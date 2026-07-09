@@ -1,0 +1,277 @@
+# 中文社区俗称 → 英文正式名映射表
+# 用途：LLM 搜索物品时，先查此表再搜 manifest
+# 来源：Bungie manifest 中文/英文对照 + 社区常用别名
+# 注意：中文名必须与 manifest 中的官方中文名一致，否则搜索不到
+# 社区别名作为别名添加，指向正确的官方中文名
+
+# ── 武器 ────────────────────────────────────────────────────────────────────
+
+weapons:
+  # 异域武器 — 官方中文名（与 manifest 一致）
+  千语: One Thousand Voices
+  伊邪那岐的重担: Izanagi's Burden
+  遗言: The Last Word
+  挽歌: The Lament
+  加拉尔号角: Gjallarhorn
+  寄生虫: Parasite
+  荆棘: Thorn
+  黑桃A: Ace of Spades
+  全面爆发: Outbreak Perfected
+  蠕虫低语: Whisper of the Worm
+  睡者之吼: Sleeper Simulant
+  烈日弹丸: Sunshot
+  土卫十三: Telesto
+  引力子长枪: Graviton Lance
+  双尾狐: Two-Tailed Fox
+  碎愿者: Wish-Ender
+  利维坦之息: Leviathan's Breath
+  死亡使者: Deathbringer
+  混乱无序: Anarchy
+  枯萎囤积: Witherhoard
+  三体坐观者: Trinity Ghoul
+  帝喾预言: Ticuu's Divination
+  帝王蝶: Le Monarque
+  异星噬菌: Xenophage
+  蒙特卡洛: Monte Carlo
+  狼王: Lord of Wolves
+  雷神: Thunderlord
+  恶意触碰: Touch of Malice
+  枯骨鳞片: Osteo Striga
+  条件终局: Conditional Finality
+  亡者传说: Dead Man's Tale
+  隼月: Hawkmoon
+  瞬变风暴: Quicksilver Storm
+  神圣裁决: Divinity
+  赴险者: Riskrunner
+  血色浪漫: Crimson
+  阿格尔的权杖: Ager's Scepter
+  故我在: Ergo Sum
+  最终警告: Final Warning
+  法定继承人: Heir Apparent
+  毁灭雕像: Ruinous Effigy
+  洛伦兹驱动器: Lorentz Driver
+  流明: Lumina
+  牵引器火炮: Tractor Cannon
+  第四骑士: The Fourth Horseman
+  米达多功能: MIDA Multi-Tool
+  糖果生意: Sweet Business
+  需求层级: Hierarchy of Needs
+  集体义务: Collective Obligation
+  深埋血脉: Buried Bloodline
+  领航员: The Navigator
+  悦耳之声: Euphony
+  杀手之牙: Slayer's Fang
+  隐秘追猎: Still Hunt
+  龙息: Dragon's Breath
+  破冰者: Ice Breaker
+
+  # 异域武器 — 社区别名（指向官方中文名）
+  伊邪那岐: 伊邪那岐的重担
+  狼头: 加拉尔号角
+  虫狙: 蠕虫低语
+  甜食: 糖果生意
+  傻瓜: 米达多功能
+  雷神: 雷霆之王
+
+  # 传说武器 — 官方中文名
+  命运悲剧: Fatebringer
+  单人合唱: Choir of One
+  岁时之巅: Yeartide Apex
+  庆典飞行: Festival Flight
+  缩影: Microcosm
+  纪念: Commemoration
+  锤头: Hammerhead
+
+  # 武器类型别名（官方中文名）
+  火箭筒: Rocket Launcher
+  冲锋枪: Submachine Gun
+  微冲: Submachine Gun
+  手炮: Hand Cannon
+  自动步枪: Auto Rifle
+  脉冲步枪: Pulse Rifle
+  侦察步枪: Scout Rifle
+  融合步枪: Fusion Rifle
+  霰弹枪: Shotgun
+  狙击步枪: Sniper Rifle
+  线性融合步枪: Linear Fusion Rifle
+  刀剑: Sword
+  机枪: Machine Gun
+  榴弹发射器: Grenade Launcher
+
+# ── 护甲 ────────────────────────────────────────────────────────────────────
+
+armor:
+  # 猎人金装 — 官方中文名（与 manifest 一致）
+  星界夜鹰: Celestial Nighthawk
+  踢踏5: St0mp-EE5
+  幸运裤: Lucky Pants
+  噬星者之灵: Star-Eater Scales
+  霜鞋: Fr0st-EE5
+  舞鞋: Radiant Dance Machines
+  光辉跳舞机: Radiant Dance Machines
+  奥菲斯钻机: Orpheus Rig
+  虫骸头冠: Wormhusk Crown
+  巨龙之影: The Dragon's Shadow
+  快速装弹松身裤: Speedloader Slacks
+  投弹手: The Bombardiers
+  双子座小丑: Gemini Jester
+  全知之眼: Omnioculus
+  失重引力子: Graviton Forfeit
+  傻瓜雷达: Knucklehead Radar
+  觅敌者: Foetracer
+  刺客风帽: Assassin's Cowl
+  凋零游侠: Blight Ranger
+  巴克里斯面具: Mask of Bakris
+  加拉诺碎片: Shards of Galanor
+  凯布利之刺: Khepri's Sting
+  幼年阿罕卡拉之脊: Young Ahamkara's Spine
+  忍野的誓言: Shinobu's Vow
+  阿斯瑞思之拥: Athrys's Embrace
+  卡利班之手: Caliban's Hand
+  复兴之握: Renewal Grasps
+  骗徒的握手: Liar's Handshake
+  第六郊狼: The Sixth Coyote
+  盘蛇苞片: Ophidia Spathe
+  雷兽的挽具: Raiju's Harness
+  雷电通流: Raiden Flux
+  矛隼胸甲: Gyrfalcon's Hauberk
+  特里同之罪: Triton Vice
+  逃逸艺术家: Getaway Artist
+  曲腹蛛的伪装: Cyrtarachne's Facade
+
+  # 猎人金装 — 社区别名（指向官方中文名）
+  天穹夜鹰: 星界夜鹰
+  忍者鞋: 踢踏5
+  噬星者: 噬星者之灵
+  噬星者之鳞: 噬星者之灵
+  食星者: 噬星者之灵
+  冰霜-EE5: 霜鞋
+  奥菲斯钻: 奥菲斯钻机
+  松身裤: 快速装弹松身裤
+
+  # 术士金装 — 官方中文名（与 manifest 一致）
+  星火协议: Starfire Protocol
+  凤凰法则: Phoenix Protocol
+  月之阵营靴: Lunafaction Boots
+  横断之步: Transversive Steps
+  汇编器战靴: Boots of the Assembler
+  地磁安定靴: Geomag Stabilizers
+  毒蛇面貌: Ophidian Aspect
+  卡恩斯坦臂章: Karnstein Armlets
+  炎阳护腕: Sunbracers
+  反转之握: Contraverse Hold
+  锇素手套: Osmiomancy Gloves
+  虚无镣铐: Nothing Manacles
+  封印阿罕卡拉护手: Sealed Ahamkara Grasps
+  阿罕卡拉之爪: Claws of Ahamkara
+  异界之眸: Eye of Another World
+  真理之容: Verity's Brow
+  奈扎雷克原罪: Nezarec's Sin
+  阿罕卡拉之颅: Skull of Dire Ahamkara
+  星云之歌: Astrocyte Verse
+  神化面纱: Apotheosis Veil
+  风暴头冠: Crown of Tempests
+  堕落者日星: Fallen Sunstar
+  纪念碑面具: Cenotaph Mask
+  先知之视: Speaker's Sight
+  神圣黎明之翼: Wings of Sacred Dawn
+  战斗和谐护肩: Mantle of Battle Harmony
+  邪冬的头盔: Felwinter's Helm
+  风暴舞者之拥: Stormdancer's Brace
+  英勇礼服: Praxic Vestment
+  炫火: Chromatic Fire
+  黎明副歌: Dawn Chorus
+  火焰润雨: Rain of Fire
+  割线纤维: Secant Filaments
+  虚荣自负: Mataiodoxía
+  恐惧弥漫: Deimosuffusion
+  蔷薇束缚: Briarbinds
+  仁心: Eunoia
+  浮游孢子: Swarmers
+  苍白苏醒: Ashen Wake
+  血红炼金术: Sanguine Alchemy
+  霜袍服装: Rime-coat Raiment
+
+  # 泰坦金装 — 官方中文名（与 manifest 一致）
+  合成感受器: Synthoceps
+  沙丘行者: Dunemarchers
+  安泰俄斯护盾: Antaeus Wards
+  独眼面具: One-Eyed Mask
+  罗蕾莱辉煌头盔: Loreley Splendor Helm
+  圣人14号的头盔: Helm of Saint-14
+  至纯光能护心甲: Heart of Inmost Light
+  圣火护心甲: Hallowfire Heart
+  陨星胸甲: Cuirass of the Falling Star
+  毁灭之牙肩甲: Doom Fang Pauldron
+  大熊狂怒: Ursa Furiosa
+  亚克兴角战役钻机: Actium War Rig
+  医疗设备: Armamentarium
+  凤巢: Phoenix Cradle
+  冰瀑衣钵: Icefall Mantle
+  凯布利角盔: Khepri's Horn
+  沉默者面具: Mask of the Quiet One
+  永恒战士: Eternal Warrior
+  据点: Stronghold
+  游隼胫甲: Peregrine Greaves
+  永劫安泰: Aeon Safe
+  白霜-Z: Hoarfrost-Z
+  火风暴臂铠: Pyrogale Gauntlets
+  点接触炮架: Point-Contact Cannon Brace
+  燃烧舞步之道: The Path of Burning Steps
+  爆炸波行者: Blastwave Striders
+  卡德马斯山脊长矛帽: Cadmus Ridge Lancecap
+  Mk.44让开: Mk. 44 Stand Asides
+  乔木典狱官: Arbor Warden
+  中止之跃: Abeyant Leap
+  力量平衡: Balance of Power
+  天赋信念: Gifted Conviction
+  危险推力: Hazardous Propulsion
+  珍贵伤痕: Precious Scars
+  难以逾越的颅骨堡垒: An Insurmountable Skullfort
+  ACD/0反馈栅: ACD/0 Feedback Fence
+  雄鹿: The Stag
+  忠诚面具: Mask of Fealty
+  坚忍克己: Stoicism
+  无知希冀: Wishful Ignorance
+  摩伊拉: Moirai
+
+  # 泰坦金装 — 社区别名（指向官方中文名）
+  圣徒14号之盔: 圣人14号的头盔
+
+  # 异域职业物品 — 官方中文名
+  唯我主义: Solipsism
+  相对主义: Relativism
+  玄铠: Melas Panoplia
+
+# ── 护甲部位 ──────────────────────────────────────────────────────────────
+
+armor_slots:
+  头盔: Helmet
+  头: Helmet
+  手甲: Gauntlets
+  手套: Gauntlets
+  手臂: Gauntlets
+  胸甲: Chest Armor
+  胸: Chest Armor
+  腿甲: Leg Armor
+  腿: Leg Armor
+  靴子: Leg Armor
+  职业护甲: Class Armor
+  职业物品: Class Armor
+  披风: Class Armor  # 猎人
+  锁链: Class Armor  # 术士
+  标记: Class Armor  # 泰坦
+
+# ── 属性 ──────────────────────────────────────────────────────────────────
+
+stats:
+  武器: Weapons
+  枪械: Weapons
+  生命: Health
+  韧性: Health
+  职业: Class
+  手雷: Discipline
+  纪律: Discipline
+  近战: Melee
+  超能: Super
+  大招: Super

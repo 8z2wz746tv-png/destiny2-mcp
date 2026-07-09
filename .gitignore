@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Virtual environment
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data / manifests (generated / downloaded)
+manifest/
+destiny_mcp/data/dim_wishlists.json
+
+# Logs
+*.log
+audit_log.jsonl
+
+# Token storage
+.destiny_mcp/

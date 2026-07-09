@@ -1,0 +1,297 @@
+# Build Import Agent 社区术语库
+# 手工维护，第一版核心术语。
+# 禁止自动从 Manifest 批量生成。
+# 参见 ADR-007: Normalizer Strategy。
+
+# ── 复合术语（职业 + 子职业组合）─────────────────────────
+# 格式：社区简称 → class + super（使用 manifest 中的英文 ID）
+# 来源：NGA / Bilibili / 贴吧 常用叫法
+compound:
+  # ── 猎人 Hunter ──
+  金枪猎:
+    class: hunter
+    super: gunslinger        # 枪手（Golden Gun）
+    description: "枪手猎人"
+  隐身猎:
+    class: hunter
+    super: nightstalker      # 夜行者（Shadowshot）
+    description: "夜行者猎人（虚空隐身）"
+  电弧猎:
+    class: hunter
+    super: arcstrider        # 弧浪行者（Arc Staff）
+    description: "电弧猎人"
+  虚空猎:
+    class: hunter
+    super: nightstalker      # 夜行者（Shadowshot）
+    description: "虚空猎人"
+  烈日猎:
+    class: hunter
+    super: gunslinger        # 枪手（Golden Gun）
+    description: "烈日猎人"
+  冰猎:
+    class: hunter
+    super: revenant          # 亡魂（Revenant）
+    description: "冰影猎人（Stasis）"
+  冰影猎:
+    class: hunter
+    super: revenant          # 亡魂（Revenant）
+    description: "冰影猎人（Stasis）"
+  丝猎:
+    class: hunter
+    super: threadrunner      # 丝线行者（Threadrunner）
+    description: "缚丝猎人（Strand）"
+  缚丝猎:
+    class: hunter
+    super: threadrunner      # 丝线行者（Threadrunner）
+    description: "缚丝猎人（Strand）"
+  棱镜猎:
+    class: hunter
+    super: golden_gun_prismatic  # 棱镜猎人（Prismatic）
+    description: "棱镜猎人（Prismatic）"
+
+  # ── 术士 Warlock ──
+  火术:
+    class: warlock
+    super: dawnblade         # 黎明之刃（Daybreak）
+    description: "烈日术士"
+  烈日术:
+    class: warlock
+    super: dawnblade         # 黎明之刃（Daybreak）
+    description: "烈日术士"
+  虚空术:
+    class: warlock
+    super: voidwalker        # 虚空行者（Voidwalker）
+    description: "虚空术士"
+  电术:
+    class: warlock
+    super: stormcaller       # 风暴使者（Stormcaller）
+    description: "电弧术士"
+  电弧术:
+    class: warlock
+    super: stormcaller       # 风暴使者（Stormcaller）
+    description: "电弧术士"
+  冰术:
+    class: warlock
+    super: shadebinder       # 缚影者（Shadebinder）
+    description: "冰影术士（Stasis）"
+  冰影术:
+    class: warlock
+    super: shadebinder       # 缚影者（Shadebinder）
+    description: "冰影术士（Stasis）"
+  丝术:
+    class: warlock
+    super: broodweaver       # 织巢者（Broodweaver）
+    description: "缚丝术士（Strand）"
+  缚丝术:
+    class: warlock
+    super: broodweaver       # 织巢者（Broodweaver）
+    description: "缚丝术士（Strand）"
+  棱镜术:
+    class: warlock
+    super: song_of_flame_prismatic  # 棱镜术士（Prismatic）
+    description: "棱镜术士（Prismatic）"
+
+  # ── 泰坦 Titan ──
+  火泰:
+    class: titan
+    super: hammer_of_sol     # 烈日之锤（Hammer of Sol）
+    description: "烈日泰坦"
+  烈日泰:
+    class: titan
+    super: hammer_of_sol     # 烈日之锤（Hammer of Sol）
+    description: "烈日泰坦"
+  虚空泰:
+    class: titan
+    super: sentinel          # 哨兵（Sentinel）
+    description: "虚空泰坦"
+  电泰:
+    class: titan
+    super: fist_of_havoc     # 浩劫之拳（Fists of Havoc）
+    description: "电弧泰坦"
+  电弧泰:
+    class: titan
+    super: fist_of_havoc     # 浩劫之拳（Fists of Havoc）
+    description: "电弧泰坦"
+  冰泰:
+    class: titan
+    super: behemoth          # 巨兽（Behemoth）
+    description: "冰影泰坦（Stasis）"
+  冰影泰:
+    class: titan
+    super: behemoth          # 巨兽（Behemoth）
+    description: "冰影泰坦（Stasis）"
+  丝泰:
+    class: titan
+    super: berserker         # 狂战士（Berserker）
+    description: "缚丝泰坦（Strand）"
+  缚丝泰:
+    class: titan
+    super: berserker         # 狂战士（Berserker）
+    description: "缚丝泰坦（Strand）"
+  棱镜泰:
+    class: titan
+    super: twilight_arsenal_prismatic  # 棱镜泰坦（Prismatic）
+    description: "棱镜泰坦（Prismatic）"
+
+# ── 直接别名 ─────────────────────────────────────────────
+# 格式：社区简称/中文名 → 官方英文名（manifest 中的 displayProperties.name）
+aliases:
+  # ── 武器类型 Weapon Types ──
+  霰弹枪: "Shotgun"                   # 霰弹枪
+  手炮: "Hand Cannon"                 # 手炮
+  步枪: "Rifle"                       # 步枪
+  冲锋枪: "Submachine Gun"            # 冲锋枪
+  自动步枪: "Auto Rifle"              # 自动步枪
+  脉冲步枪: "Pulse Rifle"             # 脉冲步枪
+  侦察步枪: "Scout Rifle"             # 侦察步枪
+  狙击枪: "Sniper Rifle"              # 狙击枪
+  火箭筒: "Rocket Launcher"           # 火箭筒
+  线性融合步枪: "Linear Fusion Rifle" # 线性融合步枪
+  融合步枪: "Fusion Rifle"            # 融合步枪
+  榴弹发射器: "Grenade Launcher"      # 榴弹发射器
+  剑: "Sword"                         # 剑
+  机枪: "Machine Gun"                 # 机枪
+  弓: "Combat Bow"                    # 战斗弓
+  微冲: "Submachine Gun"              # 冲锋枪（社区简称）
+
+  # ── 经典金装昵称 Exotic Nicknames ──
+  # 来源：NGA / Bilibili / 贴吧 常用叫法
+  # 猎人金装
+  夜鹰: "Celestial Nighthawk"         # 天穹夜鹰
+  虫狙: "Parasite"                    # 寄生虫
+  冰霜巨人: "Deterministic Chaos"     # 确定性混沌
+  风暴: "Stormchaser"                 # 追风逐暴
+  千语: "Thousand Voices"             # 千言万语
+  异星: "Witherhoard"                 # 枯萎之触（毒枪）
+  毒枪: "Witherhoard"                 # 枯萎之触
+  虚空弓: "Le Monarque"               # 虚空君主
+  三弓: "Trinity Ghoul"              # 三位一体弓（连锁弓）
+  连锁弓: "Trinity Ghoul"            # 三位一体弓
+
+  # 通用金装
+  狼头: "Gjallarhorn"                 # 加拉尔号角（Gally）
+  大G: "Gjallarhorn"                  # 加拉尔号角
+  白枪: "Whisper of the Worm"         # 蠕虫私语（大白）
+  大白: "Whisper of the Worm"         # 蠕虫私语
+  4合一: "Izanagi's Burden"           # 伊邪那岐的重担（大狙）
+  大狙: "Izanagi's Burden"            # 伊邪那岐的重担
+  沉睡者: "Sleeper Simulant"          # 沉睡模拟者（激光炮）
+  激光炮: "Sleeper Simulant"          # 沉睡模拟者
+  虫炮: "Xenophage"                   # 异星噬兽
+  电地板: "Anarchy"                   # 混乱（粘弹）
+  粘弹: "Anarchy"                     # 混乱
+  粘粘枪: "Witherhoard"               # 枯萎之触
+  神枪: "Divinity"                    # 神性（Div）
+  Div: "Divinity"                     # 神性
+  光圈: "Divinity"                    # 神性
+  电锯: "Lament"                      # 哀叹（光剑）
+  光剑: "Lament"                      # 哀叹
+  Bug枪: "Telesto"                    # 远古之触（以Bug闻名）
+  Ace: "Ace of Spades"                # 黑桃王牌（凯德的枪）
+  黑桃A: "Ace of Spades"              # 黑桃王牌
+  TLW: "Last Word"                    # 最后一词（快枪手）
+  快枪手: "Last Word"                 # 最后一词
+  荆棘: "Thorn"                       # 荆棘（毒手炮）
+  DMT: "Dead Man's Tale"              # 死神的故事（牛仔枪）
+  牛仔枪: "Dead Man's Tale"           # 死神的故事
+  毒蛇枪: "Osteo Striga"              # 骨刺
+  骨刺: "Osteo Striga"               # 骨刺
+  雷锤: "Thunderlord"                 # 雷神
+  寄生虫: "Outbreak Perfected"        # 完美爆发
+  电枪: "Riskrunner"                  # 冒险家
+
+  # ── 超能简称 Super Shortnames ──
+  # 猎人超能
+  金枪: "Golden Gun"                  # 金枪（枪手超能）
+  刀刃弹幕: "Blade Barrage"           # 刀刃弹幕（枪手超能）
+  丝线攻击: "Silkstrike"              # 丝线攻击（绞丝超能）
+  侍从: "Shadowshot"                  # 暗影之箭（夜行者超能）
+  弧浪: "Arc Staff"                   # 弧浪行者（电弧超能）
+  冰影: "Silencing Strike"            # 沉默打击（冰影超能）
+
+  # 术士超能
+  黎明之刃: "Daybreak"                # 黎明之刃（黎明使者超能）
+  混沌之触: "Chaos Reach"             # 混沌之触（风暴使者超能）
+  新星炸弹: "Nova Bomb"               # 新星炸弹（虚空行者超能）
+  霜冻之触: "Glacial Quake"           # 冰川震颤（缚影者超能）
+  针暴: "Needlestorm"                 # 针暴（织巢者超能）
+
+  # 泰坦超能
+  锤子: "Hammer of Sol"               # 烈日之锤（烈日超能）
+  盾牌: "Sentinel Shield"             # 哨兵之盾（哨兵超能）
+  浩劫: "Fists of Havoc"              # 浩劫之拳（电弧超能）
+  冰川震颤: "Glacial Quake"           # 冰川震颤（巨兽超能）
+  刃怒: "Bladefury"                   # 刃怒（狂战士超能）
+
+  # ── 子职业技能 Subclass Abilities ──
+  裂缝: "Rift"                        # 裂缝（术士职业技能）
+  闪避: "Dodge"                       # 闪避（猎人职业技能）
+  屏障: "Barricade"                   # 屏障（泰坦职业技能）
+  三段跳: "Triple Jump"               # 三段跳（猎人移动技能）
+  滑翔: "Glide"                       # 滑翔（术士移动技能）
+  冲锋: "Thruster"                    # 冲锋（泰坦移动技能）
+
+  # ── 活动类型 Activity Types ──
+  # 来源：NGA / Bilibili 常用缩写
+  GM: "Grandmaster"                   # 大宗师（日落最高难度）
+  宗师: "Grandmaster"                 # 大宗师
+  大日落: "Grandmaster Nightfall"     # 大宗师日落
+  日落: "Nightfall"                   # 日落
+  NF: "Nightfall"                     # 日落
+  试炼: "Trials of Osiris"            # 奥西里斯试炼
+  ToO: "Trials of Osiris"             # 奥西里斯试炼
+  团本: "Raid"                        # 突袭（团队副本）
+  突袭: "Raid"                        # 突袭
+  地牢: "Dungeon"                     # 地牢
+  单刷本: "Dungeon"                   # 地牢（可单刷）
+  熔炉: "Crucible"                    # 熔炉竞技场
+  PVP: "Crucible"                     # 熔炉竞技场
+  Gambit: "Gambit"                    # Gambit 模式
+  入侵模式: "Gambit"                  # Gambit 模式
+  铁旗: "Iron Banner"                # 铁旗（IB）
+  IB: "Iron Banner"                  # 铁旗
+  失落区域: "Lost Sector"            # 失落区域
+  红标: "Legend Lost Sector"          # 传说失落区域
+  金标: "Master Lost Sector"          # 大师失落区域
+  先锋打击: "Vanguard Strike"         # 先锋打击
+  英雄日落: "Heroic Nightfall"        # 英雄日落
+
+  # ── 属性名 Stat Names (Renegades) ──
+  # 属性上限为 200，超过 100 有额外收益
+  武器: "weapons"                     # 武器属性（枪械操控和换弹速度）
+  生命: "health"                      # 生命属性（生存能力和伤害抗性）
+  职业: "class_stat"                  # 职业属性（职业技能冷却）
+  手雷: "grenade"                     # 手雷属性（手雷冷却）
+  近战: "melee"                       # 近战属性（近战冷却）
+  超能: "super_stat"                  # 超能属性（大招冷却）
+
+  # ── 通用社区术语 General Slang ──
+  毕业: "God Roll"                    # 完美词条组合
+  God Roll: "God Roll"                # 完美词条组合
+  极品Roll: "God Roll"                # 完美词条组合
+  词条: "Perk"                        # 武器/护甲特性
+  模组: "Mod"                         # 模组
+  光等: "Power Level"                 # 光等级
+  光等级: "Power Level"               # 光等级
+  配装: "Build"                       # 配装
+  六维: "Six Stats"                   # 六维属性
+
+# ── 属性模式 ─────────────────────────────────────────────
+# Renegades 更新后属性上限为 200，超过 100 有额外收益
+stat_patterns:
+  双百:
+    description: "两个属性达到 200（满属性）"
+    example:
+      health: 200
+      grenade: 200
+  三百:
+    description: "三个属性达到 200（满属性）"
+    example:
+      health: 200
+      grenade: 200
+      melee: 200
+  双百五:
+    description: "两个属性达到 100（半满）"
+    example:
+      health: 100
+      grenade: 100

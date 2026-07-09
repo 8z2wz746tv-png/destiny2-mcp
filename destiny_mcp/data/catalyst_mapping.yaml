@@ -1,0 +1,10 @@
+# 手动催化剂映射表
+# 用于 manifest 中 plug set 数据不完整的武器
+# 格式: weapon_hash: [catalyst_hash1, catalyst_hash2, ...]
+
+# 狼毒 (Wolfsbane)
+1753923263:
+  - 3865920552  # 无情打击改装 (Relentless Strikes Refit)
+  - 3865920553  # 羸弱能量球改装 (Attrition Orbs Refit)
+  - 3865920554  # 子程序：~递归 (SUBROUTINE: ~RECURSION)
+  - 3865920555  # 燃烧野心改装 (Burning Ambition Refit)
