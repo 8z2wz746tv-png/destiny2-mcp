@@ -12,11 +12,11 @@ from __future__ import annotations
 import json
 import re
 from html.parser import HTMLParser
-from pathlib import Path
 
 import httpx
 from pydantic import ValidationError
 
+from ..config import resolve_resource_dir
 from ..logging_config import get_logger
 from ..utils.web_fetch import fetch_url
 from .exceptions import ExtractionError, FetchError
@@ -25,7 +25,7 @@ from .models import BuildDraft
 logger = get_logger(__name__)
 
 # Skill 文件路径
-_SKILL_DIR = Path(__file__).parent.parent.parent.parent / "skills"
+_SKILL_DIR = resolve_resource_dir("skills")
 
 
 def _load_skill(name: str) -> str:

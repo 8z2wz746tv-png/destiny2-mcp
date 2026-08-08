@@ -3,29 +3,41 @@
 from __future__ import annotations
 
 import functools
+import re
 from collections.abc import Callable
 from typing import Any
 
 from mcp.server.fastmcp import Context
 
 from .. import config
-from ..exceptions import ConfigError, DestinyMCPError
+from ..exceptions import DestinyMCPError
 from ..logging_config import get_logger
+from ._responses import error_response
 
 logger = get_logger(__name__)
 
 
-def resolve_player_name(player_name: str | None) -> str:
-    """Return the given player_name, or fall back to DESTINY_DEFAULT_PLAYER env var."""
+_CURRENT_OAUTH_PLAYER = "__destiny_current_oauth_player__"
+
+
+def resolve_player_name(*args: Any) -> str:
+    """Return an explicit player, configured default, or current OAuth player.
+
+    Some legacy tools call this as resolve_player_name(player_name), while
+    newer aggregate tools used resolve_player_name(ctx, player_name). Accepting
+    both keeps full/expert profiles compatible during the tool-layer rewrite.
+    """
+    if len(args) == 1:
+        player_name = args[0]
+    elif len(args) == 2:
+        player_name = args[1]
+    else:
+        player_name = None
+
     if player_name:
         return player_name
     default = config.DESTINY_DEFAULT_PLAYER
-    if not default:
-        raise ConfigError(
-            "No player_name provided and DESTINY_DEFAULT_PLAYER is not set. "
-            "Either pass player_name or set DESTINY_DEFAULT_PLAYER in .env."
-        )
-    return default
+    return default or _CURRENT_OAUTH_PLAYER
 
 
 def get_ctx(ctx: Context) -> dict:
@@ -47,6 +59,11 @@ def handle_tool_error(func: Callable) -> Callable:
             return await func(*args, **kwargs)
         except DestinyMCPError as e:
             logger.warning("Tool %s error: %s", func.__name__, e)
+            if func.__name__.endswith("_assistant"):
+                code = re.sub(
+                    r"(?<!^)(?=[A-Z])", "_", type(e).__name__
+                ).lower()
+                return error_response(code, str(e))
             return f"⚠️ {e}"
         except Exception:
             logger.exception("Tool %s unexpected error", func.__name__)

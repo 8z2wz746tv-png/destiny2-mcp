@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "snapshots": [
+    {
+      "weapon": {
+        "name": "庆典飞行",
+        "weapon_type": "榴弹发射器",
+        "version_label": "#2/2",
+        "status": "当前",
+        "manifest_variant": {"is_holofoil": true},
+        "release_label": "年7 第26赛季",
+        "episode": "异端",
+        "intrinsic": {
+          "name": "区域拒止框架",
+          "description": "具有点射功能的榴弹发射器。每个射弹命中时都会留下一个造成持续伤害的区域。"
+        },
+        "stats": {
+          "每分钟发射数": 72,
+          "爆炸范围": 100,
+          "弹头速度": 73,
+          "稳定性": 28,
+          "操控性": 64,
+          "填装速度": 64,
+          "弹匣": 1,
+          "辅助瞄准": 74,
+          "变焦": 13,
+          "后坐方向": 80,
+          "空中效率": 4,
+          "弹药生成": 69
+        }
+      },
+      "source": {
+        "kind": "user_screenshot",
+        "label": "用户提供截图",
+        "captured_at": "2026-07-15",
+        "snapshot_sha256": "f05b535a918927f3d9baf824e5013f804302f64fec6d9b4e754db9a036cae541",
+        "note": "人工核对截图可见值；未核实截图的第三方来源。"
+      },
+      "popular_combinations": [
+        {"perks": ["爆破专家", "羸弱能量球"], "selection_rate": 8.1},
+        {"perks": ["爆破分配器", "羸弱能量球"], "selection_rate": 8.1},
+        {"perks": ["切割", "羸弱能量球"], "selection_rate": 5.6},
+        {"perks": ["爆破分配器", "我为人人"], "selection_rate": 5.3},
+        {"perks": ["爆破分配器", "狂乱"], "selection_rate": 4.4},
+        {"perks": ["爆破分配器", "二元轨道"], "selection_rate": 3.8},
+        {"perks": ["爆破专家", "我为人人"], "selection_rate": 3.7},
+        {"perks": ["嫉妒军械库", "羸弱能量球"], "selection_rate": 3.6}
+      ],
+      "perk_columns": [
+        {
+          "slot_name": "barrel",
+          "label": "枪管 / 发射",
+          "items": [
+            {"name": "高爆弹药", "selection_rate": 20.5},
+            {"name": "密闭发射", "selection_rate": 17.2},
+            {"name": "无后坐系统", "selection_rate": 17.2},
+            {"name": "热发发射管", "selection_rate": 13.7},
+            {"name": "线性补偿装置", "selection_rate": 10.4},
+            {"name": "高速发射", "selection_rate": 13.6},
+            {"name": "智能浮动控制", "selection_rate": 7.1}
+          ]
+        },
+        {
+          "slot_name": "magazine",
+          "label": "弹匣 / 电池",
+          "items": [
+            {"name": "高速弹药", "selection_rate": 94.1},
+            {"name": "内爆弹药", "selection_rate": 5.8},
+            {"name": "感应榴弹", "selection_rate": null}
+          ]
+        },
+        {
+          "slot_name": "trait_1",
+          "label": "特性 1",
+          "items": [
+            {"name": "爆破分配器", "selection_rate": 25.8},
+            {"name": "爆破专家", "selection_rate": 21.8},
+            {"name": "已回收能量", "selection_rate": 6.9},
+            {"name": "超凡时刻", "selection_rate": 4.2},
+            {"name": "嫉妒军械库", "selection_rate": 11.9},
+            {"name": "刺客野心", "selection_rate": 11.0},
+            {"name": "切割", "selection_rate": 18.0}
+          ]
+        },
+        {
+          "slot_name": "trait_2",
+          "label": "特性 2",
+          "items": [
+            {"name": "二元轨道", "selection_rate": 11.3},
+            {"name": "狂乱", "selection_rate": 13.4},
+            {"name": "我为人人", "selection_rate": 15.8},
+            {"name": "斩首武器", "selection_rate": 9.8},
+            {"name": "羸弱能量球", "selection_rate": 31.9},
+            {"name": "幼雏", "selection_rate": 9.5},
+            {"name": "元素磨砺", "selection_rate": 8.0}
+          ]
+        },
+        {
+          "slot_name": "origin_trait",
+          "label": "起源特性",
+          "items": [
+            {"name": "梦想差事", "selection_rate": 96.2},
+            {"name": "Suros协同", "selection_rate": 3.7}
+          ]
+        }
+      ],
+      "masterworks": [
+        {"name": "填装速度", "selection_rate": 25.5},
+        {"name": "弹头速度", "selection_rate": 25.0},
+        {"name": "操控性", "selection_rate": 24.8},
+        {"name": "爆炸范围", "selection_rate": 24.5}
+      ],
+      "mods": [
+        {"name": "丰足弹药", "selection_rate": 24.3},
+        {"name": "战术", "selection_rate": 19.5},
+        {"name": "强化填装", "selection_rate": 13.3},
+        {"name": "空气动力学", "selection_rate": 8.4},
+        {"name": "快速切换枪带", "selection_rate": 7.2},
+        {"name": "强化操控性", "selection_rate": 5.9}
+      ]
+    }
+  ]
+}

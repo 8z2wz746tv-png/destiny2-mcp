@@ -13,6 +13,7 @@ class InventoryItem(BaseModel):
     item_instance_id: str = Field(description="Unique item instance ID")
     item_hash: int = Field(description="Item definition hash")
     name: str = Field(description="Item name (from manifest)")
+    name_en: str = Field(default="", description="English item name alias")
     item_type: str = Field(default="Unknown", description="Item type name (English)")
     item_type_display: str = Field(default="", description="Item type display name (Chinese, e.g. 手炮/冲锋枪)")
     power: int | None = Field(default=None, description="Attack/Defense value")

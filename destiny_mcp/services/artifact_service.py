@@ -10,6 +10,7 @@ from ..bungie_client import BungieClient
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, resolve_character_name
 from ..player_resolver import PlayerResolver
+from .account_action_lock import account_action_lock, serialized_account_action
 
 logger = get_logger(__name__)
 
@@ -24,7 +25,48 @@ class ArtifactService:
         self._bungie = bungie
         self._manifest = manifest
         self._resolver = resolver
+        self._account_action_lock = account_action_lock(bungie)
 
+    def get_seasonal_artifact(self, artifact_name: str = "") -> dict:
+        """Get seasonal artifact list or a specific artifact preview."""
+        if not artifact_name:
+            artifacts = self._manifest.get_all_artifacts()
+            return {
+                "success": True,
+                "artifacts": artifacts,
+                "message": f"找到 {len(artifacts)} 个赛季神器。",
+            }
+
+        artifact = self._manifest.get_artifact_by_name(artifact_name)
+        if not artifact:
+            return {
+                "success": False,
+                "message": f"未找到名称包含 {artifact_name!r} 的赛季神器。",
+            }
+
+        current = self._manifest.get_current_artifact()
+        return {
+            "success": True,
+            "artifact": artifact,
+            "current_artifact": current,
+            "message": f"已读取赛季神器：{artifact['name']}。",
+        }
+
+    def get_artifact_mod_info(self, mod_hash: int) -> dict:
+        """Get details for a seasonal artifact mod by hash."""
+        mod_info = self._manifest.get_artifact_mod_details(mod_hash)
+        if not mod_info:
+            return {
+                "success": False,
+                "message": f"未找到 hash={mod_hash} 的神器模组。",
+            }
+        return {
+            "success": True,
+            "artifact_mod": mod_info,
+            "message": f"已读取神器模组：{mod_info['name']}。",
+        }
+
+    @serialized_account_action
     async def equip_artifact_mod(
         self,
         player_name: str,

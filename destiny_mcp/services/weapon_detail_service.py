@@ -113,6 +113,10 @@ class WeaponDetailService:
         sandbox = self._manifest.get_sandbox_perk_description(plug_hash)
         if sandbox:
             desc = sandbox.get("description", "")
+        if not desc:
+            item_description = self._manifest.get_item_description(plug_hash)
+            if isinstance(item_description, str):
+                desc = item_description
 
         return WeaponSocketInfo(
             slot_label=label,
@@ -120,6 +124,7 @@ class WeaponDetailService:
             plug_hash=plug_hash,
             plug_category=cat_id,
             description=desc,
+            icon_url=str(info.get("icon") or "") if info else "",
         )
 
     def _build_weapon_stats(self, instance_stats: dict) -> WeaponStats:

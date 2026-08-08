@@ -35,7 +35,10 @@ class WeeklyAnalysisService:
 
         warnings: list[str] = []
         if len(milestones) > item_limit:
-            warnings.append(f"仅返回前 {item_limit} 个重点活动，完整列表请用 get_weekly_reset。")
+            warnings.append(
+                f"仅返回前 {item_limit} 个重点活动，"
+                "完整列表请用 world_assistant(intent=\"weekly_full\")。"
+            )
 
         reset_label = weekly.reset_time or "未知"
         summary = (
@@ -55,7 +58,8 @@ class WeeklyAnalysisService:
             "next_actions": [
                 {
                     "label": "查看完整周常明细",
-                    "tool": "get_weekly_reset",
+                    "tool": "world_assistant",
+                    "arguments": {"intent": "weekly_full"},
                 }
             ],
         }

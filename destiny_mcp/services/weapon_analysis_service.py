@@ -123,7 +123,12 @@ class WeaponAnalysisService:
             warnings.append("未提供 Bungie 玩家名，已跳过账号内副本对比。")
             next_actions.append({
                 "label": "提供 player_name 后重新分析",
-                "tool": "analyze_weapon",
+                "tool": "weapon_assistant",
+                "arguments": {
+                    "intent": "analyze",
+                    "weapon_name": weapon_name,
+                    "include_inventory": True,
+                },
             })
             return None
 
@@ -139,7 +144,8 @@ class WeaponAnalysisService:
             warnings.append("账号内未找到这把武器，已保留静态信息和 perk 池结果。")
             next_actions.append({
                 "label": "缩短武器名或检查是否在其他账号",
-                "tool": "search_items",
+                "tool": "inventory_assistant",
+                "arguments": {"intent": "search", "item_name": weapon_name},
             })
             return None
         except DestinyMCPError as exc:
@@ -152,7 +158,8 @@ class WeaponAnalysisService:
             warnings.append(f"账号副本对比失败：{exc}")
             next_actions.append({
                 "label": "稍后重试账号副本对比",
-                "tool": "compare_weapon_instances",
+                "tool": "weapon_assistant",
+                "arguments": {"intent": "compare", "weapon_name": weapon_name},
             })
             return None
 

@@ -52,7 +52,7 @@ async def equip_item(
 
     重要规则：
     - 命运2中，每个角色同时只能装备1件异域（金色）护甲。如果目标角色已有异域护甲，再装备异域护甲会失败。
-    - 武器没有此限制（可以同时装备3把异域武器）。
+    - 每个角色同时只能装备1把异域（金色）武器。
 
     Args:
         player_name: Bungie 名称。不填则使用默认玩家。
@@ -63,6 +63,124 @@ async def equip_item(
     svc = get_ctx(ctx)
     return await svc['transfer_svc'].equip_item(
         player_name, item_instance_id, character
+    )
+
+
+@mcp.tool()
+@handle_tool_error
+async def equip_items(
+    player_name: str | None = None,
+    item_instance_ids: list[str] | None = None,
+    character: str = "",
+    ctx: Context = None,
+) -> dict:
+    """批量装备多件物品到同一个角色，使用 Bungie 官方 EquipItems 原子接口。
+
+    何时使用：用户已经明确要同时换多件装备，例如"同时装备这三把武器"。
+    何时跳过：物品还在仓库或其他角色上，先用 move_item 转到目标角色。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家/当前 OAuth 玩家。
+        item_instance_ids: 要装备的物品实例 ID 列表。
+        character: 目标角色（hunter/warlock/titan，或中文）。
+    """
+    if not item_instance_ids:
+        return {"success": False, "message": "必须提供 item_instance_ids。"}
+    if not character:
+        return {"success": False, "message": "必须提供 character。"}
+
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    return await svc['transfer_svc'].equip_items(
+        player_name, item_instance_ids, character
+    )
+
+
+@mcp.tool()
+@handle_tool_error
+async def pull_from_postmaster(
+    player_name: str | None = None,
+    item_instance_id: str = "",
+    character: str | None = None,
+    ctx: Context = None,
+) -> dict:
+    """从邮政官取回指定物品。
+
+    何时使用：用户说"把邮政官里的金球/这件装备拉出来"，并且已经有 itemInstanceId。
+    何时跳过：普通仓库/角色背包物品移动，用 move_item 或 transfer_item。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家/当前 OAuth 玩家。
+        item_instance_id: 邮政官物品实例 ID。
+        character: 可选，指定取回到哪个角色；不填则使用物品所属角色。
+    """
+    if not item_instance_id:
+        return {"success": False, "message": "必须提供 item_instance_id。"}
+
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    return await svc['transfer_svc'].pull_from_postmaster(
+        player_name, item_instance_id, character
+    )
+
+
+@mcp.tool()
+@handle_tool_error
+async def set_item_lock_state(
+    player_name: str | None = None,
+    item_instance_id: str = "",
+    locked: bool = True,
+    character: str | None = None,
+    ctx: Context = None,
+) -> dict:
+    """锁定或解锁一件装备。
+
+    何时使用：用户明确要求"锁上这把好 roll"、"解锁这件装备"。
+    何时跳过：只是分析装备好坏时，不要自动锁定，先给建议。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家/当前 OAuth 玩家。
+        item_instance_id: 物品实例 ID。
+        locked: true=锁定，false=解锁。
+        character: 可选。仓库物品可不填，工具会用任一角色满足 Bungie 请求字段。
+    """
+    if not item_instance_id:
+        return {"success": False, "message": "必须提供 item_instance_id。"}
+
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    return await svc['transfer_svc'].set_item_lock_state(
+        player_name, item_instance_id, locked, character
+    )
+
+
+@mcp.tool()
+@handle_tool_error
+async def set_quest_tracked_state(
+    player_name: str | None = None,
+    item_instance_id: str = "",
+    tracked: bool = True,
+    character: str | None = None,
+    ctx: Context = None,
+) -> dict:
+    """追踪或取消追踪一个任务/悬赏物品。
+
+    何时使用：用户明确要求"追踪这个任务"、"取消追踪这个悬赏"。
+    何时跳过：只想查看任务信息时不要自动修改追踪状态。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家/当前 OAuth 玩家。
+        item_instance_id: 任务/悬赏实例 ID。
+        tracked: true=追踪，false=取消追踪。
+        character: 可选，任务所在角色；不填则根据物品位置推断。
+    """
+    if not item_instance_id:
+        return {"success": False, "message": "必须提供 item_instance_id。"}
+
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    return await svc['transfer_svc'].set_quest_tracked_state(
+        player_name, item_instance_id, tracked, character
     )
 
 

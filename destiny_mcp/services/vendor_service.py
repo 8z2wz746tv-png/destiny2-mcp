@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from ..bungie_client import BungieClient
+from ..exceptions import CharacterNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..models import (
@@ -156,6 +157,17 @@ def _vendor_failure_strings(
     return fallback
 
 
+def _vendor_socket_data(item_components: object) -> dict | None:
+    """Return live socket records from a vendor component payload."""
+    if not isinstance(item_components, dict):
+        return None
+    sockets = item_components.get("sockets")
+    if not isinstance(sockets, dict):
+        return None
+    data = sockets.get("data")
+    return data if isinstance(data, dict) else None
+
+
 class VendorService:
     """Operations for querying vendor inventory."""
 
@@ -171,11 +183,57 @@ class VendorService:
         self._resolver = resolver
         self._perk_svc = perk_svc
 
+    def _sale_items_include_weapon(self, sale_items: object) -> bool:
+        if not isinstance(sale_items, dict):
+            return False
+        return any(
+            (self._manifest.get_item_info(item.get("itemHash", 0)) or {}).get(
+                "itemType"
+            ) == 3
+            for item in sale_items.values()
+            if isinstance(item, dict)
+        )
+
+    async def _resolve_vendor_character(
+        self,
+        membership_id: str,
+        membership_type: int,
+        character: str,
+    ) -> tuple[str, str]:
+        """Resolve an explicit character or choose the most recently played one."""
+        if str(character or "").strip():
+            resolved = str(character).strip()
+            return resolved, await self._resolver.resolve_character_id(
+                membership_id, membership_type, resolved
+            )
+
+        profile = await self._bungie.get_profile(membership_id, membership_type, [200])
+        chars = profile.get("characters", {}).get("data", {})
+        if not isinstance(chars, dict) or not chars:
+            raise CharacterNotFoundError("可用角色")
+        candidates = [
+            (str(character_id), character_data)
+            for character_id, character_data in chars.items()
+            if isinstance(character_data, dict)
+        ]
+        if not candidates:
+            raise CharacterNotFoundError("可用角色")
+        character_id, character_data = max(
+            candidates,
+            key=lambda candidate: (
+                str(candidate[1].get("dateLastPlayed") or ""),
+                candidate[0],
+            ),
+        )
+        return class_type_name(int(character_data.get("classType", -1))), character_id
+
     async def get_vendor_inventory(
         self,
         player_name: str,
         character: str,
         vendor_name: str = "",
+        *,
+        compact: bool = True,
     ) -> VendorInventoryResponse:
         """Get vendor inventory for a character.
 
@@ -194,16 +252,23 @@ class VendorService:
         p = await self._resolver.resolve_player(player_name)
         mid = p["membership_id"]
         mtype = p["membership_type"]
-        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
+        character, char_id = await self._resolve_vendor_character(mid, mtype, character)
 
         # Determine which vendors to fetch
         filter_hashes: list[int] | None = None
         if vendor_name:
             q = vendor_name.strip().lower()
             for key, h in VENDOR_HASHES.items():
-                if q in key.lower():
+                if q == key.lower():
                     filter_hashes = [h]
                     break
+            if filter_hashes is None:
+                logger.warning("Unknown vendor requested: %s", vendor_name)
+                return VendorInventoryResponse(
+                    player_name=player_name,
+                    character=class_type_name(resolve_character_name(character)),
+                    warnings=[f"未识别商人“{vendor_name}”，本次未查询任何商品。"],
+                )
 
         # Fetch vendors from API
         raw = await self._bungie.fetch_vendors(mid, mtype, char_id)
@@ -211,12 +276,14 @@ class VendorService:
         # Parse response
         vendors_data = raw.get("vendors", {}).get("data", {})
         sales_data = raw.get("sales", {}).get("data", {})
+        item_components = raw.get("itemComponents", {})
         response_failure_strings = raw.get("failureStrings", [])
 
         results: list[VendorInfo] = []
+        warnings: list[str] = []
 
         # Client-side filter: only process requested vendor(s)
-        allowed_hashes = set(filter_hashes) if filter_hashes else None
+        allowed_hashes: set[int] = set(filter_hashes or [])
 
         # If a single main vendor was requested, also include matching sub-vendors
         if filter_hashes and len(filter_hashes) == 1:
@@ -263,6 +330,53 @@ class VendorService:
                         allowed_hashes.add(vh)
                         logger.info("Sub-vendor matched: %s", vh)
 
+        if vendor_name:
+            for vendor_hash_str in vendors_data:
+                vendor_hash = int(vendor_hash_str)
+                if allowed_hashes and vendor_hash not in allowed_hashes:
+                    continue
+                vendor_sales = sales_data.get(vendor_hash_str, {}).get("saleItems", {})
+                if not self._sale_items_include_weapon(vendor_sales):
+                    continue
+                existing = (
+                    item_components.get(vendor_hash_str)
+                    if isinstance(item_components, dict)
+                    else None
+                )
+                if _vendor_socket_data(existing):
+                    continue
+                try:
+                    detail = await self._bungie.fetch_vendor_components(
+                        mid, mtype, char_id, vendor_hash
+                    )
+                except Exception as exc:
+                    logger.warning(
+                        "GetVendor components failed for vendor=%s: %s",
+                        vendor_hash,
+                        exc,
+                    )
+                    warnings.append(
+                        f"商人 {vendor_hash} 的实际 Perk 组件读取失败，已省略 Perk。"
+                    )
+                    continue
+                components = detail.get("itemComponents") if isinstance(detail, dict) else None
+                if _vendor_socket_data(components) is None:
+                    warnings.append(
+                        f"商人 {vendor_hash} 未返回可核对的实际 socket，已省略 Perk。"
+                    )
+                    continue
+                if not isinstance(item_components, dict):
+                    item_components = {}
+                item_components[vendor_hash_str] = components
+        elif any(
+            self._sale_items_include_weapon(sales.get("saleItems"))
+            for sales in sales_data.values()
+            if isinstance(sales, dict)
+        ):
+            warnings.append(
+                "未指定商人时不批量请求所有单商人详情；缺失的实际 Perk 已省略。"
+            )
+
         for vendor_hash_str, vendor_data in vendors_data.items():
             vendor_hash = int(vendor_hash_str)
             if allowed_hashes and vendor_hash not in allowed_hashes:
@@ -289,8 +403,18 @@ class VendorService:
             sale_items: list[VendorSaleItem] = []
             vendor_sales = sales_data.get(vendor_hash_str, {})
             categories = vendor_sales.get("saleItems", {})
+            vendor_item_components: object = {}
+            if isinstance(item_components, dict):
+                vendor_item_components = (
+                    item_components.get(vendor_hash_str)
+                    or item_components.get(vendor_hash)
+                    or {}
+                )
 
             for item_index_str, sale_item in categories.items():
+                vendor_item_index = sale_item.get("vendorItemIndex")
+                if not isinstance(vendor_item_index, int):
+                    vendor_item_index = int(item_index_str)
                 item_hash = sale_item.get("itemHash", 0)
                 item_info = self._manifest.get_item_info(item_hash)
                 item_name = self._manifest.get_item_name(item_hash)
@@ -320,10 +444,20 @@ class VendorService:
                 augments = sale_item.get("augments", 0)
                 owned = bool(augments & AUGMENTS_OWNED)
 
-                # Perks from manifest socketEntries (vendor items have no itemComponents)
+                # Only live vendor socket data describes the actual sale roll.
                 perks: list[PerkInfo] | None = None
                 if item_info and item_info.get("itemType") == 3:  # Weapon
-                    perks = self._extract_perks_from_manifest(item_hash)
+                    perks = self._extract_perks_from_vendor_components(
+                        item_hash,
+                        vendor_item_index,
+                        vendor_item_components,
+                    )
+                    if perks is None:
+                        warning = (
+                            f"商品“{item_name}”未返回可核对的实际 socket，已省略 Perk。"
+                        )
+                        if warning not in warnings:
+                            warnings.append(warning)
 
                 tier_num = (item_info or {}).get("tier", 0)
                 tier = {5: "传说", 6: "异域"}.get(tier_num, "")
@@ -332,7 +466,7 @@ class VendorService:
                 icon_url = (item_info or {}).get("icon", "")
 
                 sale_items.append(VendorSaleItem(
-                    vendor_item_index=int(item_index_str),
+                    vendor_item_index=vendor_item_index,
                     item_hash=item_hash,
                     name=item_name,
                     item_type=(item_info or {}).get("itemTypeNameDisplay", "") or (item_info or {}).get("itemTypeName", ""),
@@ -368,39 +502,39 @@ class VendorService:
                 resolve_character_name(character)
             ),
             vendors=results,
+            warnings=warnings,
         )
-        return self._compact_response(response)
+        return self._compact_response(response) if compact else response
 
-    def _extract_perks_from_manifest(self, item_hash: int) -> list[PerkInfo]:
-        """Extract weapon perks from manifest socketEntries + plugSets.
+    def _extract_perks_from_vendor_components(
+        self,
+        item_hash: int,
+        vendor_item_index: int,
+        item_components: object,
+    ) -> list[PerkInfo] | None:
+        """Read actual perk plugs from a live vendor sale item."""
+        sockets_data = _vendor_socket_data(item_components)
+        if sockets_data is None:
+            return None
+        socket_component = sockets_data.get(str(vendor_item_index))
+        if socket_component is None:
+            socket_component = sockets_data.get(vendor_item_index)
+        if not isinstance(socket_component, dict):
+            return None
+        socket_states = socket_component.get("sockets")
+        if not isinstance(socket_states, list):
+            return None
 
-        Vendor items don't have itemComponents (they're templates, not instances).
-        We look up the item's socketEntries, then for each socket with a
-        reusablePlugSetHash, we list the available perks from the plug set.
-        """
-        item_def = self._manifest.get_item_definition(item_hash)
-        if not item_def:
-            logger.debug("No item definition for hash %d, skipping perk extraction", item_hash)
-            return []
-
-        socket_entries = item_def.get("sockets", {}).get("socketEntries", [])
         perks: list[PerkInfo] = []
-
-        for entry in socket_entries:
-            # Try singleInitialPlugHash first (fixed perk)
-            plug_hash = entry.get("singleInitialPlugHash", 0)
-
-            # If no fixed perk, try reusablePlugSetHash (random roll pool)
-            plug_set_hash = entry.get("reusablePlugSetHash", 0)
-            if not plug_hash and plug_set_hash:
-                # Get first perk from plug set as representative
-                plug_set = self._manifest.get_definition("DestinyPlugSetDefinition", plug_set_hash)
-                if plug_set:
-                    plug_items = plug_set.get("reusablePlugItems", [])
-                    if plug_items:
-                        plug_hash = plug_items[0].get("plugItemHash", 0)
-
-            if not plug_hash:
+        for socket_state in socket_states:
+            if not isinstance(socket_state, dict):
+                continue
+            plug_hash = socket_state.get("plugHash")
+            if (
+                not isinstance(plug_hash, int)
+                or isinstance(plug_hash, bool)
+                or plug_hash <= 0
+            ):
                 continue
 
             # Skip intrinsic traits, trackers, shaders, mods
@@ -414,7 +548,9 @@ class VendorService:
                 logger.debug("No item info for plug hash %d, skipping", plug_hash)
                 continue
 
-            name = info.get("name", f"#{plug_hash}")
+            name = str(info.get("name") or "").strip()
+            if not name:
+                continue
             desc = ""
             sandbox = self._manifest.get_sandbox_perk_description(plug_hash)
             if sandbox:
@@ -425,6 +561,7 @@ class VendorService:
                 name=name,
                 description=desc,
                 plug_category=cat_id,
+                icon_url=info.get("icon", ""),
             )
 
             # Annotate god roll if wish list service available

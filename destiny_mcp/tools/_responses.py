@@ -45,3 +45,16 @@ def error_response(
         "next_actions": next_actions or [],
         "warnings": warnings or [],
     }
+
+
+def confirmation_required_response(
+    intent: str,
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    """Return the standard two-step confirmation response for account writes."""
+    return error_response(
+        "confirmation_required",
+        f"{intent} 会修改账号状态。请确认后用 confirmed=true 重新调用。",
+        recoverable=True,
+        candidates=[payload],
+    )

@@ -14,11 +14,19 @@ Workflow:
 
 from __future__ import annotations
 
-import asyncio
+import hashlib
+import json
+import secrets
+import time
+from collections import OrderedDict
+from difflib import SequenceMatcher
+from typing import Literal
+
 from ..build import solver as _solver
 from ..build.analyzer import analyze
 from ..build.constants import MAIN_STAT_HASHES, STAT_NAMES, SUBCLASS_BONUSES
 from ..build.constraints import parse as _parse_constraints
+from ..build.farm_target import find_farm_targets
 from ..build.models import (
     BuildAnalysis,
     BuildCandidate,
@@ -28,12 +36,98 @@ from ..build.models import (
 )
 from ..build.scorer import score as _score
 from ..bungie_client import BungieClient
-from ..exceptions import ItemNotFoundError, TransferError
+from ..build_import.models import CanonicalBuild
+from ..exceptions import BuildValidationError
 from ..logging_config import get_logger
-from ..manifest import ManifestManager
+from ..manifest import ManifestManager, class_type_name, resolve_character_name
+from ..models import Loadout, LoadoutItem, LoadoutSubclassConfig
 from ..player_resolver import PlayerResolver
+from .account_action_lock import account_action_lock, serialized_account_action
+from .loadout_equipment_service import LoadoutEquipmentService
 
 logger = get_logger(__name__)
+
+
+_LOADOUT_SLOT_NAMES = {
+    "helmets": "helmet",
+    "helmet": "helmet",
+    "gauntlets": "gauntlets",
+    "chests": "chest",
+    "chest": "chest",
+    "legs": "legs",
+    "class_items": "class_item",
+    "class_item": "class_item",
+}
+_EXPECTED_ARMOR_SLOTS = {"helmet", "gauntlets", "chest", "legs", "class_item"}
+_MAX_BUILD_CANDIDATES = 200
+_BUILD_CANDIDATE_TTL_SECONDS = 10 * 60
+
+
+def _snapshot_version(snapshot) -> str:
+    """Return a deterministic version for the armor state used by the solver."""
+    rows = []
+    for collection in (
+        snapshot.helmets,
+        snapshot.gauntlets,
+        snapshot.chests,
+        snapshot.legs,
+        snapshot.class_items,
+    ):
+        for armor in collection:
+            rows.append({
+                "instance_id": armor.item_instance_id,
+                "item_hash": armor.item_hash,
+                "slot": armor.slot,
+                "stats": armor.stats.model_dump(),
+                "energy_capacity": armor.energy_capacity,
+                "source_location": getattr(armor, "source_location", ""),
+                "source_character_id": getattr(armor, "source_character_id", ""),
+                "is_equipped": getattr(armor, "is_equipped", False),
+            })
+    mod_definitions = sorted(
+        (
+            definition.model_dump()
+            for definition in getattr(snapshot, "stat_mod_definitions", [])
+        ),
+        key=lambda definition: definition["hash"],
+    )
+    payload = json.dumps(
+        {
+            "armor": sorted(rows, key=lambda row: row["instance_id"]),
+            "stat_mod_definitions": mod_definitions,
+        },
+        ensure_ascii=True,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _canonical_subclass(build: CanonicalBuild) -> LoadoutSubclassConfig | None:
+    values = {
+        "subclass_item_hash": build.subclass_item_hash or 0,
+        "subclass_instance_id": build.subclass_instance_id,
+        "super_hash": build.super_hash or 0,
+        "grenade_hash": build.grenade_hash or 0,
+        "melee_hash": build.melee_hash or 0,
+        "class_ability_hash": build.class_ability_hash or 0,
+        "movement_hash": build.movement_hash or 0,
+        "aspect_hashes": build.aspect_hashes,
+        "fragment_hashes": build.fragment_hashes,
+        "plug_sockets": build.subclass_plug_sockets,
+    }
+    if not any([
+        values["super_hash"],
+        values["grenade_hash"],
+        values["melee_hash"],
+        values["class_ability_hash"],
+        values["movement_hash"],
+        values["aspect_hashes"],
+        values["fragment_hashes"],
+        values["plug_sockets"],
+    ]):
+        return None
+    return LoadoutSubclassConfig(**values)
 
 
 class BuildService:
@@ -47,22 +141,56 @@ class BuildService:
         self._bungie = bungie
         self._manifest = manifest
         self._resolver = resolver
+        self._account_action_lock = account_action_lock(bungie)
         from .inventory_service import InventoryService
-        from .transfer_service import TransferService
 
         self._inventory = InventoryService(bungie, manifest, resolver)
-        self._transfer = TransferService(bungie, manifest, resolver)
+        self._equipment = LoadoutEquipmentService(bungie, manifest, resolver)
+        self._build_candidates: OrderedDict[str, CanonicalBuild] = OrderedDict()
+        self._build_candidate_issued_at: dict[str, float] = {}
+        self._build_candidate_players: dict[str, str] = {}
+
+    def _evict_expired_build_candidates(self, now: float) -> None:
+        """Drop expired or incomplete one-time execution candidates."""
+        for execution_id, issued_at in tuple(self._build_candidate_issued_at.items()):
+            if now - issued_at >= _BUILD_CANDIDATE_TTL_SECONDS:
+                self._build_candidate_issued_at.pop(execution_id, None)
+                self._build_candidate_players.pop(execution_id, None)
+                self._build_candidates.pop(execution_id, None)
+        for execution_id in tuple(self._build_candidates):
+            if execution_id not in self._build_candidate_issued_at:
+                self._build_candidate_players.pop(execution_id, None)
+                self._build_candidates.pop(execution_id, None)
+
+    def _register_build_candidate(
+        self,
+        build: CanonicalBuild,
+        player_name: str = "",
+    ) -> None:
+        """Store one exact build for a short, one-time execution window."""
+        if not build.execution_id:
+            return
+        now = time.monotonic()
+        self._evict_expired_build_candidates(now)
+        self._build_candidates[build.execution_id] = build.model_copy(deep=True)
+        self._build_candidates.move_to_end(build.execution_id)
+        self._build_candidate_issued_at[build.execution_id] = now
+        self._build_candidate_players[build.execution_id] = player_name.casefold()
+        while len(self._build_candidates) > _MAX_BUILD_CANDIDATES:
+            execution_id, _ = self._build_candidates.popitem(last=False)
+            self._build_candidate_issued_at.pop(execution_id, None)
+            self._build_candidate_players.pop(execution_id, None)
 
     async def _get_subclass_and_fragment_stats(
         self, player_name: str, character_class: str | None = None
-    ) -> tuple[list[int], list[int]]:
+    ) -> tuple[list[int], list[int], LoadoutSubclassConfig | None]:
         """Get subclass and fragment stat bonuses for the player's equipped subclass.
 
         Args:
             player_name: Bungie name.
             character_class: Target class (hunter/warlock/titan). If None, uses first found.
 
-        Returns (subclass_stats, fragment_stats) as vectors in STAT_NAMES order.
+        Returns stat vectors plus the exact equipped subclass configuration.
         """
         from ..manifest import resolve_character_name, class_type_name
 
@@ -105,7 +233,7 @@ class BuildService:
                 break
 
         if not subclass_inst_id:
-            return [0] * 6, [0] * 6
+            return [0] * 6, [0] * 6, None
 
         # Read socket data for the subclass
         sockets_data = sockets_map.get(subclass_inst_id, {}).get("sockets", [])
@@ -139,7 +267,10 @@ class BuildService:
             dict(zip(STAT_NAMES, subclass_vector)),
             dict(zip(STAT_NAMES, fragment_vector)),
         )
-        return subclass_vector, fragment_vector
+        subclass_config = self._equipment.read_subclass_config(
+            subclass_inst_id, subclass_hash, sockets_map
+        )
+        return subclass_vector, fragment_vector, subclass_config
 
     # ── Fragment lookup by name ──────────────────────────────────────
 
@@ -176,15 +307,187 @@ class BuildService:
                     if idx is not None and value != 0:
                         vector[idx] += value
                         frag_stats[STAT_NAMES[idx]] = value
-                if frag_stats:
-                    found = True
-                    details.append({"name": r["name"], "stats": frag_stats})
-                    logger.info("Fragment '%s' (hash=%d): %s", r["name"], h, frag_stats)
-                    break  # Take first match with stats
+                found = True
+                details.append({"name": r["name"], "hash": h, "stats": frag_stats})
+                logger.info("Fragment '%s' (hash=%d): %s", r["name"], h, frag_stats)
+                break
             if not found:
                 logger.warning("Fragment '%s': no stat bonuses found in manifest", name)
                 details.append({"name": name, "stats": {}, "warning": "未找到"})
         return vector, details
+
+    def _replace_fragment_config(
+        self,
+        current: LoadoutSubclassConfig | None,
+        fragment_hashes: list[int],
+    ) -> LoadoutSubclassConfig:
+        """Replace a complete fragment set while preserving exact socket indices."""
+        if current is None or not current.subclass_item_hash:
+            raise BuildValidationError("无法读取当前子职业，不能安全应用碎片。")
+        old_fragment_hashes = set(current.fragment_hashes)
+        fragment_indices = sorted(
+            index
+            for index, plug_hash in current.plug_sockets.items()
+            if plug_hash in old_fragment_hashes
+        )
+        if len(fragment_hashes) != len(fragment_indices):
+            raise BuildValidationError(
+                "必须提供完整碎片配置："
+                f"当前子职业需要 {len(fragment_indices)} 个，收到 {len(fragment_hashes)} 个。"
+            )
+
+        subclass_definition = self._manifest.get_item_definition(
+            current.subclass_item_hash
+        ) or {}
+        socket_entries = (subclass_definition.get("sockets") or {}).get(
+            "socketEntries", []
+        )
+        updated_sockets = dict(current.plug_sockets)
+        for socket_index, plug_hash in zip(fragment_indices, fragment_hashes):
+            if socket_index >= len(socket_entries):
+                raise BuildValidationError("子职业碎片插槽定义已变化，请刷新 Manifest。")
+            entry = socket_entries[socket_index]
+            accepted = entry.get("singleInitialItemHash", 0) == plug_hash
+            for plug_set_hash in {
+                entry.get("reusablePlugSetHash", 0),
+                entry.get("randomizedPlugSetHash", 0),
+            }:
+                if not plug_set_hash:
+                    continue
+                plug_set = self._manifest.get_definition(
+                    "DestinyPlugSetDefinition", plug_set_hash
+                ) or {}
+                if any(
+                    item.get("plugItemHash", 0) == plug_hash
+                    for item in plug_set.get("reusablePlugItems", [])
+                ):
+                    accepted = True
+                    break
+            if not accepted:
+                raise BuildValidationError(
+                    f"碎片 {plug_hash} 与当前子职业插槽 {socket_index} 不兼容。"
+                )
+            updated_sockets[socket_index] = plug_hash
+
+        return current.model_copy(update={
+            "fragment_hashes": fragment_hashes,
+            "plug_sockets": updated_sockets,
+        })
+
+    def resolve_exotic_armor(
+        self,
+        exotic_name: str,
+        character_class: str,
+        limit: int = 5,
+    ) -> dict:
+        """Resolve an exotic armor name without auto-selecting fuzzy hits."""
+        query = exotic_name.strip()
+        if not query:
+            return {"status": "not_found", "query": query, "matches": []}
+
+        class_type = resolve_character_name(character_class)
+
+        def normalize(value: str) -> str:
+            return " ".join(value.casefold().split())
+
+        query_key = normalize(query)
+
+        def public_match(candidate: dict) -> dict:
+            names = {
+                normalize(str(candidate.get("name", ""))),
+                normalize(str(candidate.get("nameEn", ""))),
+            }
+            if query_key in names:
+                raw_score = 1.0
+            else:
+                raw_score = candidate.get("match_score")
+                if raw_score is None:
+                    raw_score = max(
+                        (
+                            SequenceMatcher(None, query_key, name).ratio()
+                            for name in names
+                            if name
+                        ),
+                        default=0.0,
+                    )
+            return {
+                "name": candidate.get("name", ""),
+                "nameEn": candidate.get("nameEn", ""),
+                "item_hash": candidate.get("itemHash", 0),
+                "icon_url": candidate.get("icon", ""),
+                "class_type": candidate.get("classType", -1),
+                "score": round(float(raw_score), 3),
+            }
+
+        def unique_candidates(candidates: list[dict]) -> list[dict]:
+            filtered = [
+                candidate
+                for candidate in candidates
+                if candidate.get("itemType") == 2
+                and candidate.get("tier") == 6
+                and candidate.get("classType", -1) in {-1, class_type}
+            ]
+            unique: list[dict] = []
+            seen_names: set[tuple[str, str, int]] = set()
+            for candidate in filtered:
+                identity = (
+                    normalize(str(candidate.get("name", ""))),
+                    normalize(str(candidate.get("nameEn", ""))),
+                    int(candidate.get("classType", -1)),
+                )
+                if identity in seen_names:
+                    continue
+                seen_names.add(identity)
+                unique.append(candidate)
+                if len(unique) >= max(1, limit):
+                    break
+            return unique
+
+        candidates = unique_candidates(
+            self._manifest.search(query, limit=max(20, limit * 10))
+        )
+        exact = next(
+            (
+                candidate
+                for candidate in candidates
+                if query_key
+                in {
+                    normalize(str(candidate.get("name", ""))),
+                    normalize(str(candidate.get("nameEn", ""))),
+                }
+            ),
+            None,
+        )
+        if exact is not None:
+            return {
+                "status": "exact",
+                "query": query,
+                "canonical_name": exact.get("name", query),
+                "matches": [public_match(exact)],
+            }
+        if candidates:
+            return {
+                "status": "confirmation_required",
+                "query": query,
+                "matches": [public_match(candidate) for candidate in candidates],
+            }
+
+        candidates = unique_candidates(
+            self._manifest.search_fuzzy(
+                query,
+                limit=max(20, limit * 10),
+                item_type=2,
+                tier=6,
+                class_type=class_type,
+            )
+        )
+        if candidates:
+            return {
+                "status": "confirmation_required",
+                "query": query,
+                "matches": [public_match(candidate) for candidate in candidates],
+            }
+        return {"status": "not_found", "query": query, "matches": []}
 
     # ── Public API ────────────────────────────────────────────────────
 
@@ -206,6 +509,9 @@ class BuildService:
             Top-K BuildResults sorted by score (best first). Empty list
             if no build satisfies the constraints.
         """
+        if not request.character_class:
+            raise BuildValidationError("必须指定 hunter、warlock 或 titan。")
+
         logger.info(
             "find_build: player=%s exotic=%s targets=(wep=%s hp=%s cls=%s gre=%s mel=%s sup=%s)",
             player_name,
@@ -220,18 +526,40 @@ class BuildService:
 
         # Step 1: Fetch armor data (filtered by character class)
         snapshot = await self._inventory.get_armor_snapshot(player_name, request.character_class)
+        snapshot_version = _snapshot_version(snapshot)
         logger.info("Snapshot: %d pieces across 5 slots", snapshot.total_pieces)
 
         # Step 2: Parse constraints + subclass/fragment stats
         parsed = _parse_constraints(request, self._manifest)
         bonus_vector = [0] * 6
         fragment_details: list[dict] = []
+        execution_subclass: LoadoutSubclassConfig | None = None
         if request.fragment_names:
             # User specified fragments by name — look up their stats from manifest
             fragment_stats, fragment_details = self._get_fragment_stats_by_names(request.fragment_names)
+            missing_fragments = [
+                detail["name"]
+                for detail in fragment_details
+                if not detail.get("hash")
+            ]
+            if missing_fragments:
+                raise BuildValidationError(
+                    f"无法解析碎片：{', '.join(missing_fragments)}"
+                )
             # Also get subclass base stats (not fragments)
-            subclass_stats, _ = await self._get_subclass_and_fragment_stats(
-                player_name, request.character_class
+            subclass_stats, _, execution_subclass = (
+                await self._get_subclass_and_fragment_stats(
+                    player_name, request.character_class
+                )
+            )
+            requested_fragment_hashes = [
+                detail["hash"]
+                for detail in fragment_details
+                if detail.get("hash")
+            ]
+            execution_subclass = self._replace_fragment_config(
+                execution_subclass,
+                requested_fragment_hashes,
             )
             parsed.subclass_stats = subclass_stats
             parsed.fragment_stats = fragment_stats
@@ -243,8 +571,10 @@ class BuildService:
                 dict(zip(STAT_NAMES, fragment_stats)),
             )
         elif request.include_subclass_fragment:
-            subclass_stats, fragment_stats = await self._get_subclass_and_fragment_stats(
-                player_name, request.character_class
+            subclass_stats, fragment_stats, execution_subclass = (
+                await self._get_subclass_and_fragment_stats(
+                    player_name, request.character_class
+                )
             )
             parsed.subclass_stats = subclass_stats
             parsed.fragment_stats = fragment_stats
@@ -304,11 +634,126 @@ class BuildService:
                     missing_requirements=missing,
                     fragment_details=fragment_details,
                     active_set_bonuses=active_set_bonuses,
+                    canonical_build=CanonicalBuild(
+                        class_type=request.character_class,
+                        exotic_hash=next(
+                            (
+                                item.item_hash
+                                for item in armor_set.armor
+                                if item.is_exotic
+                            ),
+                            None,
+                        ),
+                        subclass_item_hash=(
+                            execution_subclass.subclass_item_hash
+                            if execution_subclass
+                            else None
+                        ),
+                        subclass_instance_id=(
+                            execution_subclass.subclass_instance_id
+                            if execution_subclass
+                            else ""
+                        ),
+                        subclass_plug_sockets=(
+                            execution_subclass.plug_sockets
+                            if execution_subclass
+                            else {}
+                        ),
+                        super_hash=(
+                            execution_subclass.super_hash
+                            if execution_subclass
+                            else None
+                        ),
+                        grenade_hash=(
+                            execution_subclass.grenade_hash
+                            if execution_subclass
+                            else None
+                        ),
+                        melee_hash=(
+                            execution_subclass.melee_hash
+                            if execution_subclass
+                            else None
+                        ),
+                        class_ability_hash=(
+                            execution_subclass.class_ability_hash
+                            if execution_subclass
+                            else None
+                        ),
+                        movement_hash=(
+                            execution_subclass.movement_hash
+                            if execution_subclass
+                            else None
+                        ),
+                        aspect_hashes=(
+                            execution_subclass.aspect_hashes
+                            if execution_subclass
+                            else []
+                        ),
+                        fragment_hashes=(
+                            execution_subclass.fragment_hashes
+                            if execution_subclass
+                            else []
+                        ),
+                        target_stats={
+                            name: value
+                            for name, value in {
+                                "weapons": request.weapons_target,
+                                "health": request.health_target,
+                                "class_stat": request.class_target,
+                                "grenade": request.grenade_target,
+                                "melee": request.melee_target,
+                                "super_stat": request.super_target,
+                            }.items()
+                            if value is not None
+                        },
+                        items=[
+                            LoadoutItem(
+                                item_hash=armor.item_hash,
+                                name=armor.name,
+                                slot=_LOADOUT_SLOT_NAMES.get(armor.slot, armor.slot),
+                                item_instance_id=armor.item_instance_id,
+                                mods=list(
+                                    armor_set.stat_mod_assignments.get(
+                                        armor.item_instance_id, []
+                                    )
+                                ),
+                                source_location=getattr(
+                                    armor, "source_location", ""
+                                ),
+                                source_character_id=getattr(
+                                    armor, "source_character_id", ""
+                                ),
+                                was_equipped=getattr(
+                                    armor, "is_equipped", False
+                                ),
+                            )
+                            for armor in armor_set.armor
+                        ],
+                        snapshot_version=snapshot_version,
+                        execution_id=secrets.token_urlsafe(18),
+                    ),
                 )
             )
 
-        # Sort by score (best first)
-        results.sort(key=lambda r: r.score, reverse=True)
+        priority_indices = parsed.ordered_priority_indices
+        if priority_indices:
+            results.sort(
+                key=lambda result: (
+                    result.completion_rate,
+                    *(
+                        result.build.stat(STAT_NAMES[index])
+                        for index in priority_indices
+                    ),
+                    result.score,
+                ),
+                reverse=True,
+            )
+        else:
+            results.sort(key=lambda result: result.score, reverse=True)
+
+        for result in results:
+            if result.canonical_build:
+                self._register_build_candidate(result.canonical_build, player_name)
 
         return results
 
@@ -333,12 +778,74 @@ class BuildService:
         snapshot = await self._inventory.get_armor_snapshot(player_name, request.character_class)
         parsed = _parse_constraints(request, self._manifest)
         if request.include_subclass_fragment:
-            subclass_stats, fragment_stats = await self._get_subclass_and_fragment_stats(
-                player_name, request.character_class
+            subclass_stats, fragment_stats, _ = (
+                await self._get_subclass_and_fragment_stats(
+                    player_name, request.character_class
+                )
             )
             parsed.subclass_stats = subclass_stats
             parsed.fragment_stats = fragment_stats
         return analyze(snapshot, parsed)
+
+    async def infer_required_armor(
+        self,
+        player_name: str,
+        request: BuildRequest,
+        *,
+        replacement_slot: str | None = None,
+        baseline: Literal["equipped", "inventory"] = "equipped",
+        max_replacements: Literal[1, 2] = 1,
+    ) -> BuildAnalysis:
+        """Return minimum one- or two-piece farm targets without an equip plan."""
+        if not request.character_class:
+            raise BuildValidationError("必须指定 hunter、warlock 或 titan。")
+
+        logger.info(
+            "infer_required_armor: player=%s baseline=%s replacement_slot=%s max_replacements=%d",
+            player_name,
+            baseline,
+            replacement_slot or "any",
+            max_replacements,
+        )
+        snapshot = await self._inventory.get_armor_snapshot(
+            player_name,
+            request.character_class,
+        )
+        parsed = _parse_constraints(request, self._manifest)
+        if request.fragment_names:
+            fragment_stats, fragment_details = self._get_fragment_stats_by_names(
+                request.fragment_names
+            )
+            missing_fragments = [
+                detail["name"]
+                for detail in fragment_details
+                if not detail.get("hash")
+            ]
+            if missing_fragments:
+                raise BuildValidationError(
+                    f"无法解析碎片：{', '.join(missing_fragments)}"
+                )
+            subclass_stats, _, _ = await self._get_subclass_and_fragment_stats(
+                player_name, request.character_class
+            )
+            parsed.subclass_stats = subclass_stats
+            parsed.fragment_stats = fragment_stats
+        elif request.include_subclass_fragment:
+            subclass_stats, fragment_stats, _ = (
+                await self._get_subclass_and_fragment_stats(
+                    player_name, request.character_class
+                )
+            )
+            parsed.subclass_stats = subclass_stats
+            parsed.fragment_stats = fragment_stats
+        return find_farm_targets(
+            snapshot,
+            parsed,
+            baseline=baseline,
+            replacement_slot=replacement_slot,
+            max_replacements=max_replacements,
+            top_n=request.top_n,
+        )
 
     async def recommend_build(
         self,
@@ -353,78 +860,155 @@ class BuildService:
         analysis = await self.analyze_build(player_name, request)
         return BuildRecommendation(results=[], analysis=analysis)
 
+    @serialized_account_action
     async def equip_build(
         self,
         player_name: str,
-        result: BuildResult,
+        build: CanonicalBuild,
         target_character: str,
     ) -> dict:
-        """Equip a full build result on a character.
-
-        Transfers all 5 armor pieces to the target character (if not
-        already there) and equips them. Uses TransferService for the
-        actual operations (Rule 3: no direct BungieClient calls).
-
-        Args:
-            player_name: Bungie name.
-            result: A BuildResult from find_build.
-            target_character: hunter / warlock / titan.
-
-        Returns:
-            Dict with per-piece results and overall success status.
-        """
+        """Preflight and apply the exact CanonicalBuild confirmed by the user."""
+        normalized_character = class_type_name(
+            resolve_character_name(target_character)
+        ).lower()
         logger.info(
-            "equip_build: player=%s target=%s pieces=%d",
-            player_name, target_character, len(result.build.items),
+            "equip_build: player=%s target=%s pieces=%d snapshot=%s",
+            player_name,
+            normalized_character,
+            len(build.items),
+            build.snapshot_version[:12],
         )
-
-        piece_results: list[dict] = []
-        all_ok = True
-
-        for i, armor in enumerate(result.build.items):
-            # Rate limit: ~1-2 req/s for TransferItem
-            if i > 0:
-                await asyncio.sleep(0.5)
-
-            logger.info(
-                "Equipping piece %d/5: '%s' (%s)",
-                i + 1, armor.name, armor.slot,
-            )
-            try:
-                move_result = await self._transfer.move_item(
-                    player_name=player_name,
-                    item_name=armor.name,
-                    destination=target_character,
-                    equip=True,
-                    item_instance_id=armor.item_instance_id,
-                )
-                piece_results.append({
-                    "slot": armor.slot,
-                    "name": armor.name,
-                    "success": move_result.success,
-                    "message": move_result.message,
-                })
-                if not move_result.success:
-                    all_ok = False
-            except (ItemNotFoundError, TransferError, OSError) as e:
-                logger.error("Failed to equip '%s': %s", armor.name, e)
-                piece_results.append({
-                    "slot": armor.slot,
-                    "name": armor.name,
+        if not build.execution_id:
+            return {
+                "success": False,
+                "code": "missing_execution_id",
+                "message": "配装缺少服务端候选 ID，请重新运行 find_build 后再确认。",
+            }
+        now = time.monotonic()
+        trusted = self._build_candidates.get(build.execution_id)
+        issued_at = self._build_candidate_issued_at.get(build.execution_id)
+        candidate_player = self._build_candidate_players.get(build.execution_id)
+        if (
+            trusted is None
+            or issued_at is None
+            or candidate_player is None
+            or (candidate_player and candidate_player != player_name.casefold())
+        ):
+            return {
+                "success": False,
+                "code": "unknown_execution_id",
+                "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
+            }
+        if now - issued_at >= _BUILD_CANDIDATE_TTL_SECONDS:
+            self._build_candidates.pop(build.execution_id, None)
+            self._build_candidate_issued_at.pop(build.execution_id, None)
+            self._build_candidate_players.pop(build.execution_id, None)
+            return {
+                "success": False,
+                "code": "expired_execution_id",
+                "message": "该配装候选已过期，请重新求解并确认。",
+            }
+        self._evict_expired_build_candidates(now)
+        if trusted.model_dump(mode="json") != build.model_dump(mode="json"):
+            return {
+                "success": False,
+                "code": "canonical_build_mismatch",
+                "message": "确认后的配装内容发生变化，已拒绝执行。请重新选择候选。",
+            }
+        self._build_candidates.pop(build.execution_id, None)
+        self._build_candidate_issued_at.pop(build.execution_id, None)
+        self._build_candidate_players.pop(build.execution_id, None)
+        build = trusted
+        if build.class_type:
+            build_character = class_type_name(
+                resolve_character_name(build.class_type)
+            ).lower()
+            if build_character != normalized_character:
+                return {
                     "success": False,
-                    "message": str(e),
-                })
-                all_ok = False
+                    "code": "character_mismatch",
+                    "message": "确认的配装职业与目标角色不一致，请重新生成配装。",
+                }
+        if not build.snapshot_version:
+            return {
+                "success": False,
+                "code": "missing_snapshot_version",
+                "message": "配装缺少库存快照版本，请重新运行 find_build 后再确认。",
+            }
+        if len(build.items) != 5:
+            return {
+                "success": False,
+                "code": "invalid_item_count",
+                "message": "精确配装必须包含五件护甲。",
+            }
 
+        instance_ids = [item.item_instance_id for item in build.items]
+        slots = {_LOADOUT_SLOT_NAMES.get(item.slot, item.slot) for item in build.items}
+        if (
+            any(not instance_id for instance_id in instance_ids)
+            or len(set(instance_ids)) != 5
+            or slots != _EXPECTED_ARMOR_SLOTS
+        ):
+            return {
+                "success": False,
+                "code": "invalid_exact_items",
+                "message": "配装实例或护甲槽位不完整，请重新生成配装。",
+            }
+        if any(mod_hash <= 0 for item in build.items for mod_hash in item.mods):
+            return {
+                "success": False,
+                "code": "invalid_mod_hash",
+                "message": "配装包含无效模组 Hash，请重新生成配装。",
+            }
+
+        snapshot = await self._inventory.get_armor_snapshot(
+            player_name, normalized_character
+        )
+        current_version = _snapshot_version(snapshot)
+        if current_version != build.snapshot_version:
+            return {
+                "success": False,
+                "code": "stale_inventory_snapshot",
+                "message": "生成配装后库存或护甲状态已变化；为避免装备另一套，请重新求解并确认。",
+                "expected_snapshot_version": build.snapshot_version,
+                "current_snapshot_version": current_version,
+            }
+
+        current_items = {
+            armor.item_instance_id: armor
+            for collection in (
+                snapshot.helmets,
+                snapshot.gauntlets,
+                snapshot.chests,
+                snapshot.legs,
+                snapshot.class_items,
+            )
+            for armor in collection
+        }
+        for item in build.items:
+            current = current_items.get(item.item_instance_id)
+            if current is None or current.item_hash != item.item_hash:
+                return {
+                    "success": False,
+                    "code": "exact_item_missing",
+                    "message": f"确认的装备实例 '{item.item_instance_id}' 已不存在或发生变化。",
+                }
+
+        loadout = Loadout(
+            id=f"build:{build.snapshot_version}",
+            name="已确认的精确配装",
+            character=normalized_character,
+            items=build.items,
+            subclass=_canonical_subclass(build),
+            source="build",
+        )
+        result = await self._equipment.equip_exact(player_name, loadout)
         return {
-            "success": all_ok,
-            "character": target_character,
-            "pieces": piece_results,
-            "message": (
-                f"Equipped full build on {target_character}."
-                if all_ok
-                else f"Some pieces failed to equip on {target_character}."
-            ),
+            "success": result.success,
+            "character": normalized_character,
+            "snapshot_version": build.snapshot_version,
+            "message": result.message,
+            "steps": [step.model_dump() for step in result.steps],
         }
 
     async def equip_by_score(
@@ -434,34 +1018,18 @@ class BuildService:
         target_character: str,
         score: float = 0,
     ) -> dict:
-        """Find builds matching the request, then equip the one closest to score.
-
-        Combines find_build + equip_build into a single operation.
-        If score is 0, equips the top-ranked build.
-
-        Args:
-            player_name: Bungie name.
-            request: Build request with stat targets.
-            target_character: hunter / warlock / titan.
-            score: Target score to match (from find_build results).
-
-        Returns:
-            Dict with equip result.
-        """
-        results = await self.find_build(player_name, request)
-
-        if not results:
-            return {
-                "success": False,
-                "message": "没有找到满足条件的配装方案，请先用 find_build 查看可用方案。",
-            }
-
-        if score > 0:
-            target = min(results, key=lambda r: abs(r.score - score))
-        else:
-            target = results[0]
-
-        return await self.equip_build(player_name, target, target_character)
+        """Reject the unsafe legacy score-based execution path."""
+        logger.warning(
+            "Rejected score-based build execution for player=%s target=%s score=%s",
+            player_name,
+            target_character,
+            score,
+        )
+        return {
+            "success": False,
+            "code": "exact_build_required",
+            "message": "不能再按浮点 score 重新求解并装备；请传回 find_build 返回的 canonical_build。",
+        }
 
 
 def _count_targets(parsed) -> int:

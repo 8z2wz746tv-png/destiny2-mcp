@@ -398,6 +398,7 @@ class ManifestQueryService:
                             intrinsic_perks.append({
                                 "name": name,
                                 "description": plug_display.get("description", ""),
+                                "icon_url": _absolute_icon_url(plug_display.get("icon")),
                             })
         return intrinsic_perks
 
@@ -531,3 +532,14 @@ class ManifestQueryService:
             "effects": effects,
             "icon_url": icon_url,
         }
+
+
+def _absolute_icon_url(value: object) -> str:
+    icon = str(value or "").strip()
+    if not icon:
+        return ""
+    if icon.startswith("https://www.bungie.net/"):
+        return icon
+    if icon.startswith("/"):
+        return f"https://www.bungie.net{icon}"
+    return ""

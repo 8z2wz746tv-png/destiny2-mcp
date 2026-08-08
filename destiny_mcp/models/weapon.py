@@ -20,6 +20,7 @@ class WeaponPerkPool(BaseModel):
     weapon_name: str = Field(description="Weapon name")
     weapon_type: str = Field(default="", description="Weapon type (Hand Cannon, Auto Rifle, etc.)")
     item_hash: int = Field(description="Weapon definition hash")
+    icon_url: str = Field(default="", description="Bungie CDN weapon icon URL")
     slots: list[WeaponPerkSlot] = Field(default_factory=list, description="Perk pool grouped by slot")
 
 
@@ -66,6 +67,7 @@ class WeaponSocketInfo(BaseModel):
     plug_hash: int = Field(default=0, description="Currently equipped plug hash")
     plug_category: str = Field(default="", description="Plug category identifier")
     description: str = Field(default="", description="Plug description/effect text")
+    icon_url: str = Field(default="", description="Bungie CDN plug icon URL")
 
 
 class WeaponDetail(BaseModel):

@@ -1,0 +1,1038 @@
+"""High-level assistant MCP tools.
+
+These tools are the normal user-facing surface. They route broad intents to
+domain services so the model sees a small set of stable entry points instead
+of dozens of low-level Bungie/API actions.
+"""
+
+from __future__ import annotations
+
+from typing import Annotated, Any, Literal
+
+from mcp.server.fastmcp import Context
+from pydantic import Field, ValidationError
+
+from ..build.models import BuildRequest
+from ..build_import.models import CanonicalBuild
+from ..exceptions import DestinyMCPError
+from ..server import mcp
+from ._build_confirmation import (
+    issue_exotic_confirmation_token,
+    verify_exotic_confirmation_token,
+)
+from ._farm_target import serialize_farm_target_analysis
+from ._helpers import get_ctx, handle_tool_error, resolve_player_name
+from ._responses import (
+    confirmation_required_response,
+    error_response,
+    ok_response,
+)
+
+
+def _dump(value: Any) -> Any:
+    """Recursively convert Pydantic/domain objects into plain JSON-ish data."""
+    if hasattr(value, "model_dump"):
+        return value.model_dump()
+    if isinstance(value, list):
+        return [_dump(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _dump(item) for key, item in value.items()}
+    return value
+
+
+def _requires_confirmation(intent: str) -> bool:
+    return intent in {
+        "move",
+        "transfer",
+        "equip",
+        "equip_many",
+        "equip_items",
+        "pull_postmaster",
+        "lock",
+        "save",
+        "delete",
+        "equip_loadout",
+        "snapshot_official",
+        "update_official_identifiers",
+        "clear_official",
+        "modify",
+        "equip_artifact_mod",
+        "equip_build",
+        "track_quest",
+        "quest_tracking",
+    }
+
+
+def _confirmation_required(intent: str, payload: dict[str, Any]) -> dict[str, Any]:
+    return confirmation_required_response(intent, payload)
+
+
+@mcp.tool()
+@handle_tool_error
+async def player_assistant(
+    intent: str = "profile",
+    player_name: str | None = None,
+    name_prefix: str = "",
+    ctx: Context = None,
+) -> dict:
+    """玩家/账号聚合入口：搜索玩家、模糊找人、读取角色档案。"""
+    svc = get_ctx(ctx)
+    player_svc = svc["player_svc"]
+    intent = (intent or "profile").strip().lower()
+
+    if intent in {"profile", "get_profile", "角色", "档案"}:
+        resolved = resolve_player_name(player_name)
+        result = await player_svc.get_profile(resolved)
+        return ok_response("已读取玩家档案。", {"profile": _dump(result)})
+
+    if intent in {"search", "search_player"}:
+        if not player_name:
+            return error_response("missing_player_name", "必须提供 player_name。")
+        result = await player_svc.search_player(player_name)
+        return ok_response("已搜索玩家。", {"players": _dump(result)})
+
+    if intent in {"find", "find_players", "fuzzy"}:
+        if not name_prefix:
+            return error_response("missing_name_prefix", "必须提供 name_prefix。")
+        result = await player_svc.find_players(name_prefix)
+        return ok_response("已模糊搜索玩家。", {"players": result})
+
+    return error_response("unsupported_intent", f"player_assistant 不支持 intent={intent!r}。")
+
+
+@mcp.tool()
+@handle_tool_error
+async def inventory_assistant(
+    intent: str = "summary",
+    player_name: str | None = None,
+    location: str = "",
+    item_name: str = "",
+    item_type: str = "",
+    armor_slot: str = "",
+    rarity: str = "",
+    type_name: str = "",
+    item_instance_id: str = "",
+    item_instance_ids: list[str] | None = None,
+    to_character: str = "",
+    from_character: str | None = None,
+    destination: str = "",
+    character: str = "",
+    equip: bool = False,
+    locked: bool = True,
+    tracked: bool = True,
+    confirmed: bool = False,
+    limit: int = 10,
+    offset: int = 0,
+    ctx: Context = None,
+) -> dict:
+    """背包/仓库聚合入口。
+
+    intent=duplicates 会按精确 item_hash 返回可核对的重复武器组。
+    具体武器类型查询使用 intent=type，不要把“手炮”等类型
+    传给 intent=get 的 item_type。
+    """
+    svc = get_ctx(ctx)
+    intent = (intent or "summary").strip().lower()
+    resolved = resolve_player_name(player_name)
+
+    if _requires_confirmation(intent) and not confirmed:
+        return _confirmation_required(intent, {
+            "player_name": resolved,
+            "item_name": item_name,
+            "item_instance_id": item_instance_id,
+            "item_instance_ids": item_instance_ids or [],
+            "destination": destination,
+            "character": character or to_character,
+        })
+
+    if intent in {"summary", "summarize", "概况"}:
+        result = await svc["inventory_analysis_svc"].summarize_inventory(
+            resolved,
+            location=location,
+            item_type=item_type,
+            limit=limit,
+        )
+        return ok_response(
+            result["summary"],
+            {"inventory": result["inventory"]},
+            next_actions=result["next_actions"],
+            warnings=result["warnings"],
+        )
+
+    if intent in {"duplicates", "duplicate_weapons", "find_duplicates", "重复武器"}:
+        result = await svc["inventory_analysis_svc"].find_duplicate_weapons(
+            resolved,
+            item_name=item_name,
+            type_name=type_name,
+            limit=limit,
+            offset=offset,
+        )
+        return ok_response(
+            result["summary"],
+            {
+                "duplicate_weapons": result["duplicates"],
+                "scan": result["scan"],
+                "filters": result["filters"],
+                "pagination": result["pagination"],
+            },
+            warnings=result["warnings"],
+        )
+
+    if intent in {"get", "inventory", "list"}:
+        result = await svc["inventory_svc"].get_inventory(
+            resolved,
+            location,
+            item_type=item_type or None,
+            armor_slot=armor_slot or None,
+            rarity=rarity or None,
+        )
+        return ok_response("已读取背包。", {"inventory": _dump(result)})
+
+    if intent in {"search", "find_item"}:
+        result = await svc["inventory_svc"].search_items(resolved, item_name)
+        return ok_response("已搜索物品。", {"result": _dump(result)})
+
+    if intent in {"type", "search_type"}:
+        result = await svc["inventory_svc"].search_items_by_type(resolved, type_name or item_type)
+        return ok_response("已按类型搜索物品。", {"result": _dump(result)})
+
+    if intent == "move":
+        result = await svc["transfer_svc"].move_item(
+            resolved,
+            item_name,
+            destination,
+            equip=bool(equip),
+            source=from_character,
+            item_instance_id=item_instance_id or None,
+        )
+        return ok_response("移动流程已执行。", {"result": _dump(result)})
+
+    if intent == "transfer":
+        result = await svc["transfer_svc"].transfer_item(
+            resolved,
+            item_instance_id,
+            to_character,
+            from_character,
+        )
+        return ok_response("转移已执行。", {"result": _dump(result)})
+
+    if intent == "equip":
+        result = await svc["transfer_svc"].equip_item(resolved, item_instance_id, character)
+        return ok_response("装备已执行。", {"result": _dump(result)})
+
+    if intent in {"equip_many", "equip_items"}:
+        if not item_instance_ids:
+            return error_response("missing_item_instance_ids", "批量装备需要提供 item_instance_ids。")
+        result = await svc["transfer_svc"].equip_items(resolved, item_instance_ids, character)
+        return ok_response("批量装备已执行。", {"result": _dump(result)})
+
+    if intent == "pull_postmaster":
+        result = await svc["transfer_svc"].pull_from_postmaster(
+            resolved,
+            item_instance_id,
+            character or None,
+        )
+        return ok_response("邮政官取回已执行。", {"result": result})
+
+    if intent == "lock":
+        result = await svc["transfer_svc"].set_item_lock_state(
+            resolved,
+            item_instance_id,
+            locked,
+            character or None,
+        )
+        return ok_response("锁定状态已更新。", {"result": result})
+
+    if intent in {"track_quest", "quest_tracking"}:
+        result = await svc["transfer_svc"].set_quest_tracked_state(
+            resolved,
+            item_instance_id,
+            tracked,
+            character or None,
+        )
+        return ok_response("任务追踪状态已更新。", {"result": result})
+
+    return error_response("unsupported_intent", f"inventory_assistant 不支持 intent={intent!r}。")
+
+
+@mcp.tool()
+@handle_tool_error
+async def weapon_assistant(
+    intent: Annotated[str, Field(description=(
+        "武器查询意图。analyze=武器分析（不含选取率）；"
+        "perk_pool=可能 Roll 到的 Perk 池；popularity=Perk 选取率和热门组合；"
+        "catalog=从全量 Manifest 按武器类型和 Perk 查找，不限账号是否拥有；"
+        "filter_rolls=只筛选账号持有副本。"
+    ))] = "analyze",
+    player_name: str | None = None,
+    weapon_name: str = "",
+    weapon_type: str = "",
+    perk_name: str = "",
+    item_instance_id: str = "",
+    required_perks: list[str] | str | None = None,
+    any_perks: list[str] | str | None = None,
+    excluded_perks: list[str] | str | None = None,
+    location: str = "",
+    include_inventory: bool = True,
+    limit: int = 50,
+    ctx: Context = None,
+) -> dict:
+    """武器聚合入口：分析、副本对比、perk 池、选取率和全量候选。
+
+    catalog 查询完整 Manifest，适用于“所有武器中找带某个 perk
+    的某类武器”；filter_rolls 才查玩家账号内的实际副本。
+    """
+    svc = get_ctx(ctx)
+    intent = (intent or "analyze").strip().lower()
+    catalog_intents = {"catalog", "search_catalog", "all_weapons", "global", "search_all"}
+    uses_catalog = intent in catalog_intents or (
+        intent == "filter_rolls" and not include_inventory
+    )
+    resolved = None if uses_catalog else resolve_player_name(player_name)
+
+    if intent in catalog_intents:
+        catalog_required_perks = required_perks
+        if catalog_required_perks is None and perk_name.strip():
+            catalog_required_perks = [perk_name]
+        try:
+            filtered = svc["weapon_roll_filter_svc"].filter_catalog(
+                weapon_name=weapon_name,
+                weapon_type=weapon_type,
+                required_perks=catalog_required_perks,
+                any_perks=any_perks,
+                excluded_perks=excluded_perks,
+                limit=limit,
+            )
+        except DestinyMCPError as exc:
+            return error_response("weapon_catalog_lookup_failed", str(exc))
+        return ok_response(
+            f"全量武器定义检查 {filtered['checked_count']} 把，命中 {filtered['matched_count']} 把。",
+            filtered,
+            warnings=["这些是 Manifest 全量候选，未读取账号持有情况。"],
+        )
+
+    if intent == "analyze":
+        if not weapon_name.strip():
+            return error_response("missing_weapon_name", "分析武器需要提供 weapon_name。")
+        result = await svc["weapon_analysis_svc"].analyze_weapon(
+            weapon_name,
+            player_name=resolved if include_inventory else None,
+            include_inventory=include_inventory,
+        )
+        return ok_response(result["summary"], {
+            "weapon": result["weapon"],
+            "perk_pool": result["perk_pool"],
+            "god_roll": result["god_roll"],
+            "inventory": result["inventory"],
+        }, next_actions=result["next_actions"], warnings=result["warnings"])
+
+    if intent in {"compare", "compare_duplicates"}:
+        result = await svc["weapon_compare_svc"].compare_weapon_instances(
+            resolved, weapon_name, item_instance_id or None
+        )
+        return ok_response("已对比同名武器副本。", {"comparison": _dump(result)})
+
+    if intent in {"perk_pool", "perks"}:
+        result = await svc["perk_svc"].get_weapon_perks(weapon_name)
+        return ok_response("已读取 perk 池。", {"perk_pool": _dump(result)})
+
+    if intent == "god_roll":
+        result = await svc["perk_svc"].get_god_roll(weapon_name)
+        return ok_response("已读取社区推荐 roll。", {"god_roll": result})
+
+    if intent in {"popularity", "selection_rates", "perk_selection", "selection", "usage_rates"}:
+        if not weapon_name.strip():
+            return error_response("missing_weapon_name", "查询选取率需要提供 weapon_name。")
+        try:
+            result = svc["perk_svc"].get_weapon_popularity(weapon_name)
+        except DestinyMCPError as exc:
+            return error_response("popularity_lookup_failed", str(exc))
+        if result is None:
+            return ok_response(
+                f"「{weapon_name}」暂无录入的选取率快照。",
+                {"popularity": None},
+                warnings=["未录入不代表 0%，不应据此推断 Perk 热度。"],
+            )
+        payload = dict(result)
+        warnings = payload.pop("warnings", [])
+        return ok_response(
+            f"已读取「{result['weapon']['name']}」已录入的选取率快照。",
+            {"popularity": payload},
+            warnings=warnings,
+        )
+
+    if intent == "type":
+        result = await svc["weapon_detail_svc"].get_weapon_details_by_type(
+            resolved,
+            weapon_type,
+        )
+        return ok_response("已按武器类型读取详情。", {"weapons": _dump(result)})
+
+    if intent == "filter_rolls":
+        if not include_inventory:
+            catalog_required_perks = required_perks
+            if catalog_required_perks is None and perk_name.strip():
+                catalog_required_perks = [perk_name]
+            filtered = svc["weapon_roll_filter_svc"].filter_catalog(
+                weapon_name=weapon_name,
+                weapon_type=weapon_type,
+                required_perks=catalog_required_perks,
+                any_perks=any_perks,
+                excluded_perks=excluded_perks,
+                limit=limit,
+            )
+            return ok_response(
+                f"全量武器定义检查 {filtered['checked_count']} 把，命中 {filtered['matched_count']} 把。",
+                filtered,
+                warnings=["include_inventory=false：这些是 Manifest 全量候选，未读取账号持有情况。"],
+            )
+        result = await svc["weapon_detail_svc"].get_weapon_details_by_type(
+            resolved,
+            weapon_type,
+        )
+        filtered = svc["weapon_roll_filter_svc"].filter_rolls(
+            _dump(result).get("weapons", []),
+            weapon_name=weapon_name,
+            location=location,
+            required_perks=required_perks,
+            any_perks=any_perks,
+            excluded_perks=excluded_perks,
+            limit=limit,
+        )
+        return ok_response(
+            f"共检查 {filtered['checked_count']} 把，命中 {filtered['matched_count']} 把。",
+            filtered,
+        )
+
+    if intent == "info":
+        return ok_response("已读取武器信息。", {
+            "weapon": svc["manifest_query_svc"].get_weapon_full_info(weapon_name)
+        })
+
+    if intent == "stats":
+        return ok_response("已读取武器属性。", {
+            "stats": svc["manifest_query_svc"].get_weapon_stats(weapon_name)
+        })
+
+    if intent == "perk_description":
+        return ok_response("已读取 perk 描述。", {
+            "perk": svc["manifest_query_svc"].get_perk_description(perk_name)
+        })
+
+    if intent == "catalyst":
+        return ok_response("已读取催化剂信息。", {
+            "catalyst": svc["manifest_query_svc"].get_catalyst_details(weapon_name)
+        })
+
+    return error_response("unsupported_intent", f"weapon_assistant 不支持 intent={intent!r}。")
+
+
+@mcp.tool()
+@handle_tool_error
+async def build_assistant(
+    intent: Annotated[str, Field(description=(
+        "配装意图。recommend/find/analyze/farm_target 中指定的金装和全部 "
+        "*_target 都是硬约束；无解时不得自动降低，必须先询问玩家。"
+    ))] = "recommend",
+    player_name: str | None = None,
+    character: Annotated[str, Field(description=(
+        "目标职业：hunter/warlock/titan，或猎人/术士/泰坦。"
+    ))] = "",
+    exotic_name: Annotated[str | None, Field(description=(
+        "逐字传入玩家说出的异域护甲（金装）名称，禁止翻译、补全或改写。"
+        "它属于硬约束；首次查询总会返回候选，必须先让玩家确认。"
+    ))] = None,
+    confirmed_exotic_hash: Annotated[int | None, Field(description=(
+        "金装候选确认哈希。首次查询不得填写；只有玩家明确选择候选后，"
+        "才能原样复制该候选 arguments 中的值。禁止自行猜测。"
+    ))] = None,
+    exotic_confirmation_token: Annotated[str | None, Field(description=(
+        "服务端签发的金装确认凭据。首次查询不得填写；玩家确认后必须"
+        "连同候选 arguments 原样回传，不得修改或省略其它配装参数。"
+    ))] = None,
+    weapons_target: Annotated[int | None, Field(ge=0, le=200, description=(
+        "武器属性最低目标（0-200），属于硬约束；无解时不得自动降低。"
+    ))] = None,
+    health_target: Annotated[int | None, Field(ge=0, le=200, description=(
+        "生命属性最低目标（0-200），属于硬约束；无解时不得自动降低。"
+    ))] = None,
+    class_target: Annotated[int | None, Field(ge=0, le=200, description=(
+        "职业属性最低目标（0-200），属于硬约束；无解时不得自动降低。"
+    ))] = None,
+    grenade_target: Annotated[int | None, Field(ge=0, le=200, description=(
+        "手雷属性最低目标（0-200），属于硬约束；无解时不得自动降低。"
+    ))] = None,
+    melee_target: Annotated[int | None, Field(ge=0, le=200, description=(
+        "近战属性最低目标（0-200），属于硬约束。玩家说‘力量’"
+        "或 strength 时必须传给 melee_target；无解时不得自动降低。"
+    ))] = None,
+    super_target: Annotated[int | None, Field(ge=0, le=200, description=(
+        "大招属性最低目标（0-200），属于硬约束；无解时不得自动降低。"
+    ))] = None,
+    fragment_names: Annotated[list[str] | None, Field(description=(
+        "要计入配装的碎片名称列表；重试和金装确认时必须原样保留。"
+    ))] = None,
+    include_subclass_fragment: Annotated[bool, Field(description=(
+        "是否计入当前子职业和碎片属性；重试和金装确认时必须原样保留。"
+    ))] = False,
+    set_bonus_name: str | None = None,
+    set_bonus_count: int | None = None,
+    priority_stats: Annotated[list[str] | None, Field(description=(
+        "所有硬目标达标后才按顺序最大化的属性。使用 "
+        "weapons/health/class/grenade/melee/super；力量/strength 必须写为 melee。"
+    ))] = None,
+    priority_stat: str | None = None,
+    replacement_slot: Annotated[str | None, Field(description=(
+        "farm_target 时要替换并刷取的部位：helmet/gauntlets/chest/legs/class_item。"
+        "不填时逐个尝试五个部位。"
+    ))] = None,
+    baseline: Annotated[Literal["equipped", "inventory"], Field(
+        description=(
+            "farm_target 的四件护甲基线：equipped 固定当前穿着四件；"
+            "inventory 从仓库选择更优四件。"
+        ),
+    )] = "equipped",
+    max_replacements: Annotated[int, Field(ge=1, le=2, description=(
+        "farm_target 最多反推的待刷护甲件数。默认 2：先完整查找单件，"
+        "只有单件无解才返回两件方案。两件回退目前只支持 equipped 基线。"
+    ))] = 2,
+    canonical_build: dict | None = None,
+    confirmed: bool = False,
+    top_n: Annotated[int, Field(ge=1, le=20, description="返回的候选配装数量。")] = 5,
+    ctx: Context = None,
+) -> dict:
+    """配装聚合入口：推荐、查候选、失败诊断、确认后装备。
+
+    priority_stats 按从高到低严格排序；include_subclass_fragment=True
+    时使用目标角色当前已装备的子职业和碎片属性。指定金装和数值目标都是
+    硬约束；指定金装首次查询必须等玩家确认，无解时不得自动降低目标。
+    """
+    svc = get_ctx(ctx)
+    intent = (intent or "recommend").strip().lower()
+    requested_player_name = player_name
+    resolved = resolve_player_name(player_name)
+    build_arguments = {
+        "intent": intent,
+        "player_name": requested_player_name,
+        "character": character,
+        "exotic_name": exotic_name,
+        "weapons_target": weapons_target,
+        "health_target": health_target,
+        "class_target": class_target,
+        "grenade_target": grenade_target,
+        "melee_target": melee_target,
+        "super_target": super_target,
+        "fragment_names": (
+            None if fragment_names is None else list(fragment_names)
+        ),
+        "include_subclass_fragment": include_subclass_fragment,
+        "set_bonus_name": set_bonus_name,
+        "set_bonus_count": set_bonus_count,
+        "priority_stats": (
+            None if priority_stats is None else list(priority_stats)
+        ),
+        "priority_stat": priority_stat,
+        "top_n": top_n,
+    }
+    if intent == "farm_target" or replacement_slot is not None or baseline != "equipped":
+        build_arguments["replacement_slot"] = replacement_slot
+        build_arguments["baseline"] = baseline
+        build_arguments["max_replacements"] = max_replacements
+
+    if intent in {"recommend", "find", "analyze", "farm_target"}:
+        confirmation_requested = (
+            confirmed_exotic_hash is not None
+            or exotic_confirmation_token is not None
+        )
+        if confirmation_requested:
+            confirmation_arguments = dict(build_arguments)
+            confirmation_arguments["confirmed_exotic_hash"] = confirmed_exotic_hash
+            if not verify_exotic_confirmation_token(
+                exotic_confirmation_token,
+                confirmation_arguments,
+                user_id=None,
+                player_name=resolved,
+            ):
+                return error_response(
+                    "invalid_exotic_confirmation",
+                    "金装确认凭据无效、已过期或与当前配装参数不一致，"
+                    "未启动配装求解。请重新搜索并让玩家确认候选。",
+                )
+
+    if intent in {"recommend", "find", "analyze", "farm_target"} and exotic_name:
+        resolution = _dump(
+            svc["build_svc"].resolve_exotic_armor(
+                exotic_name,
+                character,
+                limit=5,
+            )
+        )
+        status = resolution.get("status")
+        matches = resolution.get("matches") or []
+        if status in {"exact", "confirmation_required"} and confirmed_exotic_hash is None:
+            candidates = []
+            for index, match in enumerate(matches, 1):
+                arguments = dict(build_arguments)
+                arguments["exotic_name"] = match.get("name")
+                arguments["confirmed_exotic_hash"] = match.get("item_hash")
+                arguments["exotic_confirmation_token"] = (
+                    issue_exotic_confirmation_token(
+                        arguments,
+                        user_id=None,
+                        player_name=resolved,
+                    )
+                )
+                candidates.append({
+                    "selection": index,
+                    "name": match.get("name"),
+                    "nameEn": match.get("nameEn"),
+                    "item_hash": match.get("item_hash"),
+                    "icon_url": match.get("icon_url"),
+                    "character": match.get("character") or character,
+                    "arguments": arguments,
+                })
+            return error_response(
+                "exotic_confirmation_required",
+                f"“{exotic_name}”匹配到以下金装。请确认你指的是哪件。"
+                "确认后我会保留原来的职业、属性目标、优先级和碎片设置继续配装。",
+                candidates=candidates,
+            )
+        if status == "not_found":
+            return error_response(
+                "exotic_not_found",
+                f"没有找到与“{exotic_name}”匹配的{character or '目标职业'}金装。"
+                "请换一个更短或更完整的名称后重试，原属性目标不会被降低。",
+            )
+        if status not in {"exact", "confirmation_required"}:
+            return error_response(
+                "exotic_resolution_failed",
+                "金装名称解析失败，未启动配装求解。请稍后重试。",
+            )
+        confirmed_match = next(
+            (
+                match
+                for match in matches
+                if int(match.get("item_hash") or 0) == confirmed_exotic_hash
+            ),
+            None,
+        )
+        if confirmed_match is None:
+            return error_response(
+                "invalid_exotic_confirmation",
+                "金装确认信息无效或已与当前候选不一致，未启动配装求解。"
+                "请重新搜索并让玩家确认候选。",
+            )
+        exotic_name = confirmed_match.get("name") or resolution.get("canonical_name")
+        if not exotic_name:
+            return error_response(
+                "exotic_resolution_failed",
+                "金装名称解析失败，未启动配装求解。请稍后重试。",
+            )
+
+    request = BuildRequest(
+        character_class=character,
+        exotic_name=exotic_name,
+        weapons_target=weapons_target,
+        health_target=health_target,
+        class_target=class_target,
+        grenade_target=grenade_target,
+        melee_target=melee_target,
+        super_target=super_target,
+        include_subclass_fragment=include_subclass_fragment,
+        fragment_names=fragment_names or [],
+        set_bonus_name=set_bonus_name,
+        set_bonus_count=set_bonus_count,
+        priority_stats=priority_stats or [],
+        priority_stat=priority_stat,
+        top_n=top_n,
+    )
+    query: dict[str, Any] = {
+        "character": request.character_class,
+        "exotic_name": request.exotic_name,
+        "targets": {
+            "weapons": request.weapons_target,
+            "health": request.health_target,
+            "class": request.class_target,
+            "grenade": request.grenade_target,
+            "melee": request.melee_target,
+            "super": request.super_target,
+        },
+        "priority_stats": request.priority_stats,
+    }
+    if intent == "farm_target":
+        query["replacement_slot"] = replacement_slot
+        query["baseline"] = baseline
+        query["max_replacements"] = max_replacements
+        query["set_bonus_name"] = request.set_bonus_name
+        query["set_bonus_count"] = request.set_bonus_count
+
+    if intent == "recommend":
+        result = await svc["build_svc"].recommend_build(resolved, request)
+        recommendation = _dump(result)
+        if not recommendation.get("results"):
+            return ok_response(
+                "真实库存中没有满足原始硬约束的配装；金装和全部属性目标都保持不变。",
+                {"recommendation": recommendation, "query": query},
+                next_actions=[
+                    "如果玩家想知道如何达标，保留本次全部参数调用 "
+                    "build_assistant(intent='farm_target', max_replacements=2)；"
+                    "只有待刷反推也无解时才询问是否调整硬约束。"
+                ],
+                warnings=[
+                    "原始硬约束未改变。无解时不能自动降低属性目标、替换指定金装或去掉碎片设置。"
+                ],
+            )
+        return ok_response(
+            "已生成配装推荐。",
+            {"recommendation": recommendation, "query": query},
+        )
+
+    if intent == "find":
+        result = await svc["build_svc"].find_build(resolved, request)
+        return ok_response(
+            f"找到 {len(result)} 个候选配装。",
+            {"builds": _dump(result), "query": query},
+        )
+
+    if intent == "analyze":
+        result = await svc["build_svc"].analyze_build(resolved, request)
+        return ok_response(
+            "已分析配装约束。",
+            {"analysis": _dump(result), "query": query},
+        )
+
+    if intent == "farm_target":
+        result = await svc["build_svc"].infer_required_armor(
+            resolved,
+            request,
+            replacement_slot=replacement_slot,
+            baseline=baseline,
+            max_replacements=max_replacements,
+        )
+        analysis = serialize_farm_target_analysis(result)
+        options = analysis.get("farm_options") or []
+        plans = analysis.get("farm_plans") or []
+        if options:
+            summary = f"已找到 {len(options)} 个单件合法待刷护甲目标。"
+        elif plans:
+            summary = f"单件无解；已找到 {len(plans)} 个最少替换两件的合法方案。"
+        else:
+            summary = "在允许的替换件数内，合法护甲模板无法满足原始硬约束。"
+        return ok_response(
+            summary,
+            {"farm_target": analysis, "query": query},
+            warnings=analysis.get("assumptions") or [],
+        )
+
+    if intent == "equip_build":
+        if canonical_build is None:
+            return error_response(
+                "exact_build_required",
+                "装备配装需要传回候选中的 canonical_build，不能使用 score。",
+            )
+        try:
+            exact_build = CanonicalBuild.model_validate(canonical_build)
+        except ValidationError as exc:
+            return error_response("invalid_canonical_build", str(exc))
+        if not confirmed:
+            return _confirmation_required(
+                intent,
+                {
+                    "canonical_build": exact_build.model_dump(mode="json"),
+                    "character": character,
+                },
+            )
+        result = await svc["build_svc"].equip_build(
+            resolved, exact_build, character
+        )
+        if not result.get("success"):
+            return error_response(
+                result.get("code", "build_equip_failed"),
+                result.get("message", "配装装备失败。"),
+                candidates=[{"result": _dump(result)}],
+                next_actions=[{
+                    "label": "重新求解并确认配装",
+                    "tool": "build_assistant",
+                    "arguments": {"intent": "recommend", "character": character},
+                }],
+            )
+        return ok_response("配装装备流程已执行。", {"result": _dump(result)})
+
+    if intent == "armor_mods":
+        mods = svc["manifest"].get_armor_mods(slot="", category="all", stat=priority_stat or "")
+        return ok_response("已读取护甲模组。", {"mods": mods})
+
+    if intent == "exotic_armor":
+        if exotic_name:
+            return ok_response("已读取异域护甲详情。", {
+                "armor": svc["manifest_query_svc"].get_exotic_armor_details(exotic_name)
+            })
+        return ok_response("已读取异域护甲列表。", {
+            "armor": svc["manifest_query_svc"].get_exotic_armor_list(character)
+        })
+
+    if intent == "set_bonus":
+        if set_bonus_name:
+            return ok_response("已读取套装效果。", {
+                "set_bonus": svc["set_bonus_svc"].lookup_armor_set(set_bonus_name)
+            })
+        return ok_response("已读取套装效果列表。", {
+            "set_bonuses": svc["set_bonus_svc"].list_all_set_bonuses()
+        })
+
+    return error_response("unsupported_intent", f"build_assistant 不支持 intent={intent!r}。")
+
+
+@mcp.tool()
+@handle_tool_error
+async def loadout_assistant(
+    intent: str = "list",
+    player_name: str | None = None,
+    character: str = "",
+    loadout_id: str = "",
+    name: str = "",
+    notes: str = "",
+    slot_number: int = 1,
+    name_hash: int | None = None,
+    icon_hash: int | None = None,
+    color_hash: int | None = None,
+    kind: str = "all",
+    query: str = "",
+    confirmed: bool = False,
+    ctx: Context = None,
+) -> dict:
+    """配装槽聚合入口：本地/官方配装读取、保存、装备、官方槽位管理。"""
+    svc = get_ctx(ctx)
+    intent = (intent or "list").strip().lower()
+    resolved = resolve_player_name(player_name)
+
+    if _requires_confirmation(intent) and not confirmed:
+        return _confirmation_required(intent, {
+            "loadout_id": loadout_id,
+            "character": character,
+            "slot_number": slot_number,
+            "name": name,
+        })
+
+    if intent in {"list", "get"}:
+        result = await svc["loadout_svc"].get_loadouts(resolved, character or None)
+        return ok_response("已读取配装列表。", {"loadouts": _dump(result)})
+
+    if intent == "save":
+        result = await svc["loadout_svc"].save_loadout(resolved, name, character, notes)
+        return ok_response("本地配装已保存。", {"result": _dump(result)})
+
+    if intent == "delete":
+        result = await svc["loadout_svc"].delete_loadout(loadout_id)
+        return ok_response("本地配装已删除。", {"result": _dump(result)})
+
+    if intent == "equip_loadout":
+        result = await svc["loadout_svc"].equip_loadout(resolved, loadout_id)
+        return ok_response("配装装备流程已执行。", {"result": _dump(result)})
+
+    if intent == "search_identifiers":
+        result = svc["loadout_svc"].search_official_loadout_identifiers(kind, query)
+        return ok_response(result.get("message", "已查询官方配装标识。"), result)
+
+    if intent == "snapshot_official":
+        result = await svc["loadout_svc"].snapshot_official_loadout(
+            resolved, character, slot_number, name_hash, icon_hash, color_hash
+        )
+        return ok_response("官方配装槽已保存。", {"result": _dump(result)})
+
+    if intent == "update_official_identifiers":
+        result = await svc["loadout_svc"].update_official_loadout_identifiers(
+            resolved, character, slot_number, name_hash, icon_hash, color_hash
+        )
+        return ok_response("官方配装槽标识已更新。", {"result": _dump(result)})
+
+    if intent == "clear_official":
+        result = await svc["loadout_svc"].clear_official_loadout(resolved, character, slot_number)
+        return ok_response("官方配装槽已清空。", {"result": _dump(result)})
+
+    return error_response("unsupported_intent", f"loadout_assistant 不支持 intent={intent!r}。")
+
+
+@mcp.tool()
+@handle_tool_error
+async def subclass_assistant(
+    intent: str = "get",
+    player_name: str | None = None,
+    character: str = "",
+    element: str = "",
+    component: str = "",
+    fragment_name: str = "",
+    artifact_name: str = "",
+    artifact_mod_hash: int = 0,
+    artifact_mod_name: str = "",
+    changes: dict[str, str] | None = None,
+    confirmed: bool = False,
+    ctx: Context = None,
+) -> dict:
+    """子职业/碎片/神器聚合入口：读取配置、查选项、确认后修改。"""
+    svc = get_ctx(ctx)
+    intent = (intent or "get").strip().lower()
+    resolved = resolve_player_name(player_name)
+
+    if _requires_confirmation(intent) and not confirmed:
+        return _confirmation_required(intent, {"character": character, "changes": changes or {}})
+
+    if intent in {"get", "subclass"}:
+        result = await svc["subclass_svc"].get_subclass(resolved, character)
+        return ok_response("已读取子职业配置。", {"subclass": _dump(result)})
+
+    if intent == "modify":
+        result = await svc["subclass_svc"].modify_subclass(resolved, character, changes or {})
+        return ok_response("子职业修改已执行。", {"result": _dump(result)})
+
+    if intent == "options":
+        result = svc["fragment_svc"].list_subclass_options(character, element, component)
+        return ok_response("已读取子职业选项。", {"options": result})
+
+    if intent == "fragments":
+        result = svc["fragment_svc"].list_fragments(element)
+        return ok_response("已读取碎片列表。", {"fragments": result})
+
+    if intent == "fragment_details":
+        result = svc["fragment_svc"].get_fragment_details(fragment_name)
+        return ok_response("已读取碎片详情。", {"fragment": result})
+
+    if intent == "artifact":
+        result = svc["artifact_svc"].get_seasonal_artifact(artifact_name)
+        return ok_response("已读取赛季神器。", {"artifact": result})
+
+    if intent == "artifact_mod":
+        if not artifact_mod_hash:
+            return error_response("missing_artifact_mod_hash", "查询神器模组需要提供 artifact_mod_hash。")
+        result = svc["artifact_svc"].get_artifact_mod_info(artifact_mod_hash)
+        return ok_response("已读取神器模组。", {"artifact_mod": result})
+
+    if intent == "equip_artifact_mod":
+        if not artifact_mod_hash:
+            return error_response("missing_artifact_mod_hash", "装备神器模组需要提供 artifact_mod_hash。")
+        result = await svc["artifact_svc"].equip_artifact_mod(resolved, artifact_mod_hash, character)
+        return ok_response("神器模组装备已执行。", {"result": result})
+
+    return error_response("unsupported_intent", f"subclass_assistant 不支持 intent={intent!r}。")
+
+
+@mcp.tool()
+@handle_tool_error
+async def activity_assistant(
+    intent: Annotated[str, Field(description=(
+        "战绩查询意图。history=最近活动；pgcr=指定单场结算；"
+        "stats=生涯 PvE/PvP 统计；weapon_history=武器使用排行；"
+        "aggregate=活动累计排行；leaderboards=玩家排行榜；"
+        "clan_leaderboards=公会排行榜。"
+    ))] = "history",
+    player_name: str | None = None,
+    character: str | None = None,
+    mode: str | None = None,
+    activity_id: str = "",
+    group_id: str = "",
+    statid: str | None = None,
+    maxtop: int = 10,
+    count: int = 20,
+    ctx: Context = None,
+) -> dict:
+    """活动/战绩聚合入口：历史、PGCR、生涯统计、武器使用、排行榜。
+
+    “最近 N 场”只调用 history；只有指定单场详情才调用 pgcr。
+    """
+    svc = get_ctx(ctx)
+    intent = (intent or "history").strip().lower()
+    resolved = resolve_player_name(player_name)
+
+    if intent == "history":
+        result = await svc["activity_svc"].get_activity_history(resolved, character, mode, count)
+        return ok_response("已读取活动历史。", {"activities": result})
+
+    if intent == "pgcr":
+        result = await svc["activity_svc"].get_pgcr(activity_id)
+        return ok_response("已读取活动结算。", {"pgcr": result})
+
+    if intent in {"stats", "career", "historical_stats"}:
+        result = await svc["activity_svc"].get_historical_stats(resolved, character)
+        return ok_response("已读取生涯统计。", {"stats": result})
+
+    if intent in {"weapon_history", "weapons", "weapon_usage", "weapon_leaderboard"}:
+        result = await svc["activity_svc"].get_unique_weapon_history(resolved, character, limit=count)
+        return ok_response(result.get("message", "已读取武器历史。"), result)
+
+    if intent in {"aggregate", "activity_aggregate", "activity_stats"}:
+        result = await svc["activity_svc"].get_aggregate_activity_stats(resolved, character, limit=count)
+        return ok_response(result.get("message", "已读取活动聚合统计。"), result)
+
+    if intent in {"leaderboards", "leaderboard"}:
+        result = await svc["activity_svc"].get_leaderboards(resolved, character, mode, statid, maxtop)
+        return ok_response(result.get("message", "已读取排行榜。"), result)
+
+    if intent == "clan_leaderboards":
+        result = await svc["activity_svc"].get_clan_leaderboards(group_id, mode, statid, maxtop)
+        return ok_response(result.get("message", "已读取公会排行榜。"), result)
+
+    return error_response("unsupported_intent", f"activity_assistant 不支持 intent={intent!r}。")
+
+
+@mcp.tool()
+@handle_tool_error
+async def world_assistant(
+    intent: str = "weekly",
+    player_name: str | None = None,
+    character: str = "",
+    vendor_name: str = "",
+    query: str = "",
+    item_name: str = "",
+    collectible_node_hash: int = 0,
+    include_invisible: bool = False,
+    limit: int = 12,
+    ctx: Context = None,
+) -> dict:
+    """世界/周常聚合入口：商人、周常、收藏品和进度查询。"""
+    svc = get_ctx(ctx)
+    intent = (intent or "weekly").strip().lower()
+
+    if intent == "weekly":
+        result = await svc["weekly_analysis_svc"].summarize_weekly_reset(limit=limit)
+        return ok_response(
+            result["summary"],
+            {"weekly": result["weekly"]},
+            next_actions=result["next_actions"],
+            warnings=result["warnings"],
+        )
+
+    if intent == "weekly_full":
+        result = await svc["weekly_svc"].get_weekly_reset()
+        return ok_response("已读取完整周常。", {"weekly": _dump(result)})
+
+    if intent == "vendor":
+        resolved = resolve_player_name(player_name)
+        result = await svc["vendor_svc"].get_vendor_inventory(resolved, character, vendor_name)
+        return ok_response("已读取商人库存。", {"vendors": _dump(result)})
+
+    if intent == "search_collectible_nodes":
+        result = svc["collection_svc"].search_collectible_nodes(query, limit)
+        return ok_response(result.get("message", "已搜索收藏品节点。"), result)
+
+    if intent == "collectible_node":
+        resolved = resolve_player_name(player_name)
+        result = await svc["collection_svc"].get_collectible_node_status(
+            resolved,
+            collectible_node_hash,
+            character or None,
+            include_invisible,
+            limit,
+        )
+        return ok_response(result.get("message", "已读取收藏品节点。"), result)
+
+    if intent == "collectible_item":
+        resolved = resolve_player_name(player_name)
+        result = await svc["collection_svc"].get_collectible_item_status(
+            resolved,
+            item_name,
+            character or None,
+            limit,
+        )
+        return ok_response(result.get("message", "已读取收藏品状态。"), result)
+
+    return error_response("unsupported_intent", f"world_assistant 不支持 intent={intent!r}。")

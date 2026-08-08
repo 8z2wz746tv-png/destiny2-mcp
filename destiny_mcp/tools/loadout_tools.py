@@ -118,3 +118,140 @@ async def equip_loadout(
     svc = get_ctx(ctx)
     result = await svc['loadout_svc'].equip_loadout(player_name, loadout_id)
     return result.model_dump()
+
+
+@mcp.tool()
+@handle_tool_error
+async def search_official_loadout_identifiers(
+    kind: str = "all",
+    query: str = "",
+    limit: int = 30,
+    ctx: Context = None,
+) -> dict:
+    """搜索官方配装槽可用的名称、图标、颜色 hash。
+
+    何时使用：用户想设置官方配装槽图标/颜色/名称，但只说了自然语言描述。
+    何时跳过：用户已经明确提供 name_hash/icon_hash/color_hash。
+
+    Args:
+        kind: all/name/icon/color，或中文 全部/名称/图标/颜色。
+        query: 可选关键词。
+        limit: 每类最多返回数量。
+    """
+    svc = get_ctx(ctx)
+    return svc['loadout_svc'].search_official_loadout_identifiers(
+        kind=kind,
+        query=query,
+        limit=limit,
+    )
+
+
+@mcp.tool()
+@handle_tool_error
+async def snapshot_official_loadout(
+    player_name: str | None = None,
+    character: str = "",
+    slot_number: int = 1,
+    name_hash: int | None = None,
+    icon_hash: int | None = None,
+    color_hash: int | None = None,
+    ctx: Context = None,
+) -> dict:
+    """把角色当前装备写入游戏内官方配装槽。
+
+    何时使用：用户明确说"把当前这套保存到游戏内猎人 3 号配装槽"。
+    何时跳过：用户只想保存到本地无限配装，用 save_loadout。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家。
+        character: 角色名（hunter/warlock/titan，或中文）。
+        slot_number: 游戏内配装槽位，1 到 10。
+        name_hash: 可选，官方配装名称 hash。
+        icon_hash: 可选，官方配装图标 hash。
+        color_hash: 可选，官方配装颜色 hash。
+    """
+    if not character:
+        return {"success": False, "message": "必须指定角色（character 参数）。"}
+
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    result = await svc['loadout_svc'].snapshot_official_loadout(
+        player_name,
+        character,
+        slot_number,
+        name_hash,
+        icon_hash,
+        color_hash,
+    )
+    return result.model_dump()
+
+
+@mcp.tool()
+@handle_tool_error
+async def update_official_loadout_identifiers(
+    player_name: str | None = None,
+    character: str = "",
+    slot_number: int = 1,
+    name_hash: int | None = None,
+    icon_hash: int | None = None,
+    color_hash: int | None = None,
+    ctx: Context = None,
+) -> dict:
+    """更新游戏内官方配装槽的名称、图标和颜色 hash。
+
+    何时使用：用户明确要改某个官方配装槽的展示标识，并且你已获得 hash。
+    何时跳过：用户只是随口描述颜色/图标但没有可用 hash 时，先说明需要官方 hash。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家。
+        character: 角色名（hunter/warlock/titan，或中文）。
+        slot_number: 游戏内配装槽位，1 到 10。
+        name_hash: 可选，官方配装名称 hash。
+        icon_hash: 可选，官方配装图标 hash。
+        color_hash: 可选，官方配装颜色 hash。
+    """
+    if not character:
+        return {"success": False, "message": "必须指定角色（character 参数）。"}
+
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    result = await svc['loadout_svc'].update_official_loadout_identifiers(
+        player_name,
+        character,
+        slot_number,
+        name_hash,
+        icon_hash,
+        color_hash,
+    )
+    return result.model_dump()
+
+
+@mcp.tool()
+@handle_tool_error
+async def clear_official_loadout(
+    player_name: str | None = None,
+    character: str = "",
+    slot_number: int = 1,
+    ctx: Context = None,
+) -> dict:
+    """清空游戏内官方配装槽。
+
+    何时使用：用户明确说"清空猎人 3 号官方配装槽"。
+    何时跳过：删除本地自建配装时，用 delete_loadout。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家。
+        character: 角色名（hunter/warlock/titan，或中文）。
+        slot_number: 游戏内配装槽位，1 到 10。
+    """
+    if not character:
+        return {"success": False, "message": "必须指定角色（character 参数）。"}
+
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    result = await svc['loadout_svc'].clear_official_loadout(
+        player_name,
+        character,
+        slot_number,
+    )
+    return result.model_dump()

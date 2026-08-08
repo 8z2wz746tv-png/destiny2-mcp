@@ -48,3 +48,4 @@ class VendorInventoryResponse(BaseModel):
     player_name: str
     character: str
     vendors: list[VendorInfo] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)

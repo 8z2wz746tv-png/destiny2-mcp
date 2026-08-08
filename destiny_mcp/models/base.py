@@ -35,6 +35,7 @@ class PerkInfo(BaseModel):
     name: str = Field(description="Perk name (from manifest)")
     description: str = Field(default="", description="Perk effect description")
     plug_category: str = Field(default="", description="Category: barrel/sight/magazine/perk/trait/masterwork")
+    icon_url: str = Field(default="", description="Bungie CDN icon URL")
     god_roll_pve: bool = Field(default=False, description="Recommended for PvE (DIM wish list)")
     god_roll_pvp: bool = Field(default=False, description="Recommended for PvP (DIM wish list)")
 

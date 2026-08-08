@@ -44,9 +44,16 @@ class WeaponService:
         return await self._perk_svc.get_weapon_perks(weapon_name)
 
     async def compare_weapon_instances(
-        self, player_name: str, weapon_name: str
+        self,
+        player_name: str,
+        weapon_name: str,
+        item_instance_id: str | None = None,
     ) -> WeaponComparison:
-        return await self._compare_svc.compare_weapon_instances(player_name, weapon_name)
+        return await self._compare_svc.compare_weapon_instances(
+            player_name,
+            weapon_name,
+            item_instance_id,
+        )
 
     async def get_weapon_details_by_type(
         self, player_name: str, type_name: str

@@ -105,6 +105,7 @@ async def get_weapon_perks(
 async def compare_weapon_instances(
     player_name: str | None = None,
     weapon_name: str = "",
+    item_instance_id: str = "",
     ctx: Context = None,
 ) -> dict:
     """对比同一把武器在账号中的所有副本，列出各自的 perk 和差异。
@@ -119,11 +120,12 @@ async def compare_weapon_instances(
     Args:
         player_name: Bungie 名称。不填则使用默认玩家。
         weapon_name: 武器名（中英文均可），如 '千语'、'Fatebringer'。
+        item_instance_id: 可选。只查看这个物品实例；不填则对比全部同名副本。
     """
     player_name = resolve_player_name(player_name)
     svc = get_ctx(ctx)
     return await svc['weapon_compare_svc'].compare_weapon_instances(
-        player_name, weapon_name
+        player_name, weapon_name, item_instance_id or None
     )
 
 

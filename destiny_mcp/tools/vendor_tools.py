@@ -110,11 +110,8 @@ async def get_vendor_inventory(
         character: 角色名（商人库存因角色而异）。
         vendor_name: 商人名（中英文均可，如 '枪匠'、'祖尔'），不填返回所有商人。
     """
-    if not character:
-        return {"success": False, "message": "必须指定 character 参数（hunter/warlock/titan）。"}
-
-    player_name = resolve_player_name(player_name)
     svc = get_ctx(ctx)
+    player_name = resolve_player_name(svc, player_name)
 
     result = await svc['vendor_svc'].get_vendor_inventory(
         player_name, character, vendor_name

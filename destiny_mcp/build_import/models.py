@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from ..models import LoadoutItem
+
 
 class BuildDraft(BaseModel):
     """LLM 输出结构。全部是人类可读名称，不允许 Hash。
@@ -87,6 +89,18 @@ class CanonicalBuild(BaseModel):
         default_factory=list,
         description="武器 hash 列表（最多 3 把）",
     )
+    subclass_item_hash: int | None = Field(
+        default=None,
+        description="子职业物品 Hash",
+    )
+    subclass_instance_id: str = Field(
+        default="",
+        description="确认时已装备的子职业实例 ID",
+    )
+    subclass_plug_sockets: dict[int, int] = Field(
+        default_factory=dict,
+        description="准确的子职业插槽索引到 Plug Hash",
+    )
     super_hash: int | None = Field(
         default=None,
         description="超能 hash",
@@ -118,6 +132,18 @@ class CanonicalBuild(BaseModel):
     target_stats: dict[str, int] = Field(
         default_factory=dict,
         description="属性目标（Renegades 属性名：weapons/health/class_stat/grenade/melee/super_stat）",
+    )
+    items: list[LoadoutItem] = Field(
+        default_factory=list,
+        description="可执行装备项；包含准确实例 ID 和逐件模组 Hash",
+    )
+    snapshot_version: str = Field(
+        default="",
+        description="生成该方案时的护甲库存快照版本",
+    )
+    execution_id: str = Field(
+        default="",
+        description="服务端生成的一次性候选 ID，用于绑定用户确认内容",
     )
 
     @property

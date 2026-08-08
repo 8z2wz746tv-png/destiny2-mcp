@@ -7,7 +7,7 @@ Post-Game Carnage Report endpoints with automatic name resolution.
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
-from ..exceptions import APIError, PlayerNotFoundError
+from ..exceptions import APIError, CharacterNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
@@ -60,6 +60,29 @@ MODE_NAMES: dict[int, str] = {
 }
 
 
+def _unwrap_bungie_response(result: dict, operation: str) -> dict:
+    error_code = result.get("ErrorCode")
+    if error_code is not None and error_code != 1:
+        raise APIError(operation, result.get("Message", ""))
+    return result.get("Response", result)
+
+
+def _stat_entry(values: dict, stat_id: str) -> dict:
+    value = values.get(stat_id, {})
+    basic = value.get("basic", {}) if isinstance(value, dict) else {}
+    return {
+        "value": basic.get("value", 0),
+        "display": basic.get("displayValue", ""),
+    }
+
+
+def _first_stat(values: dict, stat_ids: list[str]) -> dict:
+    for stat_id in stat_ids:
+        if stat_id in values:
+            return _stat_entry(values, stat_id)
+    return {"value": 0, "display": ""}
+
+
 class ActivityService:
     """Query activity history and Post-Game Carnage Reports."""
 
@@ -78,16 +101,16 @@ class ActivityService:
         chars = profile.get("characters", {}).get("data", {})
 
         if not chars:
-            from ..exceptions import CharacterNotFoundError
             raise CharacterNotFoundError(character or "any", [])
 
         if character:
-            from ..manifest import resolve_character_name
+            from ..manifest import class_type_name, resolve_character_name
             target_type = resolve_character_name(character)
             for char_id, char_info in chars.items():
                 if char_info.get("classType") == target_type:
                     return str(mid), char_id, mtype
-            # Fall through to first character if target not found
+            available = [class_type_name(info.get("classType", -1)) for info in chars.values()]
+            raise CharacterNotFoundError(character, available)
 
         # Return first character
         char_id = next(iter(chars))
@@ -119,7 +142,6 @@ class ActivityService:
         chars = profile.get("characters", {}).get("data", {})
 
         if not chars:
-            from ..exceptions import CharacterNotFoundError
             raise CharacterNotFoundError(character or "any", [])
 
         # Determine which characters to query
@@ -132,9 +154,8 @@ class ActivityService:
                     char_ids.append((char_id, class_type_name(target_type)))
                     break
             if not char_ids:
-                # Target not found, query all
-                for char_id, char_info in chars.items():
-                    char_ids.append((char_id, class_type_name(char_info.get("classType", -1))))
+                available = [class_type_name(info.get("classType", -1)) for info in chars.values()]
+                raise CharacterNotFoundError(character, available)
         else:
             from ..manifest import class_type_name
             for char_id, char_info in chars.items():
@@ -311,7 +332,218 @@ class ActivityService:
                      "suicides", "precisionkills", "secondsPlayed"]
         pvp_keys = pve_keys + ["killsDeathsRatio"]
 
-        pve = _extract_stats(response.get("allPvE", {}), pve_keys)
-        pvp = _extract_stats(response.get("allPvP", {}), pvp_keys)
+        pve_section = response.get("allPvE", {})
+        pvp_section = response.get("allPvP", {})
+        pve_all_time = (
+            pve_section.get("allTime", pve_section)
+            if isinstance(pve_section, dict)
+            else {}
+        )
+        pvp_all_time = (
+            pvp_section.get("allTime", pvp_section)
+            if isinstance(pvp_section, dict)
+            else {}
+        )
+
+        pve = _extract_stats(pve_all_time, pve_keys)
+        pvp = _extract_stats(pvp_all_time, pvp_keys)
 
         return {"pve": pve, "pvp": pvp}
+
+    async def get_unique_weapon_history(
+        self,
+        player_name: str,
+        character: str | None = None,
+        limit: int = 25,
+    ) -> dict:
+        """Fetch and summarize per-weapon historical usage for one character."""
+        mid, char_id, mtype = await self._get_character_id(player_name, character)
+        logger.info("Fetching unique weapon history: player=%s char=%s", player_name, char_id)
+
+        result = await self._bungie.get_unique_weapon_history(mtype, mid, char_id)
+        if not isinstance(result, dict):
+            raise APIError("查询武器使用历史", "响应格式异常")
+        response = _unwrap_bungie_response(result, "查询武器使用历史")
+
+        weapons = []
+        for raw in response.get("weapons", []):
+            item_hash = raw.get("referenceId", 0)
+            values = raw.get("values", {})
+            kills = _first_stat(values, ["uniqueWeaponKills", "kills"])
+            precision = _first_stat(values, ["uniqueWeaponPrecisionKills", "precisionKills"])
+            item_info = self._manifest.get_item_info(item_hash)
+            icon = item_info.get("icon", "") if isinstance(item_info, dict) else ""
+            icon_url = (
+                icon
+                if isinstance(icon, str) and icon.startswith(("http://", "https://"))
+                else f"https://www.bungie.net{icon}"
+                if isinstance(icon, str) and icon.startswith("/")
+                else ""
+            )
+            weapons.append({
+                "item_hash": item_hash,
+                "name": self._manifest.get_item_name(item_hash),
+                "icon_url": icon_url,
+                "kills": kills["value"],
+                "kills_display": kills["display"],
+                "precision_kills": precision["value"],
+                "precision_kills_display": precision["display"],
+                "values": values,
+            })
+
+        weapons.sort(key=lambda item: item.get("kills", 0), reverse=True)
+        limited = weapons[: max(1, min(limit, 250))]
+        return {
+            "success": True,
+            "character_id": char_id,
+            "count": len(weapons),
+            "weapons": limited,
+            "message": f"找到 {len(weapons)} 把有历史记录的武器。",
+        }
+
+    async def get_aggregate_activity_stats(
+        self,
+        player_name: str,
+        character: str | None = None,
+        limit: int = 25,
+    ) -> dict:
+        """Fetch aggregate activity stats for one character."""
+        mid, char_id, mtype = await self._get_character_id(player_name, character)
+        logger.info("Fetching aggregate activity stats: player=%s char=%s", player_name, char_id)
+
+        result = await self._bungie.get_destiny_aggregate_activity_stats(mtype, mid, char_id)
+        if not isinstance(result, dict):
+            raise APIError("查询活动聚合统计", "响应格式异常")
+        response = _unwrap_bungie_response(result, "查询活动聚合统计")
+
+        activities = []
+        for raw in response.get("activities", []):
+            activity_hash = raw.get("activityHash", 0)
+            values = raw.get("values", {})
+            completions = _first_stat(values, ["activityCompletions", "activitiesWon"])
+            kills = _first_stat(values, ["activityKills", "kills"])
+            seconds = _first_stat(values, ["activitySecondsPlayed", "secondsPlayed"])
+            activities.append({
+                "activity_hash": activity_hash,
+                "activity_name": self._manifest.get_activity_name(activity_hash),
+                "completions": completions["value"],
+                "completions_display": completions["display"],
+                "kills": kills["value"],
+                "kills_display": kills["display"],
+                "seconds_played": seconds["value"],
+                "seconds_played_display": seconds["display"],
+                "values": values,
+            })
+
+        activities.sort(
+            key=lambda item: (item.get("completions", 0), item.get("kills", 0)),
+            reverse=True,
+        )
+        limited = activities[: max(1, min(limit, 250))]
+        return {
+            "success": True,
+            "character_id": char_id,
+            "count": len(activities),
+            "activities": limited,
+            "message": f"找到 {len(activities)} 条活动聚合统计。",
+        }
+
+    async def get_leaderboards(
+        self,
+        player_name: str,
+        character: str | None = None,
+        modes: str | None = None,
+        statid: str | None = None,
+        maxtop: int = 10,
+    ) -> dict:
+        """Fetch account or character leaderboards."""
+        p = await self._resolver.resolve_player(player_name)
+        mid = p["membership_id"]
+        mtype = p["membership_type"]
+
+        char_id = None
+        if character:
+            char_id = await self._resolver.resolve_character_id(mid, mtype, character)
+            result = await self._bungie.get_leaderboards_for_character(
+                mtype,
+                mid,
+                char_id,
+                maxtop=maxtop,
+                modes=modes,
+                statid=statid,
+            )
+        else:
+            result = await self._bungie.get_leaderboards(
+                mtype,
+                mid,
+                maxtop=maxtop,
+                modes=modes,
+                statid=statid,
+            )
+        if not isinstance(result, dict):
+            raise APIError("查询排行榜", "响应格式异常")
+        response = _unwrap_bungie_response(result, "查询排行榜")
+        return {
+            "success": True,
+            "character_id": char_id,
+            "leaderboards": response,
+            "preview": self._leaderboard_preview(response),
+            "message": "已读取排行榜数据。",
+        }
+
+    async def get_clan_leaderboards(
+        self,
+        group_id: str,
+        modes: str | None = None,
+        statid: str | None = None,
+        maxtop: int = 10,
+    ) -> dict:
+        """Fetch clan leaderboards by Bungie group ID."""
+        result = await self._bungie.get_clan_leaderboards(
+            group_id,
+            maxtop=maxtop,
+            modes=modes,
+            statid=statid,
+        )
+        if not isinstance(result, dict):
+            raise APIError("查询公会排行榜", "响应格式异常")
+        response = _unwrap_bungie_response(result, "查询公会排行榜")
+        return {
+            "success": True,
+            "group_id": group_id,
+            "leaderboards": response,
+            "preview": self._leaderboard_preview(response),
+            "message": "已读取公会排行榜数据。",
+        }
+
+    @staticmethod
+    def _leaderboard_preview(response: dict, max_entries: int = 5) -> list[dict]:
+        """Build a compact preview from Bungie's nested leaderboard response."""
+        preview = []
+        for mode_key, stats in response.items():
+            if mode_key in {"focusMembershipId", "focusCharacterId"}:
+                continue
+            if not isinstance(stats, dict):
+                continue
+            for stat_key, board in stats.items():
+                if not isinstance(board, dict):
+                    continue
+                entries = []
+                for entry in board.get("entries", [])[:max_entries]:
+                    player = entry.get("player", {}) or {}
+                    destiny_user = player.get("destinyUserInfo", {}) or {}
+                    value = entry.get("value", {}) or {}
+                    basic = value.get("basic", {}) or {}
+                    entries.append({
+                        "rank": entry.get("rank"),
+                        "player": destiny_user.get("displayName", ""),
+                        "character_id": str(entry.get("characterId", "")),
+                        "value": basic.get("value", 0),
+                        "display": basic.get("displayValue", ""),
+                    })
+                preview.append({
+                    "mode": mode_key,
+                    "stat": board.get("statId", stat_key),
+                    "entries": entries,
+                })
+        return preview

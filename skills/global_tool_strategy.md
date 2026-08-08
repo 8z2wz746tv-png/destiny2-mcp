@@ -1,311 +1,284 @@
-# Destiny MCP 工具调用策略
+# Destiny MCP 个人版工具调用策略
 
 ## 核心原则
 
-1. **先查后动** — 操作前先确认当前状态
-2. **最小调用** — 能一次搞定的不要分多次
-3. **失败重试** — API 超时/限流时等待后重试，最多 3 次
-4. **确认再执行** — 转移/装备操作前必须让用户确认
+1. **只用可见工具**：`normal` profile 只暴露 8 个聚合 assistant，普通对话不推荐旧低层工具。
+2. **先查后动**：账号写操作前先读取当前状态和准确实例。
+3. **确认再执行**：展示操作目标，等待玩家明确确认后才传 `confirmed=true`。
+4. **结果即边界**：名称、效果、价格、来源、持有状态和评价只能来自本次工具返回。
+5. **失败即止**：`ok=false`、鉴权失败或空数据不能用训练知识补答案。
+6. **最小调用**：复用当前有效结果，不重复发起相同查询或写操作。
+
+这是个人版。未传 `player_name` 时使用当前 OAuth 账号，并按项目配置决定是否回退到默认玩家。
 
 ---
 
-## 工具路由决策树
+## 8 个聚合工具
 
-### 查询类
-
-```
-用户问 "XXX在哪"
-  → search_items(item_name="XXX")
-
-用户问 "我有什么/背包里有什么"
-  → get_inventory(location="角色名或vault")
-
-用户问 "我有哪些某类型武器"
-  → search_items_by_type(type_name="手炮")
-
-用户问 "某武器的 perk"
-  → get_weapon_perks(weapon_name="千语")
-
-用户问 "对比我的某武器"
-  → compare_weapon_instances(weapon_name="千语")
-
-用户问 "某商人卖什么"
-  → get_vendor_inventory(vendor_name="枪匠")
-
-用户问 "这周有什么活动"
-  → get_weekly_reset()
-```
-
-### 操作类
-
-```
-用户说 "把XXX移到某角色"
-  → move_item(item_name="XXX", destination="hunter", equip=True)
-
-用户说 "装备这件"（物品已在背包）
-  → equip_item(item_instance_id="xxx", character="warlock")
-
-用户说 "把手雷换成XXX"
-  → modify_subclass(character="warlock", grenade="Incendiary Grenade")
-
-用户说 "给我装模组"
-  → apply_mod(item_instance_id="xxx", mod_name="手雷模组", character="warlock")
-```
-
-### 配装类
-
-```
-用户说 "帮我配一套XXX属性的build"
-  → find_build(character="warlock", health_target=200, grenade_target=200)
-
-用户说 "为什么找不到配装"
-  → analyze_build(同上参数)
-
-用户说 "穿上第一套"
-  → equip_build(score=第一套的score, 同上参数)
-
-用户说 "保存当前装备"
-  → save_loadout(name="GM配装", character="warlock")
-```
+| 工具 | 领域 | intent |
+|------|------|--------|
+| `player_assistant` | 玩家与角色档案 | `profile`, `search`, `find` |
+| `inventory_assistant` | 库存与物品操作 | `summary`, `duplicates`, `get`, `search`, `type`, `move`, `transfer`, `equip`, `equip_many`, `pull_postmaster`, `lock`, `track_quest` |
+| `weapon_assistant` | 武器知识与副本 | `analyze`, `compare`, `perk_pool`, `god_roll`, `popularity`, `type`, `filter_rolls`, `catalog`, `info`, `stats`, `perk_description`, `catalyst` |
+| `build_assistant` | 护甲配装 | `recommend`, `find`, `analyze`, `farm_target`, `equip_build`, `armor_mods`, `exotic_armor`, `set_bonus` |
+| `loadout_assistant` | 本地与官方配装槽 | `list`, `save`, `delete`, `equip_loadout`, `search_identifiers`, `snapshot_official`, `update_official_identifiers`, `clear_official` |
+| `subclass_assistant` | 子职业、碎片、神器 | `get`, `modify`, `options`, `fragments`, `fragment_details`, `artifact`, `artifact_mod`, `equip_artifact_mod` |
+| `activity_assistant` | 活动与战绩 | `history`, `pgcr`, `stats`, `weapon_history`, `aggregate`, `leaderboards`, `clan_leaderboards` |
+| `world_assistant` | 周常、商人、收藏 | `weekly`, `weekly_full`, `vendor`, `search_collectible_nodes`, `collectible_node`, `collectible_item` |
 
 ---
 
-## 参数推断策略
+## 查询路由
 
-### 角色推断
+### 玩家与库存
 
-| 用户说 | 推断为 |
-|--------|--------|
-| 术士/warlock/沃洛克 | character="warlock" |
-| 猎人/hunter | character="hunter" |
-| 泰坦/titan | character="titan" |
-| 不指定 | 从上下文推断，或问用户 |
+```python
+# 当前玩家和角色档案
+player_assistant(intent="profile")
 
-### 属性推断
+# 背包、角色或仓库概况
+inventory_assistant(intent="summary", location="<用户指定位置>")
 
-| 用户说 | 推断为 |
-|--------|--------|
-| 100韧性/满韧性 | health_target=100 |
-| 200手雷/溢出手雷 | grenade_target=200 |
-| 高Discipline | grenade_target=100 |
-| 100力量 | melee_target=100 |
+# 明确要求完整列表
+inventory_assistant(intent="get", location="<用户指定位置>")
 
-### 武器类型推断
+# 按名称或类型查账号已有物品
+inventory_assistant(intent="search", item_name="<用户原话>")
+inventory_assistant(intent="type", type_name="<用户原话中的类型>")
+```
 
-| 用户说 | 推断为 |
-|--------|--------|
-| 手炮 | type_name="手炮" |
-| 冲锋枪/SMG | type_name="微型冲锋枪" |
-| 火箭筒 | type_name="火箭发射器" |
-| 刀剑 | type_name="刀剑" |
+`<...>` 是占位符。名称不能翻译、补全或换成模型认为的正式名称；模糊匹配交给工具。
 
-### 商人推断
+### 重复武器
 
-| 用户说 | 推断为 |
-|--------|--------|
-| 枪匠/banshee | vendor_name="枪匠" |
-| 老九/仄/xur | vendor_name="祖尔" |
-| 艾达/ada | vendor_name="艾达" |
-| 拉乎尔/rahool | vendor_name="拉乎尔" |
+```python
+inventory_assistant(
+    intent="duplicates",
+    item_name="<可选名称过滤>",
+    type_name="<可选类型过滤>",
+    limit=<每页数量>,
+    offset=<当前页偏移>
+)
+```
+
+只使用 `data.duplicate_weapons`、`scan`、`filters` 和 `pagination`：
+
+- 分组规则是相同 `item_hash` 且实例 ID 不同。
+- `duplicate_scan_complete=false` 表示账号结论不完整。
+- `perk_data_complete=false` 表示当前页部分实例的 Perk 不完整。
+- `pagination.has_more=true` 时，下次原样使用 `next_offset`。
+- 不得从 `summary` 的截断样例或同名文本自行统计重复数。
+
+### 武器当前副本与 Perk 池
+
+```python
+# 综合分析
+weapon_assistant(intent="analyze", weapon_name="<用户原话>")
+
+# 账号同名全部副本
+weapon_assistant(intent="compare", weapon_name="<已确认名称>")
+
+# 侧栏或上文已明确选中某实例
+weapon_assistant(
+    intent="compare",
+    weapon_name="<已确认名称>",
+    item_instance_id="<工具或界面提供的实例 ID>"
+)
+
+# 所有可能 Perk，不代表当前副本拥有
+weapon_assistant(intent="perk_pool", weapon_name="<已确认名称>")
+
+# 单个 Perk 描述
+weapon_assistant(intent="perk_description", perk_name="<用户原话>")
+```
+
+- `compare.instances[].perks` 是当前副本配置。
+- `perk_pool.slots[].plugs` 是所有可能候选。
+- 指定 `item_instance_id` 时只分析该实例；它不是 `item_hash`。
+- 玩家问当前没有的 Perk 时仍要查 `perk_pool` 或 `perk_description`。
+- Perk 描述为空时写“工具未提供效果描述”，不能按名称推断。
+
+### 全量武器目录
+
+```python
+weapon_assistant(
+    intent="catalog",
+    weapon_name="<可选武器名过滤>",
+    weapon_type="<用户原话中的类型>",
+    required_perks=["<必须全部具备的 Perk>"],
+    any_perks=["<至少具备一个的 Perk>"],
+    excluded_perks=["<排除的 Perk>"],
+    limit=<结果上限>
+)
+```
+
+- 这是 Manifest 全量候选，不读取账号持有情况。
+- `owned=false` 和 `ownership_checked=false` 不能解释为玩家没有。
+- 匹配证据只来自 `matched_perks` 与 `matched_perk_details`。
+- 需要确认玩家是否持有某候选时，另用 `inventory_assistant(intent="search")`。
+
+### 武器选取率
+
+```python
+weapon_assistant(intent="popularity", weapon_name="<已确认名称>")
+```
+
+- `data.popularity=null` 表示没有录入快照。
+- `selection_rate=null` 表示原始截图未显示该比例，不是 0%。
+- `popular_combinations`、`perk_columns`、`masterworks` 和 `mods` 必须分别展示。
+- 保留 `source`、版本标签与 `warnings`，不把快照写成实时全服统计。
+
+### 商人与周常
+
+```python
+world_assistant(intent="vendor", vendor_name="<用户原话>")
+world_assistant(intent="weekly")
+world_assistant(intent="weekly_full")
+```
+
+- `vendor_name` 使用玩家原话，由工具匹配。
+- 未指定角色时可以留空，由个人账号服务选择真实可用角色。
+- 商品武器的 Perk 只能来自本次商品 socket，不能拿总 Perk 池代替。
+- 商人查询失败时停止，不能改答周常。
+
+### 收藏、子职业与活动
+
+```python
+world_assistant(intent="search_collectible_nodes", query="<用户原话>")
+world_assistant(intent="collectible_node", collectible_node_hash=<工具返回 Hash>)
+world_assistant(intent="collectible_item", item_name="<用户原话>")
+
+subclass_assistant(intent="get", character="<已确认角色>")
+subclass_assistant(intent="options", character="<已确认角色>", element="<已确认元素>", component="<组件>")
+subclass_assistant(intent="fragments", element="<已确认元素>")
+
+activity_assistant(intent="history", character="<可选角色>", count=<场数>)
+activity_assistant(intent="pgcr", activity_id="<工具返回或玩家提供的单场 ID>")
+activity_assistant(intent="weapon_history", character="<可选角色>")
+activity_assistant(intent="aggregate", character="<可选角色>")
+```
+
+近期活动列表不需要逐场追加 PGCR。只有玩家指定单场或明确要求详细结算时调用 `pgcr`。
 
 ---
 
-## 常见工具组合模式
+## 配装路由
 
-### 模式 1：查+转+装
+### 推荐、候选与诊断
 
-```
-用户：把千语移到猎人并装备
-
-步骤：
-1. search_items(item_name="千语") → 获取位置和 instance_id
-2. 如果在其他角色：move_item(item_name="千语", destination="hunter", equip=True)
-3. 如果在背包：equip_item(item_instance_id="xxx", character="hunter")
-```
-
-### 模式 2：配装全流程
-
-```
-用户：帮我配一套术士200手雷的build并装备
-
-步骤：
-1. find_build(character="warlock", grenade_target=200) → 获取 Top5
-2. 展示结果让用户选择
-3. equip_build(score=用户选择的score, character="warlock", grenade_target=200)
-4. apply_mod(...) → 安装缺失的模组（如果需要）
+```python
+build_assistant(
+    intent="recommend",
+    character="<已确认职业>",
+    exotic_name="<如有则逐字复制用户原话>",
+    weapons_target=<明确数值>,
+    health_target=<明确数值>,
+    class_target=<明确数值>,
+    grenade_target=<明确数值>,
+    melee_target=<明确数值>,
+    super_target=<明确数值>,
+    priority_stats=["<从高到低的属性代码>"],
+    include_subclass_fragment=<玩家是否明确要求计入>,
+    top_n=<候选数>
+)
 ```
 
-### 模式 3：武器对比+推荐
+- 未明确的参数省略，不从“高”“优先”“尽量”猜数值。
+- 所有 `*_target`、指定金装、碎片和套装要求都是硬约束。
+- `priority_stats` 只在硬目标满足后用于严格顺序排序。
+- 0 个候选时先用同一组参数调用 `intent="analyze"`；玩家想知道如何达标时，继续调用 `intent="farm_target", max_replacements=2`。不得自动降低目标或替换金装。
+- `exotic_confirmation_required` 时展示工具候选，让玩家选择；原样复用所选候选的完整 `arguments`。
 
-``用户：我有两把千语，哪个好？
+### 反推合法刷取目标
 
-步骤：
-1. compare_weapon_instances(weapon_name="千语") → 对比 perk
-2. get_god_roll(weapon_name="千语") → 获取推荐 roll
-3. 综合分析告诉用户哪把更好
+```python
+build_assistant(
+    intent="farm_target",
+    character="<已确认职业>",
+    replacement_slot="<可选部位>",
+    baseline="equipped",  # 或 inventory
+    max_replacements=2,
+    <保持用户原始硬约束>
+)
 ```
 
-### 模式 4：商人购物
+- 结果只可能是工具验证的 Armor 3.0 五阶 30/25/20 模板。
+- `equipped` 固定当前穿着的其余四件；`inventory` 从账号护甲中有限枚举基线。
+- `farm_options` 是未来刷取目标，不是可装备物品。
+- `farm_plans` 是完整单件搜索无解后的最少两件方案，也不是可装备物品。
+- 不得手算或改写 `base_stats`、`masterworked_stats`、`tuning_name`、`tuning_delta`、`projected_stats`、`projected_total`。
+- `reason="inventory_search_too_large"` 时建议缩小 `replacement_slot` 或目标范围，或在玩家同意后改用 `baseline="equipped"`；不能改为模型估算。
 
-```
-用户：枪匠今天有什么好东西？
+### 精确装备候选
 
-步骤：
-1. get_vendor_inventory(vendor_name="枪匠") → 获取库存
-2. 筛选值得购买的物品（god roll 武器、稀缺模组）
-3. 告知用户哪些值得买
+```python
+# 展示候选返回的完整 canonical_build 后等待玩家确认
+build_assistant(
+    intent="equip_build",
+    canonical_build=<所选候选原始值>,
+    confirmed=true
+)
 ```
+
+- 必须原样使用候选的 `canonical_build`，包括准确实例、模组、快照版本和执行标识。
+- 禁止只传分数重新求解，也不能手工拼出 canonical build。
+- 候选过期、库存变化或校验失败时重新推荐、展示并确认。
 
 ---
 
-## 错误处理策略
+## 写操作确认
 
-### 搜不到物品
+以下 intent 会修改状态：
 
-```
-错误：找不到名为 'XXX' 的物品
+- `inventory_assistant`: `move`, `transfer`, `equip`, `equip_many`, `pull_postmaster`, `lock`, `track_quest`
+- `build_assistant`: `equip_build`
+- `loadout_assistant`: `save`, `delete`, `equip_loadout`, `snapshot_official`, `update_official_identifiers`, `clear_official`
+- `subclass_assistant`: `modify`, `equip_artifact_mod`
 
-处理：
-1. 尝试更短的关键词（如 "千语" 而不是 "千语之歌"）
-2. 尝试英文名
-3. 用 get_inventory 列出全部物品再筛选
-4. 告知用户可能已分解或名称有误
-```
+执行流程：
 
-### 转移失败
+1. 用只读 intent 获取准确名称、位置、实例 ID、角色和当前状态。
+2. 向玩家复述将修改的每一项；异域装备同时检查武器和护甲限制。
+3. 等玩家明确回复确认。
+4. 使用完全相同的参数并加 `confirmed=true` 调用。
+5. 逐项展示工具实际结果；部分失败不能描述为整体成功。
 
-```
-错误：TransferError / 物品无法转移
+玩家只要求查看、分析或推荐不构成确认。目标、实例或槽位发生变化后，旧确认失效。
 
-处理：
-1. 检查仓库是否已满（600格上限）
-2. 检查目标背包是否已满
-3. 检查物品是否已装备（需先卸下）
-4. 告知用户具体原因
-```
-
-### 装备失败
-
-```
-错误：EquipError / 装备失败
-
-处理：
-1. 检查是否已有异域护甲冲突
-2. 检查物品是否在目标角色背包（不能从仓库直接装备）
-3. 告知用户异域限制规则
-```
-
-### API 超时/限流
-
-```
-错误：Timeout / RateLimit
-
-处理：
-1. 等待 1-2 秒后重试
-2. 最多重试 3 次
-3. 仍失败则告知用户 Bungie API 不稳定，稍后再试
-```
-
-### 找不到配装
-
-```
-错误：find_build 返回空结果
-
-处理：
-1. 调用 analyze_build 诊断原因
-2. 告知用户哪些属性目标无法达到
-3. 建议降低目标或刷特定活动获取缺失护甲
-```
+`needs_disambiguation=true` 时先展示所有候选，等待玩家选择，再原样使用所选 `item_instance_id`。禁止自动选择同名物品。
 
 ---
 
-## 展示格式规范
+## 展示与图标
 
-### 装备列表
+- 工具返回非空 `icon_url` 时使用标准 Markdown：`![名称](icon_url)`。
+- 装备列表使用独立图标列；Perk、固有特性、模组和商品同样渲染图标。
+- 当前配置、完整 Perk 池、社区推荐和选取率快照分区展示。
+- 缺字段时写“工具未提供”，不要构造 URL、数值、评分或效果。
+- warning 会影响完整性时必须紧邻结论展示。
 
-```
-=== 术士 · 动能武器 (3) ===
-1. ⚔️ 千语 | 光等 1810 | [已装备]
-2. 伊邪那岐的重担 | 光等 1800
-3. 遗言 | 光等 1795
-
-符号说明：
-⚔️ = 已装备
-⭐ = 异域（金色）
-❌ = 空槽位
-```
-
-### 配装方案
-
-```
-=== Top 1 配装 (score: 95.2) ===
-| 部位 | 名称 | 光等 |
-|------|------|------|
-| 头盔 | ⭐ 灵巫画服面具 | 1810 |
-| 手甲 | 荒野手套 | 1810 |
-| 胸甲 | 荒野长袍 | 1810 |
-| 腿甲 | 荒野靴 | 1810 |
-| 职业护甲 | 荒野裹腕 | 1810 |
-
-属性：Health 200 | Grenade 200 | Super 80
-```
-
-### 商人库存
-
-```
-=== 枪匠 · 本周推荐 ===
-1. ⭐ 突击冲锋枪 | 光等 1810 | 100传说碎片
-   Perk: 口径弹药 + 杀戮弹匣
-   评价：PvE God Roll，强烈推荐购买
-```
+示意模板中的方括号或尖括号都只是占位符，不能当成游戏数据。
 
 ---
+
+## 错误处理
+
+| 情况 | 处理 |
+|------|------|
+| 未找到物品 | 建议缩短关键词、核对拼写或提供另一语言名称；不循环猜测 |
+| 数据不完整 | 展示 `warnings` 和完整性字段，不下全账号结论 |
+| 转移或装备失败 | 复述工具原因，检查容量、位置和异域冲突，不自行重试写操作 |
+| 鉴权失败 | 提示重新完成个人版 OAuth，不暴露 Token 或 API Key |
+| 明确超时/限流 | 有限重试；仍失败则停止 |
+| 配装无解 | 保持原硬约束并诊断；玩家要达标方案时自动反推一件或两件，反推仍无解才询问是否调整 |
+| 排行榜权限不足 | 如实说明 Bungie 应用权限不足，不生成替代排行 |
 
 ## 禁止事项
 
-1. **禁止猜测物品名称** — 不确定就查，不要编造
-2. **禁止跳过确认** — 转移/装备前必须让用户确认
-3. **禁止忽略异域限制** — 每角色只能装备 1 件异域护甲
-4. **禁止重复调用** — 同样的查询不要重复执行
-5. **禁止暴露敏感信息** — API Key、Token 等不能出现在回复中
-
----
-
-## 知识库写入规则（强制）
-
-**核心原则：所有写入知识库的数据必须来自 MCP 工具返回值，禁止凭记忆或训练知识编造。**
-
-### 写入流程
-
-```
-1. 调用 MCP 工具查询数据（如 list_subclass_options、get_fragment_details）
-2. 将工具返回的 JSON 直接转换为 markdown 文件
-3. 写入知识库目录
-4. 重复，直到完成所有条目
-```
-
-### 适用工具
-
-| 工具 | 用途 |
-|------|------|
-| `list_subclass_options` | 导出超能/近战/手雷/星象/跳跃方式 |
-| `list_fragments` | 导出碎片列表 |
-| `get_fragment_details` | 导出碎片详情 |
-| `get_catalyst_details` | 导出催化剂详情 |
-| `get_item_definition` | 导出物品定义 |
-| `get_exotic_armor_details` | 导出异域护甲详情 |
-
-### 禁止行为
-
-- ❌ 凭记忆写星象/碎片/模组描述
-- ❌ 批量写入时不逐个调用 MCP
-- ❌ 用训练数据补充工具返回的空字段
-- ❌ 推测未查询的条目的内容
-
-### 示例
-
-```
-❌ 错误：我知道猎人虚空有4个星象，直接写入
-✅ 正确：调用 list_subclass_options(class="hunter", element="void", component="aspect")
-         → 拿到 JSON → 转 markdown → 写入
-```
+1. 禁止使用训练知识补物品、Perk、模组、商人、价格、来源和账号结论。
+2. 禁止跳过确认或自行设置 `confirmed=true`。
+3. 禁止同时装备超过 1 把异域武器或超过 1 件异域护甲。
+4. 禁止把 Manifest 全量候选说成账号持有物品。
+5. 禁止把未录入或 `null` 选取率说成 0%。
+6. 禁止把 Armor 3.0 farm option 当成真实库存物品。
+7. 禁止暴露 API Key、OAuth Token 或其他敏感配置。

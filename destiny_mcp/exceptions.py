@@ -64,6 +64,14 @@ class ManifestError(DestinyMCPError):
     """Manifest is not loaded or not found."""
 
 
+class BuildValidationError(DestinyMCPError):
+    """A build request or exact execution contract is invalid."""
+
+
+class WeaponPopularityDataError(DestinyMCPError):
+    """A bundled weapon popularity snapshot is malformed."""
+
+
 class AuthenticationError(DestinyMCPError):
     """OAuth token is missing, expired, or invalid."""
 

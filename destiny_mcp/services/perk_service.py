@@ -11,6 +11,7 @@ from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..models import PerkInfo, WeaponPerkPool, WeaponPerkSlot
 from .wishlist_service import WishListService
+from .weapon_popularity_service import WeaponPopularityService
 
 logger = get_logger(__name__)
 
@@ -47,9 +48,15 @@ class PerkService:
         self,
         manifest: ManifestManager,
         wishlist: WishListService | None = None,
+        popularity: WeaponPopularityService | None = None,
     ) -> None:
         self._manifest = manifest
         self._wishlist = wishlist
+        self._popularity = popularity or WeaponPopularityService(manifest)
+
+    def get_weapon_popularity(self, weapon_name: str) -> dict | None:
+        """Return a recorded selection-rate snapshot, if one exists."""
+        return self._popularity.get_weapon_popularity(weapon_name)
 
     def annotate_god_roll(
         self, item_hash: int, plug_hash: int, perk: PerkInfo
@@ -149,12 +156,17 @@ class PerkService:
                 sandbox_info = self._manifest.get_sandbox_perk_description(ph)
                 if sandbox_info:
                     desc = sandbox_info.get("description", "")
+                if not desc:
+                    item_description = self._manifest.get_item_description(ph)
+                    if isinstance(item_description, str):
+                        desc = item_description
 
                 perk = PerkInfo(
                     plug_hash=ph,
                     name=plug["name"],
                     description=desc,
                     plug_category=cat_id,
+                    icon_url=_item_icon_url(self._manifest, ph),
                 )
                 self.annotate_god_roll(item_hash, ph, perk)
                 grouped.setdefault(slot_label, []).append(perk)
@@ -173,6 +185,7 @@ class PerkService:
             weapon_name=weapon_display_name,
             weapon_type=weapon_type,
             item_hash=item_hash,
+            icon_url=str(weapon.get("icon") or ""),
             slots=slots,
         )
 
@@ -233,3 +246,10 @@ class PerkService:
                 lines.append(f"  • {name}")
 
         return "\n".join(lines)
+
+
+def _item_icon_url(manifest: ManifestManager, item_hash: int) -> str:
+    info = manifest.get_item_info(item_hash)
+    if not isinstance(info, dict):
+        return ""
+    return str(info.get("icon") or "")

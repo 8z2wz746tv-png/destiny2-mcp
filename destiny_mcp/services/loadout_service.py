@@ -23,7 +23,7 @@ import aiobungie
 from ..bungie_client import BungieClient
 from ..exceptions import DestinyMCPError
 from ..logging_config import get_logger
-from ..manifest import ManifestManager
+from ..manifest import BUNGIE_BASE_URL, ManifestManager, class_type_name, resolve_character_name
 from ..models import (
     Loadout,
     LoadoutItem,
@@ -32,6 +32,7 @@ from ..models import (
     LoadoutSubclassConfig,
 )
 from ..player_resolver import PlayerResolver
+from .account_action_lock import account_action_lock, serialized_account_action
 from .loadout_equipment_service import LoadoutEquipmentService
 
 logger = get_logger(__name__)
@@ -64,6 +65,7 @@ class LoadoutService:
         self._bungie = bungie
         self._manifest = manifest
         self._resolver = resolver
+        self._account_action_lock = account_action_lock(bungie)
         self._equipment = LoadoutEquipmentService(bungie, manifest, resolver)
         self._path = loadout_path or _DEFAULT_LOADOUT_PATH
 
@@ -71,6 +73,75 @@ class LoadoutService:
         self._cache: dict[str, list[Loadout]] = {}
         self._cache_timestamp: dict[str, float] = {}
         self._refresh_tasks: dict[str, asyncio.Task] = {}
+
+    @staticmethod
+    def _slot_number_to_index(slot_number: int) -> int:
+        """Convert user-facing slot number (1-10) to Bungie's zero-based index."""
+        if slot_number < 1 or slot_number > 10:
+            raise DestinyMCPError("官方配装槽位必须是 1 到 10。")
+        return slot_number - 1
+
+    def search_official_loadout_identifiers(
+        self,
+        kind: str = "all",
+        query: str = "",
+        limit: int = 30,
+    ) -> dict:
+        """Search official loadout name/icon/color identifier definitions."""
+        tables = {
+            "name": "DestinyLoadoutNameDefinition",
+            "名称": "DestinyLoadoutNameDefinition",
+            "icon": "DestinyLoadoutIconDefinition",
+            "图标": "DestinyLoadoutIconDefinition",
+            "color": "DestinyLoadoutColorDefinition",
+            "颜色": "DestinyLoadoutColorDefinition",
+        }
+        normalized = kind.strip().lower() if kind else "all"
+        selected = (
+            list({"name": tables["name"], "icon": tables["icon"], "color": tables["color"]}.items())
+            if normalized in {"all", "全部", ""}
+            else [(normalized, tables.get(normalized, ""))]
+        )
+        if not selected or not selected[0][1]:
+            return {
+                "success": False,
+                "message": "kind 只能是 all/name/icon/color（或 全部/名称/图标/颜色）。",
+            }
+
+        max_per_kind = max(1, min(limit, 100))
+        results: dict[str, list[dict]] = {}
+        for result_kind, table in selected:
+            definitions = self._manifest.search_definitions_by_name(
+                table,
+                query,
+                limit=max_per_kind,
+                scan_limit=5000,
+            )
+            entries = []
+            for definition in definitions:
+                display = definition.get("displayProperties") or {}
+                icon = display.get("icon", "")
+                icon_url = (
+                    f"{BUNGIE_BASE_URL}{icon}"
+                    if icon.startswith("/")
+                    else icon
+                )
+                entries.append({
+                    "hash": int(definition.get("hash", 0)),
+                    "name": display.get("name", ""),
+                    "description": display.get("description", ""),
+                    "icon_url": icon_url,
+                })
+            results[result_kind] = entries
+
+        total = sum(len(entries) for entries in results.values())
+        return {
+            "success": True,
+            "kind": kind,
+            "query": query,
+            "results": results,
+            "message": f"找到 {total} 个官方配装标识候选。",
+        }
 
     # ── Background cache refresh ────────────────────────────────────
 
@@ -266,11 +337,15 @@ class LoadoutService:
             if not slot:
                 slot = _ARMOR_SLOTS.get(bucket_hash & 0xFFFFFFFF)
             if slot:
-                mods = self._equipment.read_armor_mods(inst_id, sockets_data)
+                mod_sockets = self._equipment.read_armor_mod_sockets(
+                    inst_id, item_hash, sockets_data
+                )
                 item_name = self._manifest.get_item_name(item_hash)
                 equipped_items.append(LoadoutItem(
                     item_hash=item_hash, name=item_name, slot=slot,
-                    item_instance_id=inst_id, mods=mods,
+                    item_instance_id=inst_id,
+                    mods=list(mod_sockets.values()),
+                    mod_sockets=mod_sockets,
                 ))
 
             item_info = self._manifest.get_item_info(item_hash) or {}
@@ -318,6 +393,7 @@ class LoadoutService:
         logger.info("Deleted loadout %s", loadout_id)
         return LoadoutOperationResult(success=True, message="配装已删除。")
 
+    @serialized_account_action
     async def equip_loadout(
         self, player_name: str, loadout_id: str,
     ) -> LoadoutOperationResult:
@@ -358,4 +434,108 @@ class LoadoutService:
         return LoadoutOperationResult(
             success=ok,
             message="官方配装已装备。" if ok else f"装备失败：{result.get('Message', '未知错误')}",
+        )
+
+    @serialized_account_action
+    async def snapshot_official_loadout(
+        self,
+        player_name: str,
+        character: str,
+        slot_number: int,
+        name_hash: int | None = None,
+        icon_hash: int | None = None,
+        color_hash: int | None = None,
+    ) -> LoadoutOperationResult:
+        """Save current character equipment into a Bungie official loadout slot."""
+        loadout_index = self._slot_number_to_index(slot_number)
+        p = await self._resolver.resolve_player(player_name)
+        mid, mtype = p["membership_id"], p["membership_type"]
+        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
+        class_name = class_type_name(resolve_character_name(character))
+
+        result = await self._bungie.snapshot_loadout(
+            loadout_index,
+            char_id,
+            mtype,
+            name_hash=name_hash,
+            icon_hash=icon_hash,
+            color_hash=color_hash,
+        )
+        ok = result.get("ErrorCode", 0) == 1
+        self._cache_timestamp.pop(player_name, None)
+        return LoadoutOperationResult(
+            success=ok,
+            message=(
+                f"已把 {class_name} 当前装备保存到游戏内官方配装 {slot_number} 号槽。"
+                if ok
+                else f"保存官方配装失败：{result.get('Message', '未知错误')}"
+            ),
+        )
+
+    @serialized_account_action
+    async def update_official_loadout_identifiers(
+        self,
+        player_name: str,
+        character: str,
+        slot_number: int,
+        name_hash: int | None = None,
+        icon_hash: int | None = None,
+        color_hash: int | None = None,
+    ) -> LoadoutOperationResult:
+        """Update name/icon/color hashes for a Bungie official loadout slot."""
+        if name_hash is None and icon_hash is None and color_hash is None:
+            return LoadoutOperationResult(
+                success=False,
+                message="至少需要提供 name_hash、icon_hash 或 color_hash 中的一个。",
+            )
+
+        loadout_index = self._slot_number_to_index(slot_number)
+        p = await self._resolver.resolve_player(player_name)
+        mid, mtype = p["membership_id"], p["membership_type"]
+        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
+        class_name = class_type_name(resolve_character_name(character))
+
+        result = await self._bungie.update_loadout_identifiers(
+            loadout_index,
+            char_id,
+            mtype,
+            name_hash=name_hash,
+            icon_hash=icon_hash,
+            color_hash=color_hash,
+        )
+        ok = result.get("ErrorCode", 0) == 1
+        self._cache_timestamp.pop(player_name, None)
+        return LoadoutOperationResult(
+            success=ok,
+            message=(
+                f"已更新 {class_name} 官方配装 {slot_number} 号槽的名称/图标/颜色。"
+                if ok
+                else f"更新官方配装标识失败：{result.get('Message', '未知错误')}"
+            ),
+        )
+
+    @serialized_account_action
+    async def clear_official_loadout(
+        self,
+        player_name: str,
+        character: str,
+        slot_number: int,
+    ) -> LoadoutOperationResult:
+        """Clear a Bungie official loadout slot."""
+        loadout_index = self._slot_number_to_index(slot_number)
+        p = await self._resolver.resolve_player(player_name)
+        mid, mtype = p["membership_id"], p["membership_type"]
+        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
+        class_name = class_type_name(resolve_character_name(character))
+
+        result = await self._bungie.clear_loadout(loadout_index, char_id, mtype)
+        ok = result.get("ErrorCode", 0) == 1
+        self._cache_timestamp.pop(player_name, None)
+        return LoadoutOperationResult(
+            success=ok,
+            message=(
+                f"已清空 {class_name} 官方配装 {slot_number} 号槽。"
+                if ok
+                else f"清空官方配装失败：{result.get('Message', '未知错误')}"
+            ),
         )

@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
+import tempfile
 import time
 import zipfile
+from collections.abc import Mapping
 from pathlib import Path
 
 import httpx
@@ -13,13 +16,14 @@ import httpx
 import aiobungie
 
 from . import config
-from .exceptions import AuthenticationError, BungieServiceUnavailableError, ManifestError
+from .exceptions import APIError, AuthenticationError, BungieServiceUnavailableError, ManifestError
 from .logging_config import get_logger
 
 logger = get_logger(__name__)
 
 _VENDOR_COMPONENTS_FULL = [400, 401, 402, 300, 301, 302, 304, 305, 306, 307, 308, 309, 310]
 _VENDOR_COMPONENTS_BASIC = [400, 402]
+_VENDOR_ITEM_COMPONENTS = [305, 310]
 
 
 def _is_insufficient_privileges(exc: aiobungie.HTTPError) -> bool:
@@ -84,6 +88,7 @@ class BungieClient:
         self._refresh_token: str | None = None
         self._token_expires_at: float = 0.0
         self._token_dir = token_dir  # Per-user token directory override
+        self._token_lock = asyncio.Lock()
 
     # ── Token persistence ──────────────────────────────────────────
 
@@ -98,6 +103,7 @@ class BungieClient:
             logger.info("No token file at %s — OAuth setup required", path)
             return False
         try:
+            os.chmod(path, 0o600)
             data = json.loads(path.read_text())
             self._access_token = data.get("access_token")
             self._refresh_token = data.get("refresh_token")
@@ -131,7 +137,22 @@ class BungieClient:
             "expires_at": self._token_expires_at,
             "membership_id": existing.get("membership_id", ""),
         }
-        path.write_text(json.dumps(data, indent=2))
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, temp_path = tempfile.mkstemp(
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                json.dump(data, handle, indent=2)
+            os.chmod(temp_path, 0o600)
+            os.replace(temp_path, path)
+        finally:
+            try:
+                os.unlink(temp_path)
+            except FileNotFoundError:
+                pass
         logger.debug("Tokens saved to %s", path)
 
     async def _refresh_access_token(self) -> bool:
@@ -162,18 +183,25 @@ class BungieClient:
             client_id=int(config.BUNGIE_CLIENT_ID),
         )
         self._rest.open()
-
-        if not await self._load_tokens():
-            raise AuthenticationError(
-                "No valid Destiny OAuth tokens found. "
-                "Run the OAuth setup script first:\n"
-                "  python scripts/oauth_setup.py"
-            )
+        try:
+            if not await self._load_tokens():
+                raise AuthenticationError(
+                    "No valid Destiny OAuth tokens found. "
+                    "Run the OAuth setup script first:\n"
+                    "  python scripts/oauth_setup.py\n"
+                    "or after installation:\n"
+                    "  destiny-mcp-oauth"
+                )
+        except BaseException:
+            await self.close()
+            raise
         logger.info("BungieClient authenticated")
 
     async def close(self) -> None:
-        if self._rest:
-            await self._rest.close()
+        rest = self._rest
+        self._rest = None
+        if rest:
+            await rest.close()
             logger.info("BungieClient closed")
 
     async def get_access_token(self) -> str:
@@ -182,8 +210,10 @@ class BungieClient:
             raise AuthenticationError("Not authenticated. Call start() first.")
         # Refresh if expired
         if time.time() >= self._token_expires_at - 300:
-            if not await self._refresh_access_token():
-                raise AuthenticationError("Token expired and refresh failed.")
+            async with self._token_lock:
+                if time.time() >= self._token_expires_at - 300:
+                    if not await self._refresh_access_token():
+                        raise AuthenticationError("Token expired and refresh failed.")
         return self._access_token  # type: ignore[return-value]
 
     @property
@@ -335,6 +365,98 @@ class BungieClient:
             logger.error("TransferItem failed: item=%s error=%s msg=%s", item_instance_id, code, exc)
             return {"ErrorCode": code, "Message": str(exc)}
 
+    async def _post_action(
+        self,
+        path: str,
+        payload: dict,
+        operation: str,
+    ) -> dict:
+        """POST a Bungie action endpoint and normalize the action result."""
+        try:
+            result = await self.rest.static_request(
+                "POST",
+                path,
+                auth=await self.get_access_token(),
+                json=payload,
+            )
+            if isinstance(result, dict):
+                return {
+                    "ErrorCode": result.get("ErrorCode", 1),
+                    "Message": result.get("Message", "Ok"),
+                    "Response": result.get("Response"),
+                    "ErrorStatus": result.get("ErrorStatus", ""),
+                }
+            return {"ErrorCode": 1, "Message": "Ok", "Response": result}
+        except aiobungie.HTTPError as exc:
+            unavailable = _bungie_unavailable_result(exc, operation)
+            if unavailable:
+                return unavailable
+            code = _http_error_code(exc)
+            logger.error("%s failed: error=%s msg=%s", operation, code, exc)
+            return {"ErrorCode": code, "Message": str(exc)}
+
+    async def pull_from_postmaster(
+        self,
+        item_instance_id: str,
+        item_hash: int,
+        character_id: str,
+        membership_type: int,
+        *,
+        stack_size: int = 1,
+    ) -> dict:
+        """Pull an item from a character's postmaster into inventory."""
+        return await self._post_action(
+            "Destiny2/Actions/Items/PullFromPostmaster/",
+            {
+                "itemReferenceHash": item_hash,
+                "stackSize": stack_size,
+                "itemId": int(item_instance_id),
+                "characterId": int(character_id),
+                "membershipType": membership_type,
+            },
+            "从邮政官取回物品",
+        )
+
+    async def set_item_lock_state(
+        self,
+        item_instance_id: str,
+        character_id: str,
+        membership_type: int,
+        *,
+        state: bool,
+    ) -> dict:
+        """Lock or unlock an item instance."""
+        return await self._post_action(
+            "Destiny2/Actions/Items/SetLockState/",
+            {
+                "state": state,
+                "itemId": int(item_instance_id),
+                "characterId": int(character_id),
+                "membershipType": membership_type,
+            },
+            "设置物品锁定状态",
+        )
+
+    async def set_quest_tracked_state(
+        self,
+        item_instance_id: str,
+        character_id: str,
+        membership_type: int,
+        *,
+        state: bool,
+    ) -> dict:
+        """Track or untrack a quest/bounty item instance."""
+        return await self._post_action(
+            "Destiny2/Actions/Items/SetTrackedState/",
+            {
+                "state": state,
+                "itemId": int(item_instance_id),
+                "characterId": int(character_id),
+                "membershipType": membership_type,
+            },
+            "设置任务追踪状态",
+        )
+
     async def equip_item(
         self,
         item_instance_id: str,
@@ -360,6 +482,23 @@ class BungieClient:
             logger.error("EquipItem failed: item=%s char=%s error=%s msg=%s",
                         item_instance_id, character_id, code, exc)
             return {"ErrorCode": code, "Message": str(exc)}
+
+    async def equip_items(
+        self,
+        item_instance_ids: list[str],
+        character_id: str,
+        membership_type: int,
+    ) -> dict:
+        """Equip multiple items on a character in one Bungie action."""
+        return await self._post_action(
+            "Destiny2/Actions/Items/EquipItems/",
+            {
+                "itemIds": [int(item_id) for item_id in item_instance_ids],
+                "characterId": int(character_id),
+                "membershipType": membership_type,
+            },
+            "批量装备物品",
+        )
 
     async def insert_socket_plug_free(
         self,
@@ -521,6 +660,79 @@ class BungieClient:
             logger.error("EquipLoadout failed: index=%s error=%s", loadout_index, exc)
             return {"ErrorCode": code, "Message": str(exc)}
 
+    async def snapshot_loadout(
+        self,
+        loadout_index: int,
+        character_id: str,
+        membership_type: int,
+        *,
+        name_hash: int | None = None,
+        icon_hash: int | None = None,
+        color_hash: int | None = None,
+    ) -> dict:
+        """Save the character's current equipment into an official Bungie loadout slot."""
+        payload = {
+            "loadoutIndex": loadout_index,
+            "characterId": int(character_id),
+            "membershipType": membership_type,
+        }
+        if name_hash is not None:
+            payload["nameHash"] = name_hash
+        if icon_hash is not None:
+            payload["iconHash"] = icon_hash
+        if color_hash is not None:
+            payload["colorHash"] = color_hash
+        return await self._post_action(
+            "Destiny2/Actions/Loadouts/SnapshotLoadout/",
+            payload,
+            "保存官方配装槽",
+        )
+
+    async def update_loadout_identifiers(
+        self,
+        loadout_index: int,
+        character_id: str,
+        membership_type: int,
+        *,
+        name_hash: int | None = None,
+        icon_hash: int | None = None,
+        color_hash: int | None = None,
+    ) -> dict:
+        """Update official Bungie loadout name/icon/color identifiers."""
+        payload = {
+            "loadoutIndex": loadout_index,
+            "characterId": int(character_id),
+            "membershipType": membership_type,
+        }
+        if name_hash is not None:
+            payload["nameHash"] = name_hash
+        if icon_hash is not None:
+            payload["iconHash"] = icon_hash
+        if color_hash is not None:
+            payload["colorHash"] = color_hash
+        return await self._post_action(
+            "Destiny2/Actions/Loadouts/UpdateLoadoutIdentifiers/",
+            payload,
+            "更新官方配装槽标识",
+        )
+
+    async def clear_loadout(
+        self,
+        loadout_index: int,
+        character_id: str,
+        membership_type: int,
+    ) -> dict:
+        """Clear an official Bungie loadout slot."""
+        return await self._post_action(
+            "Destiny2/Actions/Loadouts/ClearLoadout/",
+            {
+                "loadoutIndex": loadout_index,
+                "characterId": int(character_id),
+                "membershipType": membership_type,
+            },
+            "清空官方配装槽",
+        )
+
     # ── Vendors & Milestones ─────────────────────────────────────────
 
     async def fetch_vendors(
@@ -578,7 +790,52 @@ class BungieClient:
                     ) from fallback_exc
                 raise
         logger.debug("GetVendors returned")
-        return result
+        if not isinstance(result, Mapping):
+            logger.error("GetVendors returned unexpected payload type: %s", type(result).__name__)
+            raise APIError("读取商人库存", "Bungie 返回了无法解析的数据格式。")
+        return dict(result)
+
+    async def fetch_vendor_components(
+        self,
+        membership_id: str,
+        membership_type: int,
+        character_id: str,
+        vendor_hash: int,
+    ) -> dict:
+        """Fetch live socket details for one vendor's sale items."""
+        token = await self.get_access_token()
+        path = (
+            f"Destiny2/{membership_type}/Profile/{membership_id}/Character/"
+            f"{character_id}/Vendors/{vendor_hash}/"
+        )
+        try:
+            result = await self.rest.static_request(
+                "GET",
+                path,
+                auth=token,
+                params={
+                    "components": ",".join(
+                        str(component) for component in _VENDOR_ITEM_COMPONENTS
+                    )
+                },
+            )
+        except aiobungie.HTTPError as exc:
+            _raise_bungie_unavailable(exc, "读取商人商品 Perk")
+            if _is_insufficient_privileges(exc):
+                raise AuthenticationError(
+                    "当前 Bungie OAuth token 缺少商人商品详情权限 "
+                    "ReadDestinyVendorsAndAdvisors，请重新完成 Bungie 授权。"
+                ) from exc
+            raise
+        logger.debug("GetVendor returned vendor=%s", vendor_hash)
+        if not isinstance(result, Mapping):
+            logger.error(
+                "GetVendor returned unexpected payload type: vendor=%s type=%s",
+                vendor_hash,
+                type(result).__name__,
+            )
+            raise APIError("读取商人商品 Perk", "Bungie 返回了无法解析的数据格式。")
+        return dict(result)
 
     async def fetch_milestones(self) -> dict:
         """Fetch current weekly milestones.
@@ -760,6 +1017,185 @@ class BungieClient:
             _raise_bungie_unavailable(exc, "读取历史统计")
             raise
         logger.debug("GetHistoricalStats returned")
+        return result
+
+    async def get_collectible_node_details(
+        self,
+        membership_type: int,
+        membership_id: str,
+        character_id: str,
+        collectible_node_hash: int,
+        components: list[int] | None = None,
+    ) -> dict:
+        """Fetch collectible details for a presentation node."""
+        params = {"components": ",".join(str(c) for c in (components or [800]))}
+        logger.debug(
+            "API call: GetCollectibleNodeDetails(mid=%s char=%s node=%s)",
+            membership_id,
+            character_id,
+            collectible_node_hash,
+        )
+        try:
+            result = await self.rest.static_request(
+                "GET",
+                f"Destiny2/{membership_type}/Profile/{membership_id}/Character/{character_id}/Collectibles/{collectible_node_hash}/",
+                auth=await self.get_access_token(),
+                params=params,
+            )
+        except aiobungie.HTTPError as exc:
+            _raise_bungie_unavailable(exc, "读取收藏品节点")
+            raise
+        logger.debug("GetCollectibleNodeDetails returned")
+        return result
+
+    async def get_unique_weapon_history(
+        self,
+        membership_type: int,
+        membership_id: str,
+        character_id: str,
+    ) -> dict:
+        """Fetch per-weapon historical usage for one character."""
+        logger.debug(
+            "API call: GetUniqueWeaponHistory(mid=%s char=%s)",
+            membership_id,
+            character_id,
+        )
+        try:
+            result = await self.rest.static_request(
+                "GET",
+                f"Destiny2/{membership_type}/Account/{membership_id}/Character/{character_id}/Stats/UniqueWeapons/",
+            )
+        except aiobungie.HTTPError as exc:
+            _raise_bungie_unavailable(exc, "读取武器使用历史")
+            raise
+        logger.debug("GetUniqueWeaponHistory returned")
+        return result
+
+    async def get_destiny_aggregate_activity_stats(
+        self,
+        membership_type: int,
+        membership_id: str,
+        character_id: str,
+    ) -> dict:
+        """Fetch aggregate activity stats for one character."""
+        logger.debug(
+            "API call: GetDestinyAggregateActivityStats(mid=%s char=%s)",
+            membership_id,
+            character_id,
+        )
+        try:
+            result = await self.rest.static_request(
+                "GET",
+                f"Destiny2/{membership_type}/Account/{membership_id}/Character/{character_id}/Stats/AggregateActivityStats/",
+            )
+        except aiobungie.HTTPError as exc:
+            _raise_bungie_unavailable(exc, "读取活动聚合统计")
+            raise
+        logger.debug("GetDestinyAggregateActivityStats returned")
+        return result
+
+    async def get_leaderboards(
+        self,
+        membership_type: int,
+        membership_id: str,
+        *,
+        maxtop: int | None = None,
+        modes: str | None = None,
+        statid: str | None = None,
+    ) -> dict:
+        """Fetch account leaderboards for a Destiny membership."""
+        params = {
+            key: value
+            for key, value in {
+                "maxtop": maxtop,
+                "modes": modes,
+                "statid": statid,
+            }.items()
+            if value is not None
+        }
+        logger.debug("API call: GetLeaderboards(mid=%s params=%s)", membership_id, params)
+        try:
+            result = await self.rest.static_request(
+                "GET",
+                f"Destiny2/{membership_type}/Account/{membership_id}/Stats/Leaderboards/",
+                auth=await self.get_access_token(),
+                params=params,
+            )
+        except aiobungie.HTTPError as exc:
+            _raise_bungie_unavailable(exc, "读取排行榜")
+            raise
+        logger.debug("GetLeaderboards returned")
+        return result
+
+    async def get_leaderboards_for_character(
+        self,
+        membership_type: int,
+        membership_id: str,
+        character_id: str,
+        *,
+        maxtop: int | None = None,
+        modes: str | None = None,
+        statid: str | None = None,
+    ) -> dict:
+        """Fetch character leaderboards for a Destiny membership."""
+        params = {
+            key: value
+            for key, value in {
+                "maxtop": maxtop,
+                "modes": modes,
+                "statid": statid,
+            }.items()
+            if value is not None
+        }
+        logger.debug(
+            "API call: GetLeaderboardsForCharacter(mid=%s char=%s params=%s)",
+            membership_id,
+            character_id,
+            params,
+        )
+        try:
+            result = await self.rest.static_request(
+                "GET",
+                f"Destiny2/Stats/Leaderboards/{membership_type}/{membership_id}/{character_id}/",
+                auth=await self.get_access_token(),
+                params=params,
+            )
+        except aiobungie.HTTPError as exc:
+            _raise_bungie_unavailable(exc, "读取角色排行榜")
+            raise
+        logger.debug("GetLeaderboardsForCharacter returned")
+        return result
+
+    async def get_clan_leaderboards(
+        self,
+        group_id: str,
+        *,
+        maxtop: int | None = None,
+        modes: str | None = None,
+        statid: str | None = None,
+    ) -> dict:
+        """Fetch clan leaderboards for a Bungie group ID."""
+        params = {
+            key: value
+            for key, value in {
+                "maxtop": maxtop,
+                "modes": modes,
+                "statid": statid,
+            }.items()
+            if value is not None
+        }
+        logger.debug("API call: GetClanLeaderboards(group=%s params=%s)", group_id, params)
+        try:
+            result = await self.rest.static_request(
+                "GET",
+                f"Destiny2/Stats/Leaderboards/Clans/{group_id}/",
+                auth=await self.get_access_token(),
+                params=params,
+            )
+        except aiobungie.HTTPError as exc:
+            _raise_bungie_unavailable(exc, "读取公会排行榜")
+            raise
+        logger.debug("GetClanLeaderboards returned")
         return result
 
     async def search_users(self, display_name_prefix: str) -> dict:

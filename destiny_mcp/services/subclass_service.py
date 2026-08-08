@@ -21,6 +21,7 @@ from ..models import (
 )
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_signed, to_unsigned
+from .account_action_lock import account_action_lock, serialized_account_action
 
 logger = get_logger(__name__)
 
@@ -71,6 +72,7 @@ class SubclassService:
         self._bungie = bungie
         self._manifest = manifest
         self._resolver = resolver
+        self._account_action_lock = account_action_lock(bungie)
 
     # ── Helpers ──────────────────────────────────────────────────────
 
@@ -252,6 +254,7 @@ class SubclassService:
             plugs=plugs,
         )
 
+    @serialized_account_action
     async def modify_subclass(
         self,
         player_name: str,

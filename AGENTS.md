@@ -1,0 +1,16 @@
+# Agent Instructions
+
+This repository contains a local Destiny 2 MCP server with Bungie OAuth authentication.
+
+## Setup-related tasks
+
+For installation, reinstallation, OAuth login, Codex MCP registration, or setup troubleshooting:
+
+1. Read `skills/destiny-mcp-setup/SKILL.md` completely before taking action.
+2. Follow that Skill through a real MCP handshake and verification; registration alone is not sufficient.
+3. Run `skills/destiny-mcp-setup/scripts/verify_mcp.py` and require `BUNGIE_PROFILE_CHECK=ok` plus all eight tools in the normal profile.
+4. Preserve unrelated worktree changes and inspect existing `.env`, OAuth tokens, and Codex MCP entries before changing them.
+
+Never print or request secrets in chat. This includes `.env` contents, Bungie API keys, OAuth client secrets, authorization codes, access tokens, refresh tokens, and callback URLs containing authorization codes. Ask users to enter credentials locally in `.env`.
+
+After registering or changing the MCP server, tell the user to restart Codex or open a new task so the new server is discovered.

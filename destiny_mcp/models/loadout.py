@@ -16,6 +16,22 @@ class LoadoutItem(BaseModel):
     item_instance_id: str = Field(default="", description="Item instance ID (if from current inventory)")
     perks: list[int] = Field(default_factory=list, description="Equipped perk plug hashes")
     mods: list[int] = Field(default_factory=list, description="Equipped mod plug hashes")
+    mod_sockets: dict[int, int] = Field(
+        default_factory=dict,
+        description="Exact armor mod socket index to equipped plug hash",
+    )
+    source_location: str = Field(
+        default="",
+        description="Location captured with the loadout: vault/hunter/warlock/titan",
+    )
+    source_character_id: str = Field(
+        default="",
+        description="Character ID captured with the loadout, when applicable",
+    )
+    was_equipped: bool = Field(
+        default=False,
+        description="Whether the item was equipped when the loadout was captured",
+    )
 
 
 class LoadoutSubclassConfig(BaseModel):
@@ -25,6 +41,10 @@ class LoadoutSubclassConfig(BaseModel):
     All equip logic (Build Import, DIM import, voice, overlay) consumes this model.
     """
 
+    subclass_item_hash: int = Field(default=0, description="Equipped subclass item hash")
+    subclass_instance_id: str = Field(
+        default="", description="Equipped subclass item instance ID"
+    )
     super_hash: int = Field(default=0, description="Super ability plug hash")
     grenade_hash: int = Field(default=0, description="Grenade plug hash")
     melee_hash: int = Field(default=0, description="Melee ability plug hash")
@@ -32,6 +52,10 @@ class LoadoutSubclassConfig(BaseModel):
     movement_hash: int = Field(default=0, description="Movement ability plug hash")
     aspect_hashes: list[int] = Field(default_factory=list, description="Aspect plug hashes")
     fragment_hashes: list[int] = Field(default_factory=list, description="Fragment plug hashes")
+    plug_sockets: dict[int, int] = Field(
+        default_factory=dict,
+        description="Exact subclass socket index to equipped plug hash",
+    )
 
 
 class Loadout(BaseModel):

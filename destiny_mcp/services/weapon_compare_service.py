@@ -6,7 +6,7 @@ Extracted from weapon_service.py during refactoring.
 
 from __future__ import annotations
 
-from ..exceptions import ItemNotFoundError
+from ..exceptions import ConfigError, ItemNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name
 from ..models import (
@@ -41,7 +41,10 @@ class WeaponCompareService:
         self._profile_cache = profile_cache
 
     async def compare_weapon_instances(
-        self, player_name: str, weapon_name: str
+        self,
+        player_name: str,
+        weapon_name: str,
+        item_instance_id: str | None = None,
     ) -> WeaponComparison:
         """Compare all instances of a weapon across the account.
 
@@ -51,6 +54,7 @@ class WeaponCompareService:
         Args:
             player_name: Bungie name.
             weapon_name: Weapon name to search for (Chinese or English).
+            item_instance_id: When provided, return only this owned instance.
 
         Returns:
             WeaponComparison with per-instance perks and diff.
@@ -58,7 +62,16 @@ class WeaponCompareService:
         Raises:
             PlayerNotFoundError, ItemNotFoundError.
         """
-        logger.info("Comparing weapon instances: %s for %s", weapon_name, player_name)
+        selected_instance_id = str(item_instance_id or "").strip()
+        weapon_query = weapon_name.strip()
+        if not weapon_query:
+            raise ConfigError("请提供 weapon_name。")
+        logger.info(
+            "Comparing weapon instances: %s for %s (instance=%s)",
+            weapon_query,
+            player_name,
+            selected_instance_id or "<all>",
+        )
 
         # Step 1: Resolve player
         p = await self._resolver.resolve_player(player_name)
@@ -67,7 +80,7 @@ class WeaponCompareService:
 
         # Step 2: Find weapon in manifest — collect ALL matching hashes
         # Use limit=50 to catch variants like 回文（专家） that sort later
-        manifest_results = self._manifest.search(weapon_name, limit=50)
+        manifest_results = self._manifest.search(weapon_query, limit=50)
         weapon_defs = [r for r in manifest_results if r["itemType"] == 3]
         if not weapon_defs:
             raise ItemNotFoundError(weapon_name, "没有找到匹配的武器。")
@@ -197,6 +210,18 @@ class WeaponCompareService:
                 "你的账号上没有这把武器。",
             )
 
+        if selected_instance_id:
+            weapon_instances = [
+                instance
+                for instance in weapon_instances
+                if instance["instance_id"] == selected_instance_id
+            ]
+            if not weapon_instances:
+                raise ItemNotFoundError(
+                    weapon_display_name,
+                    f"账号内未找到实例 {selected_instance_id}。",
+                )
+
         # Step 5: Read current perks for each instance
         comparison_instances: list[WeaponComparisonInstance] = []
         for inst in weapon_instances:
@@ -209,9 +234,14 @@ class WeaponCompareService:
                 if not info:
                     continue
                 cat_id = self._manifest.get_plug_category_identifier(plug_hash) or ""
-                if "shader" in cat_id.lower() or "mod" in cat_id.lower():
+                cat_key = cat_id.lower()
+                if "shader" in cat_key:
                     continue
-                if "tracker" in cat_id.lower():
+                if "tracker" in cat_key:
+                    continue
+                if "skin" in cat_key or "kill_vfx" in cat_key:
+                    continue
+                if "mod" in cat_key and "weapon.mod" not in cat_key:
                     continue
 
                 name = info.get("name", f"#{plug_hash}")
@@ -219,12 +249,17 @@ class WeaponCompareService:
                 sandbox = self._manifest.get_sandbox_perk_description(plug_hash)
                 if sandbox:
                     desc = sandbox.get("description", "")
+                if not desc:
+                    item_description = self._manifest.get_item_description(plug_hash)
+                    if isinstance(item_description, str):
+                        desc = item_description
 
                 perk = PerkInfo(
                     plug_hash=plug_hash,
                     name=name,
                     description=desc,
                     plug_category=cat_id,
+                    icon_url=str(info.get("icon") or ""),
                 )
                 self._perk_svc.annotate_god_roll(inst["item_hash"], plug_hash, perk)
                 current_perks.append(perk)
@@ -242,7 +277,11 @@ class WeaponCompareService:
                 weapon_defs[0],
             )
             icon_path = inst_weapon_def.get("icon", "")
-            icon_url = f"https://www.bungie.net{icon_path}" if icon_path else ""
+            icon_url = (
+                icon_path
+                if icon_path.startswith("https://www.bungie.net/")
+                else f"https://www.bungie.net{icon_path}" if icon_path else ""
+            )
 
             comparison_instances.append(WeaponComparisonInstance(
                 instance_id=inst["instance_id"],

@@ -7,6 +7,8 @@ character-to-character transfers (must go through vault).
 
 from __future__ import annotations
 
+import asyncio
+
 from ..bungie_client import BungieClient
 from ..exceptions import ItemNotFoundError, TransferError
 from ..logging_config import get_logger
@@ -22,8 +24,11 @@ from ..models import (
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
 from ..utils.item_parser import parse_items_from_profile
+from .account_action_lock import account_action_lock, serialized_account_action
 
 logger = get_logger(__name__)
+
+_TRANSFER_HOP_DELAY_SECONDS = 0.75
 
 
 class TransferService:
@@ -38,6 +43,7 @@ class TransferService:
         self._bungie = bungie
         self._manifest = manifest
         self._resolver = resolver
+        self._account_action_lock = account_action_lock(bungie)
 
     # ── Helpers ──────────────────────────────────────────────────────
 
@@ -69,14 +75,60 @@ class TransferService:
             )
         return found
 
+    async def _resolve_action_character(
+        self,
+        membership_id: str,
+        membership_type: int,
+        character: str | None = None,
+        item: InventoryItem | None = None,
+        character_id: str | None = None,
+    ) -> tuple[str, str]:
+        """Resolve a character id for item action endpoints."""
+        if character_id:
+            profile = await self._resolver.get_profile(membership_id, membership_type, [200])
+            char_data = (
+                profile.get("characters", {})
+                .get("data", {})
+                .get(character_id)
+            )
+            if not char_data:
+                raise TransferError(
+                    "Resolve character",
+                    f"Target character ID {character_id} no longer exists.",
+                )
+            return character_id, class_type_name(char_data.get("classType", -1))
+
+        if character:
+            class_type = resolve_character_name(character)
+            char_id = await self._resolver.resolve_character_id(
+                membership_id,
+                membership_type,
+                character,
+            )
+            return char_id, class_type_name(class_type)
+
+        if item and item.character_id:
+            profile = await self._resolver.get_profile(membership_id, membership_type, [200])
+            char_data = profile.get("characters", {}).get("data", {}).get(item.character_id, {})
+            return item.character_id, class_type_name(char_data.get("classType", -1))
+
+        profile = await self._resolver.get_profile(membership_id, membership_type, [200])
+        chars = profile.get("characters", {}).get("data", {})
+        if not chars:
+            raise TransferError("Resolve character", "账号下没有可用角色。")
+        char_id, char_data = next(iter(chars.items()))
+        return char_id, class_type_name(char_data.get("classType", -1))
+
     # ── Transfer ─────────────────────────────────────────────────────
 
+    @serialized_account_action
     async def transfer_item(
         self,
         player_name: str,
         item_instance_id: str,
         to_character: str,
         from_character: str | None = None,
+        to_character_id: str | None = None,
     ) -> TransferResult:
         """Transfer a single item between characters or vault.
 
@@ -113,11 +165,31 @@ class TransferService:
                 )
 
         to_vault = to_character.strip().lower() in ("vault", "仓库")
-        if not to_vault:
-            target_class = resolve_character_name(to_character)
-            target_char_id = await self._resolver.resolve_character_id(
-                mid, mtype, to_character
+        target_info = None
+        validated_target_character_id = ""
+        if to_character_id:
+            profile = await self._resolver.get_profile(mid, mtype, [200])
+            target_info = (
+                profile.get("characters", {})
+                .get("data", {})
+                .get(to_character_id)
             )
+            if not target_info:
+                raise TransferError(
+                    "Transfer",
+                    f"Target character ID {to_character_id} no longer exists.",
+                )
+            validated_target_character_id = to_character_id
+
+        if not to_vault:
+            if target_info is not None:
+                target_class = target_info.get("classType", -1)
+                target_char_id = validated_target_character_id
+            else:
+                target_class = resolve_character_name(to_character)
+                target_char_id = await self._resolver.resolve_character_id(
+                    mid, mtype, to_character
+                )
         else:
             target_class = -1
             target_char_id = ""
@@ -165,7 +237,12 @@ class TransferService:
             dest_name = class_type_name(target_class)
 
             # Already at same destination? No-op.
-            if found.location == dest_name.lower():
+            already_at_destination = (
+                found.character_id == target_char_id
+                if to_character_id
+                else found.location == dest_name.lower()
+            )
+            if already_at_destination:
                 return TransferResult(
                     success=True,
                     item_name=item_name,
@@ -184,14 +261,64 @@ class TransferService:
             )
             self._check_result(r1, "Transfer to vault (first hop)")
 
+            await asyncio.sleep(_TRANSFER_HOP_DELAY_SECONDS)
+
             # Step 2: to destination
-            r2 = await self._bungie.transfer_item(
-                item_instance_id, item_hash,
-                character_id=target_char_id,
-                membership_type=mtype,
-                to_vault=False,
-            )
-            self._check_result(r2, f"Transfer vault→{dest_name} (second hop)")
+            second_hop_operation = f"Transfer vault→{dest_name} (second hop)"
+            try:
+                r2 = await self._bungie.transfer_item(
+                    item_instance_id, item_hash,
+                    character_id=target_char_id,
+                    membership_type=mtype,
+                    to_vault=False,
+                )
+                self._check_result(r2, second_hop_operation)
+            except Exception as second_hop_error:
+                logger.warning(
+                    "%s failed for '%s'; attempting rollback to %s: %s",
+                    second_hop_operation,
+                    item_name,
+                    found.location,
+                    second_hop_error,
+                )
+                await asyncio.sleep(_TRANSFER_HOP_DELAY_SECONDS)
+
+                rollback_error: Exception | None = None
+                try:
+                    rollback = await self._bungie.transfer_item(
+                        item_instance_id, item_hash,
+                        character_id=found.character_id,
+                        membership_type=mtype,
+                        to_vault=False,
+                    )
+                    self._check_result(rollback, f"Rollback vault→{found.location}")
+                except Exception as error:
+                    rollback_error = error
+                    logger.error(
+                        "Rollback failed for '%s'; refresh inventory to confirm its location: %s",
+                        item_name,
+                        rollback_error,
+                    )
+
+                if isinstance(second_hop_error, TransferError):
+                    if rollback_error is None:
+                        raise TransferError(
+                            second_hop_operation,
+                            f"Second hop failed: {second_hop_error} "
+                            f"The item was rolled back to {found.location}.",
+                        ) from second_hop_error
+                    raise TransferError(
+                        second_hop_operation,
+                        f"Second hop failed: {second_hop_error} "
+                        f"Rollback failed: {rollback_error}. The item remains in vault.",
+                    ) from second_hop_error
+
+                if rollback_error is not None:
+                    second_hop_error.add_note(
+                        f"Rollback failed: {rollback_error}. "
+                        "Refresh inventory to confirm the item's location."
+                    )
+                raise
 
             logger.info("Transferred '%s' %s→%s (via vault)", item_name, found.location, dest_name)
             return TransferResult(
@@ -216,11 +343,13 @@ class TransferService:
 
     # ── Equip ────────────────────────────────────────────────────────
 
+    @serialized_account_action
     async def equip_item(
         self,
         player_name: str,
         item_instance_id: str,
         character: str,
+        character_id: str | None = None,
     ) -> EquipResult:
         """Equip an item on a character.
 
@@ -236,8 +365,9 @@ class TransferService:
         mid = p["membership_id"]
         mtype = p["membership_type"]
 
-        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
-        class_type = resolve_character_name(character)
+        char_id, char_name = await self._resolve_action_character(
+            mid, mtype, character, character_id=character_id
+        )
 
         # Find item name for the response
         try:
@@ -249,16 +379,206 @@ class TransferService:
         result = await self._bungie.equip_item(item_instance_id, char_id, mtype)
         self._check_result(result, "Equip")
 
-        logger.info("Equipped '%s' on %s", item_name, class_type_name(class_type))
+        logger.info("Equipped '%s' on %s", item_name, char_name)
         return EquipResult(
             success=True,
             item_name=item_name,
-            character=class_type_name(class_type),
-            message=f"Equipped '{item_name}' on {class_type_name(class_type)}.",
+            character=char_name,
+            message=f"Equipped '{item_name}' on {char_name}.",
         )
+
+    @serialized_account_action
+    async def equip_items(
+        self,
+        player_name: str,
+        item_instance_ids: list[str],
+        character: str,
+    ) -> dict:
+        """Equip several items on one character through Bungie's batch endpoint."""
+        logger.info(
+            "EquipItems: items=%s character=%s (player=%s)",
+            item_instance_ids,
+            character,
+            player_name,
+        )
+        if not item_instance_ids:
+            return {"success": False, "message": "必须提供至少一个 item_instance_id。"}
+
+        p = await self._resolver.resolve_player(player_name)
+        mid = p["membership_id"]
+        mtype = p["membership_type"]
+        target_class = resolve_character_name(character)
+        target_location = class_type_name(target_class).lower()
+        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
+
+        all_items = await self._fetch_all_items(mid, mtype)
+        by_id = {it.item_instance_id: it for it in all_items}
+        missing = [item_id for item_id in item_instance_ids if item_id not in by_id]
+        wrong_location = [
+            {
+                "item_instance_id": item_id,
+                "name": by_id[item_id].name,
+                "location": by_id[item_id].location,
+            }
+            for item_id in item_instance_ids
+            if item_id in by_id and by_id[item_id].location != target_location
+        ]
+        if missing or wrong_location:
+            return {
+                "success": False,
+                "message": "批量装备要求物品已经在目标角色背包中。请先用 move_item 转移后再批量装备。",
+                "missing_item_instance_ids": missing,
+                "wrong_location": wrong_location,
+            }
+
+        result = await self._bungie.equip_items(item_instance_ids, char_id, mtype)
+        ok = result.get("ErrorCode", 0) == 1
+        names = [by_id[item_id].name for item_id in item_instance_ids]
+        return {
+            "success": ok,
+            "items": names,
+            "character": class_type_name(target_class),
+            "message": (
+                f"已在 {class_type_name(target_class)} 上批量装备：{', '.join(names)}。"
+                if ok
+                else f"批量装备失败：{result.get('Message', '未知错误')}"
+            ),
+        }
+
+    @serialized_account_action
+    async def pull_from_postmaster(
+        self,
+        player_name: str,
+        item_instance_id: str,
+        character: str | None = None,
+        character_id: str | None = None,
+    ) -> dict:
+        """Pull a postmaster item into the owning or requested character inventory."""
+        logger.info(
+            "PullFromPostmaster: item=%s character=%s (player=%s)",
+            item_instance_id,
+            character,
+            player_name,
+        )
+        p = await self._resolver.resolve_player(player_name)
+        mid = p["membership_id"]
+        mtype = p["membership_type"]
+        found = await self._find_item(mid, mtype, item_instance_id)
+
+        if "lost" not in found.bucket_type.lower():
+            return {
+                "success": False,
+                "item_name": found.name,
+                "message": f"'{found.name}' 当前不在邮政官/Lost Items 中，不能用 PullFromPostmaster。",
+            }
+
+        char_id, char_name = await self._resolve_action_character(
+            mid, mtype, character, found, character_id
+        )
+        result = await self._bungie.pull_from_postmaster(
+            item_instance_id,
+            found.item_hash,
+            char_id,
+            mtype,
+            stack_size=found.quantity,
+        )
+        ok = result.get("ErrorCode", 0) == 1
+        return {
+            "success": ok,
+            "item_name": found.name,
+            "character": char_name,
+            "message": (
+                f"已从邮政官取回 '{found.name}' 到 {char_name}。"
+                if ok
+                else f"邮政官取回失败：{result.get('Message', '未知错误')}"
+            ),
+        }
+
+    @serialized_account_action
+    async def set_item_lock_state(
+        self,
+        player_name: str,
+        item_instance_id: str,
+        locked: bool,
+        character: str | None = None,
+    ) -> dict:
+        """Lock or unlock one item instance."""
+        logger.info(
+            "SetItemLockState: item=%s locked=%s character=%s (player=%s)",
+            item_instance_id,
+            locked,
+            character,
+            player_name,
+        )
+        p = await self._resolver.resolve_player(player_name)
+        mid = p["membership_id"]
+        mtype = p["membership_type"]
+        found = await self._find_item(mid, mtype, item_instance_id)
+        char_id, char_name = await self._resolve_action_character(mid, mtype, character, found)
+
+        result = await self._bungie.set_item_lock_state(
+            item_instance_id,
+            char_id,
+            mtype,
+            state=locked,
+        )
+        ok = result.get("ErrorCode", 0) == 1
+        return {
+            "success": ok,
+            "item_name": found.name,
+            "locked": locked,
+            "character": char_name,
+            "message": (
+                f"已{'锁定' if locked else '解锁'} '{found.name}'。"
+                if ok
+                else f"设置锁定状态失败：{result.get('Message', '未知错误')}"
+            ),
+        }
+
+    @serialized_account_action
+    async def set_quest_tracked_state(
+        self,
+        player_name: str,
+        item_instance_id: str,
+        tracked: bool,
+        character: str | None = None,
+    ) -> dict:
+        """Track or untrack one quest/bounty item instance."""
+        logger.info(
+            "SetQuestTrackedState: item=%s tracked=%s character=%s (player=%s)",
+            item_instance_id,
+            tracked,
+            character,
+            player_name,
+        )
+        p = await self._resolver.resolve_player(player_name)
+        mid = p["membership_id"]
+        mtype = p["membership_type"]
+        found = await self._find_item(mid, mtype, item_instance_id)
+        char_id, char_name = await self._resolve_action_character(mid, mtype, character, found)
+
+        result = await self._bungie.set_quest_tracked_state(
+            item_instance_id,
+            char_id,
+            mtype,
+            state=tracked,
+        )
+        ok = result.get("ErrorCode", 0) == 1
+        return {
+            "success": ok,
+            "item_name": found.name,
+            "tracked": tracked,
+            "character": char_name,
+            "message": (
+                f"已{'追踪' if tracked else '取消追踪'} '{found.name}'。"
+                if ok
+                else f"设置任务追踪失败：{result.get('Message', '未知错误')}"
+            ),
+        }
 
     # ── Move (convenience) ───────────────────────────────────────────
 
+    @serialized_account_action
     async def move_item(
         self,
         player_name: str,
@@ -535,6 +855,7 @@ class TransferService:
 
     # ── Apply Mod ─────────────────────────────────────────────────────
 
+    @serialized_account_action
     async def apply_mod(
         self,
         player_name: str,

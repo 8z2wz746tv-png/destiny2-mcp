@@ -6,7 +6,7 @@ Extracted from server.py per Rule 1: tools should not contain business logic.
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
-from ..exceptions import AuthenticationError, ItemNotFoundError
+from ..exceptions import AuthenticationError, ConfigError, ItemNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..build.models import InventorySnapshot
@@ -24,6 +24,28 @@ MISSING_INVENTORY_SCOPE_MESSAGE = (
     "请在 Bungie Developer Portal 给应用开启该 scope 后重新完成 Bungie 授权。"
     "当前只读到了已装备装备，不能判断仓库或角色背包是否为空。"
 )
+
+_INVENTORY_ITEM_TYPE_ALIASES = {
+    "": None,
+    "all": "all",
+    "全部": "all",
+    "weapon": "weapon",
+    "weapons": "weapon",
+    "武器": "weapon",
+    "armor": "armor",
+    "armors": "armor",
+    "护甲": "armor",
+}
+
+
+def _normalize_inventory_item_type(value: str | None) -> str | None:
+    key = str(value or "").strip().lower()
+    if key in _INVENTORY_ITEM_TYPE_ALIASES:
+        return _INVENTORY_ITEM_TYPE_ALIASES[key]
+    raise ConfigError(
+        f"item_type={value!r} 不受支持。get 仅支持 weapon/armor/all；"
+        f"查询具体武器类型请使用 inventory_assistant(intent=\"type\", type_name={value!r})。"
+    )
 
 
 class InventoryService:
@@ -72,7 +94,9 @@ class InventoryService:
 
         Raises:
             PlayerNotFoundError: If the player name cannot be resolved.
+            ConfigError: If item_type is not weapon/armor/all.
         """
+        item_type = _normalize_inventory_item_type(item_type)
         logger.info(
             "Fetching inventory for %s, location=%s, type=%s, slot=%s, rarity=%s",
             player_name, location, item_type, armor_slot, rarity,

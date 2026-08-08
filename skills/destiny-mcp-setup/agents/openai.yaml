@@ -1,0 +1,4 @@
+interface:
+  display_name: "Destiny MCP Setup"
+  short_description: "Install and troubleshoot Destiny MCP for Codex"
+  default_prompt: "Use $destiny-mcp-setup to install and verify Destiny MCP in Codex."

@@ -169,3 +169,122 @@ async def get_historical_stats(
         lines.append("未找到统计数据。")
 
     return "\n".join(lines)
+
+
+@mcp.tool()
+@handle_tool_error
+async def get_unique_weapon_history(
+    player_name: str | None = None,
+    character: str | None = None,
+    limit: int = 25,
+    ctx: Context = None,
+) -> dict:
+    """查询某个角色的武器历史使用统计。
+
+    何时使用：用户问"这赛季/这个角色哪把枪击杀最多"、"我常用哪些武器"。
+    何时跳过：用户想对比当前背包 roll，用 compare_weapon_instances。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家。
+        character: 角色名。不填则使用第一个角色。
+        limit: 返回数量，默认 25。
+    """
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    return await svc['activity_svc'].get_unique_weapon_history(
+        player_name,
+        character=character,
+        limit=limit,
+    )
+
+
+@mcp.tool()
+@handle_tool_error
+async def get_aggregate_activity_stats(
+    player_name: str | None = None,
+    character: str | None = None,
+    limit: int = 25,
+    ctx: Context = None,
+) -> dict:
+    """查询某个角色按活动聚合的历史统计。
+
+    何时使用：用户问"我哪些突袭/地牢打得最多"、"活动完成次数排行"。
+    何时跳过：用户想看最近几场，用 get_activity_history。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家。
+        character: 角色名。不填则使用第一个角色。
+        limit: 返回数量，默认 25。
+    """
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    return await svc['activity_svc'].get_aggregate_activity_stats(
+        player_name,
+        character=character,
+        limit=limit,
+    )
+
+
+@mcp.tool()
+@handle_tool_error
+async def get_leaderboards(
+    player_name: str | None = None,
+    character: str | None = None,
+    modes: str | None = None,
+    statid: str | None = None,
+    maxtop: int = 10,
+    ctx: Context = None,
+) -> dict:
+    """查询玩家账号或角色排行榜数据。
+
+    何时使用：用户问"我在某个模式榜单里排名如何"或要看官方 leaderboard。
+    注意：Bungie 官方排行榜接口属于 Preview，返回结构可能会变化。
+
+    Args:
+        player_name: Bungie 名称。不填则使用默认玩家。
+        character: 可选，指定角色则查角色榜单；不填查账号榜单。
+        modes: 可选，官方模式过滤字符串。
+        statid: 可选，官方统计项 ID。
+        maxtop: 返回榜单前 N 名。
+    """
+    player_name = resolve_player_name(player_name)
+    svc = get_ctx(ctx)
+    return await svc['activity_svc'].get_leaderboards(
+        player_name,
+        character=character,
+        modes=modes,
+        statid=statid,
+        maxtop=maxtop,
+    )
+
+
+@mcp.tool()
+@handle_tool_error
+async def get_clan_leaderboards(
+    group_id: str = "",
+    modes: str | None = None,
+    statid: str | None = None,
+    maxtop: int = 10,
+    ctx: Context = None,
+) -> dict:
+    """查询公会排行榜数据。
+
+    何时使用：用户提供 Bungie group_id 后，想看公会突袭/PvP 等榜单。
+    注意：Bungie 官方排行榜接口属于 Preview，返回结构可能会变化。
+
+    Args:
+        group_id: Bungie 公会/群组 ID。
+        modes: 可选，官方模式过滤字符串。
+        statid: 可选，官方统计项 ID。
+        maxtop: 返回榜单前 N 名。
+    """
+    if not group_id:
+        return {"success": False, "message": "必须提供 group_id。"}
+
+    svc = get_ctx(ctx)
+    return await svc['activity_svc'].get_clan_leaderboards(
+        group_id,
+        modes=modes,
+        statid=statid,
+        maxtop=maxtop,
+    )

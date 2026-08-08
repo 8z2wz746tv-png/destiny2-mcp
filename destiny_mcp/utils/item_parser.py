@@ -82,6 +82,7 @@ def parse_items_from_profile(
             item_instance_id=inst_id,
             item_hash=h,
             name=manifest.get_item_name(h),
+            name_en=manifest.get_english_name(h),
             item_type=manifest.item_type_name(
                 info.get("itemType", 0) if info else 0
             ),
