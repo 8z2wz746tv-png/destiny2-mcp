@@ -17,10 +17,10 @@ from __future__ import annotations
 
 import importlib
 import os
-import sys
 import time
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator, Callable
+from contextlib import AsyncExitStack, asynccontextmanager
+from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
@@ -56,70 +56,61 @@ from .services.fragment_service import FragmentService
 from .services.artifact_service import ArtifactService
 from .services.set_bonus_service import SetBonusService
 from .wishlist_data import ensure_wishlist_data
+from .service_context import ServiceContext
+from .services.account_action_lock import account_action_lock
+from .tools._registry import mcp as tool_registry
 
 # ── Logging ──────────────────────────────────────────────────────────
 
-setup_logging()
 logger = get_logger(__name__)
 
 
 # ── Lifespan ─────────────────────────────────────────────────────────
 
 @asynccontextmanager
-async def app_lifespan(server: FastMCP) -> AsyncIterator[dict]:
-    """Application lifecycle: init and cleanup.
-
-    纯个人版：直接创建所有服务实例。
-    """
+async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
+    """Initialize required dependencies or fail startup; always release resources."""
+    setup_logging()
     logger.info("Starting Destiny MCP server (standalone mode)...")
-    manifest = ManifestManager()
-
-    # Try to load manifest from disk (pre-uploaded to /data/manifest/)
-    try:
-        await manifest.ensure_loaded(BungieClient())
-    except Exception as e:
-        logger.warning("Manifest load from disk failed: %s", e)
-
-    wishlist_svc = WishListService(ensure_wishlist_data())
-
-    # Single-user BungieClient — reads token from BUNGIE_API_KEY / .env
-    bungie = BungieClient()
-    try:
+    async with AsyncExitStack() as stack:
+        manifest = ManifestManager()
+        stack.callback(manifest.close)
+        bungie = BungieClient()
+        stack.push_async_callback(bungie.close)
         await bungie.start()
-    except Exception as e:
-        logger.warning("BungieClient start failed: %s", e)
+        await manifest.ensure_loaded(bungie)
+        wishlist_svc = WishListService(ensure_wishlist_data())
+        resolver = PlayerResolver(bungie, manifest)
+        profile_cache = ProfileCache(resolver, manifest, action_lock=account_action_lock(bungie))
+        player_svc = PlayerService(bungie, manifest, resolver)
+        inventory_svc = InventoryService(bungie, manifest, resolver)
+        inventory_analysis_svc = InventoryAnalysisService(manifest, resolver)
+        transfer_svc = TransferService(bungie, manifest, resolver)
+        subclass_svc = SubclassService(bungie, manifest, resolver)
+        perk_svc = PerkService(manifest, wishlist_svc)
+        weapon_compare_svc = WeaponCompareService(manifest, resolver, perk_svc, wishlist_svc, profile_cache)
+        weapon_detail_svc = WeaponDetailService(manifest, resolver)
+        weapon_roll_filter_svc = WeaponRollFilterService(manifest)
+        manifest_query_svc = ManifestQueryService(manifest)
+        weapon_analysis_svc = WeaponAnalysisService(
+            perk_svc, weapon_compare_svc, manifest_query_svc
+        )
+        weapon_svc = WeaponService(bungie, manifest, resolver, wishlist_svc, profile_cache)
+        build_svc = BuildService(bungie, manifest, resolver)
+        vendor_svc = VendorService(bungie, manifest, resolver, perk_svc)
+        weekly_svc = WeeklyService(bungie, manifest)
+        weekly_analysis_svc = WeeklyAnalysisService(weekly_svc)
+        loadout_svc = LoadoutService(bungie, manifest, resolver)
+        build_import_svc = BuildImportService(manifest)
+        activity_svc = ActivityService(bungie, manifest, resolver)
+        fragment_svc = FragmentService(manifest)
+        artifact_svc = ArtifactService(bungie, manifest, resolver)
+        set_bonus_svc = SetBonusService(manifest)
+        collection_svc = CollectionService(bungie, manifest, resolver)
 
-    resolver = PlayerResolver(bungie, manifest)
-    profile_cache = ProfileCache(resolver, manifest)
-    player_svc = PlayerService(bungie, manifest, resolver)
-    inventory_svc = InventoryService(bungie, manifest, resolver)
-    inventory_analysis_svc = InventoryAnalysisService(manifest, resolver)
-    transfer_svc = TransferService(bungie, manifest, resolver)
-    subclass_svc = SubclassService(bungie, manifest, resolver)
-    perk_svc = PerkService(manifest, wishlist_svc)
-    weapon_compare_svc = WeaponCompareService(manifest, resolver, perk_svc, wishlist_svc, profile_cache)
-    weapon_detail_svc = WeaponDetailService(manifest, resolver)
-    weapon_roll_filter_svc = WeaponRollFilterService(manifest)
-    manifest_query_svc = ManifestQueryService(manifest)
-    weapon_analysis_svc = WeaponAnalysisService(
-        perk_svc, weapon_compare_svc, manifest_query_svc
-    )
-    weapon_svc = WeaponService(bungie, manifest, resolver, wishlist_svc, profile_cache)
-    build_svc = BuildService(bungie, manifest, resolver)
-    vendor_svc = VendorService(bungie, manifest, resolver, perk_svc)
-    weekly_svc = WeeklyService(bungie, manifest)
-    weekly_analysis_svc = WeeklyAnalysisService(weekly_svc)
-    loadout_svc = LoadoutService(bungie, manifest, resolver)
-    build_import_svc = BuildImportService(manifest)
-    activity_svc = ActivityService(bungie, manifest, resolver)
-    fragment_svc = FragmentService(manifest)
-    artifact_svc = ArtifactService(bungie, manifest, resolver)
-    set_bonus_svc = SetBonusService(manifest)
-    collection_svc = CollectionService(bungie, manifest, resolver)
-
-    logger.info("Destiny MCP server ready (standalone)")
-    try:
-        yield {
+        stack.push_async_callback(profile_cache.stop_refresh)
+        stack.push_async_callback(loadout_svc.stop_refresh)
+        context: ServiceContext = {
             "manifest": manifest,
             "bungie": bungie,
             "resolver": resolver,
@@ -148,59 +139,16 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[dict]:
             "set_bonus_svc": set_bonus_svc,
             "collection_svc": collection_svc,
         }
-    finally:
-        logger.info("Shutting down...")
-        await profile_cache.stop_refresh()
-        await loadout_svc.stop_refresh()
-        manifest.close()
-        await bungie.close()
-        logger.info("Destiny MCP server stopped")
+        logger.info("Destiny MCP server ready (standalone)")
+        yield context
 
 
-mcp = FastMCP(
-    "Destiny MCP",
-    json_response=True,
-    lifespan=app_lifespan,
-    host=os.environ.get("MCP_HOST", "127.0.0.1"),
-    port=int(os.environ.get("MCP_PORT", "8000")),
-)
+_PROMPTS: list[Callable[..., Any]] = []
 
 
-# ── Health endpoint ──────────────────────────────────────────────────
-
-@mcp.custom_route("/health", methods=["GET"])
-async def health(request):
-    """Lightweight readiness endpoint for Docker/Nginx/server checks."""
-    from starlette.responses import JSONResponse
-
-    return JSONResponse({
-        "status": "ok",
-        "service": "destiny-mcp",
-        "transport": os.environ.get("MCP_TRANSPORT", "stdio"),
-        "tool_profile": os.environ.get("DESTINY_MCP_TOOL_PROFILE", "normal"),
-        "mode": "standalone",
-    })
-
-
-# ── Audit logging ───────────────────────────────────────────────────
-
-_audit = AuditLogger()
-_original_call_tool = mcp.call_tool
-
-
-async def _audited_call_tool(name: str, arguments: dict):
-    """Wrap mcp.call_tool with audit logging."""
-    start = time.time()
-    try:
-        result = await _original_call_tool(name, arguments)
-        _audit.log(name, arguments, result, (time.time() - start) * 1000)
-        return result
-    except Exception as e:
-        _audit.log(name, arguments, None, (time.time() - start) * 1000, str(e))
-        raise
-
-
-mcp.call_tool = _audited_call_tool
+def _prompt(function):
+    _PROMPTS.append(function)
+    return function
 
 
 # ── Register prompts ─────────────────────────────────────────────────
@@ -208,7 +156,7 @@ mcp.call_tool = _audited_call_tool
 _PROMPT_DIR = resolve_resource_dir("prompts")
 
 
-@mcp.prompt()
+@_prompt
 def destiny_agent_prompt() -> str:
     """Destiny Agent 系统提示词 — 游戏规则、工具使用策略、交互规范。
 
@@ -221,7 +169,7 @@ def destiny_agent_prompt() -> str:
     return ""
 
 
-@mcp.prompt()
+@_prompt
 def weapon_perk_lookup(weapon_name: str) -> str:
     """武器 Perk 查询引导 — 帮助查找和对比武器 Perk。
 
@@ -238,7 +186,7 @@ def weapon_perk_lookup(weapon_name: str) -> str:
     )
 
 
-@mcp.prompt()
+@_prompt
 def player_lookup(player_name: str) -> str:
     """玩家查找引导 — 帮助定位和查看玩家信息。
 
@@ -256,7 +204,7 @@ def player_lookup(player_name: str) -> str:
     )
 
 
-@mcp.prompt()
+@_prompt
 def build_optimizer() -> str:
     """配装优化引导 — 帮助找到最优护甲组合。
 
@@ -277,7 +225,7 @@ def build_optimizer() -> str:
     )
 
 
-@mcp.prompt()
+@_prompt
 def global_tool_strategy() -> str:
     """全局工具调用策略 — 工具路由、参数推断、错误处理、展示格式。
 
@@ -290,7 +238,7 @@ def global_tool_strategy() -> str:
     return ""
 
 
-@mcp.prompt()
+@_prompt
 def build_diagnosis() -> str:
     """配装失败诊断 — 当 find_build 失败时，系统性分析原因并提供解决方案。
 
@@ -303,7 +251,7 @@ def build_diagnosis() -> str:
     return ""
 
 
-@mcp.prompt()
+@_prompt
 def weapon_comparison() -> str:
     """武器对比分析 — 对比同一武器的不同副本，分析 perk 差异，推荐最优选择。
 
@@ -316,7 +264,7 @@ def weapon_comparison() -> str:
     return ""
 
 
-@mcp.prompt()
+@_prompt
 def vendor_shopping() -> str:
     """商人购物助手 — 分析商人库存，推荐值得购买的物品（god roll 武器、稀缺模组、稀有装备）。
 
@@ -329,7 +277,7 @@ def vendor_shopping() -> str:
     return ""
 
 
-@mcp.prompt()
+@_prompt
 def mod_recommendation() -> str:
     """模组推荐 — 根据配装目标推荐合适的模组组合，并协助安装。
 
@@ -342,7 +290,7 @@ def mod_recommendation() -> str:
     return ""
 
 
-@mcp.prompt()
+@_prompt
 def activity_review() -> str:
     """战绩回顾引导 — 帮助查看和分析游戏表现。
 
@@ -361,19 +309,6 @@ def activity_review() -> str:
 
 
 # ── Register tools ───────────────────────────────────────────────────
-# Import tool modules to trigger @mcp.tool() registration.
-# Must be AFTER mcp is created. Circular import is safe because
-# server.py's module-level code (mcp) runs before these imports.
-#
-# IMPORTANT: When running as `python -m destiny_mcp.server`, Python loads
-# this file as both __main__ and destiny_mcp.server (two module objects).
-# Tool modules do `from ..server import mcp` which creates a SECOND mcp
-# instance with 0 tools. We fix this by ensuring sys.modules has a single
-# module object before tool imports.
-
-if __name__ == "__main__" and "destiny_mcp.server" not in sys.modules:
-    sys.modules["destiny_mcp.server"] = sys.modules["__main__"]
-
 _NORMAL_TOOL_MODULES = (
     "assistants",
 )
@@ -411,34 +346,88 @@ _FULL_TOOL_MODULES = _NORMAL_TOOL_MODULES + (
 )
 
 
-def _tool_profile() -> str:
-    profile = os.environ.get("DESTINY_MCP_TOOL_PROFILE", "normal").strip().lower()
+def _tool_profile(value: str | None = None) -> str:
+    profile = (
+        value if value is not None
+        else os.environ.get("DESTINY_MCP_TOOL_PROFILE", "normal")
+    ).strip().lower()
     if profile in {"normal", "expert", "full"}:
         return profile
-    logger.warning("Unknown DESTINY_MCP_TOOL_PROFILE=%r; falling back to normal", profile)
+    logger.warning("Unknown tool profile=%r; falling back to normal", profile)
     return "normal"
 
 
-def _register_tool_modules() -> None:
-    profile = _tool_profile()
+class AuditedMCP(FastMCP):
+    """Override before FastMCP binds protocol handlers, so audit covers MCP calls."""
+
+    def __init__(self, *args, **kwargs):
+        self._audit = AuditLogger()
+        super().__init__(*args, **kwargs)
+
+    async def call_tool(self, name: str, arguments: dict):
+        start = time.monotonic()
+        try:
+            result = await super().call_tool(name, arguments)
+            self._audit.log(name, arguments, result, (time.monotonic() - start) * 1000)
+            return result
+        except Exception as exc:
+            self._audit.log(name, arguments, None, (time.monotonic() - start) * 1000, str(exc))
+            raise
+
+
+def create_server(tool_profile: str | None = None) -> FastMCP:
+    """Create an independent server, including when modules are already imported."""
+    profile = _tool_profile(tool_profile)
+    readiness = {"ready": False}
+
+    @asynccontextmanager
+    async def lifespan(server: FastMCP):
+        try:
+            async with app_lifespan(server) as context:
+                readiness["ready"] = True
+                yield context
+        finally:
+            readiness["ready"] = False
+
+    server = AuditedMCP(
+        "Destiny MCP",
+        json_response=True,
+        lifespan=lifespan,
+        host=os.environ.get("MCP_HOST", "127.0.0.1"),
+        port=int(os.environ.get("MCP_PORT", "8000")),
+    )
+
+    @server.custom_route("/health", methods=["GET"])
+    async def health(request):
+        from starlette.responses import JSONResponse
+
+        return JSONResponse(
+            {
+                "status": "ok" if readiness["ready"] else "unavailable",
+                "service": "destiny-mcp",
+                "transport": os.environ.get("MCP_TRANSPORT", "stdio"),
+                "tool_profile": profile,
+                "mode": "standalone",
+            },
+            status_code=200 if readiness["ready"] else 503,
+        )
+
     modules = {
         "normal": _NORMAL_TOOL_MODULES,
         "expert": _EXPERT_TOOL_MODULES,
         "full": _FULL_TOOL_MODULES,
     }[profile]
-    package = __package__ or "destiny_mcp"
-
     for module_name in modules:
-        importlib.import_module(f"{package}.tools.{module_name}")
+        importlib.import_module(f"destiny_mcp.tools.{module_name}")
+    tool_registry.register(server, set(modules))
+    for function in _PROMPTS:
+        server.prompt()(function)
 
-    logger.info(
-        "Registered Destiny MCP tool profile=%s modules=%s",
-        profile,
-        ", ".join(modules),
-    )
+    return server
 
 
-_register_tool_modules()
+# Compatibility for existing imports and the installed CLI entry point.
+mcp = create_server()
 
 
 # ═══════════════════════════════════════════════════════════════════════

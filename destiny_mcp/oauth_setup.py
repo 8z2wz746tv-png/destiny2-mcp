@@ -71,7 +71,12 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
             return
 
         OAuthCallbackHandler.captured_code = code
-        self._send_html(200, "登录成功", "Token 已保存。可以关闭这个页面，回到你的本地 Agent。")
+        self._send_html(
+            200,
+            "已收到授权回调",
+            "正在交换并保存 Token，登录尚未完成。请回到终端查看最终结果；"
+            "只有显示“Bungie 登录完成”才表示 Token 已保存。",
+        )
         self._shutdown_soon()
 
     def log_message(self, fmt: str, *args: object) -> None:

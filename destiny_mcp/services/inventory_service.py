@@ -10,6 +10,7 @@ from ..exceptions import AuthenticationError, ConfigError, ItemNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..build.models import InventorySnapshot
+from ..build.constants import ARMOR_SLOT_MAP, STAT_HASH_TO_NAME
 from ..models import InventoryItem, InventoryResponse, SearchItemsResponse
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
@@ -73,6 +74,7 @@ class InventoryService:
         )
         if looks_like_missing_inventory_scope(profile):
             raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)
+        require_complete_inventory_components(profile)
         return p, profile
 
     async def get_inventory(
@@ -105,22 +107,7 @@ class InventoryService:
             player_name, _INVENTORY_PROFILE_COMPONENTS
         )
 
-        normalized_location = location.strip().lower()
-
-        if normalized_location in ("", "all", "全部", "账号", "account"):
-            items = parse_items_from_profile(profile, self._manifest)
-            loc_name = "all"
-        elif normalized_location in ("vault", "仓库"):
-            items = parse_items_from_profile(
-                profile, self._manifest, target_location="vault"
-            )
-            loc_name = "vault"
-        else:
-            class_type = resolve_character_name(location)
-            items = parse_items_from_profile(
-                profile, self._manifest, target_class_type=class_type
-            )
-            loc_name = class_type_name(class_type).lower()
+        items, loc_name = self._items_at_location(profile, location)
 
         # Apply filters
         items = self._filter_items(items, item_type, armor_slot, rarity)
@@ -195,7 +182,7 @@ class InventoryService:
         return 0
 
     async def search_items(
-        self, player_name: str, item_name: str
+        self, player_name: str, item_name: str, location: str = ""
     ) -> SearchItemsResponse:
         """Search for an item by name across all characters and vault.
 
@@ -211,32 +198,27 @@ class InventoryService:
             player_name, _INVENTORY_PROFILE_COMPONENTS
         )
 
-        manifest_results = self._manifest.search(item_name, limit=50)
-        if not manifest_results:
-            return SearchItemsResponse(query=item_name, items=[])
+        item_query = item_name.strip()
+        if not item_query:
+            raise ConfigError("请提供 item_name。")
+        manifest_results = self._manifest.search(item_query, limit=0)
 
         # Manifest hashes are signed, API returns unsigned — store both
         match_hashes: set[int] = set()
-        target_name = ""
         for r in manifest_results:
             h = r["itemHash"]
             match_hashes.add(h)
             match_hashes.add(to_unsigned(h))
-            if not target_name and r.get("itemType") in (2, 3):
-                target_name = r["name"]
 
-        all_items = parse_items_from_profile(profile, self._manifest)
-        matched = [it for it in all_items if it.item_hash in match_hashes]
-
-        # Name-based fallback: find items whose hashes weren't in manifest results
-        # (deprecated/reissued items with hashes removed from current manifest)
-        if target_name:
-            matched_hashes = {it.item_hash for it in matched}
-            for it in all_items:
-                if it.item_hash not in matched_hashes and it.item_hash not in match_hashes:
-                    if it.name == target_name:
-                        matched.append(it)
-                        matched_hashes.add(it.item_hash)
+        all_items, _ = self._items_at_location(profile, location)
+        query_key = item_query.casefold()
+        matched = [
+            item
+            for item in all_items
+            if item.item_hash in match_hashes
+            or query_key in item.name.casefold()
+            or query_key in item.name_en.casefold()
+        ]
 
         logger.info(
             "Item search '%s': %d manifest hit(s), %d instance(s) found",
@@ -247,7 +229,7 @@ class InventoryService:
         return SearchItemsResponse(query=item_name, items=matched)
 
     async def search_items_by_type(
-        self, player_name: str, type_name: str
+        self, player_name: str, type_name: str, location: str = ""
     ) -> SearchItemsResponse:
         """Search for items by weapon/armor type across all characters and vault.
 
@@ -265,9 +247,10 @@ class InventoryService:
             player_name, _INVENTORY_PROFILE_COMPONENTS
         )
 
-        manifest_results = self._manifest.search_by_type_name(type_name)
-        if not manifest_results:
-            return SearchItemsResponse(query=type_name, items=[])
+        type_query = type_name.strip()
+        if not type_query:
+            raise ConfigError("请提供 type_name。")
+        manifest_results = self._manifest.search_by_type_name(type_query, limit=0)
 
         # Build match set with both signed and unsigned hashes
         match_hashes: set[int] = set()
@@ -276,7 +259,7 @@ class InventoryService:
             match_hashes.add(h)
             match_hashes.add(to_unsigned(h))
 
-        all_items = parse_items_from_profile(profile, self._manifest)
+        all_items, _ = self._items_at_location(profile, location)
         matched = [it for it in all_items if it.item_hash in match_hashes]
 
         logger.info(
@@ -286,6 +269,31 @@ class InventoryService:
             len(matched),
         )
         return SearchItemsResponse(query=type_name, items=matched)
+
+    def _items_at_location(
+        self,
+        profile: dict,
+        location: str,
+    ) -> tuple[list[InventoryItem], str]:
+        normalized = location.strip().lower()
+        if normalized in ("", "all", "全部", "账号", "account"):
+            return parse_items_from_profile(profile, self._manifest), "all"
+        if normalized in ("vault", "仓库"):
+            return (
+                parse_items_from_profile(
+                    profile,
+                    self._manifest,
+                    target_location="vault",
+                ),
+                "vault",
+            )
+        class_type = resolve_character_name(location)
+        canonical_location = class_type_name(class_type).lower()
+        items = parse_items_from_profile(profile, self._manifest)
+        return (
+            [item for item in items if item.location == canonical_location],
+            canonical_location,
+        )
 
     async def find_item(
         self,
@@ -340,12 +348,125 @@ class InventoryService:
         _, profile = await self._resolve_and_fetch(
             player_name, _ARMOR_SNAPSHOT_COMPONENTS
         )
+        self._validate_armor_snapshot_components(profile, character_class)
         snapshot = InventorySnapshot.from_profile(profile, self._manifest, character_class)
         logger.info(
             "Armor snapshot ready: %d pieces across 5 slots",
             snapshot.total_pieces,
         )
         return snapshot
+
+    def _validate_armor_snapshot_components(
+        self,
+        profile: dict,
+        character_class: str,
+    ) -> None:
+        """Reject partial armor data before it reaches the optimizer."""
+        target_class = (
+            resolve_character_name(character_class) if character_class.strip() else -1
+        )
+        chars = profile["characters"]["data"]
+        vault_items = profile["profileInventory"]["data"]["items"]
+        inventories = profile["characterInventories"]["data"]
+        equipment = profile["characterEquipment"]["data"]
+        components = profile.get("itemComponents", {})
+        instances = (components.get("instances") or {}).get("data")
+        stats = (components.get("stats") or {}).get("data")
+        sockets = (components.get("sockets") or {}).get("data")
+        if not all(isinstance(value, dict) for value in (instances, stats, sockets)):
+            raise ConfigError(
+                "Bungie 未返回完整的护甲实例、属性或插槽组件，已停止配装计算。"
+            )
+
+        candidates: list[dict] = []
+        for raw in vault_items:
+            info = self._manifest.get_item_info(raw.get("itemHash", 0))
+            if not isinstance(info, dict):
+                if raw.get("itemInstanceId"):
+                    raise ConfigError("仓库实例缺少 Manifest 定义，已停止配装计算。")
+                continue
+            bucket = raw.get("bucketHash")
+            if bucket == 138197802:
+                bucket = info.get("bucketTypeHash")
+            if bucket not in ARMOR_SLOT_MAP:
+                continue
+            item_class = info.get("classType", -1)
+            if target_class >= 0 and item_class in {0, 1, 2} and item_class != target_class:
+                continue
+            candidates.append(raw)
+
+        for char_id, char_info in chars.items():
+            if target_class >= 0 and char_info.get("classType") != target_class:
+                continue
+            candidates.extend(inventories[char_id]["items"])
+            candidates.extend(equipment[char_id]["items"])
+
+        incomplete = 0
+        for raw in candidates:
+            info = self._manifest.get_item_info(raw.get("itemHash", 0))
+            bucket = raw.get("bucketHash")
+            if bucket == 138197802 and isinstance(info, dict):
+                bucket = info.get("bucketTypeHash")
+            if bucket not in ARMOR_SLOT_MAP:
+                continue
+            instance_id = str(raw.get("itemInstanceId") or "")
+            instance_data = instances.get(instance_id)
+            stat_data = stats.get(instance_id)
+            socket_data = sockets.get(instance_id)
+            if (
+                instance_id in {"", "0"}
+                or not isinstance(info, dict)
+                or not isinstance(instance_data, dict)
+                or not instance_data
+                or not isinstance(stat_data, dict)
+                or not isinstance(stat_data.get("stats"), dict)
+                or any(
+                    not isinstance(
+                        (stat_data["stats"].get(str(stat_hash)) or stat_data["stats"].get(stat_hash) or {}).get("value"),
+                        int,
+                    )
+                    for stat_hash in STAT_HASH_TO_NAME
+                )
+                or not isinstance(socket_data, dict)
+                or not isinstance(socket_data.get("sockets"), list)
+                or not socket_data["sockets"]
+            ):
+                incomplete += 1
+                continue
+            for socket in socket_data["sockets"]:
+                plug_hash = socket.get("plugHash", 0)
+                if plug_hash and not isinstance(self._manifest.get_item_definition(plug_hash), dict):
+                    incomplete += 1
+                    break
+
+        if incomplete:
+            raise ConfigError(
+                f"有 {incomplete} 件候选护甲缺少实例、属性或插槽数据，"
+                "已停止配装计算，避免把缺失值当成 0。"
+            )
+
+
+def require_complete_inventory_components(profile: dict) -> None:
+    """Require the inventory containers needed for an account-wide conclusion."""
+    chars = profile.get("characters", {}).get("data")
+    vault_items = profile.get("profileInventory", {}).get("data", {}).get("items")
+    inventories = profile.get("characterInventories", {}).get("data")
+    equipment = profile.get("characterEquipment", {}).get("data")
+    if (
+        not isinstance(chars, dict)
+        or not chars
+        or not isinstance(vault_items, list)
+        or not isinstance(inventories, dict)
+        or not isinstance(equipment, dict)
+        or any(
+            not isinstance(component.get(char_id, {}).get("items"), list)
+            for char_id in chars
+            for component in (inventories, equipment)
+        )
+    ):
+        raise ConfigError(
+            "Bungie 库存组件不完整，无法可靠判断账号库存；请稍后重试。"
+        )
 
 
 def looks_like_missing_inventory_scope(profile: dict) -> bool:
@@ -362,6 +483,13 @@ def looks_like_missing_inventory_scope(profile: dict) -> bool:
     )
     character_inventory = profile.get("characterInventories", {}).get("data", {})
     character_equipment = profile.get("characterEquipment", {}).get("data", {})
+
+    if not isinstance(profile_items, list):
+        profile_items = []
+    if not isinstance(character_inventory, dict):
+        character_inventory = {}
+    if not isinstance(character_equipment, dict):
+        character_equipment = {}
 
     inventory_count = len(profile_items) + sum(
         len(payload.get("items", []))

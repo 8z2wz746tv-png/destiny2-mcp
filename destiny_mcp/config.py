@@ -42,20 +42,10 @@ load_dotenv(_project_root / ".env")
 load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=False)
 
 
-def _require(key: str) -> str:
-    value = os.getenv(key)
-    if not value:
-        raise ConfigError(
-            f"Missing required environment variable: {key}. "
-            f"Copy .env.example to .env and fill in your credentials."
-        )
-    return value
-
-
 # Bungie API credentials
-BUNGIE_API_KEY: str = _require("BUNGIE_API_KEY")
-BUNGIE_CLIENT_ID: str = _require("BUNGIE_CLIENT_ID")
-BUNGIE_CLIENT_SECRET: str = _require("BUNGIE_CLIENT_SECRET")
+BUNGIE_API_KEY: str = os.getenv("BUNGIE_API_KEY", "")
+BUNGIE_CLIENT_ID: str = os.getenv("BUNGIE_CLIENT_ID", "")
+BUNGIE_CLIENT_SECRET: str = os.getenv("BUNGIE_CLIENT_SECRET", "")
 DESTINY_OAUTH_REDIRECT_URI: str | None = os.getenv("DESTINY_OAUTH_REDIRECT_URI")
 
 # Paths
@@ -72,6 +62,10 @@ DATA_PATH: Path = Path(
 # Default player name — set this to skip typing your Bungie name every time
 DESTINY_DEFAULT_PLAYER: str | None = os.getenv("DESTINY_DEFAULT_PLAYER")
 
-# Ensure directories exist
-DESTINY_TOKEN_PATH.mkdir(parents=True, exist_ok=True)
-DESTINY_MANIFEST_PATH.mkdir(parents=True, exist_ok=True)
+def validate_credentials() -> None:
+    """Validate at startup, so importing tools/models requires no credentials."""
+    for key in ("BUNGIE_API_KEY", "BUNGIE_CLIENT_ID", "BUNGIE_CLIENT_SECRET"):
+        if not globals()[key]:
+            raise ConfigError(f"Missing required environment variable: {key}. Configure it locally in .env.")
+    if not BUNGIE_CLIENT_ID.isascii() or not BUNGIE_CLIENT_ID.isdigit():
+        raise ConfigError("BUNGIE_CLIENT_ID must be a numeric client ID.")

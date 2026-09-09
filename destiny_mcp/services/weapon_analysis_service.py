@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from ..exceptions import ConfigError, DestinyMCPError, ItemNotFoundError
 from ..logging_config import get_logger
 from ..models import WeaponComparison, WeaponPerkPool
@@ -57,7 +59,7 @@ class WeaponAnalysisService:
 
         perk_pool = await self._load_perk_pool(weapon_query, warnings)
         god_roll = await self._load_god_roll(weapon_query, warnings)
-        inventory = await self._load_inventory_comparison(
+        inventory, inventory_status = await self._load_inventory_comparison(
             resolved_weapon_name,
             player_name,
             include_inventory,
@@ -72,7 +74,11 @@ class WeaponAnalysisService:
             f"{slot_count} 个 perk 栏位",
         ]
         if include_inventory:
-            summary_parts.append(f"{instance_count} 个账号副本")
+            summary_parts.append(
+                f"{instance_count} 个账号副本"
+                if inventory_status == "complete"
+                else "账号副本数未知"
+            )
 
         return {
             "summary": "，".join(summary_parts) + "。",
@@ -80,6 +86,7 @@ class WeaponAnalysisService:
             "perk_pool": _dump_model(perk_pool),
             "god_roll": god_roll,
             "inventory": _dump_model(inventory),
+            "inventory_status": inventory_status,
             "warnings": warnings,
             "next_actions": next_actions,
         }
@@ -115,9 +122,12 @@ class WeaponAnalysisService:
         include_inventory: bool,
         warnings: list[str],
         next_actions: list[dict[str, str]],
-    ) -> WeaponComparison | None:
+    ) -> tuple[
+        WeaponComparison | None,
+        Literal["complete", "unavailable", "not_requested"],
+    ]:
         if not include_inventory:
-            return None
+            return None, "not_requested"
 
         if not player_name:
             warnings.append("未提供 Bungie 玩家名，已跳过账号内副本对比。")
@@ -130,10 +140,14 @@ class WeaponAnalysisService:
                     "include_inventory": True,
                 },
             })
-            return None
+            return None, "unavailable"
 
         try:
-            return await self._compare_svc.compare_weapon_instances(player_name, weapon_name)
+            comparison = await self._compare_svc.compare_weapon_instances(
+                player_name,
+                weapon_name,
+            )
+            return comparison, "complete"
         except ItemNotFoundError as exc:
             logger.info(
                 "Weapon '%s' not found in player '%s' inventory: %s",
@@ -147,7 +161,7 @@ class WeaponAnalysisService:
                 "tool": "inventory_assistant",
                 "arguments": {"intent": "search", "item_name": weapon_name},
             })
-            return None
+            return None, "complete"
         except DestinyMCPError as exc:
             logger.warning(
                 "Inventory comparison failed for '%s' / '%s': %s",
@@ -161,7 +175,7 @@ class WeaponAnalysisService:
                 "tool": "weapon_assistant",
                 "arguments": {"intent": "compare", "weapon_name": weapon_name},
             })
-            return None
+            return None, "unavailable"
 
 
 def _dump_model(model) -> dict | None:

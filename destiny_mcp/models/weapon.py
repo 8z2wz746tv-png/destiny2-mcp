@@ -84,6 +84,7 @@ class WeaponDetail(BaseModel):
     location: str = Field(default="", description="Where the weapon is")
     is_equipped: bool = Field(default=False)
     sockets: list[WeaponSocketInfo] = Field(default_factory=list, description="All sockets, categorized")
+    perks_complete: bool = Field(default=False, description="All current socket plugs were resolved")
     stats: WeaponStats = Field(default_factory=WeaponStats, description="Weapon stat values")
     icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
 

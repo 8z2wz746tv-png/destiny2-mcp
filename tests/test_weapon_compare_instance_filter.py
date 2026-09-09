@@ -4,14 +4,26 @@ from __future__ import annotations
 
 import pytest
 
-from destiny_mcp.exceptions import ConfigError, ItemNotFoundError
+from destiny_mcp.exceptions import AuthenticationError, ConfigError, ItemNotFoundError
 from destiny_mcp.services.weapon_compare_service import WeaponCompareService
 
 
 class _ManifestStub:
+    def get_item_info(self, item_hash: int) -> dict:
+        return {"name": "测试 Perk"}
+
+    def get_plug_category_identifier(self, item_hash: int) -> str:
+        return "frames"
+
+    def get_sandbox_perk_description(self, item_hash: int) -> None:
+        return None
+
+    def get_item_description(self, item_hash: int) -> str:
+        return ""
+
     def search(self, query: str, *, limit: int = 20) -> list[dict]:
         assert query == "测试武器"
-        assert limit == 50
+        assert limit == 0
         return [
             {
                 "itemHash": 100,
@@ -41,7 +53,11 @@ class _ResolverStub:
             "profileInventory": {
                 "data": {
                     "items": [
-                        {"itemHash": 100, "itemInstanceId": "vault-instance"}
+                        {
+                            "itemHash": 100,
+                            "itemInstanceId": "vault-instance",
+                            "bucketHash": 138197802,
+                        }
                     ]
                 }
             },
@@ -54,7 +70,9 @@ class _ResolverStub:
                     }
                 }
             },
-            "characterEquipment": {"data": {}},
+            "characterEquipment": {
+                "data": {"character-1": {"items": []}}
+            },
             "itemComponents": {
                 "instances": {
                     "data": {
@@ -64,8 +82,8 @@ class _ResolverStub:
                 },
                 "sockets": {
                     "data": {
-                        "vault-instance": {"sockets": []},
-                        "character-instance": {"sockets": []},
+                        "vault-instance": {"sockets": [{"plugHash": 6001}]},
+                        "character-instance": {"sockets": [{"plugHash": 6001}]},
                     }
                 },
             },
@@ -74,7 +92,7 @@ class _ResolverStub:
 
 class _PerkServiceStub:
     def annotate_god_roll(self, item_hash: int, plug_hash: int, perk: object) -> None:
-        raise AssertionError("empty socket fixtures must not annotate perks")
+        pass
 
 
 def _service() -> WeaponCompareService:
@@ -123,6 +141,49 @@ async def test_omitted_instance_keeps_all_owned_copies() -> None:
 async def test_rejects_blank_weapon_name_before_profile_lookup() -> None:
     with pytest.raises(ConfigError, match="weapon_name"):
         await _service().compare_weapon_instances("Guardian#1234", "   ")
+
+
+async def test_rejects_missing_inventory_scope_instead_of_reporting_not_owned() -> None:
+    class Resolver(_ResolverStub):
+        async def get_profile(self, *args, **kwargs) -> dict:
+            profile = await super().get_profile(*args, **kwargs)
+            profile["profileInventory"]["data"]["items"] = []
+            profile["characterInventories"]["data"]["character-1"]["items"] = []
+            profile["characterEquipment"]["data"]["character-1"]["items"] = [{
+                "itemHash": 999,
+                "itemInstanceId": "equipped",
+            }]
+            return profile
+
+    service = WeaponCompareService(
+        _ManifestStub(),  # type: ignore[arg-type]
+        Resolver(),  # type: ignore[arg-type]
+        _PerkServiceStub(),  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(AuthenticationError, match="ReadDestinyInventoryAndVault"):
+        await service.compare_weapon_instances("Guardian#1234", "测试武器")
+
+
+async def test_rejects_missing_socket_component_instead_of_empty_perks() -> None:
+    class Resolver(_ResolverStub):
+        async def get_profile(self, *args, **kwargs) -> dict:
+            profile = await super().get_profile(*args, **kwargs)
+            del profile["itemComponents"]["sockets"]["data"]["vault-instance"]
+            return profile
+
+    service = WeaponCompareService(
+        _ManifestStub(),  # type: ignore[arg-type]
+        Resolver(),  # type: ignore[arg-type]
+        _PerkServiceStub(),  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(ConfigError, match="缺少当前插槽数据"):
+        await service.compare_weapon_instances(
+            "Guardian#1234",
+            "测试武器",
+            item_instance_id="vault-instance",
+        )
 
 
 async def test_keeps_absolute_weapon_icon_and_includes_tactical_mod() -> None:

@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+import anyio
 
 os.environ.setdefault("BUNGIE_API_KEY", "dummy")
 os.environ.setdefault("BUNGIE_CLIENT_ID", "1")
@@ -30,6 +32,7 @@ from destiny_mcp.models import (
     LoadoutOperationResult,
 )
 from destiny_mcp.services import build_service as build_service_module
+from destiny_mcp.services import loadout_equipment_service as equipment_module
 from destiny_mcp.services.build_service import BuildService, _snapshot_version
 from destiny_mcp.services.loadout_equipment_service import LoadoutEquipmentService
 from destiny_mcp.server import build_optimizer
@@ -433,6 +436,140 @@ async def test_exact_equipment_rolls_back_failed_verification() -> None:
 
     assert result.success is False
     assert "已恢复" in result.message
+    service._restore_exact_state.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("cancel_mode", ["asyncio", "mcp_scope"])
+@pytest.mark.parametrize("phase", ["apply", "verify", "rollback"])
+async def test_cancelled_equipment_recovers_before_releasing_account_lock(
+    cancel_mode: str, phase: str,
+) -> None:
+    service = _equipment_service()
+    recovery = {"captured": True}
+    service._capture_recovery_state = AsyncMock(return_value=recovery)
+    interrupted = asyncio.Event()
+    restoring = asyncio.Event()
+    release_restore = asyncio.Event()
+    next_write = asyncio.Event()
+    state = {"equipment": "before"}
+    scopes = []
+
+    async def apply(*args):
+        state["equipment"] = "changed"
+        if phase == "apply":
+            interrupted.set()
+            await asyncio.Event().wait()
+        return LoadoutOperationResult(success=True)
+
+    async def verify(*args):
+        if phase == "verify":
+            interrupted.set()
+            await asyncio.Event().wait()
+        return False
+
+    async def restore(*args):
+        if phase == "rollback" and not interrupted.is_set():
+            interrupted.set()
+            await asyncio.Event().wait()
+        # Real recovery calls serialized transfer methods in the same task.
+        async with service._equip_lock:
+            restoring.set()
+            await release_restore.wait()
+            state["equipment"] = "before"
+            return True
+
+    service._equip_local_unlocked = apply
+    service._verify_loadout = verify
+    service._restore_exact_state = AsyncMock(side_effect=restore)
+
+    async def run():
+        with anyio.CancelScope() as scope:
+            scopes.append(scope)
+            await service.equip_exact("Alpha#0100", _loadout())
+
+    async def subsequent_write():
+        async with service._equip_lock:
+            assert state["equipment"] == "before"
+            next_write.set()
+
+    task = asyncio.create_task(run())
+    other = None
+    try:
+        await asyncio.wait_for(interrupted.wait(), 1)
+        if cancel_mode == "asyncio":
+            task.cancel()
+        else:
+            scopes[0].cancel()
+        await asyncio.wait_for(restoring.wait(), 1)
+        other = asyncio.create_task(subsequent_write())
+        await asyncio.sleep(0)
+        assert not next_write.is_set()
+        release_restore.set()
+        if cancel_mode == "asyncio":
+            with pytest.raises(asyncio.CancelledError):
+                await asyncio.wait_for(task, 1)
+        else:
+            await asyncio.wait_for(task, 1)
+        await asyncio.wait_for(other, 1)
+        assert state["equipment"] == "before"
+        assert next_write.is_set()
+        assert service._restore_exact_state.await_count == (2 if phase == "rollback" else 1)
+    finally:
+        release_restore.set()
+        for pending in (task, other):
+            if pending is not None and not pending.done():
+                pending.cancel()
+        await asyncio.gather(*(pending for pending in (task, other) if pending), return_exceptions=True)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("failure", ["timeout", "exception", "incomplete"])
+async def test_cancelled_recovery_is_bounded_and_reports_failure(
+    failure: str, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture,
+) -> None:
+    service = _equipment_service()
+    service._capture_recovery_state = AsyncMock(return_value={})
+    service._equip_local_unlocked = AsyncMock(side_effect=asyncio.CancelledError)
+
+    async def restore(*args):
+        if failure == "timeout":
+            await asyncio.Event().wait()
+        if failure == "exception":
+            raise OSError("synthetic recovery failure")
+        return False
+
+    service._restore_exact_state = restore
+    monkeypatch.setattr(equipment_module, "_CANCEL_ROLLBACK_TIMEOUT_SECONDS", 0.01)
+    with pytest.raises(asyncio.CancelledError):
+        await asyncio.wait_for(service.equip_exact("Alpha#0100", _loadout()), 1)
+
+    assert "recovery incomplete" in caplog.text
+    async with service._equip_lock:
+        pass
+
+
+@pytest.mark.asyncio
+async def test_partial_batch_equip_stops_mods_and_rolls_back() -> None:
+    service = _equipment_service()
+    service._resolver.resolve_player = AsyncMock(return_value={
+        "membership_id": "11", "membership_type": 3,
+    })
+    service._resolver.get_profile = AsyncMock(return_value={
+        "characters": {"data": {"22": {"classType": 1}}},
+    })
+    service._transfer.transfer_item = AsyncMock(return_value=SimpleNamespace(success=True))
+    service._transfer.equip_items = AsyncMock(return_value={"success": False})
+    service._prepare_mod_operations = AsyncMock()
+    service._apply_subclass_config = AsyncMock()
+    service._capture_recovery_state = AsyncMock(return_value={})
+    service._restore_exact_state = AsyncMock(return_value=True)
+
+    result = await service.equip_exact("Alpha#0100", _loadout())
+
+    assert not result.success
+    service._prepare_mod_operations.assert_not_awaited()
+    service._apply_subclass_config.assert_not_awaited()
     service._restore_exact_state.assert_awaited_once()
 
 

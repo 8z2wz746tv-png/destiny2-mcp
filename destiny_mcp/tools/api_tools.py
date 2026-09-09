@@ -13,8 +13,9 @@ from mcp.server.fastmcp import Context
 
 from ..exceptions import AuthenticationError
 from ..logging_config import get_logger
-from ..server import mcp
-from ._helpers import get_ctx, handle_tool_error, resolve_player_name
+from ..services.account_action_lock import account_action_lock
+from ._registry import mcp
+from ._helpers import get_ctx, handle_tool_error
 
 logger = get_logger(__name__)
 
@@ -112,16 +113,20 @@ async def raw_api_call(
     except AuthenticationError:
         logger.debug("No auth token available for raw_api_call")
 
-    # Make the request
+    async def request() -> object:
+        return await bungie.rest.static_request(
+            method, path, auth=auth_token, json=parsed_body, params=parsed_params,
+        )
+
+    # Unknown POST endpoints may mutate account state. Serialize them with all
+    # service writes so dependent caches are invalidated conservatively.
     logger.info("raw_api_call: %s %s", method, path)
     try:
-        result = await bungie.rest.static_request(
-            method,
-            path,
-            auth=auth_token,
-            json=parsed_body,
-            params=parsed_params,
-        )
+        if method == "POST":
+            async with account_action_lock(bungie):
+                result = await request()
+        else:
+            result = await request()
     except aiobungie.HTTPError as e:
         logger.error("raw_api_call failed: %s %s → %s", method, path, e)
         return {"error": f"API 调用失败: {str(e)[:500]}"}

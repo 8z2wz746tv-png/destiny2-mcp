@@ -20,6 +20,11 @@ class ReentrantAsyncLock:
         self._lock = asyncio.Lock()
         self._owner: asyncio.Task | None = None
         self._depth = 0
+        self.version = 0
+
+    @property
+    def active(self) -> bool:
+        return self._owner is not None
 
     async def __aenter__(self) -> "ReentrantAsyncLock":
         task = asyncio.current_task()
@@ -29,6 +34,7 @@ class ReentrantAsyncLock:
         await self._lock.acquire()
         self._owner = task
         self._depth = 1
+        self.version += 1
         return self
 
     async def __aexit__(self, exc_type, exc, traceback) -> None:
@@ -37,6 +43,8 @@ class ReentrantAsyncLock:
             raise DestinyMCPError("账号操作锁由非持有任务释放，已拒绝继续执行。")
         self._depth -= 1
         if self._depth == 0:
+            # Invalidate even on failure/cancellation: the remote write may have applied.
+            self.version += 1
             self._owner = None
             self._lock.release()
 

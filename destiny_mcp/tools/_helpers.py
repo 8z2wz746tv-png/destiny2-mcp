@@ -5,13 +5,14 @@ from __future__ import annotations
 import functools
 import re
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 from mcp.server.fastmcp import Context
 
 from .. import config
 from ..exceptions import DestinyMCPError
 from ..logging_config import get_logger
+from ..service_context import ServiceContext
 from ._responses import error_response
 
 logger = get_logger(__name__)
@@ -40,12 +41,12 @@ def resolve_player_name(*args: Any) -> str:
     return default or _CURRENT_OAUTH_PLAYER
 
 
-def get_ctx(ctx: Context) -> dict:
+def get_ctx(ctx: Context) -> ServiceContext:
     """Extract services from lifespan context.
 
     纯个人版：直接返回 lifespan context，不走用户身份解析。
     """
-    return ctx.request_context.lifespan_context
+    return cast(ServiceContext, ctx.request_context.lifespan_context)
 
 
 def handle_tool_error(func: Callable) -> Callable:

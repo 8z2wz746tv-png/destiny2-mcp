@@ -6,6 +6,7 @@ Extracted from weapon_service.py during refactoring.
 
 from __future__ import annotations
 
+from ..exceptions import AuthenticationError, ConfigError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name
 from ..models import (
@@ -16,6 +17,11 @@ from ..models import (
 )
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
+from .inventory_service import (
+    MISSING_INVENTORY_SCOPE_MESSAGE,
+    looks_like_missing_inventory_scope,
+    require_complete_inventory_components,
+)
 
 logger = get_logger(__name__)
 
@@ -85,10 +91,8 @@ class WeaponDetailService:
         """Categorize a socket by its plug's plugCategoryIdentifier."""
         if not plug_hash:
             return None
-        if not weapon_def:
-            return None
 
-        socket_entries = weapon_def.get("sockets", {}).get("socketEntries", [])
+        socket_entries = (weapon_def or {}).get("sockets", {}).get("socketEntries", [])
         label = ""
         if socket_index < len(socket_entries):
             entry = socket_entries[socket_index]
@@ -102,12 +106,17 @@ class WeaponDetailService:
                 init_cat = self._manifest.get_plug_category_identifier(entry["singleInitialItemHash"]) or ""
                 label = self._cat_to_label(init_cat, trait_counter)
 
-        if not label:
-            return None
-
         info = self._manifest.get_item_info(plug_hash)
+        if not info or not info.get("name"):
+            plug_def = self._manifest.get_item_definition(plug_hash)
+            # Bungie uses named categories with intentionally unnamed placeholder plugs.
+            if isinstance(plug_def, dict) and not (plug_def.get("displayProperties") or {}).get("name"):
+                return None
         name = info.get("name", f"#{plug_hash}") if info else f"#{plug_hash}"
         cat_id = self._manifest.get_plug_category_identifier(plug_hash) or ""
+        # Unknown categories still carry real instance plugs and must be searchable.
+        if not label:
+            label = self._cat_to_label(cat_id, trait_counter) or f"插槽{socket_index + 1}"
 
         desc = ""
         sandbox = self._manifest.get_sandbox_perk_description(plug_hash)
@@ -155,28 +164,20 @@ class WeaponDetailService:
 
         Args:
             player_name: Bungie name.
-            type_name: Weapon type display name (e.g. '微型冲锋枪').
+            type_name: Weapon type display name; empty means all owned weapons.
 
         Returns:
             WeaponDetailResponse with all matching weapons and their full details.
         """
         logger.info("Getting weapon details: player=%s, type=%s", player_name, type_name)
 
-        # Step 1: Find all item hashes matching this type
-        type_results = self._manifest.search_by_type_name(type_name)
-        if not type_results:
-            return WeaponDetailResponse(weapon_type_query=type_name, weapons=[])
-
-        # Build target_hashes with BOTH signed and unsigned variants
-        target_hashes: set[int] = set()
+        # Type matching must not use the capped general Manifest search.
+        type_name = type_name.strip()
+        target_hashes = (
+            {to_unsigned(r["itemHash"]) for r in self._manifest.list_weapon_catalog(type_name)}
+            if type_name else None
+        )
         hash_to_info: dict[int, dict] = {}
-        for r in type_results:
-            h = r["itemHash"]
-            target_hashes.add(h)
-            unsigned = to_unsigned(h)
-            target_hashes.add(unsigned)
-            hash_to_info[h] = r
-            hash_to_info[unsigned] = r
 
         # Step 2: Resolve player and fetch profile
         p = await self._resolver.resolve_player(player_name)
@@ -186,6 +187,14 @@ class WeaponDetailService:
         profile = await self._resolver.get_profile(
             mid, mtype, [102, 200, 201, 205, 300, 304, 305]
         )
+        if looks_like_missing_inventory_scope(profile):
+            raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)
+        require_complete_inventory_components(profile)
+
+        chars_data = profile.get("characters", {}).get("data", {})
+        inv_data = profile.get("characterInventories", {}).get("data", {})
+        equip_data = profile.get("characterEquipment", {}).get("data", {})
+        vault_items = profile.get("profileInventory", {}).get("data", {}).get("items")
 
         # Step 3: Extract component data
         instances_data = (
@@ -200,49 +209,50 @@ class WeaponDetailService:
 
         # Step 4: Collect all matching weapon instances
         weapon_instances: list[dict] = []
+        seen_instances: dict[str, int] = {}
+
+        def add_weapon(raw: dict, location: str, is_equipped: bool) -> None:
+            item_hash = to_unsigned(raw["itemHash"])
+            info = self._manifest.get_item_info(item_hash)
+            if not info:
+                if raw.get("itemInstanceId"):
+                    raise ConfigError("库存实例缺少 Manifest 定义，无法确认完整武器范围；请更新 Manifest 后重试。")
+                return
+            if info.get("itemType") != 3:
+                return
+            if target_hashes is not None and item_hash not in target_hashes:
+                return
+            inst_id = str(raw.get("itemInstanceId") or "")
+            if inst_id in {"", "0"}:
+                raise ConfigError("库存武器缺少实例 ID，无法可靠筛选 Perk；请稍后重试。")
+            if inst_id in seen_instances:
+                if seen_instances[inst_id] != item_hash:
+                    raise ConfigError("库存实例 ID 对应多个武器定义；请稍后重试。")
+                return
+            seen_instances[inst_id] = item_hash
+            hash_to_info[item_hash] = info
+            weapon_instances.append({
+                "instance_id": inst_id,
+                "item_hash": item_hash,
+                "location": location,
+                "is_equipped": is_equipped,
+            })
 
         # From vault
-        vault_items = (
-            profile.get("profileInventory", {}).get("data", {}).get("items", [])
-        )
         for raw in vault_items:
-            if raw.get("itemHash") in target_hashes:
-                inst_id = str(raw.get("itemInstanceId", "0"))
-                weapon_instances.append({
-                    "instance_id": inst_id,
-                    "item_hash": raw["itemHash"],
-                    "location": "仓库",
-                    "is_equipped": False,
-                })
+            if raw.get("bucketHash") == 138197802:
+                add_weapon(raw, "仓库", False)
 
         # From characters
-        chars_data = profile.get("characters", {}).get("data", {})
-        inv_data = profile.get("characterInventories", {}).get("data", {})
-        equip_data = profile.get("characterEquipment", {}).get("data", {})
-
         for char_id, char_info in chars_data.items():
             ct = char_info.get("classType", -1)
             loc_name = class_type_name(ct)
 
             for raw in inv_data.get(char_id, {}).get("items", []):
-                if raw.get("itemHash") in target_hashes:
-                    inst_id = str(raw.get("itemInstanceId", "0"))
-                    weapon_instances.append({
-                        "instance_id": inst_id,
-                        "item_hash": raw["itemHash"],
-                        "location": loc_name,
-                        "is_equipped": False,
-                    })
+                add_weapon(raw, loc_name, False)
 
             for raw in equip_data.get(char_id, {}).get("items", []):
-                if raw.get("itemHash") in target_hashes:
-                    inst_id = str(raw.get("itemInstanceId", "0"))
-                    weapon_instances.append({
-                        "instance_id": inst_id,
-                        "item_hash": raw["itemHash"],
-                        "location": loc_name,
-                        "is_equipped": True,
-                    })
+                add_weapon(raw, loc_name, True)
 
         # Step 5: Build detailed weapon info
         details: list[WeaponDetail] = []
@@ -271,9 +281,14 @@ class WeaponDetailService:
 
             socket_list = sockets_data.get(inst_id, {}).get("sockets", [])
             sockets: list[WeaponSocketInfo] = []
+            perks_complete = bool(socket_list)
             trait_counter = {"count": 0}
             for idx, socket in enumerate(socket_list):
                 plug_hash = socket.get("plugHash", 0)
+                if plug_hash:
+                    info = self._manifest.get_item_info(plug_hash)
+                    if not info and not isinstance(self._manifest.get_item_definition(plug_hash), dict):
+                        perks_complete = False
                 si = self._categorize_socket(
                     idx, plug_hash, weapon_def, trait_counter
                 )
@@ -302,6 +317,7 @@ class WeaponDetailService:
                 location=wi["location"],
                 is_equipped=wi["is_equipped"],
                 sockets=sockets,
+                perks_complete=perks_complete and bool(sockets),
                 stats=weapon_stats,
                 icon_url=icon_url,
             ))

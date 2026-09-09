@@ -72,6 +72,8 @@ class LoadoutService:
         # Cache: player_name -> list of loadouts
         self._cache: dict[str, list[Loadout]] = {}
         self._cache_timestamp: dict[str, float] = {}
+        self._cache_version: dict[str, tuple[int, int]] = {}
+        self._local_version = 0
         self._refresh_tasks: dict[str, asyncio.Task] = {}
 
     @staticmethod
@@ -173,16 +175,22 @@ class LoadoutService:
                 logger.warning("Cache refresh failed for %s", player_name, exc_info=True)
 
     async def _refresh_cache(self, player_name: str) -> None:
+        version = (self._account_action_lock.version, self._local_version)
         native = await self._fetch_native(player_name)
         local = self._load_local()
         self._cache[player_name] = native + local
         self._cache_timestamp[player_name] = time.time()
+        self._cache_version[player_name] = version
         logger.info(
             "Cache refreshed for %s: %d loadouts (%d native + %d local)",
             player_name, len(self._cache[player_name]), len(native), len(local),
         )
 
     def _get_cached(self, player_name: str) -> list[Loadout] | None:
+        if self._cache_version.get(player_name) != (
+            self._account_action_lock.version, self._local_version
+        ):
+            return None
         timestamp = self._cache_timestamp.get(player_name)
         if timestamp is None:
             return None
@@ -209,6 +217,8 @@ class LoadoutService:
             json.dumps(data, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
+        self._local_version += 1
+        self._cache_timestamp.clear()
 
     # ── Native loadouts ─────────────────────────────────────────────
 

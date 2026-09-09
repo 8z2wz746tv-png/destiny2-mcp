@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from destiny_mcp.build.models import InventorySnapshot
-from destiny_mcp.exceptions import ConfigError, ItemNotFoundError
+from destiny_mcp.exceptions import APIError, ConfigError, ItemNotFoundError
 from destiny_mcp.models import WeeklyMilestone, WeeklyResetResponse
 from destiny_mcp.services.inventory_service import _normalize_inventory_item_type
 from destiny_mcp.services.weapon_analysis_service import WeaponAnalysisService
@@ -40,7 +40,7 @@ async def test_weapon_analysis_suggests_registered_assistant_tools() -> None:
     warnings: list[str] = []
     next_actions: list[dict] = []
 
-    result = await service._load_inventory_comparison(
+    result, status = await service._load_inventory_comparison(
         "命运使者",
         "Guardian#1234",
         True,
@@ -49,11 +49,41 @@ async def test_weapon_analysis_suggests_registered_assistant_tools() -> None:
     )
 
     assert result is None
+    assert status == "complete"
     assert next_actions == [{
         "label": "缩短武器名或检查是否在其他账号",
         "tool": "inventory_assistant",
         "arguments": {"intent": "search", "item_name": "命运使者"},
     }]
+
+
+async def test_weapon_analysis_does_not_report_zero_when_inventory_lookup_fails() -> None:
+    class Perks:
+        async def get_weapon_perks(self, weapon_name: str):
+            return None
+
+        async def get_god_roll(self, weapon_name: str) -> str:
+            return ""
+
+    class Compare:
+        async def compare_weapon_instances(self, player_name: str, weapon_name: str):
+            raise APIError("读取武器副本", "暂时不可用")
+
+    service = WeaponAnalysisService(
+        Perks(),  # type: ignore[arg-type]
+        Compare(),  # type: ignore[arg-type]
+        SimpleNamespace(get_weapon_full_info=lambda name: {"name": name}),
+    )
+
+    result = await service.analyze_weapon(
+        "测试武器",
+        player_name="Guardian#1234",
+    )
+
+    assert result["inventory"] is None
+    assert result["inventory_status"] == "unavailable"
+    assert "账号副本数未知" in result["summary"]
+    assert "0 个账号副本" not in result["summary"]
 
 
 async def test_weekly_analysis_suggests_world_assistant() -> None:
@@ -83,6 +113,7 @@ def test_armor_snapshot_keeps_absolute_manifest_icon_url() -> None:
             return {
                 "classType": 1,
                 "tier": 5,
+                "bucketTypeHash": 3448274439,
                 "icon": "https://www.bungie.net/common/helmet.png",
             }
 

@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ..exceptions import ManifestError
+from ..manifest import class_type_name, resolve_character_name
 
 if TYPE_CHECKING:
     from ..manifest import ManifestManager
@@ -35,27 +36,50 @@ class WeaponRollFilterService:
         any_terms = self._split_terms(any_perks)
         excluded = self._split_terms(excluded_perks)
         location_key = location.strip().lower()
+        if location_key in {"", "all", "全部", "account", "账号"}:
+            location_key = ""
+        elif location_key in {"vault", "仓库"}:
+            location_key = "vault"
+        else:
+            location_key = class_type_name(resolve_character_name(location_key)).lower()
         name_key = weapon_name.strip().lower()
         matched: list[dict[str, Any]] = []
         not_matched: list[dict[str, Any]] = []
+        unknown: list[dict[str, Any]] = []
+        english_perks: dict[int, str] = {}
+        has_perk_filters = bool(required or any_terms or excluded)
+        needs_english_names = any(
+            term.isascii() for term in required + any_terms + excluded
+        )
 
         for weapon in weapons:
             if name_key and name_key not in str(weapon.get("name", "")).lower():
                 continue
-            if location_key and location_key not in {
-                str(weapon.get("location", "")).lower(),
-                "all",
-                "全部",
-            }:
+            weapon_location = str(weapon.get("location", "")).lower()
+            if weapon_location == "仓库":
+                weapon_location = "vault"
+            if location_key and location_key != weapon_location:
                 continue
 
             perk_names = self._perk_names(weapon)
+            item = self._compact_weapon(weapon, perk_names)
+            if has_perk_filters and not weapon.get("perks_complete", bool(perk_names)):
+                item["reason"] = "当前 Perk 插槽数据缺失或无法解析，不能判断是否匹配"
+                unknown.append(item)
+                continue
             perk_keys = [name.lower() for name in perk_names]
+            if needs_english_names and self._manifest is not None:
+                for socket in weapon.get("sockets", []) or []:
+                    plug_hash = socket.get("plug_hash")
+                    if plug_hash:
+                        if plug_hash not in english_perks:
+                            english_perks[plug_hash] = self._manifest.get_english_name(plug_hash).lower()
+                        if english_perks[plug_hash]:
+                            perk_keys.append(english_perks[plug_hash])
             has_required = all(any(term in perk for perk in perk_keys) for term in required)
             has_any = not any_terms or any(any(term in perk for perk in perk_keys) for term in any_terms)
             has_excluded = any(any(term in perk for perk in perk_keys) for term in excluded)
 
-            item = self._compact_weapon(weapon, perk_names)
             if has_required and has_any and not has_excluded:
                 item["reason"] = "命中筛选条件"
                 matched.append(item)
@@ -65,10 +89,19 @@ class WeaponRollFilterService:
 
         result_limit = max(1, min(limit, 200))
         return {
+            "scope": "owned_inventory",
+            "scope_label": "账号持有武器实例",
+            "perk_scope": "current_sockets",
+            "coverage_complete": not unknown,
+            "scoped_count": len(matched) + len(not_matched) + len(unknown),
             "checked_count": len(matched) + len(not_matched),
             "matched_count": len(matched),
+            "unknown_count": len(unknown),
             "matched": matched[:result_limit],
             "not_matched": not_matched[:result_limit],
+            "unknown": unknown[:result_limit],
+            "returned_count": min(len(matched), result_limit),
+            "truncated": len(matched) > result_limit,
             "filters": {
                 "weapon_name": weapon_name,
                 "location": location,
@@ -282,6 +315,8 @@ class WeaponRollFilterService:
         return {
             "name": weapon.get("name", ""),
             "instance_id": weapon.get("instance_id", ""),
+            "item_hash": weapon.get("item_hash", 0),
+            "weapon_type": weapon.get("weapon_type", ""),
             "location": weapon.get("location", ""),
             "power": weapon.get("power"),
             "is_equipped": weapon.get("is_equipped", False),

@@ -20,7 +20,7 @@ import secrets
 import time
 from collections import OrderedDict
 from difflib import SequenceMatcher
-from typing import Literal
+from typing import Literal, cast
 
 from ..build import solver as _solver
 from ..build.analyzer import analyze
@@ -36,7 +36,7 @@ from ..build.models import (
 )
 from ..build.scorer import score as _score
 from ..bungie_client import BungieClient
-from ..build_import.models import CanonicalBuild
+from ..build_contracts import CanonicalBuild, ExecutableBuild
 from ..exceptions import BuildValidationError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
@@ -44,6 +44,7 @@ from ..models import Loadout, LoadoutItem, LoadoutSubclassConfig
 from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
 from .loadout_equipment_service import LoadoutEquipmentService
+from .build_compute import BuildCompute
 
 logger = get_logger(__name__)
 
@@ -146,6 +147,7 @@ class BuildService:
 
         self._inventory = InventoryService(bungie, manifest, resolver)
         self._equipment = LoadoutEquipmentService(bungie, manifest, resolver)
+        self._compute = BuildCompute()
         self._build_candidates: OrderedDict[str, CanonicalBuild] = OrderedDict()
         self._build_candidate_issued_at: dict[str, float] = {}
         self._build_candidate_players: dict[str, str] = {}
@@ -512,6 +514,11 @@ class BuildService:
         if not request.character_class:
             raise BuildValidationError("必须指定 hunter、warlock 或 titan。")
 
+        canonical_class = cast(
+            Literal["hunter", "warlock", "titan"],
+            class_type_name(resolve_character_name(request.character_class)).lower(),
+        )
+
         logger.info(
             "find_build: player=%s exotic=%s targets=(wep=%s hp=%s cls=%s gre=%s mel=%s sup=%s)",
             player_name,
@@ -581,7 +588,7 @@ class BuildService:
             bonus_vector = parsed.subclass_and_fragment_vector()
 
         # Step 3: Solve (DIM algorithm with mod assignment)
-        process_result = _solver.solve(snapshot, parsed)
+        process_result = await self._compute.run(_solver.solve, snapshot, parsed)
         logger.info("Solver: %d combos processed, %d valid sets", process_result.combos, len(process_result.sets))
 
         if not process_result.sets:
@@ -634,8 +641,8 @@ class BuildService:
                     missing_requirements=missing,
                     fragment_details=fragment_details,
                     active_set_bonuses=active_set_bonuses,
-                    canonical_build=CanonicalBuild(
-                        class_type=request.character_class,
+                    canonical_build=ExecutableBuild(
+                        class_type=canonical_class,
                         exotic_hash=next(
                             (
                                 item.item_hash
@@ -785,7 +792,7 @@ class BuildService:
             )
             parsed.subclass_stats = subclass_stats
             parsed.fragment_stats = fragment_stats
-        return analyze(snapshot, parsed)
+        return await self._compute.run(analyze, snapshot, parsed)
 
     async def infer_required_armor(
         self,
@@ -838,7 +845,8 @@ class BuildService:
             )
             parsed.subclass_stats = subclass_stats
             parsed.fragment_stats = fragment_stats
-        return find_farm_targets(
+        return await self._compute.run(
+            find_farm_targets,
             snapshot,
             parsed,
             baseline=baseline,
@@ -994,6 +1002,7 @@ class BuildService:
                     "message": f"确认的装备实例 '{item.item_instance_id}' 已不存在或发生变化。",
                 }
 
+        build = ExecutableBuild.model_validate(build.model_dump())
         loadout = Loadout(
             id=f"build:{build.snapshot_version}",
             name="已确认的精确配装",

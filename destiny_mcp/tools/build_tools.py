@@ -10,9 +10,9 @@ from mcp.server.fastmcp import Context
 from pydantic import ValidationError
 
 from ..build.models import BuildRequest
-from ..build_import.models import CanonicalBuild
+from ..build_contracts import ExecutableBuild
 from ..exceptions import DestinyMCPError
-from ..server import mcp
+from ._registry import mcp
 from ._farm_target import serialize_farm_target_analysis
 from ._helpers import (
     get_ctx,
@@ -619,7 +619,7 @@ async def equip_build(
             "必须传回 find_build 返回的 canonical_build，不能按 score 重新求解。",
         )
     try:
-        exact_build = CanonicalBuild.model_validate(canonical_build)
+        exact_build = ExecutableBuild.model_validate(canonical_build)
     except ValidationError as exc:
         return error_response("invalid_canonical_build", str(exc))
     if not confirmed:

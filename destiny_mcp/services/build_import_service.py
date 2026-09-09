@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from ..build_import.exceptions import ExtractionError
 from ..build_import.extractor import ArticleExtractor, ScreenshotExtractor
-from ..build_import.models import BuildDraft, CanonicalBuild
+from ..build_import.models import BuildDraft
 from ..build_import.normalizer import Normalizer
-from ..build_import.validator import ValidationResult, Validator
+from ..build_import.validator import Validator
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 

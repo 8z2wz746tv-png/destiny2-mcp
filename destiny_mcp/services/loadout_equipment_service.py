@@ -6,7 +6,10 @@ apply subclass configuration. Extracted from loadout_service.py.
 
 from __future__ import annotations
 
+import asyncio
+
 import aiobungie
+import anyio
 
 from ..bungie_client import BungieClient
 from ..exceptions import DestinyMCPError, ItemNotFoundError, TransferError
@@ -26,6 +29,8 @@ from ..utils.item_parser import parse_items_from_profile
 from .account_action_lock import account_action_lock
 
 logger = get_logger(__name__)
+
+_CANCEL_ROLLBACK_TIMEOUT_SECONDS = 60
 
 class LoadoutEquipmentService:
     """Apply loadout equipment: transfer, equip, mods, subclass config."""
@@ -440,6 +445,28 @@ class LoadoutEquipmentService:
                 steps=[MoveItemStep(action="preflight", detail=str(exc), success=False)],
             )
 
+        try:
+            return await self._apply_exact_with_recovery(player_name, loadout, recovery)
+        except asyncio.CancelledError:
+            # Stay in the lock-owning task: rollback re-enters account-write methods.
+            rollback_ok = False
+            steps: list[MoveItemStep] = []
+            with anyio.move_on_after(_CANCEL_ROLLBACK_TIMEOUT_SECONDS, shield=True):
+                try:
+                    rollback_ok = await self._restore_exact_state(
+                        player_name, loadout, recovery, steps
+                    )
+                except Exception:
+                    logger.exception("Cancelled exact loadout rollback failed")
+            if rollback_ok:
+                logger.info("Cancelled exact loadout restored the previous equipment state")
+            else:
+                logger.error("Cancelled exact loadout recovery incomplete; check character equipment")
+            raise
+
+    async def _apply_exact_with_recovery(
+        self, player_name: str, loadout: Loadout, recovery: dict
+    ) -> LoadoutOperationResult:
         try:
             applied = await self._equip_local_unlocked(player_name, loadout)
         except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:

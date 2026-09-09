@@ -18,8 +18,8 @@ import yaml
 
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
-from .exceptions import NormalizationError
-from .models import BuildDraft, CanonicalBuild
+from ..build_contracts import BuildRecipe
+from .models import BuildDraft
 
 logger = get_logger(__name__)
 
@@ -65,14 +65,14 @@ class Normalizer:
             data = yaml.safe_load(f)
             return data if data else {}
 
-    def normalize(self, draft: BuildDraft) -> tuple[CanonicalBuild, list[str]]:
+    def normalize(self, draft: BuildDraft) -> tuple[BuildRecipe, list[str]]:
         """转换 BuildDraft 为 CanonicalBuild。
 
         Returns:
             (canonical_build, errors) — errors 中包含所有解析失败的描述。
         """
         errors: list[str] = []
-        build = CanonicalBuild()
+        build = BuildRecipe()
 
         # Class type
         if draft.class_name:

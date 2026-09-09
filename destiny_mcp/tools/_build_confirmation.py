@@ -10,17 +10,19 @@ import time
 from collections.abc import Mapping
 from typing import Any
 
-from ..config import BUNGIE_CLIENT_SECRET
+from .. import config
 
 
 _TOKEN_PREFIX = "d2bc1"
 _TOKEN_TTL_SECONDS = 10 * 60
 _MAX_TOKEN_LENGTH = 512
-_SIGNING_KEY = hmac.new(
-    BUNGIE_CLIENT_SECRET.encode("utf-8"),
-    b"destiny-mcp/exotic-build-confirmation/v1",
-    hashlib.sha256,
-).digest()
+def _signing_key() -> bytes:
+    config.validate_credentials()
+    return hmac.new(
+        config.BUNGIE_CLIENT_SECRET.encode("utf-8"),
+        b"destiny-mcp/exotic-build-confirmation/v1",
+        hashlib.sha256,
+    ).digest()
 
 
 def _canonical_json(value: Any) -> str:
@@ -70,7 +72,7 @@ def issue_exotic_confirmation_token(
         expires_at=expires_at,
         nonce=nonce,
     )
-    signature = hmac.new(_SIGNING_KEY, payload, hashlib.sha256).hexdigest()
+    signature = hmac.new(_signing_key(), payload, hashlib.sha256).hexdigest()
     return f"{_TOKEN_PREFIX}.{expires_at}.{nonce}.{signature}"
 
 
@@ -111,5 +113,5 @@ def verify_exotic_confirmation_token(
         )
     except (TypeError, ValueError, UnicodeError):
         return False
-    expected_signature = hmac.new(_SIGNING_KEY, payload, hashlib.sha256).digest()
+    expected_signature = hmac.new(_signing_key(), payload, hashlib.sha256).digest()
     return hmac.compare_digest(supplied_signature, expected_signature)

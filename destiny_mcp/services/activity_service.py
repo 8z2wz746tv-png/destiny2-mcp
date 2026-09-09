@@ -7,7 +7,7 @@ Post-Game Carnage Report endpoints with automatic name resolution.
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
-from ..exceptions import APIError, CharacterNotFoundError
+from ..exceptions import APIError, CharacterNotFoundError, ConfigError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
@@ -169,9 +169,12 @@ class ActivityService:
                 try:
                     mode_hash = int(mode)
                 except ValueError:
-                    logger.warning("Unknown activity mode '%s', fetching all modes", mode)
+                    raise ConfigError(
+                        f"不支持活动模式 {mode!r}；请使用已知中英文模式名称或数字模式 ID。"
+                    ) from None
 
-        params: dict = {"count": str(min(count, 250))}
+        result_count = max(1, min(int(count), 250))
+        params: dict = {"count": str(result_count)}
         if mode_hash is not None:
             params["mode"] = str(mode_hash)
 
@@ -188,15 +191,14 @@ class ActivityService:
             )
 
             if not isinstance(result, dict):
-                logger.error("Unexpected activity history response type: %s", type(result))
-                continue
-
-            error_code = result.get("ErrorCode")
-            if error_code is not None and error_code != 1:
-                logger.error("Activity history API error: code=%s msg=%s", error_code, result.get("Message", ""))
-                continue
-
-            response = result.get("Response", result)
+                raise APIError(
+                    "读取活动历史",
+                    f"{class_name} 返回了异常响应格式。",
+                )
+            response = _unwrap_bungie_response(
+                result,
+                f"读取 {class_name} 活动历史",
+            )
             activities = response.get("activities", [])
 
             for act in activities:
@@ -228,7 +230,7 @@ class ActivityService:
 
         # Sort by time descending, take top N
         all_activities.sort(key=lambda x: x["start_time"], reverse=True)
-        result_activities = all_activities[:count]
+        result_activities = all_activities[:result_count]
         logger.info("Resolved %d activities across %d characters", len(result_activities), len(char_ids))
         return result_activities
 

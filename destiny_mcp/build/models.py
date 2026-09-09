@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 from ..logging_config import get_logger
 from ..models import ArmorStats
 from ..utils.hash_utils import to_unsigned
-from ..build_import.models import CanonicalBuild
+from ..build_contracts import CanonicalBuild
 from .armor_rules import (
     ArmorRollTemplate,
     ArmorTuningOption,
@@ -346,14 +346,16 @@ class InventorySnapshot(BaseModel):
                 location: "vault" or "character".
                 target_class_type: 0=Titan, 1=Hunter, 2=Warlock, -1=any.
             """
+            item_hash = raw.get("itemHash", 0)
+            info = manifest.get_item_info(item_hash) or {}
             bucket_hash = raw.get("bucketHash", 0)
+            if bucket_hash == 138197802:
+                bucket_hash = info.get("bucketTypeHash", 0)
             slot = armor_slot_from_bucket(bucket_hash)
             if slot is None:
                 return None  # Not an armor piece
 
             inst_id = str(raw.get("itemInstanceId", "0"))
-            item_hash = raw.get("itemHash", 0)
-            info = manifest.get_item_info(item_hash) or {}
 
             # Check class type: armor is class-specific (0=Titan, 1=Hunter, 2=Warlock)
             # classType=3 means "any class" (rare for armor)

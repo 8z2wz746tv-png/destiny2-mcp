@@ -9,6 +9,7 @@ description = "Destiny 2 MCP Server — 通过 AI Agent 管理武器和装备"
 requires-python = ">=3.12"
 dependencies = [
     "aiobungie>=0.5.0",
+    "anyio>=4.5",
     "mcp[cli]>=1.27.2",
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",

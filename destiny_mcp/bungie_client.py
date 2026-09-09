@@ -176,6 +176,7 @@ class BungieClient:
 
     async def start(self) -> None:
         """Initialize the REST client and authenticate."""
+        config.validate_credentials()
         logger.info("Starting BungieClient...")
         self._rest = aiobungie.RESTClient(
             config.BUNGIE_API_KEY,
@@ -379,13 +380,7 @@ class BungieClient:
                 auth=await self.get_access_token(),
                 json=payload,
             )
-            if isinstance(result, dict):
-                return {
-                    "ErrorCode": result.get("ErrorCode", 1),
-                    "Message": result.get("Message", "Ok"),
-                    "Response": result.get("Response"),
-                    "ErrorStatus": result.get("ErrorStatus", ""),
-                }
+            # aiobungie already unwraps the Bungie Response envelope.
             return {"ErrorCode": 1, "Message": "Ok", "Response": result}
         except aiobungie.HTTPError as exc:
             unavailable = _bungie_unavailable_result(exc, operation)

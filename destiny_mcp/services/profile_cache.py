@@ -20,6 +20,7 @@ import aiobungie
 from ..exceptions import DestinyMCPError
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
+from .account_action_lock import ReentrantAsyncLock
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,7 @@ class CachedProfile:
     profile: dict
     fetched_at: float
     components: list[int]
+    generation: tuple[int, int] = (0, 0)
 
 
 class ProfileCache:
@@ -54,10 +56,13 @@ class ProfileCache:
         resolver: PlayerResolver,
         manifest: ManifestManager,
         ttl_seconds: int = 300,  # 5 minutes, same as DIM
+        action_lock: ReentrantAsyncLock | None = None,
     ) -> None:
         self._resolver = resolver
         self._manifest = manifest
         self._ttl = ttl_seconds
+        self._action_lock = action_lock
+        self._generation = 0
         self._cache: dict[str, CachedProfile] = {}
         self._refresh_task: asyncio.Task | None = None
         self._refresh_player: str = ""
@@ -66,6 +71,8 @@ class ProfileCache:
         self,
         player_name: str,
         components: list[int] | None = None,
+        *,
+        fresh: bool = False,
     ) -> dict:
         """Get profile data, using cache if fresh enough.
 
@@ -80,7 +87,7 @@ class ProfileCache:
             components = _FULL_COMPONENTS
 
         cached = self._cache.get(player_name)
-        fresh_cached = cached if cached and self._is_fresh(cached) else None
+        fresh_cached = cached if not fresh and cached and self._is_fresh(cached) else None
         if fresh_cached:
             # Check if cached components cover the requested ones
             if all(c in fresh_cached.components for c in components):
@@ -89,6 +96,7 @@ class ProfileCache:
 
         # Cache miss or stale — fetch fresh
         logger.info("Profile cache miss for %s, fetching from API", player_name)
+        generation = self._current_generation()
         p = await self._resolver.resolve_player(player_name)
         fetch_components = components
         if fresh_cached:
@@ -99,12 +107,15 @@ class ProfileCache:
             p["membership_id"], p["membership_type"], fetch_components
         )
 
-        self._cache[player_name] = CachedProfile(
+        entry = CachedProfile(
             player_info=p,
             profile=profile,
-            fetched_at=time.time(),
+            fetched_at=time.monotonic(),
             components=fetch_components,
+            generation=generation,
         )
+        if generation == self._current_generation() and not self._write_active():
+            self._cache[player_name] = entry
 
         return profile
 
@@ -114,9 +125,8 @@ class ProfileCache:
         if cached and self._is_fresh(cached):
             return cached.player_info
 
-        # Force a profile fetch to populate cache
-        await self.get_profile(player_name)
-        return self._cache[player_name].player_info
+        # A concurrent write can prevent cache population; resolve independently.
+        return await self._resolver.resolve_player(player_name)
 
     def get_all_item_hashes(self, player_name: str) -> dict[int, str]:
         """Get all item hashes → names for a player from cached profile.
@@ -126,7 +136,7 @@ class ProfileCache:
         name-based matching for deprecated weapons.
         """
         cached = self._cache.get(player_name)
-        if not cached:
+        if not cached or not self._is_fresh(cached):
             return {}
 
         result: dict[int, str] = {}
@@ -157,6 +167,7 @@ class ProfileCache:
 
     def invalidate(self, player_name: str | None = None) -> None:
         """Invalidate cache for a player, or all players."""
+        self._generation += 1
         if player_name:
             self._cache.pop(player_name, None)
         else:
@@ -183,7 +194,17 @@ class ProfileCache:
 
     def _is_fresh(self, cached: CachedProfile) -> bool:
         """Check if cached data is still within TTL."""
-        return (time.time() - cached.fetched_at) < self._ttl
+        return (
+            not self._write_active()
+            and cached.generation == self._current_generation()
+            and (time.monotonic() - cached.fetched_at) < self._ttl
+        )
+
+    def _write_active(self) -> bool:
+        return self._action_lock is not None and self._action_lock.active
+
+    def _current_generation(self) -> tuple[int, int]:
+        return (self._generation, self._action_lock.version if self._action_lock else 0)
 
     async def _refresh_loop(self) -> None:
         """Background loop that refreshes the profile cache."""
@@ -192,7 +213,7 @@ class ProfileCache:
                 await asyncio.sleep(self._ttl)
                 if self._refresh_player:
                     logger.debug("Refreshing profile cache for %s", self._refresh_player)
-                    await self.get_profile(self._refresh_player)
+                    await self.get_profile(self._refresh_player, fresh=True)
             except asyncio.CancelledError:
                 break
             except (DestinyMCPError, aiobungie.HTTPError):

@@ -6,7 +6,7 @@ Extracted from weapon_service.py during refactoring.
 
 from __future__ import annotations
 
-from ..exceptions import ConfigError, ItemNotFoundError
+from ..exceptions import AuthenticationError, ConfigError, ItemNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name
 from ..models import (
@@ -18,6 +18,11 @@ from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
 from .perk_service import PerkService
 from .profile_cache import ProfileCache
+from .inventory_service import (
+    MISSING_INVENTORY_SCOPE_MESSAGE,
+    looks_like_missing_inventory_scope,
+    require_complete_inventory_components,
+)
 from .wishlist_service import WishListService
 
 logger = get_logger(__name__)
@@ -79,8 +84,7 @@ class WeaponCompareService:
         mtype = p["membership_type"]
 
         # Step 2: Find weapon in manifest — collect ALL matching hashes
-        # Use limit=50 to catch variants like 回文（专家） that sort later
-        manifest_results = self._manifest.search(weapon_query, limit=50)
+        manifest_results = self._manifest.search(weapon_query, limit=0)
         weapon_defs = [r for r in manifest_results if r["itemType"] == 3]
         if not weapon_defs:
             raise ItemNotFoundError(weapon_name, "没有找到匹配的武器。")
@@ -107,6 +111,14 @@ class WeaponCompareService:
             profile = await self._resolver.get_profile(
                 mid, mtype, [102, 200, 201, 205, 300, 305]
             )
+        if looks_like_missing_inventory_scope(profile):
+            raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)
+        require_complete_inventory_components(profile)
+
+        chars_data = profile.get("characters", {}).get("data", {})
+        inv_data = profile.get("characterInventories", {}).get("data", {})
+        equip_data = profile.get("characterEquipment", {}).get("data", {})
+        vault_items = profile.get("profileInventory", {}).get("data", {}).get("items")
 
         # Step 4: Find all instances of this weapon
         sockets_data = (
@@ -120,16 +132,14 @@ class WeaponCompareService:
             .get("data", {})
         )
 
+        if not isinstance(sockets_data, dict):
+            raise ConfigError("Bungie 未返回武器插槽组件，无法可靠对比 Perk。")
+
         # Collect from vault
         weapon_instances: list[dict] = []
-        vault_items = (
-            profile.get("profileInventory", {})
-            .get("data", {})
-            .get("items", [])
-        )
 
         for raw in vault_items:
-            if raw.get("itemHash") in target_hashes:
+            if raw.get("bucketHash") == 138197802 and raw.get("itemHash") in target_hashes:
                 inst_id = str(raw.get("itemInstanceId", "0"))
                 weapon_instances.append({
                     "instance_id": inst_id,
@@ -140,10 +150,6 @@ class WeaponCompareService:
                 })
 
         # Collect from characters
-        chars_data = profile.get("characters", {}).get("data", {})
-        inv_data = profile.get("characterInventories", {}).get("data", {})
-        equip_data = profile.get("characterEquipment", {}).get("data", {})
-
         for char_id, char_info in chars_data.items():
             ct = char_info.get("classType", -1)
             loc_name = class_type_name(ct)
@@ -165,17 +171,17 @@ class WeaponCompareService:
                         })
 
         # Fallback: match by name for items whose hashes aren't in manifest
-        matched_hashes = {inst["item_hash"] for inst in weapon_instances}
+        matched_instances = {inst["instance_id"] for inst in weapon_instances}
         name_matched = 0
 
         def _check_name_match(raw: dict, location: str) -> None:
             nonlocal name_matched
             h = raw.get("itemHash", 0)
-            if h in matched_hashes or h in target_hashes:
+            inst_id = str(raw.get("itemInstanceId", "0"))
+            if inst_id in matched_instances or h in target_hashes:
                 return
             name = self._manifest.get_item_name(h)
             if name == weapon_display_name:
-                inst_id = str(raw.get("itemInstanceId", "0"))
                 weapon_instances.append({
                     "instance_id": inst_id,
                     "item_hash": h,
@@ -183,12 +189,13 @@ class WeaponCompareService:
                     "power": instances_data.get(inst_id, {}).get("primaryStat", {}).get("value"),
                     "sockets": sockets_data.get(inst_id, {}).get("sockets", []),
                 })
-                matched_hashes.add(h)
+                matched_instances.add(inst_id)
                 name_matched += 1
                 logger.info("NAME MATCH: hash=%d location=%s", h, location)
 
         for raw in vault_items:
-            _check_name_match(raw, "仓库")
+            if raw.get("bucketHash") == 138197802:
+                _check_name_match(raw, "仓库")
 
         for char_id, char_info in chars_data.items():
             ct = char_info.get("classType", -1)
@@ -225,6 +232,16 @@ class WeaponCompareService:
         # Step 5: Read current perks for each instance
         comparison_instances: list[WeaponComparisonInstance] = []
         for inst in weapon_instances:
+            inst_id = inst["instance_id"]
+            socket_component = sockets_data.get(inst_id)
+            if (
+                not isinstance(socket_component, dict)
+                or not isinstance(socket_component.get("sockets"), list)
+                or not socket_component["sockets"]
+            ):
+                raise ConfigError(
+                    f"武器实例 {inst_id} 缺少当前插槽数据，无法可靠对比 Perk。"
+                )
             current_perks: list[PerkInfo] = []
             for socket in inst["sockets"]:
                 plug_hash = socket.get("plugHash")
@@ -232,7 +249,15 @@ class WeaponCompareService:
                     continue
                 info = self._manifest.get_item_info(plug_hash)
                 if not info:
-                    continue
+                    get_definition = getattr(self._manifest, "get_item_definition", None)
+                    plug_def = get_definition(plug_hash) if callable(get_definition) else None
+                    display = (plug_def or {}).get("displayProperties") or {}
+                    if isinstance(plug_def, dict) and not display.get("name"):
+                        continue
+                    raise ConfigError(
+                        f"武器实例 {inst_id} 的插槽 {plug_hash} 缺少 Manifest 定义，"
+                        "无法可靠对比 Perk。"
+                    )
                 cat_id = self._manifest.get_plug_category_identifier(plug_hash) or ""
                 cat_key = cat_id.lower()
                 if "shader" in cat_key:

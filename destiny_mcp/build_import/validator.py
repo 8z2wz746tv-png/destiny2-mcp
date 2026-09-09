@@ -16,7 +16,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from ..logging_config import get_logger
-from .models import CanonicalBuild
+from ..build_contracts import BuildRecipe
 
 logger = get_logger(__name__)
 
@@ -34,7 +34,7 @@ class Validator:
 
     def validate(
         self,
-        build: CanonicalBuild,
+        build: BuildRecipe,
         normalization_errors: list[str],
     ) -> ValidationResult:
         """校验 CanonicalBuild。

@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 
 from ..bungie_client import BungieClient
-from ..exceptions import ItemNotFoundError, TransferError
+from ..exceptions import AuthenticationError, ItemNotFoundError, TransferError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..models import (
@@ -25,6 +25,11 @@ from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
 from ..utils.item_parser import parse_items_from_profile
 from .account_action_lock import account_action_lock, serialized_account_action
+from .inventory_service import (
+    MISSING_INVENTORY_SCOPE_MESSAGE,
+    looks_like_missing_inventory_scope,
+    require_complete_inventory_components,
+)
 
 logger = get_logger(__name__)
 
@@ -54,6 +59,9 @@ class TransferService:
         profile = await self._resolver.get_profile(
             membership_id, membership_type, [102, 200, 201, 205, 300, 304]
         )
+        if looks_like_missing_inventory_scope(profile):
+            raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)
+        require_complete_inventory_components(profile)
         return parse_items_from_profile(profile, self._manifest)
 
     async def _find_item(
@@ -432,16 +440,48 @@ class TransferService:
             }
 
         result = await self._bungie.equip_items(item_instance_ids, char_id, mtype)
-        ok = result.get("ErrorCode", 0) == 1
+        response = result.get("Response")
+        equip_results = response.get("equipResults") if isinstance(response, dict) else None
+        statuses = {}
+        if isinstance(equip_results, list):
+            for entry in equip_results:
+                if isinstance(entry, dict):
+                    statuses.setdefault(str(entry.get("itemInstanceId", "")), []).append(
+                        entry.get("equipStatus")
+                    )
+        item_results = [
+            {
+                "item_instance_id": item_id,
+                "name": by_id[item_id].name,
+                "equip_status": (
+                    statuses[item_id][0] if len(statuses.get(item_id, [])) == 1 else None
+                ),
+                "success": statuses.get(item_id) == [1],
+            }
+            for item_id in item_instance_ids
+        ]
+        ok = result.get("ErrorCode", 0) == 1 and all(
+            entry["success"] for entry in item_results
+        )
         names = [by_id[item_id].name for item_id in item_instance_ids]
+        failures = "; ".join(
+            f"{entry['name']} (equipStatus={entry['equip_status']})"
+            for entry in item_results if not entry["success"]
+        )
+        failure_message = (
+            result.get("Message", "未知错误")
+            if result.get("ErrorCode", 0) != 1
+            else f"以下物品未成功装备或缺少有效结果：{failures}。请刷新装备确认状态。"
+        )
         return {
             "success": ok,
             "items": names,
+            "item_results": item_results,
             "character": class_type_name(target_class),
             "message": (
                 f"已在 {class_type_name(target_class)} 上批量装备：{', '.join(names)}。"
                 if ok
-                else f"批量装备失败：{result.get('Message', '未知错误')}"
+                else f"批量装备失败：{failure_message}"
             ),
         }
 
@@ -604,13 +644,20 @@ class TransferService:
             "Move: item=%s dest=%s equip=%s (player=%s)",
             item_name, destination, equip, player_name,
         )
+        item_name = item_name.strip()
+        if not item_name:
+            return MoveItemResult(
+                success=False,
+                item_name="",
+                message="必须提供物品名称。",
+            )
         p = await self._resolver.resolve_player(player_name)
         mid = p["membership_id"]
         mtype = p["membership_type"]
         steps: list[MoveItemStep] = []
 
         # ── Step 1: Search ──
-        manifest_results = self._manifest.search(item_name, limit=10)
+        manifest_results = self._manifest.search(item_name, limit=0)
         if not manifest_results:
             return MoveItemResult(
                 success=False,
@@ -635,11 +682,10 @@ class TransferService:
         all_items = await self._fetch_all_items(mid, mtype)
         candidates = [it for it in all_items if it.item_hash in match_hashes]
 
-        exact_name = manifest_results[0]["name"]
         steps.append(
             MoveItemStep(
                 action="search",
-                detail=f"Found {len(candidates)} instance(s) of '{exact_name}' across account",
+                detail=f"Found {len(candidates)} instance(s) matching '{item_name}' across account",
                 success=len(candidates) > 0,
             )
         )
@@ -647,21 +693,25 @@ class TransferService:
         if not candidates:
             return MoveItemResult(
                 success=False,
-                item_name=exact_name,
-                message=f"你的账号上没有找到 '{exact_name}'。它可能已被分解，或从未获得过。",
+                item_name=item_name,
+                message=f"你的账号上没有找到 '{item_name}'。它可能已被分解，或从未获得过。",
                 steps=steps,
             )
 
         # Filter by source
         if source:
-            src_class = resolve_character_name(source)
-            src_name = class_type_name(src_class).lower()
+            src_name = source.strip().lower()
+            if src_name in {"vault", "仓库"}:
+                src_name = "vault"
+            else:
+                src_class = resolve_character_name(source)
+                src_name = class_type_name(src_class).lower()
             candidates = [it for it in candidates if it.location == src_name]
             if not candidates:
                 return MoveItemResult(
                     success=False,
-                    item_name=exact_name,
-                    message=f"在 {src_name} 上没有找到 '{exact_name}'。它可能在其他角色或仓库里。",
+                    item_name=item_name,
+                    message=f"在 {src_name} 上没有找到 '{item_name}'。它可能在其他角色或仓库里。",
                     steps=steps,
                 )
 
@@ -674,8 +724,8 @@ class TransferService:
             if not target_item:
                 return MoveItemResult(
                     success=False,
-                    item_name=exact_name,
-                    message=f"找不到 instance_id='{item_instance_id}' 的 '{exact_name}'。",
+                    item_name=item_name,
+                    message=f"找不到 instance_id='{item_instance_id}' 的 '{item_name}'。",
                     steps=steps,
                 )
         elif len(candidates) == 1:
@@ -694,7 +744,7 @@ class TransferService:
             ]
             # Build formatted question for the LLM to present directly
             loc_map = {"vault": "📦 仓库", "hunter": "🏹 猎人", "warlock": "⚡ 术士", "titan": "🛡️ 泰坦"}
-            lines = [f"找到 {len(candidates)} 件「{exact_name}」，你要转移哪一件？\n"]
+            lines = [f"找到 {len(candidates)} 件匹配「{item_name}」的物品，你要转移哪一件？\n"]
             for i, c in enumerate(candidate_items, 1):
                 loc = loc_map.get(c.location, c.location)
                 equip_mark = " [已装备]" if c.is_equipped else ""
@@ -705,152 +755,55 @@ class TransferService:
 
             return MoveItemResult(
                 success=False,
-                item_name=exact_name,
+                item_name=item_name,
                 needs_disambiguation=True,
                 candidates=candidate_items,
-                message=f"找到 {len(candidates)} 件 '{exact_name}'，请选择要转移哪一件。",
+                message=f"找到 {len(candidates)} 件匹配 '{item_name}' 的物品，请选择具体实例。",
                 question=question_text,
                 steps=steps,
             )
 
-        item_id = target_item.item_instance_id
-        item_hash = target_item.item_hash
-        from_loc = target_item.location
-
         to_vault = destination.strip().lower() in ("vault", "仓库")
-        if not to_vault:
-            dest_class = resolve_character_name(destination)
-            dest_char_id = await self._resolver.resolve_character_id(
-                mid, mtype, destination
-            )
-            dest_name = class_type_name(dest_class)
-        else:
-            dest_name = "vault"
-
-        # ── Step 2: Transfer ──
-        if from_loc == dest_name.lower():
-            steps.append(
-                MoveItemStep(
-                    action="transfer",
-                    detail=f"'{exact_name}' is already at {dest_name}",
-                    success=True,
-                )
-            )
-        elif from_loc != "vault" and to_vault:
-            # Character → Vault
-            r = await self._bungie.transfer_item(
-                item_id, item_hash,
-                character_id=target_item.character_id,
-                membership_type=mtype, to_vault=True,
-            )
-            ok = r.get("ErrorCode", 0) == 1
-            steps.append(
-                MoveItemStep(
-                    action="transfer",
-                    detail=f"Transfer '{exact_name}' from {from_loc} to vault",
-                    success=ok,
-                )
-            )
-            if not ok:
-                return MoveItemResult(
-                    success=False, item_name=exact_name, steps=steps,
-                    message=f"移动失败：{r.get('Message', '未知错误')}。可能原因：物品不在该位置、目标背包已满、或服务器暂时不可用。",
-                )
-        elif from_loc == "vault" and not to_vault:
-            # Vault → Character
-            r = await self._bungie.transfer_item(
-                item_id, item_hash,
-                character_id=dest_char_id,
-                membership_type=mtype, to_vault=False,
-            )
-            ok = r.get("ErrorCode", 0) == 1
-            steps.append(
-                MoveItemStep(
-                    action="transfer",
-                    detail=f"Transfer '{exact_name}' from vault to {dest_name}",
-                    success=ok,
-                )
-            )
-            if not ok:
-                return MoveItemResult(
-                    success=False, item_name=exact_name, steps=steps,
-                    message=f"移动失败：{r.get('Message', '未知错误')}。可能原因：物品不在仓库、目标背包已满、或服务器暂时不可用。",
-                )
-        elif from_loc != "vault" and not to_vault:
-            # Character → Character (via vault)
-            deposited = await self._bungie.transfer_item(
-                item_id, item_hash,
-                character_id=target_item.character_id,
-                membership_type=mtype, to_vault=True,
-            )
-            if deposited.get("ErrorCode", 0) != 1:
-                steps.append(
-                    MoveItemStep(
-                        action="transfer",
-                        detail=f"Transfer to vault failed: {deposited.get('Message')}",
-                        success=False,
-                    )
-                )
-                return MoveItemResult(
-                    success=False, item_name=exact_name, steps=steps,
-                    message=f"存入仓库失败：{deposited.get('Message', '未知错误')}。仓库可能已满。",
-                )
-
-            pulled = await self._bungie.transfer_item(
-                item_id, item_hash,
-                character_id=dest_char_id,
-                membership_type=mtype, to_vault=False,
-            )
-            if pulled.get("ErrorCode", 0) != 1:
-                steps.append(
-                    MoveItemStep(
-                        action="transfer",
-                        detail=f"Vault→{dest_name} failed: {pulled.get('Message')}",
-                        success=False,
-                    )
-                )
-                return MoveItemResult(
-                    success=False, item_name=exact_name, steps=steps,
-                    message=f"从仓库取出失败：{pulled.get('Message', '未知错误')}。{dest_name}的背包可能已满。",
-                )
-            steps.append(
-                MoveItemStep(
-                    action="transfer",
-                    detail=f"Transfer '{exact_name}' from {from_loc} to {dest_name} (via vault)",
-                    success=True,
-                )
+        if equip and to_vault:
+            return MoveItemResult(
+                success=False, item_name=target_item.name, steps=steps,
+                message="Cannot equip an item in the vault.",
             )
 
-        # ── Step 3: Equip (optional) ──
+        # Name lookup only selects an instance; all mutations use the exact-ID path.
+        try:
+            moved = await self.transfer_item(
+                player_name, target_item.item_instance_id, destination,
+                from_character=source,
+            )
+        except TransferError as exc:
+            steps.append(MoveItemStep(action="transfer", detail=str(exc), success=False))
+            return MoveItemResult(
+                success=False, item_name=target_item.name,
+                from_location=target_item.location, steps=steps, message=str(exc),
+            )
+        steps.append(MoveItemStep(action="transfer", detail=moved.message, success=moved.success))
         equip_ok = False
-        if equip and not to_vault:
-            r = await self._bungie.equip_item(item_id, dest_char_id, mtype)
-            equip_ok = r.get("ErrorCode", 0) == 1
-            steps.append(
-                MoveItemStep(
-                    action="equip",
-                    detail=f"Equip '{exact_name}' on {dest_name}",
-                    success=equip_ok,
+        if equip and moved.success:
+            try:
+                equipped = await self.equip_item(
+                    player_name, target_item.item_instance_id, destination,
                 )
-            )
-
-        # Transfer always succeeds at this point; equip may fail
-        transfer_ok = True
-        if equip and not to_vault and not equip_ok:
-            transfer_ok = False  # Equip was requested but failed
+                equip_ok = equipped.success
+                steps.append(MoveItemStep(
+                    action="equip", detail=equipped.message, success=equip_ok,
+                ))
+            except TransferError as exc:
+                steps.append(MoveItemStep(action="equip", detail=str(exc), success=False))
 
         return MoveItemResult(
-            success=transfer_ok,
-            item_name=exact_name,
-            from_location=from_loc,
-            to_location=dest_name,
+            success=moved.success and (not equip or equip_ok),
+            item_name=target_item.name,
+            from_location=moved.from_location,
+            to_location=moved.to_location,
             equipped=equip_ok,
             steps=steps,
-            message=(
-                f"Moved '{exact_name}' from {from_loc} to {dest_name}"
-                + (", equipped" if equip_ok else "")
-                + (" (equip failed)" if equip and not equip_ok else "")
-            ),
+            message=steps[-1].detail,
         )
 
     # ── Apply Mod ─────────────────────────────────────────────────────
@@ -878,6 +831,9 @@ class TransferService:
             "apply_mod: player=%s item=%s mod=%s char=%s",
             player_name, item_instance_id, mod_name, character,
         )
+        mod_name = mod_name.strip()
+        if not mod_name:
+            return {"success": False, "message": "必须提供模组名称。"}
 
         # Resolve player
         p = await self._resolver.resolve_player(player_name)
@@ -887,7 +843,7 @@ class TransferService:
 
         # Find the mod by name — collect ALL matching hashes
         # (manifest may return multiple versions, only one is in the plug set)
-        mod_results = self._manifest.search(mod_name, limit=20)
+        mod_results = self._manifest.search(mod_name, limit=0)
         mod_hashes: list[int] = []
         mod_display_name = mod_name
         for r in mod_results:

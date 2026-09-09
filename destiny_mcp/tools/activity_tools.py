@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from mcp.server.fastmcp import Context
 
-from ..server import mcp
+from ._registry import mcp
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 
 

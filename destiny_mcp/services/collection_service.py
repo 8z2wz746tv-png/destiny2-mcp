@@ -93,17 +93,28 @@ class CollectionService:
             char_id = next(iter(chars))
 
         profile = await self._resolver.get_profile(mid, mtype, [800])
+        profile_data = profile.get("profileCollectibles", {}).get("data")
+        character_data = profile.get("characterCollectibles", {}).get("data")
         profile_collectibles = (
-            profile.get("profileCollectibles", {})
-            .get("data", {})
-            .get("collectibles", {})
+            profile_data.get("collectibles")
+            if isinstance(profile_data, dict)
+            else None
         )
         character_collectibles = (
-            profile.get("characterCollectibles", {})
-            .get("data", {})
-            .get(str(char_id), {})
-            .get("collectibles", {})
+            character_data.get(str(char_id), {}).get("collectibles")
+            if isinstance(character_data, dict)
+            else None
         )
+        if not isinstance(profile_collectibles, dict) and not isinstance(
+            character_collectibles,
+            dict,
+        ):
+            raise APIError(
+                "读取收藏品",
+                "Bungie 未返回收藏状态组件，不能把未知状态解释为未获得。",
+            )
+        profile_collectibles = profile_collectibles or {}
+        character_collectibles = character_collectibles or {}
 
         candidates = self._manifest.search(item_name, limit=max(1, min(limit, 50)))
         items: list[dict] = []
@@ -138,7 +149,12 @@ class CollectionService:
                 or profile_collectibles.get(collectible_hash)
                 or {}
             )
-            state = int(state_entry.get("state", 1))
+            if not isinstance(state_entry.get("state"), int):
+                raise APIError(
+                    "读取收藏品",
+                    f"收藏品 {collectible_hash} 未返回明确状态，不能判断是否已获得。",
+                )
+            state = state_entry["state"]
             acquired = not bool(state & 1)
             display = (collectible_def or {}).get("displayProperties") or {}
             items.append({
@@ -197,11 +213,17 @@ class CollectionService:
             raise APIError("读取收藏品", result.get("Message", ""))
 
         response = result.get("Response", result)
+        collectible_data = response.get("collectibles", {}).get("data")
         collectibles = (
-            response.get("collectibles", {})
-            .get("data", {})
-            .get("collectibles", {})
+            collectible_data.get("collectibles")
+            if isinstance(collectible_data, dict)
+            else None
         )
+        if not isinstance(collectibles, dict):
+            raise APIError(
+                "读取收藏品节点",
+                "Bungie 未返回节点收藏状态组件，不能将结果视为空节点。",
+            )
 
         items: list[dict] = []
         counts = {
@@ -211,7 +233,9 @@ class CollectionService:
             "invisible": 0,
         }
         for collectible_hash, component in collectibles.items():
-            state = int(component.get("state", 0))
+            if not isinstance(component, dict) or not isinstance(component.get("state"), int):
+                raise APIError("读取收藏品节点", "部分收藏品状态缺失，无法给出完整结论。")
+            state = component["state"]
             invisible = bool(state & 4)
             counts["total"] += 1
             if invisible:

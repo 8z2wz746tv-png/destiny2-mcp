@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from destiny_mcp.exceptions import CharacterNotFoundError
+from destiny_mcp.exceptions import APIError, CharacterNotFoundError, ConfigError
 from destiny_mcp.services.activity_service import ActivityService
 
 
@@ -48,6 +48,33 @@ async def test_history_rejects_class_missing_from_account(dependencies) -> None:
     assert exc_info.value.character_name == "titan"
     assert exc_info.value.available == ["Hunter"]
     bungie.get_activity_history.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_history_rejects_unknown_mode_instead_of_ignoring_it(dependencies) -> None:
+    bungie, manifest, resolver = dependencies
+    service = ActivityService(bungie, manifest, resolver)
+
+    with pytest.raises(ConfigError, match="不支持活动模式"):
+        await service.get_activity_history(PLAYER_NAME, mode="raidd")
+
+    bungie.get_activity_history.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_history_rejects_partial_character_failure(dependencies) -> None:
+    bungie, manifest, resolver = dependencies
+    resolver.get_profile.return_value["characters"]["data"]["second"] = {
+        "classType": 2
+    }
+    bungie.get_activity_history.side_effect = [
+        {"ErrorCode": 1, "Response": {"activities": []}},
+        {"ErrorCode": 5, "Message": "temporary failure"},
+    ]
+    service = ActivityService(bungie, manifest, resolver)
+
+    with pytest.raises(APIError, match="temporary failure"):
+        await service.get_activity_history(PLAYER_NAME)
 
 
 @pytest.mark.asyncio

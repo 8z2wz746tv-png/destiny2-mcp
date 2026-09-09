@@ -8,7 +8,7 @@ from __future__ import annotations
 from mcp.server.fastmcp import Context
 
 from ..exceptions import DestinyMCPError
-from ..server import mcp
+from ._registry import mcp
 from ._formatters import format_armor_mods, format_inventory, format_search_items
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from ._responses import error_response, ok_response

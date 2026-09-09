@@ -145,10 +145,24 @@ MCP stdio 配置示例：
 
 ## 架构
 
+本项目采用单进程、单用户的模块化单体架构。所有 Bungie 写操作在进程内共享账号锁，
+写入完成、失败或取消后，依赖账号状态的缓存都会失效。不要同时启动多个实例操作同一
+Bungie 账号；跨进程互斥不在本项目的设计范围内。
+
+`normal` profile 对外保持 8 个聚合工具，内部按意图校验参数并委托领域服务；配装组合
+计算在独立工作进程中运行，每个服务实例最多同时计算一个任务，默认 60 秒超时
+（包含排队时间）；超时或取消会终止该计算进程，不阻塞 MCP 请求循环。
+
+服务器通过 `create_server()` 显式注册工具。认证或 Manifest 初始化失败时停止启动，
+`/health` 仅在初始化完成后的生命周期内返回就绪。配装导入输出 `BuildRecipe`，
+可执行候选使用 `ExecutableBuild`，并继续校验一次性候选凭据和库存快照。
+
 ```
 destiny_mcp/
 ├── server.py          # MCP Server 入口，生命周期管理
 ├── config.py          # 环境变量配置
+├── service_context.py # 有类型的服务上下文
+├── build_contracts.py # 配装需求、兼容格式与可执行计划
 ├── bungie_client.py   # Bungie API 客户端
 ├── manifest.py        # 游戏数据清单管理
 ├── models/            # Pydantic 数据模型

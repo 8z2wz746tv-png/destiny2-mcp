@@ -13,6 +13,7 @@ from ..utils.hash_utils import to_unsigned
 from .inventory_service import (
     MISSING_INVENTORY_SCOPE_MESSAGE,
     looks_like_missing_inventory_scope,
+    require_complete_inventory_components,
 )
 from ..utils.item_parser import parse_items_from_profile
 
@@ -96,6 +97,7 @@ class InventoryAnalysisService:
         )
         if looks_like_missing_inventory_scope(profile):
             raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)
+        require_complete_inventory_components(profile)
         items = parse_items_from_profile(profile, self._manifest)
         filtered = _filter_items(items, location_key, item_type_key)
 
@@ -186,6 +188,7 @@ class InventoryAnalysisService:
         )
         if looks_like_missing_inventory_scope(profile):
             raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)
+        require_complete_inventory_components(profile)
 
         items = parse_items_from_profile(profile, self._manifest)
         weapons = [item for item in items if _is_weapon(item)]

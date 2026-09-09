@@ -1,22 +1,27 @@
 from __future__ import annotations
 
 import time
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
 
 import pytest
 
 from destiny_mcp.bungie_client import BungieClient
 from destiny_mcp.exceptions import DestinyMCPError
+from destiny_mcp.models import InventoryItem
 from destiny_mcp.services.collection_service import CollectionService
 from destiny_mcp.services.loadout_service import LoadoutService
+from destiny_mcp.services.transfer_service import TransferService
 
 
 class FakeRest:
     def __init__(self) -> None:
         self.calls: list[tuple[str, str, dict]] = []
+        self.response = {"ok": True}
 
     async def static_request(self, method: str, path: str, **kwargs):
         self.calls.append((method, path, kwargs))
-        return {"ErrorCode": 1, "Message": "Ok", "Response": {"ok": True}}
+        return self.response
 
 
 def make_client() -> tuple[BungieClient, FakeRest]:
@@ -26,6 +31,56 @@ def make_client() -> tuple[BungieClient, FakeRest]:
     client._access_token = "test-token"
     client._token_expires_at = time.time() + 3600
     return client, rest
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("payload", [None, 0, {"ok": True}, {"equipResults": []}])
+async def test_post_action_preserves_unwrapped_sdk_payload(payload) -> None:
+    client, rest = make_client()
+    rest.response = payload
+
+    result = await client.clear_loadout(0, "230584", 3)
+
+    assert result["ErrorCode"] == 1
+    assert result["Response"] == payload
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("equip_results, expected_success", [
+    ([{"itemInstanceId": 101, "equipStatus": 1},
+      {"itemInstanceId": "102", "equipStatus": 1}], True),
+    ([{"itemInstanceId": 101, "equipStatus": 1},
+      {"itemInstanceId": 102, "equipStatus": 1648}], False),
+    ([{"itemInstanceId": 101, "equipStatus": 1}], False),
+    ([{"itemInstanceId": 101, "equipStatus": 1},
+      {"itemInstanceId": 101, "equipStatus": 1}], False),
+    ([], False),
+    (None, False),
+    ([None, {"itemInstanceId": 102}], False),
+])
+async def test_batch_equip_checks_every_requested_item(equip_results, expected_success) -> None:
+    client, rest = make_client()
+    rest.response = {"equipResults": equip_results}
+    resolver = SimpleNamespace(
+        resolve_player=AsyncMock(return_value={"membership_id": "11", "membership_type": 3}),
+        resolve_character_id=AsyncMock(return_value="22"),
+    )
+    service = TransferService(client, object(), resolver)
+    service._fetch_all_items = AsyncMock(return_value=[
+        InventoryItem(item_instance_id=item_id, item_hash=int(item_id),
+                      name=item_id, location="hunter", character_id="22")
+        for item_id in ("101", "102")
+    ])
+
+    result = await service.equip_items("TestGuardian#1234", ["101", "102"], "hunter")
+
+    assert result["success"] is expected_success
+    assert len(result["item_results"]) == 2
+    if expected_success:
+        assert all(item["success"] for item in result["item_results"])
+    else:
+        assert not all(item["success"] for item in result["item_results"])
+        assert "102" in result["message"]
 
 
 @pytest.mark.asyncio

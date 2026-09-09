@@ -27,6 +27,7 @@ Thumbs.db
 # Data / manifests (generated / downloaded)
 manifest/
 destiny_mcp/data/dim_wishlists.json
+data/starside/
 
 # Logs
 *.log

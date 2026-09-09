@@ -396,7 +396,7 @@ class ManifestManager:
 
         Args:
             query: Partial or full item name.
-            limit: Max results to return.
+            limit: Max results to return; 0 returns all matches.
 
         Returns:
             List of item dicts with keys: itemHash, name, itemType, itemTypeName, tier, icon.
@@ -405,6 +405,8 @@ class ManifestManager:
             raise ManifestError("Manifest not loaded. Call ensure_loaded() first.")
 
         q = query.lower().strip()
+        if not q:
+            return []
 
         # Expand aliases: also search using official names
         search_keys = [q]
@@ -449,7 +451,7 @@ class ManifestManager:
 
         # Combine: exact → prefix → substring
         combined = exact + prefix + substring
-        return combined[:limit]
+        return combined if limit <= 0 else combined[:limit]
 
     def search_fuzzy(
         self,
@@ -525,7 +527,7 @@ class ManifestManager:
 
         Args:
             type_name: Type display name (e.g. '微型冲锋枪', '手炮', '自动步枪').
-            limit: Max results.
+            limit: Max results; 0 returns all matches.
 
         Returns:
             List of item dicts matching the type.
@@ -534,6 +536,8 @@ class ManifestManager:
             raise ManifestError("Manifest not loaded. Call ensure_loaded() first.")
 
         q = type_name.lower().strip()
+        if not q:
+            return []
         results: list[dict] = []
 
         for items in self._name_index.values():
@@ -552,7 +556,7 @@ class ManifestManager:
                 unique.append(self._canonical_item_entry(item))
 
         unique.sort(key=lambda x: (-x["tier"], x["name"]))
-        return unique[:limit]
+        return unique if limit <= 0 else unique[:limit]
 
     def get_item_name(self, item_hash: int) -> str:
         """Look up an item name by hash. Returns hex hash string if unknown."""
