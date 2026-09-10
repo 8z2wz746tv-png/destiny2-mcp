@@ -13,7 +13,6 @@ import pytest
 
 from destiny_mcp.exceptions import ManifestError
 from destiny_mcp.manifest import ManifestManager
-from destiny_mcp.utils.hash_utils import to_signed
 
 ITEM_TABLE = "DestinyInventoryItemDefinition"
 
