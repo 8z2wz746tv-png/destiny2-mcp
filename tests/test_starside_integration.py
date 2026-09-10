@@ -389,6 +389,82 @@ async def test_weapon_without_required_perks_does_not_read_sockets() -> None:
     assert missing["name"] == "测试武器"
 
 
+async def test_missing_requirements_carry_sourcing_slots() -> None:
+    """已接入的类别填来源，未接入的类别保留结构并标明 no_adapter。"""
+    build = parse_build(BUILD, build_id="a", source={"title": "A"})
+
+    def lookup(names):
+        return {
+            "available": True,
+            "matched_count": 1,
+            "results": [
+                {
+                    "name": "测试武器",
+                    "list": "刷取清单-测试",
+                    "scale": "T",
+                    "tier": "T0",
+                    "source": "某处",
+                    "perks": {"三号位": ["测试 Perk"]},
+                    "source_ref": {"source_type": "author_markdown"},
+                }
+            ],
+        }
+
+    result = await match_inventory(
+        _Manifest(),
+        "player",
+        build,
+        SimpleNamespace(
+            get_inventory=AsyncMock(return_value=SimpleNamespace(items=[])),
+            get_armor_snapshot=AsyncMock(side_effect=ConfigError("partial")),
+        ),
+        SimpleNamespace(get_weapon_details_by_type=AsyncMock()),
+        lookup=lookup,
+    )
+
+    rows = {row["kind"]: row for row in result["requirements"]}
+    weapon = rows["weapon"]
+    assert weapon["inventory_status"] == "missing"
+    # 配装模板的要求不被清单推荐污染：required_perks 保持原样。
+    assert weapon["required_perks"] == ["测试 Perk"]
+    assert weapon["sourcing"]["available"] is True
+    assert weapon["sourcing"]["source"] == "某处"
+    assert weapon["sourcing"]["tier"] == "T0"
+    assert weapon["sourcing"]["recommended_perks"] == {"三号位": ["测试 Perk"]}
+    assert weapon["sourcing"]["recommended_perk_match"] == "any_within_column"
+    # 已接入但清单里没有这件。
+    assert rows["armor_set"]["sourcing"] == {"available": False, "reason": "not_listed"}
+    # 尚未接入的类别保留结构，不能读成「没有来源」。
+    assert rows["exotic_armor"]["sourcing"] == {
+        "available": False,
+        "reason": "no_adapter",
+    }
+    assert rows["armor_mod"]["sourcing"] == {"available": False, "reason": "no_adapter"}
+    assert result["sourcing_available_kinds"] == ["weapon", "armor_set"]
+
+
+async def test_sourcing_without_lookup_reports_list_unavailable() -> None:
+    """没有清单查询可用时，不能说成「没有来源」。"""
+    build = parse_build(BUILD, build_id="a", source={"title": "A"})
+    result = await match_inventory(
+        _Manifest(),
+        "player",
+        build,
+        SimpleNamespace(
+            get_inventory=AsyncMock(return_value=SimpleNamespace(items=[])),
+            get_armor_snapshot=AsyncMock(side_effect=ConfigError("partial")),
+        ),
+        SimpleNamespace(get_weapon_details_by_type=AsyncMock()),
+    )
+
+    rows = {row["kind"]: row for row in result["requirements"]}
+    assert rows["weapon"]["sourcing"] == {
+        "available": False,
+        "reason": "list_unavailable",
+    }
+    assert rows["exotic_armor"]["sourcing"]["reason"] == "no_adapter"
+
+
 async def test_set_ownership_counts_distinct_armor_slots() -> None:
     block = BUILD.replace(" × 乙套 2 件", "").replace(
         "测试武器 | 测试 Perk", "测试武器"

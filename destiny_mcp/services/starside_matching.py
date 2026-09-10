@@ -3,13 +3,89 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any
+from typing import Any, Callable
 
 from ..manifest import ITEM_ALIASES, ManifestManager
 from ..exceptions import DestinyMCPError
 from ..utils.hash_utils import to_unsigned
 
 CLASS_TYPES = {"titan": 0, "hunter": 1, "warlock": 2}
+
+# 已经接上来源数据的缺失项类别；其余类别先留结构，等后续接入。
+SOURCING_KINDS = ("weapon", "armor_set")
+# 其余会出现在要求里的类别：结构保留，数据源未接入。
+SOURCING_RESERVED_KINDS = (
+    "exotic_armor",
+    "armor_mod",
+    "artifact",
+    "artifact_mod",
+    "subclass_component",
+)
+# 清单行里可以直接透传到来源槽的字段。
+SOURCING_FIELDS = (
+    "tier",
+    "scenario_tiers",
+    "role",
+    "rank",
+    "source",
+    "scenario",
+    "pieces",
+    "frame",
+    "element",
+    "note",
+)
+
+
+def _sourcing_payload(entry: dict) -> dict:
+    payload = {
+        "available": True,
+        "list": entry["list"],
+        "scale": entry["scale"],
+        "source_ref": entry.get("source_ref"),
+    }
+    for key in SOURCING_FIELDS:
+        if entry.get(key):
+            payload[key] = entry[key]
+    if entry.get("perks"):
+        # 清单的推荐是「同一栏位里中一个就算达标」，与配装模板的 required_perks 语义不同，不能合并。
+        payload["recommended_perks"] = entry["perks"]
+        payload["recommended_perk_match"] = "any_within_column"
+    return payload
+
+
+def attach_sourcing(rows: list[dict], lookup: Callable[[list[str]], dict] | None) -> None:
+    """给要求行补来源槽。
+
+    已接入的类别查本地评级清单；查到就给来源与评级，查不到说 ``not_listed``；
+    清单资料没装说 ``list_unavailable``；未接入的类别固定 ``no_adapter``。
+    三种「没有」必须分开，不能都读成「没有来源」。
+    """
+    pending = [
+        row["name"] for row in rows if row["kind"] in SOURCING_KINDS and row.get("name")
+    ]
+    found: dict[str, dict] = {}
+    listed = False
+    if pending and lookup is not None:
+        try:
+            result = lookup(pending)
+        except DestinyMCPError:
+            listed = False
+        else:
+            listed = bool(result.get("available"))
+            found = {entry["name"]: entry for entry in result.get("results", [])}
+    for row in rows:
+        if row["kind"] not in SOURCING_KINDS:
+            row["sourcing"] = {"available": False, "reason": "no_adapter"}
+            continue
+        entry = found.get(row.get("name", ""))
+        row["sourcing"] = (
+            _sourcing_payload(entry)
+            if entry is not None
+            else {
+                "available": False,
+                "reason": "not_listed" if listed else "list_unavailable",
+            }
+        )
 
 
 def _names(item: dict) -> set[str]:
@@ -234,6 +310,8 @@ async def match_inventory(
     build: dict,
     inventory_service: Any,
     weapon_detail_service: Any,
+    *,
+    lookup: Callable[[list[str]], dict] | None = None,
 ) -> dict:
     validation = validate_build(manifest, build)
     inventory = await inventory_service.get_inventory(player_name, "all")
@@ -454,6 +532,7 @@ async def match_inventory(
             )
     if not validation["class_resolved"]:
         unknown.append({"kind": "class", "inventory_status": "unknown_definition"})
+    attach_sourcing(ownership, lookup)
     return {
         "inventory_status": "complete",
         "requirements": ownership,
@@ -475,6 +554,9 @@ async def match_inventory(
             "stat feasibility and energy capacity",
             "requirements embedded in free-form notes",
         ],
+        "sourcing_available_kinds": list(SOURCING_KINDS),
+        "sourcing_reserved_kinds": list(SOURCING_RESERVED_KINDS),
+        "sourcing_scope": "local_community_lists_only",
         "coverage_complete": not unknown,
         "coverage_scope": "listed_requirement_checks_not_full_loadout_feasibility",
         "full_build_verified": False,
@@ -482,6 +564,9 @@ async def match_inventory(
         "warnings": [
             "missing 仅表示 Manifest 已精确解析且完整库存中未达到要求；unknown/not_account_checked 不能解释为缺少。",
             "current_roll_match 只检查当前选中的 Perk，未检查该实例可切换但未选中的 Perk。",
+            "sourcing 里的 source 来自社区清单快照，不是官方实时掉落；推荐 Perk 是同一栏位的备选，"
+            "与 required_perks 不是同一回事。no_adapter 表示该类别还没有来源数据源，"
+            "不能读成「没有来源」或「刷不到」。",
             "此结果不会执行任何游戏写入，也不能作为整套社区配装的一键装备凭据。",
         ],
     }

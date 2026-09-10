@@ -136,7 +136,7 @@ def test_lookup_returns_structured_row(tmp_path: Path) -> None:
     assert row["tier"] == "T0"
     assert row["frame"] == "区域拒止 72"
     assert row["element"] == "冰影"
-    assert row["perks"] == {"三号位": "金中藏弹", "四号位": "爆破专家"}
+    assert row["perks"] == {"三号位": ["金中藏弹"], "四号位": ["爆破专家"]}
     assert row["source"] == "安可"
     assert row["note"] == "最好用的绿弹"
     assert row["source_ref"]["source_type"] == "author_markdown"
@@ -272,7 +272,7 @@ def test_tier_list_is_a_labelled_fallback(tmp_path: Path) -> None:
             [
                 "迎驾", "", "33", "D", "虚空", "精密", "13", "萨瓦拉", "", "45",
                 "高速发射", "冲击弹壳", "操控性", "自动填装枪套",
-                "持久印象 集束炸弹 小丑皇弹药筒", "先锋平反", "整体略差于巴尔米拉-B",
+                "持久印象<br>集束炸弹<br>小丑皇弹药筒", "先锋平反", "整体略差于巴尔米拉-B",
             ]
         ],
     )
@@ -289,8 +289,8 @@ def test_tier_list_is_a_labelled_fallback(tmp_path: Path) -> None:
     assert row["source"] == "萨瓦拉"
     assert row["note"] == "整体略差于巴尔米拉-B"
     assert row["perks"] == {
-        "三号位": "自动填装枪套",
-        "四号位": "持久印象 集束炸弹 小丑皇弹药筒",
+        "三号位": ["自动填装枪套"],
+        "四号位": ["持久印象", "集束炸弹", "小丑皇弹药筒"],
     }
 
 
@@ -352,6 +352,72 @@ def test_tier_qualifier_is_kept_and_role_stays_separate(tmp_path: Path) -> None:
     assert "role" not in rows["旧版枪"]
     assert rows["工具枪"]["role"] == "输出工具枪"
     assert "tier" not in rows["工具枪"]
+
+
+def test_same_column_perks_stay_separate_alternatives(tmp_path: Path) -> None:
+    """同一栏位换行分开的是备选，必须拆成列表，不能压成一个字符串。"""
+    marked = LIST_MARKDOWN.replace(
+        "| 金中藏弹 | 爆破专家 |",
+        "| 金中藏弹 | 爆破专家\\\\我为人人\\\\高地 |",
+    )
+    service = _service(tmp_path, share_text=marked)
+
+    row = service.lookup_farming("迷失信号")["results"][0]
+    assert row["perks"] == {
+        "三号位": ["金中藏弹"],
+        "四号位": ["爆破专家", "我为人人", "高地"],
+    }
+
+
+def test_armor_list_uses_its_own_name_column_and_has_no_grade(tmp_path: Path) -> None:
+    """护甲套装的名字列是「套装」，源数据没有档位列，不能编一个评级出来。"""
+    root = tmp_path / "archive"
+    root.mkdir()
+    _archive_page(
+        root,
+        "farming-sets/index.html",
+        "刷取清单-护甲套装",
+        ["套装", "图标", "件数", "获取地点", "应用场景", "说明"],
+        [
+            [
+                "埃希恩记忆", "", "4 件", "玻璃拱顶",
+                "能量球 （输出 棱镜虚空软硬减）", "最泛用的套装",
+            ]
+        ],
+    )
+    _archive_index(root, "farming-sets/index.html")
+
+    row = StarsideService(None, root, share_root=None).lookup_farming("埃希恩记忆")[
+        "results"
+    ][0]
+
+    assert row["list"] == "刷取清单-护甲套装"
+    assert row["scale"] == "ordered"
+    assert "tier" not in row
+    assert "role" not in row
+    assert row["source"] == "玻璃拱顶"
+    assert row["pieces"] == "4 件"
+    assert row["scenario"] == "能量球 （输出 棱镜虚空软硬减）"
+    assert row["note"] == "最泛用的套装"
+
+
+def test_batched_sourcing_lookup_does_not_truncate(tmp_path: Path) -> None:
+    """一次问很多名字时必须分批取全：截断会被读成「清单里没有」。"""
+    generated = "\n".join(
+        f"| 测试枪 {index} | | T0 | 轻质 600 | 动能 | | 医治 | 互惠 | 扭曲 | 测试 |"
+        for index in range(1, 26)
+    )
+    marked = LIST_MARKDOWN.replace(
+        "| 迷失信号 | | T0 | 区域拒止\\\\72 | 冰影 | | 金中藏弹 | 爆破专家 | 安可 | 最好用的绿弹 |",
+        generated,
+    )
+    service = _service(tmp_path, share_text=marked)
+    names = [f"测试枪 {index}" for index in range(1, 26)]
+
+    result = service._lookup_sourcing(names)
+
+    assert [row["name"] for row in result["results"]] == names
+    assert service.lookup_farming(names, limit=20)["truncated"] is True
 
 
 def test_group_rows_are_not_weapons(tmp_path: Path) -> None:
