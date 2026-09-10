@@ -110,15 +110,17 @@ Manifest 侧（**不代表拥有**）：
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
-| `list` | 我的配装列表（官方槽位＋本地配装分开标注） | `character`、`kind` |
-| `get` | 单套配装的内容 | `loadout_id`、`character`、`slot_number`、`query` |
+| `list` | 我的配装列表（官方槽位＋本地配装分开标注） | `character` |
+| `get` | 配装列表，和 `list` 走同一个分支、返回同样内容 | `character` |
 | `save` | 保存配装（写入） | `name`、`character`、`notes` |
 | `delete` | 删除配装（写入） | `loadout_id` |
 | `equip_loadout` | 换上已存配装（写入） | `loadout_id` |
-| `search_identifiers` | 搜官方槽位的名称／图标／颜色 hash | `query` |
-| `snapshot_official` | 把官方槽位存成快照（写入） | `character`、`slot_number` |
-| `update_official_identifiers` | 改官方槽位标识（写入） | `slot_number`、`name_hash`／`icon_hash`／`color_hash` 至少一个 |
+| `search_identifiers` | 搜官方槽位的名称／图标／颜色 hash | `kind`、`query` |
+| `snapshot_official` | 把官方槽位存成快照（写入） | `character`、`slot_number`、`name_hash`、`icon_hash`、`color_hash` |
+| `update_official_identifiers` | 改官方槽位标识（写入） | `character`、`slot_number`、`name_hash`／`icon_hash`／`color_hash` 至少一个 |
 | `clear_official` | 清空官方槽位（写入） | `character`、`slot_number`（1–20） |
+
+`list` 和 `get` 只按 `character` 过滤，**返回全部配装**：`loadout_id`、`slot_number`、`kind`、`query` 在这两个 intent 上不参与筛选。要哪一套由你从结果里按名字或槽位号挑出来，不要假设第一条就是用户说的那套。
 
 官方槽位的名称、图标、颜色 hash 只是 Bungie 的展示元数据，**不是**配装内容，也不是热度依据。
 
@@ -127,11 +129,11 @@ Manifest 侧（**不代表拥有**）：
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
 | `get`（`subclass`） | 当前超能、手雷、近战、星相、碎片 | `character` |
-| `options` | 有哪些可选 | `character`、`element` |
+| `options` | 有哪些可选 | `character`、`element`、`component` |
 | `fragments` | 碎片列表及效果 | `element` |
 | `fragment_details` | 单个碎片的数值与条件 | `fragment_name` |
-| `artifact` | 当前神器与层级 | `character`、`artifact_name` |
-| `artifact_mod` | 神器模组分等级列表 | `artifact_name` |
+| `artifact` | 赛季神器与层级 | `artifact_name` |
+| `artifact_mod` | 神器模组详情 | `artifact_mod_hash`（必填） |
 | `modify` | 改技能（写入） | `character`、`changes` |
 | `equip_artifact_mod` | 装神器模组（写入） | `character`、`artifact_mod_hash`（必须为正） |
 | `community` | 社区职业资料，**只在 `subclass` 分类里搜** | `query` 或 `fragment_name`／`element`、`knowledge_id`、`community_section`、`limit`、`offset` |
