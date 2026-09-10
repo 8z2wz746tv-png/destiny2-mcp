@@ -13,7 +13,7 @@ from ..build.models import BuildRequest
 from ..build_contracts import ExecutableBuild
 from ..exceptions import DestinyMCPError
 from ._registry import mcp
-from ._farm_target import serialize_farm_target_analysis
+from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import (
     get_ctx,
     handle_tool_error,

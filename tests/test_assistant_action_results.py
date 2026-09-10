@@ -6,7 +6,9 @@ from unittest.mock import AsyncMock
 import pytest
 
 from destiny_mcp.models import ItemCandidate, LoadoutOperationResult, MoveItemResult
+from destiny_mcp.tools._requests import WRITE_INTENTS
 from destiny_mcp.tools.assistants import (
+    SELF_GUARDED_WRITE_INTENTS,
     inventory_assistant,
     loadout_assistant,
     subclass_assistant,
@@ -32,6 +34,13 @@ _ACTIONS = [
     (subclass_assistant, "subclass_svc", "modify", "modify_subclass", {"character": "hunter", "changes": {"super": "Test"}}),
     (subclass_assistant, "artifact_svc", "equip_artifact_mod", "equip_artifact_mod", {"artifact_mod_hash": 1, "character": "hunter"}),
 ]
+
+
+def test_action_cases_cover_every_generically_guarded_write_intent() -> None:
+    """写入清单新增 intent 时必须在这里补一条用例，否则测试失败。"""
+    covered = {intent for _, _, intent, _, _ in _ACTIONS}
+
+    assert covered == set(WRITE_INTENTS) - SELF_GUARDED_WRITE_INTENTS
 
 
 @pytest.mark.asyncio

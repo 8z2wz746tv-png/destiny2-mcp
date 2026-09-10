@@ -7,7 +7,7 @@ from collections import defaultdict
 import destiny_mcp.build.farm_target as farm_target_module
 from destiny_mcp.build.farm_target import _virtual_rolls, find_farm_targets
 from destiny_mcp.build.models import Armor, ArmorStats, BuildConstraints, InventorySnapshot
-from destiny_mcp.tools._farm_target import serialize_farm_target_analysis
+from destiny_mcp.tools._farm_target_response import serialize_farm_target_analysis
 
 
 _LOCKED_SLOTS = ("gauntlets", "chests", "legs", "class_items")

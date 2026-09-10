@@ -27,6 +27,23 @@ WorldIntent = Literal["weekly", "weekly_full", "vendor", "search_collectible_nod
 
 NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 
+# 会改变账号状态的 intent，单一事实来源。确认逻辑与测试都从这里派生：
+# 新增写入 intent 时只需要加到这里，忘了加会被测试直接抓住，而不是悄悄绕过确认。
+WRITE_INTENTS: frozenset[str] = frozenset(
+    {
+        # inventory_assistant
+        "move", "transfer", "equip", "equip_many", "equip_items",
+        "pull_postmaster", "lock", "track_quest", "quest_tracking",
+        # loadout_assistant
+        "save", "delete", "equip_loadout", "snapshot_official",
+        "update_official_identifiers", "clear_official",
+        # subclass_assistant
+        "modify", "equip_artifact_mod",
+        # build_assistant
+        "equip_build",
+    }
+)
+
 
 class IntentRequest(BaseModel):
     intent: str

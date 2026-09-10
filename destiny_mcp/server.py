@@ -16,7 +16,6 @@
 from __future__ import annotations
 
 import importlib
-import os
 import time
 from collections.abc import AsyncIterator, Callable
 from contextlib import AsyncExitStack, asynccontextmanager
@@ -26,7 +25,13 @@ from mcp.server.fastmcp import FastMCP
 
 from .audit import AuditLogger
 from .bungie_client import BungieClient
-from .config import resolve_resource_dir
+from .config import (
+    MCP_HOST,
+    MCP_PORT,
+    MCP_TRANSPORT,
+    TOOL_PROFILE,
+    resolve_resource_dir,
+)
 from .logging_config import get_logger, setup_logging
 from .manifest import ManifestManager
 from .player_resolver import PlayerResolver
@@ -358,7 +363,7 @@ _FULL_TOOL_MODULES = _NORMAL_TOOL_MODULES + (
 def _tool_profile(value: str | None = None) -> str:
     profile = (
         value if value is not None
-        else os.environ.get("DESTINY_MCP_TOOL_PROFILE", "normal")
+        else TOOL_PROFILE
     ).strip().lower()
     if profile in {"normal", "expert", "full"}:
         return profile
@@ -416,8 +421,8 @@ def create_server(tool_profile: str | None = None) -> FastMCP:
         ),
         json_response=True,
         lifespan=lifespan,
-        host=os.environ.get("MCP_HOST", "127.0.0.1"),
-        port=int(os.environ.get("MCP_PORT", "8000")),
+        host=MCP_HOST,
+        port=MCP_PORT,
     )
 
     @server.custom_route("/health", methods=["GET"])
@@ -428,7 +433,7 @@ def create_server(tool_profile: str | None = None) -> FastMCP:
             {
                 "status": "ok" if readiness["ready"] else "unavailable",
                 "service": "destiny-mcp",
-                "transport": os.environ.get("MCP_TRANSPORT", "stdio"),
+                "transport": MCP_TRANSPORT,
                 "tool_profile": profile,
                 "mode": "standalone",
             },
@@ -460,7 +465,7 @@ mcp = create_server()
 
 def main():
     """Entry point for `destiny-mcp` CLI command and `python -m`."""
-    transport = os.environ.get("MCP_TRANSPORT", "stdio")
+    transport = MCP_TRANSPORT
     mcp.run(transport=transport)
 
 

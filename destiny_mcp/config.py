@@ -86,6 +86,24 @@ STARSIDE_SHARE_PATH: Path = Path(
 # Default player name — set this to skip typing your Bungie name every time
 DESTINY_DEFAULT_PLAYER: str | None = os.getenv("DESTINY_DEFAULT_PLAYER")
 
+# MCP transport and tool surface. Read here so every env lookup lives in one module.
+MCP_HOST: str = os.getenv("MCP_HOST", "127.0.0.1")
+MCP_PORT: int = int(os.getenv("MCP_PORT", "8000"))
+MCP_TRANSPORT: str = os.getenv("MCP_TRANSPORT", "stdio")
+TOOL_PROFILE: str = os.getenv("DESTINY_MCP_TOOL_PROFILE", "normal")
+
+# DIM wish list: an explicit path wins, otherwise the fallback order below decides.
+WISHLIST_PATH: Path | None = (
+    Path(os.path.expanduser(value))
+    if (value := os.getenv("DESTINY_WISHLIST_PATH"))
+    else None
+)
+# These only say whether the environment set the value; the paths themselves are
+# derived above, so the fallback order cannot drift from DATA_PATH / PROJECT_ROOT.
+DATA_PATH_CONFIGURED: bool = bool(os.getenv("DATA_PATH"))
+PROJECT_ROOT_CONFIGURED: bool = bool(os.getenv("DESTINY_MCP_ROOT"))
+
+
 def validate_credentials() -> None:
     """Validate at startup, so importing tools/models requires no credentials."""
     for key in ("BUNGIE_API_KEY", "BUNGIE_CLIENT_ID", "BUNGIE_CLIENT_SECRET"):

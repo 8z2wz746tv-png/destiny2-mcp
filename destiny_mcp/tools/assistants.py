@@ -20,11 +20,12 @@ from ._build_confirmation import (
     issue_exotic_confirmation_token,
     verify_exotic_confirmation_token,
 )
-from ._farm_target import serialize_farm_target_analysis
+from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from ._requests import (
     ActivityIntent, BuildIntent, InventoryIntent, LoadoutIntent, PlayerIntent,
     SubclassIntent, WeaponIntent, WorldIntent,
+    WRITE_INTENTS,
     InventoryRequest, LoadoutRequest, SubclassRequest, validate_request,
 )
 from ._responses import (
@@ -137,27 +138,22 @@ def _harvest_names(value: Any, *, limit: int = 8) -> list[str]:
     return found
 
 
+def _perk_filter_terms(required_perks: list[str] | str | None, perk_name: str) -> list[str] | str | None:
+    """单个 perk_name 是 required_perks 的简写形式，三处筛选入口共用一条规则。"""
+    if required_perks is None and perk_name.strip():
+        return [perk_name]
+    return required_perks
+
+
+# 这些写入由工具自己校验，不走通用确认入口：equip_build 必须先验证服务端签发的一次性
+# 候选，确认时必须原样回传该候选。它们仍然在 WRITE_INTENTS 里，契约测试会检查两条路径
+# 合起来覆盖全部写入 intent，避免出现无人守卫的写入。
+SELF_GUARDED_WRITE_INTENTS: frozenset[str] = frozenset({"equip_build"})
+
+
 def _requires_confirmation(intent: str) -> bool:
-    return intent in {
-        "move",
-        "transfer",
-        "equip",
-        "equip_many",
-        "equip_items",
-        "pull_postmaster",
-        "lock",
-        "save",
-        "delete",
-        "equip_loadout",
-        "snapshot_official",
-        "update_official_identifiers",
-        "clear_official",
-        "modify",
-        "equip_artifact_mod",
-        "equip_build",
-        "track_quest",
-        "quest_tracking",
-    }
+    """通用确认入口覆盖的写入 intent；写入清单在 _requests.WRITE_INTENTS。"""
+    return intent in WRITE_INTENTS and intent not in SELF_GUARDED_WRITE_INTENTS
 
 
 def _confirmation_required(intent: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -436,9 +432,7 @@ async def weapon_assistant(
         ])
 
     if intent in catalog_intents:
-        catalog_required_perks = required_perks
-        if catalog_required_perks is None and perk_name.strip():
-            catalog_required_perks = [perk_name]
+        catalog_required_perks = _perk_filter_terms(required_perks, perk_name)
         try:
             filtered = svc["weapon_roll_filter_svc"].filter_catalog(
                 weapon_name=weapon_name,
@@ -535,9 +529,7 @@ async def weapon_assistant(
 
     if intent == "filter_rolls":
         if not include_inventory:
-            catalog_required_perks = required_perks
-            if catalog_required_perks is None and perk_name.strip():
-                catalog_required_perks = [perk_name]
+            catalog_required_perks = _perk_filter_terms(required_perks, perk_name)
             filtered = svc["weapon_roll_filter_svc"].filter_catalog(
                 weapon_name=weapon_name,
                 weapon_type=weapon_type,
@@ -563,9 +555,7 @@ async def weapon_assistant(
             _dump(result).get("weapons", []),
             weapon_name=weapon_name,
             location=location,
-            required_perks=(
-                [perk_name] if required_perks is None and perk_name.strip() else required_perks
-            ),
+            required_perks=_perk_filter_terms(required_perks, perk_name),
             any_perks=any_perks,
             excluded_perks=excluded_perks,
             limit=limit,

@@ -256,7 +256,7 @@ def test_archive_only_list_resolves_by_url_key(tmp_path: Path) -> None:
     assert "tier" not in row
     assert row["dps"] == "8973"
     assert row["source_ref"]["source_type"] == "web_archive_v2"
-    assert list(service._farming_index()) == ["真相"]
+    assert service._rated_lists().names() == ["真相"]
 
 
 def test_tier_list_is_a_labelled_fallback(tmp_path: Path) -> None:
@@ -429,7 +429,7 @@ def test_group_rows_are_not_weapons(tmp_path: Path) -> None:
     service = _service(tmp_path, share_text=marked)
 
     service._load()
-    assert [name for name in service._farming_index()] == ["迷失信号", "翻新 A499"]
+    assert service._rated_lists().names() == ["迷失信号", "翻新 A499"]
     assert service.lookup_farming("迷失信号")["matched_count"] == 1
 
 

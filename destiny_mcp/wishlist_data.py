@@ -6,7 +6,6 @@ import argparse
 import base64
 import io
 import json
-import os
 import re
 import tempfile
 import urllib.request
@@ -14,6 +13,7 @@ import zipfile
 from pathlib import Path, PurePosixPath
 from typing import Any
 
+from . import config
 from .logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -46,21 +46,21 @@ TAG_RE = re.compile(r"\|tags?:([^,\s]+(?:,[^,\s]+)*)", re.IGNORECASE)
 
 
 def default_wishlist_path() -> Path:
-    """Resolve where DIM wish list data should live for this install."""
-    env_path = os.getenv("DESTINY_WISHLIST_PATH")
-    if env_path:
-        return Path(env_path).expanduser().resolve()
+    """Resolve where DIM wish list data should live for this install.
+
+    路径本身由 config 推导，这里只决定回退顺序，避免两处各算一遍 DATA_PATH。
+    """
+    if config.WISHLIST_PATH is not None:
+        return config.WISHLIST_PATH.resolve()
 
     if PACKAGE_WISHLIST_PATH.exists():
         return PACKAGE_WISHLIST_PATH
 
-    data_root = os.getenv("DATA_PATH")
-    if data_root:
-        return (Path(data_root).expanduser().resolve() / DEFAULT_FILENAME)
+    if config.DATA_PATH_CONFIGURED:
+        return config.DATA_PATH / DEFAULT_FILENAME
 
-    project_root = os.getenv("DESTINY_MCP_ROOT")
-    if project_root:
-        return Path(project_root).expanduser().resolve() / "data" / DEFAULT_FILENAME
+    if config.PROJECT_ROOT_CONFIGURED:
+        return config.PROJECT_ROOT / "data" / DEFAULT_FILENAME
 
     cwd = Path.cwd().resolve()
     if (cwd / "destiny_mcp").is_dir():
