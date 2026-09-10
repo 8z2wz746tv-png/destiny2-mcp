@@ -8,16 +8,20 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from difflib import SequenceMatcher
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import yaml
 
 from . import config
 from .exceptions import CharacterNotFoundError, ManifestError
 from .logging_config import get_logger
 from .manifest_armor import ArmorCatalogMixin
+from .manifest_data import (
+    BUNGIE_BASE_URL as BUNGIE_BASE_URL,
+    ITEM_ALIASES as ITEM_ALIASES,
+    ITEM_TYPE_NAMES as ITEM_TYPE_NAMES,
+)
+from .manifest_search import SearchIndexMixin
 from .utils.hash_utils import to_signed
 
 logger = get_logger(__name__)
@@ -26,7 +30,6 @@ if TYPE_CHECKING:
     from .bungie_client import BungieClient
 
 # Bungie CDN base URL for item icons
-BUNGIE_BASE_URL = "https://www.bungie.net"
 
 # Inventory bucket hashes for common slots
 BUCKET_NAMES: dict[int, str] = {
@@ -116,89 +119,6 @@ CHARACTER_CLASS_MAP: dict[str, int] = {
     "术士": 2,
 }
 
-# Item type names
-ITEM_TYPE_NAMES: dict[int, str] = {
-    0: "None",
-    1: "Currency",
-    2: "Armor",
-    3: "Weapon",
-    7: "Message",
-    8: "Engram",
-    9: "Consumable",
-    10: "Exchange Material",
-    11: "Mission Reward",
-    12: "Quest Step",
-    13: "Quest Step Complete",
-    14: "Emblem",
-    15: "Quest",
-    16: "Subclass",
-    17: "Clan Banner",
-    18: "Aura",
-    19: "Mod",
-    20: "Dummy",
-    21: "Ship",
-    22: "Vehicle",
-    23: "Emote",
-    24: "Ghost",
-    25: "Package",
-    26: "Bounty",
-    27: "Wrapper",
-    28: "Seasonal Artifact",
-    29: "Finisher",
-    30: "Pattern",
-}
-
-# Community nickname aliases (Chinese)
-ITEM_ALIASES: dict[str, list[str]] = {
-    "狼头": ["加拉尔号角"],
-    "千语": ["千语"],
-    "遗言": ["遗言"],
-    "伊邪那岐": ["伊邪那岐的重担"],
-    "猫头鹰": ["以太之猫"],
-    "威能": ["威能武器"],
-    "动能": ["动能武器"],
-    "能量": ["能量武器"],
-}
-
-
-def _load_community_names() -> dict[str, list[str]]:
-    """Load community name aliases from YAML file.
-
-    Returns a dict mapping Chinese community names to official Chinese names.
-    """
-    yaml_path = Path(__file__).parent / "data" / "community_names.yaml"
-    if not yaml_path.exists():
-        return {}
-
-    try:
-        with open(yaml_path, encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-    except (yaml.YAMLError, OSError) as e:
-        logger.warning("Failed to load community names from %s: %s", yaml_path, e)
-        return {}
-
-    aliases: dict[str, list[str]] = {}
-
-    # Weapons: Chinese community name → English official name
-    # We need to map to Chinese official names for search to work
-    # For now, store English names as-is (search handles both)
-    for zh_name, en_name in (data.get("weapons") or {}).items():
-        aliases[zh_name.lower()] = [en_name]
-
-    # Armor: Chinese community name → English official name
-    for zh_name, en_name in (data.get("armor") or {}).items():
-        aliases[zh_name.lower()] = [en_name]
-
-    return aliases
-
-
-# Load community names at module level
-_COMMUNITY_ALIASES = _load_community_names()
-
-# Merge into ITEM_ALIASES
-ITEM_ALIASES.update(_COMMUNITY_ALIASES)
-
-
 def class_type_name(class_type: int) -> str:
     """Convert classType int to display name."""
     return {0: "Titan", 1: "Hunter", 2: "Warlock"}.get(class_type, "Unknown")
@@ -215,7 +135,7 @@ def resolve_character_name(name: str) -> int:
     raise CharacterNotFoundError(name, ["hunter", "warlock", "titan"])
 
 
-class ManifestManager(ArmorCatalogMixin):
+class ManifestManager(SearchIndexMixin, ArmorCatalogMixin):
     """Manages the Destiny manifest (SQLite) for item lookups.
 
     Supports bilingual search (English + Chinese) by loading two manifest
@@ -299,276 +219,7 @@ class ManifestManager(ArmorCatalogMixin):
             self._zh_conn.row_factory = sqlite3.Row
             self._zh_conn.execute("PRAGMA journal_mode=WAL")
             self._build_name_index(self._zh_conn, language="zh-chs")
-
-    def _build_name_index(self, conn: sqlite3.Connection, *, language: str) -> None:
-        """Build in-memory name index from a manifest connection.
-        Merges entries into self._name_index (supports loading multiple languages).
-        Also populates self._hash_index (Chinese loaded last takes priority).
-        """
-        cursor = conn.execute(
-            "SELECT id, json FROM DestinyInventoryItemDefinition"
-        )
-        for row in cursor:
-            item_id = row["id"]
-            try:
-                data = json.loads(row["json"])
-            except json.JSONDecodeError:
-                continue
-
-            display = data.get("displayProperties") or {}
-            name = display.get("name", "")
-            if not name:
-                continue
-
-            key = name.lower().strip()
-            item_type = data.get("itemType", 0)
-            tier = (data.get("inventory") or {}).get("tierType", 0)
-            bucket_type_hash = (data.get("inventory") or {}).get("bucketTypeHash", 0)
-            class_type = data.get("classType", -1)
-            signed_item_id = to_signed(item_id)
-            if language == "en":
-                self._english_name_by_hash[item_id] = name
-                self._english_name_by_hash[signed_item_id] = name
-                display_type = str(data.get("itemTypeDisplayName") or "")
-                self._english_type_display_by_hash[item_id] = display_type
-                self._english_type_display_by_hash[signed_item_id] = display_type
-            english_name = self._english_name_by_hash.get(
-                item_id,
-                self._english_name_by_hash.get(signed_item_id, name if language == "en" else ""),
-            )
-
-            entry = {
-                "itemHash": item_id,
-                "name": name,
-                "nameEn": english_name,
-                "itemType": item_type,
-                "itemTypeName": ITEM_TYPE_NAMES.get(item_type, f"Type({item_type})"),
-                "itemTypeNameDisplay": data.get("itemTypeDisplayName", ""),
-                "tier": tier,
-                "icon": (BUNGIE_BASE_URL + display["icon"]) if display.get("icon") else "",
-                "classType": class_type,
-                "damageType": data.get("defaultDamageType", data.get("damageType", 0)),
-                "ammoType": (data.get("equippingBlock") or {}).get("ammoType", 0),
-                "bucketTypeHash": bucket_type_hash,
-                "language": language,
-            }
-
-            if key not in self._name_index:
-                self._name_index[key] = []
-            self._name_index[key].append(entry)
-
-            # Hash index — Chinese manifest loaded last overwrites English
-            self._hash_index[item_id] = entry
-
-    def _canonical_item_entry(self, item: dict) -> dict:
-        """Return the preferred-language entry for a search hit."""
-        item_hash = item.get("itemHash", 0)
-        signed_hash = to_signed(item_hash)
-        canonical = self._hash_index.get(item_hash) or self._hash_index.get(signed_hash)
-        if not canonical:
-            canonical = item
-        result = dict(canonical)
-        if not result.get("nameEn"):
-            result["nameEn"] = (
-                self._english_name_by_hash.get(item_hash)
-                or self._english_name_by_hash.get(signed_hash)
-                or item.get("nameEn", "")
-            )
-        result["itemTypeNameDisplayEn"] = (
-            self._english_type_display_by_hash.get(item_hash)
-            or self._english_type_display_by_hash.get(signed_hash)
-            or item.get("itemTypeNameDisplayEn", "")
-        )
-        return result
-
     # ── Public API ─────────────────────────────────────────────────
-
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
-        """Fuzzy search items by name (Chinese or English).
-
-        Supports community nicknames via ITEM_ALIASES mapping (e.g. 千语 → 千言萬語).
-
-        Search priority:
-          1. Exact name match (highest priority)
-          2. Starts-with match (query is prefix of item name)
-          3. Substring match (lowest priority)
-
-        Within each tier, sorted by tier (exotic first) then by name.
-
-        Args:
-            query: Partial or full item name.
-            limit: Max results to return; 0 returns all matches.
-
-        Returns:
-            List of item dicts with keys: itemHash, name, itemType, itemTypeName, tier, icon.
-        """
-        if not self._name_index:
-            raise ManifestError("Manifest not loaded. Call ensure_loaded() first.")
-
-        q = query.lower().strip()
-        if not q:
-            return []
-
-        # Expand aliases: also search using official names
-        search_keys = [q]
-        if q in ITEM_ALIASES:
-            for alias_target in ITEM_ALIASES[q]:
-                search_keys.append(alias_target.lower())
-
-        # Three-tier matching
-        exact: list[dict] = []      # exact name match
-        prefix: list[dict] = []     # query is prefix of item name
-        substring: list[dict] = []  # query is substring of item name
-
-        seen: set[int] = set()
-
-        for key in search_keys:
-            # Exact match
-            if key in self._name_index:
-                for item in self._name_index[key]:
-                    h = item["itemHash"]
-                    if h not in seen:
-                        seen.add(h)
-                        exact.append(self._canonical_item_entry(item))
-
-            # Prefix + substring match
-            for idx_key, items in self._name_index.items():
-                if idx_key in search_keys:
-                    continue
-                if key in idx_key:
-                    for item in items:
-                        h = item["itemHash"]
-                        if h not in seen:
-                            seen.add(h)
-                            canonical = self._canonical_item_entry(item)
-                            if idx_key.startswith(key):
-                                prefix.append(canonical)
-                            else:
-                                substring.append(canonical)
-
-        # Sort each tier by tier (highest first) then name
-        for group in (exact, prefix, substring):
-            group.sort(key=lambda x: (-x["tier"], x["name"]))
-
-        # Combine: exact → prefix → substring
-        combined = exact + prefix + substring
-        return combined if limit <= 0 else combined[:limit]
-
-    def search_fuzzy(
-        self,
-        query: str,
-        *,
-        limit: int = 20,
-        min_score: float = 0.65,
-        item_type: int | None = None,
-        tier: int | None = None,
-        class_type: int | None = None,
-    ) -> list[dict]:
-        """Search item names with typo tolerance; callers must confirm hits."""
-        if not self._name_index:
-            raise ManifestError("Manifest not loaded. Call ensure_loaded() first.")
-
-        def normalize(value: str) -> str:
-            return "".join(char for char in value.casefold() if char.isalnum())
-
-        normalized_query = normalize(query)
-        if not normalized_query:
-            return []
-
-        search_terms = [normalized_query]
-        search_terms.extend(
-            normalized
-            for target in ITEM_ALIASES.get(query.casefold().strip(), [])
-            if (normalized := normalize(target))
-        )
-        matches: dict[int, dict] = {}
-        for indexed_name, items in self._name_index.items():
-            eligible = [
-                item
-                for item in items
-                if (item_type is None or item.get("itemType") == item_type)
-                and (tier is None or item.get("tier") == tier)
-                and (
-                    class_type is None
-                    or item.get("classType", -1) in {-1, class_type}
-                )
-            ]
-            if not eligible:
-                continue
-            normalized_name = normalize(indexed_name)
-            if not normalized_name:
-                continue
-            score = max(
-                SequenceMatcher(None, term, normalized_name).ratio()
-                for term in search_terms
-            )
-            if score < min_score:
-                continue
-            for item in eligible:
-                canonical = self._canonical_item_entry(item)
-                item_hash = canonical["itemHash"]
-                previous = matches.get(item_hash)
-                if previous is None or score > previous["match_score"]:
-                    canonical["match_score"] = round(score, 3)
-                    matches[item_hash] = canonical
-
-        return sorted(
-            matches.values(),
-            key=lambda item: (
-                -item["match_score"],
-                -item.get("tier", 0),
-                item.get("name", ""),
-            ),
-        )[:limit]
-
-    def search_by_type_name(
-        self, type_name: str, *, limit: int = 100
-    ) -> list[dict]:
-        """Search items by weapon/armor type display name.
-
-        Args:
-            type_name: Type display name (e.g. '微型冲锋枪', '手炮', '自动步枪').
-            limit: Max results; 0 returns all matches.
-
-        Returns:
-            List of item dicts matching the type.
-        """
-        if not self._name_index:
-            raise ManifestError("Manifest not loaded. Call ensure_loaded() first.")
-
-        q = type_name.lower().strip()
-        if not q:
-            return []
-        results: list[dict] = []
-
-        for items in self._name_index.values():
-            for item in items:
-                display_type = item.get("itemTypeNameDisplay", "").lower()
-                if q in display_type or q in item.get("itemTypeName", "").lower():
-                    results.append(item)
-
-        # Deduplicate
-        seen: set[int] = set()
-        unique: list[dict] = []
-        for item in results:
-            h = item["itemHash"]
-            if h not in seen:
-                seen.add(h)
-                unique.append(self._canonical_item_entry(item))
-
-        unique.sort(key=lambda x: (-x["tier"], x["name"]))
-        return unique if limit <= 0 else unique[:limit]
-
-    def get_item_name(self, item_hash: int) -> str:
-        """Look up an item name by hash. Returns hex hash string if unknown."""
-        if not self._hash_index:
-            return f"#{item_hash}"
-
-        # Manifest stores signed 32-bit hashes; API may return unsigned.
-        signed_hash = to_signed(item_hash)
-        entry = self._hash_index.get(item_hash) or self._hash_index.get(signed_hash)
-        return entry["name"] if entry else f"#{item_hash}"
-
     def get_item_info(self, item_hash: int) -> dict | None:
         """Get full item definition for a given hash."""
         signed_hash = to_signed(item_hash)
