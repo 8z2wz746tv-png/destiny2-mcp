@@ -15,15 +15,19 @@ async def get_loadouts(
     character: str | None = None,
     ctx: Context = None,
 ) -> dict:
-    """列出角色的所有配装（包括游戏内官方配装和自建配装）。
+    """列出角色的所有已存配装（包括游戏内官方配装和自建配装）。
 
     何时使用：用户问"我有哪些配装"、"看看我的装备方案"时。
     何时使用：用户要选择一个配装来装备时，先列出可用配装。
     何时跳过：用户只想看当前装备（用 get_inventory）。
 
     返回两类配装：
-    - 官方配装（source=bungie）：游戏内保存的，每个角色最多 10 个
+    - 官方配装（source=bungie）：游戏内保存的，每个角色最多 20 个
     - 自建配装（source=local）：通过本服务保存的，数量无限制
+
+    每项还包含 build_template，统一使用 class/weapons/armor/artifact/
+    stat_targets/source 结构。这里不是社区配装搜索；社区方案请使用
+    build_assistant(intent="community")。
 
     Args:
         player_name: Bungie 名称。不填则使用默认玩家。
@@ -49,7 +53,7 @@ async def save_loadout(
     何时使用：用户说"把现在的装备存成配装"、"保存当前方案"时。
     何时跳过：用户想修改已有的配装（先删除再重新保存）。
 
-    配装会保存到本地存储（不受游戏内 10 个槽位限制）。
+    配装会保存到本地存储（不受游戏内 20 个槽位限制）。
     保存的内容包括：当前已装备的护甲（头/手/胸/腿/职业）。
 
     Args:
@@ -165,7 +169,7 @@ async def snapshot_official_loadout(
     Args:
         player_name: Bungie 名称。不填则使用默认玩家。
         character: 角色名（hunter/warlock/titan，或中文）。
-        slot_number: 游戏内配装槽位，1 到 10。
+        slot_number: 游戏内配装槽位，1 到 20。
         name_hash: 可选，官方配装名称 hash。
         icon_hash: 可选，官方配装图标 hash。
         color_hash: 可选，官方配装颜色 hash。
@@ -205,7 +209,7 @@ async def update_official_loadout_identifiers(
     Args:
         player_name: Bungie 名称。不填则使用默认玩家。
         character: 角色名（hunter/warlock/titan，或中文）。
-        slot_number: 游戏内配装槽位，1 到 10。
+        slot_number: 游戏内配装槽位，1 到 20。
         name_hash: 可选，官方配装名称 hash。
         icon_hash: 可选，官方配装图标 hash。
         color_hash: 可选，官方配装颜色 hash。
@@ -242,7 +246,7 @@ async def clear_official_loadout(
     Args:
         player_name: Bungie 名称。不填则使用默认玩家。
         character: 角色名（hunter/warlock/titan，或中文）。
-        slot_number: 游戏内配装槽位，1 到 10。
+        slot_number: 游戏内配装槽位，1 到 20。
     """
     if not character:
         return {"success": False, "message": "必须指定角色（character 参数）。"}

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 from .base import MoveItemStep
@@ -59,22 +61,57 @@ class LoadoutSubclassConfig(BaseModel):
 
 
 class Loadout(BaseModel):
-    """A saved equipment loadout (配装)."""
+    """A saved equipment loadout (配装).
+
+    ``build_template`` follows the normalized community build shape. The
+    instance-bound fields above it remain the execution representation used
+    by the account equipment service.
+    """
 
     id: str = Field(description="Unique loadout ID")
     name: str = Field(description="User-defined loadout name (e.g. 'GM 配装')")
     character: str = Field(description="Target character: hunter/warlock/titan")
     items: list[LoadoutItem] = Field(default_factory=list, description="Armor pieces in this loadout")
     subclass: LoadoutSubclassConfig | None = Field(default=None, description="Subclass configuration")
-    source: str = Field(default="local", description="Origin: 'bungie' (官方) or 'local' (自建)")
+    source: str = Field(
+        default="local",
+        description="Origin: 'bungie' (官方槽位), 'local' (自建) or 'build' (求解候选)",
+    )
     created_at: str = Field(default="", description="Creation time (ISO)")
     notes: str = Field(default="", description="User notes")
+    slot_number: int | None = Field(
+        default=None,
+        ge=1,
+        le=20,
+        description="Bungie official slot number (1-20), when source=bungie",
+    )
+    native_character_id: str = Field(
+        default="", description="Bungie character ID for an official slot"
+    )
+    name_hash: int | None = Field(default=None, description="Official loadout name hash")
+    icon_hash: int | None = Field(default=None, description="Official loadout icon hash")
+    color_hash: int | None = Field(default=None, description="Official loadout color hash")
+    build_template: dict[str, Any] = Field(
+        default_factory=dict,
+        description=(
+            "Normalized build template with class/weapons/armor/artifact/stat_targets/source; "
+            "same shape as community build records and never an executable credential"
+        ),
+    )
 
 
 class LoadoutListResponse(BaseModel):
     """get_loadouts tool response."""
 
     player_name: str
+    scope: str = Field(
+        default="account_saved_loadouts",
+        description="Only saved account loadouts and Bungie official slots; not community templates",
+    )
+    loadout_format: str = Field(
+        default="destiny2_build_template_v1",
+        description="Common format used by each loadout's build_template",
+    )
     loadouts: list[Loadout] = Field(default_factory=list)
 
 

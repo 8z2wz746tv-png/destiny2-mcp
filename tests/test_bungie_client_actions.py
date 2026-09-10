@@ -182,11 +182,11 @@ async def test_collection_and_stats_endpoints_use_official_paths() -> None:
 
 def test_official_loadout_slot_number_is_user_facing() -> None:
     assert LoadoutService._slot_number_to_index(1) == 0
-    assert LoadoutService._slot_number_to_index(10) == 9
+    assert LoadoutService._slot_number_to_index(20) == 19
     with pytest.raises(DestinyMCPError):
         LoadoutService._slot_number_to_index(0)
     with pytest.raises(DestinyMCPError):
-        LoadoutService._slot_number_to_index(11)
+        LoadoutService._slot_number_to_index(21)
 
 
 def test_search_official_loadout_identifiers_formats_manifest_results() -> None:

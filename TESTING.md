@@ -2,7 +2,7 @@
 
 适用于当前工作区的本地单用户版本，默认 `normal` 模式。
 
-## 本次安装验证
+## 接入前基线验证
 
 2026-09-09 已在本机完成：
 
@@ -14,7 +14,8 @@
 
 上述结果不代表所有功能已用真实账号逐一验证。游戏写入、整套装备及真实失败回滚未在本轮执行；相关回归测试使用测试数据。
 
-Starside 接入仍是设计方案。当前版本不能直接把 Starside 链接变成整套可执行配装，也不能承诺同时应用网站列出的武器、Perk、护甲、技能和神器。
+Starside 本地资料层现已接入，测试方法见第 6 节。它支持资料检索、配装解析和库存核对，
+但不能直接把网站配装转成完整的一键执行计划；武器、Perk、技能、模组和神器不能据此宣称已全部应用。
 
 ## 1. 在新任务中检查连接
 
@@ -52,7 +53,8 @@ world_assistant
 | 全目录查询 | 从全游戏武器目录找几把手炮，不限我是否拥有。 | 使用 `catalog`；未检查库存的结果不能称为“我拥有”或“我没有”。 |
 | 社区选取率 | 查一下刚才这把武器的 Perk 选取率，注明数据来源和版本。 | 使用 `popularity`；无快照时明确缺数据，不能编造实时百分比。 |
 | 子职业 | 看看我的<职业>当前技能、星相和碎片，不修改。 | 使用 `subclass_assistant(intent="get")`，与游戏当前配置核对。 |
-| 已存配装 | 列出我的<职业>已有配装，不保存、不覆盖任何配装槽。 | 使用 `loadout_assistant(intent="list")`；本地与官方配装来源分开。 |
+| 已存配装 | 列出我的<职业>已有配装，不保存、不覆盖任何配装槽。 | 使用 `loadout_assistant(intent="list")`；本地与官方配装来源分开，每项包含统一的 `build_template`。 |
+| 社区配装 | 找 5 套<职业>社区方案，不读取我的账号。 | 使用 `build_assistant(intent="community", character="hunter", top_n=5, include_inventory=false)`；不要使用 `loadout_assistant`。 |
 | 活动记录 | 看看我的<职业>最近几场活动记录。 | 使用 `activity_assistant(intent="history")`；时间和活动可以核对，无记录不应补写。 |
 | 商人 | 看看班西现在卖哪些武器，以及这些商品本次实际的 Perk。 | 使用 `world_assistant(intent="vendor")`；不能拿武器总 Perk 池代替售卖 Roll。 |
 | 周常 | 查一下本周活动，标明数据来源和不确定的部分。 | 使用 `world_assistant(intent="weekly")`；查询失败不能凭记忆给确定答案。 |
@@ -135,5 +137,60 @@ cd "/Users/husky/项目/destiny2-mcp"
 - 写入失败：停止后续操作，重新读取实际状态。不要假设没有变更，也不要自动循环重试。
 
 反馈问题时记录：测试话术、目标职业、工具名与 intent、脱敏错误码、预期结果、实际结果，以及游戏状态有无变化。不要附 `.env`、`tokens.json` 或未经检查的完整日志。
+
+## 6. Starside 接入测试
+
+2026-09-09 本轮接入验证：
+
+- 全量回归 `275 passed`，包含旧版本地配装迁移、官方 20 槽位和跨 Agent Skill 契约回归。
+- 真实 MCP 握手返回 `BUNGIE_PROFILE_CHECK=ok`、`MCP_TOOL_COUNT=8`、`VERIFY_OK`。
+- `scripts/verify_starside.py --inventory` 通过；从 MCP 实际读取资料、分页遍历全部 108 套模板并核对一套模板的真实库存。
+- `.env`、Codex 注册及现有登录保持不变；没有执行游戏写入，没有上传 GitHub。
+- `scripts/verify_mcp.py` 是平台无关入口；它检查真实 MCP 握手、工具 schema、只读账号调用和默认 8 个工具，不依赖 Codex。
+- 使用系统构建后端完成 wheel 检查，接入模块已包含，归档和凭据未包含；项目虚拟环境未因此增加构建依赖。
+- 一套模板的库存读通不代表全部模板适合当前版本，也不代表所有模组、技能和神器已验证。
+- 官方槽位改为输出统一的 `build_template`；`slot_number` 和 `native_character_id` 仍用于 Bungie 原生槽位执行，模板本身不是 `canonical_build`。
+
+先重启 Codex 或新开任务，然后逐条发送：
+
+| 测试话术 | 验收点 |
+| --- | --- |
+| 用本地资料解释辉耀炽热的效果，区分强化效果并附来源和更新日期。 | 使用 `weapon_assistant` 的社区查询或 Perk 描述附带的社区资料；引用标记不丢失。 |
+| 找 5 套猎人社区配装，只看模板，不读取我的账号。 | `build_assistant(intent="community", character="hunter", top_n=5, include_inventory=false)`；显示总命中数和下一页位置，不把 5 当全量。 |
+| 列出我已有的猎人配装 | `loadout_assistant(intent="list", character="hunter")`；只显示账号已存配装，不能把它当社区推荐。每项检查 `source`、`slot_number`（官方）和 `build_template`。 |
+| 再看下一页，保留相同筛选条件。 | 原样使用 `next_offset`，ID 不重复、不漏页。 |
+| 读取刚才第 2 套的完整模板，检查我的库存，不装备。 | 用返回的 `community_build_id`；返回 `selected_build`，区分已持有、缺少、未解析和未验证。 |
+| 看这套模板里的重复模组、套装、六维范围和注解，列出目前不能自动验证的要求。 | 同模组出现两次不能去重；同套 2 件 + 4 件取 4 件，不同套分开；`~` 不变成 0，范围不变成单一下限。 |
+| 查副本攻略，注明哪些只是外部文档链接。 | `activity_assistant(intent="community")`；外链详情 `body_archived=false`，不能编造外部文章内容。 |
+| 查本地输出表，保留表头、条件、PvP 和待验证数值。 | `world_assistant(intent="community", query="DPS")` 搜索，再以 `knowledge_id` 和 `community_section="tables"` 读取。零散摘要不能作为完整排名。 |
+| 这套可以直接一键装备吗？只解释，不操作。 | 明确返回不能直接执行完整社区模板；不能把 `solver_handoff` 当完整候选，也不能偷换成只装备护甲。 |
+
+搜索详情调用形状如下，ID 必须来自实际搜索响应，不要凭空编造：
+
+```json
+{
+  "intent": "community",
+  "knowledge_id": "<搜索返回的 knowledge_id>",
+  "community_section": "text",
+  "offset": 0
+}
+```
+
+正文单次最多 6000 字符；表格和外链单次最多 20 行/条。存在 `next_offset` 表示还没读完。
+表格/外链是所属整页范围，不一定仅对应搜索命中的一项，响应的 `detail_scope` 会说明。
+`source.inline_semantics_preserved=false` 的普通索引摘要不保留全部内联语义，
+比较数值应优先读 `description` 条目或带标记的表格详情。
+
+自动复测命令：
+
+```bash
+.venv/bin/python -m pytest -q tests/test_starside_integration.py
+.venv/bin/python -m pytest -q
+.venv/bin/python scripts/verify_starside.py
+.venv/bin/python scripts/verify_starside.py --inventory
+```
+
+离线回归使用合成数据，覆盖归档缺失/损坏、分页、多个配装块、无损数值语义、严格名称匹配、
+未知 Perk、同部位套装计数和防止模板直接执行，不需要复制真实归档或暴露账号数据。
 
 Codex MCP 配置参考：[官方 MCP 文档](https://developers.openai.com/codex/mcp)。本项目的 Bungie 登录使用自己的 `destiny-mcp-oauth`，不是远程 MCP 的 `codex mcp login`。

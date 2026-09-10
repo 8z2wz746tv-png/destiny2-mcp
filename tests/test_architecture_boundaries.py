@@ -221,7 +221,7 @@ def test_build_recipe_is_not_an_executable_plan() -> None:
     (inventory_assistant, {"intent": "lock", "item_instance_id": " "}),
     (loadout_assistant, {"intent": "save", "name": "Test"}),
     (loadout_assistant, {"intent": "delete"}),
-    (loadout_assistant, {"intent": "clear_official", "character": "hunter", "slot_number": 11}),
+    (loadout_assistant, {"intent": "clear_official", "character": "hunter", "slot_number": 21}),
     (loadout_assistant, {"intent": "update_official_identifiers", "character": "hunter"}),
     (subclass_assistant, {"intent": "modify", "character": "hunter"}),
     (subclass_assistant, {"intent": "equip_artifact_mod", "character": "hunter", "artifact_mod_hash": -1}),

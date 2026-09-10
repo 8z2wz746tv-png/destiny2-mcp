@@ -1,0 +1,4 @@
+interface:
+  display_name: "Destiny 2 MCP"
+  short_description: "Route Destiny 2 account, community, and loadout queries"
+  default_prompt: "Use $destiny2-mcp to choose the correct Destiny 2 MCP tool and preserve evidence and confirmation boundaries."

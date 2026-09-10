@@ -2,6 +2,13 @@
 
 This repository contains a local Destiny 2 MCP server with Bungie OAuth authentication.
 
+For any agent, not only Codex:
+
+- Read `README.md` first for the platform-neutral installation and verification flow.
+- Read `skills/destiny2-mcp/SKILL.md` for tool routing and evidence boundaries.
+- Read `skills/destiny-mcp-setup/SKILL.md` only for installation, OAuth, registration, or setup troubleshooting.
+- Run `scripts/verify_mcp.py` for the real MCP handshake; do not treat registration alone as proof of readiness.
+
 ## Setup-related tasks
 
 For installation, reinstallation, OAuth login, Codex MCP registration, or setup troubleshooting:

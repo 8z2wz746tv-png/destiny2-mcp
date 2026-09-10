@@ -146,6 +146,18 @@ async def _verify(root: Path, command: Path, timeout: float) -> None:
         async with stdio_client(params) as streams:
             async with ClientSession(*streams) as session:
                 await session.initialize()
+                tools_result = await session.list_tools()
+                print("MCP_HANDSHAKE=ok")
+                invalid_schema = [
+                    tool.name
+                    for tool in tools_result.tools
+                    if not isinstance(getattr(tool, "inputSchema", None), dict)
+                ]
+                if invalid_schema:
+                    raise RuntimeError(
+                        "Tool schema mismatch: " + ",".join(sorted(invalid_schema))
+                    )
+                print("MCP_TOOL_SCHEMA=ok")
                 profile_result = await session.call_tool(
                     "player_assistant", {"intent": "profile"}
                 )
@@ -156,7 +168,6 @@ async def _verify(root: Path, command: Path, timeout: float) -> None:
                     error = profile_payload.get("error") or {}
                     code = error.get("code", "unknown") if isinstance(error, dict) else "unknown"
                     raise RuntimeError(f"Bungie profile check failed: {code}")
-                tools_result = await session.list_tools()
 
     print("BUNGIE_PROFILE_CHECK=ok")
     actual = {tool.name for tool in tools_result.tools}

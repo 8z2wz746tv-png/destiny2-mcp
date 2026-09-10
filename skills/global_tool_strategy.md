@@ -1,4 +1,17 @@
-# Destiny MCP 个人版工具调用策略
+# Destiny MCP 个人版工具调用策略（兼容入口）
+
+本文件保留给旧版 MCP Prompt 客户端。规范内容已迁移到通用 Skill：
+
+- `skills/destiny2-mcp/SKILL.md`
+- `skills/destiny2-mcp/references/routing.md`
+- `skills/destiny2-mcp/references/evidence-and-completeness.md`
+- `skills/destiny2-mcp/references/community-builds.md`
+- `skills/destiny2-mcp/references/account-loadouts.md`
+- `skills/destiny2-mcp/references/execution-safety.md`
+
+支持文件引用的 Agent 应优先读取上述文件。MCP 的 `global_tool_strategy` Prompt 也会返回新的 Skill 内容。
+
+旧客户端仍可继续读取本文件；下面的规则保留为兼容摘要。
 
 ## 核心原则
 
@@ -8,6 +21,8 @@
 4. **结果即边界**：名称、效果、价格、来源、持有状态和评价只能来自本次工具返回。
 5. **失败即止**：`ok=false`、鉴权失败或空数据不能用训练知识补答案。
 6. **最小调用**：复用当前有效结果，不重复发起相同查询或写操作。
+7. **社区与账号分开**：`loadout_assistant` 只处理玩家已存配装和 Bungie 官方槽位；社区方案统一使用 `build_assistant(intent="community")`。不要用本地槽位列表回答“社区配装”或“热门配装”。
+8. **只按证据回答**：本地 Starside 快照不是联网搜索，也不提供未记录的热度排名。缺少字段、归档不可用或结果为空时，明确说明，不能用模型记忆补齐。
 
 这是个人版。未传 `player_name` 时使用当前 OAuth 账号，并按项目配置决定是否回退到默认玩家。
 
@@ -20,8 +35,8 @@
 | `player_assistant` | 玩家与角色档案 | `profile`, `search`, `find` |
 | `inventory_assistant` | 库存与物品操作 | `summary`, `duplicates`, `get`, `search`, `type`, `move`, `transfer`, `equip`, `equip_many`, `pull_postmaster`, `lock`, `track_quest` |
 | `weapon_assistant` | 武器知识与副本 | `analyze`, `compare`, `perk_pool`, `god_roll`, `popularity`, `type`, `filter_rolls`, `catalog`, `info`, `stats`, `perk_description`, `catalyst` |
-| `build_assistant` | 护甲配装 | `recommend`, `find`, `analyze`, `farm_target`, `equip_build`, `armor_mods`, `exotic_armor`, `set_bonus` |
-| `loadout_assistant` | 本地与官方配装槽 | `list`, `save`, `delete`, `equip_loadout`, `search_identifiers`, `snapshot_official`, `update_official_identifiers`, `clear_official` |
+| `build_assistant` | 护甲配装与社区模板 | `recommend`, `find`, `analyze`, `farm_target`, `equip_build`, `armor_mods`, `exotic_armor`, `set_bonus`, `community` |
+| `loadout_assistant` | 玩家已存配装与官方槽位 | `list`, `save`, `delete`, `equip_loadout`, `search_identifiers`, `snapshot_official`, `update_official_identifiers`, `clear_official` |
 | `subclass_assistant` | 子职业、碎片、神器 | `get`, `modify`, `options`, `fragments`, `fragment_details`, `artifact`, `artifact_mod`, `equip_artifact_mod` |
 | `activity_assistant` | 活动与战绩 | `history`, `pgcr`, `stats`, `weapon_history`, `aggregate`, `leaderboards`, `clan_leaderboards` |
 | `world_assistant` | 周常、商人、收藏 | `weekly`, `weekly_full`, `vendor`, `search_collectible_nodes`, `collectible_node`, `collectible_item` |
@@ -163,6 +178,27 @@ activity_assistant(intent="aggregate", character="<可选角色>")
 ---
 
 ## 配装路由
+
+### 社区配装模板
+
+```python
+# 社区配装模板，不读取账号，也不是本地槽位列表
+build_assistant(
+    intent="community",
+    character="hunter",
+    top_n=5,
+    include_inventory=false,
+)
+
+# 读取搜索结果中的完整模板；如需库存核对，再明确打开读取
+build_assistant(
+    intent="community",
+    community_build_id="<搜索返回的 build_id>",
+    include_inventory=true,
+)
+```
+
+`loadout_assistant(intent="list")` 和 `intent="get"` 只返回玩家本地配装、Bungie 官方槽位，不能作为社区配装结果。每项的 `build_template` 使用统一的 `class/weapons/armor/artifact/stat_targets/source` 结构；其中官方槽位仍通过 Bungie 原生槽位 ID 执行，模板本身不是 `canonical_build`。
 
 ### 推荐、候选与诊断
 

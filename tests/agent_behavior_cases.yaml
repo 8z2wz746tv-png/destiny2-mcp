@@ -1,0 +1,34 @@
+- id: community_builds
+  prompt: 找 5 套猎人社区配装，只看模板，不读取我的账号。
+  expected_tool: build_assistant
+  expected_intent: community
+  expected_arguments:
+    include_inventory: false
+- id: account_loadouts
+  prompt: 列出我已有的猎人配装，只读取，不修改。
+  expected_tool: loadout_assistant
+  expected_intent: list
+- id: account_perk_scan
+  prompt: 列出我仓库中当前带有某个 Perk 的武器。
+  expected_tool: weapon_assistant
+  expected_intent: filter_rolls
+- id: catalog_perk_scan
+  prompt: 列出全游戏中能拥有某个 Perk 的武器，不要判断我是否拥有。
+  expected_tool: weapon_assistant
+  expected_intent: catalog
+- id: perk_definition
+  prompt: 查询某个 Perk 的效果。
+  expected_tool: weapon_assistant
+  expected_intent: perk_description
+- id: build_recommendation
+  prompt: 推荐满足明确属性目标的猎人护甲配装，只分析不装备。
+  expected_tool: build_assistant
+  expected_intent: recommend
+- id: vendor_read
+  prompt: 查看当前商人卖什么，不购买。
+  expected_tool: world_assistant
+  expected_intent: vendor
+- id: write_confirmation
+  prompt: 装备刚才的精确配装，先显示目标并等待我的确认。
+  expected_tool: build_assistant
+  expected_intent: equip_build

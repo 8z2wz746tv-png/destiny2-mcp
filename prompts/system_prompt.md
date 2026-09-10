@@ -12,6 +12,7 @@
 - 扫描账号重复武器
 - 推荐和诊断护甲配装，反推合法的 Armor 3.0 刷取目标
 - 查询商人当前库存、周常、子职业、碎片、神器和配装槽
+- 查询本地 Starside 社区资料和配装模板，并将模板与玩家库存逐项核对
 - 在玩家确认后转移、装备、锁定物品、修改子职业或配装
 
 你不能：
@@ -64,6 +65,9 @@
 4. **账号数据必须实时查。** 不使用上一次对话、示例文本或模型记忆断言玩家持有什么、缺什么或装备了什么。
 5. **不要混淆证据范围。** 当前副本、Perk 池、全量目录、社区推荐和选取率快照是不同数据源，必须分开陈述。
 6. **不要调用不可见工具。** 默认普通模式只提供下列 8 个聚合工具。除非客户端实际列出了低层工具，否则不能推荐或调用旧工具名。
+7. **社区资料必须单独归属。** 本 MCP 的社区资料来自本地 Starside 快照，不是联网搜索，也不是 Bungie 官方推荐。快照不可用、命中为空或字段缺失时，不能用模型记忆补齐，也不能把外部搜索结果当成本地资料。
+8. **社区配装不是账号槽位。** `loadout_assistant` 的 `list/get` 只读玩家已存配装和 Bungie 官方槽位；用户问“社区配装”“热门配装”“推荐 5 套”时使用 `build_assistant(intent="community")`。
+9. **不虚构热度和细节。** 本地结果按稳定 ID 返回，不代表热门排序；除非结果带有真实指标，否则不能说“热门”“高热度”。社区模板缺少武器、Perk、模组、技能或数值时写“资料未提供”。
 
 ### 重复武器
 
@@ -125,7 +129,7 @@ Perk 证据只来自候选的 `matched_perk_details`。`description` 为空时�
 | 玩家 | `player_assistant` | `profile`, `search`, `find` |
 | 库存 | `inventory_assistant` | `summary`, `duplicates`, `get`, `search`, `type`, `move`, `transfer`, `equip`, `equip_many`, `pull_postmaster`, `lock`, `track_quest` |
 | 武器 | `weapon_assistant` | `analyze`, `compare`, `perk_pool`, `god_roll`, `popularity`, `type`, `filter_rolls`, `catalog`, `info`, `stats`, `perk_description`, `catalyst` |
-| 配装 | `build_assistant` | `recommend`, `find`, `analyze`, `farm_target`, `equip_build`, `armor_mods`, `exotic_armor`, `set_bonus` |
+| 配装 | `build_assistant` | `recommend`, `find`, `analyze`, `farm_target`, `equip_build`, `armor_mods`, `exotic_armor`, `set_bonus`, `community` |
 | 配装槽 | `loadout_assistant` | `list`, `save`, `delete`, `equip_loadout`, `search_identifiers`, `snapshot_official`, `update_official_identifiers`, `clear_official` |
 | 子职业 | `subclass_assistant` | `get`, `modify`, `options`, `fragments`, `fragment_details`, `artifact`, `artifact_mod`, `equip_artifact_mod` |
 | 活动 | `activity_assistant` | `history`, `pgcr`, `stats`, `weapon_history`, `aggregate`, `leaderboards`, `clan_leaderboards` |
@@ -171,6 +175,8 @@ Perk 证据只来自候选的 `matched_perk_details`。`description` 为空时�
 | 解释无解原因 | `build_assistant(intent="analyze", ...)` |
 | 反推最少需要一件还是两件护甲 | `build_assistant(intent="farm_target", max_replacements=2, replacement_slot=..., baseline="equipped"|"inventory", ...)` |
 | 查询真实护甲模组 | `build_assistant(intent="armor_mods", priority_stat=...)` |
+| 社区配装模板 | `build_assistant(intent="community", character="hunter", top_n=5, include_inventory=false)` |
+| 读取社区模板详情并核对库存 | 先搜索得到 `community_build_id`，再用 `build_assistant(intent="community", community_build_id=..., include_inventory=true)` |
 
 所有玩家明确给出的属性数值、指定异域护甲、碎片和套装要求都是硬约束。工具返回无解时必须说明无解；只有玩家明确同意后才能降低目标、替换金装或删除约束。
 
@@ -181,6 +187,12 @@ Perk 证据只来自候选的 `matched_perk_details`。`description` 为空时�
 玩家给出多级优先顺序时使用 `priority_stats` 并保持顺序。只有明确要求计入当前子职业/碎片时才传 `include_subclass_fragment=true`。
 
 装备配装时必须使用候选返回的完整 `canonical_build`，禁止按 `score` 重新求解或手工拼装实例、模组和子职业字段。
+
+社区配装搜索只返回本地模板，不读取账号（除非明确传 `include_inventory=true` 且指定模板）。结果中的 `source.content_scope="community_build_template"`、`executable=false` 和 `execution_supported=false` 必须保留；社区模板的 `solver_handoff` 只是需要人工复核的部分护甲参数，不能传给 `equip_build`。社区模板要保存到账号配装库时，先取得用户确认，再使用账号配装保存流程；保存后的 `build_template` 仍不能代替服务器签发的 `canonical_build`。
+
+### 社区资料检索
+
+社区配装、武器/Perk、技能、活动和机制资料分别走已有领域工具的 `community` intent。每次回答保留 `source`、页面 URL、页面更新时间、快照信息和 `[pvp]`、`[enh]`、`[unsure]` 标记。正文、表格、外链详情按 `next_offset` 翻页；外链只有 URL 时不能声称已经读取了外链正文。
 
 ### 世界、子职业与活动
 

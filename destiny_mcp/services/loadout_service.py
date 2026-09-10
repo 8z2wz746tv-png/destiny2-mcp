@@ -1,7 +1,7 @@
 """Loadout service — save, list, equip, delete loadouts (配装).
 
 Hybrid approach:
-- Bungie native loadouts (10 per character): read + equip via API
+- Bungie native loadouts (up to 20 per character): read + equip via API
 - Local loadouts (unlimited): stored in ~/.destiny_mcp/loadouts.json
 - Background cache refresh every 5 minutes for fast equip
 
@@ -78,9 +78,9 @@ class LoadoutService:
 
     @staticmethod
     def _slot_number_to_index(slot_number: int) -> int:
-        """Convert user-facing slot number (1-10) to Bungie's zero-based index."""
-        if slot_number < 1 or slot_number > 10:
-            raise DestinyMCPError("官方配装槽位必须是 1 到 10。")
+        """Convert user-facing slot number (1-20) to Bungie's zero-based index."""
+        if slot_number < 1 or slot_number > 20:
+            raise DestinyMCPError("官方配装槽位必须是 1 到 20。")
         return slot_number - 1
 
     def search_official_loadout_identifiers(
@@ -200,12 +200,48 @@ class LoadoutService:
 
     # ── Local storage ───────────────────────────────────────────────
 
+    def _migrate_local_loadout(self, loadout: Loadout) -> Loadout:
+        """Fill the normalized template for records written by older versions."""
+        if loadout.build_template:
+            return loadout
+
+        raw_items = [
+            {
+                "itemHash": item.item_hash,
+                "itemInstanceId": item.item_instance_id,
+                "plugItemHashes": [*item.perks, *item.mods],
+            }
+            for item in loadout.items
+        ]
+        if loadout.subclass and loadout.subclass.subclass_item_hash:
+            raw_items.append({
+                "itemHash": loadout.subclass.subclass_item_hash,
+                "itemInstanceId": loadout.subclass.subclass_instance_id,
+                "plugItemHashes": [],
+            })
+
+        template = self._build_template(
+            build_id=loadout.id,
+            title=loadout.name,
+            character=loadout.character,
+            raw_items=raw_items,
+            provider="local",
+            content_scope="account_loadout_snapshot",
+            character_id=loadout.native_character_id,
+            notes=loadout.notes,
+            subclass_config=loadout.subclass,
+        )
+        return loadout.model_copy(update={"build_template": template})
+
     def _load_local(self) -> list[Loadout]:
         if not self._path.exists():
             return []
         try:
             data = json.loads(self._path.read_text(encoding="utf-8"))
-            return [Loadout(**item) for item in data.get("loadouts", [])]
+            return [
+                self._migrate_local_loadout(Loadout(**item))
+                for item in data.get("loadouts", [])
+            ]
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             logger.warning("Failed to load local loadouts: %s", e)
             return []
@@ -219,6 +255,222 @@ class LoadoutService:
         )
         self._local_version += 1
         self._cache_timestamp.clear()
+
+    def _armor_slot(self, raw_item: dict, item_info: dict | None = None) -> str:
+        """Resolve the normalized armor slot from an API item or Manifest entry."""
+        bucket_hash = raw_item.get("bucketHash") or (item_info or {}).get("bucketTypeHash", 0)
+        try:
+            bucket_hash = int(bucket_hash)
+        except (TypeError, ValueError):
+            return ""
+        return _ARMOR_SLOTS.get(bucket_hash) or _ARMOR_SLOTS.get(bucket_hash & 0xFFFFFFFF, "")
+
+    def _definition_name(self, table: str, hash_id: int | None) -> str:
+        if not hash_id:
+            return ""
+        definition = self._manifest.get_definition(table, int(hash_id))
+        if not isinstance(definition, dict):
+            return ""
+        return str((definition.get("displayProperties") or {}).get("name") or "")
+
+    @staticmethod
+    def _hashes(values) -> list[int]:
+        hashes = []
+        for value in values or []:
+            try:
+                hash_id = int(value)
+            except (TypeError, ValueError):
+                continue
+            if hash_id:
+                hashes.append(hash_id)
+        return hashes
+
+    def _plug_records(self, plug_hashes: list[int]) -> list[dict]:
+        records = []
+        for raw_hash in plug_hashes:
+            try:
+                plug_hash = int(raw_hash)
+            except (TypeError, ValueError):
+                continue
+            if not plug_hash:
+                continue
+            info = self._manifest.get_item_info(plug_hash) or {}
+            category = self._manifest.get_plug_category_identifier(plug_hash) or ""
+            records.append({
+                "hash": plug_hash,
+                "name": str(info.get("name") or self._manifest.get_item_name(plug_hash)),
+                "category": str(category),
+            })
+        return records
+
+    @staticmethod
+    def _is_armor_mod(category: str) -> bool:
+        normalized = category.casefold()
+        return normalized.startswith("enhancements.") or "armor_mod" in normalized
+
+    def _build_template(
+        self,
+        *,
+        build_id: str,
+        title: str,
+        character: str,
+        raw_items: list[dict],
+        provider: str,
+        content_scope: str,
+        character_id: str = "",
+        slot_number: int | None = None,
+        name_hash: int | None = None,
+        icon_hash: int | None = None,
+        color_hash: int | None = None,
+        notes: str = "",
+        subclass_config: LoadoutSubclassConfig | None = None,
+    ) -> dict:
+        """Normalize account loadouts to the same shape as community templates.
+
+        Hashes and instance IDs remain alongside display names. A native slot
+        is executable by its Bungie slot ID, but this template is deliberately
+        not an ``ExecutableBuild`` and must not be passed to build execution.
+        """
+        class_data: dict = {"name": character, "id": character, "plugs": []}
+        weapons: list[dict] = []
+        armor_items: list[dict] = []
+        armor_mods: dict[str, list[str]] = {}
+        armor_exotic = ""
+        subclass_name = ""
+        unparsed: list[str] = []
+
+        for raw_item in raw_items:
+            try:
+                item_hash = int(raw_item.get("itemHash", 0) or 0)
+            except (TypeError, ValueError):
+                item_hash = 0
+            instance_id = str(raw_item.get("itemInstanceId") or "")
+            item_info = self._manifest.get_item_info(item_hash) or {}
+            item_type = item_info.get("itemType")
+            plug_hashes = self._hashes(raw_item.get("plugItemHashes", []))
+            plugs = self._plug_records(plug_hashes)
+            item_name = (
+                str(item_info.get("name") or self._manifest.get_item_name(item_hash))
+                if item_hash
+                else ""
+            )
+            item_record = {
+                "name": item_name,
+                "item_hash": item_hash,
+                "item_instance_id": instance_id,
+                "plugs": plugs,
+                "plug_hashes": plug_hashes,
+            }
+
+            if item_type == 3:
+                item_record.update(
+                    perks=[plug["name"] for plug in plugs if plug["name"]],
+                    perk_hashes=plug_hashes,
+                    perk_scope="all_selected_plugs",
+                    tier="exotic" if item_info.get("tier") == 6 else "legendary",
+                )
+                weapons.append(item_record)
+                continue
+
+            if item_type == 2:
+                slot = self._armor_slot(raw_item, item_info)
+                if not slot:
+                    unparsed.append(f"护甲缺少可识别部位：{item_name or item_hash}")
+                    continue
+                item_record["slot"] = slot
+                item_record["mods"] = [
+                    plug["name"]
+                    for plug in plugs
+                    if plug["name"] and self._is_armor_mod(plug["category"])
+                ]
+                item_record["mod_hashes"] = [
+                    plug["hash"]
+                    for plug in plugs
+                    if self._is_armor_mod(plug["category"])
+                ]
+                armor_items.append(item_record)
+                armor_mods[slot] = [*armor_mods.get(slot, []), *item_record["mods"]]
+                if item_info.get("tier") == 6 and not armor_exotic:
+                    armor_exotic = item_name
+                continue
+
+            if item_type == 16:
+                subclass_name = item_name
+                class_data.update(
+                    subclass_item_hash=item_hash,
+                    subclass_instance_id=instance_id,
+                    plugs=plugs,
+                )
+                continue
+
+            if item_hash or instance_id:
+                unparsed.append(f"未分类配装物品：{item_name or item_hash or instance_id}")
+
+        if subclass_config:
+            class_data.update({
+                "subclass_item_hash": subclass_config.subclass_item_hash,
+                "subclass_instance_id": subclass_config.subclass_instance_id,
+            })
+            for field, key in (
+                ("super_hash", "super"),
+                ("grenade_hash", "grenade"),
+                ("melee_hash", "melee"),
+                ("class_ability_hash", "class_ability"),
+                ("movement_hash", "movement"),
+            ):
+                hash_id = getattr(subclass_config, field)
+                if hash_id:
+                    class_data[key] = self._manifest.get_item_name(hash_id)
+                    class_data[f"{key}_hash"] = hash_id
+            for field, key in (("aspect_hashes", "aspects"), ("fragment_hashes", "fragments")):
+                hashes = getattr(subclass_config, field)
+                if hashes:
+                    class_data[key] = [self._manifest.get_item_name(hash_id) for hash_id in hashes]
+                    class_data[f"{key}_hashes"] = hashes
+
+        execution_mode = "bungie_native_slot" if provider == "bungie" else "local_instance_loadout"
+        return {
+            "format_version": "destiny2_build_template_v1",
+            "build_id": build_id,
+            "title": title,
+            "author": "",
+            "updated_at": "",
+            "scenario": "",
+            "role": "",
+            "category": "official" if provider == "bungie" else "account",
+            "subclass": subclass_name,
+            "class": class_data,
+            "weapons": weapons,
+            "armor": {
+                "exotic": armor_exotic,
+                "set": "",
+                "set_requirements": [],
+                "mods": armor_mods,
+                "items": armor_items,
+            },
+            "artifact": {"name": "", "mods": []},
+            "stat_targets": {},
+            "notes": [notes] if notes else [],
+            "review_notes": [],
+            "unparsed": unparsed,
+            "source": {
+                "provider": provider,
+                "content_scope": content_scope,
+                "character_id": character_id,
+                "slot_number": slot_number,
+                "name_hash": name_hash,
+                "icon_hash": icon_hash,
+                "color_hash": color_hash,
+            },
+            "raw_text": "",
+            "executable": False,
+            "execution": {
+                "supported": True,
+                "mode": execution_mode,
+                "loadout_id": build_id,
+                "requires_confirmation": True,
+            },
+        }
 
     # ── Native loadouts ─────────────────────────────────────────────
 
@@ -252,24 +504,70 @@ class LoadoutService:
             class_name = {0: "titan", 1: "hunter", 2: "warlock"}.get(class_type, "unknown")
 
             for idx, lo_data in enumerate(char_loadouts.get("loadouts", [])):
-                items = []
+                raw_loadout_index = lo_data.get("loadoutIndex")
+                loadout_index = (
+                    idx
+                    if raw_loadout_index in (None, "")
+                    else int(raw_loadout_index)
+                )
+                slot_number = loadout_index + 1
+                name_hash = lo_data.get("nameHash")
+                icon_hash = lo_data.get("iconHash")
+                color_hash = lo_data.get("colorHash")
+                title = (
+                    self._definition_name("DestinyLoadoutNameDefinition", name_hash)
+                    or f"配装 {slot_number}"
+                )
+                raw_items = []
+                armor_items = []
                 for lo_item in lo_data.get("items", []):
                     instance_id = str(lo_item.get("itemInstanceId", ""))
                     item_hash = instance_to_hash.get(instance_id, 0)
-                    plug_hashes = lo_item.get("plugItemHashes", [])
-                    name = self._manifest.get_item_name(item_hash) if item_hash else ""
-                    items.append(LoadoutItem(
-                        item_hash=item_hash, name=name, slot="",
-                        item_instance_id=instance_id, perks=plug_hashes,
-                    ))
+                    raw_item = {
+                        "itemInstanceId": instance_id,
+                        "itemHash": item_hash,
+                        "plugItemHashes": lo_item.get("plugItemHashes", []),
+                    }
+                    raw_items.append(raw_item)
+                    item_info = self._manifest.get_item_info(item_hash) or {}
+                    slot = self._armor_slot(raw_item, item_info)
+                    if item_info.get("itemType") == 2 and slot:
+                        armor_items.append(LoadoutItem(
+                            item_hash=item_hash,
+                            name=self._manifest.get_item_name(item_hash),
+                            slot=slot,
+                            item_instance_id=instance_id,
+                            perks=self._hashes(lo_item.get("plugItemHashes", [])),
+                        ))
+
+                loadout_id = f"bungie:{char_id}:{loadout_index}"
+                template = self._build_template(
+                    build_id=loadout_id,
+                    title=title,
+                    character=class_name,
+                    raw_items=raw_items,
+                    provider="bungie",
+                    content_scope="official_loadout_slot",
+                    character_id=str(char_id),
+                    slot_number=slot_number,
+                    name_hash=name_hash,
+                    icon_hash=icon_hash,
+                    color_hash=color_hash,
+                )
 
                 result.append(Loadout(
-                    id=f"bungie:{char_id}:{idx}",
-                    name=f"配装 {idx + 1}",
+                    id=loadout_id,
+                    name=title,
                     character=class_name,
-                    items=items,
+                    items=armor_items,
                     source="bungie",
                     created_at="", notes="",
+                    slot_number=slot_number,
+                    native_character_id=str(char_id),
+                    name_hash=name_hash,
+                    icon_hash=icon_hash,
+                    color_hash=color_hash,
+                    build_template=template,
                 ))
 
         return result
@@ -279,7 +577,12 @@ class LoadoutService:
     async def get_loadouts(
         self, player_name: str, character: str | None = None,
     ) -> LoadoutListResponse:
-        """List all loadouts (native + local), optionally filtered by character."""
+        """List saved account loadouts in the normalized build-template format.
+
+        This is intentionally not a community search. Native Bungie slots and
+        local account snapshots are both returned here; community templates
+        remain owned by ``build_assistant(intent="community")``.
+        """
         cached = self._get_cached(player_name)
         if cached is not None:
             all_loadouts = cached
@@ -288,7 +591,9 @@ class LoadoutService:
             all_loadouts = self._cache[player_name]
 
         if character:
-            char_lower = character.lower()
+            char_lower = {
+                0: "titan", 1: "hunter", 2: "warlock",
+            }.get(resolve_character_name(character), character.lower())
             all_loadouts = [lo for lo in all_loadouts if lo.character == char_lower]
 
         return LoadoutListResponse(player_name=player_name, loadouts=all_loadouts)
@@ -337,11 +642,21 @@ class LoadoutService:
 
         equipped_items: list[LoadoutItem] = []
         subclass_config: LoadoutSubclassConfig | None = None
+        raw_equipped_items: list[dict] = []
 
         for raw_item in equip_data:
             bucket_hash = raw_item.get("bucketHash", 0)
             inst_id = str(raw_item.get("itemInstanceId", ""))
             item_hash = raw_item.get("itemHash", 0)
+            sockets = sockets_data.get(inst_id, {}).get("sockets", [])
+            raw_equipped_items.append({
+                **raw_item,
+                "plugItemHashes": [
+                    socket.get("plugHash")
+                    for socket in sockets
+                    if socket.get("plugHash")
+                ],
+            })
 
             slot = _ARMOR_SLOTS.get(bucket_hash)
             if not slot:
@@ -364,13 +679,26 @@ class LoadoutService:
                     inst_id, item_hash, sockets_data
                 )
 
+        loadout_id = str(uuid.uuid4())
         loadout = Loadout(
-            id=str(uuid.uuid4()),
+            id=loadout_id,
             name=name, character=char_lower,
             items=equipped_items, subclass=subclass_config,
             source="local",
             created_at=datetime.now(timezone.utc).isoformat(),
             notes=notes,
+            native_character_id=str(char_id),
+            build_template=self._build_template(
+                build_id=loadout_id,
+                title=name,
+                character=char_lower,
+                raw_items=raw_equipped_items,
+                provider="local",
+                content_scope="account_loadout_snapshot",
+                character_id=str(char_id),
+                notes=notes,
+                subclass_config=subclass_config,
+            ),
         )
 
         local = self._load_local()
