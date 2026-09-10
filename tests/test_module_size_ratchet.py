@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).parents[1]
 
 CEILINGS = {
-    "destiny_mcp/manifest.py":           487,
+    "destiny_mcp/manifest.py":           375,
     "destiny_mcp/tools/assistants.py": 1388,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
