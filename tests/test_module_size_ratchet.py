@@ -16,7 +16,9 @@ ROOT = Path(__file__).parents[1]
 
 CEILINGS = {
     "destiny_mcp/manifest.py":           262,
-    "destiny_mcp/tools/assistants.py": 1388,
+    # +9：8 个 assistant 各一行 @check_intent_parameters，1 行 import。
+    # 逻辑在 _param_contracts.py，这里只多了装饰器，不算这个模块长胖。
+    "destiny_mcp/tools/assistants.py": 1397,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,

@@ -22,6 +22,7 @@ from ._build_confirmation import (
 )
 from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
+from ._param_contracts import check_intent_parameters
 from ._requests import (
     ActivityIntent, BuildIntent, InventoryIntent, LoadoutIntent, PlayerIntent,
     SubclassIntent, WeaponIntent, WorldIntent,
@@ -162,6 +163,7 @@ def _confirmation_required(intent: str, payload: dict[str, Any]) -> dict[str, An
 
 @mcp.tool()
 @handle_tool_error
+@check_intent_parameters
 async def player_assistant(
     intent: PlayerIntent = "profile",
     player_name: str | None = None,
@@ -196,6 +198,7 @@ async def player_assistant(
 @mcp.tool()
 @handle_tool_error
 @validate_request(InventoryRequest)
+@check_intent_parameters
 async def inventory_assistant(
     intent: InventoryIntent = "summary",
     player_name: str | None = None,
@@ -376,6 +379,7 @@ async def inventory_assistant(
 
 @mcp.tool()
 @handle_tool_error
+@check_intent_parameters
 async def weapon_assistant(
     intent: Annotated[WeaponIntent, Field(description=(
         "武器查询意图。analyze=武器分析（不含选取率）；"
@@ -610,6 +614,7 @@ async def weapon_assistant(
 
 @mcp.tool()
 @handle_tool_error
+@check_intent_parameters
 async def build_assistant(
     intent: Annotated[BuildIntent, Field(description=(
         "配装意图。recommend/find/analyze/farm_target 中指定的金装和全部 "
@@ -1036,6 +1041,7 @@ async def build_assistant(
 @mcp.tool()
 @handle_tool_error
 @validate_request(LoadoutRequest)
+@check_intent_parameters
 async def loadout_assistant(
     intent: Annotated[LoadoutIntent, Field(description=(
         "账号配装意图。list/get=玩家已存配装（官方槽位+本地配装）；"
@@ -1137,6 +1143,7 @@ async def loadout_assistant(
 @mcp.tool()
 @handle_tool_error
 @validate_request(SubclassRequest)
+@check_intent_parameters
 async def subclass_assistant(
     intent: SubclassIntent = "get",
     player_name: str | None = None,
@@ -1225,6 +1232,7 @@ async def subclass_assistant(
 
 @mcp.tool()
 @handle_tool_error
+@check_intent_parameters
 async def activity_assistant(
     intent: Annotated[ActivityIntent, Field(description=(
         "战绩查询意图。history=最近活动；pgcr=指定单场结算；"
@@ -1299,6 +1307,7 @@ async def activity_assistant(
 
 @mcp.tool()
 @handle_tool_error
+@check_intent_parameters
 async def world_assistant(
     intent: WorldIntent = "weekly",
     player_name: str | None = None,

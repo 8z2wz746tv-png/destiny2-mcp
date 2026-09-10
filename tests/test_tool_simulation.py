@@ -21,6 +21,7 @@ import pytest
 
 from destiny_mcp import server
 from destiny_mcp.service_context import ServiceContext
+from destiny_mcp.tools._param_contracts import intent_accepts_parameter
 from destiny_mcp.tools._registry import mcp as registry
 
 # 没有默认值的参数：给一个类型合适的占位值。
@@ -156,9 +157,17 @@ def _definitions() -> list:
 
 def _arguments(function, ctx: _Context) -> dict[str, Any]:
     signature = inspect.signature(function)
+    tool = function.__name__
+    intent = ""
+    if "intent" in signature.parameters:
+        intent = str(signature.parameters["intent"].default or "").strip().lower()
     kwargs: dict[str, Any] = {}
     for name, parameter in signature.parameters.items():
         if name == "ctx":
+            continue
+        if intent and not intent_accepts_parameter(tool, intent, name):
+            # 这个 intent 不读它，传进来会被 @check_intent_parameters 拒掉。
+            # 模拟的是"一次格式正确的调用"，不是"把全部参数塞满"。
             continue
         if parameter.default is inspect.Parameter.empty:
             assert name in REQUIRED_ARGUMENTS, f"{function.__name__} 缺少占位值: {name}"
