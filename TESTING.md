@@ -2,6 +2,8 @@
 
 适用于当前工作区的本地单用户版本，默认 `normal` 模式。
 
+**完整语料见 [`TESTING_CORPUS.md`](TESTING_CORPUS.md)**：按 8 个工具逐节列出可以直接发送的话、期望路由与验收点，含确认、证据边界、缺数据、社区资料等横切用例。机器可读子集在 [`tests/agent_behavior_cases.yaml`](tests/agent_behavior_cases.yaml)。本文下面的章节是其中较早、较窄的一部分。
+
 ## 接入前基线验证
 
 2026-09-09 已在本机完成：

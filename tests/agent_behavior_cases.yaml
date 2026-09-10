@@ -1,34 +1,243 @@
-- id: community_builds
+# 自然语言用例的机器可读子集；完整语料见 TESTING_CORPUS.md。
+# 格式由 tests/test_skill_contracts.py 校验：id / prompt / expected_tool / expected_intent。
+# expected_intent 必须是 _requests.py 里声明过的 intent。
+
+# ── player_assistant ────────────────────────────────────────────────
+- id: player_profile
+  prompt: 看看我的角色概况。
+  expected_tool: player_assistant
+  expected_intent: profile
+- id: player_search
+  prompt: 搜一下玩家 PlayerName#1234。
+  expected_tool: player_assistant
+  expected_intent: search
+- id: player_fuzzy
+  prompt: 我名字记不全，找找前缀是 husky 的玩家。
+  expected_tool: player_assistant
+  expected_intent: find
+
+# ── inventory_assistant：只读 ───────────────────────────────────────
+- id: inventory_summary
+  prompt: 看看我的背包和仓库概况，只读。
+  expected_tool: inventory_assistant
+  expected_intent: summary
+- id: inventory_duplicates
+  prompt: 找几组我持有的重复武器，列出实例 ID 和位置，不要处理它们。
+  expected_tool: inventory_assistant
+  expected_intent: duplicates
+- id: inventory_search
+  prompt: 我有没有某件指定物品？
+  expected_tool: inventory_assistant
+  expected_intent: search
+- id: inventory_by_type
+  prompt: 列出我所有的微型冲锋枪。
+  expected_tool: inventory_assistant
+  expected_intent: type
+
+# ── inventory_assistant：写入，必须先确认 ───────────────────────────
+- id: inventory_move
+  prompt: 把指定物品移到仓库，先给我看目标再等我确认。
+  expected_tool: inventory_assistant
+  expected_intent: move
+- id: inventory_transfer
+  prompt: 把指定实例转移到猎人身上。
+  expected_tool: inventory_assistant
+  expected_intent: transfer
+- id: inventory_equip
+  prompt: 把指定实例装备到术士身上。
+  expected_tool: inventory_assistant
+  expected_intent: equip
+- id: inventory_equip_many
+  prompt: 把这几件一起装上，先展示清单。
+  expected_tool: inventory_assistant
+  expected_intent: equip_many
+- id: inventory_lock
+  prompt: 锁定这把武器。
+  expected_tool: inventory_assistant
+  expected_intent: lock
+- id: inventory_pull_postmaster
+  prompt: 把邮政官里的这件取出来。
+  expected_tool: inventory_assistant
+  expected_intent: pull_postmaster
+
+# ── weapon_assistant：Manifest 与账号必须分开 ───────────────────────
+- id: weapon_catalog
+  prompt: 列出全游戏中能拥有某个 Perk 的武器，不要判断我是否拥有。
+  expected_tool: weapon_assistant
+  expected_intent: catalog
+- id: weapon_filter_rolls
+  prompt: 列出我仓库中当前带有某个 Perk 的武器，并说明扫描是否完整。
+  expected_tool: weapon_assistant
+  expected_intent: filter_rolls
+- id: weapon_perk_pool
+  prompt: 查询某把武器可能滚到的全部 Perk。
+  expected_tool: weapon_assistant
+  expected_intent: perk_pool
+- id: weapon_perk_description
+  prompt: 查询某个 Perk 的效果，不要按名字猜。
+  expected_tool: weapon_assistant
+  expected_intent: perk_description
+- id: weapon_compare
+  prompt: 对比我持有的同名武器副本，逐把给建议。
+  expected_tool: weapon_assistant
+  expected_intent: compare
+- id: weapon_popularity
+  prompt: 查一下这把武器已录入的 Perk 选取率，注明来源与版本。
+  expected_tool: weapon_assistant
+  expected_intent: popularity
+- id: weapon_god_roll
+  prompt: 给我这把武器的社区推荐 roll。
+  expected_tool: weapon_assistant
+  expected_intent: god_roll
+- id: weapon_community
+  prompt: 用本地社区资料解释这个 Perk，并保留来源与更新时间。
+  expected_tool: weapon_assistant
+  expected_intent: community
+
+# ── build_assistant ────────────────────────────────────────────────
+- id: build_recommendation
+  prompt: 推荐满足明确属性目标的猎人护甲配装，只分析不装备。
+  expected_tool: build_assistant
+  expected_intent: recommend
+- id: build_candidates_only
+  prompt: 用我现有的术士护甲找三套候选，只列出来。
+  expected_tool: build_assistant
+  expected_intent: find
+- id: build_diagnosis
+  prompt: 找不到方案时别降条件，分析还差什么。
+  expected_tool: build_assistant
+  expected_intent: analyze
+- id: build_farm_target
+  prompt: 不降目标，反推我该刷哪件护甲。
+  expected_tool: build_assistant
+  expected_intent: farm_target
+- id: build_community
   prompt: 找 5 套猎人社区配装，只看模板，不读取我的账号。
   expected_tool: build_assistant
   expected_intent: community
   expected_arguments:
     include_inventory: false
-- id: account_loadouts
-  prompt: 列出我已有的猎人配装，只读取，不修改。
-  expected_tool: loadout_assistant
-  expected_intent: list
-- id: account_perk_scan
-  prompt: 列出我仓库中当前带有某个 Perk 的武器。
-  expected_tool: weapon_assistant
-  expected_intent: filter_rolls
-- id: catalog_perk_scan
-  prompt: 列出全游戏中能拥有某个 Perk 的武器，不要判断我是否拥有。
-  expected_tool: weapon_assistant
-  expected_intent: catalog
-- id: perk_definition
-  prompt: 查询某个 Perk 的效果。
-  expected_tool: weapon_assistant
-  expected_intent: perk_description
-- id: build_recommendation
-  prompt: 推荐满足明确属性目标的猎人护甲配装，只分析不装备。
+- id: build_set_bonus
+  prompt: 查询某套护甲的 2 件与 4 件效果。
   expected_tool: build_assistant
-  expected_intent: recommend
-- id: vendor_read
-  prompt: 查看当前商人卖什么，不购买。
-  expected_tool: world_assistant
-  expected_intent: vendor
+  expected_intent: set_bonus
+- id: build_armor_mods
+  prompt: 列出护甲模组及其数值。
+  expected_tool: build_assistant
+  expected_intent: armor_mods
+- id: build_exotic_armor
+  prompt: 列出适合术士的异域护甲。
+  expected_tool: build_assistant
+  expected_intent: exotic_armor
 - id: write_confirmation
   prompt: 装备刚才的精确配装，先显示目标并等待我的确认。
   expected_tool: build_assistant
   expected_intent: equip_build
+
+# ── loadout_assistant ──────────────────────────────────────────────
+- id: account_loadouts
+  prompt: 列出我已有的猎人配装，只读取，不修改。
+  expected_tool: loadout_assistant
+  expected_intent: list
+- id: loadout_get
+  prompt: 看下某套已存配装的完整内容。
+  expected_tool: loadout_assistant
+  expected_intent: get
+- id: loadout_save
+  prompt: 把这套配装保存下来，先展示将写入的内容。
+  expected_tool: loadout_assistant
+  expected_intent: save
+- id: loadout_equip
+  prompt: 换上某套已存配装，先等我确认。
+  expected_tool: loadout_assistant
+  expected_intent: equip_loadout
+- id: loadout_snapshot_official
+  prompt: 把当前官方配装槽存成快照。
+  expected_tool: loadout_assistant
+  expected_intent: snapshot_official
+- id: loadout_clear_official
+  prompt: 清空指定的官方配装槽。
+  expected_tool: loadout_assistant
+  expected_intent: clear_official
+
+# ── subclass_assistant ─────────────────────────────────────────────
+- id: subclass_read
+  prompt: 看看我的术士当前技能、星相和碎片，不修改。
+  expected_tool: subclass_assistant
+  expected_intent: get
+- id: subclass_options
+  prompt: 这个职业有哪些超能可选。
+  expected_tool: subclass_assistant
+  expected_intent: options
+- id: subclass_fragments
+  prompt: 列出可用碎片及其效果。
+  expected_tool: subclass_assistant
+  expected_intent: fragments
+- id: subclass_artifact
+  prompt: 我现在用的是哪个赛季神器。
+  expected_tool: subclass_assistant
+  expected_intent: artifact
+- id: subclass_modify
+  prompt: 修改我的超能，先展示会改哪些项。
+  expected_tool: subclass_assistant
+  expected_intent: modify
+- id: subclass_equip_artifact_mod
+  prompt: 给我装上指定的神器模组，先等我确认。
+  expected_tool: subclass_assistant
+  expected_intent: equip_artifact_mod
+- id: subclass_community
+  prompt: 用本地社区资料解释这个碎片。
+  expected_tool: subclass_assistant
+  expected_intent: community
+
+# ── activity_assistant ─────────────────────────────────────────────
+- id: activity_history
+  prompt: 看看我最近几场活动记录。
+  expected_tool: activity_assistant
+  expected_intent: history
+- id: activity_pgcr
+  prompt: 看下指定这一场的结算数据。
+  expected_tool: activity_assistant
+  expected_intent: pgcr
+- id: activity_stats
+  prompt: 看下我的生涯统计。
+  expected_tool: activity_assistant
+  expected_intent: stats
+- id: activity_weapon_history
+  prompt: 我最常用哪把武器。
+  expected_tool: activity_assistant
+  expected_intent: weapon_history
+- id: activity_leaderboards
+  prompt: 查一下我在某个榜单上的位置。
+  expected_tool: activity_assistant
+  expected_intent: leaderboards
+- id: activity_community
+  prompt: 用本地社区资料查某个副本的攻略。
+  expected_tool: activity_assistant
+  expected_intent: community
+
+# ── world_assistant ────────────────────────────────────────────────
+- id: vendor_read
+  prompt: 查看当前商人卖什么，不购买。
+  expected_tool: world_assistant
+  expected_intent: vendor
+- id: weekly_read
+  prompt: 查一下本周活动，标明数据来源和不确定的部分。
+  expected_tool: world_assistant
+  expected_intent: weekly
+- id: weekly_full_read
+  prompt: 给我完整周常清单。
+  expected_tool: world_assistant
+  expected_intent: weekly_full
+- id: collectible_search
+  prompt: 搜索收藏品节点。
+  expected_tool: world_assistant
+  expected_intent: search_collectible_nodes
+- id: collectible_item
+  prompt: 查一下某件物品的收藏品解锁状态。
+  expected_tool: world_assistant
+  expected_intent: collectible_item
+- id: world_community
+  prompt: 跨分类搜索本地社区资料里的机制说明。
+  expected_tool: world_assistant
+  expected_intent: community

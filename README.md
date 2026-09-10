@@ -333,7 +333,7 @@ PvP、强化和待验证数值保留为 `[pvp]`、`[enh]`、`[unsure]` 标记。
 .venv/bin/python scripts/verify_starside.py --inventory
 ```
 
-更多自然语言测试及验收标准见 [TESTING.md](TESTING.md)。代码更新后重启 Codex 或新开任务，
+更多自然语言测试及验收标准见 [TESTING.md](TESTING.md)；覆盖全部 8 个工具与 108 个 intent 的完整语料见 [TESTING_CORPUS.md](TESTING_CORPUS.md)。代码更新后重启 Codex 或新开任务，
 避免继续使用旧服务进程。
 
 ## License
