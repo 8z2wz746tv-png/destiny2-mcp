@@ -58,8 +58,10 @@ async def verify(root: Path, *, inventory: bool, timeout: float) -> None:
                     )
                     if not query.get("archive_available") or not query.get("results"):
                         raise RuntimeError(
-                            "Local Starside archive is unavailable or lacks the smoke-test Perk"
+                            "Local Starside data is unavailable or lacks the smoke-test Perk"
                         )
+                    if query.get("author_document_count", 0) < 22:
+                        raise RuntimeError("Bundled author documents are incomplete")
                     entry = query["results"][0]
                     detail = payload(
                         await session.call_tool(
@@ -75,12 +77,18 @@ async def verify(root: Path, *, inventory: bool, timeout: float) -> None:
                     ):
                         raise RuntimeError("Knowledge detail/provenance missing")
                     print("STARSIDE_KNOWLEDGE_CHECK=ok", flush=True)
-                    for tool, arguments in (
-                        ("subclass_assistant", {"query": "手雷"}),
-                        ("activity_assistant", {"query": ""}),
+                    print(
+                        f"STARSIDE_AUTHOR_DOCUMENT_COUNT={query['author_document_count']}",
+                        flush=True,
+                    )
+                    for tool, arguments, expected in (
+                        ("weapon_assistant", {"perk_name": "傍晚 SI4"}, "傍晚 SI4"),
+                        ("subclass_assistant", {"query": "冰霜护甲"}, "冰霜护甲"),
+                        ("activity_assistant", {"query": "被腐化的卡丽"}, "被腐化的卡丽"),
                         (
                             "world_assistant",
-                            {"query": "", "community_category": "armor"},
+                            {"query": "圣贤保护者", "community_category": "armor"},
+                            "圣贤保护者",
                         ),
                     ):
                         response = payload(
@@ -92,7 +100,15 @@ async def verify(root: Path, *, inventory: bool, timeout: float) -> None:
                             raise RuntimeError(
                                 f"Community route returned no records: {tool}"
                             )
+                        if expected not in json.dumps(response["results"], ensure_ascii=False):
+                            raise RuntimeError(
+                                f"Community route did not return expected content: {tool}"
+                            )
                     print("STARSIDE_DOMAIN_ROUTES=ok", flush=True)
+                    if query.get("build_count", 0) == 0:
+                        print("STARSIDE_BUILD_ARCHIVE=not_installed", flush=True)
+                        print("STARSIDE_VERIFY_OK=read-only checks passed")
+                        return
                     offset, builds, snapshot_id = 0, {}, query["snapshot_id"]
                     while True:
                         page = payload(

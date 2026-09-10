@@ -11,7 +11,7 @@ Inspect `ok`, `data`, `error`, `warnings`, and any `coverage` or `pagination` fi
 - Current instance data proves what was read on that instance.
 - A Perk pool proves possible candidates, not the current roll.
 - A Manifest/catalog result proves game definitions, not ownership.
-- Starside proves what the local community snapshot records, not official endorsement, current live values, or popularity unless a real metric is returned.
+- Starside proves what the bundled author document or optional local snapshot records, not official endorsement, current live values, or popularity unless a real metric is returned.
 - Bungie profile data proves the account state at the time of the request.
 
 ## Pagination and coverage
@@ -26,4 +26,4 @@ Never turn `null` selection rate into 0%, an unresolved name into “missing”,
 
 ## Output discipline
 
-Put warnings next to the affected conclusion. Preserve source URL, page update time, snapshot metadata, PvE/PvP/enhanced/uncertain markers, and external-link-only status when returned. Do not expose API keys, OAuth secrets, access tokens, refresh tokens, or authorization codes.
+Put warnings next to the affected conclusion. Preserve source URL or local document path, page update time, snapshot metadata, PvE/PvP/enhanced/uncertain markers, and external-link-only status when returned. An absent source URL must not be fabricated. A document without `updated_at` cannot establish a current live rotation. Do not expose API keys, OAuth secrets, access tokens, refresh tokens, or authorization codes.

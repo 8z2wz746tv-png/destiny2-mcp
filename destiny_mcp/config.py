@@ -36,6 +36,25 @@ def resolve_resource_dir(name: str) -> Path:
     )
     return next((path for path in candidates if path.is_dir()), candidates[0])
 
+
+def resolve_community_data_dir() -> Path:
+    """Resolve the author Markdown bundle in a checkout or wheel install."""
+
+    candidates = (
+        PROJECT_ROOT / "share",
+        Path(__file__).resolve().parents[1] / "share" / "destiny-mcp" / "community",
+        Path(sys.prefix) / "share" / "destiny-mcp" / "community",
+    )
+    return next(
+        (
+            path
+            for path in candidates
+            if (path / "weapon-perks.md").is_file()
+            and (path / "armor-sets.md").is_file()
+        ),
+        candidates[0],
+    )
+
 # Prefer the user's current checkout .env, then package-adjacent .env for
 # editable installs launched from another working directory.
 load_dotenv(_project_root / ".env")
@@ -57,6 +76,11 @@ DESTINY_MANIFEST_PATH: Path = Path(
 )
 DATA_PATH: Path = Path(
     os.path.expanduser(os.getenv("DATA_PATH", str(_project_root / "data")))
+)
+STARSIDE_SHARE_PATH: Path = Path(
+    os.path.expanduser(
+        os.getenv("STARSIDE_SHARE_PATH", str(resolve_community_data_dir()))
+    )
 )
 
 # Default player name — set this to skip typing your Bungie name every time

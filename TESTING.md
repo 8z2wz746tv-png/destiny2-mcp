@@ -54,7 +54,7 @@ world_assistant
 | 社区选取率 | 查一下刚才这把武器的 Perk 选取率，注明数据来源和版本。 | 使用 `popularity`；无快照时明确缺数据，不能编造实时百分比。 |
 | 子职业 | 看看我的<职业>当前技能、星相和碎片，不修改。 | 使用 `subclass_assistant(intent="get")`，与游戏当前配置核对。 |
 | 已存配装 | 列出我的<职业>已有配装，不保存、不覆盖任何配装槽。 | 使用 `loadout_assistant(intent="list")`；本地与官方配装来源分开，每项包含统一的 `build_template`。 |
-| 社区配装 | 找 5 套<职业>社区方案，不读取我的账号。 | 使用 `build_assistant(intent="community", character="hunter", top_n=5, include_inventory=false)`；不要使用 `loadout_assistant`。 |
+| 社区配装 | 找 5 套<职业>社区方案，不读取我的账号。 | 使用 `build_assistant(intent="community", character="hunter", top_n=5, include_inventory=false)`；不要使用 `loadout_assistant`。只有可选网页归档提供完整模板；若 `build_count=0`，应说明随附资料不含完整配装，不能现场编造。 |
 | 活动记录 | 看看我的<职业>最近几场活动记录。 | 使用 `activity_assistant(intent="history")`；时间和活动可以核对，无记录不应补写。 |
 | 商人 | 看看班西现在卖哪些武器，以及这些商品本次实际的 Perk。 | 使用 `world_assistant(intent="vendor")`；不能拿武器总 Perk 池代替售卖 Roll。 |
 | 周常 | 查一下本周活动，标明数据来源和不确定的部分。 | 使用 `world_assistant(intent="weekly")`；查询失败不能凭记忆给确定答案。 |
@@ -140,12 +140,13 @@ cd "/Users/husky/项目/destiny2-mcp"
 
 ## 6. Starside 接入测试
 
-2026-09-09 本轮接入验证：
+2026-09-10 作者 Markdown 数据包适配验证：
 
-- 全量回归 `275 passed`，包含旧版本地配装迁移、官方 20 槽位和跨 Agent Skill 契约回归。
+- 全量回归 `283 passed`，包含 Markdown 语义、复杂表格、旧归档兼容、配装迁移、官方 20 槽位和跨 Agent Skill 契约回归。
 - 真实 MCP 握手返回 `BUNGIE_PROFILE_CHECK=ok`、`MCP_TOOL_COUNT=8`、`VERIFY_OK`。
-- `scripts/verify_starside.py --inventory` 通过；从 MCP 实际读取资料、分页遍历全部 108 套模板并核对一套模板的真实库存。
-- `.env`、Codex 注册及现有登录保持不变；没有执行游戏写入，没有上传 GitHub。
+- `scripts/verify_starside.py` 通过；从 MCP 实际识别 22 份作者文档，并验证武器、子职业、护甲和活动路由。当前机器同时安装了可选归档，因此也分页遍历了全部 108 套模板。
+- 构建 wheel 后在全新临时虚拟环境安装，能自动定位安装前缀中的 22 份文档并查询“辉耀炽热”。
+- 实际 MCP 查询断言覆盖“辉耀炽热”“傍晚 SI4”“圣贤保护者”“冰霜护甲”和“被腐化的卡丽”；没有执行游戏写入。
 - `scripts/verify_mcp.py` 是平台无关入口；它检查真实 MCP 握手、工具 schema、只读账号调用和默认 8 个工具，不依赖 Codex。
 - 使用系统构建后端完成 wheel 检查，接入模块已包含，归档和凭据未包含；项目虚拟环境未因此增加构建依赖。
 - 一套模板的库存读通不代表全部模板适合当前版本，也不代表所有模组、技能和神器已验证。
@@ -156,6 +157,9 @@ cd "/Users/husky/项目/destiny2-mcp"
 | 测试话术 | 验收点 |
 | --- | --- |
 | 用本地资料解释辉耀炽热的效果，区分强化效果并附来源和更新日期。 | 使用 `weapon_assistant` 的社区查询或 Perk 描述附带的社区资料；引用标记不丢失。 |
+| 用本地资料查傍晚 SI4，列出三号位、四号位推荐 Perk 和获取地点。 | 使用 `weapon_assistant(intent="community")`；两列 Perk 不串列，结果来源为 `author_markdown`。 |
+| 查圣贤保护者的 2 件和 4 件效果。 | 使用 `world_assistant(intent="community", community_category="armor")`；能下钻正文并保留作者文档更新时间。 |
+| 查被腐化的卡丽生命值，并说明来源边界。 | 使用 `activity_assistant(intent="community")`；表格返回 `299440` 和上游链接，但仍标记为社区实测而非 Bungie 实时数据。 |
 | 找 5 套猎人社区配装，只看模板，不读取我的账号。 | `build_assistant(intent="community", character="hunter", top_n=5, include_inventory=false)`；显示总命中数和下一页位置，不把 5 当全量。 |
 | 列出我已有的猎人配装 | `loadout_assistant(intent="list", character="hunter")`；只显示账号已存配装，不能把它当社区推荐。每项检查 `source`、`slot_number`（官方）和 `build_template`。 |
 | 再看下一页，保留相同筛选条件。 | 原样使用 `next_offset`，ID 不重复、不漏页。 |
@@ -184,11 +188,16 @@ cd "/Users/husky/项目/destiny2-mcp"
 自动复测命令：
 
 ```bash
+.venv/bin/python -m pytest -q tests/test_starside_markdown.py
 .venv/bin/python -m pytest -q tests/test_starside_integration.py
 .venv/bin/python -m pytest -q
 .venv/bin/python scripts/verify_starside.py
 .venv/bin/python scripts/verify_starside.py --inventory
 ```
+
+新克隆默认只有随附 Markdown，因此 `STARSIDE_AUTHOR_DOCUMENT_COUNT=22` 和
+`STARSIDE_BUILD_ARCHIVE=not_installed` 同时出现是正常结果。安装可选 schema v2 网页归档后，
+验证脚本才要求配装分页和详情检查通过。
 
 离线回归使用合成数据，覆盖归档缺失/损坏、分页、多个配装块、无损数值语义、严格名称匹配、
 未知 Perk、同部位套装计数和防止模板直接执行，不需要复制真实归档或暴露账号数据。

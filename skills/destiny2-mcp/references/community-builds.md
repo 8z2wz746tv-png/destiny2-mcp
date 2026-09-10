@@ -1,6 +1,8 @@
 # Community builds and Starside
 
-Starside is an optional local community data layer inside the existing domain tools. It is not a ninth tool, not Bungie data, and not live web search.
+Starside is a local community data layer inside the existing domain tools. The bundled author Markdown provides reference material; an optional schema v2 archive adds complete community build templates. Neither source is a ninth tool, Bungie data, or live web search.
+
+Do not turn weapon recommendation rows, subclass references, or armor-set documents into invented character builds. If `build_count=0`, report that complete community build templates are not installed and offer the available reference queries instead.
 
 ## Search then select
 

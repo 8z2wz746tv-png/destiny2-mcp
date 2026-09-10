@@ -13,7 +13,8 @@ This is a platform-neutral usage guide. An agent may read this file directly fro
 
 - Player/account state, owned items, current rolls, or saved loadouts: use an account-aware intent.
 - All game definitions or possible rolls: use the Manifest/catalog intent; this does not prove ownership.
-- Community explanations, builds, or tables: use the relevant `community` intent; results come from the local Starside snapshot and are not official recommendations or live search.
+- Community explanations or tables: use the relevant `community` intent; results can come from bundled author Markdown or an optional local web archive and are not official recommendations or live search.
+- Community builds require the optional archive and a returned `community_build_id`. The bundled Markdown contains reference material and weapon recommendations, not complete character builds.
 - A write such as move, equip, save, delete, or modify: read the current state first, show the exact target, and wait for explicit confirmation before sending `confirmed=true`.
 
 Read only the relevant reference before a complex request:

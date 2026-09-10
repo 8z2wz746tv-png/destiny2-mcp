@@ -37,6 +37,7 @@ destiny_mcp = ["data/*.yaml", "data/weapon_popularity.json"]
 "destiny_mcp.build_import" = ["*.yaml"]
 
 [tool.setuptools.data-files]
+"share/destiny-mcp" = ["COMMUNITY_DATA_NOTICE.md"]
 "share/destiny-mcp/prompts" = ["prompts/*.md"]
 "share/destiny-mcp/skills" = ["skills/*.md"]
 "share/destiny-mcp/skills/destiny2-mcp" = ["skills/destiny2-mcp/SKILL.md"]
@@ -45,6 +46,7 @@ destiny_mcp = ["data/*.yaml", "data/weapon_popularity.json"]
 "share/destiny-mcp/skills/destiny-mcp-setup" = ["skills/destiny-mcp-setup/SKILL.md"]
 "share/destiny-mcp/skills/destiny-mcp-setup/agents" = ["skills/destiny-mcp-setup/agents/openai.yaml"]
 "share/destiny-mcp/skills/destiny-mcp-setup/scripts" = ["skills/destiny-mcp-setup/scripts/verify_mcp.py"]
+"share/destiny-mcp/community" = ["share/*.md"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
