@@ -16,11 +16,11 @@ ROOT = Path(__file__).parents[1]
 
 CEILINGS = {
     "destiny_mcp/manifest.py": 1479,
-    "destiny_mcp/services/loadout_equipment_service.py": 1422,
     "destiny_mcp/tools/assistants.py": 1388,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,
+    "destiny_mcp/services/loadout_equipment_service.py": 794,
     "destiny_mcp/services/starside_service.py": 769,
 }
 
