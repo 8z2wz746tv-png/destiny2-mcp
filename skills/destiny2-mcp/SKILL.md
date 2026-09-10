@@ -1,6 +1,6 @@
 ---
 name: destiny2-mcp
-description: Use the local Destiny 2 MCP for account queries, community build research, inventory and perk checks, loadouts, and confirmed equipment actions. Read this when an agent connects to this repository or needs to choose between account, Manifest, and Starside data.
+description: Use when a task involves the local Destiny 2 MCP - player profile, inventory and item lookup, weapon and perk questions, armor or build recommendations, saved loadouts, subclass and artifact state, activity history, weekly resets and vendors. Covers which tool and intent to call with which parameter, how to tell account data from Manifest and community data, and the confirmation rules for account writes.
 metadata:
   short-description: Route Destiny 2 MCP queries safely across agents
 ---
