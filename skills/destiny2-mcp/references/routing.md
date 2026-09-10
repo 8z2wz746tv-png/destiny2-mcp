@@ -33,3 +33,9 @@ For “what does Perk X do”, use `perk_description`; do not infer an effect fr
 ## Community and account routing
 
 “Community build”, “popular build”, or “Starside build” means `build_assistant(intent="community")`, not `loadout_assistant`. “My saved build/loadout” means `loadout_assistant`. A community result may be matched to the account only after the user asks for that and a concrete `community_build_id` is available.
+
+## Farming-list attachments
+
+Weapon-bearing responses carry a `farming_list` field: an exact-name lookup into the local 刷取清单 (白弹/绿弹/威能紫枪 and 异域武器). Each row gives `tier` (or `scenario_tiers` such as `{"输出": "T0", "高难": "T0.5"}`, or a `role` label), `frame`, `element`, `perks`, `source`, and `note`, plus `source_ref` with the list name and update date.
+
+Use it when the user asks whether a weapon is worth keeping, farming, or using. Quote the tier together with its list name; these are community ratings, not official data. `unmatched` means the local lists have no such name — never report that as "this weapon is not worth farming". The list comes from local files and may be absent; check `available` before relying on it.

@@ -93,6 +93,50 @@ def _community_enrichment(service: Any, query: str, category: str) -> dict:
         }
 
 
+def _farming_reference(service: Any, names: str | list[str], *, limit: int = 5) -> dict:
+    """把本地刷取清单精确挂到会提到武器的响应上；失败不影响官方数据查询。"""
+    if service is None:
+        return {"available": False, "matched_count": 0, "results": [], "unmatched": []}
+    try:
+        return service.lookup_farming(names, limit=limit)
+    except DestinyMCPError as exc:
+        return {
+            "available": False,
+            "matched_count": 0,
+            "results": [],
+            "unmatched": [],
+            "error": str(exc),
+            "coverage_scope": "farming_list_unavailable",
+        }
+
+
+def _harvest_names(value: Any, *, limit: int = 8) -> list[str]:
+    """从结果载荷里收集物品名，用于按名字回查刷取清单。
+
+    只收名字、不判断是不是武器；刷取清单索引本身是精确匹配，非武器名不会命中。
+    按名字去重后再计名额：同名多份副本（账号里很常见）不能挤掉别的武器。
+    """
+    found: list[str] = []
+
+    def walk(node: Any, depth: int) -> None:
+        if len(found) >= limit or depth > 6:
+            return
+        if isinstance(node, dict):
+            name = node.get("name")
+            if isinstance(name, str):
+                candidate = name.strip()
+                if candidate and candidate not in found:
+                    found.append(candidate)
+            for item in node.values():
+                walk(item, depth + 1)
+        elif isinstance(node, list):
+            for item in node:
+                walk(item, depth + 1)
+
+    walk(value, 0)
+    return found
+
+
 def _requires_confirmation(intent: str) -> bool:
     return intent in {
         "move",
@@ -208,7 +252,12 @@ async def inventory_assistant(
         )
         return ok_response(
             result["summary"],
-            {"inventory": result["inventory"]},
+            {
+                "inventory": result["inventory"],
+                "farming_list": _farming_reference(
+                    svc.get("starside_svc"), _harvest_names(result["inventory"])
+                ),
+            },
             next_actions=result["next_actions"],
             warnings=result["warnings"],
         )
@@ -228,6 +277,9 @@ async def inventory_assistant(
                 "scan": result["scan"],
                 "filters": result["filters"],
                 "pagination": result["pagination"],
+                "farming_list": _farming_reference(
+                    svc.get("starside_svc"), _harvest_names(result["duplicates"])
+                ),
             },
             warnings=result["warnings"],
         )
@@ -240,11 +292,24 @@ async def inventory_assistant(
             armor_slot=armor_slot or None,
             rarity=rarity or None,
         )
-        return ok_response("已读取背包。", {"inventory": _dump(result)})
+        inventory = _dump(result)
+        return ok_response("已读取背包。", {
+            "inventory": inventory,
+            "farming_list": _farming_reference(
+                svc.get("starside_svc"), _harvest_names(inventory)
+            ),
+        })
 
     if intent in {"search", "find_item"}:
         result = await svc["inventory_svc"].search_items(resolved, item_name, location)
-        return ok_response("已搜索物品。", {"result": _dump(result)})
+        searched = _dump(result)
+        return ok_response("已搜索物品。", {
+            "result": searched,
+            "farming_list": _farming_reference(
+                svc.get("starside_svc"),
+                [item_name] if item_name.strip() else _harvest_names(searched),
+            ),
+        })
 
     if intent in {"type", "search_type"}:
         result = await svc["inventory_svc"].search_items_by_type(
@@ -408,13 +473,17 @@ async def weapon_assistant(
             "community_references": _community_enrichment(
                 svc.get("starside_svc"), weapon_name, "weapons"
             ),
+            "farming_list": _farming_reference(svc.get("starside_svc"), weapon_name),
         }, next_actions=result["next_actions"], warnings=result["warnings"])
 
     if intent in {"compare", "compare_duplicates"}:
         result = await svc["weapon_compare_svc"].compare_weapon_instances(
             resolved, weapon_name, item_instance_id or None
         )
-        return ok_response("已对比同名武器副本。", {"comparison": _dump(result)})
+        return ok_response("已对比同名武器副本。", {
+            "comparison": _dump(result),
+            "farming_list": _farming_reference(svc.get("starside_svc"), weapon_name),
+        })
 
     if intent in {"perk_pool", "perks"}:
         result = await svc["perk_svc"].get_weapon_perks(weapon_name)
@@ -423,6 +492,7 @@ async def weapon_assistant(
             "community_references": _community_enrichment(
                 svc.get("starside_svc"), weapon_name, "weapons"
             ),
+            "farming_list": _farming_reference(svc.get("starside_svc"), weapon_name),
         })
 
     if intent == "god_roll":
@@ -455,7 +525,13 @@ async def weapon_assistant(
             resolved,
             weapon_type,
         )
-        return ok_response("已按武器类型读取详情。", {"weapons": _dump(result)})
+        weapons = _dump(result)
+        return ok_response("已按武器类型读取详情。", {
+            "weapons": weapons,
+            "farming_list": _farming_reference(
+                svc.get("starside_svc"), _harvest_names(weapons)
+            ),
+        })
 
     if intent == "filter_rolls":
         if not include_inventory:
@@ -472,7 +548,11 @@ async def weapon_assistant(
             )
             return ok_response(
                 f"全量武器定义检查 {filtered['checked_count']} 把，命中 {filtered['matched_count']} 把。",
-                filtered,
+                filtered | {
+                    "farming_list": _farming_reference(
+                        svc.get("starside_svc"), _harvest_names(filtered)
+                    )
+                },
                 warnings=["include_inventory=false：这些是 Manifest 全量候选，未读取账号持有情况。"],
             )
         result = await svc["weapon_detail_svc"].get_weapon_details_by_type(
@@ -500,7 +580,11 @@ async def weapon_assistant(
         return ok_response(
             f"范围内 {filtered['scoped_count']} 把武器，已检查 {filtered['checked_count']} 把，"
             f"当前插槽命中 {filtered['matched_count']} 把，无法判断 {filtered['unknown_count']} 把。",
-            filtered,
+            filtered | {
+                "farming_list": _farming_reference(
+                    svc.get("starside_svc"), _harvest_names(filtered)
+                )
+            },
             warnings=warnings,
         )
 
@@ -510,6 +594,7 @@ async def weapon_assistant(
             "community_references": _community_enrichment(
                 svc.get("starside_svc"), weapon_name, "weapons"
             ),
+            "farming_list": _farming_reference(svc.get("starside_svc"), weapon_name),
         })
 
     if intent == "stats":
@@ -1277,7 +1362,13 @@ async def world_assistant(
     if intent == "vendor":
         resolved = resolve_player_name(player_name)
         result = await svc["vendor_svc"].get_vendor_inventory(resolved, character, vendor_name)
-        return ok_response("已读取商人库存。", {"vendors": _dump(result)})
+        vendors = _dump(result)
+        return ok_response("已读取商人库存。", {
+            "vendors": vendors,
+            "farming_list": _farming_reference(
+                svc.get("starside_svc"), _harvest_names(vendors)
+            ),
+        })
 
     if intent == "search_collectible_nodes":
         result = svc["collection_svc"].search_collectible_nodes(query, limit)
