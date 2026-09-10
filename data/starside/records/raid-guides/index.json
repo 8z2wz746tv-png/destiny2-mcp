@@ -1,0 +1,72 @@
+{
+  "url": "https://starside.work/raid-guides/index.html",
+  "title": "Raid 攻略 · Starside",
+  "description": "突袭与众神殿的图文攻略，一张卡一份文档，点开跳转到腾讯文档。",
+  "category": "activities",
+  "updated_at": "2026.8.30",
+  "data_src": "docs/raid-guides",
+  "data_hash": "8c7b2119da23b3a27d375ecbbd0f4eadbaef39b4",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "Raid 攻略"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "突袭"
+    }
+  ],
+  "tables": [],
+  "text": "Raid 攻略 · Starside\n\nStarside\n/\nRaid 攻略\n\nRaid 攻略\n\n突袭\n\n众神殿\n\n永恒沙漠（史诗）\n\n永恒沙漠\n\n救赎的边缘\n\n克洛塔的末日修订中\n\n梦魇根源修订中\n\n国王的陨落\n\n门徒誓约\n\n玻璃拱顶\n\n深岩墓室\n\n救赎花园\n\n最后一愿\n\n更新 2026.8.30\n\n特别鸣谢：遗忘Melt 编写并维护全部图文攻略。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/raid-guides/index.html",
+    "final_url": "https://starside.work/raid-guides/index.html",
+    "path": "pages/raid-guides/index.html",
+    "bytes": 8493,
+    "sha256": "60248ad954f9baa1f9e61de487f26a504a9113867727433b3e847edda694b08f",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:46.483883+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.qq.com/doc/DQ01qTUVKWVp6UEVO",
+    "https://docs.qq.com/doc/DQ0RORUpxRWJ3SmFG",
+    "https://docs.qq.com/doc/DQ0x6b3FXcnp1TGtP",
+    "https://docs.qq.com/doc/DQ0xZZWNGRVdNeW10",
+    "https://docs.qq.com/doc/DQ1hoQXpSTU5MVVFE",
+    "https://docs.qq.com/doc/DQ21BU3pZd1B5Qmp6",
+    "https://docs.qq.com/doc/DQ21GY3BIV3ZJa1hz",
+    "https://docs.qq.com/doc/DQ2VhRXFrZ3pxZkNj",
+    "https://docs.qq.com/doc/DQ2ZKcENkWVRUYkRx",
+    "https://docs.qq.com/doc/DQ2hTZkpKbVpuTEV5",
+    "https://docs.qq.com/doc/DQ2pLUGx1bW5MQ0FS",
+    "https://docs.qq.com/doc/DQ3NGU2FnUVhzYUVy",
+    "https://space.bilibili.com/26117485",
+    "https://space.bilibili.com/3706960595650983"
+  ],
+  "assets": [
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/raid-guides/icons/576f5ee84c.webp",
+    "https://starside.work/raid-guides/icons/5e288f828f.webp",
+    "https://starside.work/raid-guides/icons/61c6576365.webp",
+    "https://starside.work/raid-guides/icons/69e0c96eb4.webp",
+    "https://starside.work/raid-guides/icons/8bd947ebbb.webp",
+    "https://starside.work/raid-guides/icons/a890626de0.webp",
+    "https://starside.work/raid-guides/icons/b0d8e4a22d.webp",
+    "https://starside.work/raid-guides/icons/bb815bae2f.webp",
+    "https://starside.work/raid-guides/icons/cdfa999a61.webp",
+    "https://starside.work/raid-guides/icons/e13af8584d.webp",
+    "https://starside.work/raid-guides/icons/e536a72f5c.webp",
+    "https://starside.work/raid-guides/icons/f43ff2553f.webp",
+    "https://starside.work/raid-guides/style.css"
+  ]
+}

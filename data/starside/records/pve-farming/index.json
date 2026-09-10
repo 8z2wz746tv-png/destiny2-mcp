@@ -1,0 +1,117 @@
+{
+  "url": "https://starside.work/pve-farming/index.html",
+  "title": "PVE 终局刷取指南 · Starside",
+  "description": "终局刷取的清单与来源：两套武器评级清单，以及可锻造武器与异域装备的来源。",
+  "category": "activities",
+  "updated_at": "2026.9.6",
+  "data_src": "docs/pve-farming",
+  "data_hash": "7eb608230db5876efd9b37b098b4fdf6e6f68943",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "PVE 终局刷取指南"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "Aegis"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "购物清单-白弹"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "购物清单-绿弹"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "购物清单-威能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "购物清单-其他"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "小棒猪-LGpig"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "刷取清单-异域武器"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "刷取清单-白弹紫枪"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "刷取清单-绿弹紫枪"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "刷取清单-威能紫枪"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "刷取清单-护甲套装"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "锻造武器"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "锻造武器来源"
+    }
+  ],
+  "tables": [],
+  "text": "PVE 终局刷取指南 · Starside\n\nStarside\n/\nPVE 终局刷取指南\n\nPVE 终局刷取指南\n\nAegis\n\n购物清单-白弹\n\n356 把白弹位传说武器按枪械类型分档评级，含框架、属性、勇士克制、Perk 推荐、来源与逐条注解。\n\n更新 2026.8.30\n\n购物清单-绿弹\n\n228 把绿弹位传说武器按枪械类型分档评级，含框架、属性、勇士克制、Perk 推荐、来源与逐条注解。\n\n更新 2026.8.30\n\n购物清单-威能\n\n156 把威能位传说武器按枪械类型分档评级，含框架、属性、勇士克制、Perk 推荐、来源与逐条注解。\n\n更新 2026.8.30\n\n购物清单-其他\n\n源表「其他」分页的 8 把武器，含框架、属性、勇士克制、Perk 推荐、来源与逐条注解。\n\n更新 2026.8.30\n\n小棒猪-LGpig\n\n刷取清单-异域武器\n\n85 把异域武器的输出、清怪与高难评级，含实测总伤与 DPS，以及每一档评级的理由。\n\n更新 2026.9.6\n\n刷取清单-白弹紫枪\n\n56 把白弹位传说武器按枪械类型分档，含框架、属性、勇士克制、推荐 Perk、获取地点与每一把的评级理由。\n\n更新 2026.9.6\n\n刷取清单-绿弹紫枪\n\n88 把绿弹位传说武器按枪械类型分档，含框架、属性、勇士克制、推荐 Perk、获取地点与每一把的评级理由。\n\n更新 2026.9.6\n\n刷取清单-威能紫枪\n\n61 把威能位传说武器按枪械类型分档，含框架、属性、勇士克制、推荐 Perk、获取地点与每一把的评级理由。\n\n更新 2026.9.6\n\n刷取清单-护甲套装\n\n29 套护甲套装按泛用性、强度与使用频率排序，含件数、获取地点、应用场景与每一套的说明。\n\n更新 2026.9.6\n\n锻造武器\n\n锻造武器来源\n\n可锻造武器的红框掉落处，以及异域任务、地牢、突袭的异域武器与催化剂获取方式。\n\n更新 2026.8.30\n\n更新 2026.9.6\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/pve-farming/index.html",
+    "final_url": "https://starside.work/pve-farming/index.html",
+    "path": "pages/pve-farming/index.html",
+    "bytes": 8651,
+    "sha256": "eff23ee914e8ff11e39acb934ff6304bc7184f6cad13224b8c2e1eca25e7c5a0",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:45.918160+00:00"
+  },
+  "links": [
+    "https://starside.work/crafting/index.html",
+    "https://starside.work/exotic-weapons/index.html",
+    "https://starside.work/farming-sets/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/legendary-heavy/index.html",
+    "https://starside.work/legendary-primary/index.html",
+    "https://starside.work/legendary-special/index.html",
+    "https://starside.work/shopping-heavy/index.html",
+    "https://starside.work/shopping-other/index.html",
+    "https://starside.work/shopping-primary/index.html",
+    "https://starside.work/shopping-special/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/pve-farming/style.css"
+  ]
+}

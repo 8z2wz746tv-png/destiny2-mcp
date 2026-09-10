@@ -1,0 +1,674 @@
+{
+  "url": "https://starside.work/builds/index.html",
+  "title": "配装推荐 · Starside",
+  "description": "按职业分类的 Destiny 2 配装推荐：职业、武器、护甲、神器模组与六维属性，每一格都链回站内资料页。",
+  "category": "builds",
+  "updated_at": "2026.9.9",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "配装推荐"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "meta"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "终局内容：命运眷顾真相输出"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "松身裤火猎人"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "棱镜光剑猎"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "强度"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "贪婪套冰猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "裂波者 觅敌矛隼猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "多人需求层级钻机腿输出"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "棱镜松身裤丢丢猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "贪婪忠诚面具冰猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "冰猎开荒回转套"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业金棱镜猎（通用模版）"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "力大砖飞，技高一筹，火刀真相恩射流"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "棱镜丢丢猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "第四骑士光芒复仇松身裤火猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "赫沃斯托夫小帝喷"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "棱镜堡垒丢丢猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "死亡信使机制弹药套"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "混乱裁决火刀猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "龟刀猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "忍野丢丢"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "双金枪输出配装"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "金枪猎守点清怪配装"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "金枪猎位移+清怪配装"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "金枪猎位移+清怪配装"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "霉B喷子"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "一拳超人"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "光能甲碎冰雷泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "火锤泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "合成手风暴怒吼冰泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "裂波者无限超能泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "圣火护心甲泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "棱镜b计划龟喷坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "虚空剑圣"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "微冲腿泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "术士"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "恐惧编织缚丝术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "宝宝术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "赫沃斯托夫逃逸手术士"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "创意"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "混乱无序高压续航棱镜猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "威胁等级电表倒转"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "卡利班合成清怪推图装"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "冰猎运动套"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "元素大师猎人"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "日常地牢通用火刀猎"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "刮刮乐泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "虫手偃月"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "英勇礼服光剑泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "不祥之兆+永恒战士电泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "小锤火泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "无序喝彩"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "炸死所有猪"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "术士"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "火术运动套"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "复古虚空术进化版"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "赫沃斯托夫星火术士"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "苍蝇头响指术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "meta电术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "冰术阿格尔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "有限点燃苍蝇头火术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "双飞饼"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "子弹印刷缚丝术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "亡妻回忆录之星火协议"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "风暴衣无限电上术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "霜袍衣冰术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "海胆头电术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "术士职业金裂波者"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "吸血手火术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "左键清屏和谐棱镜术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "坏死+合成棱镜术（贾诩术）"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "虚无镣铐/反转手虚空术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "边缘交通"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "霜袍术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "虚式·茈 五条悟虚空术士"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "牢大术士"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星火纤维棱镜术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "间桐樱术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "悬停术"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "PVP"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "66连杀兰花"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "虚空猎pvp"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "跳舞机袖珍卫士"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "虚空猎pvp"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "棱镜泰坦pvp meta 配装"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "四码头 高阶暴君"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "术士"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "闪身头虚空术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "闪电激涌电术"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "幽默术士"
+    }
+  ],
+  "tables": [],
+  "text": "配装推荐 · Starside\n\nStarside\n/\n配装推荐\n\n配装推荐\n\n投稿一套配装 →选完技能、武器、护甲与神器模组，页面直接生成标准配装文本\n\n配装合集 →同一角色的多套配装，按场景切换使用\n\nmeta\n\n猎人\n\n终局内容：命运眷顾真相输出\n\nClovis\n\n适配真相输出的突袭/地牢遭遇战\n\n突袭地牢输出\n更新 2026.9.8\n\n松身裤火猎人\n\n爱77的188\n\n通过速射神枪提供的回复来保证生存，松身裤填装武器进行输出\n\n宗师终极日常通用\n更新 2026.9.8\n\n棱镜光剑猎\n\n皮皮晓迪螺#4205\n审核意见也可以带焕光闪身+勇气琢面的组合 有光剑的情况下裁决定论的伤害并没有那么重要了,可以考虑带工具枪或白弹 没有圣贤2王冠2可以用vog4,但就只能绑定光能蜘蛛头了\n\n肉的发昏的棱镜光剑猎人，携带翻新兼顾近点和远点的清杂输出能力\n\n宗师终极通用\n更新 2026.9.8\n\n强度\n\n猎人\n\n贪婪套冰猎\n\nWJ\n审核意见想要伤害更高可以用碎裂雷\n\n无限近战回转\n\n日常清怪功能通用\n更新 2026.9.8\n\n裂波者 觅敌矛隼猎\n\n实力日天\n审核意见职业金二号位可以考虑虫头or蜘蛛头,然后腿上插吃球回技能来保持回转\n\n裂波者+vog套全程触发高增伤\n\n宗师终极日常清怪续航通用\n更新 2026.9.8\n\n多人需求层级钻机腿输出\n\n皮皮晓迪螺#4205\n\n多人使用的无脑大爆输出\n\n突袭输出\n更新 2026.9.6\n\n棱镜松身裤丢丢猎\n\n皮皮晓迪螺#4205\n审核意见已经带了金枪的话套装选择vog套实战在机动方面会更加舒适，碎片中的希望琢面对松身裤配装提升不大，组队时可以替换为慷慨琢面\n\n依靠混乱无序和庆典飞行的高频伤害快速回转闪身，提供生存和伤害\n\n宗师终极通用\n更新 2026.9.6\n\n贪婪忠诚面具冰猎\n\n颩雷#1257\n审核意见闪身是赌徒不是特技\n\n进阶版忠诚面具，保证强度的同时还能超级跳\n\n地牢宗师终极日常通用清怪续航功能通用\n更新 2026.9.8\n\n冰猎开荒回转套\n\n马sirFPS#5846\n审核意见缺少强化雷的爆发输出，但是多了星象闪身的减伤\n\n萌新开荒超硬丢丢冰\n\n宗师终极日常清怪续航通用\n更新 2026.9.6\n\n职业金棱镜猎（通用模版）\n\n紫夜非月\n\n职业金棱镜猎\n\n突袭地牢宗师终极日常通用清怪续航通用\n更新 2026.9.8\n\n力大砖飞，技高一筹，火刀真相恩射流\n\n赎罪修女深田咏美\n\n此配装适合突袭和地牢打首领用\n\n突袭地牢输出\n更新 2026.9.9\n\n棱镜丢丢猎\n\n24锅#4837\n审核意见正义琢面推荐改为毁灭琢面。飞升不触发充沛，推荐更换为弹药搜寻/弹药斥候模组。带彪悍修改器的情况下超能更换为黄金枪。 作者提到的“护甲充能在4层的时候终结技产绿弹有概率只会消耗一格充能”实际上是在终结技之后通过VOG4件套获得了光球，并搭配层层不绝获得了2层护甲充能，4-3+2=3。 减伤要求较高的情况下可酌情考虑下掉完全充能，更换为抗性模组。\n\n勇士全反\n\n宗师终极清怪通用\n更新 2026.9.8\n\n第四骑士光芒复仇松身裤火猎\n\n苍影\n\n第四骑士双增伤光芒复仇松身裤暴力输出\n\n突袭地牢输出\n更新 2026.9.2\n\n赫沃斯托夫小帝喷\n\n年轻人是这样的\n\n赫沃斯托夫快速回转超凡超能，小帝喷清理初级首领\n\n通用通用\n更新 2026.9.1\n\n棱镜堡垒丢丢猎\n\nNight_Core核\n\n动能合成堡垒无限弹药\n\n宗师终极日常续航通用\n更新 2026.9.9\n\n死亡信使机制弹药套\n\nNight_Core核\n\n死亡信使kf溢冰高效清怪产弹走机制\n\n突袭地牢日常通用清怪续航通用\n更新 2026.9.1\n\n混乱裁决火刀猎\n\nshygostin#4992\n\n碎片手松身裤双切\n\n突袭地牢通用输出\n更新 2026.9.1\n\n龟刀猎\n\nyester言泽\n\n圣贤2配合光剑快速回转复兴曲腹蛛\n\n地牢宗师终极日常通用清怪续航功能\n更新 2026.9.1\n\n忍野丢丢\n\nyester言泽\n\n新版忍野配合武器释放高频打雷\n\n宗师终极日常通用清怪续航功能通用\n更新 2026.9.1\n\n双金枪输出配装\n\n遗忘Melt\n\n突袭地牢副本，双金枪输出配装，火箭筒输出为主。\n\n突袭地牢输出\n更新 2026.9.2\n\n金枪猎守点清怪配装\n\n遗忘Melt\n\n突袭地牢副本，机制清怪配装，适合有站桩守点清怪的场景，会切双金枪输出装打首领。\n\n突袭地牢清怪\n更新 2026.9.2\n\n金枪猎位移+清怪配装\n\n遗忘Melt\n\n突袭地牢副本，走机制+清怪套装；白蛋清杂触发“跳舞机”快速回转闪身，飞升释放小绿人吸引仇恨，抓钩位移快速走机制。\n\n突袭地牢清怪\n更新 2026.9.2\n\n金枪猎位移+清怪配装\n\n遗忘Melt\n\n突袭地牢副本，走机制+清怪套装，适用于不要求站点，需要抓钩位移快速走机制的场景\n\n突袭地牢清怪\n更新 2026.9.2\n\n泰坦\n\n霉B喷子\n\n臭脸老登章鱼哥\n审核意见不触发级联点的话，阻止力全明星完美悖论是更优秀的选择；捡动能合成弹药可以通过熔炉2件套拾取和众神殿2件套补充护甲充能；不喜欢坚不可摧的玩家可以试试其他两个星象；动能裂口没什么用；泡泡盾可以续推推的30易伤\n\n可能是泰坦最安逸的近距离输出配装？\n\n突袭地牢输出\n更新 2026.9.8\n\n一拳超人\n\nyester言泽\n\n雷霆一击蓄力期间高额减伤配合其余组件提供高额生存\n\n宗师终极日常通用清怪续航通用\n更新 2026.9.6\n\n光能甲碎冰雷泰坦\n\n溴碘砹\n\n基于光能甲的高回转和高伤害\n\n宗师终极通用清怪通用\n更新 2026.9.9\n\n火锤泰坦\n\nMK_D2#7555\n\n适合新手的火锤泰坦配装，强度高易刷取，适用大多数平光、低压光PVE活动。缺点是强得有点无脑玩久了容易腻。\n\n突袭地牢日常通用输出清怪续航功能通用\n更新 2026.9.8\n\n合成手风暴怒吼冰泰坦\n\n萌动\n\n释放风暴怒吼并碎冰可造成大量伤害，通过冰霜护甲和神器模组获得减伤和治疗。\n\n宗师终极日常清怪续航功能\n更新 2026.9.1\n\n裂波者无限超能泰坦\n\nElis_R\n\n裂波者清怪，重弹输出，无限超能\n\n突袭地牢宗师终极日常通用输出清怪续航功能通用\n更新 2026.9.4\n\n圣火护心甲泰坦\n\nHuangpu\n审核意见平光地牢生存压力较小时，神器可换石板 极限突破增伤（15%）或女王兰香炉 烈焰之心（最大15%），进一步增加超能伤害\n\n地牢轮椅\n\n地牢通用\n更新 2026.9.9\n\n棱镜b计划龟喷坦\n\nyester言泽\n\n一套轻松获取全部生存增益的配装\n\n地牢宗师终极日常通用清怪续航功能通用\n更新 2026.9.1\n\n虚空剑圣\n\nyester言泽\n\n一刀劈不死勇士的本我不打\n\n地牢宗师终极日常通用输出清怪续航功能通用\n更新 2026.9.1\n\n微冲腿泰坦\n\nHuangpu\n审核意见可跻身强度配装 星象可用好耶，利用释放期间的天上减伤作为应急生存手段 腿部携带电弧拾取模组\n\n泰小坦的幸运裤\n\n宗师终极通用清怪续航通用\n更新 2026.9.6\n\n术士\n\n恐惧编织缚丝术\n\n剑崎明日梦\n\n兼具缚丝所有Buff和debuff的缚丝术集大成者\n\n宗师终极日常清怪功能通用\n更新 2026.9.7\n\n宝宝术\n\n滑稽人\n\n依旧最高的山，最长的河\n\n宗师终极日常清怪续航功能\n更新 2026.9.7\n\n赫沃斯托夫逃逸手术士\n\n剑崎明日梦\n\n依靠高抗性和高频技能战斗\n\n宗师终极通用清怪功能通用\n更新 2026.9.2\n\n创意\n\n猎人\n\n混乱无序高压续航棱镜猎\n\n余是猫\n审核意见定位模糊 又像输出配装又像机制最后只会两边不讨好 违抗琢面本身比较鸡肋 斗牛士本质PvP枪 三勇士环境过于稀少 即使有也不应该放弃裁决定论舍本逐末 因此任何情况下都应改用裁决定论 如果想产大量绿弹有无限绿弹等手段 但改用VoG套胜在生存较好 松身裤在棱镜猎本身强大的生存素体加上VoG套的加持下基本没有意义 又没有像火刀一样刷大招的需求 总体过于追求生存 在需要较为精确的武器(例如追踪)做机制时切换武器会令其他方面大打折扣 因此也不适合部分终局内容\n\n混乱无序+冰粪坑高频vog产球踢绿弹实现高续航\n\n输出续航\n更新 2026.9.7\n\n威胁等级电表倒转\n\n余是猫\n\n双动能输出武器配合神器特效疯狂产弹实现无限绿弹紫蛋\n\n宗师终极通用输出续航通用\n更新 2026.9.5\n\n卡利班合成清怪推图装\n\n超新星\n\n卡利班合成快速清怪推图\n\n突袭日常清怪\n更新 2026.9.8\n\n冰猎运动套\n\n抽刀断水\n审核意见突袭/地牢跑图超级跳\n\n猎人运动套\n\n突袭地牢日常通用清怪功能通用\n更新 2026.9.9\n\n元素大师猎人\n\nmadoka#9109\n\n赐予你焕光、增幅、隐身、冰霜护甲、织造铠甲，对战斗人员施加灼烧、震颤、虚弱、减速、瓦解、割裂。\n\n宗师终极日常通用输出清怪续航功能\n更新 2026.9.1\n\n日常地牢通用火刀猎\n\n纺木吏佐\n\n懒人福利\n\n突袭地牢日常通用\n更新 2026.9.8\n\n泰坦\n\n刮刮乐泰坦\n\nClama\n\n赫沃斯托夫搭配钻机胸与自动填装，穿上VOG套装，又能下蛋又能刮\n\n宗师终极日常清怪续航通用\n更新 2026.9.9\n\n虫手偃月\n\n纺木吏佐\n\n戳戳戳\n\n地牢宗师终极日常清怪续航功能\n更新 2026.9.8\n\n英勇礼服光剑泰坦\n\nGuardian9944#9014\n\n哦累哇刚大木！\n\n日常功能\n更新 2026.9.8\n\n不祥之兆+永恒战士电泰坦\n\nb站up：lIlIlIlIloading\n\n通过不祥之兆的连续击杀能力再加上只要造成击杀就能增强电属性的永恒战士\n\n日常清怪\n更新 2026.9.8\n\n小锤火泰坦\n\nFengZi#4812\n\n小锤丢就完了（外置大脑）\n\n地牢日常通用输出功能\n更新 2026.9.1\n\n无序喝彩\n\n臭脸老登章鱼哥\n审核意见好玩但是伤害不理想的玩法，适合打些血少站桩的首领\n\n电泰坦榴弹输出配置\n\n突袭地牢输出\n更新 2026.9.9\n\n炸死所有猪\n\n咕咕猪子\n审核意见手雷未击杀目标/手雷击杀目标数量和质量较低时，比较依赖焰灵所提供的技能回转，需要使用者频繁跑位。\n\n我爱丢融合雷欧耶耶\n\n日常清怪\n更新 2026.9.8\n\n术士\n\n火术运动套\n\n抽刀断水\n审核意见突袭/地牢跑图配装/日常公共事件/平光本/超级跳泛用性很强\n\n术士偏商务\n\n突袭地牢日常通用清怪功能通用\n更新 2026.9.9\n\n复古虚空术进化版\n\nFlos_#4022\n\n年3的老东西加了点新内容 牛头转手雷近战 有怪就是无缝\n\n日常通用清怪通用\n更新 2026.9.9\n\n赫沃斯托夫星火术士\n\n超新星\n\n依靠神器和赫沃斯托夫的高频产球可实现常驻焕光，焕光状态造成伤害或击杀就可快速回转融合雷\n\n日常清怪\n更新 2026.9.8\n\n苍蝇头响指术\n\n稻叶\n审核意见很建议副手玩纯五度故我在\n\n通过庆典飞行和响指速转超凡从而打出更多响指\n\n宗师终极日常清怪续航\n更新 2026.9.8\n\nmeta电术\n\n年糕明\n\n适合萌新，门槛超低+大招巨快\n\n地牢日常通用清怪通用\n更新 2026.9.8\n\n冰术阿格尔\n\n纺木吏佐\n\n也是滋滋滋\n\n地牢宗师终极日常通用\n更新 2026.9.8\n\n有限点燃苍蝇头火术\n\ntakt op.Destiny\n\n无限点燃轮椅\n\n突袭宗师终极日常通用清怪续航功能通用\n更新 2026.9.8\n\n双飞饼\n\n全糖牲口#6067\n\n双铸造者刀剑来回重击\n\n宗师终极日常输出清怪续航\n更新 2026.9.4\n\n子弹印刷缚丝术\n\n十四\n\n队伍子弹续航机器，兼顾清怪+团队支援\n\n清怪续航功能\n更新 2026.9.7\n\n亡妻回忆录之星火协议\n\n樱泽春花墨\n\n利用整体的高频产球配合腿部支配模组+星火特性回转手雷\n\n突袭地牢宗师终极日常通用输出清怪续航功能通用\n更新 2026.9.3\n\n风暴衣无限电上术\n\n剑崎明日梦\n\n超快回转的雷霆万钧\n\n宗师终极日常清怪\n更新 2026.9.9\n\n霜袍衣冰术\n\n剑崎明日梦\n\n常驻多炮台高频控场\n\n宗师终极日常清怪功能\n更新 2026.9.8\n\n海胆头电术\n\n樱泽春花墨\n\n梦回侠盗赛季\n\n日常清怪续航功能通用\n更新 2026.9.4\n\n术士职业金裂波者\n\n纺木吏佐\n审核意见近战换神秘织针可以更好配合神器，同时暗影条回转更快\n\n裂波者好玩喵\n\n日常清怪\n更新 2026.9.8\n\n吸血手火术\n\n。\n审核意见腿部的复原和宽恕收益不高，如果武器六维较低可酌情替换成\"武器洗礼\"。\n\n小众猎奇\n\n地牢\n更新 2026.9.8\n\n左键清屏和谐棱镜术\n\n年糕明\n\n大招超快，激光笔长按左键清屏\n\n通用清怪功能\n更新 2026.9.8\n\n坏死+合成棱镜术（贾诩术）\n\n樱泽春花墨\n\n坏死之灵dot伤害配合vog套产球和星象神器批量产线虫，合成之灵配合电好耶清群怪\n\n突袭地牢宗师终极日常通用清怪续航功能通用\n更新 2026.9.4\n\n虚无镣铐/反转手虚空术\n\n樱泽春花墨\n\n遗愿4套效果配合金装回转技能拥有极其恐怖的重弹生产能力\n\n突袭地牢日常输出清怪续航功能通用\n更新 2026.9.3\n\n边缘交通\n\nRandTransit\n审核意见边缘交通经典款配装\n\n娱乐输出配装\n\n突袭地牢输出\n更新 2026.9.9\n\n霜袍术\n\n纺木吏佐\n\n扔雷喵\n\n宗师终极日常清怪续航功能\n更新 2026.9.8\n\n虚式·茈 五条悟虚空术士\n\n许诺Styx\n\n猎人金枪头泰坦陨星胸，我们术士也要有！抱着裂波者滋，滋完就开大招！\n\n突袭日常输出清怪续航\n更新 2026.9.1\n\n牢大术士\n\n错令晚星绘天明\n\n烈日凌空\n\n日常清怪\n更新 2026.9.8\n\n星火纤维棱镜术\n\nXukonVoid\n\n通过缚丝近战获取织造铠甲，吃球获取冰霜护甲，施放强能阵获取吞食与手雷回转，无限奶雷提供续航\n\n地牢宗师终极日常通用清怪续航功能通用\n更新 2026.9.9\n\n间桐樱术\n\nyester言泽\n\n半自动产虫虫挂机配装\n\n地牢宗师终极日常清怪续航功能\n更新 2026.9.1\n\n悬停术\n\n年糕明\n\n靠缠结自循环悬停\n\n日常清怪功能\n更新 2026.9.1\n\nPVP\n\n猎人\n\n66连杀兰花\n\nAloneOvO\n\n命运2自己的杀人刀\n\n更新 2026.9.4\n\n虚空猎pvp\n\n小宁\n\n85aa玫瑰，比鹰月都好用，你值得尝试\n\n更新 2026.9.5\n\n跳舞机袖珍卫士\n\n。\n\n更新 2026.9.8\n\n虚空猎pvp\n\n小宁\n\n轮椅\n\n更新 2026.9.8\n\n泰坦\n\n棱镜泰坦pvp meta 配装\n\n小宁\n\n涨条快，移速快，回复高，吃球还给缚丝甲，打33首选泰坦配装\n\n更新 2026.9.6\n\n四码头 高阶暴君\n\n小宁\n\n66/33皆可，无论是否触发武器大师都是秒人\n\n更新 2026.9.6\n\n术士\n\n闪身头虚空术\n\n❤\n\n通过闪身头来获得稳定的不稳定弹药，帮助击杀\n\n更新 2026.9.8\n\n闪电激涌电术\n\n一粒苟\n\n跟你爆了！\n\n更新 2026.9.8\n\n幽默术士\n\n铭记QAQ\n\n更新 2026.9.8\n\n更新 2026.9.9，配装由各位推荐人提供，随赛季更新。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/index.html",
+    "final_url": "https://starside.work/builds/index.html",
+    "path": "pages/builds/index.html",
+    "bytes": 62543,
+    "sha256": "661af8d20da42f264e183421bc3882808a0c58b127caf0593d3b05eb06dc9cac",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:35.390702+00:00"
+  },
+  "links": [
+    "https://starside.work/builds/new/index.html",
+    "https://starside.work/builds/s29/00vivy2a-hunter/index.html",
+    "https://starside.work/builds/s29/0cqrj1m0-hunter/index.html",
+    "https://starside.work/builds/s29/0rzn1rj2-warlock/index.html",
+    "https://starside.work/builds/s29/12iujhbp-hunter/index.html",
+    "https://starside.work/builds/s29/16gnj6n4-warlock/index.html",
+    "https://starside.work/builds/s29/1846gzu2-warlock/index.html",
+    "https://starside.work/builds/s29/1hvh7t4d-hunter/index.html",
+    "https://starside.work/builds/s29/26x3zxkz-hunter/index.html",
+    "https://starside.work/builds/s29/3p44o63u-warlock/index.html",
+    "https://starside.work/builds/s29/45oqarm4-hunter/index.html",
+    "https://starside.work/builds/s29/6o3okjt4-titan/index.html",
+    "https://starside.work/builds/s29/76ko496i-warlock/index.html",
+    "https://starside.work/builds/s29/7b5y8phc-hunter/index.html",
+    "https://starside.work/builds/s29/9m6612x5-hunter/index.html",
+    "https://starside.work/builds/s29/acdzuqsl-warlock/index.html",
+    "https://starside.work/builds/s29/clama-he-titan/index.html",
+    "https://starside.work/builds/s29/cub5k5v5-warlock/index.html",
+    "https://starside.work/builds/s29/cw92ebx7-warlock/index.html",
+    "https://starside.work/builds/s29/d4xktql3-titan/index.html",
+    "https://starside.work/builds/s29/dwu56wqi-titan/index.html",
+    "https://starside.work/builds/s29/ec4h23xa-titan/index.html",
+    "https://starside.work/builds/s29/em3ruaaj-titan/index.html",
+    "https://starside.work/builds/s29/epfu2cst-hunter/index.html",
+    "https://starside.work/builds/s29/etcdnfru-hunter/index.html",
+    "https://starside.work/builds/s29/fc797wcs-hunter/index.html",
+    "https://starside.work/builds/s29/fhbpgwnh-titan/index.html",
+    "https://starside.work/builds/s29/fnsnwbr3-hunter/index.html",
+    "https://starside.work/builds/s29/hemhwhoe-hunter/index.html",
+    "https://starside.work/builds/s29/hl9zhtio-warlock/index.html",
+    "https://starside.work/builds/s29/ig7y9i5n-warlock/index.html",
+    "https://starside.work/builds/s29/irneezm3-warlock/index.html",
+    "https://starside.work/builds/s29/iuhsh3n7-warlock/index.html",
+    "https://starside.work/builds/s29/j53igc67-hunter/index.html",
+    "https://starside.work/builds/s29/j5lws37e-hunter/index.html",
+    "https://starside.work/builds/s29/jianqi-fengbao-warlock/index.html",
+    "https://starside.work/builds/s29/jianqi-kongjufusi-warlock/index.html",
+    "https://starside.work/builds/s29/jianqi-shuangpaoyi-warlock/index.html",
+    "https://starside.work/builds/s29/k9b88zv0-warlock/index.html",
+    "https://starside.work/builds/s29/kvy77e2g-titan/index.html",
+    "https://starside.work/builds/s29/lndho5sd-hunter/index.html",
+    "https://starside.work/builds/s29/lp6n569t-titan/index.html",
+    "https://starside.work/builds/s29/lxg8i6ue-hunter/index.html",
+    "https://starside.work/builds/s29/madoka-yuansudashi-hunter/index.html",
+    "https://starside.work/builds/s29/mc17h8dh-warlock/index.html",
+    "https://starside.work/builds/s29/mengdong-hechengstasis-titan/index.html",
+    "https://starside.work/builds/s29/mkguedf2-hunter/index.html",
+    "https://starside.work/builds/s29/mo1r9kvu-warlock/index.html",
+    "https://starside.work/builds/s29/nbq988rq-warlock/index.html",
+    "https://starside.work/builds/s29/ne0agkms-titan/index.html",
+    "https://starside.work/builds/s29/niangaoming-hexieqingping-warlock/index.html",
+    "https://starside.work/builds/s29/nianqingren-hexiaodi-hunter/index.html",
+    "https://starside.work/builds/s29/nightcore-baolei-hunter/index.html",
+    "https://starside.work/builds/s29/nightcore-swxsjz-hunter/index.html",
+    "https://starside.work/builds/s29/ozytwawh-titan/index.html",
+    "https://starside.work/builds/s29/pkz20gm1-warlock/index.html",
+    "https://starside.work/builds/s29/q01swvbe-titan/index.html",
+    "https://starside.work/builds/s29/q9y0mpko-titan/index.html",
+    "https://starside.work/builds/s29/qz9gs029-warlock/index.html",
+    "https://starside.work/builds/s29/rdrctsdn-warlock/index.html",
+    "https://starside.work/builds/s29/rnoxx0b1-warlock/index.html",
+    "https://starside.work/builds/s29/s5imk2yw-hunter/index.html",
+    "https://starside.work/builds/s29/sc398fux-titan/index.html",
+    "https://starside.work/builds/s29/swyr3tgz-warlock/index.html",
+    "https://starside.work/builds/s29/tniihk60-warlock/index.html",
+    "https://starside.work/builds/s29/tz4vvv6j-warlock/index.html",
+    "https://starside.work/builds/s29/v623u209-hunter/index.html",
+    "https://starside.work/builds/s29/vc0q45kd-hunter/index.html",
+    "https://starside.work/builds/s29/vl8gam9n-titan/index.html",
+    "https://starside.work/builds/s29/w0q7ss18-hunter/index.html",
+    "https://starside.work/builds/s29/xiaoning-xukongpvp-hunter/index.html",
+    "https://starside.work/builds/s29/xukonvoid-xinghuo-warlock/index.html",
+    "https://starside.work/builds/s29/yester-bguipen-titan/index.html",
+    "https://starside.work/builds/s29/yester-guidao-hunter/index.html",
+    "https://starside.work/builds/s29/yester-jtys-warlock/index.html",
+    "https://starside.work/builds/s29/yester-rendongdiudiu-hunter/index.html",
+    "https://starside.work/builds/s29/yester-xukongjiansheng-titan/index.html",
+    "https://starside.work/builds/s29/yiwangmelt-ggggdamage-hunter/index.html",
+    "https://starside.work/builds/s29/yiwangmelt-shoudian-hunter/index.html",
+    "https://starside.work/builds/s29/yiwangmelt-twjqg-hunter/index.html",
+    "https://starside.work/builds/s29/yiwangmelt-weiyiqingguai2-hunter/index.html",
+    "https://starside.work/builds/s29/ynwgmvks-warlock/index.html",
+    "https://starside.work/builds/s29/zf43l1v8-titan/index.html",
+    "https://starside.work/builds/s29/zqqoqjsb-warlock/index.html",
+    "https://starside.work/builds/sets/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-sets/icons/095.png",
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/elements/solar/icons/1f267ad07f.webp",
+    "https://starside.work/elements/solar/icons/75282a79bc.webp",
+    "https://starside.work/elements/solar/icons/a8feb9c7da.webp",
+    "https://starside.work/elements/stasis/icons/8d6fa9f3a1.webp",
+    "https://starside.work/elements/stasis/icons/b30869e0cb.webp",
+    "https://starside.work/elements/stasis/icons/f33df47fea.webp",
+    "https://starside.work/elements/strand/icons/5ad576bf78.webp",
+    "https://starside.work/elements/void/icons/f6b6d1d418.webp",
+    "https://starside.work/exotic-armor/icons/1107c04848.webp",
+    "https://starside.work/exotic-armor/icons/132bbc9954.webp",
+    "https://starside.work/exotic-armor/icons/29a427eb84.webp",
+    "https://starside.work/exotic-armor/icons/2b9decbbbd.webp",
+    "https://starside.work/exotic-armor/icons/3d302759ec.webp",
+    "https://starside.work/exotic-armor/icons/3f6fe4f45b.webp",
+    "https://starside.work/exotic-armor/icons/4617c0972a.webp",
+    "https://starside.work/exotic-armor/icons/475a890d79.webp",
+    "https://starside.work/exotic-armor/icons/4b66c7e894.webp",
+    "https://starside.work/exotic-armor/icons/4bbf365b1f.webp",
+    "https://starside.work/exotic-armor/icons/5285f59120.webp",
+    "https://starside.work/exotic-armor/icons/56dc556882.webp",
+    "https://starside.work/exotic-armor/icons/579ec5c591.webp",
+    "https://starside.work/exotic-armor/icons/647a1c97b2.webp",
+    "https://starside.work/exotic-armor/icons/70fbda0e52.webp",
+    "https://starside.work/exotic-armor/icons/7c2bc554d6.webp",
+    "https://starside.work/exotic-armor/icons/7fe1da85bb.webp",
+    "https://starside.work/exotic-armor/icons/9149fcdaa1.webp",
+    "https://starside.work/exotic-armor/icons/94ed262641.webp",
+    "https://starside.work/exotic-armor/icons/9621afa8b9.webp",
+    "https://starside.work/exotic-armor/icons/9c1951731b.webp",
+    "https://starside.work/exotic-armor/icons/9ee4859dac.webp",
+    "https://starside.work/exotic-armor/icons/a942279c14.webp",
+    "https://starside.work/exotic-armor/icons/a956283d1f.webp",
+    "https://starside.work/exotic-armor/icons/b15e299d36.webp",
+    "https://starside.work/exotic-armor/icons/b46405fa9a.webp",
+    "https://starside.work/exotic-armor/icons/c70bf2ae5b.webp",
+    "https://starside.work/exotic-armor/icons/dd2c0046a6.webp",
+    "https://starside.work/exotic-armor/icons/ed73b8294b.webp",
+    "https://starside.work/exotic-armor/icons/efb24f694b.webp",
+    "https://starside.work/exotic-armor/icons/f04de7974e.webp",
+    "https://starside.work/exotic-armor/icons/fc1175b364.webp",
+    "https://starside.work/exotic-weapon/icons/3e4fd55958.webp",
+    "https://starside.work/exotic-weapon/icons/7867f8edbd.webp",
+    "https://starside.work/exotic-weapon/icons/9a3c00eb45.webp",
+    "https://starside.work/exotic-weapon/icons/ab6e2e843c.webp",
+    "https://starside.work/exotic-weapon/icons/c963bcc718.webp",
+    "https://starside.work/exotic-weapon/icons/db0149e177.webp",
+    "https://starside.work/exotic-weapon/icons/df6845d757.webp",
+    "https://starside.work/exotic-weapon/icons/e00ead964b.webp",
+    "https://starside.work/exotic-weapon/icons/e25e9036b4.webp",
+    "https://starside.work/exotic-weapon/icons/f44d0f5ca3.webp",
+    "https://starside.work/exotic-weapon/icons/f8216efc3a.webp",
+    "https://starside.work/shopping-heavy/icons/a6db89326f.webp",
+    "https://starside.work/shopping-heavy/icons/d34f43defa.webp",
+    "https://starside.work/shopping-primary/icons/4298944ecd.webp",
+    "https://starside.work/shopping-primary/icons/b9206ccc5d.webp",
+    "https://starside.work/shopping-primary/icons/d2470e70ef.webp",
+    "https://starside.work/shopping-special/icons/2a90af6c07.webp",
+    "https://starside.work/shopping-special/icons/2c10e3adb4.webp",
+    "https://starside.work/shopping-special/icons/8e8aa14381.webp",
+    "https://starside.work/shopping-special/icons/fe5e6e2876.webp"
+  ]
+}

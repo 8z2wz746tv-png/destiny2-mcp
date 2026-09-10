@@ -1,0 +1,181 @@
+{
+  "url": "https://starside.work/builds/s29/epfu2cst-hunter/index.html",
+  "title": "贪婪忠诚面具冰猎 · 配装推荐 · Starside",
+  "description": "进阶版忠诚面具，保证强度的同时还能超级跳",
+  "category": "builds",
+  "updated_at": "2026.9.8",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 贪婪忠诚面具冰猎\n\n推荐人：颩雷#1257\n描述：进阶版忠诚面具，保证强度的同时还能超级跳\n更新：2026.9.8\n场景：地牢、宗师终极、日常、通用\n定位：清怪、续航、功能、通用\n分支：冰影\n类别：强度\n核心：忠诚面具\n\n## 审核意见\n\n闪身是赌徒不是特技\n\n## 职业\n\n职业：猎人\n超能：沉默狂啸\n星相：破碎俯冲、严冬帷幕\n碎片：裂隙之吟、刺激的低语、破碎之吟、韵律之吟、传导之吟、耐久之吟\n手雷：冰川手雷\n近战：枯萎之刃\n职业技能：特技闪身\n\n## 武器\n\n异域武器：混乱无序\n传说武器：裁决定论 | 聚合充能、战嚎炮管\n传说武器：驱逐引擎 | 空中扳机、混沌重塑\n\n## 护甲\n\n异域护甲：忠诚面具\n套装：贪婪之握 2 件 × 贪婪之握 4 件\n头盔：弹药搜寻者、特殊武器弹药搜寻者、特殊武器弹药搜寻者\n护臂：手雷洗礼、近战洗礼、伤害感应\n胸甲：电弧弹药生成、震荡阻尼器、虚空抗性\n腿部：电弧武器激涌、元素充能、电弧回收器\n职业物品：时间膨胀、特殊终结技、感应护盾\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：风寒、晶体转换器、削弱清敌、治疗能量球、迎接风暴、冰冷伺候、冰霜复兴\n\n## 六维\n\n六维：生命 ~ ｜ 近战 70+ ｜ 手雷 70+ ｜ 超能 ~ ｜ 职业 100+ ｜ 武器 150+\n\n## 注解\n\n用破损俯冲代替冷酷收割，能主动碎冰产生大量碎片保证技能一直续得上的同时只要碎到一个冰就给满层的冰霜护甲。\n用混乱无序+裁决能做到很不错的dps，平时下一些压力不大的本也不用带混乱无序\n有屏障就带强硬收割（这样就能破三勇士）没屏障就带急峰（超级跳劲大）\n热血上头的火箭筒破屏障也是不错的选择。武器选择非常灵活\n武器尽量堆高，职业一百，近战手雷最好70以上再用洗礼模组补到100左右就有很好的回转。\n在没有子弹的情况下这套是能做到不失误的情况下技能放不完的，近战丢完闪身回 回不上了小跳一下俯冲碎冰回技能。\n神器的迎接风暴和冰霜复兴，碎片的耐久之吟，都不是核心，可以根据个人喜好更换",
+  "source_blocks": [
+    "# 贪婪忠诚面具冰猎\n\n推荐人：颩雷#1257\n描述：进阶版忠诚面具，保证强度的同时还能超级跳\n更新：2026.9.8\n场景：地牢、宗师终极、日常、通用\n定位：清怪、续航、功能、通用\n分支：冰影\n类别：强度\n核心：忠诚面具\n\n## 审核意见\n\n闪身是赌徒不是特技\n\n## 职业\n\n职业：猎人\n超能：沉默狂啸\n星相：破碎俯冲、严冬帷幕\n碎片：裂隙之吟、刺激的低语、破碎之吟、韵律之吟、传导之吟、耐久之吟\n手雷：冰川手雷\n近战：枯萎之刃\n职业技能：特技闪身\n\n## 武器\n\n异域武器：混乱无序\n传说武器：裁决定论 | 聚合充能、战嚎炮管\n传说武器：驱逐引擎 | 空中扳机、混沌重塑\n\n## 护甲\n\n异域护甲：忠诚面具\n套装：贪婪之握 2 件 × 贪婪之握 4 件\n头盔：弹药搜寻者、特殊武器弹药搜寻者、特殊武器弹药搜寻者\n护臂：手雷洗礼、近战洗礼、伤害感应\n胸甲：电弧弹药生成、震荡阻尼器、虚空抗性\n腿部：电弧武器激涌、元素充能、电弧回收器\n职业物品：时间膨胀、特殊终结技、感应护盾\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：风寒、晶体转换器、削弱清敌、治疗能量球、迎接风暴、冰冷伺候、冰霜复兴\n\n## 六维\n\n六维：生命 ~ ｜ 近战 70+ ｜ 手雷 70+ ｜ 超能 ~ ｜ 职业 100+ ｜ 武器 150+\n\n## 注解\n\n用破损俯冲代替冷酷收割，能主动碎冰产生大量碎片保证技能一直续得上的同时只要碎到一个冰就给满层的冰霜护甲。\n用混乱无序+裁决能做到很不错的dps，平时下一些压力不大的本也不用带混乱无序\n有屏障就带强硬收割（这样就能破三勇士）没屏障就带急峰（超级跳劲大）\n热血上头的火箭筒破屏障也是不错的选择。武器选择非常灵活\n武器尽量堆高，职业一百，近战手雷最好70以上再用洗礼模组补到100左右就有很好的回转。\n在没有子弹的情况下这套是能做到不失误的情况下技能放不完的，近战丢完闪身回 回不上了小跳一下俯冲碎冰回技能。\n神器的迎接风暴和冰霜复兴，碎片的耐久之吟，都不是核心，可以根据个人喜好更换"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "贪婪忠诚面具冰猎"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "杀手公爵药剂师背包"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "贪婪忠诚面具冰猎 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n贪婪忠诚面具冰猎\n\n推荐者：\n颩雷#1257\n\n贪婪忠诚面具冰猎\n\n♥︎ 复制配装截图详情开关\n\n猎人 · 冰影 · 强度S29 · 凯旋纪念碑\n\n进阶版忠诚面具，保证强度的同时还能超级跳\n\n适用环境\n\n地牢\n\n宗师终极\n\n日常\n\n通用\n\n标签\n\n清怪\n\n续航\n\n功能\n\n通用\n\n# 贪婪忠诚面具冰猎\n\n推荐人：颩雷#1257\n描述：进阶版忠诚面具，保证强度的同时还能超级跳\n更新：2026.9.8\n场景：地牢、宗师终极、日常、通用\n定位：清怪、续航、功能、通用\n分支：冰影\n类别：强度\n核心：忠诚面具\n\n## 审核意见\n\n闪身是赌徒不是特技\n\n## 职业\n\n职业：猎人\n超能：沉默狂啸\n星相：破碎俯冲、严冬帷幕\n碎片：裂隙之吟、刺激的低语、破碎之吟、韵律之吟、传导之吟、耐久之吟\n手雷：冰川手雷\n近战：枯萎之刃\n职业技能：特技闪身\n\n## 武器\n\n异域武器：混乱无序\n传说武器：裁决定论 | 聚合充能、战嚎炮管\n传说武器：驱逐引擎 | 空中扳机、混沌重塑\n\n## 护甲\n\n异域护甲：忠诚面具\n套装：贪婪之握 2 件 × 贪婪之握 4 件\n头盔：弹药搜寻者、特殊武器弹药搜寻者、特殊武器弹药搜寻者\n护臂：手雷洗礼、近战洗礼、伤害感应\n胸甲：电弧弹药生成、震荡阻尼器、虚空抗性\n腿部：电弧武器激涌、元素充能、电弧回收器\n职业物品：时间膨胀、特殊终结技、感应护盾\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：风寒、晶体转换器、削弱清敌、治疗能量球、迎接风暴、冰冷伺候、冰霜复兴\n\n## 六维\n\n六维：生命 ~ ｜ 近战 70+ ｜ 手雷 70+ ｜ 超能 ~ ｜ 职业 100+ ｜ 武器 150+\n\n## 注解\n\n用破损俯冲代替冷酷收割，能主动碎冰产生大量碎片保证技能一直续得上的同时只要碎到一个冰就给满层的冰霜护甲。\n用混乱无序+裁决能做到很不错的dps，平时下一些压力不大的本也不用带混乱无序\n有屏障就带强硬收割（这样就能破三勇士）没屏障就带急峰（超级跳劲大）\n热血上头的火箭筒破屏障也是不错的选择。武器选择非常灵活\n武器尽量堆高，职业一百，近战手雷最好70以上再用洗礼模组补到100左右就有很好的回转。\n在没有子弹的情况下这套是能做到不失误的情况下技能放不完的，近战丢完闪身回 回不上了小跳一下俯冲碎冰回技能。\n神器的迎接风暴和冰霜复兴，碎片的耐久之吟，都不是核心，可以根据个人喜好更换\n\n审核意见\n\n闪身是赌徒不是特技\n\n职业\n\n职业\n\n猎人\n\n冰影\n\n超能\n\n沉默狂啸\n\n技能\n\n冰川手雷\n\n枯萎之刃\n\n特技闪身\n\n星相\n\n破碎俯冲\n\n严冬帷幕\n\n碎片\n\n裂隙之吟\n\n刺激的低语\n\n破碎之吟\n\n韵律之吟\n\n传导之吟\n\n耐久之吟\n\n武器\n\n混乱无序\n\n裁决定论聚合充能战嚎炮管\n\n驱逐引擎空中扳机混沌重塑\n\n神器模组\n\n杀手公爵药剂师背包\n\n风寒\n\n晶体转换器\n\n削弱清敌\n\n治疗能量球\n\n迎接风暴\n\n冰冷伺候\n\n冰霜复兴\n\n护甲\n\n忠诚面具\n\n贪婪之握渴望回响2 件\n\n贪婪之握渴望回响4 件\n\n生命~\n\n近战70+\n\n手雷70+\n\n超能~\n\n职业100+\n\n武器150+\n\n头盔\n\n弹药搜寻者\n\n特殊武器弹药搜寻者弹药搜寻者\n\n特殊武器弹药搜寻者弹药搜寻者\n\n护臂\n\n手雷洗礼\n\n近战洗礼\n\n伤害感应\n\n胸甲\n\n电弧弹药生成弹药生成\n\n震荡阻尼器抗性\n\n虚空抗性抗性\n\n腿部\n\n电弧武器激涌武器激涌\n\n元素充能\n\n电弧回收器回收利用\n\n职业物品\n\n时间膨胀\n\n特殊终结技\n\n感应护盾\n\n注解\n\n用破损俯冲代替冷酷收割，能主动碎冰产生大量碎片保证技能一直续得上的同时只要碎到一个冰就给满层的冰霜护甲。\n用混乱无序+裁决能做到很不错的dps，平时下一些压力不大的本也不用带混乱无序\n有屏障就带强硬收割（这样就能破三勇士）没屏障就带急峰（超级跳劲大）\n热血上头的火箭筒破屏障也是不错的选择。武器选择非常灵活\n武器尽量堆高，职业一百，近战手雷最好70以上再用洗礼模组补到100左右就有很好的回转。\n在没有子弹的情况下这套是能做到不失误的情况下技能放不完的，近战丢完闪身回 回不上了小跳一下俯冲碎冰回技能。\n神器的迎接风暴和冰霜复兴，碎片的耐久之吟，都不是核心，可以根据个人喜好更换\n\n更新 2026.9.8\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/epfu2cst-hunter/index.html",
+    "final_url": "https://starside.work/builds/s29/epfu2cst-hunter/index.html",
+    "path": "pages/builds/s29/epfu2cst-hunter/index.html",
+    "bytes": 33135,
+    "sha256": "1552e3c74992e7be8f6ee3ce87d46fb57bc5cfe3ac583442f4fc411878cabde3",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:28:12.116336+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/197de64d1b.webp",
+    "https://starside.work/armor-mods/icons/346923d6cc.webp",
+    "https://starside.work/armor-mods/icons/37bedc55b8.webp",
+    "https://starside.work/armor-mods/icons/549322d88e.webp",
+    "https://starside.work/armor-mods/icons/5a6be432c9.webp",
+    "https://starside.work/armor-mods/icons/63b6a1e140.webp",
+    "https://starside.work/armor-mods/icons/8c22cf983d.webp",
+    "https://starside.work/armor-mods/icons/ab17306a96.webp",
+    "https://starside.work/armor-mods/icons/b2c34e83e7.webp",
+    "https://starside.work/armor-mods/icons/c014f3b5ea.webp",
+    "https://starside.work/armor-mods/icons/d482839737.webp",
+    "https://starside.work/armor-mods/icons/de11071dd7.webp",
+    "https://starside.work/armor-mods/icons/e10db37ad3.webp",
+    "https://starside.work/armor-mods/icons/fc4ae31f8f.webp",
+    "https://starside.work/armor-sets/icons/095.png",
+    "https://starside.work/armor-sets/icons/096.png",
+    "https://starside.work/artifact-mods/icons/060edf607a.webp",
+    "https://starside.work/artifact-mods/icons/2670d7c9d5.webp",
+    "https://starside.work/artifact-mods/icons/78a42211b1.webp",
+    "https://starside.work/artifact-mods/icons/8e857c15d5.webp",
+    "https://starside.work/artifact-mods/icons/bf9ce7a203.webp",
+    "https://starside.work/artifact-mods/icons/eb925e3624.webp",
+    "https://starside.work/artifact-mods/icons/fe7753e6b0.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/934a3556a0.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/cba8013059.webp",
+    "https://starside.work/elements/class-abilities/icons/fad1ac3672.webp",
+    "https://starside.work/elements/stasis/icons/1ce9063ff7.webp",
+    "https://starside.work/elements/stasis/icons/481a86e7c6.webp",
+    "https://starside.work/elements/stasis/icons/4ef3a870f7.webp",
+    "https://starside.work/elements/stasis/icons/6ded4a097e.webp",
+    "https://starside.work/elements/stasis/icons/849beb7009.webp",
+    "https://starside.work/elements/stasis/icons/93cf350c0b.webp",
+    "https://starside.work/elements/stasis/icons/b30869e0cb.webp",
+    "https://starside.work/elements/stasis/icons/c7be215908.webp",
+    "https://starside.work/elements/stasis/icons/d41cd404fa.webp",
+    "https://starside.work/elements/stasis/icons/dcb861ec73.webp",
+    "https://starside.work/elements/stasis/icons/f33df47fea.webp",
+    "https://starside.work/elements/stasis/icons/f84b6c172e.webp",
+    "https://starside.work/exotic-armor/icons/9c1951731b.webp",
+    "https://starside.work/exotic-weapon/icons/f8216efc3a.webp",
+    "https://starside.work/shopping-special/icons/3d0491b9e1.webp",
+    "https://starside.work/shopping-special/icons/7aff96017d.webp",
+    "https://starside.work/weapon-perks/icons/28f22a2b37.webp",
+    "https://starside.work/weapon-perks/icons/b0b30fdda2.webp",
+    "https://starside.work/weapon-perks/icons/e0749cfc0e.webp",
+    "https://starside.work/weapon-perks/icons/e94d2a7d2d.webp"
+  ]
+}

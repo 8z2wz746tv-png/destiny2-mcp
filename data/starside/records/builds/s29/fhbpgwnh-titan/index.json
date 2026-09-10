@@ -1,0 +1,179 @@
+{
+  "url": "https://starside.work/builds/s29/fhbpgwnh-titan/index.html",
+  "title": "光能甲碎冰雷泰坦 · 配装推荐 · Starside",
+  "description": "基于光能甲的高回转和高伤害",
+  "category": "builds",
+  "updated_at": "2026.9.9",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 光能甲碎冰雷泰坦\n\n推荐人：溴碘砹\n描述：基于光能甲的高回转和高伤害\n更新：2026.9.9\n场景：宗师终极、通用\n定位：清怪、通用\n分支：冰影\n类别：强度\n核心：至纯光能护心甲\n\n## 职业\n\n职业：泰坦\n超能：冰川震击\n星相：构造收割、风暴怒吼\n碎片：传导之吟、破碎之吟、饥饿之吟、韵律之吟\n手雷：碎裂手雷\n近战：战栗打击\n职业技能：集结屏障\n\n## 武器\n\n异域武器：死亡信使\n传说武器：骑士之火 | 集体爆破、急切刀锋\n传说武器：言语轨迹 | 丰盈满溢、覆盖护盾克星\n\n## 护甲\n\n异域护甲：至纯光能护心甲\n套装：预言 2 件 × 预言 4 件\n头盔：特殊武器弹药搜寻者、点尸成金、弹药搜寻者\n护臂：伤害感应、火力无限、手雷洗礼\n胸甲：抗性、抗性、抗性\n腿部：元素充能、虚空回收器、宽恕\n职业物品：特殊终结技、强力吸引、感应护盾\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：晶体转换器、大肆屠杀、冰霜复兴、迎接风暴、削弱清敌、治疗能量球、置身其中\n\n## 六维\n\n六维：生命 ~ ｜ 近战 70～100 ｜ 手雷 200+ ｜ 超能 100+ ｜ 职业 ~ ｜ 武器 ~\n\n## 注解\n\n1.碎裂手雷命中冻结的战斗人员可造成较高的伤害，光能甲可进一步提高回转和伤害，进行高频率碎冰雷输出。\n2.预言4件套可通过光能武器摧毁冰影水晶来触发回复手雷能量，死亡信使可稳定摧毁风暴怒吼的冰影水晶来回满手雷能量。\n3.死亡信使自身拥有较高的三波形伤害，碎裂手雷可触发死亡信使的“爆破专家”来填装弹药，同时死亡信使也可触发“削弱清敌”神器来上易伤以及基本法则增伤，是本套的另一大输出手段。\n4.本套配装碎冰效率很高，生存能力具备保障，可酌情选择将碎片“韵律之吟”换为“刺激的低语”来优化手感。骑士之火触发集体爆破期间，重攻击即可回满手雷能量，可作为额外回复手雷的手段。\n5.本套最大的优点是不依赖战斗人员和盟友，纯自主回转即可具备高输出能力。但要注意碎裂手雷有较高自伤，要保持自身与手雷的落点距离。",
+  "source_blocks": [
+    "# 光能甲碎冰雷泰坦\n\n推荐人：溴碘砹\n描述：基于光能甲的高回转和高伤害\n更新：2026.9.9\n场景：宗师终极、通用\n定位：清怪、通用\n分支：冰影\n类别：强度\n核心：至纯光能护心甲\n\n## 职业\n\n职业：泰坦\n超能：冰川震击\n星相：构造收割、风暴怒吼\n碎片：传导之吟、破碎之吟、饥饿之吟、韵律之吟\n手雷：碎裂手雷\n近战：战栗打击\n职业技能：集结屏障\n\n## 武器\n\n异域武器：死亡信使\n传说武器：骑士之火 | 集体爆破、急切刀锋\n传说武器：言语轨迹 | 丰盈满溢、覆盖护盾克星\n\n## 护甲\n\n异域护甲：至纯光能护心甲\n套装：预言 2 件 × 预言 4 件\n头盔：特殊武器弹药搜寻者、点尸成金、弹药搜寻者\n护臂：伤害感应、火力无限、手雷洗礼\n胸甲：抗性、抗性、抗性\n腿部：元素充能、虚空回收器、宽恕\n职业物品：特殊终结技、强力吸引、感应护盾\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：晶体转换器、大肆屠杀、冰霜复兴、迎接风暴、削弱清敌、治疗能量球、置身其中\n\n## 六维\n\n六维：生命 ~ ｜ 近战 70～100 ｜ 手雷 200+ ｜ 超能 100+ ｜ 职业 ~ ｜ 武器 ~\n\n## 注解\n\n1.碎裂手雷命中冻结的战斗人员可造成较高的伤害，光能甲可进一步提高回转和伤害，进行高频率碎冰雷输出。\n2.预言4件套可通过光能武器摧毁冰影水晶来触发回复手雷能量，死亡信使可稳定摧毁风暴怒吼的冰影水晶来回满手雷能量。\n3.死亡信使自身拥有较高的三波形伤害，碎裂手雷可触发死亡信使的“爆破专家”来填装弹药，同时死亡信使也可触发“削弱清敌”神器来上易伤以及基本法则增伤，是本套的另一大输出手段。\n4.本套配装碎冰效率很高，生存能力具备保障，可酌情选择将碎片“韵律之吟”换为“刺激的低语”来优化手感。骑士之火触发集体爆破期间，重攻击即可回满手雷能量，可作为额外回复手雷的手段。\n5.本套最大的优点是不依赖战斗人员和盟友，纯自主回转即可具备高输出能力。但要注意碎裂手雷有较高自伤，要保持自身与手雷的落点距离。"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "光能甲碎冰雷泰坦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "杀手公爵药剂师背包"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "光能甲碎冰雷泰坦 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n光能甲碎冰雷泰坦\n\n推荐者：\n溴碘砹\n\n光能甲碎冰雷泰坦\n\n♥︎ 复制配装截图详情开关\n\n泰坦 · 冰影 · 强度S29 · 凯旋纪念碑\n\n基于光能甲的高回转和高伤害\n\n适用环境\n\n宗师终极\n\n通用\n\n标签\n\n清怪\n\n通用\n\n# 光能甲碎冰雷泰坦\n\n推荐人：溴碘砹\n描述：基于光能甲的高回转和高伤害\n更新：2026.9.9\n场景：宗师终极、通用\n定位：清怪、通用\n分支：冰影\n类别：强度\n核心：至纯光能护心甲\n\n## 职业\n\n职业：泰坦\n超能：冰川震击\n星相：构造收割、风暴怒吼\n碎片：传导之吟、破碎之吟、饥饿之吟、韵律之吟\n手雷：碎裂手雷\n近战：战栗打击\n职业技能：集结屏障\n\n## 武器\n\n异域武器：死亡信使\n传说武器：骑士之火 | 集体爆破、急切刀锋\n传说武器：言语轨迹 | 丰盈满溢、覆盖护盾克星\n\n## 护甲\n\n异域护甲：至纯光能护心甲\n套装：预言 2 件 × 预言 4 件\n头盔：特殊武器弹药搜寻者、点尸成金、弹药搜寻者\n护臂：伤害感应、火力无限、手雷洗礼\n胸甲：抗性、抗性、抗性\n腿部：元素充能、虚空回收器、宽恕\n职业物品：特殊终结技、强力吸引、感应护盾\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：晶体转换器、大肆屠杀、冰霜复兴、迎接风暴、削弱清敌、治疗能量球、置身其中\n\n## 六维\n\n六维：生命 ~ ｜ 近战 70～100 ｜ 手雷 200+ ｜ 超能 100+ ｜ 职业 ~ ｜ 武器 ~\n\n## 注解\n\n1.碎裂手雷命中冻结的战斗人员可造成较高的伤害，光能甲可进一步提高回转和伤害，进行高频率碎冰雷输出。\n2.预言4件套可通过光能武器摧毁冰影水晶来触发回复手雷能量，死亡信使可稳定摧毁风暴怒吼的冰影水晶来回满手雷能量。\n3.死亡信使自身拥有较高的三波形伤害，碎裂手雷可触发死亡信使的“爆破专家”来填装弹药，同时死亡信使也可触发“削弱清敌”神器来上易伤以及基本法则增伤，是本套的另一大输出手段。\n4.本套配装碎冰效率很高，生存能力具备保障，可酌情选择将碎片“韵律之吟”换为“刺激的低语”来优化手感。骑士之火触发集体爆破期间，重攻击即可回满手雷能量，可作为额外回复手雷的手段。\n5.本套最大的优点是不依赖战斗人员和盟友，纯自主回转即可具备高输出能力。但要注意碎裂手雷有较高自伤，要保持自身与手雷的落点距离。\n\n职业\n\n职业\n\n泰坦\n\n冰影\n\n超能\n\n冰川震击\n\n技能\n\n碎裂手雷\n\n战栗打击\n\n集结屏障\n\n星相\n\n构造收割\n\n风暴怒吼\n\n碎片\n\n传导之吟\n\n破碎之吟\n\n饥饿之吟\n\n韵律之吟\n\n武器\n\n死亡信使\n\n骑士之火集体爆破急切刀锋\n\n言语轨迹丰盈满溢覆盖护盾克星\n\n神器模组\n\n杀手公爵药剂师背包\n\n晶体转换器\n\n大肆屠杀\n\n冰霜复兴\n\n迎接风暴\n\n削弱清敌\n\n治疗能量球\n\n置身其中\n\n护甲\n\n至纯光能护心甲\n\n预言终曲2 件\n\n预言终曲4 件\n\n生命~\n\n近战70～100\n\n手雷200+\n\n超能100+\n\n职业~\n\n武器~\n\n头盔\n\n特殊武器弹药搜寻者弹药搜寻者\n\n点尸成金\n\n弹药搜寻者\n\n护臂\n\n伤害感应\n\n火力无限\n\n手雷洗礼\n\n胸甲\n\n抗性\n\n抗性\n\n抗性\n\n腿部\n\n元素充能\n\n虚空回收器回收利用\n\n宽恕\n\n职业物品\n\n特殊终结技\n\n强力吸引\n\n感应护盾\n\n注解\n\n1.碎裂手雷命中冻结的战斗人员可造成较高的伤害，光能甲可进一步提高回转和伤害，进行高频率碎冰雷输出。\n2.预言4件套可通过光能武器摧毁冰影水晶来触发回复手雷能量，死亡信使可稳定摧毁风暴怒吼的冰影水晶来回满手雷能量。\n3.死亡信使自身拥有较高的三波形伤害，碎裂手雷可触发死亡信使的“爆破专家”来填装弹药，同时死亡信使也可触发“削弱清敌”神器来上易伤以及基本法则增伤，是本套的另一大输出手段。\n4.本套配装碎冰效率很高，生存能力具备保障，可酌情选择将碎片“韵律之吟”换为“刺激的低语”来优化手感。骑士之火触发集体爆破期间，重攻击即可回满手雷能量，可作为额外回复手雷的手段。\n5.本套最大的优点是不依赖战斗人员和盟友，纯自主回转即可具备高输出能力。但要注意碎裂手雷有较高自伤，要保持自身与手雷的落点距离。\n\n更新 2026.9.9\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/fhbpgwnh-titan/index.html",
+    "final_url": "https://starside.work/builds/s29/fhbpgwnh-titan/index.html",
+    "path": "pages/builds/s29/fhbpgwnh-titan/index.html",
+    "bytes": 32367,
+    "sha256": "0fd542e008b4781d00352d41933296d41f8624155792a2b547d6e162aa28f6eb",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:28:14.175484+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-heavy/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/1281c5dda9.webp",
+    "https://starside.work/armor-mods/icons/197de64d1b.webp",
+    "https://starside.work/armor-mods/icons/346923d6cc.webp",
+    "https://starside.work/armor-mods/icons/549322d88e.webp",
+    "https://starside.work/armor-mods/icons/5667ee76b8.webp",
+    "https://starside.work/armor-mods/icons/5704e0690e.webp",
+    "https://starside.work/armor-mods/icons/63b6a1e140.webp",
+    "https://starside.work/armor-mods/icons/8c22cf983d.webp",
+    "https://starside.work/armor-mods/icons/9e78787019.webp",
+    "https://starside.work/armor-mods/icons/b2c34e83e7.webp",
+    "https://starside.work/armor-mods/icons/b7c73dd956.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-mods/icons/fc4ae31f8f.webp",
+    "https://starside.work/armor-sets/icons/093.png",
+    "https://starside.work/armor-sets/icons/094.png",
+    "https://starside.work/artifact-mods/icons/060edf607a.webp",
+    "https://starside.work/artifact-mods/icons/2670d7c9d5.webp",
+    "https://starside.work/artifact-mods/icons/78a42211b1.webp",
+    "https://starside.work/artifact-mods/icons/8e857c15d5.webp",
+    "https://starside.work/artifact-mods/icons/9ed0a859b2.webp",
+    "https://starside.work/artifact-mods/icons/bf9ce7a203.webp",
+    "https://starside.work/artifact-mods/icons/cfc1a2b42b.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/934a3556a0.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/9b7d9d8088.webp",
+    "https://starside.work/elements/class-abilities/icons/f267262f1f.webp",
+    "https://starside.work/elements/stasis/icons/1ce9063ff7.webp",
+    "https://starside.work/elements/stasis/icons/224d56a6aa.webp",
+    "https://starside.work/elements/stasis/icons/27386d7cc8.webp",
+    "https://starside.work/elements/stasis/icons/47b7881b6e.webp",
+    "https://starside.work/elements/stasis/icons/533b665598.webp",
+    "https://starside.work/elements/stasis/icons/8d6fa9f3a1.webp",
+    "https://starside.work/elements/stasis/icons/93cf350c0b.webp",
+    "https://starside.work/elements/stasis/icons/a56a8163a3.webp",
+    "https://starside.work/elements/stasis/icons/dbaa5e6414.webp",
+    "https://starside.work/elements/stasis/icons/f84b6c172e.webp",
+    "https://starside.work/exotic-armor/icons/c70bf2ae5b.webp",
+    "https://starside.work/exotic-weapon/icons/ab6e2e843c.webp",
+    "https://starside.work/shopping-heavy/icons/b68883c7df.webp",
+    "https://starside.work/shopping-special/icons/fc3a7ade43.webp",
+    "https://starside.work/weapon-perks/icons/2cc9032c97.webp",
+    "https://starside.work/weapon-perks/icons/bea24a8a17.webp",
+    "https://starside.work/weapon-perks/icons/ee34ad56e0.webp",
+    "https://starside.work/weapon-perks/icons/ff99099ca7.webp"
+  ]
+}

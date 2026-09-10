@@ -1,0 +1,2841 @@
+{
+  "url": "https://starside.work/combatant-scalars/index.html",
+  "title": "战斗人员倍率 · Starside",
+  "description": "各类武器对载具、首领、勇士、初级首领、橙血与红血战斗人员的伤害倍率，按主武器、特殊武器、威能武器分节，含单列的具名武器。",
+  "category": "mechanics",
+  "updated_at": "2026.8.14",
+  "data_src": "docs/combatant-scalars",
+  "data_hash": "a0738e17c5a26e41bc9025783ae11beb58c03b21",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "战斗人员倍率"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "主武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "特殊武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "威能武器"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "主武器",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "载具",
+            "html": "<img src=\"icons/236d59ff30.webp\" alt=\"\" width=\"45\" height=\"20\" fetchpriority=\"high\"><br>载具"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "首领",
+            "html": "<img src=\"icons/ac1a85a7fa.webp\" alt=\"\" width=\"20\" height=\"20\" fetchpriority=\"high\"><br>首领"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "<img src=\"icons/94970be80a.webp\" alt=\"\" width=\"20\" height=\"20\" fetchpriority=\"high\"><br>勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "初级首领",
+            "html": "<img src=\"icons/778609a089.webp\" alt=\"\" width=\"22\" height=\"20\" fetchpriority=\"high\"><br>初级首领"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "橙血",
+            "html": "<img src=\"icons/e6bfbc985f.webp\" alt=\"\" width=\"17\" height=\"20\" fetchpriority=\"high\"><br>橙血"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "红血",
+            "html": "<img src=\"icons/3fdc34c0bf.webp\" alt=\"\" width=\"20\" height=\"20\" fetchpriority=\"high\"><br>红血"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "自动步枪",
+            "html": "自动步枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.07",
+            "html": "1.07"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.07",
+            "html": "1.07"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.116",
+            "html": "1.116"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.116",
+            "html": "1.116"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.780",
+            "html": "1.780"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.100",
+            "html": "2.100"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "冥府三头犬 +1",
+            "html": "冥府三头犬 +1"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "0.803",
+            "html": "0.803"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "0.803",
+            "html": "0.803"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "0.837",
+            "html": "0.837"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "0.837",
+            "html": "0.837"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "1.335",
+            "html": "1.335"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "2.730",
+            "html": "2.730"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "斥候步枪",
+            "html": "斥候步枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.210",
+            "html": "1.210"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.210",
+            "html": "1.210"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.210",
+            "html": "1.210"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.210",
+            "html": "1.210"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "1.850",
+            "html": "1.850"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "2.670",
+            "html": "2.670"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "脉冲步枪",
+            "html": "脉冲步枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.0110",
+            "html": "1.0110"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.1234",
+            "html": "1.1234"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.1790",
+            "html": "1.1790"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.1790",
+            "html": "1.1790"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.7040",
+            "html": "1.7040"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "2.5900",
+            "html": "2.5900"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "零号修订",
+            "html": "零号修订"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.0110",
+            "html": "1.0110"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.1234",
+            "html": "1.1234"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "2.3580",
+            "html": "2.3580"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.1790",
+            "html": "1.1790"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.7040",
+            "html": "1.7040"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.3670",
+            "html": "3.3670"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "手炮",
+            "html": "手炮"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.176",
+            "html": "1.176"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.274",
+            "html": "1.274"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "1.372",
+            "html": "1.372"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "1.372",
+            "html": "1.372"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.082",
+            "html": "3.082"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.153",
+            "html": "3.153"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "微型冲锋枪",
+            "html": "微型冲锋枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "1.372",
+            "html": "1.372"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.500",
+            "html": "1.500"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.500",
+            "html": "1.500"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.500",
+            "html": "1.500"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "1.992",
+            "html": "1.992"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.150",
+            "html": "2.150"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "手枪",
+            "html": "手枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "1.302",
+            "html": "1.302"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "1.442",
+            "html": "1.442"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "1.442",
+            "html": "1.442"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "1.442",
+            "html": "1.442"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.149",
+            "html": "2.149"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "2.411",
+            "html": "2.411"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "弓箭",
+            "html": "弓箭"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.500",
+            "html": "1.500"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.500",
+            "html": "1.500"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.500",
+            "html": "1.500"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "1.500",
+            "html": "1.500"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.033",
+            "html": "2.033"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.000",
+            "html": "3.000"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "7",
+              "scope": "colgroup"
+            },
+            "text": "异域主武器（红血 ×1.3）",
+            "html": "<span class=\"exotic\">异域</span>主武器（<span class=\"bar-red\">红血</span> ×1.3）"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "枯骨鳞片中毒",
+            "html": "枯骨鳞片中毒"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.00",
+            "html": "1.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.00",
+            "html": "1.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.00",
+            "html": "1.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.00",
+            "html": "1.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.00",
+            "html": "1.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.30",
+            "html": "1.30"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "Vex 揭秘者",
+            "html": "Vex 揭秘者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.00",
+            "html": "2.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.00",
+            "html": "2.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "2.75",
+            "html": "2.75"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.025",
+            "html": "3.025"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "Vex 揭秘者 线融",
+            "html": "Vex 揭秘者 线融"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.00",
+            "html": "2.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "6.00",
+            "html": "6.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "2.75",
+            "html": "2.75"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.025",
+            "html": "3.025"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "特殊武器",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "载具",
+            "html": "<img src=\"icons/236d59ff30.webp\" alt=\"\" width=\"45\" height=\"20\" loading=\"lazy\"><br>载具"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "首领",
+            "html": "<img src=\"icons/ac1a85a7fa.webp\" alt=\"\" width=\"20\" height=\"20\" loading=\"lazy\"><br>首领"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "<img src=\"icons/94970be80a.webp\" alt=\"\" width=\"20\" height=\"20\" loading=\"lazy\"><br>勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "初级首领",
+            "html": "<img src=\"icons/778609a089.webp\" alt=\"\" width=\"22\" height=\"20\" loading=\"lazy\"><br>初级首领"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "橙血",
+            "html": "<img src=\"icons/e6bfbc985f.webp\" alt=\"\" width=\"17\" height=\"20\" loading=\"lazy\"><br>橙血"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "红血",
+            "html": "<img src=\"icons/3fdc34c0bf.webp\" alt=\"\" width=\"20\" height=\"20\" loading=\"lazy\"><br>红血"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "霰弹枪",
+            "html": "霰弹枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.80",
+            "html": "2.80"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.30",
+            "html": "2.30"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.88",
+            "html": "2.88"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.20",
+            "html": "3.20"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "特殊榴弹发射器",
+            "html": "特殊榴弹发射器"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.63",
+            "html": "2.63"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.63",
+            "html": "2.63"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.63",
+            "html": "2.63"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.13",
+            "html": "3.13"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "白弹榴弹发射器",
+            "html": "白弹榴弹发射器"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.63",
+            "html": "2.63"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.63",
+            "html": "2.63"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.63",
+            "html": "2.63"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "4.38",
+            "html": "4.38"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "融合步枪",
+            "html": "融合步枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.18",
+            "html": "2.18"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.55",
+            "html": "2.55"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.31",
+            "html": "3.31"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.31",
+            "html": "3.31"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.31",
+            "html": "3.31"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.55",
+            "html": "3.55"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "攻击融合步枪",
+            "html": "攻击融合步枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.18",
+            "html": "2.18"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.55",
+            "html": "2.55"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.31",
+            "html": "3.31"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.31",
+            "html": "3.31"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.81",
+            "html": "3.81"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "4.08",
+            "html": "4.08"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "堡垒",
+            "html": "堡垒"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.20",
+            "html": "1.20"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.40",
+            "html": "1.40"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.093",
+            "html": "2.093"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.093",
+            "html": "2.093"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.093",
+            "html": "2.093"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.2425",
+            "html": "2.2425"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "狙击步枪",
+            "html": "狙击步枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.42",
+            "html": "1.42"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.52",
+            "html": "1.52"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.063",
+            "html": "2.063"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.23",
+            "html": "2.23"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.43",
+            "html": "3.43"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.00",
+            "html": "5.00"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "彼岸新域",
+            "html": "彼岸新域"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.42",
+            "html": "1.42"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.32",
+            "html": "1.32"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.063",
+            "html": "2.063"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.23",
+            "html": "2.23"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "3.43",
+            "html": "3.43"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.00",
+            "html": "5.00"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "追踪步枪",
+            "html": "追踪步枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.40",
+            "html": "1.40"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.50",
+            "html": "1.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.70",
+            "html": "1.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.70",
+            "html": "1.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "2.04",
+            "html": "2.04"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.28",
+            "html": "2.28"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "异域追踪步枪",
+            "html": "异域追踪步枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.40",
+            "html": "1.40"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.50",
+            "html": "1.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.70",
+            "html": "1.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.70",
+            "html": "1.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "2.04",
+            "html": "2.04"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "2.96",
+            "html": "2.96"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "偃月",
+            "html": "偃月"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.00",
+            "html": "3.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.00",
+            "html": "3.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.00",
+            "html": "3.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.00",
+            "html": "3.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.00",
+            "html": "3.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "4.50",
+            "html": "4.50"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "洛伦兹驱动器",
+            "html": "洛伦兹驱动器"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.54",
+            "html": "1.54"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.31",
+            "html": "1.31"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.39",
+            "html": "1.39"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.39",
+            "html": "1.39"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.925",
+            "html": "1.925"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "2.035",
+            "html": "2.035"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "劲弩",
+            "html": "劲弩"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.54",
+            "html": "1.54"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.31",
+            "html": "1.31"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.04",
+            "html": "1.04"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.39",
+            "html": "1.39"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.93",
+            "html": "1.93"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "2.04",
+            "html": "2.04"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "火箭手枪",
+            "html": "火箭手枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.30",
+            "html": "1.30"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.15",
+            "html": "1.15"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.15",
+            "html": "1.15"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.15",
+            "html": "1.15"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.149",
+            "html": "2.149"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.411",
+            "html": "2.411"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "威能武器",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "载具",
+            "html": "<img src=\"icons/236d59ff30.webp\" alt=\"\" width=\"45\" height=\"20\" loading=\"lazy\"><br>载具"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "首领",
+            "html": "<img src=\"icons/ac1a85a7fa.webp\" alt=\"\" width=\"20\" height=\"20\" loading=\"lazy\"><br>首领"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "<img src=\"icons/94970be80a.webp\" alt=\"\" width=\"20\" height=\"20\" loading=\"lazy\"><br>勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "初级首领",
+            "html": "<img src=\"icons/778609a089.webp\" alt=\"\" width=\"22\" height=\"20\" loading=\"lazy\"><br>初级首领"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "橙血",
+            "html": "<img src=\"icons/e6bfbc985f.webp\" alt=\"\" width=\"17\" height=\"20\" loading=\"lazy\"><br>橙血"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "红血",
+            "html": "<img src=\"icons/3fdc34c0bf.webp\" alt=\"\" width=\"20\" height=\"20\" loading=\"lazy\"><br>红血"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "刀剑",
+            "html": "刀剑"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.275",
+            "html": "1.275"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.275",
+            "html": "1.275"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.275",
+            "html": "1.275"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.275",
+            "html": "1.275"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.50",
+            "html": "1.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.90",
+            "html": "1.90"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "刀剑狼群弹药",
+            "html": "刀剑狼群弹药"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.275",
+            "html": "1.275"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.275",
+            "html": "1.275"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.275",
+            "html": "1.275"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.275",
+            "html": "1.275"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.50",
+            "html": "1.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.47",
+            "html": "2.47"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "威能榴弹发射器",
+            "html": "威能榴弹发射器"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.00",
+            "html": "3.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.70",
+            "html": "2.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.00",
+            "html": "3.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.14",
+            "html": "3.14"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.14",
+            "html": "3.14"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "4.375",
+            "html": "4.375"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "混乱无序",
+            "html": "混乱无序"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.50",
+            "html": "1.50"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.89",
+            "html": "1.89"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.00",
+            "html": "3.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.14",
+            "html": "3.14"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.14",
+            "html": "3.14"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "4.375",
+            "html": "4.375"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "寄生虫",
+            "html": "寄生虫"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.25",
+            "html": "2.25"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.25",
+            "html": "2.25"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.25",
+            "html": "2.25"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.3625",
+            "html": "2.3625"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.3625",
+            "html": "2.3625"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "4.375",
+            "html": "4.375"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "火箭发射器",
+            "html": "火箭发射器"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "4.70",
+            "html": "4.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "4.70",
+            "html": "4.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "4.70",
+            "html": "4.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "4.70",
+            "html": "4.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.00",
+            "html": "5.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "6.00",
+            "html": "6.00"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "双尾狐",
+            "html": "双尾狐"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.06",
+            "html": "3.06"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.06",
+            "html": "3.06"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.35",
+            "html": "2.35"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.35",
+            "html": "2.35"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.00",
+            "html": "5.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "6.00",
+            "html": "6.00"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "沃德克里夫线圈",
+            "html": "沃德克里夫线圈"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "0.94",
+            "html": "0.94"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "0.94",
+            "html": "0.94"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "0.94",
+            "html": "0.94"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "0.94",
+            "html": "0.94"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.00",
+            "html": "5.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "6.00",
+            "html": "6.00"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "明日之眼",
+            "html": "明日之眼"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.12",
+            "html": "2.12"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.12",
+            "html": "2.12"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.12",
+            "html": "2.12"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.52",
+            "html": "2.52"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.00",
+            "html": "5.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "6.00",
+            "html": "6.00"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "狼群弹药",
+            "html": "狼群弹药"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.00",
+            "html": "1.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "1.00",
+            "html": "1.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.91",
+            "html": "2.91"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.91",
+            "html": "2.91"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.00",
+            "html": "5.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "6.00",
+            "html": "6.00"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "线性融合步枪",
+            "html": "线性融合步枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.543",
+            "html": "1.543"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.543",
+            "html": "1.543"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.636",
+            "html": "1.636"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.636",
+            "html": "1.636"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.925",
+            "html": "1.925"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.035",
+            "html": "2.035"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "睡者之吼",
+            "html": "睡者之吼"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.815",
+            "html": "1.815"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.815",
+            "html": "1.815"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.925",
+            "html": "1.925"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.925",
+            "html": "1.925"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.925",
+            "html": "1.925"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.035",
+            "html": "2.035"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "弑后者",
+            "html": "弑后者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.033",
+            "html": "2.033"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.033",
+            "html": "2.033"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.156",
+            "html": "2.156"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.156",
+            "html": "2.156"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.925",
+            "html": "1.925"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.035",
+            "html": "2.035"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "机枪",
+            "html": "机枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "2.00",
+            "html": "2.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.82",
+            "html": "1.82"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.12",
+            "html": "2.12"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.12",
+            "html": "2.12"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.83",
+            "html": "2.83"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.54",
+            "html": "3.54"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "异星噬菌",
+            "html": "异星噬菌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "2.00",
+            "html": "2.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.52",
+            "html": "1.52"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.70",
+            "html": "1.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.12",
+            "html": "2.12"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.83",
+            "html": "2.83"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.54",
+            "html": "3.54"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "大序曲",
+            "html": "大序曲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "2.00",
+            "html": "2.00"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.52",
+            "html": "1.52"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "1.70",
+            "html": "1.70"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "2.12",
+            "html": "2.12"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "4.05",
+            "html": "4.05"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "3.54",
+            "html": "3.54"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "弩",
+            "html": "弩"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.716",
+            "html": "5.716"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.716",
+            "html": "5.716"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.852",
+            "html": "5.852"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "5.852",
+            "html": "5.852"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "6.076",
+            "html": "6.076"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "7.203",
+            "html": "7.203"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "named"
+            },
+            "text": "利维坦之息爆炸",
+            "html": "利维坦之息爆炸"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.71",
+            "html": "3.71"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.71",
+            "html": "3.71"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "4.82",
+            "html": "4.82"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "3.71",
+            "html": "3.71"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "1.90",
+            "html": "1.90"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "2.50",
+            "html": "2.50"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "战斗人员倍率 · Starside\n\nStarside\n/\n战斗人员倍率\n\n战斗人员倍率\n\n主武器\n\n数据源最后一次标注的版本为 2025.2.20，之后的沙盒改动可能未收录，数值或有偏差。\n\n武器\n\n载具\n\n首领\n\n勇士\n\n初级首领\n\n橙血\n\n红血\n\n自动步枪1.071.071.1161.1161.7802.100\n\n冥府三头犬 +10.8030.8030.8370.8371.3352.730\n\n斥候步枪1.2101.2101.2101.2101.8502.670\n\n脉冲步枪1.01101.12341.17901.17901.70402.5900\n\n零号修订1.01101.12342.35801.17901.70403.3670\n\n手炮1.1761.2741.3721.3723.0823.153\n\n微型冲锋枪1.3721.5001.5001.5001.9922.150\n\n手枪1.3021.4421.4421.4422.1492.411\n\n弓箭1.5001.5001.5001.5002.0333.000\n\n异域主武器（红血 ×1.3）\n\n枯骨鳞片中毒1.001.001.001.001.001.30\n\nVex 揭秘者2.002.502.002.502.753.025\n\nVex 揭秘者 线融2.002.506.002.502.753.025\n\n特殊武器\n\n武器\n\n载具\n\n首领\n\n勇士\n\n初级首领\n\n橙血\n\n红血\n\n霰弹枪2.802.302.502.502.883.20\n\n特殊榴弹发射器2.502.502.632.632.633.13\n\n白弹榴弹发射器2.502.502.632.632.634.38\n\n融合步枪2.182.553.313.313.313.55\n\n攻击融合步枪2.182.553.313.313.814.08\n\n堡垒1.201.402.0932.0932.0932.2425\n\n狙击步枪1.421.522.0632.233.435.00\n\n彼岸新域1.421.322.0632.233.435.00\n\n追踪步枪1.401.501.701.702.042.28\n\n异域追踪步枪1.401.501.701.702.042.96\n\n偃月3.003.003.003.003.004.50\n\n洛伦兹驱动器1.541.311.391.391.9252.035\n\n劲弩1.541.311.041.391.932.04\n\n火箭手枪1.301.151.151.152.1492.411\n\n威能武器\n\n武器\n\n载具\n\n首领\n\n勇士\n\n初级首领\n\n橙血\n\n红血\n\n刀剑1.2751.2751.2751.2751.501.90\n\n刀剑狼群弹药1.2751.2751.2751.2751.502.47\n\n威能榴弹发射器3.002.703.003.143.144.375\n\n混乱无序1.501.893.003.143.144.375\n\n寄生虫2.252.252.252.36252.36254.375\n\n火箭发射器4.704.704.704.705.006.00\n\n双尾狐3.063.062.352.355.006.00\n\n沃德克里夫线圈0.940.940.940.945.006.00\n\n明日之眼2.122.122.122.525.006.00\n\n狼群弹药1.001.002.912.915.006.00\n\n线性融合步枪1.5431.5431.6361.6361.9252.035\n\n睡者之吼1.8151.8151.9251.9251.9252.035\n\n弑后者2.0332.0332.1562.1561.9252.035\n\n机枪2.001.822.122.122.833.54\n\n异星噬菌2.001.521.702.122.833.54\n\n大序曲2.001.521.702.124.053.54\n\n弩5.7165.7165.8525.8526.0767.203\n\n利维坦之息爆炸3.713.714.823.711.902.50\n\n更新 2026.8.14\n\n数据源：MossyMax 的 Destiny 2 Damage Scaling Spreadsheet。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/combatant-scalars/index.html",
+    "final_url": "https://starside.work/combatant-scalars/index.html",
+    "path": "pages/combatant-scalars/index.html",
+    "bytes": 17963,
+    "sha256": "91b113119255667738679c2254c5762a50eea41def792fcd87d08717967b7846",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:39.334345+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/d/1b57Hb8m1L3daFfUckQQqvvN6VOpD03KEssvQLMFpC5I/edit#gid=1386975095",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/combatant-scalars/icons/236d59ff30.webp",
+    "https://starside.work/combatant-scalars/icons/3fdc34c0bf.webp",
+    "https://starside.work/combatant-scalars/icons/778609a089.webp",
+    "https://starside.work/combatant-scalars/icons/94970be80a.webp",
+    "https://starside.work/combatant-scalars/icons/ac1a85a7fa.webp",
+    "https://starside.work/combatant-scalars/icons/e6bfbc985f.webp",
+    "https://starside.work/combatant-scalars/style.css"
+  ]
+}

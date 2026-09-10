@@ -1,0 +1,181 @@
+{
+  "url": "https://starside.work/builds/s29/madoka-yuansudashi-hunter/index.html",
+  "title": "元素大师猎人 · 配装推荐 · Starside",
+  "description": "赐予你焕光、增幅、隐身、冰霜护甲、织造铠甲，对战斗人员施加灼烧、震颤、虚弱、减速、瓦解、割裂。",
+  "category": "builds",
+  "updated_at": "2026.9.1",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 元素大师猎人\n\n推荐人：madoka#9109\n描述：赐予你焕光、增幅、隐身、冰霜护甲、织造铠甲，对战斗人员施加灼烧、震颤、虚弱、减速、瓦解、割裂。\n更新：2026.9.1\n场景：宗师终极、日常、通用\n定位：输出、清怪、续航、功能\n分支：棱镜\n类别：创意\n核心：沉默狂啸\n\n## 职业\n\n职业：猎人\n超能：沉默狂啸\n星相：潇洒行刑者、飞升\n碎片：平衡琢面、使命琢面、希望琢面、保护琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n传说武器：完美逆行 | 回转弹药、切割\n传说武器：岁时之巅 | 羸弱能量球、燃烧野心\n\n## 护甲\n\n异域护甲：至纯光能之灵\n套装：破碎王座 2 件 × 破碎王座 4 件\n头盔：烈日虹吸、缚丝虹吸、特殊弹药斥候\n护臂：回天掌法、火力无限、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、电弧抗性\n腿部：复原、宽恕、宽恕\n职业物品：特殊终结技、强力吸引、收割者\n\n## 神器\n\n神器：女王兰香炉\n模组：火种扳机、火炬、瓦解能量球、愿望成真、发热寒颤、崩解、群敌飞梭\n\n## 六维\n\n六维：生命 ~ ｜ 近战 70+ ｜ 手雷 100+ ｜ 超能 ~ ｜ 职业 70+ ｜ 武器 ~\n\n## 注解\n\n本配装核心为获得五属性增幅以及给战斗人员施加五属性debuff\n首先介绍如何获取五属性增幅：\n烈日-焕光：装备女王兰香炉神器中的发热寒颤模组后使用岁时之巅快速精准命中获取，大概15发左右的精准命中即可获取焕光\n电弧-增幅：使用星相飞升获取\n虚空-隐身：通过星相潇洒行刑者击败受到减益的战斗人员获取、通过近战技能陷阱炸弹（烟雾弹）获取\n冰影-冰霜护甲：通过碎片使命啄面并携带超能沉默狂啸后拾取能量球获取\n缚丝-织造铠甲：装备女王兰香炉神器中的崩解模组并在使用职业技能后通过装备切割perk的完美逆行施加割裂debuff后击杀并在织造铠甲节点附近获取，此外也可通过神器中的瓦解能量球和群敌群敌飞梭模组给战斗人员施加割裂debuff进而获取织造铠甲。\n接下来介绍如何施加五元素debuff：\n烈日-灼烧（点燃）：通过拥有岁时之巅的燃烧野心perk射击施加，也可以通过神器发热寒颤和火种扳机联动施加，还可以通过超凡手雷施加\n电弧-震颤：使用星相飞升施加\n虚空-虚弱：通过星相潇洒行刑者在隐身状态下对战斗人员使用近战施加，以及使用近战技能陷阱炸弹（烟雾弹）施加\n冰影-减速（冻结）：通过破碎王座两件套套装效果使用终结技后对范围内战斗人员施加，以及使用超能沉默狂啸施加，还可以通过超凡手雷施加\n缚丝-瓦解：通过神器模组瓦解能量球在拾取能量球和投掷缠结后使用完美逆行施加，此外还可以通过神奇模组崩解对切割后的战斗人员造成多次伤害施加。\n缚丝-切割：使用职业技能后通过装备切割perk的完美逆行射击施加，神器模组群敌飞梭产生的线虫施加\n上述配装仅提供核心要求，空缺部位可以根据需求进行填补。王座四件套的目的为提高回转以及获取减伤，可根据自身需求自行调整。本配装无眩晕屏障的手段，在宗师、终极等副本需要自行佩戴相应武器。\n该配装仅为娱乐配装，如有雷同，纯属巧合。",
+  "source_blocks": [
+    "# 元素大师猎人\n\n推荐人：madoka#9109\n描述：赐予你焕光、增幅、隐身、冰霜护甲、织造铠甲，对战斗人员施加灼烧、震颤、虚弱、减速、瓦解、割裂。\n更新：2026.9.1\n场景：宗师终极、日常、通用\n定位：输出、清怪、续航、功能\n分支：棱镜\n类别：创意\n核心：沉默狂啸\n\n## 职业\n\n职业：猎人\n超能：沉默狂啸\n星相：潇洒行刑者、飞升\n碎片：平衡琢面、使命琢面、希望琢面、保护琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n传说武器：完美逆行 | 回转弹药、切割\n传说武器：岁时之巅 | 羸弱能量球、燃烧野心\n\n## 护甲\n\n异域护甲：至纯光能之灵\n套装：破碎王座 2 件 × 破碎王座 4 件\n头盔：烈日虹吸、缚丝虹吸、特殊弹药斥候\n护臂：回天掌法、火力无限、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、电弧抗性\n腿部：复原、宽恕、宽恕\n职业物品：特殊终结技、强力吸引、收割者\n\n## 神器\n\n神器：女王兰香炉\n模组：火种扳机、火炬、瓦解能量球、愿望成真、发热寒颤、崩解、群敌飞梭\n\n## 六维\n\n六维：生命 ~ ｜ 近战 70+ ｜ 手雷 100+ ｜ 超能 ~ ｜ 职业 70+ ｜ 武器 ~\n\n## 注解\n\n本配装核心为获得五属性增幅以及给战斗人员施加五属性debuff\n首先介绍如何获取五属性增幅：\n烈日-焕光：装备女王兰香炉神器中的发热寒颤模组后使用岁时之巅快速精准命中获取，大概15发左右的精准命中即可获取焕光\n电弧-增幅：使用星相飞升获取\n虚空-隐身：通过星相潇洒行刑者击败受到减益的战斗人员获取、通过近战技能陷阱炸弹（烟雾弹）获取\n冰影-冰霜护甲：通过碎片使命啄面并携带超能沉默狂啸后拾取能量球获取\n缚丝-织造铠甲：装备女王兰香炉神器中的崩解模组并在使用职业技能后通过装备切割perk的完美逆行施加割裂debuff后击杀并在织造铠甲节点附近获取，此外也可通过神器中的瓦解能量球和群敌群敌飞梭模组给战斗人员施加割裂debuff进而获取织造铠甲。\n接下来介绍如何施加五元素debuff：\n烈日-灼烧（点燃）：通过拥有岁时之巅的燃烧野心perk射击施加，也可以通过神器发热寒颤和火种扳机联动施加，还可以通过超凡手雷施加\n电弧-震颤：使用星相飞升施加\n虚空-虚弱：通过星相潇洒行刑者在隐身状态下对战斗人员使用近战施加，以及使用近战技能陷阱炸弹（烟雾弹）施加\n冰影-减速（冻结）：通过破碎王座两件套套装效果使用终结技后对范围内战斗人员施加，以及使用超能沉默狂啸施加，还可以通过超凡手雷施加\n缚丝-瓦解：通过神器模组瓦解能量球在拾取能量球和投掷缠结后使用完美逆行施加，此外还可以通过神奇模组崩解对切割后的战斗人员造成多次伤害施加。\n缚丝-切割：使用职业技能后通过装备切割perk的完美逆行射击施加，神器模组群敌飞梭产生的线虫施加\n上述配装仅提供核心要求，空缺部位可以根据需求进行填补。王座四件套的目的为提高回转以及获取减伤，可根据自身需求自行调整。本配装无眩晕屏障的手段，在宗师、终极等副本需要自行佩戴相应武器。\n该配装仅为娱乐配装，如有雷同，纯属巧合。"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "元素大师猎人"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "女王兰香炉"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "元素大师猎人 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n元素大师猎人\n\n推荐者：\nmadoka#9109\n\n元素大师猎人\n\n♥︎ 复制配装截图详情开关\n\n猎人 · 棱镜 · 创意S29 · 凯旋纪念碑\n\n赐予你焕光、增幅、隐身、冰霜护甲、织造铠甲，对战斗人员施加灼烧、震颤、虚弱、减速、瓦解、割裂。\n\n适用环境\n\n宗师终极\n\n日常\n\n通用\n\n标签\n\n输出\n\n清怪\n\n续航\n\n功能\n\n# 元素大师猎人\n\n推荐人：madoka#9109\n描述：赐予你焕光、增幅、隐身、冰霜护甲、织造铠甲，对战斗人员施加灼烧、震颤、虚弱、减速、瓦解、割裂。\n更新：2026.9.1\n场景：宗师终极、日常、通用\n定位：输出、清怪、续航、功能\n分支：棱镜\n类别：创意\n核心：沉默狂啸\n\n## 职业\n\n职业：猎人\n超能：沉默狂啸\n星相：潇洒行刑者、飞升\n碎片：平衡琢面、使命琢面、希望琢面、保护琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n传说武器：完美逆行 | 回转弹药、切割\n传说武器：岁时之巅 | 羸弱能量球、燃烧野心\n\n## 护甲\n\n异域护甲：至纯光能之灵\n套装：破碎王座 2 件 × 破碎王座 4 件\n头盔：烈日虹吸、缚丝虹吸、特殊弹药斥候\n护臂：回天掌法、火力无限、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、电弧抗性\n腿部：复原、宽恕、宽恕\n职业物品：特殊终结技、强力吸引、收割者\n\n## 神器\n\n神器：女王兰香炉\n模组：火种扳机、火炬、瓦解能量球、愿望成真、发热寒颤、崩解、群敌飞梭\n\n## 六维\n\n六维：生命 ~ ｜ 近战 70+ ｜ 手雷 100+ ｜ 超能 ~ ｜ 职业 70+ ｜ 武器 ~\n\n## 注解\n\n本配装核心为获得五属性增幅以及给战斗人员施加五属性debuff\n首先介绍如何获取五属性增幅：\n烈日-焕光：装备女王兰香炉神器中的发热寒颤模组后使用岁时之巅快速精准命中获取，大概15发左右的精准命中即可获取焕光\n电弧-增幅：使用星相飞升获取\n虚空-隐身：通过星相潇洒行刑者击败受到减益的战斗人员获取、通过近战技能陷阱炸弹（烟雾弹）获取\n冰影-冰霜护甲：通过碎片使命啄面并携带超能沉默狂啸后拾取能量球获取\n缚丝-织造铠甲：装备女王兰香炉神器中的崩解模组并在使用职业技能后通过装备切割perk的完美逆行施加割裂debuff后击杀并在织造铠甲节点附近获取，此外也可通过神器中的瓦解能量球和群敌群敌飞梭模组给战斗人员施加割裂debuff进而获取织造铠甲。\n接下来介绍如何施加五元素debuff：\n烈日-灼烧（点燃）：通过拥有岁时之巅的燃烧野心perk射击施加，也可以通过神器发热寒颤和火种扳机联动施加，还可以通过超凡手雷施加\n电弧-震颤：使用星相飞升施加\n虚空-虚弱：通过星相潇洒行刑者在隐身状态下对战斗人员使用近战施加，以及使用近战技能陷阱炸弹（烟雾弹）施加\n冰影-减速（冻结）：通过破碎王座两件套套装效果使用终结技后对范围内战斗人员施加，以及使用超能沉默狂啸施加，还可以通过超凡手雷施加\n缚丝-瓦解：通过神器模组瓦解能量球在拾取能量球和投掷缠结后使用完美逆行施加，此外还可以通过神奇模组崩解对切割后的战斗人员造成多次伤害施加。\n缚丝-切割：使用职业技能后通过装备切割perk的完美逆行射击施加，神器模组群敌飞梭产生的线虫施加\n上述配装仅提供核心要求，空缺部位可以根据需求进行填补。王座四件套的目的为提高回转以及获取减伤，可根据自身需求自行调整。本配装无眩晕屏障的手段，在宗师、终极等副本需要自行佩戴相应武器。\n该配装仅为娱乐配装，如有雷同，纯属巧合。\n\n职业\n\n职业\n\n猎人\n\n棱镜\n\n超能\n\n沉默狂啸\n\n技能\n\n抓钩\n\n陷阱炸弹\n\n赌徒闪身\n\n星相\n\n潇洒行刑者\n\n飞升\n\n碎片\n\n平衡琢面\n\n使命琢面\n\n希望琢面\n\n保护琢面\n\n武器\n\n完美逆行回转弹药切割\n\n岁时之巅羸弱能量球燃烧野心\n\n神器模组\n\n女王兰香炉\n\n火种扳机\n\n火炬\n\n瓦解能量球\n\n愿望成真\n\n发热寒颤\n\n崩解\n\n群敌飞梭\n\n护甲\n\n至纯光能之灵\n\n破碎王座灵巫华服2 件\n\n破碎王座灵巫华服4 件\n\n生命~\n\n近战70+\n\n手雷100+\n\n超能~\n\n职业70+\n\n武器~\n\n头盔\n\n烈日虹吸虹吸\n\n缚丝虹吸虹吸\n\n特殊弹药斥候弹药斥候\n\n护臂\n\n回天掌法\n\n火力无限\n\n专注打击\n\n胸甲\n\n震荡阻尼器抗性\n\n近战伤害抗性抗性\n\n电弧抗性抗性\n\n腿部\n\n复原\n\n宽恕\n\n宽恕\n\n职业物品\n\n特殊终结技\n\n强力吸引\n\n收割者\n\n注解\n\n本配装核心为获得五属性增幅以及给战斗人员施加五属性debuff\n首先介绍如何获取五属性增幅：\n烈日-焕光：装备女王兰香炉神器中的发热寒颤模组后使用岁时之巅快速精准命中获取，大概15发左右的精准命中即可获取焕光\n电弧-增幅：使用星相飞升获取\n虚空-隐身：通过星相潇洒行刑者击败受到减益的战斗人员获取、通过近战技能陷阱炸弹（烟雾弹）获取\n冰影-冰霜护甲：通过碎片使命啄面并携带超能沉默狂啸后拾取能量球获取\n缚丝-织造铠甲：装备女王兰香炉神器中的崩解模组并在使用职业技能后通过装备切割perk的完美逆行施加割裂debuff后击杀并在织造铠甲节点附近获取，此外也可通过神器中的瓦解能量球和群敌群敌飞梭模组给战斗人员施加割裂debuff进而获取织造铠甲。\n接下来介绍如何施加五元素debuff：\n烈日-灼烧（点燃）：通过拥有岁时之巅的燃烧野心perk射击施加，也可以通过神器发热寒颤和火种扳机联动施加，还可以通过超凡手雷施加\n电弧-震颤：使用星相飞升施加\n虚空-虚弱：通过星相潇洒行刑者在隐身状态下对战斗人员使用近战施加，以及使用近战技能陷阱炸弹（烟雾弹）施加\n冰影-减速（冻结）：通过破碎王座两件套套装效果使用终结技后对范围内战斗人员施加，以及使用超能沉默狂啸施加，还可以通过超凡手雷施加\n缚丝-瓦解：通过神器模组瓦解能量球在拾取能量球和投掷缠结后使用完美逆行施加，此外还可以通过神奇模组崩解对切割后的战斗人员造成多次伤害施加。\n缚丝-切割：使用职业技能后通过装备切割perk的完美逆行射击施加，神器模组群敌飞梭产生的线虫施加\n上述配装仅提供核心要求，空缺部位可以根据需求进行填补。王座四件套的目的为提高回转以及获取减伤，可根据自身需求自行调整。本配装无眩晕屏障的手段，在宗师、终极等副本需要自行佩戴相应武器。\n该配装仅为娱乐配装，如有雷同，纯属巧合。\n\n更新 2026.9.1\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/madoka-yuansudashi-hunter/index.html",
+    "final_url": "https://starside.work/builds/s29/madoka-yuansudashi-hunter/index.html",
+    "path": "pages/builds/s29/madoka-yuansudashi-hunter/index.html",
+    "bytes": 36352,
+    "sha256": "f0512e18742d5af369a4822944d2f8713f7cf55ad43eb68c692f830ce09e86e3",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:28:27.956856+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/prismatic/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/elements/strand/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-other/index.html",
+    "https://starside.work/shopping-primary/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/11cf2eaffb.webp",
+    "https://starside.work/armor-mods/icons/4da157f3a7.webp",
+    "https://starside.work/armor-mods/icons/6eb4a7eab1.webp",
+    "https://starside.work/armor-mods/icons/733f0ff195.webp",
+    "https://starside.work/armor-mods/icons/85da4740a7.webp",
+    "https://starside.work/armor-mods/icons/962b1f1c65.webp",
+    "https://starside.work/armor-mods/icons/9e78787019.webp",
+    "https://starside.work/armor-mods/icons/b2c34e83e7.webp",
+    "https://starside.work/armor-mods/icons/b7c73dd956.webp",
+    "https://starside.work/armor-mods/icons/c9476266a5.webp",
+    "https://starside.work/armor-mods/icons/cee9e0f613.webp",
+    "https://starside.work/armor-mods/icons/e10db37ad3.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-mods/icons/fd06023f70.webp",
+    "https://starside.work/armor-sets/icons/089.png",
+    "https://starside.work/armor-sets/icons/090.png",
+    "https://starside.work/artifact-mods/icons/1f9e95d817.webp",
+    "https://starside.work/artifact-mods/icons/512918d956.webp",
+    "https://starside.work/artifact-mods/icons/5af0138a3e.webp",
+    "https://starside.work/artifact-mods/icons/8e2db21458.webp",
+    "https://starside.work/artifact-mods/icons/9a5ec863b6.webp",
+    "https://starside.work/artifact-mods/icons/cb97394434.webp",
+    "https://starside.work/artifact-mods/icons/db04b4ad17.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/5757d150c7.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/65d4e919d1.webp",
+    "https://starside.work/elements/class-abilities/icons/cba8013059.webp",
+    "https://starside.work/elements/prismatic/icons/2b0c20c15a.webp",
+    "https://starside.work/elements/prismatic/icons/3cb69eea59.webp",
+    "https://starside.work/elements/prismatic/icons/5b6e2f0217.webp",
+    "https://starside.work/elements/prismatic/icons/67d91531a9.webp",
+    "https://starside.work/elements/prismatic/icons/727574c917.webp",
+    "https://starside.work/elements/prismatic/icons/901742a8ea.webp",
+    "https://starside.work/elements/prismatic/icons/b5a97142a6.webp",
+    "https://starside.work/elements/stasis/icons/f33df47fea.webp",
+    "https://starside.work/elements/strand/icons/24b726319d.webp",
+    "https://starside.work/elements/void/icons/3ed96daa22.webp",
+    "https://starside.work/exotic-armor/icons/094d23ba92.webp",
+    "https://starside.work/shopping-other/icons/d53b47fdec.webp",
+    "https://starside.work/shopping-primary/icons/0f52e68a68.webp",
+    "https://starside.work/weapon-perks/icons/0df7295f4b.webp",
+    "https://starside.work/weapon-perks/icons/26d0b5700a.webp",
+    "https://starside.work/weapon-perks/icons/5ef5fce627.webp",
+    "https://starside.work/weapon-perks/icons/5f98e03ee7.webp"
+  ]
+}

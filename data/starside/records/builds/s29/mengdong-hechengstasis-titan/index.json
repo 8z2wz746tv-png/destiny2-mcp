@@ -1,0 +1,177 @@
+{
+  "url": "https://starside.work/builds/s29/mengdong-hechengstasis-titan/index.html",
+  "title": "合成手风暴怒吼冰泰坦 · 配装推荐 · Starside",
+  "description": "释放风暴怒吼并碎冰可造成大量伤害，通过冰霜护甲和神器模组获得减伤和治疗。",
+  "category": "builds",
+  "updated_at": "2026.9.1",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 合成手风暴怒吼冰泰坦\n\n推荐人：萌动\n描述：释放风暴怒吼并碎冰可造成大量伤害，通过冰霜护甲和神器模组获得减伤和治疗。\n更新：2026.9.1\n场景：宗师终极、日常\n定位：清怪、续航、功能\n分支：冰影\n类别：强度\n核心：风暴怒吼\n\n## 职业\n\n职业：泰坦\n超能：冰川震击\n星相：风暴怒吼、构造收割\n碎片：传导之吟、裂解之吟、韵律之吟、破碎之吟\n手雷：冰川手雷\n近战：战栗打击\n职业技能：巍峨屏障\n\n## 武器\n\n异域武器：战狮\n传说武器：言语轨迹 | 丰盈满溢、覆盖护盾克星、热血上头\n传说武器：急锋 | 急切刀锋\n\n## 护甲\n\n异域护甲：合成感受器\n套装：贪婪之握 2 件 × 贪婪之握 4 件\n头盔：超能洗礼、特殊武器弹药搜寻者\n护臂：回天掌法、回天掌法、回天掌法\n胸甲：抗性、抗性、震荡阻尼器\n腿部：宽恕、元素充能、谐振回收器\n职业物品：特殊终结技、强力吸引、感应护盾\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：晶体转换器、风寒、迎接风暴、削弱清敌、治疗能量球、冰霜复兴、动能冲击\n\n## 六维\n\n六维：生命 ~ ｜ 近战 100 ｜ 手雷 100+ ｜ 超能 200 ｜ 职业 ~ ｜ 武器 ~\n\n## 注解\n\n由于是贪婪之握4件套，碎片除了传导/韵律之吟以外都可自由更换。如果要使用除贪婪之握4件套以外的护甲套装，需要装备饥饿之吟。\n武器可换双绿（迷失信号/驱逐引擎+破冰者），无论如何都推荐带一把榴弹，触发削弱清敌施加易伤提高总伤害。\n头部根据六维携带一定量的超能洗礼，保证超能属性达到200。风暴怒吼所衍生的碎冰伤害不吃100近战以上的乘算近战加成，但合成手/虫手/雪上加霜类的近战加成仍然生效。手部3回天掌法加快超能回转，超能的输出能力非常夸张。\n实战保证近战全程连打，近战冻结目标后第一时间使用武器命中战斗人员造成碎冰伤害，碎冰频率越快输出能力越强。超能期间如果追求dps使用滑铲左键+右键的连招，熟练的情况下超能期间可循环4次。超能追求总伤的话保持一定距离连打右键即可。",
+  "source_blocks": [
+    "# 合成手风暴怒吼冰泰坦\n\n推荐人：萌动\n描述：释放风暴怒吼并碎冰可造成大量伤害，通过冰霜护甲和神器模组获得减伤和治疗。\n更新：2026.9.1\n场景：宗师终极、日常\n定位：清怪、续航、功能\n分支：冰影\n类别：强度\n核心：风暴怒吼\n\n## 职业\n\n职业：泰坦\n超能：冰川震击\n星相：风暴怒吼、构造收割\n碎片：传导之吟、裂解之吟、韵律之吟、破碎之吟\n手雷：冰川手雷\n近战：战栗打击\n职业技能：巍峨屏障\n\n## 武器\n\n异域武器：战狮\n传说武器：言语轨迹 | 丰盈满溢、覆盖护盾克星、热血上头\n传说武器：急锋 | 急切刀锋\n\n## 护甲\n\n异域护甲：合成感受器\n套装：贪婪之握 2 件 × 贪婪之握 4 件\n头盔：超能洗礼、特殊武器弹药搜寻者\n护臂：回天掌法、回天掌法、回天掌法\n胸甲：抗性、抗性、震荡阻尼器\n腿部：宽恕、元素充能、谐振回收器\n职业物品：特殊终结技、强力吸引、感应护盾\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：晶体转换器、风寒、迎接风暴、削弱清敌、治疗能量球、冰霜复兴、动能冲击\n\n## 六维\n\n六维：生命 ~ ｜ 近战 100 ｜ 手雷 100+ ｜ 超能 200 ｜ 职业 ~ ｜ 武器 ~\n\n## 注解\n\n由于是贪婪之握4件套，碎片除了传导/韵律之吟以外都可自由更换。如果要使用除贪婪之握4件套以外的护甲套装，需要装备饥饿之吟。\n武器可换双绿（迷失信号/驱逐引擎+破冰者），无论如何都推荐带一把榴弹，触发削弱清敌施加易伤提高总伤害。\n头部根据六维携带一定量的超能洗礼，保证超能属性达到200。风暴怒吼所衍生的碎冰伤害不吃100近战以上的乘算近战加成，但合成手/虫手/雪上加霜类的近战加成仍然生效。手部3回天掌法加快超能回转，超能的输出能力非常夸张。\n实战保证近战全程连打，近战冻结目标后第一时间使用武器命中战斗人员造成碎冰伤害，碎冰频率越快输出能力越强。超能期间如果追求dps使用滑铲左键+右键的连招，熟练的情况下超能期间可循环4次。超能追求总伤的话保持一定距离连打右键即可。"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "合成手风暴怒吼冰泰坦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "杀手公爵药剂师背包"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "合成手风暴怒吼冰泰坦 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n合成手风暴怒吼冰泰坦\n\n推荐者：\n萌动\n\n合成手风暴怒吼冰泰坦\n\n♥︎ 复制配装截图详情开关\n\n泰坦 · 冰影 · 强度S29 · 凯旋纪念碑\n\n释放风暴怒吼并碎冰可造成大量伤害，通过冰霜护甲和神器模组获得减伤和治疗。\n\n适用环境\n\n宗师终极\n\n日常\n\n标签\n\n清怪\n\n续航\n\n功能\n\n# 合成手风暴怒吼冰泰坦\n\n推荐人：萌动\n描述：释放风暴怒吼并碎冰可造成大量伤害，通过冰霜护甲和神器模组获得减伤和治疗。\n更新：2026.9.1\n场景：宗师终极、日常\n定位：清怪、续航、功能\n分支：冰影\n类别：强度\n核心：风暴怒吼\n\n## 职业\n\n职业：泰坦\n超能：冰川震击\n星相：风暴怒吼、构造收割\n碎片：传导之吟、裂解之吟、韵律之吟、破碎之吟\n手雷：冰川手雷\n近战：战栗打击\n职业技能：巍峨屏障\n\n## 武器\n\n异域武器：战狮\n传说武器：言语轨迹 | 丰盈满溢、覆盖护盾克星、热血上头\n传说武器：急锋 | 急切刀锋\n\n## 护甲\n\n异域护甲：合成感受器\n套装：贪婪之握 2 件 × 贪婪之握 4 件\n头盔：超能洗礼、特殊武器弹药搜寻者\n护臂：回天掌法、回天掌法、回天掌法\n胸甲：抗性、抗性、震荡阻尼器\n腿部：宽恕、元素充能、谐振回收器\n职业物品：特殊终结技、强力吸引、感应护盾\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：晶体转换器、风寒、迎接风暴、削弱清敌、治疗能量球、冰霜复兴、动能冲击\n\n## 六维\n\n六维：生命 ~ ｜ 近战 100 ｜ 手雷 100+ ｜ 超能 200 ｜ 职业 ~ ｜ 武器 ~\n\n## 注解\n\n由于是贪婪之握4件套，碎片除了传导/韵律之吟以外都可自由更换。如果要使用除贪婪之握4件套以外的护甲套装，需要装备饥饿之吟。\n武器可换双绿（迷失信号/驱逐引擎+破冰者），无论如何都推荐带一把榴弹，触发削弱清敌施加易伤提高总伤害。\n头部根据六维携带一定量的超能洗礼，保证超能属性达到200。风暴怒吼所衍生的碎冰伤害不吃100近战以上的乘算近战加成，但合成手/虫手/雪上加霜类的近战加成仍然生效。手部3回天掌法加快超能回转，超能的输出能力非常夸张。\n实战保证近战全程连打，近战冻结目标后第一时间使用武器命中战斗人员造成碎冰伤害，碎冰频率越快输出能力越强。超能期间如果追求dps使用滑铲左键+右键的连招，熟练的情况下超能期间可循环4次。超能追求总伤的话保持一定距离连打右键即可。\n\n职业\n\n职业\n\n泰坦\n\n冰影\n\n超能\n\n冰川震击\n\n技能\n\n冰川手雷\n\n战栗打击\n\n巍峨屏障\n\n星相\n\n风暴怒吼\n\n构造收割\n\n碎片\n\n传导之吟\n\n裂解之吟\n\n韵律之吟\n\n破碎之吟\n\n武器\n\n战狮\n\n言语轨迹丰盈满溢覆盖护盾克星热血上头\n\n急锋急切刀锋\n\n神器模组\n\n杀手公爵药剂师背包\n\n晶体转换器\n\n风寒\n\n迎接风暴\n\n削弱清敌\n\n治疗能量球\n\n冰霜复兴\n\n动能冲击\n\n护甲\n\n合成感受器\n\n贪婪之握渴望回响2 件\n\n贪婪之握渴望回响4 件\n\n生命~\n\n近战100\n\n手雷100+\n\n超能200\n\n职业~\n\n武器~\n\n头盔\n\n超能洗礼\n\n特殊武器弹药搜寻者弹药搜寻者\n\n护臂\n\n回天掌法\n\n回天掌法\n\n回天掌法\n\n胸甲\n\n抗性\n\n抗性\n\n震荡阻尼器抗性\n\n腿部\n\n宽恕\n\n元素充能\n\n谐振回收器回收利用\n\n职业物品\n\n特殊终结技\n\n强力吸引\n\n感应护盾\n\n注解\n\n由于是贪婪之握4件套，碎片除了传导/韵律之吟以外都可自由更换。如果要使用除贪婪之握4件套以外的护甲套装，需要装备饥饿之吟。\n武器可换双绿（迷失信号/驱逐引擎+破冰者），无论如何都推荐带一把榴弹，触发削弱清敌施加易伤提高总伤害。\n头部根据六维携带一定量的超能洗礼，保证超能属性达到200。风暴怒吼所衍生的碎冰伤害不吃100近战以上的乘算近战加成，但合成手/虫手/雪上加霜类的近战加成仍然生效。手部3回天掌法加快超能回转，超能的输出能力非常夸张。\n实战保证近战全程连打，近战冻结目标后第一时间使用武器命中战斗人员造成碎冰伤害，碎冰频率越快输出能力越强。超能期间如果追求dps使用滑铲左键+右键的连招，熟练的情况下超能期间可循环4次。超能追求总伤的话保持一定距离连打右键即可。\n\n更新 2026.9.1\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/mengdong-hechengstasis-titan/index.html",
+    "final_url": "https://starside.work/builds/s29/mengdong-hechengstasis-titan/index.html",
+    "path": "pages/builds/s29/mengdong-hechengstasis-titan/index.html",
+    "bytes": 32021,
+    "sha256": "6c6b9db4f6e16aadabb792246436f3a69332c544f4bb94f0977f1f32be665a9f",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:28:29.621826+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-heavy/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/328d80acfa.webp",
+    "https://starside.work/armor-mods/icons/549322d88e.webp",
+    "https://starside.work/armor-mods/icons/5704e0690e.webp",
+    "https://starside.work/armor-mods/icons/63b6a1e140.webp",
+    "https://starside.work/armor-mods/icons/733f0ff195.webp",
+    "https://starside.work/armor-mods/icons/7a002a3848.webp",
+    "https://starside.work/armor-mods/icons/8c22cf983d.webp",
+    "https://starside.work/armor-mods/icons/b2c34e83e7.webp",
+    "https://starside.work/armor-mods/icons/b7c73dd956.webp",
+    "https://starside.work/armor-mods/icons/e10db37ad3.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-sets/icons/095.png",
+    "https://starside.work/armor-sets/icons/096.png",
+    "https://starside.work/artifact-mods/icons/060edf607a.webp",
+    "https://starside.work/artifact-mods/icons/2670d7c9d5.webp",
+    "https://starside.work/artifact-mods/icons/78a42211b1.webp",
+    "https://starside.work/artifact-mods/icons/8e857c15d5.webp",
+    "https://starside.work/artifact-mods/icons/a49b5612d9.webp",
+    "https://starside.work/artifact-mods/icons/bf9ce7a203.webp",
+    "https://starside.work/artifact-mods/icons/eb925e3624.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/934a3556a0.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/9b7d9d8088.webp",
+    "https://starside.work/elements/class-abilities/icons/dc6210c147.webp",
+    "https://starside.work/elements/stasis/icons/1ce9063ff7.webp",
+    "https://starside.work/elements/stasis/icons/224d56a6aa.webp",
+    "https://starside.work/elements/stasis/icons/27386d7cc8.webp",
+    "https://starside.work/elements/stasis/icons/47b7881b6e.webp",
+    "https://starside.work/elements/stasis/icons/849beb7009.webp",
+    "https://starside.work/elements/stasis/icons/8d6fa9f3a1.webp",
+    "https://starside.work/elements/stasis/icons/93cf350c0b.webp",
+    "https://starside.work/elements/stasis/icons/a56a8163a3.webp",
+    "https://starside.work/elements/stasis/icons/b4a3f6320f.webp",
+    "https://starside.work/elements/stasis/icons/f84b6c172e.webp",
+    "https://starside.work/exotic-armor/icons/5b27ce8087.webp",
+    "https://starside.work/exotic-weapon/icons/eed89bc559.webp",
+    "https://starside.work/shopping-heavy/icons/8eb0cdeddb.webp",
+    "https://starside.work/shopping-special/icons/fc3a7ade43.webp",
+    "https://starside.work/weapon-perks/icons/2cc9032c97.webp",
+    "https://starside.work/weapon-perks/icons/3de967731a.webp",
+    "https://starside.work/weapon-perks/icons/bea24a8a17.webp",
+    "https://starside.work/weapon-perks/icons/ee34ad56e0.webp"
+  ]
+}

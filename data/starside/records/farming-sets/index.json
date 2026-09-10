@@ -1,0 +1,1418 @@
+{
+  "url": "https://starside.work/farming-sets/index.html",
+  "title": "刷取清单-护甲套装 · Starside",
+  "description": "29 套护甲套装按泛用性、强度与使用频率排序，含件数、获取地点、应用场景与每一套的说明。",
+  "category": "armor",
+  "updated_at": "2026.9.6",
+  "data_src": "docs/farming-sets",
+  "data_hash": "377290e887705fa7fe3f0bbb2dbd2d67602332c4",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "刷取清单-护甲套装"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "排序说明"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "套装"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "套装",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "套装",
+            "html": "套装"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "件数",
+            "html": "件数"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取地点",
+            "html": "获取地点"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "应用场景",
+            "html": "应用场景"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "埃希恩记忆",
+            "html": "埃希恩记忆"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5ebe47c952.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "玻璃拱顶",
+            "html": "玻璃拱顶"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "能量球\n（输出\n棱镜虚空软硬减）",
+            "html": "<span class=\"orb\">能量球</span><br>（输出<br><span class=\"el-prismatic\">棱镜</span><span class=\"el-void\">虚空</span>软硬减）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "最好最泛用的套装，可以优化掉一切配装中与产球有关的模组换成洗礼；棱镜持续触发使命琢面软硬减、虚空持续触发饥饿回声触发吞噬回血",
+            "html": "最好最泛用的套装，可以优化掉一切配装中与产球有关的模组换成洗礼；<span class=\"el-prismatic\">棱镜</span>持续触发<span class=\"el-prismatic\">使命琢面</span>软硬减、<span class=\"el-void\">虚空</span>持续触发<span class=\"el-void\">饥饿回声</span>触发吞噬回血"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "应许之物",
+            "html": "应许之物"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/45bf108269.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "救赎的边缘",
+            "html": "救赎的边缘"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减伤、增伤",
+            "html": "减伤、增伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "只需要击杀橙血就可以获得抵抗 X2 和额外武器增伤 12 秒，持续时间长并且很容易获取。无法与其他抵抗来源叠加",
+            "html": "只需要击杀<span class=\"bar-orange\">橙血</span>就可以获得抵抗 X2 和额外武器增伤 12 秒，持续时间长并且很容易获取。无法与其他抵抗来源叠加"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "溢冰",
+            "html": "溢冰"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3be5f9391c.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "弹药、产球",
+            "html": "弹药、产球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "bug 的每 12 秒一次弹药进度和能量球",
+            "html": "bug 的每 12 秒一次弹药进度和<span class=\"orb\">能量球</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "欧里克斯记忆",
+            "html": "欧里克斯记忆"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7c8b116a0a.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "国王的陨落",
+            "html": "国王的陨落"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "弹药",
+            "html": "弹药"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀橙血额外弹药进度",
+            "html": "击杀<span class=\"bar-orange\">橙血</span>额外弹药进度"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "渴望回响",
+            "html": "渴望回响"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6dd85f8fca.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "贪婪之握",
+            "html": "贪婪之握"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰影电弧技能回转",
+            "html": "<span class=\"el-stasis\">冰影</span><span class=\"el-arc\">电弧</span>技能回转"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "对元素拾取物多的电冰职业多给予的技能能量非常慷慨（几乎都是翻倍能量），有质变的效果。2 件套减伤",
+            "html": "对元素拾取物多的电冰职业多给予的技能能量非常慷慨（几乎都是翻倍能量），有质变的效果。2 件套减伤"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "终曲",
+            "html": "终曲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0b0af2c55f.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "预言",
+            "html": "预言"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "技能回转、减伤",
+            "html": "技能回转、减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "低压环境击杀提供可观近战和手雷回转，对技能相关配装很有用（逃逸手、好耶泰坦等），抵抗 3 是锦上添花。摧毁构造体可触发，但仅有死亡信使霜袍术适合，冰猎和冰泰坦贪婪套更优",
+            "html": "低压环境击杀提供可观近战和手雷回转，对技能相关配装很有用（逃逸手、好耶泰坦等），抵抗 3 是锦上添花。摧毁构造体可触发，但仅有<span class=\"exotic\">死亡信使</span>霜袍术适合，冰猎和冰泰坦贪婪套更优"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "移民号陨落",
+            "html": "移民号陨落"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/197b054090.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减伤",
+            "html": "减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "简单获取的常驻减伤效果，需要有能量球产出，因为 4 层充能后收益不佳，不需要携带多个层层不绝，通常只需要 1 个层层不绝+绿弹终结/快速启动模组即可",
+            "html": "简单获取的常驻减伤效果，需要有<span class=\"orb\">能量球</span>产出，因为 4 层充能后收益不佳，不需要携带多个层层不绝，通常只需要 1 个层层不绝+绿弹终结/快速启动模组即可"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "奈扎雷克的梦魇",
+            "html": "奈扎雷克的梦魇"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6ff8e06ec3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "梦魇根源",
+            "html": "梦魇根源"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "orb"
+            },
+            "text": "能量球",
+            "html": "能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "低压环境的产球选择，任意击杀 3 个元素减益影响的战斗人员就能产出能量球，适合不稳定弹药/拆解子弹武器，逃逸手/忍野等等一切有频繁元素减益的玩法，压制偃月虫手泰坦也是优秀的使用案例\n适合与空降灭火配合使用",
+            "html": "低压环境的产球选择，任意击杀 3 个元素<span class=\"debuff\">减益</span>影响的<span class=\"enemy\">战斗人员</span>就能产出<span class=\"orb\">能量球</span>，适合不稳定弹药/拆解子弹武器，逃逸手/忍野等等一切有频繁元素<span class=\"debuff\">减益</span>的玩法，<span class=\"art-perk\">压制偃月</span>虫手泰坦也是优秀的使用案例<br>适合与空降灭火配合使用"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "空降灭火",
+            "html": "空降灭火"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e15f2d2559.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "单人/火力战队行动",
+            "html": "单人/火力战队行动"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减伤",
+            "html": "减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "持续能量球产出的不错减伤来源，适合与梦根 2 或者小锤泰坦等高频产球配装搭配使用",
+            "html": "持续<span class=\"orb\">能量球</span>产出的不错减伤来源，适合与梦根 2 或者小锤泰坦等高频产球配装搭配使用"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "传承之誓",
+            "html": "传承之誓"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e9b9588aeb.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "深岩墓室",
+            "html": "深岩墓室"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近战功能性",
+            "html": "近战功能性"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "10m 致盲范围足够，最合适的是火小锤泰坦和升龙电猎，能够大大减少空近战的情况。飞蛾和好耶大范围近战通常会将周围怪一起击杀",
+            "html": "10m <span class=\"deb-arc\">致盲</span>范围足够，最合适的是火小锤泰坦和升龙电猎，能够大大减少空近战的情况。飞蛾和好耶大范围近战通常会将周围怪一起击杀"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "艾昂适配",
+            "html": "艾昂适配"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/13659000ad.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "开普勒",
+            "html": "开普勒"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减伤",
+            "html": "减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "爆炸武器击杀获取长达 15 秒的 20% 范围减伤\n注：范围伤害在所有伤害来源中大约占据 50% 的比例，等效 10% 减伤",
+            "html": "爆炸武器击杀获取长达 15 秒的 20% 范围减伤<br>注：范围伤害在所有伤害来源中大约占据 50% 的比例，等效 10% 减伤"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "圣贤保护者",
+            "html": "圣贤保护者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/57b29cc5a0.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "平衡",
+            "html": "平衡"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "技能回转\n（刀剑）",
+            "html": "技能回转<br>（刀剑）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "单独用效果一般，但是剑刃风暴连击可以触发大大提升了技能回转能力\n常与光剑王冠套配合使用",
+            "html": "单独用效果一般，但是剑刃风暴连击可以触发大大提升了技能回转能力<br>常与光剑王冠套配合使用"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "双重王冠",
+            "html": "双重王冠"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/205e26cd83.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "奥斯里斯试炼",
+            "html": "奥斯里斯试炼"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "软减\n（光剑）",
+            "html": "软减<br>（光剑）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "搭配动能合成作为有效回血手段，常与光剑圣贤搭配",
+            "html": "搭配<span class=\"art-perk\">动能合成</span>作为有效回血手段，常与光剑圣贤搭配"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "定制特机",
+            "html": "定制特机"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/25b535490d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "守望者尖塔",
+            "html": "守望者尖塔"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出",
+            "html": "输出"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "唯一的额外增伤效果套装，很适合剑狙翻新双切，好建议三切等等",
+            "html": "唯一的额外增伤效果套装，很适合剑狙翻新双切，好建议三切等等"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "奈扎雷克的梦魇",
+            "html": "奈扎雷克的梦魇"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c9fe2f2d96.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "梦魇根源",
+            "html": "梦魇根源"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "吞噬、减伤",
+            "html": "吞噬、减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "任意分支获取吞噬的手段，还有附赠的减伤。2 件套也比较优秀",
+            "html": "任意分支获取吞噬的手段，还有附赠的减伤。2 件套也比较优秀"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "应许之物",
+            "html": "应许之物"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/fb9ae396d7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "救赎的边缘",
+            "html": "救赎的边缘"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "施加减伤",
+            "html": "施加减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "触发 8m 疲惫爆发的效果频率不低，对战斗人员施加的 25% 减伤与个人获得的减伤不同，是所有人收益的，非常团队的套装效果",
+            "html": "触发 8m 疲惫爆发的效果频率不低，对<span class=\"enemy\">战斗人员</span>施加的 25% 减伤与个人获得的减伤不同，是所有人收益的，非常团队的套装效果"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "黑暗纪元",
+            "html": "黑暗纪元"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/83b8f58c02.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "战争领主的废墟",
+            "html": "战争领主的废墟"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "团队软减\n（松身裤）",
+            "html": "团队软减<br>（松身裤）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "职业技能会释放一个小型治疗无人机，适合缚丝猎松身裤这种缺少软减的分支。棱镜虚空适合 vog4，火猎适合减伤套装。然而在多人环境下为所有人提供治疗效果非常不错，可根据自身需求选择，谁更优秀并不是绝对的。部分人可能会出现无法释放治疗无人机的 bug，切换套装或者让主动出击 buff 自然流失完可以解决",
+            "html": "职业技能会释放一个小型治疗无人机，适合<span class=\"el-strand\">缚丝</span>猎松身裤这种缺少软减的分支。<span class=\"el-prismatic\">棱镜</span><span class=\"el-void\">虚空</span>适合 vog4，火猎适合减伤套装。然而在多人环境下为所有人提供治疗效果非常不错，可根据自身需求选择，谁更优秀并不是绝对的。部分人可能会出现无法释放治疗无人机的 bug，切换套装或者让主动出击 buff 自然流失完可以解决"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "克洛塔记忆",
+            "html": "克洛塔记忆"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/85a69d38be.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "克洛塔的末日",
+            "html": "克洛塔的末日"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减伤",
+            "html": "减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "类似混沌重塑机制的减伤效果，脱战 7 秒后才失去效果比较理想",
+            "html": "类似<span class=\"perk\">混沌重塑</span>机制的减伤效果，脱战 7 秒后才失去效果比较理想"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "深渊探索者",
+            "html": "深渊探索者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6b2418a49b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "二象性",
+            "html": "二象性"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "软减",
+            "html": "软减"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适合只有硬减没有软减的分支职业，输出场景也可以使用",
+            "html": "适合只有硬减没有软减的分支职业，输出场景也可以使用"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "剑圣",
+            "html": "剑圣"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/21b30685e6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "巅峰行动",
+            "html": "巅峰行动"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减伤",
+            "html": "减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适合偃月玩法的高额抵抗 4 减伤",
+            "html": "适合偃月玩法的高额抵抗 4 减伤"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "剑圣",
+            "html": "剑圣"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/27f16ceffb.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "巅峰行动",
+            "html": "巅峰行动"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "施加减伤",
+            "html": "施加减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近战、偃月、刀剑施加疲惫，可在以上武器/玩法特化的配装中使用",
+            "html": "近战、偃月、刀剑施加疲惫，可在以上武器/玩法特化的配装中使用"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "铁能",
+            "html": "铁能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2e87c24414.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "单人/火力战队行动",
+            "html": "单人/火力战队行动"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减伤",
+            "html": "减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "触发条件简单，抵抗 1 几乎常驻。不能与其他抵抗来源叠加",
+            "html": "触发条件简单，抵抗 1 几乎常驻。不能与其他抵抗来源叠加"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "积雨云",
+            "html": "积雨云"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/bcce124172.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "海王星",
+            "html": "海王星"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "手雷配装减伤",
+            "html": "手雷配装减伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "只对近距离 5m 范围内的战斗人员有减伤，数值够高，适合一些频繁使用手雷的配装（忍野、幼龙手）。原本是最适配勾爪肘击的套装，但是现在强度不足基本没上场空间",
+            "html": "只对近距离 5m 范围内的<span class=\"enemy\">战斗人员</span>有减伤，数值够高，适合一些频繁使用手雷的配装（忍野、幼龙手）。原本是最适配勾爪肘击的套装，但是现在强度不足基本没上场空间"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "凯旋圣歌",
+            "html": "凯旋圣歌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/53cd257cfe.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "熔炉竞技场",
+            "html": "熔炉竞技场"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "捡子弹\n（输出）",
+            "html": "捡子弹<br>（输出）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "进入输出前配合完美逆行金中藏弹空洞拒绝捡子弹常与众神辉煌配合使用\n动能合成武器输出时用于拾取弹药盒填装，比如级联点全明星威胁等级",
+            "html": "进入输出前配合完美逆行<span class=\"perk\">金中藏弹</span>空洞拒绝捡子弹常与众神辉煌配合使用<br><span class=\"art-perk\">动能合成</span>武器输出时用于拾取弹药盒填装，比如<span class=\"perk\">级联点</span><span class=\"perk\">全明星</span>威胁等级"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "众神辉煌",
+            "html": "众神辉煌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2f6bb7b807.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "众神殿",
+            "html": "众神殿"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "捡子弹\n（输出）\n踢绿弹",
+            "html": "捡子弹<br>（输出）<br>踢绿弹"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "捡起子弹获取护甲充能，常与凯旋圣歌配合使用\n也有搭配治疗能量球/碎裂能量球神器+层层不绝无限踢绿弹的玩法，实际使用不多",
+            "html": "捡起子弹获取<span class=\"armor-charge\">护甲充能</span>，常与凯旋圣歌配合使用<br>也有搭配<span class=\"art-perk\">治疗能量球</span>/<span class=\"art-perk\">碎裂能量球</span>神器+层层不绝无限踢绿弹的玩法，实际使用不多"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "圣贤保护者",
+            "html": "圣贤保护者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/eea50b0a2e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "平衡",
+            "html": "平衡"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超级跳\n技能回转\n（刀剑）",
+            "html": "超级跳<br>技能回转<br>（刀剑）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "摧毁构造体可触发，提供的额外刀剑挥砍距离可进行远距超级跳。额外技能回转不实用，具体如何使用在武器推荐中涡流刀剑有介绍，或者可自行查询教程",
+            "html": "摧毁构造体可触发，提供的额外刀剑挥砍距离可进行远距超级跳。额外技能回转不实用，具体如何使用在武器推荐中涡流刀剑有介绍，或者可自行查询教程"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "梦境祸根",
+            "html": "梦境祸根"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/02a5e21587.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 件",
+            "html": "2 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "二象性地牢专用增伤",
+            "html": "二象性地牢专用增伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "获得的梦魇精华 buff 套用的就是原本的梦魇精华代码，可以获得对梦魇战斗人员大幅额外增伤，而二象性地牢的首领全都是梦魇",
+            "html": "获得的梦魇精华 buff 套用的就是原本的梦魇精华代码，可以获得对梦魇<span class=\"enemy\">战斗人员</span>大幅额外增伤，而二象性地牢的<span class=\"bar-yellow\">首领</span>全都是梦魇"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "光耀万钧",
+            "html": "光耀万钧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/732e04a4e3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "单人/火力战队行动",
+            "html": "单人/火力战队行动"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "技能（大招）回转",
+            "html": "技能（大招）回转"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电术双炮台、地磁靴搭配电荷思维双倍离子轨迹大招回转",
+            "html": "电术双炮台、地磁靴搭配<span class=\"el-arc\">电荷思维</span>双倍<span class=\"el-arc\">离子轨迹</span>大招回转"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "机械营",
+            "html": "机械营"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/98ffc31c03.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4 件",
+            "html": "4 件"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "铁旗",
+            "html": "铁旗"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "大招回转",
+            "html": "大招回转"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "加拉诺冰镐/虚空箭、阿罕卡拉之颅涡流大招、圣火护心甲无法正常生效\n持续型大招可以通过切换套装来刷新触发效果",
+            "html": "加拉诺冰镐/<span class=\"el-void\">虚空</span>箭、<span class=\"exotic\">阿罕卡拉之颅</span>涡流大招、<span class=\"exotic\">圣火护心甲</span>无法正常生效<br>持续型大招可以通过切换套装来刷新触发效果"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "刷取清单-护甲套装 · Starside\n\nStarside\n/\n刷取清单-护甲套装\n\n刷取清单-护甲套装\n\n排序说明\n\n排列顺序主要从泛用性、强度、实际使用频率三个方向考虑，一些特殊用法放在最后六条\n\nvog 套在各种意义上都是十分超模的，包括但不限于：优化所有能量球相关模组带上一身的洗礼；持续触发使命琢面、饥饿回声，神器拆解子弹、不稳定弹药、焕光、银白利刃、银白重炮、银白弩箭；对金枪狙、裂波者、赫沃斯托夫、榴弹爆炸光能的质变影响\n\n在减伤手段如此方便获得的最终版本，套装效果会更加注重功能性而非仅仅是减伤。以涅索斯套举例，在版本刚开始时几乎所有人都刷了一套涅索斯套装，而随着时间推移，玩家的游戏理解加深，包括我身边的大部分玩家都几乎没有再使用过涅索斯了。别误会，对萌新而言，涅索斯仍然是最好获得的优秀套装\n\n尖塔套虽然是独一无二的输出额外伤害倍率，但现在的玩家伤害溢出太多，就算没有这个 7% 的多余伤害大部分首领也能照样一波\n\n总有关于光剑套装是圣贤王冠还是 vog4 的争论，我想说的是从来没有事情是绝对的，更多的是依据使用场景和个人偏好来决定，对棱镜而言圣贤王冠更偏向上限，vog4 更偏向下限；而其他分支吃球收益不高，使用圣贤王冠往往是更佳选择\n\n套装\n\n套装\n图标\n件数\n获取地点\n应用场景\n说明\n\n埃希恩记忆4 件玻璃拱顶能量球\n（输出\n棱镜虚空软硬减）最好最泛用的套装，可以优化掉一切配装中与产球有关的模组换成洗礼；棱镜持续触发使命琢面软硬减、虚空持续触发饥饿回声触发吞噬回血\n\n应许之物2 件救赎的边缘减伤、增伤只需要击杀橙血就可以获得抵抗 X2 和额外武器增伤 12 秒，持续时间长并且很容易获取。无法与其他抵抗来源叠加\n\n溢冰2 件木卫二弹药、产球bug 的每 12 秒一次弹药进度和能量球\n\n欧里克斯记忆2 件国王的陨落弹药击杀橙血额外弹药进度\n\n渴望回响4 件贪婪之握冰影电弧技能回转对元素拾取物多的电冰职业多给予的技能能量非常慷慨（几乎都是翻倍能量），有质变的效果。2 件套减伤\n\n终曲4 件预言技能回转、减伤低压环境击杀提供可观近战和手雷回转，对技能相关配装很有用（逃逸手、好耶泰坦等），抵抗 3 是锦上添花。摧毁构造体可触发，但仅有死亡信使霜袍术适合，冰猎和冰泰坦贪婪套更优\n\n移民号陨落4 件涅索斯减伤简单获取的常驻减伤效果，需要有能量球产出，因为 4 层充能后收益不佳，不需要携带多个层层不绝，通常只需要 1 个层层不绝+绿弹终结/快速启动模组即可\n\n奈扎雷克的梦魇2 件梦魇根源能量球低压环境的产球选择，任意击杀 3 个元素减益影响的战斗人员就能产出能量球，适合不稳定弹药/拆解子弹武器，逃逸手/忍野等等一切有频繁元素减益的玩法，压制偃月虫手泰坦也是优秀的使用案例\n适合与空降灭火配合使用\n\n空降灭火2 件单人/火力战队行动减伤持续能量球产出的不错减伤来源，适合与梦根 2 或者小锤泰坦等高频产球配装搭配使用\n\n传承之誓2 件深岩墓室近战功能性10m 致盲范围足够，最合适的是火小锤泰坦和升龙电猎，能够大大减少空近战的情况。飞蛾和好耶大范围近战通常会将周围怪一起击杀\n\n艾昂适配2 件开普勒减伤爆炸武器击杀获取长达 15 秒的 20% 范围减伤\n注：范围伤害在所有伤害来源中大约占据 50% 的比例，等效 10% 减伤\n\n圣贤保护者2 件平衡技能回转\n（刀剑）单独用效果一般，但是剑刃风暴连击可以触发大大提升了技能回转能力\n常与光剑王冠套配合使用\n\n双重王冠2 件奥斯里斯试炼软减\n（光剑）搭配动能合成作为有效回血手段，常与光剑圣贤搭配\n\n定制特机4 件守望者尖塔输出唯一的额外增伤效果套装，很适合剑狙翻新双切，好建议三切等等\n\n奈扎雷克的梦魇4 件梦魇根源吞噬、减伤任意分支获取吞噬的手段，还有附赠的减伤。2 件套也比较优秀\n\n应许之物4 件救赎的边缘施加减伤触发 8m 疲惫爆发的效果频率不低，对战斗人员施加的 25% 减伤与个人获得的减伤不同，是所有人收益的，非常团队的套装效果\n\n黑暗纪元4 件战争领主的废墟团队软减\n（松身裤）职业技能会释放一个小型治疗无人机，适合缚丝猎松身裤这种缺少软减的分支。棱镜虚空适合 vog4，火猎适合减伤套装。然而在多人环境下为所有人提供治疗效果非常不错，可根据自身需求选择，谁更优秀并不是绝对的。部分人可能会出现无法释放治疗无人机的 bug，切换套装或者让主动出击 buff 自然流失完可以解决\n\n克洛塔记忆4 件克洛塔的末日减伤类似混沌重塑机制的减伤效果，脱战 7 秒后才失去效果比较理想\n\n深渊探索者4 件二象性软减适合只有硬减没有软减的分支职业，输出场景也可以使用\n\n剑圣4 件巅峰行动减伤适合偃月玩法的高额抵抗 4 减伤\n\n剑圣2 件巅峰行动施加减伤近战、偃月、刀剑施加疲惫，可在以上武器/玩法特化的配装中使用\n\n铁能2 件单人/火力战队行动减伤触发条件简单，抵抗 1 几乎常驻。不能与其他抵抗来源叠加\n\n积雨云2 件海王星手雷配装减伤只对近距离 5m 范围内的战斗人员有减伤，数值够高，适合一些频繁使用手雷的配装（忍野、幼龙手）。原本是最适配勾爪肘击的套装，但是现在强度不足基本没上场空间\n\n凯旋圣歌2 件熔炉竞技场捡子弹\n（输出）进入输出前配合完美逆行金中藏弹空洞拒绝捡子弹常与众神辉煌配合使用\n动能合成武器输出时用于拾取弹药盒填装，比如级联点全明星威胁等级\n\n众神辉煌2 件众神殿捡子弹\n（输出）\n踢绿弹捡起子弹获取护甲充能，常与凯旋圣歌配合使用\n也有搭配治疗能量球/碎裂能量球神器+层层不绝无限踢绿弹的玩法，实际使用不多\n\n圣贤保护者4 件平衡超级跳\n技能回转\n（刀剑）摧毁构造体可触发，提供的额外刀剑挥砍距离可进行远距超级跳。额外技能回转不实用，具体如何使用在武器推荐中涡流刀剑有介绍，或者可自行查询教程\n\n梦境祸根2 件月球二象性地牢专用增伤获得的梦魇精华 buff 套用的就是原本的梦魇精华代码，可以获得对梦魇战斗人员大幅额外增伤，而二象性地牢的首领全都是梦魇\n\n光耀万钧4 件单人/火力战队行动技能（大招）回转电术双炮台、地磁靴搭配电荷思维双倍离子轨迹大招回转\n\n机械营4 件铁旗大招回转加拉诺冰镐/虚空箭、阿罕卡拉之颅涡流大招、圣火护心甲无法正常生效\n持续型大招可以通过切换套装来刷新触发效果\n\n更新 2026.9.6\n\n数据源：刷取清单。本页在其基础上统一了术语、标点与排版。\n\n特别鸣谢：小棒猪-LGpig 整理全部排序、场景与评语。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/farming-sets/index.html",
+    "final_url": "https://starside.work/farming-sets/index.html",
+    "path": "pages/farming-sets/index.html",
+    "bytes": 19974,
+    "sha256": "47b8f78b0f70685a923a94f2998e606328ba18c19432fb1b18f57c787a032d19",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:31.722277+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/d/1qsKGrRzCePGaIM5gNtAQNh949d3OsMJ6qV6Fqtpj22k/htmlview",
+    "https://space.bilibili.com/169548478",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/farming-sets/icons/02a5e21587.webp",
+    "https://starside.work/farming-sets/icons/0b0af2c55f.webp",
+    "https://starside.work/farming-sets/icons/13659000ad.webp",
+    "https://starside.work/farming-sets/icons/197b054090.webp",
+    "https://starside.work/farming-sets/icons/205e26cd83.webp",
+    "https://starside.work/farming-sets/icons/21b30685e6.webp",
+    "https://starside.work/farming-sets/icons/25b535490d.webp",
+    "https://starside.work/farming-sets/icons/27f16ceffb.webp",
+    "https://starside.work/farming-sets/icons/2e87c24414.webp",
+    "https://starside.work/farming-sets/icons/2f6bb7b807.webp",
+    "https://starside.work/farming-sets/icons/3be5f9391c.webp",
+    "https://starside.work/farming-sets/icons/45bf108269.webp",
+    "https://starside.work/farming-sets/icons/53cd257cfe.webp",
+    "https://starside.work/farming-sets/icons/57b29cc5a0.webp",
+    "https://starside.work/farming-sets/icons/5ebe47c952.webp",
+    "https://starside.work/farming-sets/icons/6b2418a49b.webp",
+    "https://starside.work/farming-sets/icons/6dd85f8fca.webp",
+    "https://starside.work/farming-sets/icons/6ff8e06ec3.webp",
+    "https://starside.work/farming-sets/icons/732e04a4e3.webp",
+    "https://starside.work/farming-sets/icons/7c8b116a0a.webp",
+    "https://starside.work/farming-sets/icons/83b8f58c02.webp",
+    "https://starside.work/farming-sets/icons/85a69d38be.webp",
+    "https://starside.work/farming-sets/icons/98ffc31c03.webp",
+    "https://starside.work/farming-sets/icons/bcce124172.webp",
+    "https://starside.work/farming-sets/icons/c9fe2f2d96.webp",
+    "https://starside.work/farming-sets/icons/e15f2d2559.webp",
+    "https://starside.work/farming-sets/icons/e9b9588aeb.webp",
+    "https://starside.work/farming-sets/icons/eea50b0a2e.webp",
+    "https://starside.work/farming-sets/icons/fb9ae396d7.webp",
+    "https://starside.work/farming-sets/style.css"
+  ]
+}

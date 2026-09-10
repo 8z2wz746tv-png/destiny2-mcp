@@ -1,0 +1,42 @@
+[
+  {
+    "title": "护甲模组 · Starside",
+    "url": "https://starside.work/armor-mods/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/armor-mods/index.json",
+    "text": "texts/armor/armor-mods/index.md",
+    "raw": "pages/armor-mods/index.html",
+    "source_blocks": 0,
+    "tables": 16
+  },
+  {
+    "title": "护甲套装效果 · Starside",
+    "url": "https://starside.work/armor-sets/index.html",
+    "updated_at": "2026.9.7",
+    "record": "records/armor-sets/index.json",
+    "text": "texts/armor/armor-sets/index.md",
+    "raw": "pages/armor-sets/index.html",
+    "source_blocks": 0,
+    "tables": 0
+  },
+  {
+    "title": "异域护甲详解 · Starside",
+    "url": "https://starside.work/exotic-armor/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/exotic-armor/index.json",
+    "text": "texts/armor/exotic-armor/index.md",
+    "raw": "pages/exotic-armor/index.html",
+    "source_blocks": 0,
+    "tables": 5
+  },
+  {
+    "title": "刷取清单-护甲套装 · Starside",
+    "url": "https://starside.work/farming-sets/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/farming-sets/index.json",
+    "text": "texts/armor/farming-sets/index.md",
+    "raw": "pages/farming-sets/index.html",
+    "source_blocks": 0,
+    "tables": 1
+  }
+]

@@ -1,0 +1,2189 @@
+{
+  "url": "https://starside.work/palette/index.html",
+  "title": "配色总览 · Starside",
+  "description": "Starside 全站着色的色板——27 支渲染色（23 个色号）与 32 个语义标记，各带色号、色样与用途。",
+  "category": "sources",
+  "updated_at": "2026.8.24",
+  "data_src": "docs/palette",
+  "data_hash": "412dfef538d0beb49dc2df3254ee2f130bdd8e95",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "配色总览"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "渲染色"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "语义"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "页面专属"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "同色待裁定"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "渲染色",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "变量",
+            "html": "变量"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "色号",
+            "html": "色号"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "色样",
+            "html": "色样"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "用途",
+            "html": "用途"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "七个元素",
+            "html": "七个元素"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-arc",
+            "html": "--c-arc"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#5fd8e0",
+            "html": "#5fd8e0"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-arc"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电弧元素与其减益",
+            "html": "电弧元素与其减益"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-stasis",
+            "html": "--c-stasis"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#7fb4ff",
+            "html": "#7fb4ff"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-stasis"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰影元素与其减益",
+            "html": "冰影元素与其减益"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-void",
+            "html": "--c-void"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#c08cff",
+            "html": "#c08cff"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-void"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空元素与其减益",
+            "html": "虚空元素与其减益"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-strand",
+            "html": "--c-strand"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#7fdc86",
+            "html": "#7fdc86"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-strand"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "缚丝元素与其减益",
+            "html": "缚丝元素与其减益"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-solar",
+            "html": "--c-solar"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#ffb35c",
+            "html": "#ffb35c"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-solar"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日元素与其减益",
+            "html": "烈日元素与其减益"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-kinetic",
+            "html": "--c-kinetic"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#eef7f2",
+            "html": "#eef7f2"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-kinetic"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "动能元素",
+            "html": "动能元素"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-prism",
+            "html": "--c-prism"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#f58fc8",
+            "html": "#f58fc8"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-prism"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "棱镜与超凡",
+            "html": "棱镜与超凡"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "游戏内的其他编码",
+            "html": "游戏内的其他编码"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-artifact",
+            "html": "--c-artifact"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#20c4b0",
+            "html": "#20c4b0"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-artifact"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "神器模组名",
+            "html": "神器模组名"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-legend",
+            "html": "--c-legend"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#cf4a9c",
+            "html": "#cf4a9c"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-legend"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "稀有度：传说，行标题后那一截武器类别",
+            "html": "稀有度：传说，行标题后那一截武器类别"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-exotic",
+            "html": "--c-exotic"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#fcb70a",
+            "html": "#fcb70a"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-exotic"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "稀有度：异域，含专属 Perk 名",
+            "html": "稀有度：异域，含专属 Perk 名"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-orb",
+            "html": "--c-orb"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#dbc46a",
+            "html": "#dbc46a"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-orb"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "能量球与超能能量",
+            "html": "能量球与超能能量"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-stack",
+            "html": "--c-stack"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#dbc46a",
+            "html": "#dbc46a"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-stack"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精准命中与增益层数",
+            "html": "精准命中与增益层数"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-charge",
+            "html": "--c-charge"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#2f9fd6",
+            "html": "#2f9fd6"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-charge"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "护甲充能与模组耗费，技能能量、充能与护盾",
+            "html": "护甲充能与模组耗费，技能能量、充能与护盾"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-ammo",
+            "html": "--c-ammo"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#cc44ff",
+            "html": "#cc44ff"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-ammo"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "威能弹药",
+            "html": "威能弹药"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-ammo-special",
+            "html": "--c-ammo-special"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#3ff24f",
+            "html": "#3ff24f"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-ammo-special"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊弹药",
+            "html": "特殊弹药"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-health",
+            "html": "--c-health"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#41b349",
+            "html": "#41b349"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-health"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "生命值与治疗",
+            "html": "生命值与治疗"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-enemy",
+            "html": "--c-enemy"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#d94452",
+            "html": "#d94452"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-enemy"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战斗人员、勇士与数值",
+            "html": "战斗人员、勇士与数值"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-term",
+            "html": "--c-term"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#d6c39a",
+            "html": "#d6c39a"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-term"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "词表着色里不属于元素的游戏术语，兼图表曲线、强调色与轮换页的突袭标签",
+            "html": "词表着色里不属于元素的游戏术语，兼图表曲线、强调色与轮换页的突袭标签"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-perk",
+            "html": "--c-perk"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#f9e9cd",
+            "html": "#f9e9cd"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-perk"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "武器 Perk 名",
+            "html": "武器 Perk 名"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-buff",
+            "html": "--c-buff"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#2f9fd6",
+            "html": "#2f9fd6"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-buff"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "增益与引号里的 buff 名，首领生命值页的减伤列",
+            "html": "增益与引号里的 buff 名，首领生命值页的减伤列"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-bar-red",
+            "html": "--c-bar-red"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#ff8e86",
+            "html": "#ff8e86"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-bar-red"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战斗人员档位：红血",
+            "html": "战斗人员档位：红血"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-bar-orange",
+            "html": "--c-bar-orange"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#ffb35c",
+            "html": "#ffb35c"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-bar-orange"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战斗人员档位：橙血与守护者",
+            "html": "战斗人员档位：橙血与守护者"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-bar-yellow",
+            "html": "--c-bar-yellow"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#f2ce5b",
+            "html": "#f2ce5b"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-bar-yellow"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战斗人员档位：初级首领与首领",
+            "html": "战斗人员档位：初级首领与首领"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "站点自己的话",
+            "html": "站点自己的话"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-debuff",
+            "html": "--c-debuff"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#a2848c",
+            "html": "#a2848c"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-debuff"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减益",
+            "html": "减益"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-unsure",
+            "html": "--c-unsure"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#a2848c",
+            "html": "#a2848c"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-unsure"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "待测数值",
+            "html": "待测数值"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-pvp",
+            "html": "--c-pvp"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#ee2746",
+            "html": "#ee2746"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-pvp"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "方括号里的 PvP 数值",
+            "html": "方括号里的 PvP 数值"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "--c-note",
+            "html": "--c-note"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "#eea6b7",
+            "html": "#eea6b7"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "c-note"
+            },
+            "text": "Aa 汉字 123",
+            "html": "Aa 汉字 123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "注解：作者的话与限制说明，兼 DPS 页的模拟值",
+            "html": "注解：作者的话与限制说明，兼 DPS 页的模拟值"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "语义",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "标记",
+            "html": "标记"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "渲染色",
+            "html": "渲染色"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "用途",
+            "html": "用途"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-arc"
+            },
+            "text": "el-arc",
+            "html": "el-arc"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-arc",
+            "html": "--c-arc"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电弧元素",
+            "html": "电弧元素"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "deb-arc"
+            },
+            "text": "deb-arc",
+            "html": "deb-arc"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-arc",
+            "html": "--c-arc"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电弧减益：震颤、致盲",
+            "html": "电弧减益：震颤、致盲"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-stasis"
+            },
+            "text": "el-stasis",
+            "html": "el-stasis"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-stasis",
+            "html": "--c-stasis"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰影元素",
+            "html": "冰影元素"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "deb-stasis"
+            },
+            "text": "deb-stasis",
+            "html": "deb-stasis"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-stasis",
+            "html": "--c-stasis"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰影减益：冻结、碎裂",
+            "html": "冰影减益：冻结、碎裂"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-void"
+            },
+            "text": "el-void",
+            "html": "el-void"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-void",
+            "html": "--c-void"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空元素",
+            "html": "虚空元素"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "deb-void"
+            },
+            "text": "deb-void",
+            "html": "deb-void"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-void",
+            "html": "--c-void"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空减益：虚弱、压制",
+            "html": "虚空减益：虚弱、压制"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-strand"
+            },
+            "text": "el-strand",
+            "html": "el-strand"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-strand",
+            "html": "--c-strand"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "缚丝元素",
+            "html": "缚丝元素"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "deb-strand"
+            },
+            "text": "deb-strand",
+            "html": "deb-strand"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-strand",
+            "html": "--c-strand"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "缚丝减益：割裂、瓦解",
+            "html": "缚丝减益：割裂、瓦解"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-solar"
+            },
+            "text": "el-solar",
+            "html": "el-solar"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-solar",
+            "html": "--c-solar"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日元素",
+            "html": "烈日元素"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "deb-solar"
+            },
+            "text": "deb-solar",
+            "html": "deb-solar"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-solar",
+            "html": "--c-solar"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日减益：灼烧、点燃",
+            "html": "烈日减益：灼烧、点燃"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-kinetic"
+            },
+            "text": "el-kinetic",
+            "html": "el-kinetic"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-kinetic",
+            "html": "--c-kinetic"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "动能",
+            "html": "动能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-prismatic"
+            },
+            "text": "el-prismatic",
+            "html": "el-prismatic"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-prism",
+            "html": "--c-prism"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "棱镜与超凡",
+            "html": "棱镜与超凡"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "art-perk"
+            },
+            "text": "art-perk",
+            "html": "art-perk"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-artifact",
+            "html": "--c-artifact"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "神器模组名",
+            "html": "神器模组名"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "perk"
+            },
+            "text": "perk",
+            "html": "perk"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-perk",
+            "html": "--c-perk"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "武器 Perk 名",
+            "html": "武器 Perk 名"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "kind"
+            },
+            "text": "kind",
+            "html": "kind"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-legend",
+            "html": "--c-legend"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "行标题后面那一截武器类别",
+            "html": "行标题后面那一截武器类别"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "exotic"
+            },
+            "text": "exotic",
+            "html": "exotic"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-exotic",
+            "html": "--c-exotic"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "异域装备",
+            "html": "异域装备"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "orb"
+            },
+            "text": "orb",
+            "html": "orb"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-orb",
+            "html": "--c-orb"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "能量球与超能能量",
+            "html": "能量球与超能能量"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "stack"
+            },
+            "text": "stack",
+            "html": "stack"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-stack",
+            "html": "--c-stack"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精准命中与增益层数",
+            "html": "精准命中与增益层数"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "armor-charge"
+            },
+            "text": "armor-charge",
+            "html": "armor-charge"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-charge",
+            "html": "--c-charge"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "护甲充能",
+            "html": "护甲充能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "ammo-heavy"
+            },
+            "text": "ammo-heavy",
+            "html": "ammo-heavy"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-ammo",
+            "html": "--c-ammo"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "威能弹药",
+            "html": "威能弹药"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "ammo-special"
+            },
+            "text": "ammo-special",
+            "html": "ammo-special"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-ammo-special",
+            "html": "--c-ammo-special"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊弹药",
+            "html": "特殊弹药"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "health"
+            },
+            "text": "health",
+            "html": "health"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-health",
+            "html": "--c-health"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "生命值与治疗",
+            "html": "生命值与治疗"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "enemy"
+            },
+            "text": "enemy",
+            "html": "enemy"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-enemy",
+            "html": "--c-enemy"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战斗人员、勇士与数值",
+            "html": "战斗人员、勇士与数值"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "buff"
+            },
+            "text": "buff",
+            "html": "buff"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-buff",
+            "html": "--c-buff"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "增益",
+            "html": "增益"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "pickup"
+            },
+            "text": "pickup",
+            "html": "pickup"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-charge",
+            "html": "--c-charge"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "技能能量、充能与护盾",
+            "html": "技能能量、充能与护盾"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "bar-red"
+            },
+            "text": "bar-red",
+            "html": "bar-red"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-bar-red",
+            "html": "--c-bar-red"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "红血",
+            "html": "红血"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "bar-orange"
+            },
+            "text": "bar-orange",
+            "html": "bar-orange"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-bar-orange",
+            "html": "--c-bar-orange"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "橙血与守护者",
+            "html": "橙血与守护者"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "bar-yellow"
+            },
+            "text": "bar-yellow",
+            "html": "bar-yellow"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-bar-yellow",
+            "html": "--c-bar-yellow"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "初级首领与首领",
+            "html": "初级首领与首领"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "debuff"
+            },
+            "text": "debuff",
+            "html": "debuff"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-debuff",
+            "html": "--c-debuff"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减益",
+            "html": "减益"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "unsure"
+            },
+            "text": "unsure",
+            "html": "unsure"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-unsure",
+            "html": "--c-unsure"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "待测数值 [?]",
+            "html": "待测数值 [?]"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "pvp"
+            },
+            "text": "pvp",
+            "html": "pvp"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-pvp",
+            "html": "--c-pvp"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "方括号里的 PvP 数值",
+            "html": "方括号里的 PvP 数值"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "note"
+            },
+            "text": "note",
+            "html": "note"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-note",
+            "html": "--c-note"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "注解：作者的话与限制说明",
+            "html": "注解：作者的话与限制说明"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "页面专属",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "标记",
+            "html": "标记"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "渲染色",
+            "html": "渲染色"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "页面",
+            "html": "页面"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "用途",
+            "html": "用途"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "cost"
+            },
+            "text": "cost",
+            "html": "cost"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-charge",
+            "html": "--c-charge"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "armor-mods",
+            "html": "armor-mods"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "模组的充能耗费",
+            "html": "模组的充能耗费"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "perk"
+            },
+            "text": "perk",
+            "html": "perk"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-exotic",
+            "html": "--c-exotic"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "exotic-weapon、exotic-armor",
+            "html": "exotic-weapon、exotic-armor"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "异域装备的专属 Perk 名",
+            "html": "异域装备的专属 Perk 名"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "amp"
+            },
+            "text": "amp",
+            "html": "amp"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-void",
+            "html": "--c-void"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "首领生命值页",
+            "html": "首领生命值页"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "易伤列",
+            "html": "易伤列"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "res"
+            },
+            "text": "res",
+            "html": "res"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-buff",
+            "html": "--c-buff"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "首领生命值页",
+            "html": "首领生命值页"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减伤列",
+            "html": "减伤列"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "sim"
+            },
+            "text": "sim",
+            "html": "sim"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-note",
+            "html": "--c-note"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "dps",
+            "html": "dps"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "模拟值",
+            "html": "模拟值"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "term"
+            },
+            "text": "term",
+            "html": "term"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-term",
+            "html": "--c-term"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "armor-sets",
+            "html": "armor-sets"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "引号里的 buff 名",
+            "html": "引号里的 buff 名"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "sk-arc"
+            },
+            "text": "sk-arc",
+            "html": "sk-arc"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-arc",
+            "html": "--c-arc"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "elements",
+            "html": "elements"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "棱镜页共享技能的电弧列",
+            "html": "棱镜页共享技能的电弧列"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "sk-stasis"
+            },
+            "text": "sk-stasis",
+            "html": "sk-stasis"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-stasis",
+            "html": "--c-stasis"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "elements",
+            "html": "elements"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "棱镜页共享技能的冰影列",
+            "html": "棱镜页共享技能的冰影列"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "sk-void"
+            },
+            "text": "sk-void",
+            "html": "sk-void"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-void",
+            "html": "--c-void"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "elements",
+            "html": "elements"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "棱镜页共享技能的虚空列",
+            "html": "棱镜页共享技能的虚空列"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "sk-strand"
+            },
+            "text": "sk-strand",
+            "html": "sk-strand"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-strand",
+            "html": "--c-strand"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "elements",
+            "html": "elements"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "棱镜页共享技能的缚丝列",
+            "html": "棱镜页共享技能的缚丝列"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "sk-solar"
+            },
+            "text": "sk-solar",
+            "html": "sk-solar"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "--c-solar",
+            "html": "--c-solar"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "elements",
+            "html": "elements"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "棱镜页共享技能的烈日列",
+            "html": "棱镜页共享技能的烈日列"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "同色待裁定",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "色号",
+            "html": "色号"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "共用的族",
+            "html": "共用的族"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "状态",
+            "html": "状态"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "#dbc46a",
+            "html": "#dbc46a"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "能量球、层数",
+            "html": "能量球、层数"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "有意：同为资源与层数",
+            "html": "有意：同为资源与层数"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "#2f9fd6",
+            "html": "#2f9fd6"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "护甲充能与耗费、增益、技能能量与护盾、减伤列",
+            "html": "护甲充能与耗费、增益、技能能量与护盾、减伤列"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "有意：同为增益一侧",
+            "html": "有意：同为增益一侧"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "#a2848c",
+            "html": "#a2848c"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "待测、减益",
+            "html": "待测、减益"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "有意：同为限定语",
+            "html": "有意：同为限定语"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "#ffb35c",
+            "html": "#ffb35c"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日元素、橙血档",
+            "html": "烈日元素、橙血档"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "待裁定：exotic-armor 页烈日×163 与橙血×54 同屏",
+            "html": "待裁定：exotic-armor 页烈日×163 与橙血×54 同屏"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "配色总览 · Starside\n\nStarside\n/\n配色总览\n\n配色总览\n\n渲染色\n\n变量\n色号\n色样\n用途\n\n七个元素\n\n--c-arc#5fd8e0Aa 汉字 123电弧元素与其减益\n\n--c-stasis#7fb4ffAa 汉字 123冰影元素与其减益\n\n--c-void#c08cffAa 汉字 123虚空元素与其减益\n\n--c-strand#7fdc86Aa 汉字 123缚丝元素与其减益\n\n--c-solar#ffb35cAa 汉字 123烈日元素与其减益\n\n--c-kinetic#eef7f2Aa 汉字 123动能元素\n\n--c-prism#f58fc8Aa 汉字 123棱镜与超凡\n\n游戏内的其他编码\n\n--c-artifact#20c4b0Aa 汉字 123神器模组名\n\n--c-legend#cf4a9cAa 汉字 123稀有度：传说，行标题后那一截武器类别\n\n--c-exotic#fcb70aAa 汉字 123稀有度：异域，含专属 Perk 名\n\n--c-orb#dbc46aAa 汉字 123能量球与超能能量\n\n--c-stack#dbc46aAa 汉字 123精准命中与增益层数\n\n--c-charge#2f9fd6Aa 汉字 123护甲充能与模组耗费，技能能量、充能与护盾\n\n--c-ammo#cc44ffAa 汉字 123威能弹药\n\n--c-ammo-special#3ff24fAa 汉字 123特殊弹药\n\n--c-health#41b349Aa 汉字 123生命值与治疗\n\n--c-enemy#d94452Aa 汉字 123战斗人员、勇士与数值\n\n--c-term#d6c39aAa 汉字 123词表着色里不属于元素的游戏术语，兼图表曲线、强调色与轮换页的突袭标签\n\n--c-perk#f9e9cdAa 汉字 123武器 Perk 名\n\n--c-buff#2f9fd6Aa 汉字 123增益与引号里的 buff 名，首领生命值页的减伤列\n\n--c-bar-red#ff8e86Aa 汉字 123战斗人员档位：红血\n\n--c-bar-orange#ffb35cAa 汉字 123战斗人员档位：橙血与守护者\n\n--c-bar-yellow#f2ce5bAa 汉字 123战斗人员档位：初级首领与首领\n\n站点自己的话\n\n--c-debuff#a2848cAa 汉字 123减益\n\n--c-unsure#a2848cAa 汉字 123待测数值\n\n--c-pvp#ee2746Aa 汉字 123方括号里的 PvP 数值\n\n--c-note#eea6b7Aa 汉字 123注解：作者的话与限制说明，兼 DPS 页的模拟值\n\n语义\n\n标记\n渲染色\n用途\n\nel-arc--c-arc电弧元素\n\ndeb-arc--c-arc电弧减益：震颤、致盲\n\nel-stasis--c-stasis冰影元素\n\ndeb-stasis--c-stasis冰影减益：冻结、碎裂\n\nel-void--c-void虚空元素\n\ndeb-void--c-void虚空减益：虚弱、压制\n\nel-strand--c-strand缚丝元素\n\ndeb-strand--c-strand缚丝减益：割裂、瓦解\n\nel-solar--c-solar烈日元素\n\ndeb-solar--c-solar烈日减益：灼烧、点燃\n\nel-kinetic--c-kinetic动能\n\nel-prismatic--c-prism棱镜与超凡\n\nart-perk--c-artifact神器模组名\n\nperk--c-perk武器 Perk 名\n\nkind--c-legend行标题后面那一截武器类别\n\nexotic--c-exotic异域装备\n\norb--c-orb能量球与超能能量\n\nstack--c-stack精准命中与增益层数\n\narmor-charge--c-charge护甲充能\n\nammo-heavy--c-ammo威能弹药\n\nammo-special--c-ammo-special特殊弹药\n\nhealth--c-health生命值与治疗\n\nenemy--c-enemy战斗人员、勇士与数值\n\nbuff--c-buff增益\n\npickup--c-charge技能能量、充能与护盾\n\nbar-red--c-bar-red红血\n\nbar-orange--c-bar-orange橙血与守护者\n\nbar-yellow--c-bar-yellow初级首领与首领\n\ndebuff--c-debuff减益\n\nunsure--c-unsure待测数值 [?]\n\npvp--c-pvp方括号里的 PvP 数值\n\nnote--c-note注解：作者的话与限制说明\n\n页面专属\n\n标记\n渲染色\n页面\n用途\n\ncost--c-chargearmor-mods模组的充能耗费\n\nperk--c-exoticexotic-weapon、exotic-armor异域装备的专属 Perk 名\n\namp--c-void首领生命值页易伤列\n\nres--c-buff首领生命值页减伤列\n\nsim--c-notedps模拟值\n\nterm--c-termarmor-sets引号里的 buff 名\n\nsk-arc--c-arcelements棱镜页共享技能的电弧列\n\nsk-stasis--c-stasiselements棱镜页共享技能的冰影列\n\nsk-void--c-voidelements棱镜页共享技能的虚空列\n\nsk-strand--c-strandelements棱镜页共享技能的缚丝列\n\nsk-solar--c-solarelements棱镜页共享技能的烈日列\n\n同色待裁定\n\n一支色号被几个族共用的地方。有意共用的写明理由，剩下的按同屏那一列排先后。\n色号定完这一节即删。\n\n色号\n共用的族\n状态\n\n#dbc46a能量球、层数有意：同为资源与层数\n\n#2f9fd6护甲充能与耗费、增益、技能能量与护盾、减伤列有意：同为增益一侧\n\n#a2848c待测、减益有意：同为限定语\n\n#ffb35c烈日元素、橙血档待裁定：exotic-armor 页烈日×163 与橙血×54 同屏\n\n更新 2026.8.24色号与 assets/site.css 的 :root 由 check_terms.py 逐条比对，两处必须一致。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/palette/index.html",
+    "final_url": "https://starside.work/palette/index.html",
+    "path": "pages/palette/index.html",
+    "bytes": 15498,
+    "sha256": "8ae9970ff6e27f9b6a35a76f342a5a74bbd4176ee92ca1e071601891c589a4b7",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:44.420930+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/palette/style.css"
+  ]
+}

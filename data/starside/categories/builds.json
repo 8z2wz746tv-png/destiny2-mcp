@@ -1,0 +1,942 @@
+[
+  {
+    "title": "配装推荐 · Starside",
+    "url": "https://starside.work/builds/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/index.json",
+    "text": "texts/builds/builds/index.md",
+    "raw": "pages/builds/index.html",
+    "source_blocks": 0,
+    "tables": 0
+  },
+  {
+    "title": "配装工具 · Starside",
+    "url": "https://starside.work/builds/new/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/new/index.json",
+    "text": "texts/builds/builds/new/index.md",
+    "raw": "pages/builds/new/index.html",
+    "source_blocks": 0,
+    "tables": 0
+  },
+  {
+    "title": "合集工具 · Starside",
+    "url": "https://starside.work/builds/new/set/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/new/set/index.json",
+    "text": "texts/builds/builds/new/set/index.md",
+    "raw": "pages/builds/new/set/index.html",
+    "source_blocks": 0,
+    "tables": 0
+  },
+  {
+    "title": "混乱无序高压续航棱镜猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/00vivy2a-hunter/index.html",
+    "updated_at": "2026.9.7",
+    "record": "records/builds/s29/00vivy2a-hunter/index.json",
+    "text": "texts/builds/builds/s29/00vivy2a-hunter/index.md",
+    "raw": "pages/builds/s29/00vivy2a-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "贪婪套冰猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/0cqrj1m0-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/0cqrj1m0-hunter/index.json",
+    "text": "texts/builds/builds/s29/0cqrj1m0-hunter/index.md",
+    "raw": "pages/builds/s29/0cqrj1m0-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "火刀猎狼毒输出配装合集 · 配装合集 · Starside",
+    "url": "https://starside.work/builds/s29/0n05dhek-hunter/index.html",
+    "updated_at": "2026.9.7",
+    "record": "records/builds/s29/0n05dhek-hunter/index.json",
+    "text": "texts/builds/builds/s29/0n05dhek-hunter/index.md",
+    "raw": "pages/builds/s29/0n05dhek-hunter/index.html",
+    "source_blocks": 3,
+    "tables": 0
+  },
+  {
+    "title": "火术运动套 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/0rzn1rj2-warlock/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/0rzn1rj2-warlock/index.json",
+    "text": "texts/builds/builds/s29/0rzn1rj2-warlock/index.md",
+    "raw": "pages/builds/s29/0rzn1rj2-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "终局内容：命运眷顾真相输出 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/12iujhbp-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/12iujhbp-hunter/index.json",
+    "text": "texts/builds/builds/s29/12iujhbp-hunter/index.md",
+    "raw": "pages/builds/s29/12iujhbp-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "复古虚空术进化版 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/16gnj6n4-warlock/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/16gnj6n4-warlock/index.json",
+    "text": "texts/builds/builds/s29/16gnj6n4-warlock/index.md",
+    "raw": "pages/builds/s29/16gnj6n4-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "赫沃斯托夫星火术士 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/1846gzu2-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/1846gzu2-warlock/index.json",
+    "text": "texts/builds/builds/s29/1846gzu2-warlock/index.md",
+    "raw": "pages/builds/s29/1846gzu2-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "裂波者 觅敌矛隼猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/1hvh7t4d-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/1hvh7t4d-hunter/index.json",
+    "text": "texts/builds/builds/s29/1hvh7t4d-hunter/index.md",
+    "raw": "pages/builds/s29/1hvh7t4d-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "多人需求层级钻机腿输出 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/26x3zxkz-hunter/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/builds/s29/26x3zxkz-hunter/index.json",
+    "text": "texts/builds/builds/s29/26x3zxkz-hunter/index.md",
+    "raw": "pages/builds/s29/26x3zxkz-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "闪身头虚空术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/3p44o63u-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/3p44o63u-warlock/index.json",
+    "text": "texts/builds/builds/s29/3p44o63u-warlock/index.md",
+    "raw": "pages/builds/s29/3p44o63u-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "威胁等级电表倒转 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/45oqarm4-hunter/index.html",
+    "updated_at": "2026.9.5",
+    "record": "records/builds/s29/45oqarm4-hunter/index.json",
+    "text": "texts/builds/builds/s29/45oqarm4-hunter/index.md",
+    "raw": "pages/builds/s29/45oqarm4-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "霉B喷子 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/6o3okjt4-titan/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/6o3okjt4-titan/index.json",
+    "text": "texts/builds/builds/s29/6o3okjt4-titan/index.md",
+    "raw": "pages/builds/s29/6o3okjt4-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "苍蝇头响指术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/76ko496i-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/76ko496i-warlock/index.json",
+    "text": "texts/builds/builds/s29/76ko496i-warlock/index.md",
+    "raw": "pages/builds/s29/76ko496i-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "棱镜松身裤丢丢猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/7b5y8phc-hunter/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/builds/s29/7b5y8phc-hunter/index.json",
+    "text": "texts/builds/builds/s29/7b5y8phc-hunter/index.md",
+    "raw": "pages/builds/s29/7b5y8phc-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "猎人沙漠专用六边形战士 · 配装合集 · Starside",
+    "url": "https://starside.work/builds/s29/8p1f06qc-hunter/index.html",
+    "updated_at": "2026.9.7",
+    "record": "records/builds/s29/8p1f06qc-hunter/index.json",
+    "text": "texts/builds/builds/s29/8p1f06qc-hunter/index.md",
+    "raw": "pages/builds/s29/8p1f06qc-hunter/index.html",
+    "source_blocks": 4,
+    "tables": 0
+  },
+  {
+    "title": "卡利班合成清怪推图装 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/9m6612x5-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/9m6612x5-hunter/index.json",
+    "text": "texts/builds/builds/s29/9m6612x5-hunter/index.md",
+    "raw": "pages/builds/s29/9m6612x5-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "meta电术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/acdzuqsl-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/acdzuqsl-warlock/index.json",
+    "text": "texts/builds/builds/s29/acdzuqsl-warlock/index.md",
+    "raw": "pages/builds/s29/acdzuqsl-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "猎人日志solo见证者配装 · 配装合集 · Starside",
+    "url": "https://starside.work/builds/s29/bcndfero-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/bcndfero-hunter/index.json",
+    "text": "texts/builds/builds/s29/bcndfero-hunter/index.md",
+    "raw": "pages/builds/s29/bcndfero-hunter/index.html",
+    "source_blocks": 3,
+    "tables": 0
+  },
+  {
+    "title": "刮刮乐泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/clama-he-titan/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/clama-he-titan/index.json",
+    "text": "texts/builds/builds/s29/clama-he-titan/index.md",
+    "raw": "pages/builds/s29/clama-he-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "闪电激涌电术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/cub5k5v5-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/cub5k5v5-warlock/index.json",
+    "text": "texts/builds/builds/s29/cub5k5v5-warlock/index.md",
+    "raw": "pages/builds/s29/cub5k5v5-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "冰术阿格尔 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/cw92ebx7-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/cw92ebx7-warlock/index.json",
+    "text": "texts/builds/builds/s29/cw92ebx7-warlock/index.md",
+    "raw": "pages/builds/s29/cw92ebx7-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "虫手偃月 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/d4xktql3-titan/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/d4xktql3-titan/index.json",
+    "text": "texts/builds/builds/s29/d4xktql3-titan/index.md",
+    "raw": "pages/builds/s29/d4xktql3-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "英勇礼服光剑泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/dwu56wqi-titan/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/dwu56wqi-titan/index.json",
+    "text": "texts/builds/builds/s29/dwu56wqi-titan/index.md",
+    "raw": "pages/builds/s29/dwu56wqi-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "火刀猎，突袭三切输出配装 · 配装合集 · Starside",
+    "url": "https://starside.work/builds/s29/e4jm22gv-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/e4jm22gv-hunter/index.json",
+    "text": "texts/builds/builds/s29/e4jm22gv-hunter/index.md",
+    "raw": "pages/builds/s29/e4jm22gv-hunter/index.html",
+    "source_blocks": 5,
+    "tables": 0
+  },
+  {
+    "title": "不祥之兆+永恒战士电泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/ec4h23xa-titan/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/ec4h23xa-titan/index.json",
+    "text": "texts/builds/builds/s29/ec4h23xa-titan/index.md",
+    "raw": "pages/builds/s29/ec4h23xa-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "一拳超人 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/em3ruaaj-titan/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/builds/s29/em3ruaaj-titan/index.json",
+    "text": "texts/builds/builds/s29/em3ruaaj-titan/index.md",
+    "raw": "pages/builds/s29/em3ruaaj-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "贪婪忠诚面具冰猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/epfu2cst-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/epfu2cst-hunter/index.json",
+    "text": "texts/builds/builds/s29/epfu2cst-hunter/index.md",
+    "raw": "pages/builds/s29/epfu2cst-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "66连杀兰花 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/etcdnfru-hunter/index.html",
+    "updated_at": "2026.9.4",
+    "record": "records/builds/s29/etcdnfru-hunter/index.json",
+    "text": "texts/builds/builds/s29/etcdnfru-hunter/index.md",
+    "raw": "pages/builds/s29/etcdnfru-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "松身裤火猎人 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/fc797wcs-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/fc797wcs-hunter/index.json",
+    "text": "texts/builds/builds/s29/fc797wcs-hunter/index.md",
+    "raw": "pages/builds/s29/fc797wcs-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "光能甲碎冰雷泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/fhbpgwnh-titan/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/fhbpgwnh-titan/index.json",
+    "text": "texts/builds/builds/s29/fhbpgwnh-titan/index.md",
+    "raw": "pages/builds/s29/fhbpgwnh-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "冰猎开荒回转套 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/fnsnwbr3-hunter/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/builds/s29/fnsnwbr3-hunter/index.json",
+    "text": "texts/builds/builds/s29/fnsnwbr3-hunter/index.md",
+    "raw": "pages/builds/s29/fnsnwbr3-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "冰猎运动套 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/hemhwhoe-hunter/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/hemhwhoe-hunter/index.json",
+    "text": "texts/builds/builds/s29/hemhwhoe-hunter/index.md",
+    "raw": "pages/builds/s29/hemhwhoe-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "有限点燃苍蝇头火术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/hl9zhtio-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/hl9zhtio-warlock/index.json",
+    "text": "texts/builds/builds/s29/hl9zhtio-warlock/index.md",
+    "raw": "pages/builds/s29/hl9zhtio-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "配装合集测试 · 配装合集 · Starside",
+    "url": "https://starside.work/builds/s29/hqq17mla-hunter/index.html",
+    "updated_at": "2026.9.5",
+    "record": "records/builds/s29/hqq17mla-hunter/index.json",
+    "text": "texts/builds/builds/s29/hqq17mla-hunter/index.md",
+    "raw": "pages/builds/s29/hqq17mla-hunter/index.html",
+    "source_blocks": 4,
+    "tables": 0
+  },
+  {
+    "title": "双飞饼 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/ig7y9i5n-warlock/index.html",
+    "updated_at": "2026.9.4",
+    "record": "records/builds/s29/ig7y9i5n-warlock/index.json",
+    "text": "texts/builds/builds/s29/ig7y9i5n-warlock/index.md",
+    "raw": "pages/builds/s29/ig7y9i5n-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "子弹印刷缚丝术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/irneezm3-warlock/index.html",
+    "updated_at": "2026.9.7",
+    "record": "records/builds/s29/irneezm3-warlock/index.json",
+    "text": "texts/builds/builds/s29/irneezm3-warlock/index.md",
+    "raw": "pages/builds/s29/irneezm3-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "亡妻回忆录之星火协议 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/iuhsh3n7-warlock/index.html",
+    "updated_at": "2026.9.3",
+    "record": "records/builds/s29/iuhsh3n7-warlock/index.json",
+    "text": "texts/builds/builds/s29/iuhsh3n7-warlock/index.md",
+    "raw": "pages/builds/s29/iuhsh3n7-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "棱镜光剑猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/j53igc67-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/j53igc67-hunter/index.json",
+    "text": "texts/builds/builds/s29/j53igc67-hunter/index.md",
+    "raw": "pages/builds/s29/j53igc67-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "职业金棱镜猎（通用模版） · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/j5lws37e-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/j5lws37e-hunter/index.json",
+    "text": "texts/builds/builds/s29/j5lws37e-hunter/index.md",
+    "raw": "pages/builds/s29/j5lws37e-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "风暴衣无限电上术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/jianqi-fengbao-warlock/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/jianqi-fengbao-warlock/index.json",
+    "text": "texts/builds/builds/s29/jianqi-fengbao-warlock/index.md",
+    "raw": "pages/builds/s29/jianqi-fengbao-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "恐惧编织缚丝术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/jianqi-kongjufusi-warlock/index.html",
+    "updated_at": "2026.9.7",
+    "record": "records/builds/s29/jianqi-kongjufusi-warlock/index.json",
+    "text": "texts/builds/builds/s29/jianqi-kongjufusi-warlock/index.md",
+    "raw": "pages/builds/s29/jianqi-kongjufusi-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "霜袍衣冰术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/jianqi-shuangpaoyi-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/jianqi-shuangpaoyi-warlock/index.json",
+    "text": "texts/builds/builds/s29/jianqi-shuangpaoyi-warlock/index.md",
+    "raw": "pages/builds/s29/jianqi-shuangpaoyi-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "海胆头电术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/k9b88zv0-warlock/index.html",
+    "updated_at": "2026.9.4",
+    "record": "records/builds/s29/k9b88zv0-warlock/index.json",
+    "text": "texts/builds/builds/s29/k9b88zv0-warlock/index.md",
+    "raw": "pages/builds/s29/k9b88zv0-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "小锤火泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/kvy77e2g-titan/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/kvy77e2g-titan/index.json",
+    "text": "texts/builds/builds/s29/kvy77e2g-titan/index.md",
+    "raw": "pages/builds/s29/kvy77e2g-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "力大砖飞，技高一筹，火刀真相恩射流 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/lndho5sd-hunter/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/lndho5sd-hunter/index.json",
+    "text": "texts/builds/builds/s29/lndho5sd-hunter/index.md",
+    "raw": "pages/builds/s29/lndho5sd-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "火锤泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/lp6n569t-titan/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/lp6n569t-titan/index.json",
+    "text": "texts/builds/builds/s29/lp6n569t-titan/index.md",
+    "raw": "pages/builds/s29/lp6n569t-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "棱镜丢丢猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/lxg8i6ue-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/lxg8i6ue-hunter/index.json",
+    "text": "texts/builds/builds/s29/lxg8i6ue-hunter/index.md",
+    "raw": "pages/builds/s29/lxg8i6ue-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "元素大师猎人 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/madoka-yuansudashi-hunter/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/madoka-yuansudashi-hunter/index.json",
+    "text": "texts/builds/builds/s29/madoka-yuansudashi-hunter/index.md",
+    "raw": "pages/builds/s29/madoka-yuansudashi-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "冰泰坦 · 配装合集 · Starside",
+    "url": "https://starside.work/builds/s29/mbgvkw8f-titan/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/mbgvkw8f-titan/index.json",
+    "text": "texts/builds/builds/s29/mbgvkw8f-titan/index.md",
+    "raw": "pages/builds/s29/mbgvkw8f-titan/index.html",
+    "source_blocks": 3,
+    "tables": 0
+  },
+  {
+    "title": "幽默术士 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/mc17h8dh-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/mc17h8dh-warlock/index.json",
+    "text": "texts/builds/builds/s29/mc17h8dh-warlock/index.md",
+    "raw": "pages/builds/s29/mc17h8dh-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "合成手风暴怒吼冰泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/mengdong-hechengstasis-titan/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/mengdong-hechengstasis-titan/index.json",
+    "text": "texts/builds/builds/s29/mengdong-hechengstasis-titan/index.md",
+    "raw": "pages/builds/s29/mengdong-hechengstasis-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "第四骑士光芒复仇松身裤火猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/mkguedf2-hunter/index.html",
+    "updated_at": "2026.9.2",
+    "record": "records/builds/s29/mkguedf2-hunter/index.json",
+    "text": "texts/builds/builds/s29/mkguedf2-hunter/index.md",
+    "raw": "pages/builds/s29/mkguedf2-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "术士职业金裂波者 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/mo1r9kvu-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/mo1r9kvu-warlock/index.json",
+    "text": "texts/builds/builds/s29/mo1r9kvu-warlock/index.md",
+    "raw": "pages/builds/s29/mo1r9kvu-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "吸血手火术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/nbq988rq-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/nbq988rq-warlock/index.json",
+    "text": "texts/builds/builds/s29/nbq988rq-warlock/index.md",
+    "raw": "pages/builds/s29/nbq988rq-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "裂波者无限超能泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/ne0agkms-titan/index.html",
+    "updated_at": "2026.9.4",
+    "record": "records/builds/s29/ne0agkms-titan/index.json",
+    "text": "texts/builds/builds/s29/ne0agkms-titan/index.md",
+    "raw": "pages/builds/s29/ne0agkms-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "左键清屏和谐棱镜术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/niangaoming-hexieqingping-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/niangaoming-hexieqingping-warlock/index.json",
+    "text": "texts/builds/builds/s29/niangaoming-hexieqingping-warlock/index.md",
+    "raw": "pages/builds/s29/niangaoming-hexieqingping-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "赫沃斯托夫小帝喷 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/nianqingren-hexiaodi-hunter/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/nianqingren-hexiaodi-hunter/index.json",
+    "text": "texts/builds/builds/s29/nianqingren-hexiaodi-hunter/index.md",
+    "raw": "pages/builds/s29/nianqingren-hexiaodi-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "棱镜堡垒丢丢猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/nightcore-baolei-hunter/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/nightcore-baolei-hunter/index.json",
+    "text": "texts/builds/builds/s29/nightcore-baolei-hunter/index.md",
+    "raw": "pages/builds/s29/nightcore-baolei-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "死亡信使机制弹药套 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/nightcore-swxsjz-hunter/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/nightcore-swxsjz-hunter/index.json",
+    "text": "texts/builds/builds/s29/nightcore-swxsjz-hunter/index.md",
+    "raw": "pages/builds/s29/nightcore-swxsjz-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "圣火护心甲泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/ozytwawh-titan/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/ozytwawh-titan/index.json",
+    "text": "texts/builds/builds/s29/ozytwawh-titan/index.md",
+    "raw": "pages/builds/s29/ozytwawh-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "坏死+合成棱镜术（贾诩术） · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/pkz20gm1-warlock/index.html",
+    "updated_at": "2026.9.4",
+    "record": "records/builds/s29/pkz20gm1-warlock/index.json",
+    "text": "texts/builds/builds/s29/pkz20gm1-warlock/index.md",
+    "raw": "pages/builds/s29/pkz20gm1-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "棱镜泰坦pvp meta 配装 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/q01swvbe-titan/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/builds/s29/q01swvbe-titan/index.json",
+    "text": "texts/builds/builds/s29/q01swvbe-titan/index.md",
+    "raw": "pages/builds/s29/q01swvbe-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "四码头 高阶暴君 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/q9y0mpko-titan/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/builds/s29/q9y0mpko-titan/index.json",
+    "text": "texts/builds/builds/s29/q9y0mpko-titan/index.md",
+    "raw": "pages/builds/s29/q9y0mpko-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "虚无镣铐/反转手虚空术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/qz9gs029-warlock/index.html",
+    "updated_at": "2026.9.3",
+    "record": "records/builds/s29/qz9gs029-warlock/index.json",
+    "text": "texts/builds/builds/s29/qz9gs029-warlock/index.md",
+    "raw": "pages/builds/s29/qz9gs029-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "边缘交通 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/rdrctsdn-warlock/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/rdrctsdn-warlock/index.json",
+    "text": "texts/builds/builds/s29/rdrctsdn-warlock/index.md",
+    "raw": "pages/builds/s29/rdrctsdn-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "宝宝术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/rnoxx0b1-warlock/index.html",
+    "updated_at": "2026.9.7",
+    "record": "records/builds/s29/rnoxx0b1-warlock/index.json",
+    "text": "texts/builds/builds/s29/rnoxx0b1-warlock/index.md",
+    "raw": "pages/builds/s29/rnoxx0b1-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "虚空猎pvp · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/s5imk2yw-hunter/index.html",
+    "updated_at": "2026.9.5",
+    "record": "records/builds/s29/s5imk2yw-hunter/index.json",
+    "text": "texts/builds/builds/s29/s5imk2yw-hunter/index.md",
+    "raw": "pages/builds/s29/s5imk2yw-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "无序喝彩 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/sc398fux-titan/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/sc398fux-titan/index.json",
+    "text": "texts/builds/builds/s29/sc398fux-titan/index.md",
+    "raw": "pages/builds/s29/sc398fux-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "霜袍术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/swyr3tgz-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/swyr3tgz-warlock/index.json",
+    "text": "texts/builds/builds/s29/swyr3tgz-warlock/index.md",
+    "raw": "pages/builds/s29/swyr3tgz-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "虚式·茈 五条悟虚空术士 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/tniihk60-warlock/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/tniihk60-warlock/index.json",
+    "text": "texts/builds/builds/s29/tniihk60-warlock/index.md",
+    "raw": "pages/builds/s29/tniihk60-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "牢大术士 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/tz4vvv6j-warlock/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/tz4vvv6j-warlock/index.json",
+    "text": "texts/builds/builds/s29/tz4vvv6j-warlock/index.md",
+    "raw": "pages/builds/s29/tz4vvv6j-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "跳舞机袖珍卫士 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/v623u209-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/v623u209-hunter/index.json",
+    "text": "texts/builds/builds/s29/v623u209-hunter/index.md",
+    "raw": "pages/builds/s29/v623u209-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "日常地牢通用火刀猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/vc0q45kd-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/vc0q45kd-hunter/index.json",
+    "text": "texts/builds/builds/s29/vc0q45kd-hunter/index.md",
+    "raw": "pages/builds/s29/vc0q45kd-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "炸死所有猪 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/vl8gam9n-titan/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/vl8gam9n-titan/index.json",
+    "text": "texts/builds/builds/s29/vl8gam9n-titan/index.md",
+    "raw": "pages/builds/s29/vl8gam9n-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "混乱裁决火刀猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/w0q7ss18-hunter/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/w0q7ss18-hunter/index.json",
+    "text": "texts/builds/builds/s29/w0q7ss18-hunter/index.md",
+    "raw": "pages/builds/s29/w0q7ss18-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "虚空猎pvp · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/xiaoning-xukongpvp-hunter/index.html",
+    "updated_at": "2026.9.8",
+    "record": "records/builds/s29/xiaoning-xukongpvp-hunter/index.json",
+    "text": "texts/builds/builds/s29/xiaoning-xukongpvp-hunter/index.md",
+    "raw": "pages/builds/s29/xiaoning-xukongpvp-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "狼毒火刀猎 · 配装合集 · Starside",
+    "url": "https://starside.work/builds/s29/xk3o6vpu-hunter/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/xk3o6vpu-hunter/index.json",
+    "text": "texts/builds/builds/s29/xk3o6vpu-hunter/index.md",
+    "raw": "pages/builds/s29/xk3o6vpu-hunter/index.html",
+    "source_blocks": 3,
+    "tables": 0
+  },
+  {
+    "title": "星火纤维棱镜术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/xukonvoid-xinghuo-warlock/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/s29/xukonvoid-xinghuo-warlock/index.json",
+    "text": "texts/builds/builds/s29/xukonvoid-xinghuo-warlock/index.md",
+    "raw": "pages/builds/s29/xukonvoid-xinghuo-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "棱镜b计划龟喷坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/yester-bguipen-titan/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/yester-bguipen-titan/index.json",
+    "text": "texts/builds/builds/s29/yester-bguipen-titan/index.md",
+    "raw": "pages/builds/s29/yester-bguipen-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "龟刀猎 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/yester-guidao-hunter/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/yester-guidao-hunter/index.json",
+    "text": "texts/builds/builds/s29/yester-guidao-hunter/index.md",
+    "raw": "pages/builds/s29/yester-guidao-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "间桐樱术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/yester-jtys-warlock/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/yester-jtys-warlock/index.json",
+    "text": "texts/builds/builds/s29/yester-jtys-warlock/index.md",
+    "raw": "pages/builds/s29/yester-jtys-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "忍野丢丢 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/yester-rendongdiudiu-hunter/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/yester-rendongdiudiu-hunter/index.json",
+    "text": "texts/builds/builds/s29/yester-rendongdiudiu-hunter/index.md",
+    "raw": "pages/builds/s29/yester-rendongdiudiu-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "虚空剑圣 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/yester-xukongjiansheng-titan/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/yester-xukongjiansheng-titan/index.json",
+    "text": "texts/builds/builds/s29/yester-xukongjiansheng-titan/index.md",
+    "raw": "pages/builds/s29/yester-xukongjiansheng-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "双金枪输出配装 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/yiwangmelt-ggggdamage-hunter/index.html",
+    "updated_at": "2026.9.2",
+    "record": "records/builds/s29/yiwangmelt-ggggdamage-hunter/index.json",
+    "text": "texts/builds/builds/s29/yiwangmelt-ggggdamage-hunter/index.md",
+    "raw": "pages/builds/s29/yiwangmelt-ggggdamage-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "金枪猎守点清怪配装 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/yiwangmelt-shoudian-hunter/index.html",
+    "updated_at": "2026.9.2",
+    "record": "records/builds/s29/yiwangmelt-shoudian-hunter/index.json",
+    "text": "texts/builds/builds/s29/yiwangmelt-shoudian-hunter/index.md",
+    "raw": "pages/builds/s29/yiwangmelt-shoudian-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "金枪猎位移+清怪配装 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/yiwangmelt-twjqg-hunter/index.html",
+    "updated_at": "2026.9.2",
+    "record": "records/builds/s29/yiwangmelt-twjqg-hunter/index.json",
+    "text": "texts/builds/builds/s29/yiwangmelt-twjqg-hunter/index.md",
+    "raw": "pages/builds/s29/yiwangmelt-twjqg-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "金枪猎位移+清怪配装 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/yiwangmelt-weiyiqingguai2-hunter/index.html",
+    "updated_at": "2026.9.2",
+    "record": "records/builds/s29/yiwangmelt-weiyiqingguai2-hunter/index.json",
+    "text": "texts/builds/builds/s29/yiwangmelt-weiyiqingguai2-hunter/index.md",
+    "raw": "pages/builds/s29/yiwangmelt-weiyiqingguai2-hunter/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "赫沃斯托夫逃逸手术士 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/ynwgmvks-warlock/index.html",
+    "updated_at": "2026.9.2",
+    "record": "records/builds/s29/ynwgmvks-warlock/index.json",
+    "text": "texts/builds/builds/s29/ynwgmvks-warlock/index.md",
+    "raw": "pages/builds/s29/ynwgmvks-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "微冲腿泰坦 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/zf43l1v8-titan/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/builds/s29/zf43l1v8-titan/index.json",
+    "text": "texts/builds/builds/s29/zf43l1v8-titan/index.md",
+    "raw": "pages/builds/s29/zf43l1v8-titan/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "悬停术 · 配装推荐 · Starside",
+    "url": "https://starside.work/builds/s29/zqqoqjsb-warlock/index.html",
+    "updated_at": "2026.9.1",
+    "record": "records/builds/s29/zqqoqjsb-warlock/index.json",
+    "text": "texts/builds/builds/s29/zqqoqjsb-warlock/index.md",
+    "raw": "pages/builds/s29/zqqoqjsb-warlock/index.html",
+    "source_blocks": 1,
+    "tables": 0
+  },
+  {
+    "title": "配装合集 · Starside",
+    "url": "https://starside.work/builds/sets/index.html",
+    "updated_at": "2026.9.9",
+    "record": "records/builds/sets/index.json",
+    "text": "texts/builds/builds/sets/index.md",
+    "raw": "pages/builds/sets/index.html",
+    "source_blocks": 0,
+    "tables": 0
+  }
+]

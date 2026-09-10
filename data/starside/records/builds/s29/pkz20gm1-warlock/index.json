@@ -1,0 +1,183 @@
+{
+  "url": "https://starside.work/builds/s29/pkz20gm1-warlock/index.html",
+  "title": "坏死+合成棱镜术（贾诩术） · 配装推荐 · Starside",
+  "description": "坏死之灵dot伤害配合vog套产球和星象神器批量产线虫，合成之灵配合电好耶清群怪",
+  "category": "builds",
+  "updated_at": "2026.9.4",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 坏死+合成棱镜术（贾诩术）\n\n推荐人：樱泽春花墨\n描述：坏死之灵dot伤害配合vog套产球和星象神器批量产线虫，合成之灵配合电好耶清群怪\n更新：2026.9.4\n场景：突袭、地牢、宗师终极、日常、通用\n定位：清怪、续航、功能、通用\n分支：棱镜\n类别：创意\n核心：坏死之灵\n\n## 职业\n\n职业：术士\n超能：烈焰之歌\n星相：闪电激涌、编织者之唤\n碎片：保护琢面、黎明琢面、使命琢面、勇气琢面、希望琢面\n手雷：急冻手雷\n近战：神秘织针\n职业技能：凤凰俯冲\n\n## 武器\n\n异域武器：荆棘\n传说武器：VS 速度指挥 | 重建、羸弱能量球\n传说武器：翻新 A499 | 自动填装枪套、移动目标\n\n## 护甲\n\n异域护甲：坏死之灵、合成感受器之灵\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：超能洗礼、超能洗礼、动能虹吸\n护臂：回天掌法、回天掌法、回天掌法\n胸甲：抗性、电弧抗性、震荡阻尼器\n腿部：武器洗礼、恢复能量球、武器激涌\n职业物品：特殊终结技、强力吸引、投弹手\n\n## 神器\n\n神器：废墟石板\n模组：电介质、光子耀斑、邪恶编织、群敌飞梭、闪电过载、除颤爆破、崩解\n\n## 六维\n\n六维：生命 ~ ｜ 近战 100+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 70+ ｜ 武器 ~\n\n## 注解\n\n1、拱顶4件套：拥有元素增益时造成5次伤害在脚下产一个球且会自动拾取\n2、大招选火歌使命琢面吃球给5秒恢复*1，黎明琢面充能近战给5秒幻光配合电好耶星象，滑铲充能近战可一次获得5秒幻光和15秒增幅，配合荆棘和坏死的毒，恢复基本是不会断的\n3、近战选缚丝近战可以上瓦解，神器里武器伤害被瓦解的目标会产线虫，星象造成伤害和击败目标也会产线虫，被瓦解的目标受到伤害会产生瓦解丝线到处飞，配合荆棘和坏死之灵还有震颤的dot伤害，屏幕中会产生极多的瓦解丝线，配合神器线虫和缠结命中目标会将其割裂，神器里还有崩解，被割裂的目标受伤还会瓦解，击杀割裂目标产生范围的织造铠甲\n4、合成之灵配合电好耶和坏死对怪堆有奇效，还能触发神器中的电系模组且释放就行无命中需求，是最优选择\n5、生存方面：被割裂的目标造成伤害降低40%，击败割裂给10s织造铠甲（45%免伤），增幅（15%免伤），神器击杀电弧减益目标回血和眩晕勇士打雷回血，还有vog套产球碎片吃球给恢复\n6、强度方面：自己试试就知道，本人已用这套通关过终极光刃和终极炽天使，整套配装从星象碎片到武器和神器选择环环相扣堪称完美\n7、总结，利用荆棘的毒，结合震颤、瓦解丝线、坏死等多种dot配合vog套产球，碎片吃球给恢复*1，缠结和近战瓦解目标配合神器给免伤，同时各种dot伤害配合星象神器还会产线虫，电好耶一个近战就能无条件获取增益配合合成之灵对群效果显著",
+  "source_blocks": [
+    "# 坏死+合成棱镜术（贾诩术）\n\n推荐人：樱泽春花墨\n描述：坏死之灵dot伤害配合vog套产球和星象神器批量产线虫，合成之灵配合电好耶清群怪\n更新：2026.9.4\n场景：突袭、地牢、宗师终极、日常、通用\n定位：清怪、续航、功能、通用\n分支：棱镜\n类别：创意\n核心：坏死之灵\n\n## 职业\n\n职业：术士\n超能：烈焰之歌\n星相：闪电激涌、编织者之唤\n碎片：保护琢面、黎明琢面、使命琢面、勇气琢面、希望琢面\n手雷：急冻手雷\n近战：神秘织针\n职业技能：凤凰俯冲\n\n## 武器\n\n异域武器：荆棘\n传说武器：VS 速度指挥 | 重建、羸弱能量球\n传说武器：翻新 A499 | 自动填装枪套、移动目标\n\n## 护甲\n\n异域护甲：坏死之灵、合成感受器之灵\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：超能洗礼、超能洗礼、动能虹吸\n护臂：回天掌法、回天掌法、回天掌法\n胸甲：抗性、电弧抗性、震荡阻尼器\n腿部：武器洗礼、恢复能量球、武器激涌\n职业物品：特殊终结技、强力吸引、投弹手\n\n## 神器\n\n神器：废墟石板\n模组：电介质、光子耀斑、邪恶编织、群敌飞梭、闪电过载、除颤爆破、崩解\n\n## 六维\n\n六维：生命 ~ ｜ 近战 100+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 70+ ｜ 武器 ~\n\n## 注解\n\n1、拱顶4件套：拥有元素增益时造成5次伤害在脚下产一个球且会自动拾取\n2、大招选火歌使命琢面吃球给5秒恢复*1，黎明琢面充能近战给5秒幻光配合电好耶星象，滑铲充能近战可一次获得5秒幻光和15秒增幅，配合荆棘和坏死的毒，恢复基本是不会断的\n3、近战选缚丝近战可以上瓦解，神器里武器伤害被瓦解的目标会产线虫，星象造成伤害和击败目标也会产线虫，被瓦解的目标受到伤害会产生瓦解丝线到处飞，配合荆棘和坏死之灵还有震颤的dot伤害，屏幕中会产生极多的瓦解丝线，配合神器线虫和缠结命中目标会将其割裂，神器里还有崩解，被割裂的目标受伤还会瓦解，击杀割裂目标产生范围的织造铠甲\n4、合成之灵配合电好耶和坏死对怪堆有奇效，还能触发神器中的电系模组且释放就行无命中需求，是最优选择\n5、生存方面：被割裂的目标造成伤害降低40%，击败割裂给10s织造铠甲（45%免伤），增幅（15%免伤），神器击杀电弧减益目标回血和眩晕勇士打雷回血，还有vog套产球碎片吃球给恢复\n6、强度方面：自己试试就知道，本人已用这套通关过终极光刃和终极炽天使，整套配装从星象碎片到武器和神器选择环环相扣堪称完美\n7、总结，利用荆棘的毒，结合震颤、瓦解丝线、坏死等多种dot配合vog套产球，碎片吃球给恢复*1，缠结和近战瓦解目标配合神器给免伤，同时各种dot伤害配合星象神器还会产线虫，电好耶一个近战就能无条件获取增益配合合成之灵对群效果显著"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "坏死+合成棱镜术（贾诩术）"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "废墟石板"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "坏死+合成棱镜术（贾诩术） · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n坏死+合成棱镜术（贾诩术）\n\n推荐者：\n樱泽春花墨\n\n坏死+合成棱镜术（贾诩术）\n\n♥︎ 复制配装截图详情开关\n\n术士 · 棱镜 · 创意S29 · 凯旋纪念碑\n\n坏死之灵dot伤害配合vog套产球和星象神器批量产线虫，合成之灵配合电好耶清群怪\n\n适用环境\n\n突袭\n\n地牢\n\n宗师终极\n\n日常\n\n通用\n\n标签\n\n清怪\n\n续航\n\n功能\n\n通用\n\n# 坏死+合成棱镜术（贾诩术）\n\n推荐人：樱泽春花墨\n描述：坏死之灵dot伤害配合vog套产球和星象神器批量产线虫，合成之灵配合电好耶清群怪\n更新：2026.9.4\n场景：突袭、地牢、宗师终极、日常、通用\n定位：清怪、续航、功能、通用\n分支：棱镜\n类别：创意\n核心：坏死之灵\n\n## 职业\n\n职业：术士\n超能：烈焰之歌\n星相：闪电激涌、编织者之唤\n碎片：保护琢面、黎明琢面、使命琢面、勇气琢面、希望琢面\n手雷：急冻手雷\n近战：神秘织针\n职业技能：凤凰俯冲\n\n## 武器\n\n异域武器：荆棘\n传说武器：VS 速度指挥 | 重建、羸弱能量球\n传说武器：翻新 A499 | 自动填装枪套、移动目标\n\n## 护甲\n\n异域护甲：坏死之灵、合成感受器之灵\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：超能洗礼、超能洗礼、动能虹吸\n护臂：回天掌法、回天掌法、回天掌法\n胸甲：抗性、电弧抗性、震荡阻尼器\n腿部：武器洗礼、恢复能量球、武器激涌\n职业物品：特殊终结技、强力吸引、投弹手\n\n## 神器\n\n神器：废墟石板\n模组：电介质、光子耀斑、邪恶编织、群敌飞梭、闪电过载、除颤爆破、崩解\n\n## 六维\n\n六维：生命 ~ ｜ 近战 100+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 70+ ｜ 武器 ~\n\n## 注解\n\n1、拱顶4件套：拥有元素增益时造成5次伤害在脚下产一个球且会自动拾取\n2、大招选火歌使命琢面吃球给5秒恢复*1，黎明琢面充能近战给5秒幻光配合电好耶星象，滑铲充能近战可一次获得5秒幻光和15秒增幅，配合荆棘和坏死的毒，恢复基本是不会断的\n3、近战选缚丝近战可以上瓦解，神器里武器伤害被瓦解的目标会产线虫，星象造成伤害和击败目标也会产线虫，被瓦解的目标受到伤害会产生瓦解丝线到处飞，配合荆棘和坏死之灵还有震颤的dot伤害，屏幕中会产生极多的瓦解丝线，配合神器线虫和缠结命中目标会将其割裂，神器里还有崩解，被割裂的目标受伤还会瓦解，击杀割裂目标产生范围的织造铠甲\n4、合成之灵配合电好耶和坏死对怪堆有奇效，还能触发神器中的电系模组且释放就行无命中需求，是最优选择\n5、生存方面：被割裂的目标造成伤害降低40%，击败割裂给10s织造铠甲（45%免伤），增幅（15%免伤），神器击杀电弧减益目标回血和眩晕勇士打雷回血，还有vog套产球碎片吃球给恢复\n6、强度方面：自己试试就知道，本人已用这套通关过终极光刃和终极炽天使，整套配装从星象碎片到武器和神器选择环环相扣堪称完美\n7、总结，利用荆棘的毒，结合震颤、瓦解丝线、坏死等多种dot配合vog套产球，碎片吃球给恢复*1，缠结和近战瓦解目标配合神器给免伤，同时各种dot伤害配合星象神器还会产线虫，电好耶一个近战就能无条件获取增益配合合成之灵对群效果显著\n\n职业\n\n职业\n\n术士\n\n棱镜\n\n超能\n\n烈焰之歌\n\n技能\n\n急冻手雷\n\n神秘织针\n\n凤凰俯冲\n\n星相\n\n闪电激涌\n\n编织者之唤\n\n碎片\n\n保护琢面\n\n黎明琢面\n\n使命琢面\n\n勇气琢面\n\n希望琢面\n\n武器\n\n荆棘\n\nVS 速度指挥重建羸弱能量球\n\n翻新 A499自动填装枪套移动目标\n\n神器模组\n\n废墟石板\n\n电介质\n\n光子耀斑\n\n邪恶编织\n\n群敌飞梭\n\n闪电过载\n\n除颤爆破\n\n崩解\n\n护甲\n\n坏死之灵合成感受器之灵\n\n玻璃拱顶埃希恩记忆2 件\n\n玻璃拱顶埃希恩记忆4 件\n\n生命~\n\n近战100+\n\n手雷70+\n\n超能70+\n\n职业70+\n\n武器~\n\n头盔\n\n超能洗礼\n\n超能洗礼\n\n动能虹吸虹吸\n\n护臂\n\n回天掌法\n\n回天掌法\n\n回天掌法\n\n胸甲\n\n抗性\n\n电弧抗性抗性\n\n震荡阻尼器抗性\n\n腿部\n\n武器洗礼\n\n恢复能量球\n\n武器激涌\n\n职业物品\n\n特殊终结技\n\n强力吸引\n\n投弹手\n\n注解\n\n1、拱顶4件套：拥有元素增益时造成5次伤害在脚下产一个球且会自动拾取\n2、大招选火歌使命琢面吃球给5秒恢复1，黎明琢面充能近战给5秒幻光配合电好耶星象，滑铲充能近战可一次获得5秒幻光和15秒增幅，配合荆棘和坏死的毒，恢复基本是不会断的\n3、近战选缚丝近战可以上瓦解，神器里武器伤害被瓦解的目标会产线虫，星象造成伤害和击败目标也会产线虫，被瓦解的目标受到伤害会产生瓦解丝线到处飞，配合荆棘和坏死之灵还有震颤的dot伤害，屏幕中会产生极多的瓦解丝线，配合神器线虫和缠结命中目标会将其割裂，神器里还有崩解，被割裂的目标受伤还会瓦解，击杀割裂目标产生范围的织造铠甲\n4、合成之灵配合电好耶和坏死对怪堆有奇效，还能触发神器中的电系模组且释放就行无命中需求，是最优选择\n5、生存方面：被割裂的目标造成伤害降低40%，击败割裂给10s织造铠甲（45%免伤），增幅（15%免伤），神器击杀电弧减益目标回血和眩晕勇士打雷回血，还有vog套产球碎片吃球给恢复\n6、强度方面：自己试试就知道，本人已用这套通关过终极光刃和终极炽天使，整套配装从星象碎片到武器和神器选择环环相扣堪称完美\n7、总结，利用荆棘的毒，结合震颤、瓦解丝线、坏死等多种dot配合vog套产球，碎片吃球给恢复1，缠结和近战瓦解目标配合神器给免伤，同时各种dot伤害配合星象神器还会产线虫，电好耶一个近战就能无条件获取增益配合合成之灵对群效果显著\n\n更新 2026.9.4\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/pkz20gm1-warlock/index.html",
+    "final_url": "https://starside.work/builds/s29/pkz20gm1-warlock/index.html",
+    "path": "pages/builds/s29/pkz20gm1-warlock/index.html",
+    "bytes": 35267,
+    "sha256": "6f02523f56407693d83b6732255bd96536d2250b39af1bf73fd5b16dea48c006",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:28:37.959486+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/prismatic/index.html",
+    "https://starside.work/elements/solar/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/elements/strand/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-other/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/1f6f21330f.webp",
+    "https://starside.work/armor-mods/icons/4fc3a01c77.webp",
+    "https://starside.work/armor-mods/icons/5704e0690e.webp",
+    "https://starside.work/armor-mods/icons/733f0ff195.webp",
+    "https://starside.work/armor-mods/icons/743f30103e.webp",
+    "https://starside.work/armor-mods/icons/7a002a3848.webp",
+    "https://starside.work/armor-mods/icons/a9cd3fdd65.webp",
+    "https://starside.work/armor-mods/icons/b2c34e83e7.webp",
+    "https://starside.work/armor-mods/icons/cbfd0cd511.webp",
+    "https://starside.work/armor-mods/icons/e10db37ad3.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-mods/icons/fd06023f70.webp",
+    "https://starside.work/armor-sets/icons/071.png",
+    "https://starside.work/armor-sets/icons/072.png",
+    "https://starside.work/artifact-mods/icons/12acb62a3f.webp",
+    "https://starside.work/artifact-mods/icons/276c29dcad.webp",
+    "https://starside.work/artifact-mods/icons/8e2db21458.webp",
+    "https://starside.work/artifact-mods/icons/8ed5f7d5d9.webp",
+    "https://starside.work/artifact-mods/icons/9a5ec863b6.webp",
+    "https://starside.work/artifact-mods/icons/d5d2a0d065.webp",
+    "https://starside.work/artifact-mods/icons/e9a8f1c3da.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/8f9b85fb5d.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/20d0864b80.webp",
+    "https://starside.work/elements/class-abilities/icons/d50e6be2ce.webp",
+    "https://starside.work/elements/prismatic/icons/1dd3dd05aa.webp",
+    "https://starside.work/elements/prismatic/icons/283624ce70.webp",
+    "https://starside.work/elements/prismatic/icons/48bc7ae6d4.webp",
+    "https://starside.work/elements/prismatic/icons/67d91531a9.webp",
+    "https://starside.work/elements/prismatic/icons/727574c917.webp",
+    "https://starside.work/elements/prismatic/icons/77096a21b5.webp",
+    "https://starside.work/elements/prismatic/icons/9dbe20cbcd.webp",
+    "https://starside.work/elements/prismatic/icons/b5a97142a6.webp",
+    "https://starside.work/elements/solar/icons/15c9d59551.webp",
+    "https://starside.work/elements/stasis/icons/72a47e98d5.webp",
+    "https://starside.work/elements/strand/icons/aed8d97601.webp",
+    "https://starside.work/exotic-armor/icons/b9f60e6fa8.webp",
+    "https://starside.work/exotic-armor/icons/dd2c0046a6.webp",
+    "https://starside.work/exotic-weapon/icons/ebc52a8d8e.webp",
+    "https://starside.work/shopping-other/icons/8a126a8a14.webp",
+    "https://starside.work/shopping-special/icons/5ec1f8389e.webp",
+    "https://starside.work/weapon-perks/icons/0e95e0bd20.webp",
+    "https://starside.work/weapon-perks/icons/5ef5fce627.webp",
+    "https://starside.work/weapon-perks/icons/a4d0dbee15.webp",
+    "https://starside.work/weapon-perks/icons/ae1a996ad3.webp"
+  ]
+}

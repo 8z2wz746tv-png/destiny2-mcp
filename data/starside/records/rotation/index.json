@@ -1,0 +1,1624 @@
+{
+  "url": "https://starside.work/rotation/index.html",
+  "title": "轮换速查表 · Starside",
+  "description": "突袭与地牢每周轮换，扭曲星球每小时轮换。一页查完两条轮换轴。",
+  "category": "activities",
+  "updated_at": "2026.8.30",
+  "data_src": "docs/rotation",
+  "data_hash": "bc00efb7074f51138371d44f948cdc0fb1a2a8a9",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "轮换速查表"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "RAID&地牢轮换"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "扭曲星球轮换"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "RAID&地牢轮换",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "序号",
+            "html": "序号"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "突袭",
+            "html": "突袭"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "地牢",
+            "html": "地牢"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "1",
+            "html": "1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "最后一愿",
+            "html": "最后一愿"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "破碎王座",
+            "html": "破碎王座"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "2",
+            "html": "2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "救赎花园",
+            "html": "救赎花园"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "异端深渊",
+            "html": "异端深渊"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "3",
+            "html": "3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "深岩墓室",
+            "html": "深岩墓室"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "预言",
+            "html": "预言"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "4",
+            "html": "4"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "玻璃拱顶",
+            "html": "玻璃拱顶"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "贪婪之握",
+            "html": "贪婪之握"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "5",
+            "html": "5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "门徒誓约",
+            "html": "门徒誓约"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "二象性",
+            "html": "二象性"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "6",
+            "html": "6"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "国王的陨落",
+            "html": "国王的陨落"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "守望者尖塔",
+            "html": "守望者尖塔"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "7",
+            "html": "7"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "梦魇根源",
+            "html": "梦魇根源"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "深渊机灵",
+            "html": "深渊机灵"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "8",
+            "html": "8"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "克洛塔的末日",
+            "html": "克洛塔的末日"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战争领主的废墟",
+            "html": "战争领主的废墟"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "9",
+            "html": "9"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "救赎的边缘",
+            "html": "救赎的边缘"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "晚星之主",
+            "html": "晚星之主"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "10",
+            "html": "10"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "分离教义",
+            "html": "分离教义"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "扭曲星球轮换",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "时段",
+            "html": "时段"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "周一",
+            "html": "周一"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "周二",
+            "html": "周二"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "周三",
+            "html": "周三"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "周四",
+            "html": "周四"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "周五",
+            "html": "周五"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "周六",
+            "html": "周六"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "周天",
+            "html": "周天"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "00:00-01:00",
+            "html": "00:00-01:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "01:00-02:00",
+            "html": "01:00-02:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "02:00-03:00",
+            "html": "02:00-03:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "03:00-04:00",
+            "html": "03:00-04:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "04:00-05:00",
+            "html": "04:00-05:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "05:00-06:00",
+            "html": "05:00-06:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "06:00-07:00",
+            "html": "06:00-07:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "07:00-08:00",
+            "html": "07:00-08:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "08:00-09:00",
+            "html": "08:00-09:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "09:00-10:00",
+            "html": "09:00-10:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "10:00-11:00",
+            "html": "10:00-11:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "11:00-12:00",
+            "html": "11:00-12:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "12:00-13:00",
+            "html": "12:00-13:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "13:00-14:00",
+            "html": "13:00-14:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "14:00-15:00",
+            "html": "14:00-15:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "15:00-16:00",
+            "html": "15:00-16:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "16:00-17:00",
+            "html": "16:00-17:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "17:00-18:00",
+            "html": "17:00-18:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "18:00-19:00",
+            "html": "18:00-19:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "19:00-20:00",
+            "html": "19:00-20:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "20:00-21:00",
+            "html": "20:00-21:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "21:00-22:00",
+            "html": "21:00-22:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "22:00-23:00",
+            "html": "22:00-23:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "23:00-24:00",
+            "html": "23:00-24:00"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "涅索斯",
+            "html": "涅索斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "月球",
+            "html": "月球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发射基地",
+            "html": "发射基地"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "轮换速查表 · Starside\n\nStarside\n/\n轮换速查表\n\n轮换速查表\n\nRAID&地牢轮换\n\n序号\n突袭\n地牢\n\n1最后一愿破碎王座\n\n2救赎花园异端深渊\n\n3深岩墓室预言\n\n4玻璃拱顶贪婪之握\n\n5门徒誓约二象性\n\n6国王的陨落守望者尖塔\n\n7梦魇根源深渊机灵\n\n8克洛塔的末日战争领主的废墟\n\n9救赎的边缘晚星之主\n\n10分离教义\n\n扭曲星球轮换\n\n欧洲无人区 → 幽梦之城 → 王座世界 → 月球 → 木卫二 → 涅索斯 → 发射基地 → 回到开头\n\n时段\n周一\n周二\n周三\n周四\n周五\n周六\n周天\n\n00:00-01:00欧洲无人区月球发射基地王座世界涅索斯幽梦之城木卫二\n\n01:00-02:00幽梦之城木卫二欧洲无人区月球发射基地王座世界涅索斯\n\n02:00-03:00王座世界涅索斯幽梦之城木卫二欧洲无人区月球发射基地\n\n03:00-04:00月球发射基地王座世界涅索斯幽梦之城木卫二欧洲无人区\n\n04:00-05:00木卫二欧洲无人区月球发射基地王座世界涅索斯幽梦之城\n\n05:00-06:00涅索斯幽梦之城木卫二欧洲无人区月球发射基地王座世界\n\n06:00-07:00发射基地王座世界涅索斯幽梦之城木卫二欧洲无人区月球\n\n07:00-08:00欧洲无人区月球发射基地王座世界涅索斯幽梦之城木卫二\n\n08:00-09:00幽梦之城木卫二欧洲无人区月球发射基地王座世界涅索斯\n\n09:00-10:00王座世界涅索斯幽梦之城木卫二欧洲无人区月球发射基地\n\n10:00-11:00月球发射基地王座世界涅索斯幽梦之城木卫二欧洲无人区\n\n11:00-12:00木卫二欧洲无人区月球发射基地王座世界涅索斯幽梦之城\n\n12:00-13:00涅索斯幽梦之城木卫二欧洲无人区月球发射基地王座世界\n\n13:00-14:00发射基地王座世界涅索斯幽梦之城木卫二欧洲无人区月球\n\n14:00-15:00欧洲无人区月球发射基地王座世界涅索斯幽梦之城木卫二\n\n15:00-16:00幽梦之城木卫二欧洲无人区月球发射基地王座世界涅索斯\n\n16:00-17:00王座世界涅索斯幽梦之城木卫二欧洲无人区月球发射基地\n\n17:00-18:00月球发射基地王座世界涅索斯幽梦之城木卫二欧洲无人区\n\n18:00-19:00木卫二欧洲无人区月球发射基地王座世界涅索斯幽梦之城\n\n19:00-20:00涅索斯幽梦之城木卫二欧洲无人区月球发射基地王座世界\n\n20:00-21:00发射基地王座世界涅索斯幽梦之城木卫二欧洲无人区月球\n\n21:00-22:00欧洲无人区月球发射基地王座世界涅索斯幽梦之城木卫二\n\n22:00-23:00幽梦之城木卫二欧洲无人区月球发射基地王座世界涅索斯\n\n23:00-24:00王座世界涅索斯幽梦之城木卫二欧洲无人区月球发射基地\n\n扭曲每小时换一个目的地，一周 168 个时段的顺序固定不变。表内当前时段一整行、今天一整列跟随本机时钟高亮，两条的交点即此刻所在，整点自动跳到下一格。\n\n更新 2026.8.30扭曲星球的轮换周期 7 小时，一周 168 小时正好走完 24 轮，因此每周的表相同。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/rotation/index.html",
+    "final_url": "https://starside.work/rotation/index.html",
+    "path": "pages/rotation/index.html",
+    "bytes": 11380,
+    "sha256": "17439de446ff3c151335615dfe1beeea3c91c159c0662a1e0ba6421183101864",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:47.069868+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/rotation/style.css"
+  ]
+}

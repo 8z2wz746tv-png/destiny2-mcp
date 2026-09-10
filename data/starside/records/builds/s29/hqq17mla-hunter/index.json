@@ -1,0 +1,503 @@
+{
+  "url": "https://starside.work/builds/s29/hqq17mla-hunter/index.html",
+  "title": "配装合集测试 · 配装合集 · Starside",
+  "description": "突袭与地牢的四套配装：三套清怪分别应对站桩守点与两种跑机制，首领战切换双金枪输出。",
+  "category": "builds",
+  "updated_at": "2026.9.5",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 守点清怪\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，机制清怪配装，适合有站桩守点清怪的场景，会切双金枪输出装打首领。\n定位：清怪\n分支：棱镜\n核心：提娜莎精通\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：暮域手雷\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：提娜莎精通 | 空中扳机、冰冷弹匣\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：复兴之灵、虫骸之灵\n套装：国王的陨落 2 件 × 溢冰 2 件\n头盔：冰影虹吸、重型弹药斥候、特殊弹药斥候\n护臂：近战洗礼、伤害感应、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、冰影弹药生成\n腿部：绝缘、谐振回收器、层层不绝\n职业物品：强力吸引、感应护盾、特殊终结技\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：风寒、大肆屠杀、冰霜复兴、苦痛之力、治疗能量球、迎接风暴、冰冷伺候\n\n## 六维\n\n六维：生命 ~ ｜ 近战 50+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 200\n\n## 注解\n\n1.  双金枪输出的前置配装，适合突袭地老副本走机制清怪位，守点站台为主，不要求频繁位移的场景。\n2.  多用终结技，可触发神器“治疗能量球”产球回血（间接触发“特殊终结技”产绿弹，保证弹药经济）。\n3.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n# 跳舞机位移\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，走机制+清怪套装；白蛋清杂触发“跳舞机”快速回转闪身，飞升释放小绿人吸引仇恨，抓钩位移快速走机制。\n定位：清怪\n分支：棱镜\n核心：光辉跳舞机\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：红衣威尔 | 羸弱能量球、动能震颤\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：光辉跳舞机\n套装：国王的陨落 2 件 × 溢冰 2 件\n头盔：重型弹药搜寻者、重型弹药斥候、特殊弹药斥候\n护臂：近战洗礼、伤害感应、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、动能弹药生成\n腿部：绝缘、谐振回收器、恢复能量球\n职业物品：强力吸引、感应护盾、特殊终结技\n\n## 神器\n\n神器：猎人日志\n模组：持续火力、能量扩散基质、虚空霸权、焕光能量球、瞄准自动填装器、护盾粉碎、元素虹吸\n\n## 六维\n\n六维：生命 20+ ｜ 近战 50+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 200\n\n## 注解\n\n1.  双金枪输出的前置配装，适合突袭地老副本走机制清怪位，频繁位移，不需要站台的场景。\n2.  ⚠️压光场景建议使用“赫沃斯托夫+裁决定论（聚合+战嚎）”组合，优先保证清怪生存能力。\n3.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n# 宣召位移\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，走机制+清怪套装，适用于不要求站点，需要抓钩位移快速走机制的场景\n定位：清怪\n分支：棱镜\n核心：宣召呼唤\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：宣召呼唤 | 金中藏弹、幼雏\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：至纯光能之灵、虫骸之灵\n套装：国王的陨落 2 件 × 溢冰 2 件\n头盔：缚丝虹吸、重型弹药斥候、特殊弹药斥候\n护臂：近战洗礼、伤害感应、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、缚丝弹药生成\n腿部：绝缘、谐振回收器、层层不绝\n职业物品：强力吸引、感应护盾、特殊终结技\n\n## 神器\n\n神器：废墟石板\n模组：电介质、瓦解能量球、群敌飞梭、邪恶收割、邪恶编织、崩解、除颤爆破\n\n## 六维\n\n六维：生命 20+ ｜ 近战 50+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 200\n\n## 注解\n\n1.  双金枪输出的前置配装，适合突袭地老副本走机制清怪位，频繁位移，不需要站台的场景\n2.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n3.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n# 双金枪输出\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，双金枪输出配装，火箭筒输出为主。\n定位：输出\n分支：棱镜\n核心：星界夜鹰\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：暮域手雷\n近战：陷阱炸弹\n职业技能：射手闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：无誓 | 边打边劫\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：星界夜鹰\n套装：玻璃拱顶 4 件\n头盔：超能洗礼、超能洗礼、超能洗礼\n护臂：近战洗礼、近战洗礼、烈日灵巧\n胸甲：震荡阻尼器、震荡阻尼器、灼烧抗性\n腿部：烈日武器激涌、烈日武器激涌、烈日武器激涌\n职业物品：强力吸引、职业洗礼、职业洗礼\n\n## 神器\n\n神器：女王兰香炉\n模组：发热寒颤、火炬、烈焰之心、火种扳机、瓦解能量球、群敌飞梭、银白重炮\n\n## 六维\n\n六维：生命 20+ ｜ 近战 10+ ｜ 手雷 70+ ｜ 超能 150 ｜ 职业 30+ ｜ 武器 200\n\n## 注解\n\n1.  输出轴：缚丝武器挂“瓦解”➡️隐秘追猎金枪➡️火箭筒3发（提前触发丰盈满溢）➡️黄金枪大招➡️2发火箭筒➡️5发火箭筒（边打边劫/射手闪身捡子弹 触发“丰盈满溢”武器perk）\n\n2.   清怪配装带的“赌徒闪身”，需要提前切配装或手动切“闪身技能”，保证输出时有一次“射手闪身”可以使用（射手闪身可以吸取半径15米范围内的弹药盒）\n3.  如果地上有很方便拾取的“威能弹药盒”就不太需要闪身了，直接“边打边劫”即可。\n3.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL",
+  "source_blocks": [
+    "# 守点清怪\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，机制清怪配装，适合有站桩守点清怪的场景，会切双金枪输出装打首领。\n定位：清怪\n分支：棱镜\n核心：提娜莎精通\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：暮域手雷\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：提娜莎精通 | 空中扳机、冰冷弹匣\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：复兴之灵、虫骸之灵\n套装：国王的陨落 2 件 × 溢冰 2 件\n头盔：冰影虹吸、重型弹药斥候、特殊弹药斥候\n护臂：近战洗礼、伤害感应、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、冰影弹药生成\n腿部：绝缘、谐振回收器、层层不绝\n职业物品：强力吸引、感应护盾、特殊终结技\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：风寒、大肆屠杀、冰霜复兴、苦痛之力、治疗能量球、迎接风暴、冰冷伺候\n\n## 六维\n\n六维：生命 ~ ｜ 近战 50+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 200\n\n## 注解\n\n1.  双金枪输出的前置配装，适合突袭地老副本走机制清怪位，守点站台为主，不要求频繁位移的场景。\n2.  多用终结技，可触发神器“治疗能量球”产球回血（间接触发“特殊终结技”产绿弹，保证弹药经济）。\n3.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL",
+    "# 跳舞机位移\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，走机制+清怪套装；白蛋清杂触发“跳舞机”快速回转闪身，飞升释放小绿人吸引仇恨，抓钩位移快速走机制。\n定位：清怪\n分支：棱镜\n核心：光辉跳舞机\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：红衣威尔 | 羸弱能量球、动能震颤\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：光辉跳舞机\n套装：国王的陨落 2 件 × 溢冰 2 件\n头盔：重型弹药搜寻者、重型弹药斥候、特殊弹药斥候\n护臂：近战洗礼、伤害感应、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、动能弹药生成\n腿部：绝缘、谐振回收器、恢复能量球\n职业物品：强力吸引、感应护盾、特殊终结技\n\n## 神器\n\n神器：猎人日志\n模组：持续火力、能量扩散基质、虚空霸权、焕光能量球、瞄准自动填装器、护盾粉碎、元素虹吸\n\n## 六维\n\n六维：生命 20+ ｜ 近战 50+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 200\n\n## 注解\n\n1.  双金枪输出的前置配装，适合突袭地老副本走机制清怪位，频繁位移，不需要站台的场景。\n2.  ⚠️压光场景建议使用“赫沃斯托夫+裁决定论（聚合+战嚎）”组合，优先保证清怪生存能力。\n3.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL",
+    "# 宣召位移\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，走机制+清怪套装，适用于不要求站点，需要抓钩位移快速走机制的场景\n定位：清怪\n分支：棱镜\n核心：宣召呼唤\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：宣召呼唤 | 金中藏弹、幼雏\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：至纯光能之灵、虫骸之灵\n套装：国王的陨落 2 件 × 溢冰 2 件\n头盔：缚丝虹吸、重型弹药斥候、特殊弹药斥候\n护臂：近战洗礼、伤害感应、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、缚丝弹药生成\n腿部：绝缘、谐振回收器、层层不绝\n职业物品：强力吸引、感应护盾、特殊终结技\n\n## 神器\n\n神器：废墟石板\n模组：电介质、瓦解能量球、群敌飞梭、邪恶收割、邪恶编织、崩解、除颤爆破\n\n## 六维\n\n六维：生命 20+ ｜ 近战 50+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 200\n\n## 注解\n\n1.  双金枪输出的前置配装，适合突袭地老副本走机制清怪位，频繁位移，不需要站台的场景\n2.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n3.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL",
+    "# 双金枪输出\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，双金枪输出配装，火箭筒输出为主。\n定位：输出\n分支：棱镜\n核心：星界夜鹰\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：暮域手雷\n近战：陷阱炸弹\n职业技能：射手闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：无誓 | 边打边劫\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：星界夜鹰\n套装：玻璃拱顶 4 件\n头盔：超能洗礼、超能洗礼、超能洗礼\n护臂：近战洗礼、近战洗礼、烈日灵巧\n胸甲：震荡阻尼器、震荡阻尼器、灼烧抗性\n腿部：烈日武器激涌、烈日武器激涌、烈日武器激涌\n职业物品：强力吸引、职业洗礼、职业洗礼\n\n## 神器\n\n神器：女王兰香炉\n模组：发热寒颤、火炬、烈焰之心、火种扳机、瓦解能量球、群敌飞梭、银白重炮\n\n## 六维\n\n六维：生命 20+ ｜ 近战 10+ ｜ 手雷 70+ ｜ 超能 150 ｜ 职业 30+ ｜ 武器 200\n\n## 注解\n\n1.  输出轴：缚丝武器挂“瓦解”➡️隐秘追猎金枪➡️火箭筒3发（提前触发丰盈满溢）➡️黄金枪大招➡️2发火箭筒➡️5发火箭筒（边打边劫/射手闪身捡子弹 触发“丰盈满溢”武器perk）\n\n2.   清怪配装带的“赌徒闪身”，需要提前切配装或手动切“闪身技能”，保证输出时有一次“射手闪身”可以使用（射手闪身可以吸取半径15米范围内的弹药盒）\n3.  如果地上有很方便拾取的“威能弹药盒”就不太需要闪身了，直接“边打边劫”即可。\n3.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "配装合集测试"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "合集介绍"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "守点清怪"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "杀手公爵药剂师背包"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "跳舞机位移"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "猎人日志"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "宣召位移"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "废墟石板"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "双金枪输出"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "女王兰香炉"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "配装合集测试 · 配装合集 · Starside\n\nStarside\n/\n配装合集\n/\n凯旋纪念碑\n/\n配装合集测试\n\n推荐者：\n遗忘Melt\n\n配装合集测试\n\n♥︎ 详情开关\n\n猎人 · 4 套 · 强度S29 · 凯旋纪念碑\n\n突袭与地牢的四套配装：三套清怪分别应对站桩守点与两种跑机制，首领战切换双金枪输出。\n\n适用环境\n\n突袭\n\n地牢\n\n标签\n\n清怪\n\n输出\n\n合集介绍\n\n站桩守点的位置使用「守点清怪」；需要频繁跑机制时，按是否要求站点在「跳舞机位移」与\n「宣召位移」之间选一套。三套清怪均为双金枪输出的前置配装。\n进入首领战前切换至「双金枪输出」：三套清怪配装携带赌徒闪身，输出阶段需要\n射手闪身拾取弹药盒。\n\n4 套展开全部\n\n猎人棱镜守点清怪清怪\n\n猎人棱镜跳舞机位移清怪\n\n猎人棱镜宣召位移清怪\n\n猎人棱镜双金枪输出输出\n\n守点清怪\n\n复制配装截图\n\n猎人 · 棱镜 · 清怪\n\n突袭地牢副本，机制清怪配装，适合有站桩守点清怪的场景，会切双金枪输出装打首领。\n\n# 守点清怪\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，机制清怪配装，适合有站桩守点清怪的场景，会切双金枪输出装打首领。\n定位：清怪\n分支：棱镜\n核心：提娜莎精通\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：暮域手雷\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：提娜莎精通 | 空中扳机、冰冷弹匣\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：复兴之灵、虫骸之灵\n套装：国王的陨落 2 件 × 溢冰 2 件\n头盔：冰影虹吸、重型弹药斥候、特殊弹药斥候\n护臂：近战洗礼、伤害感应、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、冰影弹药生成\n腿部：绝缘、谐振回收器、层层不绝\n职业物品：强力吸引、感应护盾、特殊终结技\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：风寒、大肆屠杀、冰霜复兴、苦痛之力、治疗能量球、迎接风暴、冰冷伺候\n\n## 六维\n\n六维：生命 ~ ｜ 近战 50+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 200\n\n## 注解\n\n1. 双金枪输出的前置配装，适合突袭地老副本走机制清怪位，守点站台为主，不要求频繁位移的场景。\n2. 多用终结技，可触发神器“治疗能量球”产球回血（间接触发“特殊终结技”产绿弹，保证弹药经济）。\n3. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n职业\n\n职业\n\n猎人\n\n棱镜\n\n超能\n\n黄金枪：神枪手\n\n技能\n\n暮域手雷\n\n陷阱炸弹\n\n赌徒闪身\n\n星相\n\n飞升\n\n线织幽灵\n\n碎片\n\n保护琢面\n\n使命琢面\n\n勇气琢面\n\n毁灭琢面\n\n黎明琢面\n\n武器\n\n隐秘追猎\n\n提娜莎精通空中扳机冰冷弹匣\n\n光芒复仇丰盈满溢聚合充能\n\n神器模组\n\n杀手公爵药剂师背包\n\n风寒\n\n大肆屠杀\n\n冰霜复兴\n\n苦痛之力\n\n治疗能量球\n\n迎接风暴\n\n冰冷伺候\n\n护甲\n\n复兴之灵虫骸之灵\n\n国王的陨落欧里克斯记忆2 件\n\n溢冰木卫二2 件\n\n生命~\n\n近战50+\n\n手雷70+\n\n超能70+\n\n职业80+\n\n武器200\n\n头盔\n\n冰影虹吸虹吸\n\n重型弹药斥候弹药斥候\n\n特殊弹药斥候弹药斥候\n\n护臂\n\n近战洗礼\n\n伤害感应\n\n专注打击\n\n胸甲\n\n震荡阻尼器抗性\n\n近战伤害抗性抗性\n\n冰影弹药生成弹药生成\n\n腿部\n\n绝缘\n\n谐振回收器回收利用\n\n层层不绝\n\n职业物品\n\n强力吸引\n\n感应护盾\n\n特殊终结技\n\n注解\n\n1. 双金枪输出的前置配装，适合突袭地老副本走机制清怪位，守点站台为主，不要求频繁位移的场景。\n2. 多用终结技，可触发神器“治疗能量球”产球回血（间接触发“特殊终结技”产绿弹，保证弹药经济）。\n3. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n跳舞机位移\n\n复制配装截图\n\n猎人 · 棱镜 · 清怪\n\n突袭地牢副本，走机制+清怪套装；白蛋清杂触发“跳舞机”快速回转闪身，飞升释放小绿人吸引仇恨，抓钩位移快速走机制。\n\n# 跳舞机位移\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，走机制+清怪套装；白蛋清杂触发“跳舞机”快速回转闪身，飞升释放小绿人吸引仇恨，抓钩位移快速走机制。\n定位：清怪\n分支：棱镜\n核心：光辉跳舞机\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：红衣威尔 | 羸弱能量球、动能震颤\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：光辉跳舞机\n套装：国王的陨落 2 件 × 溢冰 2 件\n头盔：重型弹药搜寻者、重型弹药斥候、特殊弹药斥候\n护臂：近战洗礼、伤害感应、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、动能弹药生成\n腿部：绝缘、谐振回收器、恢复能量球\n职业物品：强力吸引、感应护盾、特殊终结技\n\n## 神器\n\n神器：猎人日志\n模组：持续火力、能量扩散基质、虚空霸权、焕光能量球、瞄准自动填装器、护盾粉碎、元素虹吸\n\n## 六维\n\n六维：生命 20+ ｜ 近战 50+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 200\n\n## 注解\n\n1. 双金枪输出的前置配装，适合突袭地老副本走机制清怪位，频繁位移，不需要站台的场景。\n2. ⚠️压光场景建议使用“赫沃斯托夫+裁决定论（聚合+战嚎）”组合，优先保证清怪生存能力。\n3. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n职业\n\n职业\n\n猎人\n\n棱镜\n\n超能\n\n黄金枪：神枪手\n\n技能\n\n抓钩\n\n陷阱炸弹\n\n赌徒闪身\n\n星相\n\n飞升\n\n线织幽灵\n\n碎片\n\n保护琢面\n\n使命琢面\n\n勇气琢面\n\n毁灭琢面\n\n黎明琢面\n\n武器\n\n隐秘追猎\n\n红衣威尔羸弱能量球动能震颤\n\n光芒复仇丰盈满溢聚合充能\n\n神器模组\n\n猎人日志\n\n持续火力\n\n能量扩散基质\n\n虚空霸权\n\n焕光能量球\n\n瞄准自动填装器\n\n护盾粉碎\n\n元素虹吸\n\n护甲\n\n光辉跳舞机\n\n国王的陨落欧里克斯记忆2 件\n\n溢冰木卫二2 件\n\n生命20+\n\n近战50+\n\n手雷70+\n\n超能70+\n\n职业80+\n\n武器200\n\n头盔\n\n重型弹药搜寻者弹药搜寻者\n\n重型弹药斥候弹药斥候\n\n特殊弹药斥候弹药斥候\n\n护臂\n\n近战洗礼\n\n伤害感应\n\n专注打击\n\n胸甲\n\n震荡阻尼器抗性\n\n近战伤害抗性抗性\n\n动能弹药生成弹药生成\n\n腿部\n\n绝缘\n\n谐振回收器回收利用\n\n恢复能量球\n\n职业物品\n\n强力吸引\n\n感应护盾\n\n特殊终结技\n\n注解\n\n1. 双金枪输出的前置配装，适合突袭地老副本走机制清怪位，频繁位移，不需要站台的场景。\n2. ⚠️压光场景建议使用“赫沃斯托夫+裁决定论（聚合+战嚎）”组合，优先保证清怪生存能力。\n3. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n宣召位移\n\n复制配装截图\n\n猎人 · 棱镜 · 清怪\n\n突袭地牢副本，走机制+清怪套装，适用于不要求站点，需要抓钩位移快速走机制的场景\n\n# 宣召位移\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，走机制+清怪套装，适用于不要求站点，需要抓钩位移快速走机制的场景\n定位：清怪\n分支：棱镜\n核心：宣召呼唤\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：宣召呼唤 | 金中藏弹、幼雏\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：至纯光能之灵、虫骸之灵\n套装：国王的陨落 2 件 × 溢冰 2 件\n头盔：缚丝虹吸、重型弹药斥候、特殊弹药斥候\n护臂：近战洗礼、伤害感应、专注打击\n胸甲：震荡阻尼器、近战伤害抗性、缚丝弹药生成\n腿部：绝缘、谐振回收器、层层不绝\n职业物品：强力吸引、感应护盾、特殊终结技\n\n## 神器\n\n神器：废墟石板\n模组：电介质、瓦解能量球、群敌飞梭、邪恶收割、邪恶编织、崩解、除颤爆破\n\n## 六维\n\n六维：生命 20+ ｜ 近战 50+ ｜ 手雷 70+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 200\n\n## 注解\n\n1. 双金枪输出的前置配装，适合突袭地老副本走机制清怪位，频繁位移，不需要站台的场景\n2. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n3. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n职业\n\n职业\n\n猎人\n\n棱镜\n\n超能\n\n黄金枪：神枪手\n\n技能\n\n抓钩\n\n陷阱炸弹\n\n赌徒闪身\n\n星相\n\n飞升\n\n线织幽灵\n\n碎片\n\n保护琢面\n\n使命琢面\n\n勇气琢面\n\n毁灭琢面\n\n黎明琢面\n\n武器\n\n隐秘追猎\n\n宣召呼唤金中藏弹幼雏\n\n光芒复仇丰盈满溢聚合充能\n\n神器模组\n\n废墟石板\n\n电介质\n\n瓦解能量球\n\n群敌飞梭\n\n邪恶收割\n\n邪恶编织\n\n崩解\n\n除颤爆破\n\n护甲\n\n至纯光能之灵虫骸之灵\n\n国王的陨落欧里克斯记忆2 件\n\n溢冰木卫二2 件\n\n生命20+\n\n近战50+\n\n手雷70+\n\n超能70+\n\n职业80+\n\n武器200\n\n头盔\n\n缚丝虹吸虹吸\n\n重型弹药斥候弹药斥候\n\n特殊弹药斥候弹药斥候\n\n护臂\n\n近战洗礼\n\n伤害感应\n\n专注打击\n\n胸甲\n\n震荡阻尼器抗性\n\n近战伤害抗性抗性\n\n缚丝弹药生成弹药生成\n\n腿部\n\n绝缘\n\n谐振回收器回收利用\n\n层层不绝\n\n职业物品\n\n强力吸引\n\n感应护盾\n\n特殊终结技\n\n注解\n\n1. 双金枪输出的前置配装，适合突袭地老副本走机制清怪位，频繁位移，不需要站台的场景\n2. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n3. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n双金枪输出\n\n复制配装截图\n\n猎人 · 棱镜 · 输出\n\n突袭地牢副本，双金枪输出配装，火箭筒输出为主。\n\n# 双金枪输出\n推荐人：遗忘Melt\n更新：2026.9.5\n场景：突袭、地牢\n类别：强度\n\n描述：突袭地牢副本，双金枪输出配装，火箭筒输出为主。\n定位：输出\n分支：棱镜\n核心：星界夜鹰\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：暮域手雷\n近战：陷阱炸弹\n职业技能：射手闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：无誓 | 边打边劫\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：星界夜鹰\n套装：玻璃拱顶 4 件\n头盔：超能洗礼、超能洗礼、超能洗礼\n护臂：近战洗礼、近战洗礼、烈日灵巧\n胸甲：震荡阻尼器、震荡阻尼器、灼烧抗性\n腿部：烈日武器激涌、烈日武器激涌、烈日武器激涌\n职业物品：强力吸引、职业洗礼、职业洗礼\n\n## 神器\n\n神器：女王兰香炉\n模组：发热寒颤、火炬、烈焰之心、火种扳机、瓦解能量球、群敌飞梭、银白重炮\n\n## 六维\n\n六维：生命 20+ ｜ 近战 10+ ｜ 手雷 70+ ｜ 超能 150 ｜ 职业 30+ ｜ 武器 200\n\n## 注解\n\n1. 输出轴：缚丝武器挂“瓦解”➡️隐秘追猎金枪➡️火箭筒3发（提前触发丰盈满溢）➡️黄金枪大招➡️2发火箭筒➡️5发火箭筒（边打边劫/射手闪身捡子弹 触发“丰盈满溢”武器perk）\n\n2. 清怪配装带的“赌徒闪身”，需要提前切配装或手动切“闪身技能”，保证输出时有一次“射手闪身”可以使用（射手闪身可以吸取半径15米范围内的弹药盒）\n3. 如果地上有很方便拾取的“威能弹药盒”就不太需要闪身了，直接“边打边劫”即可。\n3. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n职业\n\n职业\n\n猎人\n\n棱镜\n\n超能\n\n黄金枪：神枪手\n\n技能\n\n暮域手雷\n\n陷阱炸弹\n\n射手闪身\n\n星相\n\n飞升\n\n线织幽灵\n\n碎片\n\n保护琢面\n\n使命琢面\n\n勇气琢面\n\n毁灭琢面\n\n黎明琢面\n\n武器\n\n隐秘追猎\n\n无誓边打边劫\n\n光芒复仇丰盈满溢聚合充能\n\n神器模组\n\n女王兰香炉\n\n发热寒颤\n\n火炬\n\n烈焰之心\n\n火种扳机\n\n瓦解能量球\n\n群敌飞梭\n\n银白重炮\n\n护甲\n\n星界夜鹰\n\n玻璃拱顶埃希恩记忆4 件\n\n生命20+\n\n近战10+\n\n手雷70+\n\n超能150\n\n职业30+\n\n武器200\n\n头盔\n\n超能洗礼\n\n超能洗礼\n\n超能洗礼\n\n护臂\n\n近战洗礼\n\n近战洗礼\n\n烈日灵巧灵巧\n\n胸甲\n\n震荡阻尼器抗性\n\n震荡阻尼器抗性\n\n灼烧抗性抗性\n\n腿部\n\n烈日武器激涌武器激涌\n\n烈日武器激涌武器激涌\n\n烈日武器激涌武器激涌\n\n职业物品\n\n强力吸引\n\n职业洗礼\n\n职业洗礼\n\n注解\n\n1. 输出轴：缚丝武器挂“瓦解”➡️隐秘追猎金枪➡️火箭筒3发（提前触发丰盈满溢）➡️黄金枪大招➡️2发火箭筒➡️5发火箭筒（边打边劫/射手闪身捡子弹 触发“丰盈满溢”武器perk）\n\n2. 清怪配装带的“赌徒闪身”，需要提前切配装或手动切“闪身技能”，保证输出时有一次“射手闪身”可以使用（射手闪身可以吸取半径15米范围内的弹药盒）\n3. 如果地上有很方便拾取的“威能弹药盒”就不太需要闪身了，直接“边打边劫”即可。\n3. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n更新 2026.9.5\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/hqq17mla-hunter/index.html",
+    "final_url": "https://starside.work/builds/s29/hqq17mla-hunter/index.html",
+    "path": "pages/builds/s29/hqq17mla-hunter/index.html",
+    "bytes": 105893,
+    "sha256": "f21cea9e00db736ba223b6b202054682840048c993ff9a7be0c010dec1c7ee02",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:28.744470+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/sets/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/prismatic/index.html",
+    "https://starside.work/elements/solar/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/elements/strand/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-heavy/index.html",
+    "https://starside.work/shopping-primary/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/00ea2319c5.webp",
+    "https://starside.work/armor-mods/icons/11cf2eaffb.webp",
+    "https://starside.work/armor-mods/icons/197de64d1b.webp",
+    "https://starside.work/armor-mods/icons/1db6e3cbc8.webp",
+    "https://starside.work/armor-mods/icons/22ce769fe6.webp",
+    "https://starside.work/armor-mods/icons/288b195b88.webp",
+    "https://starside.work/armor-mods/icons/2ee424e9c4.webp",
+    "https://starside.work/armor-mods/icons/328d80acfa.webp",
+    "https://starside.work/armor-mods/icons/7a002a3848.webp",
+    "https://starside.work/armor-mods/icons/85da4740a7.webp",
+    "https://starside.work/armor-mods/icons/89db762989.webp",
+    "https://starside.work/armor-mods/icons/8c22cf983d.webp",
+    "https://starside.work/armor-mods/icons/95d6868e0d.webp",
+    "https://starside.work/armor-mods/icons/962b1f1c65.webp",
+    "https://starside.work/armor-mods/icons/a0fe5bff4e.webp",
+    "https://starside.work/armor-mods/icons/a9cd3fdd65.webp",
+    "https://starside.work/armor-mods/icons/ae18f06fee.webp",
+    "https://starside.work/armor-mods/icons/b2c34e83e7.webp",
+    "https://starside.work/armor-mods/icons/c9476266a5.webp",
+    "https://starside.work/armor-mods/icons/cdb376332b.webp",
+    "https://starside.work/armor-mods/icons/d482839737.webp",
+    "https://starside.work/armor-mods/icons/e10db37ad3.webp",
+    "https://starside.work/armor-mods/icons/ebc8826474.webp",
+    "https://starside.work/armor-mods/icons/f049892fbd.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-sets/icons/011.png",
+    "https://starside.work/armor-sets/icons/072.png",
+    "https://starside.work/armor-sets/icons/075.png",
+    "https://starside.work/artifact-mods/icons/17368dcba6.webp",
+    "https://starside.work/artifact-mods/icons/18aea7a3cf.webp",
+    "https://starside.work/artifact-mods/icons/1f9e95d817.webp",
+    "https://starside.work/artifact-mods/icons/2552ea2c2f.webp",
+    "https://starside.work/artifact-mods/icons/2670d7c9d5.webp",
+    "https://starside.work/artifact-mods/icons/376b28ea97.webp",
+    "https://starside.work/artifact-mods/icons/5af0138a3e.webp",
+    "https://starside.work/artifact-mods/icons/5d1ac408b5.webp",
+    "https://starside.work/artifact-mods/icons/6883791796.webp",
+    "https://starside.work/artifact-mods/icons/8531c7b770.webp",
+    "https://starside.work/artifact-mods/icons/8e2db21458.webp",
+    "https://starside.work/artifact-mods/icons/8e857c15d5.webp",
+    "https://starside.work/artifact-mods/icons/8ed5f7d5d9.webp",
+    "https://starside.work/artifact-mods/icons/9a5ec863b6.webp",
+    "https://starside.work/artifact-mods/icons/9bcf935d15.webp",
+    "https://starside.work/artifact-mods/icons/bf9ce7a203.webp",
+    "https://starside.work/artifact-mods/icons/c5f49ff8b5.webp",
+    "https://starside.work/artifact-mods/icons/cb97394434.webp",
+    "https://starside.work/artifact-mods/icons/cfc1a2b42b.webp",
+    "https://starside.work/artifact-mods/icons/d5d2a0d065.webp",
+    "https://starside.work/artifact-mods/icons/db04b4ad17.webp",
+    "https://starside.work/artifact-mods/icons/e9a8f1c3da.webp",
+    "https://starside.work/artifact-mods/icons/ea272b4fc9.webp",
+    "https://starside.work/artifact-mods/icons/ea5c3a3846.webp",
+    "https://starside.work/artifact-mods/icons/eb925e3624.webp",
+    "https://starside.work/artifact-mods/icons/fe7753e6b0.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/5757d150c7.webp",
+    "https://starside.work/builds/icons/8f9b85fb5d.webp",
+    "https://starside.work/builds/icons/934a3556a0.webp",
+    "https://starside.work/builds/icons/c4dd841478.webp",
+    "https://starside.work/builds/set.js",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/65d4e919d1.webp",
+    "https://starside.work/elements/class-abilities/icons/cba8013059.webp",
+    "https://starside.work/elements/class-abilities/icons/dc62a7c73b.webp",
+    "https://starside.work/elements/prismatic/icons/2b0c20c15a.webp",
+    "https://starside.work/elements/prismatic/icons/3cb69eea59.webp",
+    "https://starside.work/elements/prismatic/icons/48bc7ae6d4.webp",
+    "https://starside.work/elements/prismatic/icons/4f517c0390.webp",
+    "https://starside.work/elements/prismatic/icons/67d91531a9.webp",
+    "https://starside.work/elements/prismatic/icons/727574c917.webp",
+    "https://starside.work/elements/prismatic/icons/77096a21b5.webp",
+    "https://starside.work/elements/prismatic/icons/e421ab5fa8.webp",
+    "https://starside.work/elements/solar/icons/0ee82bc44a.webp",
+    "https://starside.work/elements/stasis/icons/c0c58d0bc0.webp",
+    "https://starside.work/elements/strand/icons/24b726319d.webp",
+    "https://starside.work/elements/void/icons/3ed96daa22.webp",
+    "https://starside.work/exotic-armor/icons/094d23ba92.webp",
+    "https://starside.work/exotic-armor/icons/383674c370.webp",
+    "https://starside.work/exotic-armor/icons/4617c0972a.webp",
+    "https://starside.work/exotic-armor/icons/56dc556882.webp",
+    "https://starside.work/exotic-armor/icons/5deb4b3503.webp",
+    "https://starside.work/exotic-weapon/icons/29152fe571.webp",
+    "https://starside.work/shopping-heavy/icons/9bb4715a83.webp",
+    "https://starside.work/shopping-primary/icons/33d2bfb676.webp",
+    "https://starside.work/shopping-special/icons/8e8aa14381.webp",
+    "https://starside.work/shopping-special/icons/ce750fc24f.webp",
+    "https://starside.work/shopping-special/icons/fe5e6e2876.webp",
+    "https://starside.work/weapon-perks/icons/279bcd3ea5.webp",
+    "https://starside.work/weapon-perks/icons/4a19f71392.webp",
+    "https://starside.work/weapon-perks/icons/5ef5fce627.webp",
+    "https://starside.work/weapon-perks/icons/6c464afa64.webp",
+    "https://starside.work/weapon-perks/icons/b06ce958a8.webp",
+    "https://starside.work/weapon-perks/icons/b0b30fdda2.webp",
+    "https://starside.work/weapon-perks/icons/b0dabeea90.webp",
+    "https://starside.work/weapon-perks/icons/bea24a8a17.webp",
+    "https://starside.work/weapon-perks/icons/e0749cfc0e.webp"
+  ]
+}

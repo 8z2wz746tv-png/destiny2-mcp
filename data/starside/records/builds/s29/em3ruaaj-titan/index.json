@@ -1,0 +1,183 @@
+{
+  "url": "https://starside.work/builds/s29/em3ruaaj-titan/index.html",
+  "title": "一拳超人 · 配装推荐 · Starside",
+  "description": "雷霆一击蓄力期间高额减伤配合其余组件提供高额生存",
+  "category": "builds",
+  "updated_at": "2026.9.6",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 一拳超人\n\n推荐人：yester言泽\n描述：雷霆一击蓄力期间高额减伤配合其余组件提供高额生存\n更新：2026.9.6\n场景：宗师终极、日常、通用\n定位：清怪、续航、通用\n分支：棱镜\n类别：强度\n核心：点接触炮架\n\n## 职业\n\n职业：泰坦\n超能：暮光军火\n星相：重击、勇士之鞭\n碎片：黎明琢面、使命琢面、保护琢面、勇敢琢面、勇气琢面\n手雷：冰川手雷\n近战：雷霆一击\n职业技能：集结屏障\n\n## 武器\n\n异域武器：堡垒\n传说武器：VS 速度指挥 | 重建、羸弱能量球、布瑞遗产\n传说武器：拜龙教镰刀 | 急切刀锋、羸弱能量球\n\n## 护甲\n\n异域护甲：点接触炮架\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：拳到力来、特殊武器弹药搜寻者\n护臂：回天掌法、回天掌法、手雷洗礼\n胸甲：震荡阻尼器、近战伤害抗性、灼烧抗性\n腿部：药到病除、鼓舞、宽恕\n职业物品：强力吸引、特殊终结技、扩展\n\n## 神器\n\n神器：加密数据盘\n模组：苦痛之力、动能合成、电介质、护甲匠、奇点利刃、致盲震颤、泰瑟电触\n\n## 六维\n\n六维：生命 ~ ｜ 近战 200 ｜ 手雷 100 ｜ 超能 ~ ｜ 职业 100 ｜ 武器 ~\n\n## 注解\n\n点接触的范围震颤和神器泰瑟电触提供高额频率用于触发vog套装效果\n近战蓄力期间高额减伤搭配虚空覆盖护盾提供高额生存能力，并且触发神器奇点利刃挂虚弱，触发吞食之后解放虚空减益\n近战蓄力总时长较长，吃不到雪上，但是可以极限吃到堡垒，并且堡垒可以利用动能合成获取弹药，解放武器六维（但是为保证其余武器弹药量，如有余韵可叠加武器六维到150以上）\n护甲套装如果没有vog套，或者在低难度环境下，可使用梦魇2+移民号2作为替代，30光内（门户终极难度）产球效率远高于vog\n近战六维100以上收益不高可放弃，其余回转可用洗礼补充六维，整体回转较为依赖超凡启动，但进入超凡速度很快可以放心使用\n武器可也可选择热门动能合成搭配威胁等级+缩影，超能更换烈日超能效果类似，但是虚空超能更具功能性",
+  "source_blocks": [
+    "# 一拳超人\n\n推荐人：yester言泽\n描述：雷霆一击蓄力期间高额减伤配合其余组件提供高额生存\n更新：2026.9.6\n场景：宗师终极、日常、通用\n定位：清怪、续航、通用\n分支：棱镜\n类别：强度\n核心：点接触炮架\n\n## 职业\n\n职业：泰坦\n超能：暮光军火\n星相：重击、勇士之鞭\n碎片：黎明琢面、使命琢面、保护琢面、勇敢琢面、勇气琢面\n手雷：冰川手雷\n近战：雷霆一击\n职业技能：集结屏障\n\n## 武器\n\n异域武器：堡垒\n传说武器：VS 速度指挥 | 重建、羸弱能量球、布瑞遗产\n传说武器：拜龙教镰刀 | 急切刀锋、羸弱能量球\n\n## 护甲\n\n异域护甲：点接触炮架\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：拳到力来、特殊武器弹药搜寻者\n护臂：回天掌法、回天掌法、手雷洗礼\n胸甲：震荡阻尼器、近战伤害抗性、灼烧抗性\n腿部：药到病除、鼓舞、宽恕\n职业物品：强力吸引、特殊终结技、扩展\n\n## 神器\n\n神器：加密数据盘\n模组：苦痛之力、动能合成、电介质、护甲匠、奇点利刃、致盲震颤、泰瑟电触\n\n## 六维\n\n六维：生命 ~ ｜ 近战 200 ｜ 手雷 100 ｜ 超能 ~ ｜ 职业 100 ｜ 武器 ~\n\n## 注解\n\n点接触的范围震颤和神器泰瑟电触提供高额频率用于触发vog套装效果\n近战蓄力期间高额减伤搭配虚空覆盖护盾提供高额生存能力，并且触发神器奇点利刃挂虚弱，触发吞食之后解放虚空减益\n近战蓄力总时长较长，吃不到雪上，但是可以极限吃到堡垒，并且堡垒可以利用动能合成获取弹药，解放武器六维（但是为保证其余武器弹药量，如有余韵可叠加武器六维到150以上）\n护甲套装如果没有vog套，或者在低难度环境下，可使用梦魇2+移民号2作为替代，30光内（门户终极难度）产球效率远高于vog\n近战六维100以上收益不高可放弃，其余回转可用洗礼补充六维，整体回转较为依赖超凡启动，但进入超凡速度很快可以放心使用\n武器可也可选择热门动能合成搭配威胁等级+缩影，超能更换烈日超能效果类似，但是虚空超能更具功能性"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "一拳超人"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "加密数据盘"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "一拳超人 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n一拳超人\n\n推荐者：\nyester言泽\n\n一拳超人\n\n♥︎ 复制配装截图详情开关\n\n泰坦 · 棱镜 · 强度S29 · 凯旋纪念碑\n\n雷霆一击蓄力期间高额减伤配合其余组件提供高额生存\n\n适用环境\n\n宗师终极\n\n日常\n\n通用\n\n标签\n\n清怪\n\n续航\n\n通用\n\n# 一拳超人\n\n推荐人：yester言泽\n描述：雷霆一击蓄力期间高额减伤配合其余组件提供高额生存\n更新：2026.9.6\n场景：宗师终极、日常、通用\n定位：清怪、续航、通用\n分支：棱镜\n类别：强度\n核心：点接触炮架\n\n## 职业\n\n职业：泰坦\n超能：暮光军火\n星相：重击、勇士之鞭\n碎片：黎明琢面、使命琢面、保护琢面、勇敢琢面、勇气琢面\n手雷：冰川手雷\n近战：雷霆一击\n职业技能：集结屏障\n\n## 武器\n\n异域武器：堡垒\n传说武器：VS 速度指挥 | 重建、羸弱能量球、布瑞遗产\n传说武器：拜龙教镰刀 | 急切刀锋、羸弱能量球\n\n## 护甲\n\n异域护甲：点接触炮架\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：拳到力来、特殊武器弹药搜寻者\n护臂：回天掌法、回天掌法、手雷洗礼\n胸甲：震荡阻尼器、近战伤害抗性、灼烧抗性\n腿部：药到病除、鼓舞、宽恕\n职业物品：强力吸引、特殊终结技、扩展\n\n## 神器\n\n神器：加密数据盘\n模组：苦痛之力、动能合成、电介质、护甲匠、奇点利刃、致盲震颤、泰瑟电触\n\n## 六维\n\n六维：生命 ~ ｜ 近战 200 ｜ 手雷 100 ｜ 超能 ~ ｜ 职业 100 ｜ 武器 ~\n\n## 注解\n\n点接触的范围震颤和神器泰瑟电触提供高额频率用于触发vog套装效果\n近战蓄力期间高额减伤搭配虚空覆盖护盾提供高额生存能力，并且触发神器奇点利刃挂虚弱，触发吞食之后解放虚空减益\n近战蓄力总时长较长，吃不到雪上，但是可以极限吃到堡垒，并且堡垒可以利用动能合成获取弹药，解放武器六维（但是为保证其余武器弹药量，如有余韵可叠加武器六维到150以上）\n护甲套装如果没有vog套，或者在低难度环境下，可使用梦魇2+移民号2作为替代，30光内（门户终极难度）产球效率远高于vog\n近战六维100以上收益不高可放弃，其余回转可用洗礼补充六维，整体回转较为依赖超凡启动，但进入超凡速度很快可以放心使用\n武器可也可选择热门动能合成搭配威胁等级+缩影，超能更换烈日超能效果类似，但是虚空超能更具功能性\n\n职业\n\n职业\n\n泰坦\n\n棱镜\n\n超能\n\n暮光军火\n\n技能\n\n冰川手雷\n\n雷霆一击\n\n集结屏障\n\n星相\n\n重击\n\n勇士之鞭\n\n碎片\n\n黎明琢面\n\n使命琢面\n\n保护琢面\n\n勇敢琢面\n\n勇气琢面\n\n武器\n\n堡垒\n\nVS 速度指挥重建羸弱能量球布瑞遗产\n\n拜龙教镰刀急切刀锋羸弱能量球\n\n神器模组\n\n加密数据盘\n\n苦痛之力\n\n动能合成\n\n电介质\n\n护甲匠\n\n奇点利刃\n\n致盲震颤\n\n泰瑟电触\n\n护甲\n\n点接触炮架\n\n玻璃拱顶埃希恩记忆2 件\n\n玻璃拱顶埃希恩记忆4 件\n\n生命~\n\n近战200\n\n手雷100\n\n超能~\n\n职业100\n\n武器~\n\n头盔\n\n拳到力来\n\n特殊武器弹药搜寻者弹药搜寻者\n\n护臂\n\n回天掌法\n\n回天掌法\n\n手雷洗礼\n\n胸甲\n\n震荡阻尼器抗性\n\n近战伤害抗性抗性\n\n灼烧抗性抗性\n\n腿部\n\n药到病除\n\n鼓舞\n\n宽恕\n\n职业物品\n\n强力吸引\n\n特殊终结技\n\n扩展\n\n注解\n\n点接触的范围震颤和神器泰瑟电触提供高额频率用于触发vog套装效果\n近战蓄力期间高额减伤搭配虚空覆盖护盾提供高额生存能力，并且触发神器奇点利刃挂虚弱，触发吞食之后解放虚空减益\n近战蓄力总时长较长，吃不到雪上，但是可以极限吃到堡垒，并且堡垒可以利用动能合成获取弹药，解放武器六维（但是为保证其余武器弹药量，如有余韵可叠加武器六维到150以上）\n护甲套装如果没有vog套，或者在低难度环境下，可使用梦魇2+移民号2作为替代，30光内（门户终极难度）产球效率远高于vog\n近战六维100以上收益不高可放弃，其余回转可用洗礼补充六维，整体回转较为依赖超凡启动，但进入超凡速度很快可以放心使用\n武器可也可选择热门动能合成搭配威胁等级+缩影，超能更换烈日超能效果类似，但是虚空超能更具功能性\n\n更新 2026.9.6\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/em3ruaaj-titan/index.html",
+    "final_url": "https://starside.work/builds/s29/em3ruaaj-titan/index.html",
+    "path": "pages/builds/s29/em3ruaaj-titan/index.html",
+    "bytes": 32616,
+    "sha256": "cd494b0e0957259d32092aa4c1ede81c8d861c2b69a95238a9082ced9f43ee28",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:28:11.398866+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/arc/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/prismatic/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-heavy/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/11cf2eaffb.webp",
+    "https://starside.work/armor-mods/icons/19f8d7086a.webp",
+    "https://starside.work/armor-mods/icons/1db6e3cbc8.webp",
+    "https://starside.work/armor-mods/icons/346923d6cc.webp",
+    "https://starside.work/armor-mods/icons/549322d88e.webp",
+    "https://starside.work/armor-mods/icons/733f0ff195.webp",
+    "https://starside.work/armor-mods/icons/8b4038415c.webp",
+    "https://starside.work/armor-mods/icons/9d8f34b802.webp",
+    "https://starside.work/armor-mods/icons/b2c34e83e7.webp",
+    "https://starside.work/armor-mods/icons/b7c73dd956.webp",
+    "https://starside.work/armor-mods/icons/e10db37ad3.webp",
+    "https://starside.work/armor-mods/icons/e4a0edee57.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-sets/icons/071.png",
+    "https://starside.work/armor-sets/icons/072.png",
+    "https://starside.work/artifact-mods/icons/376b28ea97.webp",
+    "https://starside.work/artifact-mods/icons/48c4d61945.webp",
+    "https://starside.work/artifact-mods/icons/7057925a5a.webp",
+    "https://starside.work/artifact-mods/icons/8507f59a0c.webp",
+    "https://starside.work/artifact-mods/icons/8ed5f7d5d9.webp",
+    "https://starside.work/artifact-mods/icons/97ef185661.webp",
+    "https://starside.work/artifact-mods/icons/c7f72197cb.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/2d9ac155cf.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/arc/icons/7f930d12a2.webp",
+    "https://starside.work/elements/class-abilities/icons/9b7d9d8088.webp",
+    "https://starside.work/elements/class-abilities/icons/f267262f1f.webp",
+    "https://starside.work/elements/prismatic/icons/1653e0640c.webp",
+    "https://starside.work/elements/prismatic/icons/1a18a55dd2.webp",
+    "https://starside.work/elements/prismatic/icons/48bc7ae6d4.webp",
+    "https://starside.work/elements/prismatic/icons/67d91531a9.webp",
+    "https://starside.work/elements/prismatic/icons/727574c917.webp",
+    "https://starside.work/elements/prismatic/icons/77096a21b5.webp",
+    "https://starside.work/elements/prismatic/icons/947bf83419.webp",
+    "https://starside.work/elements/prismatic/icons/b5144f8083.webp",
+    "https://starside.work/elements/stasis/icons/849beb7009.webp",
+    "https://starside.work/elements/void/icons/331e6e45bc.webp",
+    "https://starside.work/exotic-armor/icons/1107c04848.webp",
+    "https://starside.work/exotic-weapon/icons/e00ead964b.webp",
+    "https://starside.work/shopping-heavy/icons/831a22cf37.webp",
+    "https://starside.work/shopping-special/icons/5ec1f8389e.webp",
+    "https://starside.work/weapon-perks/icons/2cc9032c97.webp",
+    "https://starside.work/weapon-perks/icons/5ef5fce627.webp",
+    "https://starside.work/weapon-perks/icons/a4d0dbee15.webp",
+    "https://starside.work/weapon-perks/icons/ad3c67ba37.webp"
+  ]
+}

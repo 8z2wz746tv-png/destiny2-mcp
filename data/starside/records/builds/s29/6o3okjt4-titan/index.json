@@ -1,0 +1,151 @@
+{
+  "url": "https://starside.work/builds/s29/6o3okjt4-titan/index.html",
+  "title": "霉B喷子 · 配装推荐 · Starside",
+  "description": "可能是泰坦最安逸的近距离输出配装？",
+  "category": "builds",
+  "updated_at": "2026.9.8",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 霉B喷子\n\n推荐人：臭脸老登章鱼哥\n描述：可能是泰坦最安逸的近距离输出配装？\n更新：2026.9.8\n场景：突袭、地牢\n定位：输出\n分支：虚空\n类别：强度\n核心：没有B计划\n\n## 审核意见\n\n不触发级联点的话，阻止力全明星完美悖论是更优秀的选择；捡动能合成弹药可以通过熔炉2件套拾取和众神殿2件套补充护甲充能；不喜欢坚不可摧的玩家可以试试其他两个星象；动能裂口没什么用；泡泡盾可以续推推的30易伤\n\n## 职业\n\n职业：泰坦\n超能：黎明护罩\n星相：坚不可摧、进攻堡垒\n碎片：坚韧回声、饥饿回声\n手雷：抑制手雷\n近战：圣盾投掷\n职业技能：集结屏障\n\n## 武器\n\n传说武器：威胁等级 | 级联点、全明星\n\n## 护甲\n\n异域护甲：没有B计划\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：特殊武器弹药搜寻者、谐振虹吸\n腿部：动能武器激涌、动能武器激涌、动能武器激涌\n职业物品：强力吸引、时间膨胀、时间膨胀\n\n## 神器\n\n神器：加密数据盘\n模组：动能合成、苦痛之力、奇点利刃、动能裂口、虚空感染\n\n## 六维\n\n六维：生命 ~ ｜ 近战 ~ ｜ 手雷 ~ ｜ 超能 100+ ｜ 职业 ~ ｜ 武器 200\n\n## 注解\n\n这是我见到的目前版本最安逸的近距离输出配置了，它帮助我十分安逸地走过了单无平衡\n核心就在“全明星”perk和数据盘“动能合成”的联动上，威胁层级连续喷可以触发动能合成产出弹药，产出的弹药盒又能反过来触发全明星的增伤，并且实现喷子的电表倒转\n霉B（没有B计划）简单的喷子增伤，级联点增加dps\n\n我配装的特点就是除了核心的几个联动机制构成配装的底层逻辑之外，其余的空着的部分自由发挥就行\n比如其他武器的选择上，你可以用缩影来补伤害、回超能以及触发级联点，也可以选择裂波者产球、触发级联点、清怪，也可以带奥术之拥/弑神者之类的2号位喷子联动输出，不过我自己的习惯是带vex咖喱棒用来走机制和清怪，同时吃神器里的奇点利刃和霉B的近战增伤，只是说要触发级联点的话需要提前杀怪，而且无法通过精准命中持续触发级联点\n甚至——你不想刷威胁等级的话，拿完美悖论都能凑合\n\n平光靶场测试不触发级联点就能喷出3k+的dps了，在泡泡盾的持续时间里能打12w的总伤，够用了\n唯一的缺点就是只能打贴脸，受限于喷子的射程以及动能合成弹药盒的拾取",
+  "source_blocks": [
+    "# 霉B喷子\n\n推荐人：臭脸老登章鱼哥\n描述：可能是泰坦最安逸的近距离输出配装？\n更新：2026.9.8\n场景：突袭、地牢\n定位：输出\n分支：虚空\n类别：强度\n核心：没有B计划\n\n## 审核意见\n\n不触发级联点的话，阻止力全明星完美悖论是更优秀的选择；捡动能合成弹药可以通过熔炉2件套拾取和众神殿2件套补充护甲充能；不喜欢坚不可摧的玩家可以试试其他两个星象；动能裂口没什么用；泡泡盾可以续推推的30易伤\n\n## 职业\n\n职业：泰坦\n超能：黎明护罩\n星相：坚不可摧、进攻堡垒\n碎片：坚韧回声、饥饿回声\n手雷：抑制手雷\n近战：圣盾投掷\n职业技能：集结屏障\n\n## 武器\n\n传说武器：威胁等级 | 级联点、全明星\n\n## 护甲\n\n异域护甲：没有B计划\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：特殊武器弹药搜寻者、谐振虹吸\n腿部：动能武器激涌、动能武器激涌、动能武器激涌\n职业物品：强力吸引、时间膨胀、时间膨胀\n\n## 神器\n\n神器：加密数据盘\n模组：动能合成、苦痛之力、奇点利刃、动能裂口、虚空感染\n\n## 六维\n\n六维：生命 ~ ｜ 近战 ~ ｜ 手雷 ~ ｜ 超能 100+ ｜ 职业 ~ ｜ 武器 200\n\n## 注解\n\n这是我见到的目前版本最安逸的近距离输出配置了，它帮助我十分安逸地走过了单无平衡\n核心就在“全明星”perk和数据盘“动能合成”的联动上，威胁层级连续喷可以触发动能合成产出弹药，产出的弹药盒又能反过来触发全明星的增伤，并且实现喷子的电表倒转\n霉B（没有B计划）简单的喷子增伤，级联点增加dps\n\n我配装的特点就是除了核心的几个联动机制构成配装的底层逻辑之外，其余的空着的部分自由发挥就行\n比如其他武器的选择上，你可以用缩影来补伤害、回超能以及触发级联点，也可以选择裂波者产球、触发级联点、清怪，也可以带奥术之拥/弑神者之类的2号位喷子联动输出，不过我自己的习惯是带vex咖喱棒用来走机制和清怪，同时吃神器里的奇点利刃和霉B的近战增伤，只是说要触发级联点的话需要提前杀怪，而且无法通过精准命中持续触发级联点\n甚至——你不想刷威胁等级的话，拿完美悖论都能凑合\n\n平光靶场测试不触发级联点就能喷出3k+的dps了，在泡泡盾的持续时间里能打12w的总伤，够用了\n唯一的缺点就是只能打贴脸，受限于喷子的射程以及动能合成弹药盒的拾取"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "霉B喷子"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "加密数据盘"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "霉B喷子 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n霉B喷子\n\n推荐者：\n臭脸老登章鱼哥\n\n霉B喷子\n\n♥︎ 复制配装截图详情开关\n\n泰坦 · 虚空 · 强度S29 · 凯旋纪念碑\n\n可能是泰坦最安逸的近距离输出配装？\n\n适用环境\n\n突袭\n\n地牢\n\n标签\n\n输出\n\n# 霉B喷子\n\n推荐人：臭脸老登章鱼哥\n描述：可能是泰坦最安逸的近距离输出配装？\n更新：2026.9.8\n场景：突袭、地牢\n定位：输出\n分支：虚空\n类别：强度\n核心：没有B计划\n\n## 审核意见\n\n不触发级联点的话，阻止力全明星完美悖论是更优秀的选择；捡动能合成弹药可以通过熔炉2件套拾取和众神殿2件套补充护甲充能；不喜欢坚不可摧的玩家可以试试其他两个星象；动能裂口没什么用；泡泡盾可以续推推的30易伤\n\n## 职业\n\n职业：泰坦\n超能：黎明护罩\n星相：坚不可摧、进攻堡垒\n碎片：坚韧回声、饥饿回声\n手雷：抑制手雷\n近战：圣盾投掷\n职业技能：集结屏障\n\n## 武器\n\n传说武器：威胁等级 | 级联点、全明星\n\n## 护甲\n\n异域护甲：没有B计划\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：特殊武器弹药搜寻者、谐振虹吸\n腿部：动能武器激涌、动能武器激涌、动能武器激涌\n职业物品：强力吸引、时间膨胀、时间膨胀\n\n## 神器\n\n神器：加密数据盘\n模组：动能合成、苦痛之力、奇点利刃、动能裂口、虚空感染\n\n## 六维\n\n六维：生命 ~ ｜ 近战 ~ ｜ 手雷 ~ ｜ 超能 100+ ｜ 职业 ~ ｜ 武器 200\n\n## 注解\n\n这是我见到的目前版本最安逸的近距离输出配置了，它帮助我十分安逸地走过了单无平衡\n核心就在“全明星”perk和数据盘“动能合成”的联动上，威胁层级连续喷可以触发动能合成产出弹药，产出的弹药盒又能反过来触发全明星的增伤，并且实现喷子的电表倒转\n霉B（没有B计划）简单的喷子增伤，级联点增加dps\n\n我配装的特点就是除了核心的几个联动机制构成配装的底层逻辑之外，其余的空着的部分自由发挥就行\n比如其他武器的选择上，你可以用缩影来补伤害、回超能以及触发级联点，也可以选择裂波者产球、触发级联点、清怪，也可以带奥术之拥/弑神者之类的2号位喷子联动输出，不过我自己的习惯是带vex咖喱棒用来走机制和清怪，同时吃神器里的奇点利刃和霉B的近战增伤，只是说要触发级联点的话需要提前杀怪，而且无法通过精准命中持续触发级联点\n甚至——你不想刷威胁等级的话，拿完美悖论都能凑合\n\n平光靶场测试不触发级联点就能喷出3k+的dps了，在泡泡盾的持续时间里能打12w的总伤，够用了\n唯一的缺点就是只能打贴脸，受限于喷子的射程以及动能合成弹药盒的拾取\n\n审核意见\n\n不触发级联点的话，阻止力全明星完美悖论是更优秀的选择；捡动能合成弹药可以通过熔炉2件套拾取和众神殿2件套补充护甲充能；不喜欢坚不可摧的玩家可以试试其他两个星象；动能裂口没什么用；泡泡盾可以续推推的30易伤\n\n职业\n\n职业\n\n泰坦\n\n虚空\n\n超能\n\n黎明护罩\n\n技能\n\n抑制手雷\n\n圣盾投掷\n\n集结屏障\n\n星相\n\n坚不可摧\n\n进攻堡垒\n\n碎片\n\n坚韧回声\n\n饥饿回声\n\n武器\n\n威胁等级级联点全明星\n\n神器模组\n\n加密数据盘\n\n动能合成\n\n苦痛之力\n\n奇点利刃\n\n动能裂口\n\n虚空感染\n\n护甲\n\n没有B计划\n\n玻璃拱顶埃希恩记忆2 件\n\n玻璃拱顶埃希恩记忆4 件\n\n生命~\n\n近战~\n\n手雷~\n\n超能100+\n\n职业~\n\n武器200\n\n头盔\n\n特殊武器弹药搜寻者弹药搜寻者\n\n谐振虹吸虹吸\n\n腿部\n\n动能武器激涌武器激涌\n\n动能武器激涌武器激涌\n\n动能武器激涌武器激涌\n\n职业物品\n\n强力吸引\n\n时间膨胀\n\n时间膨胀\n\n注解\n\n这是我见到的目前版本最安逸的近距离输出配置了，它帮助我十分安逸地走过了单无平衡\n核心就在“全明星”perk和数据盘“动能合成”的联动上，威胁层级连续喷可以触发动能合成产出弹药，产出的弹药盒又能反过来触发全明星的增伤，并且实现喷子的电表倒转\n霉B（没有B计划）简单的喷子增伤，级联点增加dps\n\n我配装的特点就是除了核心的几个联动机制构成配装的底层逻辑之外，其余的空着的部分自由发挥就行\n比如其他武器的选择上，你可以用缩影来补伤害、回超能以及触发级联点，也可以选择裂波者产球、触发级联点、清怪，也可以带奥术之拥/弑神者之类的2号位喷子联动输出，不过我自己的习惯是带vex咖喱棒用来走机制和清怪，同时吃神器里的奇点利刃和霉B的近战增伤，只是说要触发级联点的话需要提前杀怪，而且无法通过精准命中持续触发级联点\n甚至——你不想刷威胁等级的话，拿完美悖论都能凑合\n\n平光靶场测试不触发级联点就能喷出3k+的dps了，在泡泡盾的持续时间里能打12w的总伤，够用了\n唯一的缺点就是只能打贴脸，受限于喷子的射程以及动能合成弹药盒的拾取\n\n更新 2026.9.8\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/6o3okjt4-titan/index.html",
+    "final_url": "https://starside.work/builds/s29/6o3okjt4-titan/index.html",
+    "path": "pages/builds/s29/6o3okjt4-titan/index.html",
+    "bytes": 28121,
+    "sha256": "331d80377c102a35fbd2fe643d79dd33ff5520a4c952b1ac0a9e05da2888e415",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:28:02.215596+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/37bedc55b8.webp",
+    "https://starside.work/armor-mods/icons/549322d88e.webp",
+    "https://starside.work/armor-mods/icons/626d0634f7.webp",
+    "https://starside.work/armor-mods/icons/b0ccd9cbcf.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-sets/icons/071.png",
+    "https://starside.work/armor-sets/icons/072.png",
+    "https://starside.work/artifact-mods/icons/376b28ea97.webp",
+    "https://starside.work/artifact-mods/icons/7057925a5a.webp",
+    "https://starside.work/artifact-mods/icons/97ef185661.webp",
+    "https://starside.work/artifact-mods/icons/c5d70719db.webp",
+    "https://starside.work/artifact-mods/icons/e721485d9e.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/2d9ac155cf.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/9b7d9d8088.webp",
+    "https://starside.work/elements/class-abilities/icons/f267262f1f.webp",
+    "https://starside.work/elements/void/icons/0566b8255d.webp",
+    "https://starside.work/elements/void/icons/077fdefd08.webp",
+    "https://starside.work/elements/void/icons/26cce5074c.webp",
+    "https://starside.work/elements/void/icons/790072b53c.webp",
+    "https://starside.work/elements/void/icons/7ae8554d07.webp",
+    "https://starside.work/elements/void/icons/aad67e3608.webp",
+    "https://starside.work/elements/void/icons/ac4a159058.webp",
+    "https://starside.work/elements/void/icons/d6b0443957.webp",
+    "https://starside.work/exotic-armor/icons/579ec5c591.webp",
+    "https://starside.work/shopping-special/icons/2c10e3adb4.webp",
+    "https://starside.work/weapon-perks/icons/c8d28ae0ba.webp",
+    "https://starside.work/weapon-perks/icons/ef42bf0ef0.webp"
+  ]
+}

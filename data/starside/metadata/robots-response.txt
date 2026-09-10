@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Starside · Destiny 2 资料台</title>
+<meta name="description" content="Destiny 2 中文资料台：护甲、武器、属性与副本的效果、数值与机制速查表。">
+<meta name="theme-color" content="#0b0d14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Starside">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="Starside · Destiny 2 资料台">
+<meta property="og:description" content="Destiny 2 中文资料台：护甲、武器、属性与副本的效果、数值与机制速查表。">
+<link rel="preload" href="assets/fonts/chakra-petch-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/app.js" defer></script>
+</head>
+<body>
+
+<div class="grid-flow" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<header class="hero">
+<div class="wordmark-row">
+<span class="mark hero-sigil" aria-hidden="true"><i></i><i></i><i></i></span>
+<h1 class="wordmark">Starside</h1>
+<p class="wordmark-meta"><span>Destiny 2 <em class="cn">中文资料台</em></span><span class="by">BY 日栎w<a class="support" href="https://ifdian.net/a/eliver" target="_blank" rel="noopener"><span class="sup-cell" aria-hidden="true"><i></i><i></i><i></i></span>发电</a></span></p>
+<span class="hero-mark warlock" aria-hidden="true">
+<i class="circle c1"></i>
+<i class="circle c2"></i>
+<i class="circle c3"></i>
+<i class="circle c4"></i>
+<span class="shapes">
+<i class="shape s1"></i>
+<i class="shape s2"></i>
+<i class="shape s3"></i>
+<i class="shape s4"></i>
+<i class="shape s5"></i>
+<i class="shape s6"></i>
+</span>
+<span class="rays g1"><i class="line l1"></i><i class="line l2"></i><i class="line l3"></i><i class="line l4"></i></span>
+<span class="rays g2"><i class="line l1"></i><i class="line l2"></i><i class="line l3"></i><i class="line l4"></i></span>
+<span class="rays g3"><i class="line l1"></i><i class="line l2"></i><i class="line l3"></i><i class="line l4"></i></span>
+</span>
+</div>
+<p class="hero-note">护甲、武器、属性与副本的效果、数值与机制，按页整理成中文速查表。</p>
+<p class="hero-sub">方括号内是 PvP 数值，如抵抗 x4（50% <span class="pvp-eg">[10%]</span>）中 10% 只在 PvP 生效；<span class="unsure">?</span> 是原作者标的未测数值。</p>
+</header>
+
+<div class="hero-band">
+<p class="hero-util"><button type="button" class="qq" data-qq="1095954157" aria-label="复制 QQ 群号 1095954157">QQ群 <b>1095954157</b><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="9" rx="1.5"/><path d="M10.5 3.5v-1a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h1"/></svg></button><a href="changelog/index.html">更新日志</a></p>
+<a class="pledge" href="https://ifdian.net/a/eliver" target="_blank" rel="noopener">
+<span class="pl-art" aria-hidden="true">
+<i class="ring r1"></i><i class="ring r2"></i><i class="ring r3"></i>
+<span class="orbit"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+<i class="core"></i>
+<span class="lead d1"><b></b></span><span class="lead d2"><b></b></span><span class="lead d3"><b></b></span>
+</span>
+<span class="pl-say">为它发电</span>
+</a>
+<div class="hero-search"></div>
+</div>
+
+<main class="index">
+<h2 class="group-label">配装<span>成套配装推荐，以及自己填一份的工具</span></h2>
+<ul class="entries">
+<li>
+<a class="entry" href="builds/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M13 18h18M13 24h18M13 30h11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>配装推荐</h3>
+<p>读者投稿的成套配装，按强度、创意与 PVP 分组，点开即知每一格配什么。</p>
+<span class="entry-stamp">更新 2026.9.9</span>
+</span>
+<dl class="entry-meta">
+<div><dt>配装</dt><dd>83</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="builds/sets/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M13 16h13v13H13z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M18.5 21.5h13v13h-13z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>配装合集</h3>
+<p>同一角色的多套配装合为一页，按场景切换使用，逐套列出技能、武器、护甲与神器模组。</p>
+<span class="entry-stamp">更新 2026.9.9</span>
+</span>
+<dl class="entry-meta">
+<div><dt>合集</dt><dd>7</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="builds/new/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M14 17h16M14 24h16M14 31h9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+<path d="m26.5 33.5 6.5-6.5 2.5 2.5-6.5 6.5-3 .5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>配装工具</h3>
+<p>选完技能、武器、护甲与神器模组，页面直接生成标准配装文本，复制发来即可挂上站。</p>
+<span class="entry-stamp">更新 2026.9.9</span>
+</span>
+</a>
+</li>
+<li>
+<a class="entry" href="builds/new/set/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M12 16h12v12H12z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M17 21h12v12H17z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="m26.5 33.5 6.5-6.5 2.5 2.5-6.5 6.5-3 .5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>合集工具</h3>
+<p>逐套选择装备，左侧目录可随时切换与复制，页面直接生成标准格式的合集文本。</p>
+<span class="entry-stamp">更新 2026.9.9</span>
+</span>
+</a>
+</li>
+</ul>
+<h2 class="group-label">档案<span>武器、护甲与技能的效果与数值，以及首领血量</span></h2>
+<ul class="entries">
+<li class="k-perk">
+<a class="entry" href="weapon-perks/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="12.5" cy="24" r="3.2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="22" cy="24" r="4.4" fill="currentColor"/>
+<circle cx="31.5" cy="24" r="3.2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>武器 PERK</h3>
+<p>Perk、模组、框架固有与起源特性共 406 条的触发条件与数值。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>PERK</dt><dd>406</dd></div>
+<div><dt>分节</dt><dd>7</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="weapon-frames/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<rect x="13" y="26" width="4.5" height="8" fill="currentColor"/>
+<rect x="19.75" y="21" width="4.5" height="13" fill="currentColor"/>
+<rect x="26.5" y="15.5" width="4.5" height="18.5" fill="currentColor"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>武器框架</h3>
+<p>各类武器框架的伤害、射速、填装、DPS 与评分，含勇士克制与逐条注解。</p>
+<span class="entry-stamp">更新 2026.8.22</span>
+</span>
+<dl class="entry-meta">
+<div><dt>武器类</dt><dd>18</dd></div>
+<div><dt>框架</dt><dd>94</dd></div>
+</dl>
+</a>
+</li>
+<li class="k-charge">
+<a class="entry" href="armor-mods/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 13.5 30.5 17.5v6.5c0 5-3.6 8.6-8.5 10.5-4.9-1.9-8.5-5.5-8.5-10.5v-6.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="22" cy="23" r="2.6" fill="currentColor"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>护甲模组</h3>
+<p>头盔、护臂、胸甲、腿部、职业物品的模组，外加副本与活动的传承模组。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>部位</dt><dd>5</dd></div>
+<div><dt>模组</dt><dd>128</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="armor-sets/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 12.5 31.5 18v11L22 34.5 12.5 29V18z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<rect x="18.5" y="20" width="7" height="7" transform="rotate(45 22 23.5)" fill="currentColor"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>护甲套装效果</h3>
+<p>目的地、行动、突袭、地牢与活动的护甲套装，2 件与 4 件各给一条效果。</p>
+<span class="entry-stamp">更新 2026.9.7</span>
+</span>
+<dl class="entry-meta">
+<div><dt>套装</dt><dd>56</dd></div>
+<div><dt>效果</dt><dd>112</dd></div>
+</dl>
+</a>
+</li>
+<li class="k-exotic">
+<a class="entry" href="exotic-weapon/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M12 30 32 14" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 16.5 28.5 23 22 29.5 15.5 23z" fill="currentColor"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>异域武器</h3>
+<p>动能、能量、威能三个槽位共 146 把异域武器的机制与数值。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>武器</dt><dd>146</dd></div>
+<div><dt>槽位</dt><dd>3</dd></div>
+</dl>
+</a>
+</li>
+<li class="k-exotic">
+<a class="entry" href="exotic-armor/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 10.5 34.5 23 22 35.5 9.5 23z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 16.5 28.5 23 22 29.5 15.5 23z" fill="currentColor"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>异域护甲</h3>
+<p>猎人、泰坦、术士各 45 件异域护甲的机制与数值，外加三个永劫教派与 36 枚职业物品之灵。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>护甲</dt><dd>135</dd></div>
+<div><dt>之灵</dt><dd>36</dd></div>
+</dl>
+</a>
+</li>
+<li class="k-prism">
+<a class="entry" href="elements/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 14.5 29.5 27h-15z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 33.5 14.5 21h15z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>职业分支详解</h3>
+<p>电弧、烈日、虚空、冰影、缚丝、棱镜的效果、碎片、手雷与三职业技能，另有一页职业技能。</p>
+<span class="entry-stamp">更新 2026.8.23</span>
+</span>
+<dl class="entry-meta">
+<div><dt>属性</dt><dd>6</dd></div>
+<div><dt>条目</dt><dd>336</dd></div>
+</dl>
+</a>
+</li>
+<li class="k-artifact">
+<a class="entry" href="artifact-mods/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<rect x="15.5" y="17.5" width="13" height="13" transform="rotate(45 22 24)" fill="currentColor"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>神器模组</h3>
+<p>历代赛季神器的模组，按一至三级分档，各自专注元素、武器类型与机制。</p>
+<span class="entry-stamp">更新 2026.9.7</span>
+</span>
+<dl class="entry-meta">
+<div><dt>神器</dt><dd>7</dd></div>
+<div><dt>模组</dt><dd>147</dd></div>
+</dl>
+</a>
+</li>
+<li class="k-charge">
+<a class="entry" href="ability-cooldown/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="22" cy="24" r="9.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 18v6.5l4.5 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>技能冷却</h3>
+<p>手雷、近战与职业技能在 0 到 100 属性下的冷却秒数，分 PvE 与 PvP 两节，含回复倍率、属性倍率与技能能量的整块获取规则。</p>
+<span class="entry-stamp">更新 2026.8.25</span>
+</span>
+<dl class="entry-meta">
+<div><dt>技能</dt><dd>113</dd></div>
+<div><dt>属性档</dt><dd>11</dd></div>
+</dl>
+</a>
+</li>
+<li class="k-enemy">
+<a class="entry" href="boss-hp/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 33.5c-5-3.6-9.5-7-9.5-11.9a4.9 4.9 0 0 1 9.5-1.8 4.9 4.9 0 0 1 9.5 1.8c0 4.9-4.5 8.3-9.5 11.9z" fill="currentColor"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>首领生命值</h3>
+<p>突袭与地牢首领的生命值、交战距离、输出时间与人均 DPS 门槛。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>副本</dt><dd>23</dd></div>
+<div><dt>首领</dt><dd>61</dd></div>
+</dl>
+</a>
+</li>
+</ul>
+<h2 class="group-label">终局分析<span>刷取清单、副本攻略、每周轮换与实测输出排行</span></h2>
+<ul class="entries">
+<li class="wide">
+<a class="entry" href="pve-farming/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="22" cy="24" r="8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 18.5v11m0 0-3.5-3.5M22 29.5l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>PVE 终局刷取指南</h3>
+<p>终局刷取的清单与来源：两套武器评级清单，以及可锻造武器与异域装备的来源。</p>
+<span class="entry-stamp">更新 2026.9.6</span>
+</span>
+<dl class="entry-meta">
+<div><dt>清单</dt><dd>10</dd></div>
+<div><dt>武器</dt><dd>1031</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="raid-guides/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<rect x="13" y="17" width="18" height="14" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M13 27l5-4 4 3 4-3.5 5 4.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>Raid 攻略</h3>
+<p>突袭与众神殿的图文攻略，一张卡一份文档，点开跳转到腾讯文档。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>攻略</dt><dd>12</dd></div>
+<div><dt>突袭</dt><dd>10</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="dps/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 34V15m0 0-7.5 7.5M22 15l7.5 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>DPS 排行</h3>
+<p>258 组配装的持续输出实测排行，含弹数、打空耗时、倍率拆解与逐条注解。</p>
+<span class="entry-stamp">更新 2026.8.25</span>
+</span>
+<dl class="entry-meta">
+<div><dt>配装</dt><dd>258</dd></div>
+<div><dt>武器类</dt><dd>22</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="swap-dps/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M15 20h14l-4-4M29 28H15l4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>切枪 DPS 排行</h3>
+<p>198 组切枪配装的爆发输出排行，含倍率拆解与举枪、开火、收枪的逐段耗时。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>配装</dt><dd>198</dd></div>
+<div><dt>类型</dt><dd>6</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="skill-damage/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 13v22M13 18l18 12M31 18 13 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>技能伤害排行</h3>
+<p>238 组技能配置的单次伤害实测排行，分手雷、近战、超能、杂项与无 200 属性实测五节，含伤害构成与测试条件。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>配置</dt><dd>238</dd></div>
+<div><dt>类别</dt><dd>5</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="rotation/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="22" cy="24" r="9" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 18.5V24l4.5 2.8" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>轮换速查表</h3>
+<p>突袭与地牢每周轮换，扭曲星球每小时轮换。一页查完两条轮换轴。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>突袭</dt><dd>9</dd></div>
+<div><dt>地牢</dt><dd>10</dd></div>
+</dl>
+</a>
+</li>
+</ul>
+<h2 class="group-label">机制<span>伤害、能量与倍率的计算与叠加规则</span></h2>
+<ul class="entries">
+<li class="k-buff">
+<a class="entry" href="buff-debuffs/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M15.5 29.5V17m0 0-4 4m4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M28.5 18.5V31m0 0 4-4m-4 4-4-4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>增伤 &amp; 易伤</h3>
+<p>全局易伤、强化增益、武器激涌、放大类增益，另加世界与活动，共五类的触发、数值、时长与叠加规则。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>效果</dt><dd>118</dd></div>
+<div><dt>类别</dt><dd>5</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="game-mechanics/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="22" cy="24" r="6" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 12v5m0 14v5m-10.4-16 4.3 2.5m12.2 7 4.3 2.5m0-12-4.3 2.5m-12.2 7L11.6 30" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>游戏机制</h3>
+<p>六项护甲属性、敏捷与生命值护盾、护甲充能、超能能量获取、活动修改器全表、战斗人员档位与祸因、三类勇士的难度分档与热量武器。</p>
+<span class="entry-stamp">更新 2026.8.30</span>
+</span>
+<dl class="entry-meta">
+<div><dt>修改器</dt><dd>66</dd></div>
+<div><dt>祸因</dt><dd>22</dd></div>
+</dl>
+</a>
+</li>
+<li class="k-ammo">
+<a class="entry" href="ammo/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 13v22M13.5 21.5 22 13l8.5 8.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>弹药生成机制</h3>
+<p>击杀生成弹药的基础百分比，以及 Perk、模组与套装加成的叠加方式。</p>
+<span class="entry-stamp">更新 2026.8.25</span>
+</span>
+<dl class="entry-meta">
+<div><dt>组合</dt><dd>10</dd></div>
+<div><dt>增益</dt><dd>14</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="power-delta/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M13 31 19 25.5 25 28 31 17" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="31" cy="17" r="2.4" fill="currentColor"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>压光伤害</h3>
+<p>−100 到 +100 每一点的伤害倍率，标准与传说战役两条曲线，0 记作 1 倍。</p>
+<span class="entry-stamp">更新 2026.8.14</span>
+</span>
+<dl class="entry-meta">
+<div><dt>光等差</dt><dd>201</dd></div>
+<div><dt>曲线</dt><dd>2</dd></div>
+</dl>
+</a>
+</li>
+<li class="k-enemy">
+<a class="entry" href="combatant-scalars/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="22" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M22 12.5v5M22 30.5v5M10.5 24h5M28.5 24h5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="22" cy="24" r="2.4" fill="currentColor"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>战斗人员倍率</h3>
+<p>各类武器对载具、首领、勇士、初级首领、橙血与红血的伤害倍率，含单列的具名武器。</p>
+<span class="entry-stamp">更新 2026.8.14</span>
+</span>
+<dl class="entry-meta">
+<div><dt>武器</dt><dd>44</dd></div>
+<div><dt>战斗人员</dt><dd>6</dd></div>
+</dl>
+</a>
+</li>
+</ul>
+<h2 class="group-label">站务<span>站点的改动记录、内容来源与全站配色</span></h2>
+<ul class="entries">
+<li>
+<a class="entry" href="changelog/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M13.5 18h17M13.5 24h17M13.5 30h10" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>更新日志</h3>
+<p>各资料页的内容改动记录，按日期倒序，每条写明改动类型、所在页面与改动内容。</p>
+<span class="entry-stamp">更新 2026.9.7</span>
+</span>
+<dl class="entry-meta">
+<div><dt>条目</dt><dd>111</dd></div>
+<div><dt>日期</dt><dd>12</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="sources/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<ellipse cx="22" cy="17" rx="8.5" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M13.5 17v13c0 1.9 3.8 3.5 8.5 3.5s8.5-1.6 8.5-3.5V17" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<path d="M13.5 23.5c0 1.9 3.8 3.5 8.5 3.5s8.5-1.6 8.5-3.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>数据源与鸣谢</h3>
+<p>各资料页的数值出处与贡献者，一处来源一行，列出它支撑的页面。</p>
+<span class="entry-stamp">更新 2026.8.28</span>
+</span>
+<dl class="entry-meta">
+<div><dt>数据源</dt><dd>10</dd></div>
+<div><dt>鸣谢</dt><dd>7</dd></div>
+</dl>
+</a>
+</li>
+<li>
+<a class="entry" href="palette/index.html">
+<span class="entry-node" aria-hidden="true">
+<svg viewBox="0 0 44 48">
+<path d="M22 1.5 41.5 12.75v22.5L22 46.5 2.5 35.25v-22.5z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="18" cy="20" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="26" cy="20" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<circle cx="22" cy="28" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/>
+</svg>
+</span>
+<span class="entry-body">
+<h3>配色总览</h3>
+<p>全站着色的色板，每支渲染色列出色号、色样与用途，由闸门与样式表逐条比对。</p>
+<span class="entry-stamp">更新 2026.8.24</span>
+</span>
+<dl class="entry-meta">
+<div><dt>渲染色</dt><dd>27</dd></div>
+<div><dt>标记</dt><dd>32</dd></div>
+</dl>
+</a>
+</li>
+</ul>
+</main>
+
+<footer class="site-foot">
+<p>© 2026 日栎w · <a href="https://space.bilibili.com/26117485" target="_blank" rel="noopener">哔哩哔哩</a></p>
+<p class="legal">Starside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。</p>
+<p class="legal"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">鲁ICP备2026052166号-1</a></p>
+<p class="visits"><span id="sv"></span></p>
+</footer>
+<script>
+/* 群号复制。app.js 那份只管全站搜索与工具条，跟这里没有一行共用，所以就地写。
+   失败不吞掉：写不进剪贴板就把原因显示出来。 */
+document.querySelector('.qq').addEventListener('click', function () {
+  var btn = this;
+  function tip(t) {
+    btn.dataset.tip = t;
+    setTimeout(function () { delete btn.dataset.tip; }, 1600);
+  }
+  navigator.clipboard.writeText(btn.dataset.qq).then(
+    function () { tip('已复制'); },
+    function (err) { tip('复制失败 ' + err.name); }
+  );
+});
+</script>
+<script type="speculationrules">{"prefetch":[{"where":{"href_matches":"/*"},"eagerness":"moderate"}]}</script>
+<script>(function(){var d=new Date(Date.now()+288e5).toISOString().slice(0,10);var o=document.getElementById("sv"),f=1;try{f=localStorage.getItem("svd")===d?0:1;if(f)localStorage.setItem("svd",d)}catch(_){}if(!f){if(!o)return;try{var c=localStorage.getItem("svt");if(c){o.textContent=c;return}}catch(_){}}var r=f?fetch("https://dea-mods-d1g0j2rile2323f73.service.tcloudbase.com/api",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({a:"hit",s:o?1:0})}):fetch("https://dea-mods-d1g0j2rile2323f73.service.tcloudbase.com/api?a=stats");r.then(function(x){return x.json()}).then(function(s){if(o){var t="今日 "+s.today+" 位访客 · 累计 "+s.total;o.textContent=t;try{localStorage.setItem("svt",t)}catch(_){}}},function(x){if(o)o.textContent="访问统计取不到："+x})})()</script>
+<script>try{if(localStorage.sa_at&&document.querySelector("main[data-src]")){var l=document.querySelector('link[href$="assets/site.css"]');if(l)import(l.href.replace("assets/site.css","admin/edit.js"))}}catch(_){}</script>
+<script>(function(){if(!/\.tcloudbase(app)?\.com$/.test(location.hostname))return;var u="https://starside.work"+location.pathname+location.search+location.hash;document.title="【测试地址】"+document.title;function link(t,big){var a=document.createElement("a");a.href=u;a.textContent=t;a.style.cssText=big?"padding:.7em 1.6em;border:1px solid var(--accent);border-radius:2px;color:var(--accent);text-decoration:none;font-size:16px":"color:var(--accent);white-space:nowrap";return a}var bar=document.createElement("div");bar.style.cssText="position:fixed;left:0;right:0;bottom:0;z-index:99;display:flex;flex-wrap:wrap;gap:.2em 1em;align-items:center;justify-content:center;padding:.55em 1em;background-color:var(--ink-lift);border-top:1px solid var(--hair-lit);color:var(--bone);font:13px/1.7 var(--font-cn)";bar.append("这是测试地址，站点已经搬到 starside.work ",link("立即换过去"));var box=document.createElement("div");box.style.cssText="position:fixed;inset:0;z-index:999;display:flex;flex-direction:column;gap:1.4em;align-items:center;justify-content:center;padding:2em;text-align:center;background-color:var(--ink);color:var(--bone);font:15px/1.9 var(--font-cn)";var say=document.createElement("p");say.textContent="你打开的是测试地址。站点的正式地址是 starside.work，请改用它并更新收藏。";say.style.cssText="margin:0;max-width:32em";var stay=document.createElement("button");stay.type="button";stay.disabled=true;stay.style.cssText="background:none;border:0;color:var(--bone-faint);font:13px/1.7 var(--font-cn);cursor:pointer";var n=5;stay.textContent="仍要留在测试地址（"+n+"）";var t=setInterval(function(){n--;stay.textContent="仍要留在测试地址"+(n?"（"+n+"）":"");if(!n){clearInterval(t);stay.disabled=false}},1000);stay.onclick=function(){box.remove();document.body.appendChild(bar)};box.append(say,link("去 starside.work",1),stay);document.body.appendChild(box)})()</script>
+</body>
+</html>

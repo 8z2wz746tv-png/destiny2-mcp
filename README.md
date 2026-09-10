@@ -83,9 +83,21 @@ DESTINY_MCP_TOOL_PROFILE=normal
 | `expert` | 聚合工具 + 常用查询类旧工具，用于排查查询问题 |
 | `full` | 聚合工具 + 全部历史工具，用于兼容旧提示词或开发调试 |
 
-### 3. 预热 DIM Wish List（可选）
+### 3. 准备可选数据（Manifest / DIM Wish List）
 
-MCP 启动时如果发现 DIM wish list 数据不存在，会自动下载。Agent 也可以提前运行：
+**Manifest（省去首次建库）**：服务首次启动会从 Bungie 下载 Manifest 并建库，两个库
+合计约 685 MB，需要能访问 Bungie 且耗时较长。想跳过这一步，可直接取预构建好的数据库：
+
+```bash
+mkdir -p manifest
+gh release download manifest-data-v1 -R 8z2wz746tv-png/destiny2-mcp -D manifest
+```
+
+也可以从 [Releases](https://github.com/8z2wz746tv-png/destiny2-mcp/releases) 页面手动
+下载后放进 `manifest/`。仓库不直接包含这两个库——单文件超过 GitHub 的 100 MB 限制。
+缺少时服务仍会自行下载重建，这一步不影响安装能否成功。
+
+**DIM Wish List**：MCP 启动时如果发现数据不存在，会自动下载。Agent 也可以提前运行：
 
 ```bash
 .venv/bin/destiny-mcp-fetch-wishlists
@@ -248,7 +260,8 @@ Starside 作为现有工具的本地资料层，不新增第九个工具，也�
 不需要解压 ZIP、抓取网站或手动导入。可用 `STARSIDE_SHARE_PATH` 指向更新后的文档目录。
 
 此前的 schema v2 网页归档仍受支持，并可与 Markdown 合并查询；它额外包含 108 个社区
-配装块，但仍是本地可选数据，不随项目分发。Markdown 数据包不含完整角色配装模板，
+配装块。仓库已随附该归档中运行所需的部分，但原始抓取页与素材不入库，详见下文
+「本地数据与更新」。Markdown 数据包不含完整角色配装模板，
 不能根据武器推荐表自行拼成“热门配装”。具体许可与来源边界见
 [`COMMUNITY_DATA_NOTICE.md`](COMMUNITY_DATA_NOTICE.md)。
 
@@ -297,6 +310,11 @@ Starside 作为现有工具的本地资料层，不新增第九个工具，也�
 可选网页归档目录是 `DATA_PATH/starside`，未配置 `DATA_PATH` 时使用项目下的
 `data/starside`。适配器读取 `index.json`、索引列出的 `records/` 和两个 `exports/`
 JSON 文件。不执行原始网页或脚本，也不在查询时访问 Starside。
+
+仓库已随附该归档中 MCP 运行需要的部分（`index.json`、`records/`、`exports/`、
+`categories/`、`metadata/`、`texts/`，约 17 MB），克隆后即可直接查询，不需要额外下载。
+归档里的 `pages/`（原始 HTML）与 `assets/`（3824 个图标与前端资源）运行时不会被读取，
+因此不入库；需要完整原始页时用 `scripts/fetch_starside.py` 重新抓取，抓取会补全这两部分。
 
 仅接受完成状态的 schema v2 归档；失败项、待处理 URL、缺失页面、无效路径或损坏 JSON
 会拒绝使用。文件更新后自动重载。每份引用都携带页面地址、页面更新时间、抓取时间、

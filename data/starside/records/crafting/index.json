@@ -1,0 +1,1164 @@
+{
+  "url": "https://starside.work/crafting/index.html",
+  "title": "锻造武器来源 · Starside",
+  "description": "可锻造武器的红框掉落处，以及异域任务、地牢、突袭的异域武器与催化剂获取方式。",
+  "category": "activities",
+  "updated_at": "2026.8.30",
+  "data_src": "docs/crafting",
+  "data_hash": "8c53c568de8104cb781c69f97a2528c2668e0cd2",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "锻造武器来源"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "仄出售"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "目的地活动"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "异域任务"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "地牢"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "突袭"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "仄出售",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "分组",
+            "html": "分组"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "霰弹枪",
+            "html": "霰弹枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "帝国法令",
+            "html": "帝国法令"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "职业刀",
+            "html": "职业刀"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "黄金长牙、死神剃刀、王座切割者",
+            "html": "黄金长牙、死神剃刀、王座切割者"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "侠盗赛季",
+            "html": "侠盗赛季"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "无赦、血仇、褪色毅力、盗亦有道、启航望远镜、普朗克的步伐",
+            "html": "无赦、血仇、褪色毅力、盗亦有道、启航望远镜、普朗克的步伐"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "奇巫赛季",
+            "html": "奇巫赛季"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "隐士、言语轨迹、埃里亚原则、布瑞亚之爱、笃信、符号学家",
+            "html": "隐士、言语轨迹、埃里亚原则、布瑞亚之爱、笃信、符号学家"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "深渊赛季",
+            "html": "深渊赛季"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "目标修订、贪婪胃口、纤薄断崖、远方吸引、不同时代、直至回归",
+            "html": "目标修订、贪婪胃口、纤薄断崖、远方吸引、不同时代、直至回归"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "目的地活动",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "目的地",
+            "html": "目的地"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "红框掉落",
+            "html": "红框掉落"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "内欧姆纳",
+            "html": "内欧姆纳"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "维度内旋轮线、迭代循环、叶序螺旋、反复记号、循环赛",
+            "html": "维度内旋轮线、迭代循环、叶序螺旋、反复记号、循环赛"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "永恒挑战",
+            "html": "永恒挑战"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "BxR-55 战士、赦免尘埃、荒原 M5、回溯路径、真假参半、另一半",
+            "html": "BxR-55 战士、赦免尘埃、荒原 M5、回溯路径、真假参半、另一半"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "苍白之心",
+            "html": "苍白之心"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "专业记忆、虚假偶像、毫不迟疑、大胆终末、轴向缺漏、有朝一日、宣召呼唤、拥抱身份",
+            "html": "专业记忆、虚假偶像、毫不迟疑、大胆终末、轴向缺漏、有朝一日、宣召呼唤、拥抱身份"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "王座世界",
+            "html": "王座世界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "经验证据、鉴定梦魇、精确调查、可疑对象、红鲱鱼、恶魔谎言、实现、父之罪孽、咒骂",
+            "html": "经验证据、鉴定梦魇、精确调查、可疑对象、红鲱鱼、恶魔谎言、实现、父之罪孽、咒骂"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "异域任务",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "任务",
+            "html": "任务"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "异域武器",
+            "html": "异域武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "红框掉落",
+            "html": "红框掉落"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "凯尔之陨",
+            "html": "凯尔之陨"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "杀手之牙",
+            "html": "杀手之牙"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "无",
+            "html": "无"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "去现实化",
+            "html": "去现实化"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "墓园双星",
+            "html": "墓园双星"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "无",
+            "html": "无"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "行动时刻",
+            "html": "行动时刻"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "全面爆发",
+            "html": "全面爆发"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "无",
+            "html": "无"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冥冥低语",
+            "html": "冥冥低语"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "蠕虫低语",
+            "html": "蠕虫低语"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "无",
+            "html": "无"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "定日镜",
+            "html": "定日镜"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "狼毒",
+            "html": "狼毒"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "无",
+            "html": "无"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "超控节点阿瓦隆",
+            "html": "超控节点阿瓦隆"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "维王者之剑",
+            "html": "维王者之剑"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "恒久、皇家行刑者、善谈者、看护人、浪子回头、统御",
+            "html": "恒久、皇家行刑者、善谈者、看护人、浪子回头、统御"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暗屋之声",
+            "html": "暗屋之声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "死亡信使",
+            "html": "死亡信使"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "甜蜜忧愁、火爆秉性、切肤之痛、往复冲击、无念、心灵碎片",
+            "html": "甜蜜忧愁、火爆秉性、切肤之痛、往复冲击、无念、心灵碎片"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "前兆",
+            "html": "前兆"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "亡者传说",
+            "html": "亡者传说"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈火惊骇、空洞拒绝、黑夜中的擦撞、义无反顾、养鹰人、卡鲁斯迷你、突进（巴洛克）、奈扎雷克的耳语、挚爱、悔恨泪水",
+            "html": "烈火惊骇、空洞拒绝、黑夜中的擦撞、义无反顾、养鹰人、卡鲁斯迷你、突进（巴洛克）、奈扎雷克的耳语、挚爱、悔恨泪水"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "炽天使之盾",
+            "html": "炽天使之盾"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "零号修订",
+            "html": "零号修订"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "绊索金丝雀、改型冒险、克尔格拉斯的审判、低阻之道、悬殊、射后不理、IKELOS_SR、IKELOS_SG、IKELOS_HC、IKELOS_SMG",
+            "html": "绊索金丝雀、改型冒险、克尔格拉斯的审判、低阻之道、悬殊、射后不理、IKELOS_SR、IKELOS_SG、IKELOS_HC、IKELOS_SMG"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "安可",
+            "html": "安可"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "单人合唱",
+            "html": "单人合唱"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "反常行动、褪色旅人、刻蚀、视野勘察、面纱威胁、迷失信号、时间食者、洞穴学者、守信者、噩兆",
+            "html": "反常行动、褪色旅人、刻蚀、视野勘察、面纱威胁、迷失信号、时间食者、洞穴学者、守信者、噩兆"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "苦命鸳鸯",
+            "html": "苦命鸳鸯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "守愿者",
+            "html": "守愿者"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "遗忘恐惧症、散射信号、超星系团、祈使、假设、极欲、祈愿、劝告、标量潜能、无望请愿者",
+            "html": "遗忘恐惧症、散射信号、超星系团、祈使、假设、极欲、祈愿、劝告、标量潜能、无望请愿者"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "地牢",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "地牢",
+            "html": "地牢"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "异域武器",
+            "html": "异域武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取 / 催化剂",
+            "html": "获取 / 催化剂"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "深渊机灵",
+            "html": "深渊机灵"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "领航员",
+            "html": "领航员"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 解密",
+            "html": "尾王 / 解密"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "破碎王座",
+            "html": "破碎王座"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "碎愿者",
+            "html": "碎愿者"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "解密 / 尾王",
+            "html": "解密 / 尾王"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "平衡",
+            "html": "平衡"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "传家宝",
+            "html": "传家宝"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 任务同调",
+            "html": "尾王 / 任务同调"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "分离教义",
+            "html": "分离教义"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "终局螺旋钻",
+            "html": "终局螺旋钻"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 溺水迷宫",
+            "html": "尾王 / 溺水迷宫"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "晚星之主",
+            "html": "晚星之主"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "破冰者",
+            "html": "破冰者"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 异常网络",
+            "html": "尾王 / 异常网络"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "战争领主的废墟",
+            "html": "战争领主的废墟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "深埋血脉",
+            "html": "深埋血脉"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 群山阴影",
+            "html": "尾王 / 群山阴影"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "守望者尖塔",
+            "html": "守望者尖塔"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "需求层级",
+            "html": "需求层级"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 大师",
+            "html": "尾王 / 大师"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "二象性",
+            "html": "二象性"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "心影",
+            "html": "心影"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 解密",
+            "html": "尾王 / 解密"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "贪婪之握",
+            "html": "贪婪之握"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "加拉尔号角",
+            "html": "加拉尔号角"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "解密 / 解密",
+            "html": "解密 / 解密"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "异端深渊",
+            "html": "异端深渊"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "异星噬菌",
+            "html": "异星噬菌"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "解密 / 尾王",
+            "html": "解密 / 尾王"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "突袭",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "突袭",
+            "html": "突袭"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "异域武器",
+            "html": "异域武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取 / 催化剂",
+            "html": "获取 / 催化剂"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "红框掉落",
+            "html": "红框掉落"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "永恒沙漠",
+            "html": "永恒沙漠"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "回旋喝彩",
+            "html": "回旋喝彩"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 任务同调",
+            "html": "尾王 / 任务同调"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "无",
+            "html": "无"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "救赎的边缘",
+            "html": "救赎的边缘"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "悦耳之声",
+            "html": "悦耳之声"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 大师",
+            "html": "尾王 / 大师"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "作废、迫近、终焉未至、临界异常、偏异将临、至善",
+            "html": "作废、迫近、终焉未至、临界异常、偏异将临、至善"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "梦魇根源",
+            "html": "梦魇根源"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "条件终局",
+            "html": "条件终局"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 大师",
+            "html": "尾王 / 大师"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "鲁弗斯的狂怒、科拉西斯的苦恼、蔷薇的蔑视、内萨的奉献、麦克尔的崇敬、阿卡西娅的沮丧",
+            "html": "鲁弗斯的狂怒、科拉西斯的苦恼、蔷薇的蔑视、内萨的奉献、麦克尔的崇敬、阿卡西娅的沮丧"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "国王的陨落",
+            "html": "国王的陨落"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "恶意触碰",
+            "html": "恶意触碰"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 解密",
+            "html": "尾王 / 解密"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "梅拉恩的惩戒、切尔奇斯的末日、扎乌利的克星、弥达的清算、亚斯明的抗争、库里姆的终界",
+            "html": "梅拉恩的惩戒、切尔奇斯的末日、扎乌利的克星、弥达的清算、亚斯明的抗争、库里姆的终界"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "克洛塔的末日",
+            "html": "克洛塔的末日"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "坏疽",
+            "html": "坏疽"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "解密 / 解密",
+            "html": "解密 / 解密"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超灵之诏、伊尔约特的尖牙、克洛塔之语、深渊叛逆、断剑者、伊尔约特之歌",
+            "html": "超灵之诏、伊尔约特的尖牙、克洛塔之语、深渊叛逆、断剑者、伊尔约特之歌"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "门徒誓约",
+            "html": "门徒誓约"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "集体义务",
+            "html": "集体义务"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王",
+            "html": "尾王"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "鲁布瑞之厄、驯顺、灾变、阴险、自制、解脱",
+            "html": "鲁布瑞之厄、驯顺、灾变、阴险、自制、解脱"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "深岩墓室",
+            "html": "深岩墓室"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "明日之眼",
+            "html": "明日之眼"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王",
+            "html": "尾王"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "继承、遗赠、受托、后代、遗产、纪念",
+            "html": "继承、遗赠、受托、后代、遗产、纪念"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "玻璃拱顶",
+            "html": "玻璃拱顶"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "Vex 揭秘者",
+            "html": "Vex 揭秘者"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王 / 解密",
+            "html": "尾王 / 解密"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "汇流愿景、惩戒措施、裁决定论、命运终结者、光芒复仇、普莱蒂斯的复仇",
+            "html": "汇流愿景、惩戒措施、裁决定论、命运终结者、光芒复仇、普莱蒂斯的复仇"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "救赎花园",
+            "html": "救赎花园"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "神圣裁决",
+            "html": "神圣裁决"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "解密 / 世界掉落",
+            "html": "解密 / 世界掉落"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "鲁莽神谕、累积救赎、上古福音、神圣起源、狂徒的奖励、末日先知、全知之眼",
+            "html": "鲁莽神谕、累积救赎、上古福音、神圣起源、狂徒的奖励、末日先知、<span class=\"exotic\">全知之眼</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "最后一愿",
+            "html": "最后一愿"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "exotic"
+            },
+            "text": "千语",
+            "html": "千语"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尾王",
+            "html": "尾王"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "野兽国度、唠叨龙骨、变形术、旧日羁绊、天堂暴政、霸权、灵巫力量、巅峰捕食者",
+            "html": "野兽国度、唠叨龙骨、变形术、旧日羁绊、天堂暴政、霸权、灵巫力量、巅峰捕食者"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "锻造武器来源 · Starside\n\nStarside\n/\n锻造武器来源\n\n锻造武器来源\n\n仄出售\n\n仄每周出售的可锻造武器，按来源分组。\n\n分组\n武器\n\n霰弹枪帝国法令\n\n职业刀黄金长牙、死神剃刀、王座切割者\n\n侠盗赛季无赦、血仇、褪色毅力、盗亦有道、启航望远镜、普朗克的步伐\n\n奇巫赛季隐士、言语轨迹、埃里亚原则、布瑞亚之爱、笃信、符号学家\n\n深渊赛季目标修订、贪婪胃口、纤薄断崖、远方吸引、不同时代、直至回归\n\n目的地活动\n\n目的地\n红框掉落\n\n内欧姆纳维度内旋轮线、迭代循环、叶序螺旋、反复记号、循环赛\n\n永恒挑战BxR-55 战士、赦免尘埃、荒原 M5、回溯路径、真假参半、另一半\n\n苍白之心专业记忆、虚假偶像、毫不迟疑、大胆终末、轴向缺漏、有朝一日、宣召呼唤、拥抱身份\n\n王座世界经验证据、鉴定梦魇、精确调查、可疑对象、红鲱鱼、恶魔谎言、实现、父之罪孽、咒骂\n\n故我在掉自苍白之心活动或切除，金偃月掉自王座世界源泉活动。\n\n异域任务\n\n任务\n异域武器\n红框掉落\n\n凯尔之陨杀手之牙无\n\n去现实化墓园双星无\n\n行动时刻全面爆发无\n\n冥冥低语蠕虫低语无\n\n定日镜狼毒无\n\n超控节点阿瓦隆维王者之剑恒久、皇家行刑者、善谈者、看护人、浪子回头、统御\n\n暗屋之声死亡信使甜蜜忧愁、火爆秉性、切肤之痛、往复冲击、无念、心灵碎片\n\n前兆亡者传说烈火惊骇、空洞拒绝、黑夜中的擦撞、义无反顾、养鹰人、卡鲁斯迷你、突进（巴洛克）、奈扎雷克的耳语、挚爱、悔恨泪水\n\n炽天使之盾零号修订绊索金丝雀、改型冒险、克尔格拉斯的审判、低阻之道、悬殊、射后不理、IKELOS_SR、IKELOS_SG、IKELOS_HC、IKELOS_SMG\n\n安可单人合唱反常行动、褪色旅人、刻蚀、视野勘察、面纱威胁、迷失信号、时间食者、洞穴学者、守信者、噩兆\n\n苦命鸳鸯守愿者遗忘恐惧症、散射信号、超星系团、祈使、假设、极欲、祈愿、劝告、标量潜能、无望请愿者\n\n狼毒的催化剂由解密获取，其余五把大师及以上难度掉落催化剂。\n\n地牢\n\n地牢\n异域武器\n获取 / 催化剂\n\n深渊机灵领航员尾王 / 解密\n\n破碎王座碎愿者解密 / 尾王\n\n平衡传家宝尾王 / 任务同调\n\n分离教义终局螺旋钻尾王 / 溺水迷宫\n\n晚星之主破冰者尾王 / 异常网络\n\n战争领主的废墟深埋血脉尾王 / 群山阴影\n\n守望者尖塔需求层级尾王 / 大师\n\n二象性心影尾王 / 解密\n\n贪婪之握加拉尔号角解密 / 解密\n\n异端深渊异星噬菌解密 / 尾王\n\n二象性另会掉落宿命（尾王）与享乐主义（尾王、第一位首领），掉率较低。\n\n突袭\n\n突袭\n异域武器\n获取 / 催化剂\n红框掉落\n\n永恒沙漠回旋喝彩尾王 / 任务同调无\n\n救赎的边缘悦耳之声尾王 / 大师作废、迫近、终焉未至、临界异常、偏异将临、至善\n\n梦魇根源条件终局尾王 / 大师鲁弗斯的狂怒、科拉西斯的苦恼、蔷薇的蔑视、内萨的奉献、麦克尔的崇敬、阿卡西娅的沮丧\n\n国王的陨落恶意触碰尾王 / 解密梅拉恩的惩戒、切尔奇斯的末日、扎乌利的克星、弥达的清算、亚斯明的抗争、库里姆的终界\n\n克洛塔的末日坏疽解密 / 解密超灵之诏、伊尔约特的尖牙、克洛塔之语、深渊叛逆、断剑者、伊尔约特之歌\n\n门徒誓约集体义务尾王鲁布瑞之厄、驯顺、灾变、阴险、自制、解脱\n\n深岩墓室明日之眼尾王继承、遗赠、受托、后代、遗产、纪念\n\n玻璃拱顶Vex 揭秘者尾王 / 解密汇流愿景、惩戒措施、裁决定论、命运终结者、光芒复仇、普莱蒂斯的复仇\n\n救赎花园神圣裁决解密 / 世界掉落鲁莽神谕、累积救赎、上古福音、神圣起源、狂徒的奖励、末日先知、全知之眼\n\n最后一愿千语尾王野兽国度、唠叨龙骨、变形术、旧日羁绊、天堂暴政、霸权、灵巫力量、巅峰捕食者\n\n更新 2026.8.30\n\n特别鸣谢：蜃零#7456 整理全部来源与掉落。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/crafting/index.html",
+    "final_url": "https://starside.work/crafting/index.html",
+    "path": "pages/crafting/index.html",
+    "bytes": 13078,
+    "sha256": "69f30dc3496928e3e9793da8fc1d8912850d890af47b2dcaaaa7cfe36bfd011c",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:29.845314+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/crafting/style.css"
+  ]
+}

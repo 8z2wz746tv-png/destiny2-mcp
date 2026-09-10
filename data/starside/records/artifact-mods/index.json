@@ -1,0 +1,957 @@
+{
+  "url": "https://starside.work/artifact-mods/index.html",
+  "title": "神器模组 · Starside",
+  "description": "7 件神器、147 个模组的效果与数值，一级／二级／三级并排对照。",
+  "category": "subclass",
+  "updated_at": "2026.9.7",
+  "data_src": "artifact-mods",
+  "data_hash": "9ad84714aea6f2235c478400e4746ce8a42c91c3",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "✦ 神器模组 · 凯旋纪念碑 ✦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "使用限制"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "加密数据盘 （反叛）"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "乘胜追击"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "电介质"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "元素能量球：电弧"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "动能合成"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "护甲匠"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "动能裂口"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "远距填装"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "反制能量"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "狙击手冥想"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "还击"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "组合银白利刃"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "刀剑风暴连击"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "苦痛之力"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "奇点利刃"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "虚空感染"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "凶险距离"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "致盲震颤"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "泰瑟电触"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "快速治疗"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "精准平等"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "黏附冲击"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "好奇之器 （溯回）"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "发热寒颤"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "线织爆破"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "焕光碎片"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "元素仁慈"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "灼烧暗影"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "护盾粉碎"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "冰霜复兴"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "元素眩晕"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "元素超驰"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "群敌飞梭"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "并肩作战"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "纠缠罗网"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "醒神丝线"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "元素聚合"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "极寒凝视"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "集群战术"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "鲜弹芬芳"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "钢铁领主的活力"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "半自动强袭"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "能量加速"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "银白箭袋"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "废墟石板 （异端）"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "死守防线"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "邪恶编织"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "粒子重建"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "电介质"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "邪恶收割"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "元素超充器"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "不稳定神枪手"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "闪电过载"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "重型军械回复"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "瓦解能量球"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "群敌飞梭"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "除颤爆破"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "光子耀斑"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "静铃无响"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "虚空助焊"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "元素虹吸"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "严酷折射"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "极限突破"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "永恒毁灭"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "弹中藏金"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "崩解"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "杀手公爵药剂师背包 （怨魂）"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "风寒"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "冰霜复兴"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "寒脑凝滞"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "晶体转换器"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "迎接风暴"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "超新星"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "大肆屠杀"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "弱化波"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "传导宇宙水晶"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "苦痛之力"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "削弱清敌"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "冰冷伺候"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "轨迹证据"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "视网膜灼烧"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "动能冲击"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "置身其中"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "治疗能量球"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "电弧复合"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "杀戮之风"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "虚空复兴"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "古神仪式"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "猎人日志 （回响）"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "元素虹吸"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "反制能量"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "棱镜转移"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "能量扩散基质"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "利刃耐力"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "银白利刃"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "凉意袭人"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "虚空霸权"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "扩展深渊"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "乘胜追击"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "焕光能量球"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "护盾粉碎"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "线织爆破"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "妨害振幅"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "转移"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "燃烧步枪弹药"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "烈日爆发"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "狙击手冥想"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "持续火力"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "瞄准自动填装器"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "震慑行动"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "女王兰香炉 （终愿）"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "发热寒颤"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "瓦解能量球"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "群敌飞梭"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "火炬"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "冰柱"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "迎接风暴"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "烈焰之心"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "复苏爆破"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "精密射线"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "护甲匠"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "反勇士弹头"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "单人特工"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "愿望成真"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "龙之啮"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "银白重炮"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "火种扳机"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "凉意袭人"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "极寒凝视"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "爆炸范围"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "永恒毁灭"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "崩解"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "NPA 斥力调节器 （深渊）"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "改良版瓦解"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "缚丝士兵"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "传导宇宙织针"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "不稳定流动"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "压制偃月"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "震慑行动"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "朝向裂口"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "防护裂口"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "超新星"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "持久增幅"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "反制充能"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "小队目标"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "雷霆反击"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "远方砖块"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "两次闪电打击"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "持续火力"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "超载手雷"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "被动攻击刀剑格"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "碎裂能量球"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "瞄准自动填装器"
+    },
+    {
+      "level": "h4",
+      "id": "",
+      "text": "虚空武器输能"
+    }
+  ],
+  "tables": [],
+  "text": "神器模组 · Starside\n\nStarside\n/\n神器模组\n\n✦ 神器模组 · 凯旋纪念碑 ✦\n\n神器模组\n\n来自过去赛季的神器可装备，每件专注于特定元素、武器类型和独特机制。\n\n使用限制\n\n神器模组在多人竞技和奥斯里斯试炼被禁用。\n\n加密数据盘 （反叛）\n\n动能 | 虚空 | 电弧\n刀剑 | 狙击步枪 | 机枪\n\n乘胜追击\n\n击破战斗人员护盾：\n\n+20 稳定性，\n+20 操控性，\n+20 填装速度，持续 10 秒。\n刀剑获得 +20 防御抗性。\n\n电介质\n\n击杀电弧减益战斗人员：\n\n获得 x1 电光充能。\n\n在 6 秒内连续击杀 3 名电弧减益战斗人员：\n生成一个能量球，提供 7.15% 超能能量，并恢复 40 点生命值。\n\n元素能量球：电弧\n\n使用电弧武器击杀 6 [2?] 名战斗人员：\n生成一个电弧元素能量球。\n\n电弧元素能量球：\n落地后最多停留 20 秒，随后消失。\n拾取后最多可持有 20 秒。\n\n造成最多 405 [101] 点伤害，随距离最低衰减至 90%，并在 8 米范围内施加震颤。\n\n动能合成\n\n造成动能武器伤害或完成动能武器击杀会推进计数器，达到 100% 时生成一个独特的动能弹药盒。\n计数器持续 15 秒，每次造成动能武器伤害都会刷新。\n\n每点伤害提供 0.0265% 进度，即需要造成 3770 点伤害才能生成一个弹药盒。\nA499 提供的进度减少 75%，需要 15000 点伤害才能生成一个弹药盒。\n红血 = 8% | 橙血 = 15% | 初级首领 = 25%\n伤害需求忽略光等差距，但计入实际伤害系数——也就是说，无论光等差距把伤害压低多少，需要的“基础伤害”都一样。\n\n收集一个动能弹药盒时：\n获得 +5% 特殊弹药与 +5% 威能弹药进度。\n填装当前装备的动能武器，并为它们生成特殊／威能弹药。\n每次生成（弹匣容量的 1/3）+ 1 发弹药，个别武器例外。\n计入弹药拾取效果。动能弹药生成不受回收器影响。\n\n堡垒 = +1 弹药 | 库尔之影 = +2 弹药 | 英勇利刃 = +2 弹药 | 缩影 = +12 弹药。\n\n护甲匠\n\n击破一个战斗人员护盾时：\n\n10% [2.5%] 伤害抗性（抵抗 x1），持续 6 秒。\n近战伤害提高 100%，持续 6 秒。\n超能近战伤害同样提高。\n\n动能裂口\n\n对橙血 + 战斗人员造成足够次数的动能武器伤害时：\n生成一个动能裂口，持续 ? 秒。\n\n动能裂口可以被攻击，受到伤害 ? 秒后激活。\n\n动能裂口的爆炸伤害等于它受到的伤害的 [?]%，可眩晕势不可挡勇士，并会击退战斗人员。\n\n远距填装\n\n使用弓或狙击步枪造成精准命中时：\n\n获得一层远距填装，持续 ? 秒，最多 3 层。\n\n远距填装：每层提供 +? 填装速度。\n\n反制能量\n\n每当勇士被眩晕时：\n\n为充能最少的技能提供 25% 技能能量。\n不包括超能技能。\n\n狙击手冥想\n\n狙击步枪命中时：\n获得一层狙击手冥想，持续 7 秒。\n威能狙击步枪命中获得 2 层。\n狙击手冥想在收起武器后仍然保留。\n\n狙击手冥想按层数提高伤害、稳定性与填装速度：\n伤害：2.8% | 5.7% | 9% | 12% | 15%\n稳定性：+? | +? | +? | +? | +?\n填装速度：+15 | +30 | +35 | +40 | +45\n\n还击\n\n在使用刀剑进行格挡后：\n\n获得势不可挡射击，持续 3 秒。\n\n这在所有情况下都不起任何作用哈哈哈哈哈哈哈哈哈哈。\n\n组合银白利刃\n\n攻击后等待 0.5 秒再次攻击：\n获得银白利刃，持续 5 秒。\n该效果无法刷新。\n\n银白利刃：\n刀剑伤害提高 15%，充能效率 +100。\n\n刀剑风暴连击\n\n连续 3 次轻攻击后再打出一次重攻击：\n获得刀剑风暴连击，持续 5 秒。\n额外的刀剑击杀会刷新该效果。\n\n刀剑风暴连击：\n自动对使用者周围 6 米内的战斗人员每 0.53 秒造成 103 [?] 点刀剑动能伤害并施加迷惑，持续 3 秒。\n距离小于 4 米时，伤害最多提高 15%。\n\n只受银白利刃加成。\n\n苦痛之力\n\n在 4 秒内连续击杀 3 名被虚弱的战斗人员：\n\n获得吞食，持续 5 +2.5 秒。\n\n本应造成虚弱的命中，即使当场击杀战斗人员也计入。\n\n奇点利刃\n\n当拥有虚空元素增益（吞食、隐身或虚空覆盖护盾）时：\n近战与刀剑命中造成虚弱，持续 6 秒。\n在命中时检测，而非在使用时快照。\n\n当拥有虚空元素增益时，用近战或刀剑击杀：\n触发一次虚弱爆发，对 4 米内的战斗人员造成虚弱，持续 6 秒。\n\n虚空感染\n\n击杀一个被虚弱的战斗人员后：\n\n生成一个追踪弹头，寻找 15 米内的战斗人员。\n\n弹头造成 87 [?] 点虚空伤害，并在 ? 米范围内施加虚弱。\n\n凶险距离\n\n使用终结技：\n\n获得 25% 手雷与近战技能能量。\n\n致盲震颤\n\n击杀被震颤的战斗人员时：\n\n对 8 米内的战斗人员施加致盲，持续 10 秒。\n\n泰瑟电触\n\n造成电弧近战伤害时：\n\n施加震颤，并每 0.25 秒造成 23 点电弧持续伤害，8.75 秒内合计约 800 点电弧伤害。\n此数值不含震颤伤害；计入震颤后总伤害为 1245 点。\n\n快速治疗\n\n在 3 秒内取得 3 次机枪击杀时：\n\n恢复 15 点生命值，并开始生命回复。\n\n精准平等\n\n精准击杀提供精准平等层数，最高 10 层。\n红血 = 1 | 橙血 = 2 | 初级首领 = 5 | 勇士 + = 10\n层数不会溢出，也不会超过 x10。\n\n达到 x10 层数时：\n消耗全部层数，生成一个大型能量球，该能量球提供 12.5% 超能能量。\n\n拾取大型能量球时：\n获得武器激涌 x2，持续 11 秒。\n不会覆盖更强的武器激涌，对所有伤害类型均生效。\n\n黏附冲击\n\n电弧粘性电浆手雷、融合手雷与磁性手雷的直接命中伤害提高。\n电弧粘性电浆手雷 = 60% | 融合手雷 = 30% | 磁性手雷 = 总计提升 22.5%\n其中只有第一次磁性手雷获得 45% 的加成。\n不会提高融合手雷的烈日效果伤害。\n\n用上述手雷击杀战斗人员时：\n在战斗人员死亡位置上方生成 4 枚追踪动能微型导弹，追踪 30 米内最近的战斗人员。\n\n微型导弹命中时造成 216 [?] 点动能伤害。\n行为与辅助炸药的导弹完全相同。\n\n好奇之器 （溯回）\n\n动能 | 烈日 | 冰影 | 缚丝\n弓 | 刀剑 | 微型导弹\n\n发热寒颤\n\n在 3 秒内对同一目标造成多次精准命中时：\n烈日武器：获得焕光，持续 10 +5 秒。\n冰影武器：获得一层冰霜护甲。\n\n触发后有 1.5 秒冷却，冷却期间的额外命中不计。\n\n多次精准命中的次数要求：\n（弹匣容量的 25%）+ 1，向下取整；弓为 3 次。\n\n线织爆破\n\n使用缚丝摧毁缠结时：\n\n爆炸额外造成一次 288 [?] 点伤害，在 17 米半径内衰减至 75%。\n额外伤害计为缠结伤害，在所有交互中均如此。\n\n焕光碎片\n\n处于焕光状态时，造成相当于战斗人员生命值与护盾之和 10% 的武器伤害，或用武器击杀灼烧状态战斗人员：\n\n目标释放 1 枚烈日弹片，造成 54 [?] 点伤害与最多 289 [20] 点爆炸伤害，并在 ? 米范围内施加 x20+0 灼烧。\n\n弹片生成有 1 秒冷却时间。\n弹片有轻微追踪，但经常会错过生成时瞄准的那个战斗人员。\n\n元素仁慈\n\n向盟友施加元素增益时：\n\n获得约 15% [?] 职业技能能量。\n\n每个盟友触发后各有 ? 秒冷却时间。\n\n灼烧暗影\n\n对非首领战斗人员施加暗影减益时：\n\n造成的烈日伤害提高 75%。\n表现为烈日伤害跳出黄色数字。\n与其他虚弱来源按层数叠加。\n\n重复施加暗影减益以再次触发，需要 2? 秒冷却时间。\n\n护盾粉碎\n\n当冰霜护甲、虚空覆盖护盾或织造铠甲激活时：\n近战充能速率额外提高 ?% [?%]。\n充能近战伤害提高 50% [5%]。\n超能近战伤害同样提高。\n\n当增幅或焕光激活时：\n手雷充能速率额外提高 ?% [?%]。\n手雷伤害提高 25% [5%]。\n\n抓钩近战改为提高 12% 伤害，Perk 的两半各提供一半。\n\n冰霜复兴\n\n冰霜护甲激活期间，护盾被战斗人员的伤害击破时：\n\n在 10 米范围内释放冰影爆发。\n冰影爆发冻结战斗人员，并为使用者与范围内的盟友各提供一层冰霜护甲。\n\n元素眩晕\n\n用元素武器眩晕勇士时：\n\n触发一次元素匹配爆炸，造成最多 315 点元素伤害，并在 5 米范围内施加对应的元素减益（伤害向外递减至 0%）。\n\n电弧：震颤 | 烈日：点燃 | 虚空：不稳定\n冰影：冻结 | 缚丝：割裂\n\n对动能武器无效。\n\n元素超驰\n\n拾取元素拾取物时：\n\n与拾取物类型匹配的武器伤害提高 22% [?%]，持续 7 秒。\n显示为武器激涌，但与武器激涌是乘算。\n\n群敌飞梭\n\n对被瓦解的战斗人员造成相当于其生命值与护盾之和 10% [100? 生命值] 的武器伤害时：\n\n生成一个线虫。\n生成线虫有 0.5 秒冷却时间。\n\n线虫造成伤害时施加割裂。\n\n并肩作战\n\n在 2 名盟友 15 米范围内持续造成精准伤害时：\n\n获得 25% 伤害抗性（抵抗 x2），持续 10 ? 秒。\n\n纠缠罗网\n\n击杀受到缚丝减益的战斗人员时：\n\n触发一次悬停爆破。\n仅在生成缠结时触发。\n\n醒神丝线\n\n拾取一个与超能元素匹配的元素拾取物时：\n\n为充能最少的技能提供 25% 技能能量。\n缠结也会触发。\n\n两次触发之间有 0.3 秒冷却。\n不会对已有至少 1 层充能的技能触发。\n在棱镜分支职业上装备特技闪身时不生效。\n\n元素聚合\n\n击杀足够数量的战斗人员后：\n生成一个与超能元素匹配的元素拾取物。\n\n所需击杀数因元素拾取物而异：\n焰灵、虚空裂口：4–7 次击杀。\n离子轨迹、冰影碎片、缠结：9–11 次击杀。\n\n会触发焰灵、虚空裂口与缠结的全局冷却。\n冷却期间的击杀不计入下一个拾取物。\n\n伤害类型与超能元素匹配时没有额外加成。\n\n极寒凝视\n\n冰霜护甲激活期间，用冰影武器取得精准击杀：\n\n在战斗人员死亡位置触发一次冰冻爆发，影响 7 米内的战斗人员。\n\n集群战术\n\n造成线虫伤害时：\n获得一层集群战术，持续 10 秒，最多叠加至 2 层。\n再次造成线虫伤害会刷新持续时间。\n\n集群战术 x1 | 线虫伤害提高 15%。\n集群战术 x2 | 线虫伤害提高 30%。\n\n处于集群战术 x2 期间，每次线虫命中再把线虫伤害提高 1.03 倍，直到增益到期。\n\n线虫伤害会眩晕势不可挡勇士。\n\n鲜弹芬芳\n\n拾取弹药盒时：\n\n获得动能武器激涌，持续 11 秒。\n特殊弹药盒 = x2 动能武器激涌。\n威能弹药盒 = x3 动能武器激涌。\n\n不会覆盖更强的武器激涌。\n\n钢铁领主的活力\n\n在 3 秒内用刀剑取得 3 次击杀：\n\n获得 +3 弹药。\n英勇利刃与故我在改为获得 +1 弹药。\n\n与描述相反，它不提供任何伤害抗性。\n\n半自动强袭\n\n护甲充能低于 2 层，且在 3 秒内用弓、狙击步枪或斥候步枪造成多次精准命中时：\n\n获得一层护甲充能。\n\n多次精准命中的次数要求：\n斥候步枪 = 5 | 弓 = 3 | 狙击步枪 = 2\n\n能量加速\n\n在 3 秒内造成 2 次非同时的微型导弹伤害，或取得一次微型导弹击杀后：\n\n目标释放一道动能冲击波，对 7 米范围内的战斗人员造成 120 [20] 点动能伤害，并眩晕势不可挡勇士。\n冲击波无伤害衰减。\n触发后进入 ? 秒冷却时间。\n\n银白箭袋\n\n护甲充能激活时：\n\n填装弓可获得 3 层弑神箭头。\n收起武器会移除所有层数。\n\n持有弑神箭头时开火：\n消耗 1 层以提高伤害，并获得 +? 填装速度。\n\n主武器 = 对战斗人员伤害提高 35%。\n威能武器 = 对战斗人员伤害提高 25%。\n层数与所有效果叠加。\n\n废墟石板 （异端）\n\n电弧 | 虚空 | 缚丝 | 棱镜\n融合步枪 | 偃月 | 追踪步枪\n\n死守防线\n\n15 米范围内有 3 名战斗人员，且装备偃月或机枪时：\n\n偃月与机枪各获得 +? 稳定性与 +30 填装速度。\n偃月的射弹、近战或机枪击杀可恢复 55 点生命值。\n\n条件不再满足后，属性加成再持续 5 秒。\n击杀回血效果不会延续。\n\n邪恶编织\n\n缠结造成伤害时施加割裂，持续 10 +5 秒。\n\n拾取缠结时：\n缠结冷却时间减少 4 秒。\n\n可由摩伊拉的线织尖刺击中缠结触发，也可由卢扎卡的丰饶之巢产出的缠结触发。\n\n粒子重建\n\n（线性）融合步枪命中时施加一个独特的可叠加虚弱，提高自身对该目标的伤害。\n各层对应：5% | 10.25% | 15.8% | 21.6% | 27.6%。\n30% 虚弱会覆盖粒子重建虚弱；神圣裁决的泡泡会把它压到 15%。\n\n多次直接命中会补充 10% 的弹匣，向上取整。\n融合步枪的弹匣中每一发弹药通常都算一次命中；攻击融合步枪（含库尔之影）例外，每两次点射才触发一次。\n\n精密线性融合步枪：弹匣 + 2\n适配点射线性融合步枪：3 x（弹匣 + 4）\n\n以下武器的触发条件另计：\n堡垒 = 每 7 次点射\n悦耳之声 = 线虫算作命中，否则需要 30 次命中（8 次点射）\n精致坟墓 = 每 3 次完整点射\n冰霜巨人 = 8 次射击后\nVex 揭秘者 = 每 25 次命中\n\n电介质\n\n击杀电弧减益战斗人员：\n\n获得 x1 电光充能。\n\n在 6 秒内连续击杀 3 名电弧减益战斗人员：\n生成一个能量球，提供 7.15% 超能能量，并恢复 40 点生命值。\n\n邪恶收割\n\n在 5 秒内施加不稳定 4 次时：\n\n接下来 10 秒内的下一次虚空伤害会释放一个虚弱爆发，影响 7 米内的战斗人员。\n\n对尚未被虚弱的战斗人员施加虚弱时：\n虚空覆盖护盾生命值 +25，持续 10 +5 秒。\n每个虚弱来源只触发一次，例如烟雾弹不会重复触发。\n\n用法夫纳或牵引器火炮时不会获得虚空覆盖护盾。\n\n元素超充器\n\n用与超能元素匹配的武器击杀疲惫或割裂状态的战斗人员时：\n\n额外获得 2?% 超能技能能量。\n\n不稳定神枪手\n\n在 3 秒内用虚空武器造成多次精准命中，或在 3 秒内取得 3 次击杀：\n\n获得不稳定弹药，持续 10 [6] 秒。\n\n多次精准命中的次数要求：\n（弹匣容量的 25%）+ 1，向下取整；弓为 2 次。\n\n触发不稳定爆炸可获得 10% 职业技能能量。\n\n闪电过载\n\n达到 x10 电光充能时：\n获得增幅，持续 15 秒。\n\n闪电过载对战斗人员的伤害提高 50%：\n基础：405 伤害 + 270 溅射 = 675\n闪电过载：608 伤害 + 406 溅射 = 1014\n\n不会提高对守护者的伤害。\n\n重型军械回复\n\n在 7 秒内造成 8 次机枪伤害或 2 次火箭发射器伤害时：\n\n获得 25% [5%] 伤害抗性（抵抗 x2），持续 15.5 秒。\n手雷与近战技能的基础充能速率额外提高 85%，持续 10 秒。\n\n当威能军械激活时：\n击杀橙血 + 战斗人员会使 10 米内的红血迷失方向。\n\n瓦解能量球\n\n拾取能量球或缠结时：\n\n获得瓦解弹药，持续 14 [?] 秒。\n\n群敌飞梭\n\n对被瓦解的战斗人员造成相当于其生命值与护盾之和 10% [100? 生命值] 的武器伤害时：\n\n生成一个线虫。\n生成线虫有 0.5 秒冷却时间。\n\n线虫造成伤害时施加割裂。\n\n除颤爆破\n\n眩晕一名勇士时：\n获得 x10 电光充能。\n\n闪电过载的溅射伤害部分会施加震颤。\n\n触发闪电过载时：\n恢复约 55 点生命值，并开始生命回复。\n但不会重新开始护盾充能。\n\n光子耀斑\n\n用电弧击杀疲惫或割裂状态的战斗人员时：\n\n触发一次致盲爆发，致盲 5 米内的战斗人员。\n触发有 6 秒冷却时间。\n\n静铃无响\n\n在 3 秒内取得 2 次偃月近战击杀时：\n为特殊弹药偃月补充 +2 备用弹药。\n\n用偃月护盾格挡伤害时：\n偃月近战伤害提高 85% [?%]，持续 6 秒。\n友方射击该护盾也会触发。\n\n虚空助焊\n\n用虚空武器击杀被虚弱的战斗人员时：\n\n对 ? 米内的战斗人员施加不稳定。\n对橙血 + [?] 战斗人员与守护者 [?]，范围扩大至 ? 米。\n\n元素虹吸\n\n用动能武器或与超能元素匹配的武器在 3 秒内取得 3 次击杀时：\n\n生成一个与所装备超能元素匹配的元素拾取物。\n\n拾取元素拾取物时：\n获得 5% [1%] 对应元素的超能技能充能。\n两次额外充能之间有 2 秒冷却时间。\n\n严酷折射\n\n对受到元素匹配减益的战斗人员造成 3 次追踪步枪命中时：\n追踪步枪伤害提高，持续 4 秒。\n\n传说追踪步枪 = 50%\n异域特殊追踪步枪与北极星 = 35%\n\n缩影对受到任意元素减益的战斗人员造成 4 次命中后，伤害提高 20%。\n\n电弧 = ↓致盲 ↓震颤\n烈日 = ↓灼烧 ↓点燃\n虚空 = ↓压制 ↓不稳定 ↓虚弱\n冰影 = ↓减速 ↓冻结 ↓碎裂\n缚丝 = ↓割裂 ↓悬停 ↓瓦解\n\n极限突破\n\n释放超能时处于低生命值，或拥有元素匹配增益：\n\n超能技能伤害提高 15%。\n一次性超能只获得 8 秒加成，持续型超能的加成持续到结束。\n\n电弧 = ↑增幅 ↑电光充能\n烈日 = ↑治愈 ↑焕光 ↑恢复\n虚空 = ↑吞食 ↑隐身 ↑虚空覆盖护盾\n冰影 = ↑冰霜护甲\n缚丝 = ↑织造铠甲\n\n永恒毁灭\n\n2–3 秒内的每次非异域火箭发射器击杀都会推进计数器：\n红血 = 25% | 橙血 = 34% | 初级首领 = 100%\n\n计数器达到 100% 时：\n火箭发射器获得 +1 弹药，精密框架火箭发射器（或任何带双脚架的框架）获得 +2 弹药。\n同时获得 +? 填装速度与 0.?× 填装持续时间倍率，持续 10 秒。\n不受回收器模组影响。\n\n弹中藏金\n\n拾取 5–6 个特殊弹药盒时：\n生成 8% 威能弹药，向上取整。\n\n拾取计数器在死亡时重置；不受回收器模组影响；在熔炉竞技场中无效。\n\n崩解\n\n对割裂状态的战斗人员造成 6 次武器伤害时：\n施加瓦解。\n\n击杀割裂状态的战斗人员时：\n在战斗人员死亡位置释放 3 个治疗脉冲，每 2 秒一次，各恢复 15 点生命值，并为使用者与 10 米内的盟友提供织造铠甲，持续 10 秒。\n\n杀手公爵药剂师背包 （怨魂）\n\n电弧 | 虚空 | 冰影\n榴弹发射器 | 霰弹枪\n\n风寒\n\n在 3 秒内对同一目标造成多次非同时的冰影武器伤害时：\n获得一层冰霜护甲。\n\n两次触发之间有 0.45 秒冷却，冷却期间的额外命中不计；收起武器时计数器重置。\n\n触发冰霜护甲所需的命中次数：\n弓：3 | 单发榴弹发射器、刀剑：2 | 其余为（弹匣的 35%，向下取整）+ 2\n无需手持冰影武器，按当前武器的弹匣计算。\n\n在 3 秒内对减速的战斗人员造成多次冰影武器伤害时：\n在战斗人员上方生成一个冰影碎片。\n所需命中次数为弓：3 | 单发榴弹发射器、刀剑：2 | 其余为（弹匣的 25%，向下取整）+ 2。\n\n冰霜复兴\n\n冰霜护甲激活期间，护盾被战斗人员的伤害击破时：\n\n在 10 米范围内释放冰影爆发。\n冰影爆发冻结战斗人员，并为使用者与范围内的盟友各提供一层冰霜护甲。\n\n寒脑凝滞\n\n被冻结的战斗人员会对 4 米内尚未受冰影减益影响的战斗人员施加 x? 减速。\n\n晶体转换器\n\n拾取冰影碎片会推进晶体转换器计数器。\n\n造成冰影近战伤害或钻石长矛伤害时：\n消耗晶体转换器计数器，按已拾取的碎片数量生成水晶——\n拾取 8 | 12 | 15 个碎片，分别生成 1 | 2 | 3 个水晶。\n\n使用职业技能时：\n下一次冰影武器击杀会生成一个冰影碎片。\n\n迎接风暴\n\n击碎冰影水晶时：\n\n呈 * 形释放 5 枚追踪冰刺，每枚造成 46 点伤害，并施加 x? [x10] 减速，持续 ? 秒。\n冰刺均匀散开，其中一枚会飞向最近的战斗人员。\n\n在战斗人员身上击碎额外造成 12.5% [?%] 伤害；击碎水晶额外造成 25% [?%] 伤害。\n\n超新星\n\n拾取虚空裂口时：\n\n10 秒内的下一次虚空伤害会释放一个虚弱爆发，对 5 米内的战斗人员施加虚弱。\n\n大肆屠杀\n\n终结一个橙血 + 战斗人员时：\n\n恢复 100 点生命值，并开始生命回复。\n获得 25% 伤害抗性（抵抗 x2），持续 11 秒。\n\n弱化波\n\n终结一个战斗人员时：\n\n触发一道波形，造成 180 点超能元素匹配伤害，最远波及 15 米。\n波会朝终结技的方向推进，并追踪战斗人员。\n\n装备电弧、虚空或冰影超能时，波会额外施加与超能元素匹配的减益：\n\n电弧 = 致盲\n虚空 = 虚弱\n冰影 = 减速\n\n传导宇宙水晶\n\n对冰影减益战斗人员：\n\n电弧与虚空技能伤害提高 5%?\n\n苦痛之力\n\n在 4 秒内连续击杀 3 名被虚弱的战斗人员：\n\n获得吞食，持续 5 +2.5 秒，并生成一个虚空裂口。\n\n本应造成虚弱的命中，即使当场击杀战斗人员也计入。\n\n削弱清敌\n\n用榴弹发射器对首领或勇士造成伤害，或击破战斗人员的护盾时：\n\n施加虚弱，持续 20 秒，同时填装已收起的武器。\n\n该减益无法由榴弹发射器自己刷新，但可以由任何其他来源重新施加；施加虚弱与填装各有 10 秒冷却时间。\n\n冰冷伺候\n\n冰影碎片额外提供 10% 职业技能能量。\n\n虚空裂口额外提供 10?% 近战技能能量。\n\n轨迹证据\n\n在 1? 秒内对受到电弧减益的战斗人员造成 2 次精准命中，或在 ? 秒内击杀 3 名受到电弧减益的战斗人员：\n\n生成一个离子轨迹。\n离子轨迹生成有 4 秒冷却时间。\n\n拾取离子轨迹时：\n获得一层护甲充能。\n\n视网膜灼烧\n\n护甲充能激活期间，于 ? 秒内对尚未致盲的战斗人员造成 2 次电弧武器精准命中：\n\n消耗 1 层护甲充能，触发致盲爆发，对 ? 米半径内的战斗人员施加致盲，持续 ? 秒。\n\n动能冲击\n\n在 3 秒内用威能榴弹发射器造成 3 次非同时伤害，或用主武器／特殊榴弹发射器造成单次非致命伤害：\n\n在战斗人员脚下触发一次冲击波，造成 227×2 = 454 点动能伤害，并在 7 米范围内踉跄并眩晕势不可挡勇士。\n来自主武器与特殊榴弹发射器的冲击波只造成 150×2 伤害。\n冲击波无伤害衰减；两次结算之间有 1 秒冷却时间。\n\n造成榴弹发射器伤害时：\n获得一层快速冲击，持续 5 秒，最多叠加 5 层。\n填装速度：+5 | +10 | +15? | +20? | +30\n填装持续时间倍率：0.99× | 0.99× | 0.98× | 0.96× | 0.94×\n\n可以被除了激涌和武器属性之外的增益加成。\n\n置身其中\n\n15? 米范围内有 3? 名战斗人员，且在 ? 秒内击杀 3 名战斗人员时：\n获得一层护甲充能。\n\n15? 米范围内有 3? 名战斗人员时：\n获得 +? 操控性与 +? 充能效率。\n\n治疗能量球\n\n首次击破战斗人员护盾或超能状态下的守护者护盾时：\n\n生成一个能量球，提供 7.15% 超能能量。\n对尚未触发过该效果的战斗人员使用终结技也会生成一个能量球。\n\n拾取能量球、元素拾取物或摧毁缠结时：\n恢复 40 点生命值。\n\n电弧复合\n\n对致盲战斗人员造成的电弧伤害提高 15% [7.5%]。\n与所有效果叠加。\n\n杀戮之风\n\n在 3 秒内用武器击杀 3 名战斗人员：\n\n获得 +? 敏捷，持续 7 秒。\n再次触发会刷新。\n\n虚空复兴\n\n吞食激活时：\n\n虚空武器击杀会推进计数器，达到 100% 时生成一个虚空裂口：\n红血 = 16.7% | 橙血 = 34% | 初级首领 + = 50% | 守护者 = ?%\n\n拾取虚空裂口时：\n获得 +? 操控性与 +? 填装速度，持续 ? 秒，并装满霰弹枪与榴弹发射器的弹药。\n\n古神仪式\n\n拾取虚空裂口时：\n\n10 秒内的下一次虚空武器伤害会开启一个虚空门户。\n\n虚空门户：\n向约 10 米内的战斗人员释放 8 枚追踪虚空球，每枚在约 3 米范围内造成最多 334 [?] 点溅射伤害。\n红血每枚球受到 540 点伤害，初级首领 + 每枚受到 180 点伤害。\n\n猎人日志 （回响）\n\n烈日 | 电弧 | 虚空 | 棱镜\n自动步枪 | 狙击步枪 | 刀剑\n\n元素虹吸\n\n用动能武器或与超能元素匹配的武器在 3 秒内连续击杀 3 名战斗人员时：\n\n生成一个与所装备超能元素匹配的元素拾取物。\n\n与废墟石板上的同名模组不同，此处不提供超能能量。\n\n反制能量\n\n每当勇士被眩晕时：\n\n为充能最少的技能提供 25% 技能能量。\n\n棱镜转移\n\n释放超能时：\n\n15 米内超能元素与施法者不同的盟友获得 20% [10%] 伤害加成，持续 10 [5] 秒。\n\n伤害加成不可刷新，也不与焕光一类的强化增益叠加。\n\n能量扩散基质\n\n获得 5%? 对战斗人员的伤害抗性。\n\n利刃耐力\n\n用刀剑在 5 秒内连续击杀 3 名战斗人员时：\n\n获得 +3 弹药。\n英勇利刃与故我在改为获得 +2 弹药。\n\n银白利刃\n\n造成刀剑伤害时：\n消耗一层护甲充能，获得银白利刃，持续 5 秒。\n\n银白利刃：\n刀剑伤害提高 15%，充能效率 +100。\n\n与其他增益叠加；持续期间不会再消耗额外的护甲充能。\n\n凉意袭人\n\n对冰影减益战斗人员取得冰影击杀时：\n在 6 米范围内触发减速爆发。\n\n减速爆发：\n对战斗人员施加 x20 减速，持续 2? +? 秒。\n为使用者与盟友提供 x? 冰霜护甲。\n\n冰霜护甲部分实测无效。\n\n虚空霸权\n\n装备虚空或棱镜分支职业时：\n\n击杀被虚弱的战斗人员可获得 15 点生命值的覆盖护盾。\n\n扩展深渊\n\n对被虚弱的战斗人员造成的虚空伤害提高。\n虚弱强度随之变化，括号内为实际伤害增幅：\n\n7.5% → 10%（伤害提升 2.3%）\n15% → 25%（伤害提升 8.7%）\n30% → 35%（伤害提升 3.8%）\n35% → 40%（伤害提升 3.7%）\n\n神圣裁决的虚弱效果不受影响。\n\n乘胜追击\n\n击破战斗人员护盾：\n\n+20 稳定性，\n+20 操控性，\n+20 填装速度，持续 10 秒。\n刀剑获得 +20 防御抗性。\n\n焕光能量球\n\n装备烈日或棱镜分支职业时：\n\n能量球额外提供焕光。\n\n护盾粉碎\n\n当冰霜护甲、虚空覆盖护盾或织造铠甲激活时：\n近战充能速率额外提高 ?% [?%]。\n充能近战伤害提高 50% [5%]。\n超能近战伤害同样提高。\n\n当增幅或焕光激活时：\n手雷充能速率额外提高 ?% [?%]。\n手雷伤害提高 25% [5%]。\n\n抓钩近战改为提高 12% 伤害，Perk 的两半各提供一半。\n\n线织爆破\n\n使用缚丝摧毁缠结时：\n\n爆炸额外造成一次 288 [?] 点伤害，在 17 米半径内衰减至 75%。\n额外伤害计为缠结伤害，在所有交互中均如此。\n\n妨害振幅\n\n对勇士造成电弧技能伤害时：\n\n对该勇士施加震颤。\n\n转移\n\n超凡激活期间：\n手雷与近战伤害提高 10%。\n\n超凡结束后：\n每次武器击杀返还 4.2% 的光能与暗影能量，最多累计至 50%（需要 12 次击杀）。\n\n燃烧步枪弹药\n\n用烈日狙击步枪造成精准命中时：\n施加 x30+15 灼烧。\n\n不受武器框架与弹药类型影响。\n\n烈日爆发\n\n点燃会额外造成一次伤害。\n\n爆燃在 12 米半径内造成 171 [30] 点烈日伤害，并视为点燃效果，没有伤害衰减 [待确认]。\n\n装备烧焦余烬时：\n爆燃额外施加 x40+20 灼烧。\n\n不受任何加成。\n\n狙击手冥想\n\n狙击步枪直接命中时：\n获得一层狙击手冥想，持续 7 秒。\n威能狙击步枪命中提供 2 层。\n狙击手冥想在收起武器后仍然保留。\n\n狙击手冥想按层数提高伤害、稳定性与填装速度：\n伤害：2.8% | 5.7% | 9% | 12% | 15%\n稳定性：+? | +? | +? | +? | +?\n填装速度：+15 | +30 | +35 | +40 | +45\n\n持续火力\n\n在 1.5 秒内对同一名战斗人员造成 10 次自动步枪命中时：\n\n获得 25% 伤害抗性（抵抗 x2），持续 6 秒。\n该效果可刷新，收起武器后仍然保留。\n\n支援型自动步枪可通过治疗受伤的盟友触发。\n\n瞄准自动填装器\n\n用自动步枪击杀战斗人员会推进计数器：\n普通击杀提供 50% 进度；\n15 米内有 3 名战斗人员时，或已有 5 层时，击杀提供 100% 进度。\n计数器进度在收起武器后保留。\n\n计数器进度达到 100% 时：\n获得一层瞄准自动填装器，持续 15 秒，最多叠加至 5 层，可刷新。\n\n瞄准自动填装器按层数生效：\n填装弹匣：20% | 20% | 30% | 40% | 40%\n自动步枪伤害提高：10% | 13% | 16% | 18% | 20%\n与其他增益叠加；切换到非自动步枪武器时移除。\n\n震慑行动\n\n装备电弧或棱镜分支职业，且处于增幅状态时：\n\n电弧击杀会触发一次闪电爆发，在 8 米半径内造成最多 126 [?] 点电弧伤害，并施加震颤。\n\n两次触发之间有 5 秒冷却时间。\n\n女王兰香炉 （终愿）\n\n烈日 | 冰影 | 缚丝\n火箭发射器 | 榴弹发射器\n\n发热寒颤\n\n在 3 秒内对同一目标造成多次精准命中时：\n烈日武器：获得焕光，持续 10 +5 秒。\n冰影武器：获得一层冰霜护甲。\n\n触发后有 1.5 秒冷却，冷却期间的额外命中不计。\n\n多次精准命中的次数要求：\n（弹匣容量的 25%）+ 1，向下取整；弓为 3 次。\n\n瓦解能量球\n\n拾取能量球或投掷缠结时：\n\n获得瓦解弹药，持续 14 [?] 秒。\n\n群敌飞梭\n\n对被瓦解的战斗人员造成相当于其生命值与护盾之和 10% [100? 生命值] 的武器伤害时：\n\n生成一个线虫。\n生成线虫有 0.5 秒冷却时间。\n\n线虫造成伤害时施加割裂。\n\n火炬\n\n处于焕光状态时：\n\n对受缚丝或冰影减益影响的非首领战斗人员，武器伤害提高 5%。\n\n缚丝减益：瓦解、割裂、悬停\n冰影减益：减速或冻结。\n\n冰柱\n\n击杀一个被冻结的战斗人员时：\n\n生成 1 个冰影水晶，首领则生成 2 个。\n水晶生成在战斗人员死亡位置附近。\n\n迎接风暴\n\n击碎冰影水晶时：\n\n呈 * 形释放 5 枚追踪冰刺，每枚造成 46 点伤害，并施加 x? [x10] 减速，持续 ? 秒。\n冰刺均匀散开，其中一枚会飞向最近的战斗人员。\n\n在战斗人员身上击碎额外造成 12.5% [?%] 伤害；击碎水晶额外造成 25% [?%] 伤害。\n\n烈焰之心\n\n释放烈日超能时：\n施法者与 15 米内的盟友获得焕光。\n\n按盟友数量提供超能伤害加成，施法者本人也算一名盟友：\n6% | ?% | ?% | ?% | ?% | 15?%\n\n光焰之井的施法者只受益 5 秒。\n\n复苏爆破\n\n眩晕一名勇士时：\n该勇士被点燃。\n\n精密射线\n\n处于焕光状态时：\n\n烈日精准击杀战斗人员会触发点燃。\n\n护甲匠\n\n击破一个战斗人员护盾时：\n\n10% [2.5%] 伤害抗性（抵抗 x1），持续 6 秒。\n近战伤害提高 100%，持续 6 秒。\n超能近战伤害同样提高。\n\n反勇士弹头\n\n火箭发射器对勇士的伤害提高 33%。\n\n单人特工\n\n单人游玩时：\n\n精准击杀叠加一层伤害增益，层数无上限（∞），死亡时全部失去。\n\n每层提供 1.2% 对战斗人员的武器伤害加成，x25 层时即 30% 武器伤害加成。\n该加成与所有效果叠加。\n\n愿望成真\n\n超能能量高于 60% 但尚未充满时：\n\n技能击杀会生成 3 个能量球，每个提供 7.15% 超能能量。\n生成能量球有 30 秒冷却时间。\n\n只要超能能量高于 60%，就能与漫游超能配合使用。\n\n龙之啮\n\n每用缚丝或冰影武器击破第 3 个战斗人员护盾时：\n\n缚丝施加悬停，冰影施加冻结。\n\n银白重炮\n\n发射火箭发射器时：\n消耗 x1 护甲充能，获得弑神弹头，持续 4.5 秒。\n\n弑神弹头：\n伤害提高 15%，可叠加；\n+? 填装速度，0.?× 填装持续时间倍率。\n\n持续期间不会再消耗额外的护甲充能。\n\n火种扳机\n\n处于焕光状态时：\n\n烈日武器对尚无灼烧层数的战斗人员施加 x30+15 灼烧。\n\n由火种扳机首次触发的灼烧不受武器或技能伤害加成影响；在光焰之井内无效。\n\n凉意袭人\n\n对冰影减益战斗人员取得冰影击杀时：\n在 6 米范围内触发一次减速爆发。\n\n减速爆发：\n对战斗人员施加 x20 减速，持续 2? +? 秒。\n为使用者与盟友提供 x? 冰霜护甲。\n\n冰霜护甲部分实测无效。\n\n极寒凝视\n\n冰霜护甲激活期间，用冰影武器取得精准击杀：\n\n在战斗人员死亡位置触发一次冰冻爆发，影响 7 米内的战斗人员。\n\n爆炸范围\n\n在 ? 秒内用榴弹发射器或火箭发射器取得 2 次击杀时：\n\n获得一层护甲充能。\n\n永恒毁灭\n\n2–3? 秒内的每次非异域火箭发射器击杀都会推进计数器：\n红血 = 25% | 橙血 = 34% | 初级首领 = 100%\n\n计数器达到 100% 时：\n火箭发射器获得 +1 弹药，精密框架火箭发射器（或任何带双脚架的框架）获得 +2 弹药。\n同时获得 +? 填装速度与 0.?× 填装持续时间倍率，持续 10 秒。\n不受回收器模组影响。\n\n崩解\n\n对割裂状态的战斗人员造成 6 次武器伤害时：\n施加瓦解。\n\n击杀割裂状态的战斗人员时：\n在战斗人员死亡位置释放 3 个治疗脉冲，每 2 秒一次，各恢复 15 点生命值，并为使用者与 10 米内的盟友提供织造铠甲，持续 10 秒。\n\nNPA 斥力调节器 （深渊）\n\n电弧 | 虚空 | 缚丝\n偃月 | 自动步枪\n\n改良版瓦解\n\n瓦解织线额外造成 15% 伤害。\n\n缚丝士兵\n\n装备缚丝或棱镜分支职业，并获得织造铠甲时：\n\n获得瓦解弹药，持续 8 秒。\n\n传导宇宙织针\n\n对受缚丝减益影响的战斗人员：\n\n电弧与虚空技能伤害提高 5%。\n\n不稳定流动\n\n拾取能量球或虚空裂口时：\n\n获得不稳定弹药，持续 9 [?] 秒。\n\n压制偃月\n\n用偃月对战斗人员造成伤害时：\n施加压制，持续 10 秒。\n\n偃月近战会消耗 10% 偃月能量来施加压制；战斗人员已被压制时不消耗能量。\n\n震慑行动\n\n装备电弧或棱镜分支职业，且处于增幅状态时：\n\n电弧击杀会触发一次闪电爆发，在 8 米半径内造成最多 126 [?] 点电弧伤害，并施加震颤。\n\n两次触发之间有 5 秒冷却时间。\n\n朝向裂口\n\n装备虚空或棱镜分支职业时，击杀虚空减益战斗人员：\n\n生成一个虚空裂口。\n\n防护裂口\n\n拾取虚空裂口时：\n\n虚空覆盖护盾 +45，持续 10 +5 秒。\n\n超新星\n\n拾取虚空裂口时：\n\n10 秒内的下一次虚空伤害会释放一次虚弱爆发，对 5 米内的战斗人员施加虚弱，持续 8 秒。\n\n持久增幅\n\n装备电弧或棱镜分支职业时：\n\n增幅的持续时间延长至 20 秒。\n\n反制充能\n\n眩晕一名勇士时：\n\n获得一层护甲充能。\n\n小队目标\n\n在超能元素匹配增益的影响下使用终结技时：\n\n? 米范围内的盟友获得对应分支职业的增益：\n电弧：增幅 | 虚空：吞食 | 缚丝：织造铠甲\n\n雷霆反击\n\n处于重伤或增幅状态时：\n\n电弧超能伤害提高 30%。\n\n只影响超能动画期间造成的伤害，因此雷霆冲击与风起云涌实际吃到的加成偏低。\n\n远方砖块\n\n每取得 3? 次对橙血 + 战斗人员的虚空武器击杀：\n\n为使用者与 ? 米范围内的盟友提供 50?% 威能弹药进度。\n\n两次闪电打击\n\n使用电弧手雷技能时：\n\n5 秒内手雷基础充能速率额外提高 130%。\n\n电弧击杀会为该效果延长 +3? 秒，最多累计至 20 秒。\n\n持续火力\n\n在 1.5 秒内对同一名战斗人员造成 10 次自动步枪命中时：\n\n获得 25% 伤害抗性（抵抗 x2），持续 6 秒。\n该效果可刷新，收起武器后仍然保留。\n\n支援型自动步枪也可通过治疗盟友触发。\n\n超载手雷\n\n虚空手雷技能伤害会施加干扰。\n\n被动攻击刀剑格\n\n装备偃月时：\n\n对 ? 米范围内的战斗人员获得 50% 伤害抗性。\n\n碎裂能量球\n\n首次击破战斗人员护盾时：\n\n生成一个能量球，提供 7.15% 超能能量。\n对尚未触发过该效果的战斗人员使用终结技也会生成一个能量球。\n\n每个战斗人员只生效一次。\n\n瞄准自动填装器\n\n用自动步枪击杀战斗人员会推进计数器：\n普通击杀提供 50% 进度；\n15 米内有 3 名战斗人员时，或已有 5 层时，击杀提供 100% 进度。\n计数器进度在收起武器后保留。\n\n计数器进度达到 100% 时：\n获得一层瞄准自动填装器，持续 15 秒，最多叠加至 5 层，可刷新。\n\n瞄准自动填装器按层数生效：\n填装弹匣：20% | 20% | 30% | 40% | 40%\n自动步枪伤害提高：10% | 13% | 16% | 18% | 20%\n与其他增益叠加；切换到非自动步枪武器时移除。\n\n虚空武器输能\n\n持有至少 1 层虚空技能充能时，用虚空武器取得击杀：\n\n按虚空手雷、近战与超能技能的充能层数，获得等量的武器激涌，持续 11 秒。\n\n拥有 4 层虚空技能充能时最多获得 x4 武器激涌，例如 2 手雷 + 2 近战 = x4 激涌。\n\n只有当前层数不超过虚空技能充能数量时才能刷新；在棱镜上表现正常。\n\n更新 2026.9.7方括号内是 PvP 数值。数值以游戏内实测为准，标注 [?] 的条目尚待核实。\n\n数据源：Destiny Data Compendium。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/artifact-mods/index.html",
+    "final_url": "https://starside.work/artifact-mods/index.html",
+    "path": "pages/artifact-mods/index.html",
+    "bytes": 117313,
+    "sha256": "049b87701fd3a107dde9e36775e76262891cef85de1919cd18eb28d11fbeda4f",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:33.249319+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/artifact-mods/icons/02db89df92.webp",
+    "https://starside.work/artifact-mods/icons/060edf607a.webp",
+    "https://starside.work/artifact-mods/icons/0bbb2b31d4.webp",
+    "https://starside.work/artifact-mods/icons/0cfff803a5.webp",
+    "https://starside.work/artifact-mods/icons/0e06632f31.webp",
+    "https://starside.work/artifact-mods/icons/0f15a046fb.webp",
+    "https://starside.work/artifact-mods/icons/103a8b0af1.webp",
+    "https://starside.work/artifact-mods/icons/11589a79bf.webp",
+    "https://starside.work/artifact-mods/icons/1267f1e313.webp",
+    "https://starside.work/artifact-mods/icons/12acb62a3f.webp",
+    "https://starside.work/artifact-mods/icons/14b440b58c.webp",
+    "https://starside.work/artifact-mods/icons/17368dcba6.webp",
+    "https://starside.work/artifact-mods/icons/18aea7a3cf.webp",
+    "https://starside.work/artifact-mods/icons/1bac8b5727.webp",
+    "https://starside.work/artifact-mods/icons/1d83d5276f.webp",
+    "https://starside.work/artifact-mods/icons/1dc82d1649.webp",
+    "https://starside.work/artifact-mods/icons/1dfc444f71.webp",
+    "https://starside.work/artifact-mods/icons/1f9e95d817.webp",
+    "https://starside.work/artifact-mods/icons/2164dae0fd.webp",
+    "https://starside.work/artifact-mods/icons/2552ea2c2f.webp",
+    "https://starside.work/artifact-mods/icons/2670d7c9d5.webp",
+    "https://starside.work/artifact-mods/icons/276c29dcad.webp",
+    "https://starside.work/artifact-mods/icons/2c1864a750.webp",
+    "https://starside.work/artifact-mods/icons/2d161f0e61.webp",
+    "https://starside.work/artifact-mods/icons/349e9aac03.webp",
+    "https://starside.work/artifact-mods/icons/376b28ea97.webp",
+    "https://starside.work/artifact-mods/icons/390972baed.webp",
+    "https://starside.work/artifact-mods/icons/3b69fe406a.webp",
+    "https://starside.work/artifact-mods/icons/41ee68d087.webp",
+    "https://starside.work/artifact-mods/icons/4219fd530e.webp",
+    "https://starside.work/artifact-mods/icons/43626c6ee5.webp",
+    "https://starside.work/artifact-mods/icons/472bf82298.webp",
+    "https://starside.work/artifact-mods/icons/48c4d61945.webp",
+    "https://starside.work/artifact-mods/icons/4c44076eaa.webp",
+    "https://starside.work/artifact-mods/icons/4cfdaff66f.webp",
+    "https://starside.work/artifact-mods/icons/512918d956.webp",
+    "https://starside.work/artifact-mods/icons/56957d124c.webp",
+    "https://starside.work/artifact-mods/icons/58a1f91d9e.webp",
+    "https://starside.work/artifact-mods/icons/5af0138a3e.webp",
+    "https://starside.work/artifact-mods/icons/5d1ac408b5.webp",
+    "https://starside.work/artifact-mods/icons/5d60dbb918.webp",
+    "https://starside.work/artifact-mods/icons/5e9d2859b8.webp",
+    "https://starside.work/artifact-mods/icons/60eec59ceb.webp",
+    "https://starside.work/artifact-mods/icons/6883791796.webp",
+    "https://starside.work/artifact-mods/icons/6c15b8b247.webp",
+    "https://starside.work/artifact-mods/icons/6e7297b9f6.webp",
+    "https://starside.work/artifact-mods/icons/7057925a5a.webp",
+    "https://starside.work/artifact-mods/icons/762de2b230.webp",
+    "https://starside.work/artifact-mods/icons/770f4b05cd.webp",
+    "https://starside.work/artifact-mods/icons/77d21b0974.webp",
+    "https://starside.work/artifact-mods/icons/78a42211b1.webp",
+    "https://starside.work/artifact-mods/icons/7b8ab43d4b.webp",
+    "https://starside.work/artifact-mods/icons/7bd2354fb1.webp",
+    "https://starside.work/artifact-mods/icons/84f442e522.webp",
+    "https://starside.work/artifact-mods/icons/8507f59a0c.webp",
+    "https://starside.work/artifact-mods/icons/8531c7b770.webp",
+    "https://starside.work/artifact-mods/icons/8a538d37f8.webp",
+    "https://starside.work/artifact-mods/icons/8d3bb5366b.webp",
+    "https://starside.work/artifact-mods/icons/8decdfe7ff.webp",
+    "https://starside.work/artifact-mods/icons/8e2db21458.webp",
+    "https://starside.work/artifact-mods/icons/8e32caca53.webp",
+    "https://starside.work/artifact-mods/icons/8e857c15d5.webp",
+    "https://starside.work/artifact-mods/icons/8ed5f7d5d9.webp",
+    "https://starside.work/artifact-mods/icons/92042fc745.webp",
+    "https://starside.work/artifact-mods/icons/92defe1ef6.webp",
+    "https://starside.work/artifact-mods/icons/97ef185661.webp",
+    "https://starside.work/artifact-mods/icons/9a5d94004e.webp",
+    "https://starside.work/artifact-mods/icons/9a5ec863b6.webp",
+    "https://starside.work/artifact-mods/icons/9ab65ca51d.webp",
+    "https://starside.work/artifact-mods/icons/9bcf935d15.webp",
+    "https://starside.work/artifact-mods/icons/9ed0a859b2.webp",
+    "https://starside.work/artifact-mods/icons/a4396176d4.webp",
+    "https://starside.work/artifact-mods/icons/a49b5612d9.webp",
+    "https://starside.work/artifact-mods/icons/a529f5f78b.webp",
+    "https://starside.work/artifact-mods/icons/a6103f6cf6.webp",
+    "https://starside.work/artifact-mods/icons/a7c831cc0b.webp",
+    "https://starside.work/artifact-mods/icons/ad0f33b04f.webp",
+    "https://starside.work/artifact-mods/icons/ad8db41513.webp",
+    "https://starside.work/artifact-mods/icons/af9329df5b.webp",
+    "https://starside.work/artifact-mods/icons/b042006b70.webp",
+    "https://starside.work/artifact-mods/icons/b0e1dfe385.webp",
+    "https://starside.work/artifact-mods/icons/b359738cdb.webp",
+    "https://starside.work/artifact-mods/icons/b440aba242.webp",
+    "https://starside.work/artifact-mods/icons/b47e9a844c.webp",
+    "https://starside.work/artifact-mods/icons/b5a08796e9.webp",
+    "https://starside.work/artifact-mods/icons/b849c2857b.webp",
+    "https://starside.work/artifact-mods/icons/b89f90e00b.webp",
+    "https://starside.work/artifact-mods/icons/b8b3be6ff2.webp",
+    "https://starside.work/artifact-mods/icons/bf9ce7a203.webp",
+    "https://starside.work/artifact-mods/icons/c026769da3.webp",
+    "https://starside.work/artifact-mods/icons/c033c1eef0.webp",
+    "https://starside.work/artifact-mods/icons/c131f21a7c.webp",
+    "https://starside.work/artifact-mods/icons/c27ec76afd.webp",
+    "https://starside.work/artifact-mods/icons/c32660ffdc.webp",
+    "https://starside.work/artifact-mods/icons/c42f62c2b0.webp",
+    "https://starside.work/artifact-mods/icons/c5d70719db.webp",
+    "https://starside.work/artifact-mods/icons/c5f49ff8b5.webp",
+    "https://starside.work/artifact-mods/icons/c7f72197cb.webp",
+    "https://starside.work/artifact-mods/icons/cb4d96812e.webp",
+    "https://starside.work/artifact-mods/icons/cb97394434.webp",
+    "https://starside.work/artifact-mods/icons/cbe95c5f3b.webp",
+    "https://starside.work/artifact-mods/icons/cc005ff2bc.webp",
+    "https://starside.work/artifact-mods/icons/ced5e669dd.webp",
+    "https://starside.work/artifact-mods/icons/cfc1a2b42b.webp",
+    "https://starside.work/artifact-mods/icons/d239347755.webp",
+    "https://starside.work/artifact-mods/icons/d27dae6fa6.webp",
+    "https://starside.work/artifact-mods/icons/d41a698173.webp",
+    "https://starside.work/artifact-mods/icons/d43cb1c347.webp",
+    "https://starside.work/artifact-mods/icons/d5d2a0d065.webp",
+    "https://starside.work/artifact-mods/icons/da45148b75.webp",
+    "https://starside.work/artifact-mods/icons/db04b4ad17.webp",
+    "https://starside.work/artifact-mods/icons/dbdf0e8e46.webp",
+    "https://starside.work/artifact-mods/icons/dbf3fce2ea.webp",
+    "https://starside.work/artifact-mods/icons/e3bce85864.webp",
+    "https://starside.work/artifact-mods/icons/e3c2d59121.webp",
+    "https://starside.work/artifact-mods/icons/e5b0a6609c.webp",
+    "https://starside.work/artifact-mods/icons/e60a35ae2d.webp",
+    "https://starside.work/artifact-mods/icons/e721485d9e.webp",
+    "https://starside.work/artifact-mods/icons/e8b2737188.webp",
+    "https://starside.work/artifact-mods/icons/e95703936e.webp",
+    "https://starside.work/artifact-mods/icons/e9a8f1c3da.webp",
+    "https://starside.work/artifact-mods/icons/ea272b4fc9.webp",
+    "https://starside.work/artifact-mods/icons/ea5c3a3846.webp",
+    "https://starside.work/artifact-mods/icons/eb925e3624.webp",
+    "https://starside.work/artifact-mods/icons/ee64323994.webp",
+    "https://starside.work/artifact-mods/icons/ee856bc8ef.webp",
+    "https://starside.work/artifact-mods/icons/f29b206a2d.webp",
+    "https://starside.work/artifact-mods/icons/f332aa7dd2.webp",
+    "https://starside.work/artifact-mods/icons/f5bf4d5316.webp",
+    "https://starside.work/artifact-mods/icons/f9b2bf4e0e.webp",
+    "https://starside.work/artifact-mods/icons/fae170b3c8.webp",
+    "https://starside.work/artifact-mods/icons/fb7e47a66a.webp",
+    "https://starside.work/artifact-mods/icons/fe7753e6b0.webp",
+    "https://starside.work/artifact-mods/style.css",
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css"
+  ]
+}

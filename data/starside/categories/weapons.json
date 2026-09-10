@@ -1,0 +1,112 @@
+[
+  {
+    "title": "异域武器详解 · Starside",
+    "url": "https://starside.work/exotic-weapon/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/exotic-weapon/index.json",
+    "text": "texts/weapons/exotic-weapon/index.md",
+    "raw": "pages/exotic-weapon/index.html",
+    "source_blocks": 0,
+    "tables": 3
+  },
+  {
+    "title": "刷取清单-异域武器 · Starside",
+    "url": "https://starside.work/exotic-weapons/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/exotic-weapons/index.json",
+    "text": "texts/weapons/exotic-weapons/index.md",
+    "raw": "pages/exotic-weapons/index.html",
+    "source_blocks": 0,
+    "tables": 1
+  },
+  {
+    "title": "刷取清单-威能紫枪 · Starside",
+    "url": "https://starside.work/legendary-heavy/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/legendary-heavy/index.json",
+    "text": "texts/weapons/legendary-heavy/index.md",
+    "raw": "pages/legendary-heavy/index.html",
+    "source_blocks": 0,
+    "tables": 7
+  },
+  {
+    "title": "刷取清单-白弹紫枪 · Starside",
+    "url": "https://starside.work/legendary-primary/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/legendary-primary/index.json",
+    "text": "texts/weapons/legendary-primary/index.md",
+    "raw": "pages/legendary-primary/index.html",
+    "source_blocks": 0,
+    "tables": 8
+  },
+  {
+    "title": "刷取清单-绿弹紫枪 · Starside",
+    "url": "https://starside.work/legendary-special/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/legendary-special/index.json",
+    "text": "texts/weapons/legendary-special/index.md",
+    "raw": "pages/legendary-special/index.html",
+    "source_blocks": 0,
+    "tables": 9
+  },
+  {
+    "title": "购物清单-威能 · Starside",
+    "url": "https://starside.work/shopping-heavy/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/shopping-heavy/index.json",
+    "text": "texts/weapons/shopping-heavy/index.md",
+    "raw": "pages/shopping-heavy/index.html",
+    "source_blocks": 0,
+    "tables": 5
+  },
+  {
+    "title": "购物清单-其他 · Starside",
+    "url": "https://starside.work/shopping-other/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/shopping-other/index.json",
+    "text": "texts/weapons/shopping-other/index.md",
+    "raw": "pages/shopping-other/index.html",
+    "source_blocks": 0,
+    "tables": 1
+  },
+  {
+    "title": "购物清单-白弹 · Starside",
+    "url": "https://starside.work/shopping-primary/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/shopping-primary/index.json",
+    "text": "texts/weapons/shopping-primary/index.md",
+    "raw": "pages/shopping-primary/index.html",
+    "source_blocks": 0,
+    "tables": 7
+  },
+  {
+    "title": "购物清单-绿弹 · Starside",
+    "url": "https://starside.work/shopping-special/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/shopping-special/index.json",
+    "text": "texts/weapons/shopping-special/index.md",
+    "raw": "pages/shopping-special/index.html",
+    "source_blocks": 0,
+    "tables": 7
+  },
+  {
+    "title": "武器框架 · Starside",
+    "url": "https://starside.work/weapon-frames/index.html",
+    "updated_at": "2026.8.22",
+    "record": "records/weapon-frames/index.json",
+    "text": "texts/weapons/weapon-frames/index.md",
+    "raw": "pages/weapon-frames/index.html",
+    "source_blocks": 0,
+    "tables": 1
+  },
+  {
+    "title": "武器 PERK 详解 · Starside",
+    "url": "https://starside.work/weapon-perks/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/weapon-perks/index.json",
+    "text": "texts/weapons/weapon-perks/index.md",
+    "raw": "pages/weapon-perks/index.html",
+    "source_blocks": 0,
+    "tables": 7
+  }
+]

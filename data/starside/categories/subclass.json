@@ -1,0 +1,92 @@
+[
+  {
+    "title": "神器模组 · Starside",
+    "url": "https://starside.work/artifact-mods/index.html",
+    "updated_at": "2026.9.7",
+    "record": "records/artifact-mods/index.json",
+    "text": "texts/subclass/artifact-mods/index.md",
+    "raw": "pages/artifact-mods/index.html",
+    "source_blocks": 0,
+    "tables": 0
+  },
+  {
+    "title": "电弧 · Starside",
+    "url": "https://starside.work/elements/arc/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/elements/arc/index.json",
+    "text": "texts/subclass/elements/arc/index.md",
+    "raw": "pages/elements/arc/index.html",
+    "source_blocks": 0,
+    "tables": 6
+  },
+  {
+    "title": "职业技能 · Starside",
+    "url": "https://starside.work/elements/class-abilities/index.html",
+    "updated_at": "2026.8.19",
+    "record": "records/elements/class-abilities/index.json",
+    "text": "texts/subclass/elements/class-abilities/index.md",
+    "raw": "pages/elements/class-abilities/index.html",
+    "source_blocks": 0,
+    "tables": 3
+  },
+  {
+    "title": "职业分支详解 · Starside",
+    "url": "https://starside.work/elements/index.html",
+    "updated_at": "2026.8.23",
+    "record": "records/elements/index.json",
+    "text": "texts/subclass/elements/index.md",
+    "raw": "pages/elements/index.html",
+    "source_blocks": 0,
+    "tables": 2
+  },
+  {
+    "title": "棱镜 · Starside",
+    "url": "https://starside.work/elements/prismatic/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/elements/prismatic/index.json",
+    "text": "texts/subclass/elements/prismatic/index.md",
+    "raw": "pages/elements/prismatic/index.html",
+    "source_blocks": 0,
+    "tables": 11
+  },
+  {
+    "title": "烈日 · Starside",
+    "url": "https://starside.work/elements/solar/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/elements/solar/index.json",
+    "text": "texts/subclass/elements/solar/index.md",
+    "raw": "pages/elements/solar/index.html",
+    "source_blocks": 0,
+    "tables": 6
+  },
+  {
+    "title": "冰影 · Starside",
+    "url": "https://starside.work/elements/stasis/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/elements/stasis/index.json",
+    "text": "texts/subclass/elements/stasis/index.md",
+    "raw": "pages/elements/stasis/index.html",
+    "source_blocks": 0,
+    "tables": 6
+  },
+  {
+    "title": "缚丝 · Starside",
+    "url": "https://starside.work/elements/strand/index.html",
+    "updated_at": "2026.8.10",
+    "record": "records/elements/strand/index.json",
+    "text": "texts/subclass/elements/strand/index.md",
+    "raw": "pages/elements/strand/index.html",
+    "source_blocks": 0,
+    "tables": 6
+  },
+  {
+    "title": "虚空 · Starside",
+    "url": "https://starside.work/elements/void/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/elements/void/index.json",
+    "text": "texts/subclass/elements/void/index.md",
+    "raw": "pages/elements/void/index.html",
+    "source_blocks": 0,
+    "tables": 6
+  }
+]

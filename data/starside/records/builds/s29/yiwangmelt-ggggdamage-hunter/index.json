@@ -1,0 +1,176 @@
+{
+  "url": "https://starside.work/builds/s29/yiwangmelt-ggggdamage-hunter/index.html",
+  "title": "双金枪输出配装 · 配装推荐 · Starside",
+  "description": "突袭地牢副本，双金枪输出配装，火箭筒输出为主。",
+  "category": "builds",
+  "updated_at": "2026.9.2",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 双金枪输出配装\n\n推荐人：遗忘Melt\n描述：突袭地牢副本，双金枪输出配装，火箭筒输出为主。\n更新：2026.9.2\n场景：突袭、地牢\n定位：输出\n分支：棱镜\n类别：强度\n核心：星界夜鹰\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：暮域手雷\n近战：陷阱炸弹\n职业技能：射手闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：无誓 | 边打边劫\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：星界夜鹰\n套装：玻璃拱顶 4 件\n头盔：超能洗礼、超能洗礼、超能洗礼\n护臂：近战洗礼、近战洗礼、烈日灵巧\n胸甲：震荡阻尼器、震荡阻尼器、灼烧抗性\n腿部：烈日武器激涌、烈日武器激涌、烈日武器激涌\n职业物品：强力吸引、职业洗礼、职业洗礼\n\n## 神器\n\n神器：女王兰香炉\n模组：发热寒颤、火炬、烈焰之心、火种扳机、瓦解能量球、群敌飞梭、银白重炮\n\n## 六维\n\n六维：生命 20+ ｜ 近战 10+ ｜ 手雷 70+ ｜ 超能 150 ｜ 职业 30+ ｜ 武器 200\n\n## 注解\n\n1.  输出轴：缚丝武器挂“瓦解”➡️隐秘追猎金枪➡️火箭筒3发（提前触发丰盈满溢）➡️黄金枪大招➡️2发火箭筒➡️5发火箭筒（边打边劫/射手闪身捡子弹 触发“丰盈满溢”武器perk）\n\n2.   清怪配装带的“赌徒闪身”，需要提前切配装或手动切“闪身技能”，保证输出时有一次“射手闪身”可以使用（射手闪身可以吸取半径15米范围内的弹药盒）\n3.  如果地上有很方便拾取的“威能弹药盒”就不太需要闪身了，直接“边打边劫”即可。\n3.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL",
+  "source_blocks": [
+    "# 双金枪输出配装\n\n推荐人：遗忘Melt\n描述：突袭地牢副本，双金枪输出配装，火箭筒输出为主。\n更新：2026.9.2\n场景：突袭、地牢\n定位：输出\n分支：棱镜\n类别：强度\n核心：星界夜鹰\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：暮域手雷\n近战：陷阱炸弹\n职业技能：射手闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：无誓 | 边打边劫\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：星界夜鹰\n套装：玻璃拱顶 4 件\n头盔：超能洗礼、超能洗礼、超能洗礼\n护臂：近战洗礼、近战洗礼、烈日灵巧\n胸甲：震荡阻尼器、震荡阻尼器、灼烧抗性\n腿部：烈日武器激涌、烈日武器激涌、烈日武器激涌\n职业物品：强力吸引、职业洗礼、职业洗礼\n\n## 神器\n\n神器：女王兰香炉\n模组：发热寒颤、火炬、烈焰之心、火种扳机、瓦解能量球、群敌飞梭、银白重炮\n\n## 六维\n\n六维：生命 20+ ｜ 近战 10+ ｜ 手雷 70+ ｜ 超能 150 ｜ 职业 30+ ｜ 武器 200\n\n## 注解\n\n1.  输出轴：缚丝武器挂“瓦解”➡️隐秘追猎金枪➡️火箭筒3发（提前触发丰盈满溢）➡️黄金枪大招➡️2发火箭筒➡️5发火箭筒（边打边劫/射手闪身捡子弹 触发“丰盈满溢”武器perk）\n\n2.   清怪配装带的“赌徒闪身”，需要提前切配装或手动切“闪身技能”，保证输出时有一次“射手闪身”可以使用（射手闪身可以吸取半径15米范围内的弹药盒）\n3.  如果地上有很方便拾取的“威能弹药盒”就不太需要闪身了，直接“边打边劫”即可。\n3.  光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4.  讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "双金枪输出配装"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "女王兰香炉"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "双金枪输出配装 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n双金枪输出配装\n\n推荐者：\n遗忘Melt\n\n双金枪输出配装\n\n♥︎ 复制配装截图详情开关\n\n猎人 · 棱镜 · 强度S29 · 凯旋纪念碑\n\n突袭地牢副本，双金枪输出配装，火箭筒输出为主。\n\n适用环境\n\n突袭\n\n地牢\n\n标签\n\n输出\n\n# 双金枪输出配装\n\n推荐人：遗忘Melt\n描述：突袭地牢副本，双金枪输出配装，火箭筒输出为主。\n更新：2026.9.2\n场景：突袭、地牢\n定位：输出\n分支：棱镜\n类别：强度\n核心：星界夜鹰\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：飞升、线织幽灵\n碎片：保护琢面、使命琢面、勇气琢面、毁灭琢面、黎明琢面\n手雷：暮域手雷\n近战：陷阱炸弹\n职业技能：射手闪身\n\n## 武器\n\n异域武器：隐秘追猎\n传说武器：无誓 | 边打边劫\n传说武器：光芒复仇 | 丰盈满溢、聚合充能\n\n## 护甲\n\n异域护甲：星界夜鹰\n套装：玻璃拱顶 4 件\n头盔：超能洗礼、超能洗礼、超能洗礼\n护臂：近战洗礼、近战洗礼、烈日灵巧\n胸甲：震荡阻尼器、震荡阻尼器、灼烧抗性\n腿部：烈日武器激涌、烈日武器激涌、烈日武器激涌\n职业物品：强力吸引、职业洗礼、职业洗礼\n\n## 神器\n\n神器：女王兰香炉\n模组：发热寒颤、火炬、烈焰之心、火种扳机、瓦解能量球、群敌飞梭、银白重炮\n\n## 六维\n\n六维：生命 20+ ｜ 近战 10+ ｜ 手雷 70+ ｜ 超能 150 ｜ 职业 30+ ｜ 武器 200\n\n## 注解\n\n1. 输出轴：缚丝武器挂“瓦解”➡️隐秘追猎金枪➡️火箭筒3发（提前触发丰盈满溢）➡️黄金枪大招➡️2发火箭筒➡️5发火箭筒（边打边劫/射手闪身捡子弹 触发“丰盈满溢”武器perk）\n\n2. 清怪配装带的“赌徒闪身”，需要提前切配装或手动切“闪身技能”，保证输出时有一次“射手闪身”可以使用（射手闪身可以吸取半径15米范围内的弹药盒）\n3. 如果地上有很方便拾取的“威能弹药盒”就不太需要闪身了，直接“边打边劫”即可。\n3. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n职业\n\n职业\n\n猎人\n\n棱镜\n\n超能\n\n黄金枪：神枪手\n\n技能\n\n暮域手雷\n\n陷阱炸弹\n\n射手闪身\n\n星相\n\n飞升\n\n线织幽灵\n\n碎片\n\n保护琢面\n\n使命琢面\n\n勇气琢面\n\n毁灭琢面\n\n黎明琢面\n\n武器\n\n隐秘追猎\n\n无誓边打边劫\n\n光芒复仇丰盈满溢聚合充能\n\n神器模组\n\n女王兰香炉\n\n发热寒颤\n\n火炬\n\n烈焰之心\n\n火种扳机\n\n瓦解能量球\n\n群敌飞梭\n\n银白重炮\n\n护甲\n\n星界夜鹰\n\n玻璃拱顶埃希恩记忆4 件\n\n生命20+\n\n近战10+\n\n手雷70+\n\n超能150\n\n职业30+\n\n武器200\n\n头盔\n\n超能洗礼\n\n超能洗礼\n\n超能洗礼\n\n护臂\n\n近战洗礼\n\n近战洗礼\n\n烈日灵巧灵巧\n\n胸甲\n\n震荡阻尼器抗性\n\n震荡阻尼器抗性\n\n灼烧抗性抗性\n\n腿部\n\n烈日武器激涌武器激涌\n\n烈日武器激涌武器激涌\n\n烈日武器激涌武器激涌\n\n职业物品\n\n强力吸引\n\n职业洗礼\n\n职业洗礼\n\n注解\n\n1. 输出轴：缚丝武器挂“瓦解”➡️隐秘追猎金枪➡️火箭筒3发（提前触发丰盈满溢）➡️黄金枪大招➡️2发火箭筒➡️5发火箭筒（边打边劫/射手闪身捡子弹 触发“丰盈满溢”武器perk）\n\n2. 清怪配装带的“赌徒闪身”，需要提前切配装或手动切“闪身技能”，保证输出时有一次“射手闪身”可以使用（射手闪身可以吸取半径15米范围内的弹药盒）\n3. 如果地上有很方便拾取的“威能弹药盒”就不太需要闪身了，直接“边打边劫”即可。\n3. 光芒复仇 perk：人多推荐“聚合充能”；如果首领不好挂Debuff，或者队伍人少推荐“元素磨砺”。\n4. 讲解视频：https://www.bilibili.com/video/BV1Ygtg6WEeL\n\n更新 2026.9.2\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/yiwangmelt-ggggdamage-hunter/index.html",
+    "final_url": "https://starside.work/builds/s29/yiwangmelt-ggggdamage-hunter/index.html",
+    "path": "pages/builds/s29/yiwangmelt-ggggdamage-hunter/index.html",
+    "bytes": 31499,
+    "sha256": "e600dcf10a5fc649b24690c104698a976807fbcdfa1155f5bb10e2f993468c73",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:23.711920+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/prismatic/index.html",
+    "https://starside.work/elements/solar/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-heavy/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/1db6e3cbc8.webp",
+    "https://starside.work/armor-mods/icons/22ce769fe6.webp",
+    "https://starside.work/armor-mods/icons/288b195b88.webp",
+    "https://starside.work/armor-mods/icons/2ee424e9c4.webp",
+    "https://starside.work/armor-mods/icons/7a002a3848.webp",
+    "https://starside.work/armor-mods/icons/d482839737.webp",
+    "https://starside.work/armor-mods/icons/e10db37ad3.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-sets/icons/072.png",
+    "https://starside.work/artifact-mods/icons/1f9e95d817.webp",
+    "https://starside.work/artifact-mods/icons/5af0138a3e.webp",
+    "https://starside.work/artifact-mods/icons/8531c7b770.webp",
+    "https://starside.work/artifact-mods/icons/8e2db21458.webp",
+    "https://starside.work/artifact-mods/icons/cb97394434.webp",
+    "https://starside.work/artifact-mods/icons/db04b4ad17.webp",
+    "https://starside.work/artifact-mods/icons/ea272b4fc9.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/5757d150c7.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/cba8013059.webp",
+    "https://starside.work/elements/class-abilities/icons/dc62a7c73b.webp",
+    "https://starside.work/elements/prismatic/icons/2b0c20c15a.webp",
+    "https://starside.work/elements/prismatic/icons/3cb69eea59.webp",
+    "https://starside.work/elements/prismatic/icons/48bc7ae6d4.webp",
+    "https://starside.work/elements/prismatic/icons/4f517c0390.webp",
+    "https://starside.work/elements/prismatic/icons/67d91531a9.webp",
+    "https://starside.work/elements/prismatic/icons/727574c917.webp",
+    "https://starside.work/elements/prismatic/icons/77096a21b5.webp",
+    "https://starside.work/elements/prismatic/icons/e421ab5fa8.webp",
+    "https://starside.work/elements/solar/icons/0ee82bc44a.webp",
+    "https://starside.work/elements/stasis/icons/c0c58d0bc0.webp",
+    "https://starside.work/elements/void/icons/3ed96daa22.webp",
+    "https://starside.work/exotic-armor/icons/4617c0972a.webp",
+    "https://starside.work/exotic-weapon/icons/29152fe571.webp",
+    "https://starside.work/shopping-heavy/icons/9bb4715a83.webp",
+    "https://starside.work/shopping-special/icons/ce750fc24f.webp",
+    "https://starside.work/weapon-perks/icons/4a19f71392.webp",
+    "https://starside.work/weapon-perks/icons/bea24a8a17.webp",
+    "https://starside.work/weapon-perks/icons/e0749cfc0e.webp"
+  ]
+}

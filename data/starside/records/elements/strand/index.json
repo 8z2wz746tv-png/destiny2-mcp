@@ -1,0 +1,1776 @@
+{
+  "url": "https://starside.work/elements/strand/index.html",
+  "title": "缚丝 · Starside",
+  "description": "缚丝分支职业速查表——缠结、抓钩缠结、线虫、织造铠甲、割裂、悬停、瓦解、瓦解弹药八个效果，14 枚碎片，4 种手雷，以及猎人、泰坦、术士的近战、超能与星相，带图标与全部数值。",
+  "category": "subclass",
+  "updated_at": "2026.8.10",
+  "data_src": "docs/strand",
+  "data_hash": "4ce072e4bd24e92e751d995543a85ea5c3479e06",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "缚丝"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "效果"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "手雷技能"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "术士"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "效果",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "缠结",
+            "html": "缠结"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b879741c89.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "装备缚丝技能时，击杀受缚丝减益（割裂、悬停、瓦解）影响的战斗人员生成一枚缠结。\n \n 缚丝元素拾取物，是一个构造体，有 ? 点生命值，最多存在 20 秒；5 米内可以拾取，最多持有 20 秒。\n 生成后有 12 秒冷却，冷却结束前无法生成更多。\n 攻击它或把它投出去都会引爆，在 8 米半径内造成 346 [100] 伤害；两种方式都计为一次元素交互。\n 用抓钩钩住缠结会完全返还手雷能量并把使用者拉过去。",
+            "html": "装备<span class=\"el-strand\">缚丝</span>技能时，击杀受<span class=\"el-strand\">缚丝</span><span class=\"debuff\">减益</span>（<span class=\"deb-strand\">割裂</span>、<span class=\"deb-strand\">悬停</span>、<span class=\"deb-strand\">瓦解</span>）影响的<span class=\"enemy\">战斗人员</span>生成一枚<span class=\"el-strand\">缠结</span>。<br> <br> <span class=\"el-strand\">缚丝</span>元素拾取物，是一个构造体，有 <span class=\"unsure\">?</span> 点<span class=\"health\">生命值</span>，最多存在 20 秒；5 米内可以拾取，最多持有 20 秒。<br> 生成后有 12 秒冷却，冷却结束前无法生成更多。<br> 攻击它或把它投出去都会引爆，在 8 米半径内造成 346 <span class=\"pvp\">[100]</span> 伤害；两种方式都计为一次元素交互。<br> 用<span class=\"el-strand\">抓钩</span>钩住<span class=\"el-strand\">缠结</span>会完全返还<span class=\"pickup\">手雷能量</span>并把使用者拉过去。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "抓钩缠结",
+            "html": "抓钩缠结"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/22406e20bf.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "只与抓钩交互的缠结等价物，抓钩时表现与普通缠结一致。\n \n 最长持续 20 秒，每次抓钩刷新 5 秒；无法被摧毁，也无法拾取。\n 瞄准 27 米（装备抓钩手雷时 32 米）内的抓钩缠结，会在 0.3 秒内把手雷技能覆盖为非攻势抓钩。\n 缚丝与棱镜分支职业允许使用抓钩近战；棱镜术士需要装备神秘织针才能用。\n 连续 5 次抓取同一枚抓钩缠结后，刷新量降到 1 秒。",
+            "html": "只与<span class=\"el-strand\">抓钩</span>交互的<span class=\"el-strand\">缠结</span>等价物，<span class=\"el-strand\">抓钩</span>时表现与普通<span class=\"el-strand\">缠结</span>一致。<br> <br> 最长持续 20 秒，每次<span class=\"el-strand\">抓钩</span>刷新 5 秒；无法被摧毁，也无法拾取。<br> 瞄准 27 米（装备<span class=\"el-strand\">抓钩</span>手雷时 32 米）内的<span class=\"el-strand\">抓钩缠结</span>，会在 0.3 秒内把手雷技能覆盖为非攻势<span class=\"el-strand\">抓钩</span>。<br> <span class=\"el-strand\">缚丝</span>与<span class=\"el-prismatic\">棱镜</span>分支职业允许使用<span class=\"el-strand\">抓钩</span>近战；<span class=\"el-prismatic\">棱镜</span>术士需要装备<span class=\"el-strand\">神秘织针</span>才能用。<br> <span class=\"note\">连续 5 次抓取同一枚抓钩缠结后，刷新量降到 1 秒。</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "线虫",
+            "html": "线虫"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9753dd3b68.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "缚丝召唤物，追逐 20? 米内的战斗人员，在 ? 米内跃向目标。\n \n 接触或跃起后爆炸，在小范围内最多造成 366 [35] 伤害。\n 接触前丢失目标的线虫会落地另寻战斗人员，而不是自爆。\n 线虫的伤害计入其生成来源，但一旦停栖就失去这层继承关系。\n \n 术士互动：\n 未开始追踪战斗人员的线虫飞行 14 米后返回并停栖，最多 5 只。\n 造成武器伤害或近战命中时逐只释放，每次释放间隔 0.5 秒。\n 以这种方式释放的线虫可以在任意射程追踪。",
+            "html": "<span class=\"el-strand\">缚丝</span>召唤物，追逐 <span class=\"unsure\">20?</span> 米内的<span class=\"enemy\">战斗人员</span>，在 <span class=\"unsure\">?</span> 米内跃向目标。<br> <br> 接触或跃起后爆炸，在小范围内最多造成 366 <span class=\"pvp\">[35]</span> 伤害。<br> 接触前丢失目标的<span class=\"el-strand\">线虫</span>会落地另寻<span class=\"enemy\">战斗人员</span>，而不是自爆。<br> <span class=\"el-strand\">线虫</span>的伤害计入其生成来源，但一旦停栖就失去这层继承关系。<br> <br> 术士互动：<br> 未开始追踪<span class=\"enemy\">战斗人员</span>的<span class=\"el-strand\">线虫</span>飞行 14 米后返回并停栖，最多 5 只。<br> 造成武器伤害或近战命中时逐只释放，每次释放间隔 0.5 秒。<br> 以这种方式释放的<span class=\"el-strand\">线虫</span>可以在任意射程追踪。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "织造铠甲",
+            "html": "织造铠甲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/742d37444f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "提供 45% [25%] 伤害抗性，持续 10 秒。\n 来自守护者的精准命中与近战攻击无视这层抗性。\n \n 施放任意超能技能时织造铠甲被移除。",
+            "html": "提供 45% <span class=\"pvp\">[25%]</span> 伤害抗性，持续 10 秒。<br> <span class=\"note\">来自守护者的精准命中与近战攻击无视这层抗性。</span><br> <br> 施放任意超能技能时<span class=\"el-strand\">织造铠甲</span>被移除。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "割裂",
+            "html": "割裂"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f74fd71921.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战斗人员造成的伤害降低 40% [15%]，持续 10+5 [5+2.5] 秒。",
+            "html": "<span class=\"enemy\">战斗人员</span>造成的伤害降低 40% <span class=\"pvp\">[15%]</span>，持续 10+5 <span class=\"pvp\">[5+2.5]</span> 秒。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "悬停",
+            "html": "悬停"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b18acd6942.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被悬停的战斗人员无法移动、射击或使用技能。\n 红血与橙血最多被悬停 6+2 秒，初级首领只有 3+1 秒。\n 首领不受悬停效果阻挡，1 秒后挣脱，改为受到 300 缚丝伤害；尽管如此，这段时间内它仍视为带着悬停减益。\n 被悬停的守护者被抬到空中，可以缓慢水平悬浮并腰射武器，持续 2+1 秒，视角切到第三人称。\n 势不可挡勇士被悬停时进入眩晕。",
+            "html": "被<span class=\"deb-strand\">悬停</span>的<span class=\"enemy\">战斗人员</span>无法移动、射击或使用技能。<br> <span class=\"bar-red\">红血</span>与<span class=\"bar-orange\">橙血</span>最多被<span class=\"deb-strand\">悬停</span> 6+2 秒，<span class=\"bar-yellow\">初级首领</span>只有 3+1 秒。<br> <span class=\"bar-yellow\">首领</span>不受<span class=\"deb-strand\">悬停</span>效果阻挡，1 秒后挣脱，改为受到 300 <span class=\"el-strand\">缚丝伤害</span>；尽管如此，这段时间内它仍视为带着<span class=\"deb-strand\">悬停</span><span class=\"debuff\">减益</span>。<br> 被<span class=\"deb-strand\">悬停</span>的<span class=\"bar-orange\">守护者</span>被抬到空中，可以缓慢水平悬浮并腰射武器，持续 2+1 秒，视角切到第三人称。<br> <span class=\"enemy\">势不可挡勇士</span>被<span class=\"deb-strand\">悬停</span>时进入<span class=\"enemy\">眩晕</span>。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "瓦解",
+            "html": "瓦解"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7d532f89f7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被瓦解的战斗人员在受到 40 点伤害后 0.25 秒释放 3 条追踪线，飞向 ? 米内的战斗人员。\n 每条线造成 26 [4] 伤害并在命中时施加瓦解。\n 两次释放之间有 1.2 秒冷却。\n 线命中会把瓦解的持续时间刷新回它原本的长度——若来源施加的是 9 秒，命中就重置回 9 秒。",
+            "html": "被<span class=\"deb-strand\">瓦解</span>的<span class=\"enemy\">战斗人员</span>在受到 40 点伤害后 0.25 秒释放 3 条追踪线，飞向 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>。<br> 每条线造成 26 <span class=\"pvp\">[4]</span> 伤害并在命中时施加<span class=\"deb-strand\">瓦解</span>。<br> 两次释放之间有 1.2 秒冷却。<br> 线命中会把<span class=\"deb-strand\">瓦解</span>的持续时间刷新回它原本的长度——若来源施加的是 9 秒，命中就重置回 9 秒。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "瓦解弹药",
+            "html": "瓦解弹药"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a2e8c19bf6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "缚丝武器造成伤害时施加瓦解。",
+            "html": "<span class=\"el-strand\">缚丝</span>武器造成伤害时施加<span class=\"deb-strand\">瓦解</span>。"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "碎片",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "碎片",
+            "html": "碎片"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性变化",
+            "html": "属性变化"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "上升丝线",
+            "html": "上升丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/87a87f9d87.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "使用手雷技能补满已准备的武器，并提供 +40? 操控性、+40 填装速度、换弹时长 ×0.925 与 +30 空中效率，持续 15 秒。\n 激活后每次补弹之间有 4 秒冷却。",
+            "html": "使用手雷技能补满已准备的武器，并提供 <span class=\"unsure\">+40?</span> 操控性、+40 填装速度、换弹时长 ×0.925 与 +30 空中效率，持续 15 秒。<br> <span class=\"note\">激活后每次补弹之间有 4 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 武器",
+            "html": "+10 武器"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "束缚丝线",
+            "html": "束缚丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0c2a3d6507.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超能击杀使战斗人员触发一次悬停爆裂，在 6 米内造成 108 [?] 伤害并施加悬停。",
+            "html": "超能击杀使<span class=\"enemy\">战斗人员</span>触发一次<span class=\"deb-strand\">悬停</span>爆裂，在 6 米内造成 108 <span class=\"unsure\">[?]</span> 伤害并施加<span class=\"deb-strand\">悬停</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 生命值",
+            "html": "+10 <span class=\"health\">生命值</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "持续丝线",
+            "html": "持续丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8394dd8463.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "缚丝减益的持续时间通常延长 50%。\n 受影响的来源会在常规时长旁用小字标出增量。",
+            "html": "<span class=\"el-strand\">缚丝</span><span class=\"debuff\">减益</span>的持续时间通常延长 50%。<br> 受影响的来源会在常规时长旁用小字标出增量。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "进化丝线",
+            "html": "进化丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/051d772217.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "线虫移动速度提高 30?%，飞得更远，伤害也更高。\n 对战斗人员 +33%，对守护者 +12.5%。",
+            "html": "<span class=\"el-strand\">线虫</span>移动速度提高 <span class=\"unsure\">30?</span>%，飞得更远，伤害也更高。<br> 对<span class=\"enemy\">战斗人员</span> +33%，对<span class=\"bar-orange\">守护者</span> +12.5%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 超能",
+            "html": "+10 超能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "终局丝线",
+            "html": "终局丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/314c9085f4.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "终结技生成线虫，数量随战斗人员等级变化。\n 红血 1 只 ｜ 橙血 2 只 ｜ 初级首领 3 只。",
+            "html": "<span class=\"enemy\">终结技</span>生成<span class=\"el-strand\">线虫</span>，数量随<span class=\"enemy\">战斗人员</span>等级变化。<br> <span class=\"bar-red\">红血</span> 1 只 ｜ <span class=\"bar-orange\">橙血</span> 2 只 ｜ <span class=\"bar-yellow\">初级首领</span> 3 只。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 职业",
+            "html": "+10 职业"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "狂怒丝线",
+            "html": "狂怒丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cbdec13d01.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "用缠结造成伤害时，每次伤害实例提供一部分近战能量。\n T1 级战斗人员 10% ｜ T2 18% ｜ T3 20% ｜ T4 30% ｜ 守护者 25%。\n 两次触发之间约有 1 秒冷却。",
+            "html": "用<span class=\"el-strand\">缠结</span>造成伤害时，每次伤害实例提供一部分<span class=\"pickup\">近战能量</span>。<br> <span class=\"enemy\">T1 级战斗人员</span> 10% ｜ <span class=\"enemy\">T2</span> 18% ｜ <span class=\"enemy\">T3</span> 20% ｜ <span class=\"enemy\">T4</span> 30% ｜ <span class=\"bar-orange\">守护者</span> 25%。<br> <span class=\"note\">两次触发之间约有 1 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 近战",
+            "html": "-10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "生成丝线",
+            "html": "生成丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6339b0bf03.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "造成伤害时提供一部分手雷技能能量。\n 回能随来源与伤害量而变，通常造成的伤害越高，回的能量越多。",
+            "html": "造成伤害时提供一部分<span class=\"pickup\">手雷技能能量</span>。<br> <span class=\"note\">回能随来源与伤害量而变，通常造成的伤害越高，回的能量越多。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 手雷",
+            "html": "-10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "孤立丝线",
+            "html": "孤立丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/553302e384.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2 秒内连续取得多次精准命中后，发射一次割裂爆裂，对 ? 米内的战斗人员施加割裂。\n 精准命中按武器流派计数，满 100% 触发：独头霰弹枪 50% ｜ 弓箭与狙击步枪 34% ｜ 手炮与斥候步枪 25% ｜ 手枪 20% ｜ 自动步枪 15% ｜ 机枪与脉冲步枪 12% ｜ 追踪步枪与微型冲锋枪 10%。\n 割裂后有 4 秒冷却，冷却期间的精准命中不计入。",
+            "html": "2 秒内连续取得多次<span class=\"stack\">精准命中</span>后，发射一次<span class=\"deb-strand\">割裂</span>爆裂，对 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-strand\">割裂</span>。<br> <span class=\"stack\">精准命中</span>按武器流派计数，满 100% 触发：独头霰弹枪 50% ｜ 弓箭与狙击步枪 34% ｜ 手炮与斥候步枪 25% ｜ 手枪 20% ｜ 自动步枪 15% ｜ 机枪与脉冲步枪 12% ｜ 追踪步枪与微型冲锋枪 10%。<br> <span class=\"note\">割裂后有 4 秒冷却，冷却期间的精准命中不计入。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "思维丝线",
+            "html": "思维丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d31001ff60.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀被悬停的战斗人员按等级提供职业技能能量。\n T1 级战斗人员 10% ｜ T2 12% ｜ T3 15% ｜ T4 30% ｜ 守护者 15%。\n 每次击杀后约有 1 秒冷却。",
+            "html": "击杀被<span class=\"deb-strand\">悬停</span>的<span class=\"enemy\">战斗人员</span>按等级提供<span class=\"pickup\">职业技能能量</span>。<br> <span class=\"enemy\">T1 级战斗人员</span> 10% ｜ <span class=\"enemy\">T2</span> 12% ｜ <span class=\"enemy\">T3</span> 15% ｜ <span class=\"enemy\">T4</span> 30% ｜ <span class=\"bar-orange\">守护者</span> 15%。<br> <span class=\"note\">每次击杀后约有 1 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "增殖丝线",
+            "html": "增殖丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a2e8c19bf6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "充能近战技能击杀为缚丝武器提供瓦解子弹，持续 8 [5] 秒。",
+            "html": "充能近战技能击杀为<span class=\"el-strand\">缚丝</span>武器提供<span class=\"deb-strand\">瓦解</span>子弹，持续 8 <span class=\"pvp\">[5]</span> 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "重生丝线",
+            "html": "重生丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5b66311b2a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "缚丝武器击杀推进计数，满 100% 生成若干线虫。\n 红血 34%（1 只）｜ 橙血 67%（2 只）｜ 初级首领与首领 100%（3 只）｜ 守护者 67%（2 只）。",
+            "html": "<span class=\"el-strand\">缚丝</span>武器击杀推进计数，满 100% 生成若干<span class=\"el-strand\">线虫</span>。<br> <span class=\"bar-red\">红血</span> 34%（1 只）｜ <span class=\"bar-orange\">橙血</span> 67%（2 只）｜ <span class=\"bar-yellow\">初级首领</span>与<span class=\"bar-yellow\">首领</span> 100%（3 只）｜ <span class=\"bar-orange\">守护者</span> 67%（2 只）。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "蜕变丝线",
+            "html": "蜕变丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9efade5da9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "织造铠甲激活期间，武器击杀生成缠结。",
+            "html": "<span class=\"el-strand\">织造铠甲</span>激活期间，武器击杀生成<span class=\"el-strand\">缠结</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "守护丝线",
+            "html": "守护丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/901bc1cfcc.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "拾取能量球提供织造铠甲，持续 5 秒。",
+            "html": "拾取<span class=\"orb\">能量球</span>提供<span class=\"el-strand\">织造铠甲</span>，持续 5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 生命值",
+            "html": "-10 <span class=\"health\">生命值</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "智慧丝线",
+            "html": "智慧丝线"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2e591f02fc.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀被悬停的战斗人员生成一枚能量球，提供 2.5% 超能能量。\n 生成能量球后有 10 秒冷却。",
+            "html": "击杀被<span class=\"deb-strand\">悬停</span>的<span class=\"enemy\">战斗人员</span>生成一枚<span class=\"orb\">能量球</span>，提供 2.5% <span class=\"orb\">超能能量</span>。<br> <span class=\"note\">生成能量球后有 10 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "手雷技能",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "手雷",
+            "html": "手雷"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "基础冷却",
+            "html": "基础冷却"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "抓钩",
+            "html": "抓钩"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/24b726319d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "钩住 22 米外的目标，造成 38 [?] 伤害并在接触时使战斗人员踉跄，同时附着到战斗人员或物体上。\n 激活 1 秒内取消返还 50% 手雷能量。\n \n 钩住缠结或抓钩缠结时：\n 完全返还抓钩技能充能，并提供抓钩返还持续 4 秒——增益期间抓钩结束可以立即再用。\n 此时手雷快速启动不会激活。\n \n 抓钩近战 ｜ 抓钩期间，或结束后 ? 秒内速度仍够快时，按［近战攻击］发动。\n 造成 432 [61] 直击伤害与在 4? 米半径内最多 432 [61] 径向伤害，施加瓦解并把战斗人员推开。\n 它同时计为手雷与近战技能。\n 被抓钩近战直接命中的守护者近战突进失效 0.5 秒；抓钩近战配合抓钩缠结使用时，点尸成金提供的超能能量减少 50%。\n 空中期间抓钩的被动技能恢复被禁用，丝线打击同理。\n \n 心纺祷告：\n 抓钩近战命中时生成 3 只线虫。",
+            "html": "钩住 22 米外的目标，造成 38 <span class=\"unsure\">[?]</span> 伤害并在接触时使<span class=\"enemy\">战斗人员</span>踉跄，同时附着到<span class=\"enemy\">战斗人员</span>或物体上。<br> 激活 1 秒内取消返还 50% <span class=\"pickup\">手雷能量</span>。<br> <br> 钩住<span class=\"el-strand\">缠结</span>或<span class=\"el-strand\">抓钩缠结</span>时：<br> 完全返还<span class=\"pickup\">抓钩技能充能</span>，并提供<span class=\"el-strand\">抓钩</span>返还持续 4 秒——<span class=\"buff\">增益</span>期间<span class=\"el-strand\">抓钩</span>结束可以立即再用。<br> <span class=\"note\">此时手雷快速启动不会激活。</span><br> <br> <span class=\"el-strand\">抓钩</span>近战 ｜ <span class=\"el-strand\">抓钩</span>期间，或结束后 <span class=\"unsure\">?</span> 秒内速度仍够快时，按［近战攻击］发动。<br> 造成 432 <span class=\"pvp\">[61]</span> 直击伤害与在 <span class=\"unsure\">4?</span> 米半径内最多 432 <span class=\"pvp\">[61]</span> 径向伤害，施加<span class=\"deb-strand\">瓦解</span>并把<span class=\"enemy\">战斗人员</span>推开。<br> 它同时计为手雷与近战技能。<br> <span class=\"note\">被抓钩近战直接命中的守护者近战突进失效 0.5 秒；抓钩近战配合抓钩缠结使用时，点尸成金提供的超能能量减少 50%。</span><br> <span class=\"note\">空中期间抓钩的被动技能恢复被禁用，丝线打击同理。</span><br> <br> <span class=\"el-strand\">心纺祷告</span>：<br> <span class=\"el-strand\">抓钩</span>近战命中时生成 3 只<span class=\"el-strand\">线虫</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 118.7 秒\n 回复倍率 0.875×",
+            "html": "基础冷却 118.7 秒<br> 回复倍率 0.875×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "束缚手雷",
+            "html": "束缚手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/bf16066e67.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "捕缚球弹道\n \n 投出一枚捕缚球，受到伤害时释放爆炸，造成 190 [?] 伤害并在 ? 米半径内对被命中的战斗人员施加悬停。\n 随后释放更小的捕缚球——直接命中释放 2 个，接触表面则释放 3 个。\n 更小的捕缚球射向附近战斗人员，每个造成 81 [?] 伤害并在命中时施加悬停。\n \n 心纺祷告：\n 提供织者迷境持续 25 秒；期间击杀的战斗人员死亡时触发悬停爆炸，对 6 米内的战斗人员造成 108 [?] 缚丝手雷技能伤害。",
+            "html": "<span class=\"note\">捕缚球弹道</span><br> <br> 投出一枚捕缚球，受到伤害时释放爆炸，造成 190 <span class=\"unsure\">[?]</span> 伤害并在 <span class=\"unsure\">?</span> 米半径内对被命中的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-strand\">悬停</span>。<br> 随后释放更小的捕缚球——直接命中释放 2 个，接触表面则释放 3 个。<br> 更小的捕缚球射向附近<span class=\"enemy\">战斗人员</span>，每个造成 81 <span class=\"unsure\">[?]</span> 伤害并在命中时施加<span class=\"deb-strand\">悬停</span>。<br> <br> <span class=\"el-strand\">心纺祷告</span>：<br> 提供织者迷境持续 25 秒；期间击杀的<span class=\"enemy\">战斗人员</span>死亡时触发<span class=\"deb-strand\">悬停</span>爆炸，对 6 米内的<span class=\"enemy\">战斗人员</span>造成 108 <span class=\"unsure\">[?]</span> <span class=\"el-strand\">缚丝</span>手雷技能伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 219.5 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 219.5 秒<br> 回复倍率 0.5×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "切线手雷",
+            "html": "切线手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/36f7c00ff9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道\n \n 投出一枚弹跳手雷，接触后不久爆炸，在 6 米范围内造成 4 次溅射伤害并施加割裂，持续 10+5 秒。\n \n 四次爆炸最大伤害：\n 第 1 次 178 [?] ｜ 第 2 次 178 [?] ｜ 第 3 次 222 [?] ｜ 第 4 次 267 [?]。\n 对任意战斗人员的第一次命中额外造成一次 307 [?] 伤害。\n \n 心纺祷告：\n 第四次爆炸呈 X 形释放 4 枚子弹药，每枚最多造成 64 [?] 伤害并生成缠结，无视缠结的生成冷却。",
+            "html": "<span class=\"note\">中型弹道</span><br> <br> 投出一枚弹跳手雷，接触后不久爆炸，在 6 米范围内造成 4 次溅射伤害并施加<span class=\"deb-strand\">割裂</span>，持续 10+5 秒。<br> <br> 四次爆炸最大伤害：<br> 第 1 次 178 <span class=\"unsure\">[?]</span> ｜ 第 2 次 178 <span class=\"unsure\">[?]</span> ｜ 第 3 次 222 <span class=\"unsure\">[?]</span> ｜ 第 4 次 267 <span class=\"unsure\">[?]</span>。<br> 对任意<span class=\"enemy\">战斗人员</span>的第一次命中额外造成一次 307 <span class=\"unsure\">[?]</span> 伤害。<br> <br> <span class=\"el-strand\">心纺祷告</span>：<br> 第四次爆炸呈 X 形释放 4 枚子弹药，每枚最多造成 64 <span class=\"unsure\">[?]</span> 伤害并生成<span class=\"el-strand\">缠结</span>，无视<span class=\"el-strand\">缠结</span>的生成冷却。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 219.5 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 219.5 秒<br> 回复倍率 0.5×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "线虫手雷",
+            "html": "线虫手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/27e137debb.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道\n \n 在半空中分裂为 3 发弹体，每发接触时生成一只线虫。\n \n 心纺祷告：\n 按住［手雷］改为准备巢穴手雷，接触时生成拥挤巢穴。\n 巢穴有 300 构造体生命值，持续 17.5 秒；满血 1.5 秒后开始每秒消耗 6.7% 自身生命值。\n 部署时孕育 3 只线虫，此后每 5 秒再产一只。",
+            "html": "<span class=\"note\">中型弹道</span><br> <br> 在半空中分裂为 3 发弹体，每发接触时生成一只<span class=\"el-strand\">线虫</span>。<br> <br> <span class=\"el-strand\">心纺祷告</span>：<br> 按住［手雷］改为准备巢穴手雷，接触时生成拥挤巢穴。<br> 巢穴有 300 构造体<span class=\"health\">生命值</span>，持续 17.5 秒；满血 1.5 秒后开始每秒消耗 6.7% 自身<span class=\"health\">生命值</span>。<br> 部署时孕育 3 只<span class=\"el-strand\">线虫</span>，此后每 5 秒再产一只。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 175.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 175.6 秒<br> 回复倍率 0.625×"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "猎人",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "线织尖刺",
+            "html": "线织尖刺"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8dfedcd534.webp\" alt=\"\" width=\"56\" height=\"54\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "弹体命中或撞到表面时弹跳，最多飞向 ? 米内的 9 名战斗人员，造成 427 [82] 伤害并在命中时施加割裂，持续 ?+? 秒。\n 第一次弹跳伤害减 18%，之后每次减 42.5%。\n \n 返回时按命中次数提供近战能量；弹体靠近时按［近战攻击］可以接住它，接住能提高回能量。\n 命中 / 近战回能 / 接住回能：\n 0 次 5% / 20% ｜ 1 次 10% / 30% ｜ 2 次 20% / 50% ｜ 3 次 30% / 70% ｜ 4 次 35% / 85% ｜ 5 次以上 40% / 100%。\n \n 缚丝分支职业专属：\n 接住线织尖刺时，每次击杀提供 2 秒织造铠甲，最多 10 秒。",
+            "html": "弹体命中或撞到表面时弹跳，最多飞向 <span class=\"unsure\">?</span> 米内的 9 名<span class=\"enemy\">战斗人员</span>，造成 427 <span class=\"pvp\">[82]</span> 伤害并在命中时施加<span class=\"deb-strand\">割裂</span>，持续 <span class=\"unsure\">?+?</span> 秒。<br> 第一次弹跳伤害减 18%，之后每次减 42.5%。<br> <br> 返回时按命中次数提供<span class=\"pickup\">近战能量</span>；弹体靠近时按［近战攻击］可以接住它，接住能提高回能量。<br> 命中 / 近战回能 / 接住回能：<br> 0 次 5% / 20% ｜ 1 次 10% / 30% ｜ 2 次 20% / 50% ｜ 3 次 30% / 70% ｜ 4 次 35% / 85% ｜ 5 次以上 40% / 100%。<br> <br> <span class=\"el-strand\">缚丝</span>分支职业专属：<br> 接住<span class=\"el-strand\">线织尖刺</span>时，每次击杀提供 2 秒<span class=\"el-strand\">织造铠甲</span>，最多 10 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 145.2 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 145.2 秒<br> 回复倍率 0.8×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "丝线打击",
+            "html": "丝线打击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e43c48d22c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [45%]\n 基础持续：24.5 秒，或每秒消耗 4% 超能能量\n \n 轻攻击 ｜ 消耗 4% 超能能量。\n 命中造成 1638 [260] 伤害；击杀会让战斗人员爆炸，对 ? 米内的战斗人员最多造成 1293 [?] 伤害。\n \n 重击 ｜ 消耗 9% 超能能量。\n 以 360 度挥动绳镖，在 ? 米半径内造成 504 [80] 伤害，每次使用命中两次。\n \n 手雷 ｜ 不消耗超能能量。\n 功能上等同一枚扎根后立即充能的抓钩手雷。\n \n 职业技能 ｜ 消耗 4.5% 超能能量。\n 播放电弧法杖闪避动画，躲开攻击。\n 装备星相「诱捕猛击」时可以反复使用它，每次代价 4.5% 超能能量。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[45%]</span><br> 基础持续：24.5 秒，或每秒消耗 4% <span class=\"orb\">超能能量</span><br> <br> 轻攻击 ｜ 消耗 4% <span class=\"orb\">超能能量</span>。<br> 命中造成 1638 <span class=\"pvp\">[260]</span> 伤害；击杀会让<span class=\"enemy\">战斗人员</span>爆炸，对 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>最多造成 1293 <span class=\"unsure\">[?]</span> 伤害。<br> <br> 重击 ｜ 消耗 9% <span class=\"orb\">超能能量</span>。<br> 以 360 度挥动绳镖，在 <span class=\"unsure\">?</span> 米半径内造成 504 <span class=\"pvp\">[80]</span> 伤害，每次使用命中两次。<br> <br> 手雷 ｜ 不消耗<span class=\"orb\">超能能量</span>。<br> 功能上等同一枚扎根后立即充能的<span class=\"el-strand\">抓钩</span>手雷。<br> <br> 职业技能 ｜ 消耗 4.5% <span class=\"orb\">超能能量</span>。<br> 播放<span class=\"el-arc\">电弧</span>法杖闪避动画，躲开攻击。<br> 装备星相「<span class=\"el-strand\">诱捕猛击</span>」时可以反复使用它，每次代价 4.5% <span class=\"orb\">超能能量</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "诱捕猛击",
+            "html": "诱捕猛击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/fe3f17a0da.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "按［空中移动］：\n 消耗职业技能能量向下俯冲，对 8 [6.5] 米内的战斗人员造成 61 [11] 伤害并施加悬停。\n 触发已装备职业技能的效果，装备线织幽灵时也一并触发。\n 每悬停一名战斗人员提供 4 秒织造铠甲，最长 20 秒。",
+            "html": "按［空中移动］：<br> 消耗<span class=\"pickup\">职业技能能量</span>向下俯冲，对 8 <span class=\"pvp\">[6.5]</span> 米内的<span class=\"enemy\">战斗人员</span>造成 61 <span class=\"pvp\">[11]</span> 伤害并施加<span class=\"deb-strand\">悬停</span>。<br> 触发已装备职业技能的效果，装备<span class=\"el-strand\">线织幽灵</span>时也一并触发。<br> 每<span class=\"deb-strand\">悬停</span>一名<span class=\"enemy\">战斗人员</span>提供 4 秒<span class=\"el-strand\">织造铠甲</span>，最长 20 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "线织幽灵",
+            "html": "线织幽灵"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4f517c0390.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "使用职业技能生成一个缚丝诱饵。\n \n 诱饵有 175 生命值，最多持续 12 秒；战斗人员会被吸引去攻击它，它对战斗人员有 70% 伤害抗性。\n 盟友与施法者对它造成的技能与武器伤害提高 150%。\n 诱饵始终计为敌对目标，盟友、战斗人员与施法者都能伤害它，且不会触发任何击杀效果。\n \n 失去全部生命值或 ? 米内有战斗人员时爆炸，最多在 ? 米半径内造成 600 [60 守护者 ｜ 121 物体] 伤害；由战斗人员靠近触发的爆炸会生成 2 只线虫。\n 装备时被动施加 0.6 倍职业技能充能速度。",
+            "html": "使用职业技能生成一个<span class=\"el-strand\">缚丝</span>诱饵。<br> <br> 诱饵有 175 <span class=\"health\">生命值</span>，最多持续 12 秒；<span class=\"enemy\">战斗人员</span>会被吸引去攻击它，它对<span class=\"enemy\">战斗人员</span>有 70% 伤害抗性。<br> <span class=\"enemy\">盟友</span>与<span class=\"enemy\">施法者</span>对它造成的技能与武器伤害提高 150%。<br> <span class=\"note\">诱饵始终计为敌对目标，盟友、战斗人员与施法者都能伤害它，且不会触发任何击杀效果。</span><br> <br> 失去全部<span class=\"health\">生命值</span>或 <span class=\"unsure\">?</span> 米内有<span class=\"enemy\">战斗人员</span>时爆炸，最多在 <span class=\"unsure\">?</span> 米半径内造成 600 <span class=\"pvp\">[60 守护者 ｜ 121 物体]</span> 伤害；由<span class=\"enemy\">战斗人员</span>靠近触发的爆炸会生成 2 只<span class=\"el-strand\">线虫</span>。<br> <span class=\"note\">装备时被动施加 0.6 倍职业技能充能速度。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "回旋漩涡",
+            "html": "回旋漩涡"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4056702e98.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "摧毁一枚普通缠结时：\n 召唤一枚旋转缠结，它会搜寻 ? 米内的战斗人员，接近时加速到最高 6 米/秒，并计为抓钩缠结。\n 旋转缠结有 ? 点构造体生命值，持续 12 秒，每 0.1 秒在 2? 米半径内造成 29 [?] 缚丝伤害，击杀时释放瓦解弹。\n 旋转缠结的击杀计为缠结击杀，但它的命中既不计为缠结命中，也不计为技能伤害。",
+            "html": "摧毁一枚普通<span class=\"el-strand\">缠结</span>时：<br> 召唤一枚旋转<span class=\"el-strand\">缠结</span>，它会搜寻 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>，接近时加速到最高 6 米/秒，并计为<span class=\"el-strand\">抓钩缠结</span>。<br> 旋转<span class=\"el-strand\">缠结</span>有 <span class=\"unsure\">?</span> 点构造体<span class=\"health\">生命值</span>，持续 12 秒，每 0.1 秒在 <span class=\"unsure\">2?</span> 米半径内造成 29 <span class=\"unsure\">[?]</span> <span class=\"el-strand\">缚丝伤害</span>，击杀时释放<span class=\"deb-strand\">瓦解</span>弹。<br> <span class=\"note\">旋转缠结的击杀计为缠结击杀，但它的命中既不计为缠结命中，也不计为技能伤害。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "寡妇之丝",
+            "html": "寡妇之丝"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3181e5be9b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "额外提供一次手雷技能充能。\n \n 抓钩生成抓钩缠结；抓钩若附着到战斗人员或盟友身上则不生成。\n 抓钩近战命中同样生成抓钩缠结。\n 若这次抓钩本身就因瞄准缠结或抓钩缠结而免费，则不会再生成。",
+            "html": "额外提供一次<span class=\"pickup\">手雷技能充能</span>。<br> <br> <span class=\"el-strand\">抓钩</span>生成<span class=\"el-strand\">抓钩缠结</span>；<span class=\"el-strand\">抓钩</span>若附着到<span class=\"enemy\">战斗人员</span>或<span class=\"enemy\">盟友</span>身上则不生成。<br> <span class=\"el-strand\">抓钩</span>近战命中同样生成<span class=\"el-strand\">抓钩缠结</span>。<br> <span class=\"note\">若这次抓钩本身就因瞄准缠结或抓钩缠结而免费，则不会再生成。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "泰坦",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "狂暴利刃",
+            "html": "狂暴利刃"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a0ae53f14d.webp\" alt=\"\" width=\"56\" height=\"54\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "固有 3 次近战技能充能，充能速度随余量变化：\n 0 充能 1.15× ｜ 1 充能 1.55× ｜ 2 充能 1.95×。\n 棱镜下额外承受 0.7 倍充能速度惩罚。\n \n 向前冲刺 ? 米并挥砍战斗人员，造成 569 [105] 伤害并施加割裂。",
+            "html": "固有 3 次近战技能充能，充能速度随余量变化：<br> 0 充能 1.15× ｜ 1 充能 1.55× ｜ 2 充能 1.95×。<br> <span class=\"note\">棱镜下额外承受 0.7 倍充能速度惩罚。</span><br> <br> 向前冲刺 <span class=\"unsure\">?</span> 米并挥砍<span class=\"enemy\">战斗人员</span>，造成 569 <span class=\"pvp\">[105]</span> 伤害并施加<span class=\"deb-strand\">割裂</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 159.6 秒\n 回复倍率 0.7×",
+            "html": "基础冷却 159.6 秒<br> 回复倍率 0.7×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "剑刃之怒",
+            "html": "剑刃之怒"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f203c37654.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [50%]\n 基础持续：24 秒，或每秒消耗 4.167% 超能能量\n \n 超能结束时提供 3 次近战技能充能。\n \n 轻攻击 ｜ 消耗 3% 超能能量。\n 打出强化狂暴利刃近战，造成 851 [210] 伤害，可以无限连锁；对被悬停的战斗人员伤害提高 25%。\n 每秒攻击 3 次，连续命中 3 次后攻速提高 100%；使用重击或断连都会清掉加速。\n \n 重击 ｜ 消耗 10.5% 超能能量，使用后有 3 秒冷却。\n 掷出一对追踪的悬停弹体，造成 143 × 2 [61] 直击伤害与在 ? 米内最多 608 × 2 [36] 溅射伤害。\n 轻攻击命中或自身受伤，冷却各缩短 1 秒。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[50%]</span><br> 基础持续：24 秒，或每秒消耗 4.167% <span class=\"orb\">超能能量</span><br> <br> 超能结束时提供 3 次<span class=\"pickup\">近战技能充能</span>。<br> <br> 轻攻击 ｜ 消耗 3% <span class=\"orb\">超能能量</span>。<br> 打出强化<span class=\"el-strand\">狂暴利刃</span>近战，造成 851 <span class=\"pvp\">[210]</span> 伤害，可以无限连锁；对被<span class=\"deb-strand\">悬停</span>的<span class=\"enemy\">战斗人员</span>伤害提高 25%。<br> 每秒攻击 3 次，连续命中 3 次后攻速提高 100%；使用重击或断连都会清掉加速。<br> <br> 重击 ｜ 消耗 10.5% <span class=\"orb\">超能能量</span>，使用后有 3 秒冷却。<br> 掷出一对追踪的<span class=\"deb-strand\">悬停</span>弹体，造成 143 × 2 <span class=\"pvp\">[61]</span> 直击伤害与在 <span class=\"unsure\">?</span> 米内最多 608 × 2 <span class=\"pvp\">[36]</span> 溅射伤害。<br> 轻攻击命中或自身受伤，冷却各缩短 1 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "战争旗帜",
+            "html": "战争旗帜"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7397ec7e1d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "刀剑击杀、近战击杀、偃月近战击杀、超能轻攻击击杀或终结技时：\n 升起战争旗帜，为自己与 10 米内的盟友提供增益。\n \n 旗帜基础持续 15 秒，最长 24 秒；自己或附近盟友的击杀会强化并延长它，最多 4 层、30 秒。\n 每 7 [2] 名在 20 米内死亡的战斗人员提供 1 层；层数越高，延长量递减、恢复脉冲越快。\n \n 旗帜提供：\n 周期性恢复 20 生命值，间隔从 2.5 秒随层数降到 1 秒。\n 近战伤害提高 100% [随层数而变]、剑刃之怒伤害提高 40%、刀剑伤害提高 20%。\n \n 层数 / 时间延长 / 下一层所需击杀 / 脉冲间隔：\n 1 层 +6 秒 / 7 [2] 杀 / 2.5 秒 ｜ 2 层 +5 秒 / 7 [2] 杀 / 2 秒 ｜ 3 层 +4 秒 / 7 [2] 杀 / 1.5 秒 ｜ 4 层 +3 秒 / — / 1 秒。",
+            "html": "刀剑击杀、近战击杀、偃月近战击杀、超能轻攻击击杀或<span class=\"enemy\">终结技</span>时：<br> 升起<span class=\"el-strand\">战争旗帜</span>，为<span class=\"enemy\">自己</span>与 10 米内的<span class=\"enemy\">盟友</span>提供<span class=\"buff\">增益</span>。<br> <br> 旗帜基础持续 15 秒，最长 24 秒；<span class=\"enemy\">自己</span>或附近<span class=\"enemy\">盟友</span>的击杀会强化并延长它，最多 4 层、30 秒。<br> 每 7 <span class=\"pvp\">[2]</span> 名在 20 米内死亡的<span class=\"enemy\">战斗人员</span>提供 1 层；层数越高，延长量递减、恢复脉冲越快。<br> <br> 旗帜提供：<br> 周期性恢复 20 <span class=\"health\">生命值</span>，间隔从 2.5 秒随层数降到 1 秒。<br> 近战伤害提高 100% <span class=\"unsure\">[随层数而变]</span>、<span class=\"el-strand\">剑刃之怒</span>伤害提高 40%、刀剑伤害提高 20%。<br> <br> 层数 / 时间延长 / 下一层所需击杀 / 脉冲间隔：<br> 1 层 +6 秒 / 7 <span class=\"pvp\">[2]</span> 杀 / 2.5 秒 ｜ 2 层 +5 秒 / 7 <span class=\"pvp\">[2]</span> 杀 / 2 秒 ｜ 3 层 +4 秒 / 7 <span class=\"pvp\">[2]</span> 杀 / 1.5 秒 ｜ 4 层 +3 秒 / — / 1 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "勇士之鞭",
+            "html": "勇士之鞭"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7bc4b447f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀受元素减益影响的战斗人员提供 10% 职业技能能量。\n \n 使用职业技能：\n 释放一条缚丝鞭，向前飞行最远 30 米，追踪路径上的战斗人员，命中造成 61 [31] 伤害并施加悬停。",
+            "html": "击杀受元素<span class=\"debuff\">减益</span>影响的<span class=\"enemy\">战斗人员</span>提供 10% <span class=\"pickup\">职业技能能量</span>。<br> <br> 使用职业技能：<br> 释放一条<span class=\"el-strand\">缚丝</span>鞭，向前飞行最远 30 米，追踪路径上的<span class=\"enemy\">战斗人员</span>，命中造成 61 <span class=\"pvp\">[31]</span> 伤害并施加<span class=\"deb-strand\">悬停</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "镖弹风暴",
+            "html": "镖弹风暴"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8e323785fd.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "滑铲时按［近战技能］：\n 跃入空中，消耗 50% 近战能量，击退 ? 米内战斗人员并造成 135 [66] 伤害。\n 开火状态下无法在滑铲期间使用。\n \n 使用近战技能后处于空中时，再按［近战技能］：\n 消耗 50% 近战能量发射一组 4 发瓦解弹，每发对 ? 米内战斗人员造成 171 [25.2] 伤害；空中可以连锁多次投掷。\n \n 近战动画期间对非近战伤害提供 25% 伤害抗性。",
+            "html": "滑铲时按［近战技能］：<br> 跃入空中，消耗 50% <span class=\"pickup\">近战能量</span>，击退 <span class=\"unsure\">?</span> 米内<span class=\"enemy\">战斗人员</span>并造成 135 <span class=\"pvp\">[66]</span> 伤害。<br> <span class=\"note\">开火状态下无法在滑铲期间使用。</span><br> <br> 使用近战技能后处于空中时，再按［近战技能］：<br> 消耗 50% <span class=\"pickup\">近战能量</span>发射一组 4 发<span class=\"deb-strand\">瓦解</span>弹，每发对 <span class=\"unsure\">?</span> 米内<span class=\"enemy\">战斗人员</span>造成 171 <span class=\"pvp\">[25.2]</span> 伤害；空中可以连锁多次投掷。<br> <br> 近战动画期间对非近战伤害提供 25% 伤害抗性。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "投身激战",
+            "html": "投身激战"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/11d2f2390d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "摧毁缠结时：\n 从缠结位置释放 3 次脉冲，每 2 秒为 10? 米内的自己与盟友恢复 15 生命值并提供织造铠甲。\n \n 超能施放时为 ? 米内的盟友提供织造铠甲。\n \n 织造铠甲激活期间：\n 近战基础充能速度额外 +300% [200%]。",
+            "html": "摧毁<span class=\"el-strand\">缠结</span>时：<br> 从<span class=\"el-strand\">缠结</span>位置释放 3 次脉冲，每 2 秒为 <span class=\"unsure\">10?</span> 米内的<span class=\"enemy\">自己</span>与<span class=\"enemy\">盟友</span>恢复 15 <span class=\"health\">生命值</span>并提供<span class=\"el-strand\">织造铠甲</span>。<br> <br> 超能施放时为 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-strand\">织造铠甲</span>。<br> <br> <span class=\"el-strand\">织造铠甲</span>激活期间：<br> <span class=\"pickup\">近战</span>基础充能速度额外 +300% <span class=\"pvp\">[200%]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "术士",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "神秘织针",
+            "html": "神秘织针"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/aed8d97601.webp\" alt=\"\" width=\"56\" height=\"54\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "固有 3 次近战技能充能，充能速度随余量变化：\n 0 充能 1.16× ｜ 1 充能 1.64× ｜ 2 充能 2.6×。\n 棱镜下额外承受 0.7 倍充能速度惩罚。\n \n 投出一枚追踪的缚丝针，造成 505 [68] 伤害并施加瓦解，持续 ?+? [7+2.5] 秒。",
+            "html": "固有 3 次近战技能充能，充能速度随余量变化：<br> 0 充能 1.16× ｜ 1 充能 1.64× ｜ 2 充能 2.6×。<br> <span class=\"note\">棱镜下额外承受 0.7 倍充能速度惩罚。</span><br> <br> 投出一枚追踪的<span class=\"el-strand\">缚丝</span>针，造成 505 <span class=\"pvp\">[68]</span> 伤害并施加<span class=\"deb-strand\">瓦解</span>，持续 <span class=\"unsure\">?+?</span> <span class=\"pvp\">[7+2.5]</span> 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 146 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 146 秒<br> 回复倍率 0.8×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "织针风暴",
+            "html": "织针风暴"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c07f528756.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：? [53%]\n \n 释放 9 发追踪弹，每发造成 783 [?] 伤害并在命中时嵌入，? 秒后爆开成线虫。\n 由织针风暴生成的线虫造成 368 [?] 伤害。",
+            "html": "伤害抗性：<span class=\"unsure\">?</span> <span class=\"pvp\">[53%]</span><br> <br> 释放 9 发追踪弹，每发造成 783 <span class=\"unsure\">[?]</span> 伤害并在命中时嵌入，<span class=\"unsure\">?</span> 秒后爆开成<span class=\"el-strand\">线虫</span>。<br> 由<span class=\"el-strand\">织针风暴</span>生成的<span class=\"el-strand\">线虫</span>造成 368 <span class=\"unsure\">[?]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T3 级超能\n 基础冷却 500 秒",
+            "html": "T3 级超能<br> 基础冷却 500 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "心纺祷告",
+            "html": "心纺祷告"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5f1ca141ec.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "强化四种缚丝手雷：\n \n 抓钩 ｜ 抓钩近战命中时生成 3 只线虫。\n 线虫手雷 ｜ 按住［手雷］改投线虫巢。\n 束缚手雷 ｜ 按住［手雷］消耗手雷充能，提供织者迷境持续 25 秒；期间的击杀会生成悬停爆炸，对 6 米内的战斗人员造成 108 [?] 缚丝手雷技能伤害。\n 切线手雷 ｜ 按住［手雷］使其过载，第四次爆炸呈 X 形释放 4 枚子弹药，每枚最多造成 64 [?] 伤害并生成缠结，无视生成冷却。",
+            "html": "强化四种<span class=\"el-strand\">缚丝</span>手雷：<br> <br> <span class=\"el-strand\">抓钩</span> ｜ <span class=\"el-strand\">抓钩</span>近战命中时生成 3 只<span class=\"el-strand\">线虫</span>。<br> <span class=\"el-strand\">线虫手雷</span> ｜ 按住［手雷］改投线虫巢。<br> <span class=\"el-strand\">束缚手雷</span> ｜ 按住［手雷］消耗<span class=\"pickup\">手雷充能</span>，提供织者迷境持续 25 秒；期间的击杀会生成<span class=\"deb-strand\">悬停</span>爆炸，对 6 米内的<span class=\"enemy\">战斗人员</span>造成 108 <span class=\"unsure\">[?]</span> <span class=\"el-strand\">缚丝</span>手雷技能伤害。<br> <span class=\"el-strand\">切线手雷</span> ｜ 按住［手雷］使其过载，第四次爆炸呈 X 形释放 4 枚子弹药，每枚最多造成 64 <span class=\"unsure\">[?]</span> 伤害并生成<span class=\"el-strand\">缠结</span>，无视生成冷却。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "羁客",
+            "html": "羁客"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f2cc00067a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "缠结爆炸 1 秒后触发悬停爆炸，造成 324 [?] 伤害并对 6 米内的战斗人员施加悬停。\n \n 投掷出去的缠结会搜寻并附着战斗人员，且不受重力影响。\n 线虫击杀生成缠结，并把缠结冷却缩短 1 秒。",
+            "html": "<span class=\"el-strand\">缠结</span>爆炸 1 秒后触发<span class=\"deb-strand\">悬停</span>爆炸，造成 324 <span class=\"unsure\">[?]</span> 伤害并对 6 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-strand\">悬停</span>。<br> <br> 投掷出去的<span class=\"el-strand\">缠结</span>会搜寻并附着<span class=\"enemy\">战斗人员</span>，且不受重力影响。<br> <span class=\"el-strand\">线虫</span>击杀生成<span class=\"el-strand\">缠结</span>，并把<span class=\"el-strand\">缠结</span>冷却缩短 1 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "编织者之唤",
+            "html": "编织者之唤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9dbe20cbcd.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "线虫命中提供 10% 职业技能能量。\n \n 累计造成 700 [?] 伤害提供一只停栖的线虫；生成之间有 2 秒冷却，一次最多生成 1 只。\n 伤害需求按显示的伤害数字计算，并受力量等级差惩罚。\n \n 使用职业技能生成 3 只线虫，并部署全部停栖的线虫。\n \n 击杀推进一个计数，满 100% 提供一只停栖的线虫：\n 初级首领及以下 34% ｜ 首领 100% ｜ 守护者 67%。",
+            "html": "<span class=\"el-strand\">线虫</span>命中提供 10% <span class=\"pickup\">职业技能能量</span>。<br> <br> 累计造成 700 <span class=\"unsure\">[?]</span> 伤害提供一只停栖的<span class=\"el-strand\">线虫</span>；生成之间有 2 秒冷却，一次最多生成 1 只。<br> <span class=\"note\">伤害需求按显示的伤害数字计算，并受力量等级差惩罚。</span><br> <br> 使用职业技能生成 3 只<span class=\"el-strand\">线虫</span>，并部署全部停栖的<span class=\"el-strand\">线虫</span>。<br> <br> 击杀推进一个计数，满 100% 提供一只停栖的<span class=\"el-strand\">线虫</span>：<br> <span class=\"bar-yellow\">初级首领</span>及以下 34% ｜ <span class=\"bar-yellow\">首领</span> 100% ｜ <span class=\"bar-orange\">守护者</span> 67%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "编织微步",
+            "html": "编织微步"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5ad576bf78.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在空中且至少有 1 次近战技能充能时：\n 按［空中移动］进入编织微步，并立即消耗 20% 近战技能能量。\n \n 编织微步期间：\n 每 0.5 秒生成一只停栖的线虫。\n 提供 90% 伤害抗性（携带花火时 60%）。\n 每秒消耗 25% 近战技能能量。功能上等同虚空隐身。\n 电弧之魂、无时辩解的岁月流逝传送门与线虫在此期间伤害降低 50%；无法使用武器、技能或复活，也无法拾取弹药与能量球。\n \n 退出编织微步时为自己与 ? 米内的盟友提供织造铠甲，时长从 2 秒起随停留时间增长，停留 ? 秒后达到最长 20 秒。",
+            "html": "在空中且至少有 1 次<span class=\"pickup\">近战技能充能</span>时：<br> 按［空中移动］进入<span class=\"el-strand\">编织微步</span>，并立即消耗 20% <span class=\"pickup\">近战技能能量</span>。<br> <br> <span class=\"el-strand\">编织微步</span>期间：<br> 每 0.5 秒生成一只停栖的<span class=\"el-strand\">线虫</span>。<br> 提供 90% 伤害抗性（携带花火时 60%）。<br> 每秒消耗 25% <span class=\"pickup\">近战技能能量</span>。功能上等同<span class=\"el-void\">虚空隐身</span>。<br> <span class=\"note\">电弧之魂、无时辩解的岁月流逝传送门与线虫在此期间伤害降低 50%；无法使用武器、技能或复活，也无法拾取弹药与能量球。</span><br> <br> 退出<span class=\"el-strand\">编织微步</span>时为<span class=\"enemy\">自己</span>与 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-strand\">织造铠甲</span>，时长从 2 秒起随停留时间增长，停留 <span class=\"unsure\">?</span> 秒后达到最长 20 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "缚丝 · Starside\n\nStarside\n/\n职业分支详解\n/\n缚丝\n\n缚丝\n\n效果\n\n名称\n图标\n说明\n\n缠结装备缚丝技能时，击杀受缚丝减益（割裂、悬停、瓦解）影响的战斗人员生成一枚缠结。\n\n 缚丝元素拾取物，是一个构造体，有 ? 点生命值，最多存在 20 秒；5 米内可以拾取，最多持有 20 秒。\n 生成后有 12 秒冷却，冷却结束前无法生成更多。\n 攻击它或把它投出去都会引爆，在 8 米半径内造成 346 [100] 伤害；两种方式都计为一次元素交互。\n 用抓钩钩住缠结会完全返还手雷能量并把使用者拉过去。\n\n抓钩缠结只与抓钩交互的缠结等价物，抓钩时表现与普通缠结一致。\n\n 最长持续 20 秒，每次抓钩刷新 5 秒；无法被摧毁，也无法拾取。\n 瞄准 27 米（装备抓钩手雷时 32 米）内的抓钩缠结，会在 0.3 秒内把手雷技能覆盖为非攻势抓钩。\n 缚丝与棱镜分支职业允许使用抓钩近战；棱镜术士需要装备神秘织针才能用。\n 连续 5 次抓取同一枚抓钩缠结后，刷新量降到 1 秒。\n\n线虫缚丝召唤物，追逐 20? 米内的战斗人员，在 ? 米内跃向目标。\n\n 接触或跃起后爆炸，在小范围内最多造成 366 [35] 伤害。\n 接触前丢失目标的线虫会落地另寻战斗人员，而不是自爆。\n 线虫的伤害计入其生成来源，但一旦停栖就失去这层继承关系。\n\n 术士互动：\n 未开始追踪战斗人员的线虫飞行 14 米后返回并停栖，最多 5 只。\n 造成武器伤害或近战命中时逐只释放，每次释放间隔 0.5 秒。\n 以这种方式释放的线虫可以在任意射程追踪。\n\n织造铠甲提供 45% [25%] 伤害抗性，持续 10 秒。\n 来自守护者的精准命中与近战攻击无视这层抗性。\n\n 施放任意超能技能时织造铠甲被移除。\n\n割裂战斗人员造成的伤害降低 40% [15%]，持续 10+5 [5+2.5] 秒。\n\n悬停被悬停的战斗人员无法移动、射击或使用技能。\n 红血与橙血最多被悬停 6+2 秒，初级首领只有 3+1 秒。\n 首领不受悬停效果阻挡，1 秒后挣脱，改为受到 300 缚丝伤害；尽管如此，这段时间内它仍视为带着悬停减益。\n 被悬停的守护者被抬到空中，可以缓慢水平悬浮并腰射武器，持续 2+1 秒，视角切到第三人称。\n 势不可挡勇士被悬停时进入眩晕。\n\n瓦解被瓦解的战斗人员在受到 40 点伤害后 0.25 秒释放 3 条追踪线，飞向 ? 米内的战斗人员。\n 每条线造成 26 [4] 伤害并在命中时施加瓦解。\n 两次释放之间有 1.2 秒冷却。\n 线命中会把瓦解的持续时间刷新回它原本的长度——若来源施加的是 9 秒，命中就重置回 9 秒。\n\n瓦解弹药缚丝武器造成伤害时施加瓦解。\n\n碎片\n\n碎片\n图标\n说明\n属性变化\n\n上升丝线使用手雷技能补满已准备的武器，并提供 +40? 操控性、+40 填装速度、换弹时长 ×0.925 与 +30 空中效率，持续 15 秒。\n 激活后每次补弹之间有 4 秒冷却。+10 武器\n\n束缚丝线超能击杀使战斗人员触发一次悬停爆裂，在 6 米内造成 108 [?] 伤害并施加悬停。+10 生命值\n\n持续丝线缚丝减益的持续时间通常延长 50%。\n 受影响的来源会在常规时长旁用小字标出增量。—\n\n进化丝线线虫移动速度提高 30?%，飞得更远，伤害也更高。\n 对战斗人员 +33%，对守护者 +12.5%。+10 超能\n\n终局丝线终结技生成线虫，数量随战斗人员等级变化。\n 红血 1 只 ｜ 橙血 2 只 ｜ 初级首领 3 只。+10 职业\n\n狂怒丝线用缠结造成伤害时，每次伤害实例提供一部分近战能量。\n T1 级战斗人员 10% ｜ T2 18% ｜ T3 20% ｜ T4 30% ｜ 守护者 25%。\n 两次触发之间约有 1 秒冷却。-10 近战\n\n生成丝线造成伤害时提供一部分手雷技能能量。\n 回能随来源与伤害量而变，通常造成的伤害越高，回的能量越多。-10 手雷\n\n孤立丝线2 秒内连续取得多次精准命中后，发射一次割裂爆裂，对 ? 米内的战斗人员施加割裂。\n 精准命中按武器流派计数，满 100% 触发：独头霰弹枪 50% ｜ 弓箭与狙击步枪 34% ｜ 手炮与斥候步枪 25% ｜ 手枪 20% ｜ 自动步枪 15% ｜ 机枪与脉冲步枪 12% ｜ 追踪步枪与微型冲锋枪 10%。\n 割裂后有 4 秒冷却，冷却期间的精准命中不计入。—\n\n思维丝线击杀被悬停的战斗人员按等级提供职业技能能量。\n T1 级战斗人员 10% ｜ T2 12% ｜ T3 15% ｜ T4 30% ｜ 守护者 15%。\n 每次击杀后约有 1 秒冷却。—\n\n增殖丝线充能近战技能击杀为缚丝武器提供瓦解子弹，持续 8 [5] 秒。+10 近战\n\n重生丝线缚丝武器击杀推进计数，满 100% 生成若干线虫。\n 红血 34%（1 只）｜ 橙血 67%（2 只）｜ 初级首领与首领 100%（3 只）｜ 守护者 67%（2 只）。—\n\n蜕变丝线织造铠甲激活期间，武器击杀生成缠结。+10 近战\n\n守护丝线拾取能量球提供织造铠甲，持续 5 秒。-10 生命值\n\n智慧丝线击杀被悬停的战斗人员生成一枚能量球，提供 2.5% 超能能量。\n 生成能量球后有 10 秒冷却。—\n\n手雷技能\n\n手雷\n图标\n说明\n基础冷却\n\n抓钩钩住 22 米外的目标，造成 38 [?] 伤害并在接触时使战斗人员踉跄，同时附着到战斗人员或物体上。\n 激活 1 秒内取消返还 50% 手雷能量。\n\n 钩住缠结或抓钩缠结时：\n 完全返还抓钩技能充能，并提供抓钩返还持续 4 秒——增益期间抓钩结束可以立即再用。\n 此时手雷快速启动不会激活。\n\n 抓钩近战 ｜ 抓钩期间，或结束后 ? 秒内速度仍够快时，按［近战攻击］发动。\n 造成 432 [61] 直击伤害与在 4? 米半径内最多 432 [61] 径向伤害，施加瓦解并把战斗人员推开。\n 它同时计为手雷与近战技能。\n 被抓钩近战直接命中的守护者近战突进失效 0.5 秒；抓钩近战配合抓钩缠结使用时，点尸成金提供的超能能量减少 50%。\n 空中期间抓钩的被动技能恢复被禁用，丝线打击同理。\n\n 心纺祷告：\n 抓钩近战命中时生成 3 只线虫。基础冷却 118.7 秒\n 回复倍率 0.875×\n\n束缚手雷捕缚球弹道\n\n 投出一枚捕缚球，受到伤害时释放爆炸，造成 190 [?] 伤害并在 ? 米半径内对被命中的战斗人员施加悬停。\n 随后释放更小的捕缚球——直接命中释放 2 个，接触表面则释放 3 个。\n 更小的捕缚球射向附近战斗人员，每个造成 81 [?] 伤害并在命中时施加悬停。\n\n 心纺祷告：\n 提供织者迷境持续 25 秒；期间击杀的战斗人员死亡时触发悬停爆炸，对 6 米内的战斗人员造成 108 [?] 缚丝手雷技能伤害。基础冷却 219.5 秒\n 回复倍率 0.5×\n\n切线手雷中型弹道\n\n 投出一枚弹跳手雷，接触后不久爆炸，在 6 米范围内造成 4 次溅射伤害并施加割裂，持续 10+5 秒。\n\n 四次爆炸最大伤害：\n 第 1 次 178 [?] ｜ 第 2 次 178 [?] ｜ 第 3 次 222 [?] ｜ 第 4 次 267 [?]。\n 对任意战斗人员的第一次命中额外造成一次 307 [?] 伤害。\n\n 心纺祷告：\n 第四次爆炸呈 X 形释放 4 枚子弹药，每枚最多造成 64 [?] 伤害并生成缠结，无视缠结的生成冷却。基础冷却 219.5 秒\n 回复倍率 0.5×\n\n线虫手雷中型弹道\n\n 在半空中分裂为 3 发弹体，每发接触时生成一只线虫。\n\n 心纺祷告：\n 按住［手雷］改为准备巢穴手雷，接触时生成拥挤巢穴。\n 巢穴有 300 构造体生命值，持续 17.5 秒；满血 1.5 秒后开始每秒消耗 6.7% 自身生命值。\n 部署时孕育 3 只线虫，此后每 5 秒再产一只。基础冷却 175.6 秒\n 回复倍率 0.625×\n\n 猎人\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n线织尖刺弹体命中或撞到表面时弹跳，最多飞向 ? 米内的 9 名战斗人员，造成 427 [82] 伤害并在命中时施加割裂，持续 ?+? 秒。\n 第一次弹跳伤害减 18%，之后每次减 42.5%。\n\n 返回时按命中次数提供近战能量；弹体靠近时按［近战攻击］可以接住它，接住能提高回能量。\n 命中 / 近战回能 / 接住回能：\n 0 次 5% / 20% ｜ 1 次 10% / 30% ｜ 2 次 20% / 50% ｜ 3 次 30% / 70% ｜ 4 次 35% / 85% ｜ 5 次以上 40% / 100%。\n\n 缚丝分支职业专属：\n 接住线织尖刺时，每次击杀提供 2 秒织造铠甲，最多 10 秒。基础冷却 145.2 秒\n 回复倍率 0.8×\n\n超能技能\n\n丝线打击伤害抗性：90% [45%]\n 基础持续：24.5 秒，或每秒消耗 4% 超能能量\n\n 轻攻击 ｜ 消耗 4% 超能能量。\n 命中造成 1638 [260] 伤害；击杀会让战斗人员爆炸，对 ? 米内的战斗人员最多造成 1293 [?] 伤害。\n\n 重击 ｜ 消耗 9% 超能能量。\n 以 360 度挥动绳镖，在 ? 米半径内造成 504 [80] 伤害，每次使用命中两次。\n\n 手雷 ｜ 不消耗超能能量。\n 功能上等同一枚扎根后立即充能的抓钩手雷。\n\n 职业技能 ｜ 消耗 4.5% 超能能量。\n 播放电弧法杖闪避动画，躲开攻击。\n 装备星相「诱捕猛击」时可以反复使用它，每次代价 4.5% 超能能量。T2 级超能\n 基础冷却 556 秒\n\n星相\n\n诱捕猛击按［空中移动］：\n 消耗职业技能能量向下俯冲，对 8 [6.5] 米内的战斗人员造成 61 [11] 伤害并施加悬停。\n 触发已装备职业技能的效果，装备线织幽灵时也一并触发。\n 每悬停一名战斗人员提供 4 秒织造铠甲，最长 20 秒。\n\n线织幽灵使用职业技能生成一个缚丝诱饵。\n\n 诱饵有 175 生命值，最多持续 12 秒；战斗人员会被吸引去攻击它，它对战斗人员有 70% 伤害抗性。\n 盟友与施法者对它造成的技能与武器伤害提高 150%。\n 诱饵始终计为敌对目标，盟友、战斗人员与施法者都能伤害它，且不会触发任何击杀效果。\n\n 失去全部生命值或 ? 米内有战斗人员时爆炸，最多在 ? 米半径内造成 600 [60 守护者 ｜ 121 物体] 伤害；由战斗人员靠近触发的爆炸会生成 2 只线虫。\n 装备时被动施加 0.6 倍职业技能充能速度。\n\n回旋漩涡摧毁一枚普通缠结时：\n 召唤一枚旋转缠结，它会搜寻 ? 米内的战斗人员，接近时加速到最高 6 米/秒，并计为抓钩缠结。\n 旋转缠结有 ? 点构造体生命值，持续 12 秒，每 0.1 秒在 2? 米半径内造成 29 [?] 缚丝伤害，击杀时释放瓦解弹。\n 旋转缠结的击杀计为缠结击杀，但它的命中既不计为缠结命中，也不计为技能伤害。\n\n寡妇之丝额外提供一次手雷技能充能。\n\n 抓钩生成抓钩缠结；抓钩若附着到战斗人员或盟友身上则不生成。\n 抓钩近战命中同样生成抓钩缠结。\n 若这次抓钩本身就因瞄准缠结或抓钩缠结而免费，则不会再生成。\n\n 泰坦\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n狂暴利刃固有 3 次近战技能充能，充能速度随余量变化：\n 0 充能 1.15× ｜ 1 充能 1.55× ｜ 2 充能 1.95×。\n 棱镜下额外承受 0.7 倍充能速度惩罚。\n\n 向前冲刺 ? 米并挥砍战斗人员，造成 569 [105] 伤害并施加割裂。基础冷却 159.6 秒\n 回复倍率 0.7×\n\n超能技能\n\n剑刃之怒伤害抗性：90% [50%]\n 基础持续：24 秒，或每秒消耗 4.167% 超能能量\n\n 超能结束时提供 3 次近战技能充能。\n\n 轻攻击 ｜ 消耗 3% 超能能量。\n 打出强化狂暴利刃近战，造成 851 [210] 伤害，可以无限连锁；对被悬停的战斗人员伤害提高 25%。\n 每秒攻击 3 次，连续命中 3 次后攻速提高 100%；使用重击或断连都会清掉加速。\n\n 重击 ｜ 消耗 10.5% 超能能量，使用后有 3 秒冷却。\n 掷出一对追踪的悬停弹体，造成 143 × 2 [61] 直击伤害与在 ? 米内最多 608 × 2 [36] 溅射伤害。\n 轻攻击命中或自身受伤，冷却各缩短 1 秒。T2 级超能\n 基础冷却 556 秒\n\n星相\n\n战争旗帜刀剑击杀、近战击杀、偃月近战击杀、超能轻攻击击杀或终结技时：\n 升起战争旗帜，为自己与 10 米内的盟友提供增益。\n\n 旗帜基础持续 15 秒，最长 24 秒；自己或附近盟友的击杀会强化并延长它，最多 4 层、30 秒。\n 每 7 [2] 名在 20 米内死亡的战斗人员提供 1 层；层数越高，延长量递减、恢复脉冲越快。\n\n 旗帜提供：\n 周期性恢复 20 生命值，间隔从 2.5 秒随层数降到 1 秒。\n 近战伤害提高 100% [随层数而变]、剑刃之怒伤害提高 40%、刀剑伤害提高 20%。\n\n 层数 / 时间延长 / 下一层所需击杀 / 脉冲间隔：\n 1 层 +6 秒 / 7 [2] 杀 / 2.5 秒 ｜ 2 层 +5 秒 / 7 [2] 杀 / 2 秒 ｜ 3 层 +4 秒 / 7 [2] 杀 / 1.5 秒 ｜ 4 层 +3 秒 / — / 1 秒。\n\n勇士之鞭击杀受元素减益影响的战斗人员提供 10% 职业技能能量。\n\n 使用职业技能：\n 释放一条缚丝鞭，向前飞行最远 30 米，追踪路径上的战斗人员，命中造成 61 [31] 伤害并施加悬停。\n\n镖弹风暴滑铲时按［近战技能］：\n 跃入空中，消耗 50% 近战能量，击退 ? 米内战斗人员并造成 135 [66] 伤害。\n 开火状态下无法在滑铲期间使用。\n\n 使用近战技能后处于空中时，再按［近战技能］：\n 消耗 50% 近战能量发射一组 4 发瓦解弹，每发对 ? 米内战斗人员造成 171 [25.2] 伤害；空中可以连锁多次投掷。\n\n 近战动画期间对非近战伤害提供 25% 伤害抗性。\n\n投身激战摧毁缠结时：\n 从缠结位置释放 3 次脉冲，每 2 秒为 10? 米内的自己与盟友恢复 15 生命值并提供织造铠甲。\n\n 超能施放时为 ? 米内的盟友提供织造铠甲。\n\n 织造铠甲激活期间：\n 近战基础充能速度额外 +300% [200%]。\n\n 术士\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n神秘织针固有 3 次近战技能充能，充能速度随余量变化：\n 0 充能 1.16× ｜ 1 充能 1.64× ｜ 2 充能 2.6×。\n 棱镜下额外承受 0.7 倍充能速度惩罚。\n\n 投出一枚追踪的缚丝针，造成 505 [68] 伤害并施加瓦解，持续 ?+? [7+2.5] 秒。基础冷却 146 秒\n 回复倍率 0.8×\n\n超能技能\n\n织针风暴伤害抗性：? [53%]\n\n 释放 9 发追踪弹，每发造成 783 [?] 伤害并在命中时嵌入，? 秒后爆开成线虫。\n 由织针风暴生成的线虫造成 368 [?] 伤害。T3 级超能\n 基础冷却 500 秒\n\n星相\n\n心纺祷告强化四种缚丝手雷：\n\n 抓钩 ｜ 抓钩近战命中时生成 3 只线虫。\n 线虫手雷 ｜ 按住［手雷］改投线虫巢。\n 束缚手雷 ｜ 按住［手雷］消耗手雷充能，提供织者迷境持续 25 秒；期间的击杀会生成悬停爆炸，对 6 米内的战斗人员造成 108 [?] 缚丝手雷技能伤害。\n 切线手雷 ｜ 按住［手雷］使其过载，第四次爆炸呈 X 形释放 4 枚子弹药，每枚最多造成 64 [?] 伤害并生成缠结，无视生成冷却。\n\n羁客缠结爆炸 1 秒后触发悬停爆炸，造成 324 [?] 伤害并对 6 米内的战斗人员施加悬停。\n\n 投掷出去的缠结会搜寻并附着战斗人员，且不受重力影响。\n 线虫击杀生成缠结，并把缠结冷却缩短 1 秒。\n\n编织者之唤线虫命中提供 10% 职业技能能量。\n\n 累计造成 700 [?] 伤害提供一只停栖的线虫；生成之间有 2 秒冷却，一次最多生成 1 只。\n 伤害需求按显示的伤害数字计算，并受力量等级差惩罚。\n\n 使用职业技能生成 3 只线虫，并部署全部停栖的线虫。\n\n 击杀推进一个计数，满 100% 提供一只停栖的线虫：\n 初级首领及以下 34% ｜ 首领 100% ｜ 守护者 67%。\n\n编织微步在空中且至少有 1 次近战技能充能时：\n 按［空中移动］进入编织微步，并立即消耗 20% 近战技能能量。\n\n 编织微步期间：\n 每 0.5 秒生成一只停栖的线虫。\n 提供 90% 伤害抗性（携带花火时 60%）。\n 每秒消耗 25% 近战技能能量。功能上等同虚空隐身。\n 电弧之魂、无时辩解的岁月流逝传送门与线虫在此期间伤害降低 50%；无法使用武器、技能或复活，也无法拾取弹药与能量球。\n\n 退出编织微步时为自己与 ? 米内的盟友提供织造铠甲，时长从 2 秒起随停留时间增长，停留 ? 秒后达到最长 20 秒。\n\n更新 2026.8.10\n\n数据源：Destiny Data Compendium。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/elements/strand/index.html",
+    "final_url": "https://starside.work/elements/strand/index.html",
+    "path": "pages/elements/strand/index.html",
+    "bytes": 44238,
+    "sha256": "62ade3f37ba9fbe816e258d3b7f7b638e63a5f5fabf7458b46ef61fd3e78640b",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:30.939237+00:00"
+  },
+  "links": [
+    "https://starside.work/elements/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/elements/strand/icons/051d772217.webp",
+    "https://starside.work/elements/strand/icons/0c2a3d6507.webp",
+    "https://starside.work/elements/strand/icons/11d2f2390d.webp",
+    "https://starside.work/elements/strand/icons/22406e20bf.webp",
+    "https://starside.work/elements/strand/icons/24b726319d.webp",
+    "https://starside.work/elements/strand/icons/27e137debb.webp",
+    "https://starside.work/elements/strand/icons/2e591f02fc.webp",
+    "https://starside.work/elements/strand/icons/314c9085f4.webp",
+    "https://starside.work/elements/strand/icons/3181e5be9b.webp",
+    "https://starside.work/elements/strand/icons/36f7c00ff9.webp",
+    "https://starside.work/elements/strand/icons/4056702e98.webp",
+    "https://starside.work/elements/strand/icons/4f517c0390.webp",
+    "https://starside.work/elements/strand/icons/5512e0a7cf.webp",
+    "https://starside.work/elements/strand/icons/553302e384.webp",
+    "https://starside.work/elements/strand/icons/5ad576bf78.webp",
+    "https://starside.work/elements/strand/icons/5b66311b2a.webp",
+    "https://starside.work/elements/strand/icons/5f1ca141ec.webp",
+    "https://starside.work/elements/strand/icons/5fc7a97f63.webp",
+    "https://starside.work/elements/strand/icons/6339b0bf03.webp",
+    "https://starside.work/elements/strand/icons/7397ec7e1d.webp",
+    "https://starside.work/elements/strand/icons/742d37444f.webp",
+    "https://starside.work/elements/strand/icons/7d532f89f7.webp",
+    "https://starside.work/elements/strand/icons/8394dd8463.webp",
+    "https://starside.work/elements/strand/icons/87a87f9d87.webp",
+    "https://starside.work/elements/strand/icons/8dfedcd534.webp",
+    "https://starside.work/elements/strand/icons/8e323785fd.webp",
+    "https://starside.work/elements/strand/icons/901bc1cfcc.webp",
+    "https://starside.work/elements/strand/icons/9753dd3b68.webp",
+    "https://starside.work/elements/strand/icons/9dbe20cbcd.webp",
+    "https://starside.work/elements/strand/icons/9efade5da9.webp",
+    "https://starside.work/elements/strand/icons/a0ae53f14d.webp",
+    "https://starside.work/elements/strand/icons/a2e8c19bf6.webp",
+    "https://starside.work/elements/strand/icons/aed8d97601.webp",
+    "https://starside.work/elements/strand/icons/b18acd6942.webp",
+    "https://starside.work/elements/strand/icons/b7bc4b447f.webp",
+    "https://starside.work/elements/strand/icons/b879741c89.webp",
+    "https://starside.work/elements/strand/icons/bf16066e67.webp",
+    "https://starside.work/elements/strand/icons/c07f528756.webp",
+    "https://starside.work/elements/strand/icons/cbdec13d01.webp",
+    "https://starside.work/elements/strand/icons/cf6c8a6a75.webp",
+    "https://starside.work/elements/strand/icons/d1941c224a.webp",
+    "https://starside.work/elements/strand/icons/d31001ff60.webp",
+    "https://starside.work/elements/strand/icons/e43c48d22c.webp",
+    "https://starside.work/elements/strand/icons/e82a969e3f.webp",
+    "https://starside.work/elements/strand/icons/f203c37654.webp",
+    "https://starside.work/elements/strand/icons/f2cc00067a.webp",
+    "https://starside.work/elements/strand/icons/f74fd71921.webp",
+    "https://starside.work/elements/strand/icons/fe3f17a0da.webp",
+    "https://starside.work/elements/strand/style.css",
+    "https://starside.work/elements/style.css"
+  ]
+}

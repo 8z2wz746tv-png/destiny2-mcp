@@ -1,0 +1,2232 @@
+{
+  "url": "https://starside.work/elements/void/index.html",
+  "title": "虚空 · Starside",
+  "description": "虚空分支职业速查表——吞食、隐身、覆盖护盾、虚空裂口、压制、不稳定、不稳定弹药、虚弱八个效果，16 枚碎片，8 种手雷，以及猎人、泰坦、术士的近战、超能与星相，带图标与全部数值。",
+  "category": "subclass",
+  "updated_at": "2026.8.30",
+  "data_src": "docs/void",
+  "data_hash": "e94d2226507271d563815674026a14c73f886b96",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "虚空"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "效果"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "手雷技能"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "术士"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "效果",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "吞食",
+            "html": "吞食"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/908f4e5a73.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "激活时恢复 70 生命值并提供吞食，持续 10+5 秒。\n 重新激活再恢复 70 生命值并刷新 5+3 秒。\n \n 吞食期间击杀：\n 恢复 70 生命值，获得手雷技能能量，并刷新 5+3 秒。\n 击杀回能：T1 级战斗人员 7.5% ｜ T2 11.6% ｜ T3 13.75% ｜ T4 20% ｜ 守护者 20%。",
+            "html": "激活时恢复 70 <span class=\"health\">生命值</span>并提供<span class=\"el-void\">吞食</span>，持续 10+5 秒。<br> 重新激活再恢复 70 <span class=\"health\">生命值</span>并刷新 5+3 秒。<br> <br> <span class=\"el-void\">吞食</span>期间击杀：<br> 恢复 70 <span class=\"health\">生命值</span>，获得<span class=\"pickup\">手雷技能能量</span>，并刷新 5+3 秒。<br> 击杀回能：<span class=\"enemy\">T1 级战斗人员</span> 7.5% ｜ <span class=\"enemy\">T2</span> 11.6% ｜ <span class=\"enemy\">T3</span> 13.75% ｜ <span class=\"enemy\">T4</span> 20% ｜ <span class=\"bar-orange\">守护者</span> 20%。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "隐身",
+            "html": "隐身"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/49d46ca870.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "隐形并获得多项增益，同时最大雷达射程降到 24 米，持续 5+2 秒。做出攻势动作立即结束。\n 雷达增强装置模组可移除雷达缩减。重新施加隐身时，只要没破隐，会刷新持续最久的那一份。\n \n 战斗人员无法直接锁定使用者，通常朝最后可见的位置射击或干脆停火；做出高噪声动作时会追踪但不射击。\n 守护者看不到使用者的生命值条；使用者的雷达每 5 秒才脉冲 0.6 秒，做高噪声动作时也会脉冲。\n 会追踪（追踪投射物）或扫描（烈焰手雷）的武器与技能不会锁定使用者，已锁定的也会脱锁。\n \n 攻势动作（立即破隐）：\n 射击 ｜ 手雷、近战、超能或瞬移技能 ｜ 放置屏障或裂痕 ｜ 召唤载具。\n \n 高噪声动作（暴露位置但不破隐）：\n 开始冲刺 ｜ 非瞬移的移动技能 ｜ 猎人职业技能。",
+            "html": "隐形并获得多项<span class=\"buff\">增益</span>，同时最大雷达射程降到 24 米，持续 5+2 秒。做出攻势动作立即结束。<br> <span class=\"note\">雷达增强装置模组可移除雷达缩减。重新施加隐身时，只要没破隐，会刷新持续最久的那一份。</span><br> <br> <span class=\"enemy\">战斗人员</span>无法直接锁定使用者，通常朝最后可见的位置射击或干脆停火；做出高噪声动作时会追踪但不射击。<br> <span class=\"bar-orange\">守护者</span>看不到使用者的<span class=\"health\">生命值</span>条；使用者的雷达每 5 秒才脉冲 0.6 秒，做高噪声动作时也会脉冲。<br> 会追踪（追踪投射物）或扫描（<span class=\"el-solar\">烈焰手雷</span>）的武器与技能不会锁定使用者，已锁定的也会脱锁。<br> <br> 攻势动作（立即破隐）：<br> 射击 ｜ 手雷、近战、超能或瞬移技能 ｜ 放置屏障或裂痕 ｜ 召唤载具。<br> <br> 高噪声动作（暴露位置但不破隐）：<br> 开始冲刺 ｜ 非瞬移的移动技能 ｜ 猎人职业技能。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "覆盖护盾",
+            "html": "覆盖护盾"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3610c97f35.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空覆盖护盾最多 45 生命值，持续 10+5 秒。\n \n 护盾的生命值部分对战斗人员有 70% 伤害抗性，等效约 150 生命值。\n 打在虚空覆盖护盾上的伤害不会中断生命值恢复。\n 可以与其它覆盖护盾叠加（还治彼身、职业属性给的那层等），多层按先进先出消耗。",
+            "html": "<span class=\"el-void\">虚空覆盖护盾</span>最多 45 <span class=\"health\">生命值</span>，持续 10+5 秒。<br> <br> 护盾的<span class=\"health\">生命值</span>部分对<span class=\"enemy\">战斗人员</span>有 70% 伤害抗性，等效约 150 <span class=\"health\">生命值</span>。<br> 打在<span class=\"el-void\">虚空覆盖护盾</span>上的伤害不会中断<span class=\"health\">生命值</span>恢复。<br> 可以与其它<span class=\"pickup\">覆盖护盾</span>叠加（<span class=\"perk\">还治彼身</span>、职业属性给的那层等），多层按先进先出消耗。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "虚空裂口",
+            "html": "虚空裂口"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b9cb27f4c1.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空元素拾取物。\n \n 拾取提供 11.25% 职业技能能量。\n 使用者生成的虚空裂口对盟友不生效。\n 停留 25 秒后消失，两次生成之间有 5 秒冷却。",
+            "html": "<span class=\"el-void\">虚空</span>元素拾取物。<br> <br> 拾取提供 11.25% <span class=\"pickup\">职业技能能量</span>。<br> 使用者生成的<span class=\"el-void\">虚空裂口</span>对<span class=\"enemy\">盟友</span>不生效。<br> 停留 25 秒后消失，两次生成之间有 5 秒冷却。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "压制",
+            "html": "压制"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3ca5afc0d3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被压制的战斗人员被强制打断当前技能，10 [5] 秒内无法使用技能。\n \n 被压制的红血与橙血战斗人员还会陷入迷失、无法射击。\n 被压制的守护者被强制退出当前超能与超凡，并且无法使用手雷、近战、职业、超能、移动技能与超凡。\n \n 过载勇士被压制时进入眩晕。",
+            "html": "被<span class=\"deb-void\">压制</span>的<span class=\"enemy\">战斗人员</span>被强制打断当前技能，10 <span class=\"pvp\">[5]</span> 秒内无法使用技能。<br> <br> 被<span class=\"deb-void\">压制</span>的<span class=\"bar-red\">红血</span>与<span class=\"bar-orange\">橙血</span><span class=\"enemy\">战斗人员</span>还会陷入迷失、无法射击。<br> 被<span class=\"deb-void\">压制</span>的<span class=\"bar-orange\">守护者</span>被强制退出当前超能与<span class=\"el-prismatic\">超凡</span>，并且无法使用手雷、近战、职业、超能、移动技能与<span class=\"el-prismatic\">超凡</span>。<br> <br> <span class=\"enemy\">过载勇士</span>被<span class=\"deb-void\">压制</span>时进入<span class=\"enemy\">眩晕</span>。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "不稳定",
+            "html": "不稳定"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d4d2986dc7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "不稳定的战斗人员在累计受到 190 [200] 伤害后、或死亡时触发爆炸，在 5 米半径内最多造成 145 [80] 虚空技能伤害。\n \n 持续 10 [6] 秒，到期未触发则无害消失；爆炸触发后减益随之移除。\n 施加不稳定那一次命中的伤害不计入引爆阈值。\n 爆炸后需要 1 秒冷却才能对同一名战斗人员再次施加。",
+            "html": "<span class=\"deb-void\">不稳定</span>的<span class=\"enemy\">战斗人员</span>在累计受到 190 <span class=\"pvp\">[200]</span> 伤害后、或死亡时触发爆炸，在 5 米半径内最多造成 145 <span class=\"pvp\">[80]</span> <span class=\"el-void\">虚空</span>技能伤害。<br> <br> 持续 10 <span class=\"pvp\">[6]</span> 秒，到期未触发则无害消失；爆炸触发后<span class=\"debuff\">减益</span>随之移除。<br> 施加<span class=\"deb-void\">不稳定</span>那一次命中的伤害不计入引爆阈值。<br> 爆炸后需要 1 秒冷却才能对同一名<span class=\"enemy\">战斗人员</span>再次施加。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "不稳定弹药",
+            "html": "不稳定弹药"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6236b2edc3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空武器造成伤害时施加不稳定。\n 不稳定子弹激活期间，对勇士的武器伤害提高 10%。",
+            "html": "<span class=\"el-void\">虚空</span>武器造成伤害时施加<span class=\"deb-void\">不稳定</span>。<br> <span class=\"deb-void\">不稳定</span>子弹激活期间，对<span class=\"enemy\">勇士</span>的武器伤害提高 10%。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "虚弱",
+            "html": "虚弱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0c75d0ba42.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被虚弱的战斗人员受到的伤害提高 15% [7.5%]，移动速度降低 20%，持续 6 [2.5] 秒。\n 被虚弱的战斗人员精度下降、动作变慢。\n \n 部分来源施加的是显著更强的虚弱，伤害提高 30%（PvP 通常 50%）：\n 暗影箭矢：莫比乌斯对被束缚的战斗人员提供 30% [50%]。\n 邪冬的头盔「领主之末」对受其虚弱爆裂影响的战斗人员提供 30% [30%]。\n 牵引器火炮的冲击波与法夫纳（量子新星激活时）提供 30% [50%]。\n 暗影箭矢：狩猎陷阱另成一档，提供 35% [50%?]。\n \n 法夫纳、费尔温特与牵引者的虚弱时长可以被任何其它虚弱效果延长。",
+            "html": "被<span class=\"deb-void\">虚弱</span>的<span class=\"enemy\">战斗人员</span>受到的伤害提高 15% <span class=\"pvp\">[7.5%]</span>，移动速度降低 20%，持续 6 <span class=\"pvp\">[2.5]</span> 秒。<br> 被<span class=\"deb-void\">虚弱</span>的<span class=\"enemy\">战斗人员</span>精度下降、动作变慢。<br> <br> 部分来源施加的是显著更强的<span class=\"deb-void\">虚弱</span>，伤害提高 30%（PvP 通常 50%）：<br> 暗影箭矢：莫比乌斯对被束缚的<span class=\"enemy\">战斗人员</span>提供 30% <span class=\"pvp\">[50%]</span>。<br> <span class=\"exotic\">邪冬的头盔</span>「<span class=\"exotic\">领主之末</span>」对受其<span class=\"deb-void\">虚弱</span>爆裂影响的<span class=\"enemy\">战斗人员</span>提供 30% <span class=\"pvp\">[30%]</span>。<br> <span class=\"exotic\">牵引器火炮</span>的冲击波与<span class=\"exotic\">法夫纳</span>（量子新星激活时）提供 30% <span class=\"pvp\">[50%]</span>。<br> <span class=\"el-void\">暗影箭矢：狩猎陷阱</span>另成一档，提供 35% <span class=\"unsure\">[50%?]</span>。<br> <br> <span class=\"exotic\">法夫纳</span>、费尔温特与牵引者的<span class=\"deb-void\">虚弱</span>时长可以被任何其它<span class=\"deb-void\">虚弱</span>效果延长。"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "碎片",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "碎片",
+            "html": "碎片"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性变化",
+            "html": "属性变化"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "休止回声",
+            "html": "休止回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ef99f996a6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "终结技对 ? 米内的战斗人员施加不稳定。\n 击杀不稳定的战斗人员生成虚空裂口。",
+            "html": "<span class=\"enemy\">终结技</span>对 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-void\">不稳定</span>。<br> 击杀<span class=\"deb-void\">不稳定</span>的<span class=\"enemy\">战斗人员</span>生成<span class=\"el-void\">虚空裂口</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "扩张回声",
+            "html": "扩张回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/68a6773b90.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "蹲伏速度固定为 4 米/秒，蹲伏时雷达分辨率翻倍。\n 蹲伏速度不会被压到 4 米/秒以下，与横越之步同理。",
+            "html": "蹲伏速度固定为 4 米/秒，蹲伏时雷达分辨率翻倍。<br> <span class=\"note\">蹲伏速度不会被压到 4 米/秒以下，与横越之步同理。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 武器\n +10 超能",
+            "html": "+10 武器<br> +10 超能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "霸道回声",
+            "html": "霸道回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6387c0f4d8.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "压制一名战斗人员：\n 提供 +30 武器属性、10 秒内 4% 前向移动加成，并补满已准备的武器（4 秒内置冷却）。\n \n 击杀被压制的战斗人员生成虚空裂口。",
+            "html": "<span class=\"deb-void\">压制</span>一名<span class=\"enemy\">战斗人员</span>：<br> 提供 +30 武器属性、10 秒内 4% 前向移动加成，并补满已准备的武器（4 秒内置冷却）。<br> <br> 击杀被<span class=\"deb-void\">压制</span>的<span class=\"enemy\">战斗人员</span>生成<span class=\"el-void\">虚空裂口</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 手雷",
+            "html": "+10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "交换回声",
+            "html": "交换回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/55cbca69fd.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近战击杀按战斗人员等级提供手雷技能能量：\n T1 级战斗人员 7.5% ｜ T2 11% ｜ T3 与守护者 16.25% ｜ T4、初级首领与首领 25%。",
+            "html": "近战击杀按<span class=\"enemy\">战斗人员</span>等级提供<span class=\"pickup\">手雷技能能量</span>：<br> <span class=\"enemy\">T1 级战斗人员</span> 7.5% ｜ <span class=\"enemy\">T2</span> 11% ｜ <span class=\"enemy\">T3</span> 与<span class=\"bar-orange\">守护者</span> 16.25% ｜ <span class=\"enemy\">T4</span>、<span class=\"bar-yellow\">初级首领</span>与<span class=\"bar-yellow\">首领</span> 25%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "驱逐回声",
+            "html": "驱逐回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7f5dd9aca.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空技能击杀使战斗人员爆炸，在 7 米半径内最多造成 160 [130] 伤害。",
+            "html": "<span class=\"el-void\">虚空</span>技能击杀使<span class=\"enemy\">战斗人员</span>爆炸，在 7 米半径内最多造成 160 <span class=\"pvp\">[130]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 超能",
+            "html": "+10 超能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "收割回声",
+            "html": "收割回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f4ba7c174c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀被虚弱的战斗人员：\n 生成一枚能量球（提供 2.5% 超能能量）与一枚虚空裂口。\n 生成能量球后有 10 秒冷却。",
+            "html": "击杀被<span class=\"deb-void\">虚弱</span>的<span class=\"enemy\">战斗人员</span>：<br> 生成一枚<span class=\"orb\">能量球</span>（提供 2.5% <span class=\"orb\">超能能量</span>）与一枚<span class=\"el-void\">虚空裂口</span>。<br> 生成<span class=\"orb\">能量球</span>后有 10 秒冷却。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "失稳回声",
+            "html": "失稳回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6236b2edc3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "手雷击杀为虚空武器提供不稳定子弹，持续 11.25 [7.5] 秒。\n 不要求是虚空手雷击杀。",
+            "html": "手雷击杀为<span class=\"el-void\">虚空</span>武器提供<span class=\"deb-void\">不稳定</span>子弹，持续 11.25 <span class=\"pvp\">[7.5]</span> 秒。<br> <span class=\"note\">不要求是虚空手雷击杀。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "吸吮回声",
+            "html": "吸吮回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4c80493410.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近战击杀为自己与 ? 米内的盟友开始生命值恢复。",
+            "html": "近战击杀为<span class=\"enemy\">自己</span>与 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">盟友</span>开始<span class=\"health\">生命值</span>恢复。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 生命值",
+            "html": "+10 <span class=\"health\">生命值</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "朦胧回声",
+            "html": "朦胧回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/74a706d010.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "终结技提供隐身，持续 5+2 秒。",
+            "html": "<span class=\"enemy\">终结技</span>提供<span class=\"el-void\">隐身</span>，持续 5+2 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 职业",
+            "html": "+10 职业"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "坚韧回声",
+            "html": "坚韧回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/26cce5074c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "施加给使用者的虚空增益持续更久：\n 吞食 +50% ｜ 隐身 +40% ｜ 虚空覆盖护盾 +50%。",
+            "html": "施加给使用者的<span class=\"el-void\">虚空</span><span class=\"buff\">增益</span>持续更久：<br> <span class=\"el-void\">吞食</span> +50% ｜ <span class=\"el-void\">隐身</span> +40% ｜ <span class=\"el-void\">虚空覆盖护盾</span> +50%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 武器（猎人）\n -10 生命值（泰坦）\n -10 职业（术士）",
+            "html": "-10 武器（猎人）<br> -10 <span class=\"health\">生命值</span>（泰坦）<br> -10 职业（术士）"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "补能回声",
+            "html": "补能回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/30b9440981.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "手雷技能伤害提供近战技能能量，每次伤害实例只触发一次（同时命中多名战斗人员算一次）。\n \n 3% ｜ 散射、虚空尖刺、虚空墙壁、涡流。\n 8% ｜ 量子光束、手持超新星、磁性、抑制。\n 与坚不可摧不兼容。",
+            "html": "手雷技能伤害提供<span class=\"pickup\">近战技能能量</span>，每次伤害实例只触发一次（同时命中多名<span class=\"enemy\">战斗人员</span>算一次）。<br> <br> 3% ｜ 散射、<span class=\"el-void\">虚空尖刺</span>、<span class=\"el-void\">虚空墙壁</span>、涡流。<br> 8% ｜ <span class=\"el-void\">量子光束</span>、手持超新星、磁性、抑制。<br> <span class=\"note\">与坚不可摧不兼容。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 手雷",
+            "html": "+10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "残存回声",
+            "html": "残存回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/31c46f20a5.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "量子光束 ｜ 持续时间延长 ?%。\n 虚空尖刺 ｜ 持续时间 +50%，并提前 0.1 秒开始造成伤害。\n 虚空墙壁 ｜ 持续时间 +50%。\n 涡流手雷 ｜ 持续时间 +25%，并提前 0.13 秒开始造成伤害；被混沌加速强化过的涡流手雷 +55%。",
+            "html": "<span class=\"el-void\">量子光束</span> ｜ 持续时间延长 <span class=\"unsure\">?</span>%。<br> <span class=\"el-void\">虚空尖刺</span> ｜ 持续时间 +50%，并提前 0.1 秒开始造成伤害。<br> <span class=\"el-void\">虚空墙壁</span> ｜ 持续时间 +50%。<br> <span class=\"el-void\">涡流手雷</span> ｜ 持续时间 +25%，并提前 0.13 秒开始造成伤害；被<span class=\"el-void\">混沌加速</span>强化过的<span class=\"el-void\">涡流手雷</span> +55%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "报复回声",
+            "html": "报复回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cfe053953c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "8 米内被 3 名以上战斗人员腹背受敌时，击杀额外提供超能能量：\n 3 名 +0.3% ｜ 4 名 +0.65% ｜ 5 名 +1% ｜ 6 名 +1.6% ｜ 7 名 +2.3%。\n 两次激活之间有 1 秒冷却。",
+            "html": "8 米内被 3 名以上<span class=\"enemy\">战斗人员</span><span class=\"enemy\">腹背受敌</span>时，击杀额外提供<span class=\"orb\">超能能量</span>：<br> 3 名 +0.3% ｜ 4 名 +0.65% ｜ 5 名 +1% ｜ 6 名 +1.6% ｜ 7 名 +2.3%。<br> <span class=\"note\">两次激活之间有 1 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "饥饿回声",
+            "html": "饥饿回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/077fdefd08.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "拾取能量球或虚空裂口提供吞食，持续 5+2.5 秒。",
+            "html": "拾取<span class=\"orb\">能量球</span>或<span class=\"el-void\">虚空裂口</span>提供<span class=\"el-void\">吞食</span>，持续 5+2.5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 职业",
+            "html": "-10 职业"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "弱化回声",
+            "html": "弱化回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8e4dbbda8c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空手雷命中时施加虚弱，持续 6 [2.5] 秒。",
+            "html": "<span class=\"el-void\">虚空</span>手雷命中时施加<span class=\"deb-void\">虚弱</span>，持续 6 <span class=\"pvp\">[2.5]</span> 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 手雷",
+            "html": "-10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "警惕回声",
+            "html": "警惕回声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6c04bbc07b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "处于重伤时击杀：\n 提供虚空覆盖护盾，持续 5+2.5 秒。\n 激活后有 8 秒冷却。",
+            "html": "处于重伤时击杀：<br> 提供<span class=\"el-void\">虚空覆盖护盾</span>，持续 5+2.5 秒。<br> <span class=\"note\">激活后有 8 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "手雷技能",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "手雷",
+            "html": "手雷"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "基础冷却",
+            "html": "基础冷却"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "量子光束",
+            "html": "量子光束"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6c52bb0ab8.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "重型弹道 ｜ 扫描\n \n 接触时扫描 10 米视线内最多 2 名战斗人员，延迟 1 秒后放出减速飞行的量子光束追向它们。\n 光束造成 575 [65] 伤害，以 ? 米/秒的速度飞行、最长持续 ? 秒，本体有 10 生命值，可以被摧毁。\n \n 混沌加速：\n 扫描目标提高到 4 名、范围 12 米，光束飞行速度提高 ?%、伤害提高 25%，落地 1 秒后再触发一次。",
+            "html": "<span class=\"note\">重型弹道 ｜ 扫描</span><br> <br> 接触时扫描 10 米视线内最多 2 名<span class=\"enemy\">战斗人员</span>，延迟 1 秒后放出减速飞行的<span class=\"el-void\">量子光束</span>追向它们。<br> 光束造成 575 <span class=\"pvp\">[65]</span> 伤害，以 <span class=\"unsure\">?</span> 米/秒的速度飞行、最长持续 <span class=\"unsure\">?</span> 秒，本体有 10 <span class=\"health\">生命值</span>，可以被摧毁。<br> <br> <span class=\"el-void\">混沌加速</span>：<br> 扫描目标提高到 4 名、范围 12 米，光束飞行速度提高 <span class=\"unsure\">?</span>%、伤害提高 25%，落地 1 秒后再触发一次。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 219.5 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 219.5 秒<br> 回复倍率 0.5×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "手持超新星",
+            "html": "手持超新星"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico2"
+            },
+            "text": "",
+            "html": "<img src=\"icons/824cbafc99.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <img src=\"icons/99620cefe2.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "装备磁性、虚空尖刺、抑制或虚空墙壁手雷、并带星相「混沌加速」时的形态\n \n 被动提供 1.154 倍手雷充能速度。\n 按住［手雷］蓄力 ? 秒后准备就绪，最多维持 4.5 秒。\n \n 松开［手雷］：\n 向前发出一道短射程虚空爆炸，造成 150 [50] 伤害并强力击退 12.5 米扇形内的战斗人员。\n 爆炸同时释放 9 发虚空矢弹，最远 12.5 米，每发在 3 米半径内造成 375 [15] 溅射伤害并施加不稳定。\n 9 发矢弹加初始爆炸全中时最多合计 3525 [185] 伤害。\n 对自身伤害降低 75%，也不会给自己施加不稳定。",
+            "html": "<span class=\"note\">装备磁性、虚空尖刺、抑制或虚空墙壁手雷、并带星相「混沌加速」时的形态</span><br> <br> 被动提供 1.154 倍手雷充能速度。<br> 按住［手雷］蓄力 <span class=\"unsure\">?</span> 秒后准备就绪，最多维持 4.5 秒。<br> <br> 松开［手雷］：<br> 向前发出一道短射程<span class=\"el-void\">虚空</span>爆炸，造成 150 <span class=\"pvp\">[50]</span> 伤害并强力击退 12.5 米扇形内的<span class=\"enemy\">战斗人员</span>。<br> 爆炸同时释放 9 发<span class=\"el-void\">虚空</span>矢弹，最远 12.5 米，每发在 3 米半径内造成 375 <span class=\"pvp\">[15]</span> 溅射伤害并施加<span class=\"deb-void\">不稳定</span>。<br> 9 发矢弹加初始爆炸全中时最多合计 3525 <span class=\"pvp\">[185]</span> 伤害。<br> <span class=\"note\">对自身伤害降低 75%，也不会给自己施加不稳定。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "磁性手雷",
+            "html": "磁性手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f4dc76a627.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻型弹道 ｜ 轻微追踪 ｜ 粘附 ｜ 快速\n \n 附着到战斗人员或表面上，1.2 秒后第一次爆炸，再过 0.6 秒二次爆炸。\n \n 每次爆炸在 5 米内最多造成 472 [75] 伤害，两次合计最多 946 [150]。",
+            "html": "<span class=\"note\">轻型弹道 ｜ 轻微追踪 ｜ 粘附 ｜ 快速</span><br> <br> 附着到<span class=\"enemy\">战斗人员</span>或表面上，1.2 秒后第一次爆炸，再过 0.6 秒二次爆炸。<br> <br> 每次爆炸在 5 米内最多造成 472 <span class=\"pvp\">[75]</span> 伤害，两次合计最多 946 <span class=\"pvp\">[150]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 151.5 秒\n 回复倍率 0.75×",
+            "html": "基础冷却 151.5 秒<br> 回复倍率 0.75×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "散射手雷",
+            "html": "散射手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e2f44ea0a4.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "重型弹道\n \n 接触时爆炸，造成 5 [1] 伤害并在 4 米范围内释放 8 枚子弹药。\n \n 每枚子弹药爆两次：第一次在 4 米内最多造成 70 [16] 伤害，0.5 秒后第二次最多造成 115 [20] 伤害。\n 8 枚全部打满时最多合计 1480 [288] 伤害。\n \n 混沌加速：\n 多 4 枚子弹药共 12 枚，子弹药强力追踪 5 米内的战斗人员，并对战斗人员伤害提高 25%。",
+            "html": "<span class=\"note\">重型弹道</span><br> <br> 接触时爆炸，造成 5 <span class=\"pvp\">[1]</span> 伤害并在 4 米范围内释放 8 枚子弹药。<br> <br> 每枚子弹药爆两次：第一次在 4 米内最多造成 70 <span class=\"pvp\">[16]</span> 伤害，0.5 秒后第二次最多造成 115 <span class=\"pvp\">[20]</span> 伤害。<br> 8 枚全部打满时最多合计 1480 <span class=\"pvp\">[288]</span> 伤害。<br> <br> <span class=\"el-void\">混沌加速</span>：<br> 多 4 枚子弹药共 12 枚，子弹药强力追踪 5 米内的<span class=\"enemy\">战斗人员</span>，并对<span class=\"enemy\">战斗人员</span>伤害提高 25%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 151.5 秒\n 回复倍率 0.75×",
+            "html": "基础冷却 151.5 秒<br> 回复倍率 0.75×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "抑制手雷",
+            "html": "抑制手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0566b8255d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道\n \n 速度降到足够低后爆炸，爆炸前有短暂延迟。\n \n 爆炸在 9 米范围内最多造成 863 [150] 伤害并施加压制，持续 10 [5] 秒。\n 使用者不会被自己压制。",
+            "html": "<span class=\"note\">中型弹道</span><br> <br> 速度降到足够低后爆炸，爆炸前有短暂延迟。<br> <br> 爆炸在 9 米范围内最多造成 863 <span class=\"pvp\">[150]</span> 伤害并施加<span class=\"deb-void\">压制</span>，持续 10 <span class=\"pvp\">[5]</span> 秒。<br> 使用者不会被<span class=\"enemy\">自己</span><span class=\"deb-void\">压制</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 175.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 175.6 秒<br> 回复倍率 0.625×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "虚空尖刺",
+            "html": "虚空尖刺"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b2746f67a5.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 壁挂\n \n 附着到表面和战斗人员身上，0.67−0.1 秒后开始投射虚空光能。\n \n 光能每 0.217 秒造成 80 [28] 伤害，最多 16+9 次，持续 3.5+1.75 秒。\n 持续时间内最多合计 1280（延长后 2000）[448（延长后 700）] 伤害。",
+            "html": "<span class=\"note\">中型弹道 ｜ 壁挂</span><br> <br> 附着到表面和<span class=\"enemy\">战斗人员</span>身上，0.67−0.1 秒后开始投射<span class=\"el-void\">虚空</span>光能。<br> <br> 光能每 0.217 秒造成 80 <span class=\"pvp\">[28]</span> 伤害，最多 16+9 次，持续 3.5+1.75 秒。<br> 持续时间内最多合计 1280（延长后 2000）<span class=\"pvp\">[448（延长后 700）]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 175.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 175.6 秒<br> 回复倍率 0.625×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "虚空墙壁",
+            "html": "虚空墙壁"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9b84895a8e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 持续伤害场域\n \n 接触时爆炸并立起一道跨度 ? 米、垂直的虚空光能墙，展开过程中最多造成 173 [46] 伤害。\n \n 生成 0.85 秒后开始造成伤害，每 0.2 秒 120 [35]，最多 18+9 次，持续 3.75+1.875 秒。\n 持续时间内最多合计 2160（延长后 3240）[630（延长后 945）] 伤害。",
+            "html": "<span class=\"note\">中型弹道 ｜ 持续伤害场域</span><br> <br> 接触时爆炸并立起一道跨度 <span class=\"unsure\">?</span> 米、垂直的<span class=\"el-void\">虚空</span>光能墙，展开过程中最多造成 173 <span class=\"pvp\">[46]</span> 伤害。<br> <br> 生成 0.85 秒后开始造成伤害，每 0.2 秒 120 <span class=\"pvp\">[35]</span>，最多 18+9 次，持续 3.75+1.875 秒。<br> 持续时间内最多合计 2160（延长后 3240）<span class=\"pvp\">[630（延长后 945）]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 175.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 175.6 秒<br> 回复倍率 0.625×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "涡流手雷",
+            "html": "涡流手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b1f7ceb49e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 持续伤害场域\n \n 接触时在 5 米内最多造成 195 [25] 伤害，并生成一团虚空涡流。\n \n 命中 0.833 秒后开始把 5? 米内的战斗人员往里拉。\n 生成 1.45−0.13 秒后开始伤害，每 0.267 秒对 4 米半径内的战斗人员造成 78 [20] 伤害，最多 12+7 次，持续 4+1 秒。第 13 至 20 跳有衰减，最多 54 [?] 伤害。\n 场域内最多合计 990（延长后 1536）[240（延长后 380）] 伤害。\n \n 混沌加速：\n 命中 0.617 秒后开始把 ? 米内的战斗人员往里拉，生成 1.2 秒后开始伤害，每 0.267 秒 78 [20] 伤害，最多 17+7 次，持续 4.3+2.3 秒，半径扩大到 7 米。\n 第 17 至 24 跳有衰减，最多 54 [?] 伤害。合计最多 1380（延长后 1926）[340（延长后 480）] 伤害。",
+            "html": "<span class=\"note\">中型弹道 ｜ 持续伤害场域</span><br> <br> 接触时在 5 米内最多造成 195 <span class=\"pvp\">[25]</span> 伤害，并生成一团<span class=\"el-void\">虚空</span>涡流。<br> <br> 命中 0.833 秒后开始把 <span class=\"unsure\">5?</span> 米内的<span class=\"enemy\">战斗人员</span>往里拉。<br> 生成 1.45−0.13 秒后开始伤害，每 0.267 秒对 4 米半径内的<span class=\"enemy\">战斗人员</span>造成 78 <span class=\"pvp\">[20]</span> 伤害，最多 12+7 次，持续 4+1 秒。第 13 至 20 跳有衰减，最多 54 <span class=\"unsure\">[?]</span> 伤害。<br> 场域内最多合计 990（延长后 1536）<span class=\"pvp\">[240（延长后 380）]</span> 伤害。<br> <br> <span class=\"el-void\">混沌加速</span>：<br> 命中 0.617 秒后开始把 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>往里拉，生成 1.2 秒后开始伤害，每 0.267 秒 78 <span class=\"pvp\">[20]</span> 伤害，最多 17+7 次，持续 4.3+2.3 秒，半径扩大到 7 米。<br> 第 17 至 24 跳有衰减，最多 54 <span class=\"unsure\">[?]</span> 伤害。合计最多 1380（延长后 1926）<span class=\"pvp\">[340（延长后 480）]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 219.5 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 219.5 秒<br> 回复倍率 0.5×"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "猎人",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "鬼灵激涌",
+            "html": "鬼灵激涌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0b7287dfe2.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "向前挥砍最远 12 米，对 2 米内的战斗人员造成 595 [?] 伤害并穿过它们。\n \n 每命中一名战斗人员提供 +10 虚空覆盖护盾。\n 对受虚空减益影响的战斗人员，或被「伺机而动」标记的战斗人员，伤害提高 100% [?%]。\n 击杀额外提供 +45 虚空覆盖护盾并返还 60% 近战技能能量。",
+            "html": "向前挥砍最远 12 米，对 2 米内的<span class=\"enemy\">战斗人员</span>造成 595 <span class=\"unsure\">[?]</span> 伤害并穿过它们。<br> <br> 每命中一名<span class=\"enemy\">战斗人员</span>提供 +10 <span class=\"el-void\">虚空覆盖护盾</span>。<br> 对受<span class=\"el-void\">虚空</span><span class=\"debuff\">减益</span>影响的<span class=\"enemy\">战斗人员</span>，或被「<span class=\"el-void\">伺机而动</span>」标记的<span class=\"enemy\">战斗人员</span>，伤害提高 100% <span class=\"unsure\">[?%]</span>。<br> 击杀额外提供 +45 <span class=\"el-void\">虚空覆盖护盾</span>并返还 60% <span class=\"pickup\">近战技能能量</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 130.7 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 130.7 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "陷阱炸弹",
+            "html": "陷阱炸弹"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3ed96daa22.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烟幕弹可附着表面最多 9 秒，附着期间会在战斗人员雷达上脉冲。\n 为接触点 6 米内的盟友提供隐身，持续 5+2 秒。\n 探测到 ? 米内的战斗人员或直接命中战斗人员时爆炸，生成烟幕。\n \n 接触造成 33 [10] 伤害，爆炸在 ? 米范围内最多造成 120 + 24 [40 + ?] 伤害。\n 接触与爆炸都施加虚弱与迷失，持续 8 [2.5] 秒。\n \n 烟幕在引爆后停留 5 [2] 秒，每 0.6 秒造成一次持续伤害并使战斗人员迷失。\n 0.87 秒后起跳伤害 12.65 [?]，每跳提高 13%，第 9 跳最多 24.8 [?]，5 秒内合计最多 156.7 [?]。",
+            "html": "烟幕弹可附着表面最多 9 秒，附着期间会在<span class=\"enemy\">战斗人员</span>雷达上脉冲。<br> 为接触点 6 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-void\">隐身</span>，持续 5+2 秒。<br> 探测到 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>或直接命中<span class=\"enemy\">战斗人员</span>时爆炸，生成烟幕。<br> <br> 接触造成 33 <span class=\"pvp\">[10]</span> 伤害，爆炸在 <span class=\"unsure\">?</span> 米范围内最多造成 120 + 24 <span class=\"unsure\">[40 + ?]</span> 伤害。<br> 接触与爆炸都施加<span class=\"deb-void\">虚弱</span>与迷失，持续 8 <span class=\"pvp\">[2.5]</span> 秒。<br> <br> 烟幕在引爆后停留 5 <span class=\"pvp\">[2]</span> 秒，每 0.6 秒造成一次持续伤害并使<span class=\"enemy\">战斗人员</span>迷失。<br> 0.87 秒后起跳伤害 12.65 <span class=\"unsure\">[?]</span>，每跳提高 13%，第 9 跳最多 24.8 <span class=\"unsure\">[?]</span>，5 秒内合计最多 156.7 <span class=\"unsure\">[?]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 130.7 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 130.7 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "鬼灵利刃",
+            "html": "鬼灵利刃"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0f6a1a58e7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [隐身 59%? ｜ 可见 58%]\n 基础持续：23.5 秒，或每秒消耗 4.25% 超能能量；不处于隐身时消耗加快 50%\n \n 轻攻击 ｜ 消耗 5%? 超能能量。\n 造成 1107 [?] 伤害并解除隐身，每秒攻击 ? 次。连续命中最多提供 25%? 的近战攻速加成。\n \n 重击 ｜ 消耗 15%? 超能能量。\n 打出上勾拳，造成 1620 [?] 伤害，施加虚弱并提供隐身。\n \n 允许无限使用「捕猎者的伏击」，每次代价 15%? 超能能量。",
+            "html": "伤害抗性：90% <span class=\"unsure\">[隐身 59%? ｜ 可见 58%]</span><br> 基础持续：23.5 秒，或每秒消耗 4.25% <span class=\"orb\">超能能量</span>；不处于<span class=\"el-void\">隐身</span>时消耗加快 50%<br> <br> 轻攻击 ｜ 消耗 <span class=\"unsure\">5%?</span> <span class=\"orb\">超能能量</span>。<br> 造成 1107 <span class=\"unsure\">[?]</span> 伤害并解除<span class=\"el-void\">隐身</span>，每秒攻击 <span class=\"unsure\">?</span> 次。连续命中最多提供 <span class=\"unsure\">25%?</span> 的近战攻速加成。<br> <br> 重击 ｜ 消耗 <span class=\"unsure\">15%?</span> <span class=\"orb\">超能能量</span>。<br> 打出上勾拳，造成 1620 <span class=\"unsure\">[?]</span> 伤害，施加<span class=\"deb-void\">虚弱</span>并提供<span class=\"el-void\">隐身</span>。<br> <br> 允许无限使用「<span class=\"el-void\">捕猎者的伏击</span>」，每次代价 <span class=\"unsure\">15%?</span> <span class=\"orb\">超能能量</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暗影箭矢：狩猎陷阱",
+            "html": "暗影箭矢：狩猎陷阱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c78143215f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [53%]\n \n 发射一枚陷落锚，附着到表面或战斗人员身上，接触时把 12.5 米内的所有战斗人员拉向它。\n 锚在探测到 12.5 米内有战斗人员 1 秒后激活，或 30 秒后自动激活。\n \n 陷落锚接触造成 2583 [?] 伤害，对 ? 米内的战斗人员施加陷落虚弱与压制，锚本体有 ? 点构造体生命值。\n 锚 12.5 米内的战斗人员被束缚，施加陷落虚弱、压制与标记，持续 30 [10] 秒。\n 对被束缚战斗人员造成的身体伤害，50%（基础）会同时施加给其它被束缚的战斗人员。\n 陷落虚弱另成一档，使受到的伤害提高 35%。\n \n 陷落锚默认持续 12 秒，击杀被束缚的战斗人员延长 0.5 秒，最长 25 秒。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[53%]</span><br> <br> 发射一枚陷落锚，附着到表面或<span class=\"enemy\">战斗人员</span>身上，接触时把 12.5 米内的所有<span class=\"enemy\">战斗人员</span>拉向它。<br> 锚在探测到 12.5 米内有<span class=\"enemy\">战斗人员</span> 1 秒后激活，或 30 秒后自动激活。<br> <br> 陷落锚接触造成 2583 <span class=\"unsure\">[?]</span> 伤害，对 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>施加陷落<span class=\"deb-void\">虚弱</span>与<span class=\"deb-void\">压制</span>，锚本体有 <span class=\"unsure\">?</span> 点构造体<span class=\"health\">生命值</span>。<br> 锚 12.5 米内的<span class=\"enemy\">战斗人员</span>被束缚，施加陷落<span class=\"deb-void\">虚弱</span>、<span class=\"deb-void\">压制</span>与标记，持续 30 <span class=\"pvp\">[10]</span> 秒。<br> 对被束缚<span class=\"enemy\">战斗人员</span>造成的身体伤害，50%（基础）会同时施加给其它被束缚的<span class=\"enemy\">战斗人员</span>。<br> 陷落<span class=\"deb-void\">虚弱</span>另成一档，使受到的伤害提高 35%。<br> <br> 陷落锚默认持续 12 秒，击杀被束缚的<span class=\"enemy\">战斗人员</span>延长 0.5 秒，最长 25 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T4 级超能\n 基础冷却 455 秒",
+            "html": "T4 级超能<br> 基础冷却 455 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暗影箭矢：莫比乌斯箭袋",
+            "html": "暗影箭矢：莫比乌斯箭袋"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d006f786a7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [53%]\n 基础持续：16 秒（装备奥菲斯钻机为 20 秒）\n \n 每次激活最多发射 2 轮，每轮 3 枚莫比乌斯锚。\n 激活期间造成伤害会线性提高莫比乌斯锚与弓箭武器的伤害，累计约 3000 伤害后达到上限：锚 +127%，弓箭 +150%（弩 +75%）。\n 伤害需求无视力量等级差，按实际造成的伤害计算。\n \n 莫比乌斯锚接触造成 1076 [?] 伤害，并施加压制、不稳定与虚弱，锚本体有 ? 点构造体生命值。\n 锚 7 米内的战斗人员被束缚，对它们的伤害提高 20%，并被施加虚弱与压制。\n 身体伤害的 50%（基础）同时施加给其它被束缚的战斗人员。\n \n 莫比乌斯锚默认持续 6 秒，击杀被束缚的战斗人员延长 0.5 秒，最长 25 秒。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[53%]</span><br> 基础持续：16 秒（装备<span class=\"exotic\">奥菲斯钻机</span>为 20 秒）<br> <br> 每次激活最多发射 2 轮，每轮 3 枚莫比乌斯锚。<br> 激活期间造成伤害会线性提高莫比乌斯锚与弓箭武器的伤害，累计约 3000 伤害后达到上限：锚 +127%，弓箭 +150%（弩 +75%）。<br> 伤害需求无视力量等级差，按实际造成的伤害计算。<br> <br> 莫比乌斯锚接触造成 1076 <span class=\"unsure\">[?]</span> 伤害，并施加<span class=\"deb-void\">压制</span>、<span class=\"deb-void\">不稳定</span>与<span class=\"deb-void\">虚弱</span>，锚本体有 <span class=\"unsure\">?</span> 点构造体<span class=\"health\">生命值</span>。<br> 锚 7 米内的<span class=\"enemy\">战斗人员</span>被束缚，对它们的伤害提高 20%，并被施加<span class=\"deb-void\">虚弱</span>与<span class=\"deb-void\">压制</span>。<br> 身体伤害的 50%（基础）同时施加给其它被束缚的<span class=\"enemy\">战斗人员</span>。<br> <br> 莫比乌斯锚默认持续 6 秒，击杀被束缚的<span class=\"enemy\">战斗人员</span>延长 0.5 秒，最长 25 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T3 级超能\n 基础冷却 500 秒",
+            "html": "T3 级超能<br> 基础冷却 500 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "伺机而动",
+            "html": "伺机而动"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/62bb64ca14.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "获得虚空隐身时，或距上次标记满 10 秒时：\n 把 45 [25] 米内一名非首领战斗人员标记为优先目标，优先选离准星更近的红血。\n 优先目标存活期间提供伺机而动增益，目标本身则无限期（PvP 15 秒）承受「追猎掠食」减益。\n \n 击杀优先目标：\n 在其死亡位置释放一团虚弱烟幕。\n 提供 1 层成功狩猎（持续 ? 秒，最多 3 层）与 ?% 手雷、近战与职业技能能量。\n 每层提供 +? 稳定性、+? 填装速度，换弹时长 ×0.?。\n \n 烟幕立即在 5 米范围内造成最多 133 [?] 虚空近战伤害。\n 接触到的战斗人员被虚弱 6? 秒，处在烟里时迷失。\n 使用者与盟友获得虚空隐身，持续 5+2 秒。\n 烟幕停留 7? 秒，范围 ? 米，每 0.6 秒造成一次递增的持续伤害：0.87 秒后起跳 12.65 [?]，每跳提高 ?%，第 9 跳最多 24.8 [?]，7 秒内合计最多 ? [?] 伤害。\n 功能上，烟幕就是一枚立即引爆、半径与时长更大的陷阱炸弹，甚至能触发近战相关效果。",
+            "html": "获得<span class=\"el-void\">虚空隐身</span>时，或距上次标记满 10 秒时：<br> 把 45 <span class=\"pvp\">[25]</span> 米内一名非<span class=\"bar-yellow\">首领</span><span class=\"enemy\">战斗人员</span>标记为优先目标，优先选离准星更近的<span class=\"bar-red\">红血</span>。<br> 优先目标存活期间提供<span class=\"el-void\">伺机而动</span><span class=\"buff\">增益</span>，目标本身则无限期（PvP 15 秒）承受「追猎掠食」<span class=\"debuff\">减益</span>。<br> <br> 击杀优先目标：<br> 在其死亡位置释放一团<span class=\"deb-void\">虚弱</span>烟幕。<br> 提供 1 层成功狩猎（持续 <span class=\"unsure\">?</span> 秒，最多 3 层）与 <span class=\"unsure\">?</span>% <span class=\"pickup\">手雷、近战与职业技能能量</span>。<br> 每层提供 +<span class=\"unsure\">?</span> 稳定性、+<span class=\"unsure\">?</span> 填装速度，换弹时长 ×<span class=\"unsure\">0.?</span>。<br> <br> 烟幕立即在 5 米范围内造成最多 133 <span class=\"unsure\">[?]</span> <span class=\"el-void\">虚空</span>近战伤害。<br> 接触到的<span class=\"enemy\">战斗人员</span>被<span class=\"deb-void\">虚弱</span> <span class=\"unsure\">6?</span> 秒，处在烟里时迷失。<br> 使用者与<span class=\"enemy\">盟友</span>获得<span class=\"el-void\">虚空隐身</span>，持续 5+2 秒。<br> 烟幕停留 <span class=\"unsure\">7?</span> 秒，范围 <span class=\"unsure\">?</span> 米，每 0.6 秒造成一次递增的持续伤害：0.87 秒后起跳 12.65 <span class=\"unsure\">[?]</span>，每跳提高 <span class=\"unsure\">?</span>%，第 9 跳最多 24.8 <span class=\"unsure\">[?]</span>，7 秒内合计最多 <span class=\"unsure\">? [?]</span> 伤害。<br> <span class=\"note\">功能上，烟幕就是一枚立即引爆、半径与时长更大的陷阱炸弹，甚至能触发近战相关效果。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "潇洒行刑者",
+            "html": "潇洒行刑者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/901742a8ea.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀受虚空减益影响的战斗人员：\n 提供隐身持续 8+3.2 秒，以及真实视界持续 4 秒。\n \n 隐身期间可以发动优雅处决：\n 近战攻击伤害提高 300% [20%]，使战斗人员虚弱持续 5 [2.5] 秒，并延长近战突进射程。\n 触发后会附带「过于优雅」，在 2 [12] 秒内阻止再次触发优雅处决。",
+            "html": "击杀受<span class=\"el-void\">虚空</span><span class=\"debuff\">减益</span>影响的<span class=\"enemy\">战斗人员</span>：<br> 提供<span class=\"el-void\">隐身</span>持续 8+3.2 秒，以及真实视界持续 4 秒。<br> <br> <span class=\"el-void\">隐身</span>期间可以发动优雅处决：<br> 近战攻击伤害提高 300% <span class=\"pvp\">[20%]</span>，使<span class=\"enemy\">战斗人员</span><span class=\"deb-void\">虚弱</span>持续 5 <span class=\"pvp\">[2.5]</span> 秒，并延长近战突进射程。<br> 触发后会附带「过于优雅」，在 2 <span class=\"pvp\">[12]</span> 秒内阻止再次触发优雅处决。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "捕猎者的伏击",
+            "html": "捕猎者的伏击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a0992b4d28.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "按［空中移动］：\n 消耗一次职业技能充能触发快速坠落，并触发已装备职业技能的使用效果。\n 若隐身正生效，快速坠落会再次施加它。\n \n 快速坠落打出猛击，最多造成 630 [71 守护者 ｜ 700 构造体] 虚空伤害；有虚空增益时伤害提高 50%。\n 造成伤害时恢复生命值，击杀提供吞食持续 10+5 秒。\n \n 同时装备隐身步法时：\n 快速坠落改为施加迷失与虚弱，并为自己与 10 米内的盟友提供隐身。\n \n 星相伤害随超过 100 的职业属性缩放，200 属性时最多 +65%。",
+            "html": "按［空中移动］：<br> 消耗一次<span class=\"pickup\">职业技能充能</span>触发快速坠落，并触发已装备职业技能的使用效果。<br> 若<span class=\"el-void\">隐身</span>正生效，快速坠落会再次施加它。<br> <br> 快速坠落打出猛击，最多造成 630 <span class=\"pvp\">[71 守护者 ｜ 700 构造体]</span> <span class=\"el-void\">虚空伤害</span>；有<span class=\"el-void\">虚空</span><span class=\"buff\">增益</span>时伤害提高 50%。<br> 造成伤害时恢复<span class=\"health\">生命值</span>，击杀提供<span class=\"el-void\">吞食</span>持续 10+5 秒。<br> <br> 同时装备<span class=\"el-void\">隐身步法</span>时：<br> 快速坠落改为施加迷失与<span class=\"deb-void\">虚弱</span>，并为<span class=\"enemy\">自己</span>与 10 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-void\">隐身</span>。<br> <br> 星相伤害随超过 100 的职业属性缩放，200 属性时最多 +65%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "隐身步法",
+            "html": "隐身步法"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c151824cde.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "闪身动画替换为更快、更远的一种，并提供隐身，持续 5+2 秒。",
+            "html": "闪身动画替换为更快、更远的一种，并提供<span class=\"el-void\">隐身</span>，持续 5+2 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "泰坦",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "圣盾强袭",
+            "html": "圣盾强袭"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/48d3393af0.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "与其它肩撞类技能共用的规则：\n 需要冲刺 1.25 秒；未命中战斗人员时消耗 15% 近战技能能量；开火状态下无法在滑铲期间使用；被肩撞直接命中的守护者近战突进失效 0.5 秒。\n \n 向前突进 6.8 米，自动瞄准射程内的战斗人员。\n \n 命中战斗人员：\n 造成 1073 [110] 直击伤害。\n 对命中目标后方最远 7 米的战斗人员造成 391 [40] 径向伤害。\n 对命中目标 2 米内的战斗人员施加压制。\n \n 用圣盾强袭击杀提供 45 生命值的虚空覆盖护盾，持续 10+5 秒。",
+            "html": "与其它肩撞类技能共用的规则：<br> <span class=\"note\">需要冲刺 1.25 秒；未命中战斗人员时消耗 15% 近战技能能量；开火状态下无法在滑铲期间使用；被肩撞直接命中的守护者近战突进失效 0.5 秒。</span><br> <br> 向前突进 6.8 米，自动瞄准射程内的<span class=\"enemy\">战斗人员</span>。<br> <br> 命中<span class=\"enemy\">战斗人员</span>：<br> 造成 1073 <span class=\"pvp\">[110]</span> 直击伤害。<br> 对命中目标后方最远 7 米的<span class=\"enemy\">战斗人员</span>造成 391 <span class=\"pvp\">[40]</span> 径向伤害。<br> 对命中目标 2 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-void\">压制</span>。<br> <br> 用<span class=\"el-void\">圣盾强袭</span>击杀提供 45 <span class=\"health\">生命值</span>的<span class=\"el-void\">虚空覆盖护盾</span>，持续 10+5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.7×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.7×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "圣盾投掷",
+            "html": "圣盾投掷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/790072b53c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "向前掷出虚空护盾，每次最多跳弹 4 次，会尝试追踪战斗人员并受重力影响。\n \n 每次命中造成 400 [70] 直击伤害，并提供 15 生命值的虚空覆盖护盾。",
+            "html": "向前掷出<span class=\"el-void\">虚空</span>护盾，每次最多跳弹 4 次，会尝试追踪<span class=\"enemy\">战斗人员</span>并受重力影响。<br> <br> 每次命中造成 400 <span class=\"pvp\">[70]</span> 直击伤害，并提供 15 <span class=\"health\">生命值</span>的<span class=\"el-void\">虚空覆盖护盾</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "哨兵圣盾",
+            "html": "哨兵圣盾"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5856baf475.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [53%]\n 基础持续：17 秒，或每秒消耗 5.88% 超能能量\n \n 轻攻击 ｜ 每次消耗 4.5% 超能能量，连击最后一击消耗 2%。\n 扎根 3 连击造成 797 [?] 与 856 [?] 伤害；空中 2 连击造成 797 [?] 伤害。\n 连击最后一击在 ? 米锥形范围内造成 1516 [?] 伤害。\n \n 重击 ｜ 生成一面盟友可以射穿的坚不可摧屏障，代价是移动速度降低 20%。\n 施法者对所有正面伤害免疫，包括敌方守护者。触碰屏障的战斗人员每 0.05 秒受到 7 [?] 伤害。\n 格挡伤害会生成能量球，提供 2.5%? 超能能量（1.5 秒内置冷却）。\n 格挡越多，圣盾投掷伤害越高，累计格挡 ? 伤害后最高 +1787%；持续格挡还能延长超能时长，最多 ?%。\n 守护者的伤害被完全无效化，也不会在屏障上触发命中相关效果；技能伤害会扣超能能量，但同时部分延长超能。\n \n 站在屏障后方 5 米内的盟友：\n 获得 25% 伤害提高、45 生命值的虚空覆盖护盾、+50 操控性与 +50 填装速度，所有武器每 2.5 秒补满弹药。\n 他们的虚空覆盖护盾在 3 秒未受伤后按每秒 9 生命值恢复。\n 屏障后方的盟友越多，格挡时的被动超能能量吸收越少：1 名 20% ｜ 2 名 35% ｜ 3 名 ?% ｜ 4 名 ?% ｜ 5 名 50%。\n \n 手雷技能 ｜ 不消耗超能能量，两次投掷之间有 3 秒冷却。\n 投出哨兵圣盾，造成 723 [?] 伤害，可接触反弹最多 ? 次，并追踪 ? 米内的战斗人员。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[53%]</span><br> 基础持续：17 秒，或每秒消耗 5.88% <span class=\"orb\">超能能量</span><br> <br> 轻攻击 ｜ 每次消耗 4.5% <span class=\"orb\">超能能量</span>，连击最后一击消耗 2%。<br> 扎根 3 连击造成 797 <span class=\"unsure\">[?]</span> 与 856 <span class=\"unsure\">[?]</span> 伤害；空中 2 连击造成 797 <span class=\"unsure\">[?]</span> 伤害。<br> 连击最后一击在 <span class=\"unsure\">?</span> 米锥形范围内造成 1516 <span class=\"unsure\">[?]</span> 伤害。<br> <br> 重击 ｜ 生成一面<span class=\"enemy\">盟友</span>可以射穿的<span class=\"el-void\">坚不可摧</span>屏障，代价是移动速度降低 20%。<br> <span class=\"enemy\">施法者</span>对所有正面伤害免疫，包括敌方<span class=\"bar-orange\">守护者</span>。触碰屏障的<span class=\"enemy\">战斗人员</span>每 0.05 秒受到 7 <span class=\"unsure\">[?]</span> 伤害。<br> 格挡伤害会生成<span class=\"orb\">能量球</span>，提供 <span class=\"unsure\">2.5%?</span> <span class=\"orb\">超能能量</span>（1.5 秒内置冷却）。<br> 格挡越多，<span class=\"el-void\">圣盾投掷</span>伤害越高，累计格挡 <span class=\"unsure\">?</span> 伤害后最高 +1787%；持续格挡还能延长超能时长，最多 <span class=\"unsure\">?</span>%。<br> <span class=\"bar-orange\">守护者</span>的伤害被完全无效化，也不会在屏障上触发命中相关效果；技能伤害会扣<span class=\"orb\">超能能量</span>，但同时部分延长超能。<br> <br> 站在屏障后方 5 米内的<span class=\"enemy\">盟友</span>：<br> 获得 25% 伤害提高、45 <span class=\"health\">生命值</span>的<span class=\"el-void\">虚空覆盖护盾</span>、+50 操控性与 +50 填装速度，所有武器每 2.5 秒补满弹药。<br> 他们的<span class=\"el-void\">虚空覆盖护盾</span>在 3 秒未受伤后按每秒 9 <span class=\"health\">生命值</span>恢复。<br> 屏障后方的<span class=\"enemy\">盟友</span>越多，格挡时的被动<span class=\"orb\">超能能量</span>吸收越少：1 名 20% ｜ 2 名 35% ｜ 3 名 <span class=\"unsure\">?</span>% ｜ 4 名 <span class=\"unsure\">?</span>% ｜ 5 名 50%。<br> <br> 手雷技能 ｜ 不消耗<span class=\"orb\">超能能量</span>，两次投掷之间有 3 秒冷却。<br> 投出哨兵圣盾，造成 723 <span class=\"unsure\">[?]</span> 伤害，可接触反弹最多 <span class=\"unsure\">?</span> 次，并追踪 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暮光军火",
+            "html": "暮光军火"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/331e6e45bc.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "召唤 3 把虚空斧并朝准星方向抛出。\n \n 斧头接触时在 ? 米范围内最多造成 1250 [?] 伤害并把战斗人员向内拉扯，0.6 秒后爆炸，在 ? 米范围内最多造成 1750 [?] 伤害并施加虚弱。\n 爆炸后斧头落地成为可携带武器，最多停留 20 秒。\n \n 可携带的斧头有 10 发弹药，最多可持有 15 秒。\n 轻攻击 ｜ 挥砍造成 581 [175] 伤害并施加虚弱，消耗 1 发。\n 重击 ｜ 把斧头当爆炸弹体投出，消耗全部弹药。接触造成 1337 [?] 伤害，爆炸在 ? 米范围内最多造成 830 [250] 伤害并使受损战斗人员虚弱。\n 斧头伤害只能被虚空激涌修正与减益提高。",
+            "html": "召唤 3 把<span class=\"el-void\">虚空</span>斧并朝准星方向抛出。<br> <br> 斧头接触时在 <span class=\"unsure\">?</span> 米范围内最多造成 1250 <span class=\"unsure\">[?]</span> 伤害并把<span class=\"enemy\">战斗人员</span>向内拉扯，0.6 秒后爆炸，在 <span class=\"unsure\">?</span> 米范围内最多造成 1750 <span class=\"unsure\">[?]</span> 伤害并施加<span class=\"deb-void\">虚弱</span>。<br> 爆炸后斧头落地成为可携带武器，最多停留 20 秒。<br> <br> 可携带的斧头有 10 发弹药，最多可持有 15 秒。<br> 轻攻击 ｜ 挥砍造成 581 <span class=\"pvp\">[175]</span> 伤害并施加<span class=\"deb-void\">虚弱</span>，消耗 1 发。<br> 重击 ｜ 把斧头当爆炸弹体投出，消耗全部弹药。接触造成 1337 <span class=\"unsure\">[?]</span> 伤害，爆炸在 <span class=\"unsure\">?</span> 米范围内最多造成 830 <span class=\"pvp\">[250]</span> 伤害并使受损<span class=\"enemy\">战斗人员</span><span class=\"deb-void\">虚弱</span>。<br> <span class=\"note\">斧头伤害只能被虚空激涌修正与减益提高。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T3 级超能\n 基础冷却 500 秒",
+            "html": "T3 级超能<br> 基础冷却 500 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "黎明护罩",
+            "html": "黎明护罩"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ac4a159058.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "施法动画期间伤害抗性：?% [26.5%]\n \n 施放时提供一次手雷技能充能，并生成 3 枚能量球，每枚提供 2.3% 超能能量。\n \n 投出一座 8000 构造体生命值的防护穹顶，对战斗人员有 75%? 伤害抗性，内含一枚 200 生命值的核心。\n 穹顶以核心为中心覆盖 8 米半径，持续 30 秒；摧毁核心即摧毁护罩。\n 守护者对穹顶本身造成的伤害提高 50%，技能伤害另行缩放。\n 除非穹顶内有战斗人员，否则所有弹体无法进出；穹顶内有战斗人员时，施法者与盟友可以射穿。\n 部署或重新部署时会把 15 米内的战斗人员向内拉。超能属性最多把持续时间再延长 10 秒（200 超能）。\n \n 站在穹顶内：\n 施法者近战伤害 +50%，施法者的近战击杀会生成能量球（每次施放最多 5 枚）。\n 战斗人员持续虚弱，? 米内的战斗人员被嘲讽走向穹顶内的守护者。\n 光能护甲每秒生成 15 点虚空覆盖护盾，并提供 40% [?%] 伤害抗性、+50 操控性与 +50 填装速度。\n \n 重新部署：\n 核心在部署 3 秒后可由施法者拾起，每次施放最多两次，旋转的能量球表示剩余次数。\n 持有期间，剩余护罩时长每（77 ÷ 拾取时剩余的光能护甲秒数）减少 1 秒。",
+            "html": "施法动画期间伤害抗性：<span class=\"unsure\">?</span>% <span class=\"pvp\">[26.5%]</span><br> <br> 施放时提供一次<span class=\"pickup\">手雷技能充能</span>，并生成 3 枚<span class=\"orb\">能量球</span>，每枚提供 2.3% <span class=\"orb\">超能能量</span>。<br> <br> 投出一座 8000 构造体<span class=\"health\">生命值</span>的防护穹顶，对<span class=\"enemy\">战斗人员</span>有 <span class=\"unsure\">75%?</span> 伤害抗性，内含一枚 200 <span class=\"health\">生命值</span>的核心。<br> 穹顶以核心为中心覆盖 8 米半径，持续 30 秒；摧毁核心即摧毁护罩。<br> <span class=\"bar-orange\">守护者</span>对穹顶本身造成的伤害提高 50%，技能伤害另行缩放。<br> 除非穹顶内有<span class=\"enemy\">战斗人员</span>，否则所有弹体无法进出；穹顶内有<span class=\"enemy\">战斗人员</span>时，<span class=\"enemy\">施法者</span>与<span class=\"enemy\">盟友</span>可以射穿。<br> 部署或重新部署时会把 15 米内的<span class=\"enemy\">战斗人员</span>向内拉。超能属性最多把持续时间再延长 10 秒（200 超能）。<br> <br> 站在穹顶内：<br> <span class=\"enemy\">施法者</span>近战伤害 +50%，<span class=\"enemy\">施法者</span>的近战击杀会生成<span class=\"orb\">能量球</span>（每次施放最多 5 枚）。<br> <span class=\"enemy\">战斗人员</span>持续<span class=\"deb-void\">虚弱</span>，<span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>被嘲讽走向穹顶内的<span class=\"bar-orange\">守护者</span>。<br> 光能护甲每秒生成 15 点<span class=\"el-void\">虚空覆盖护盾</span>，并提供 40% <span class=\"unsure\">[?%]</span> 伤害抗性、+50 操控性与 +50 填装速度。<br> <br> 重新部署：<br> 核心在部署 3 秒后可由<span class=\"enemy\">施法者</span>拾起，每次施放最多两次，旋转的<span class=\"orb\">能量球</span>表示剩余次数。<br> 持有期间，剩余护罩时长每（77 ÷ 拾取时剩余的光能护甲秒数）减少 1 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T4 级超能\n 基础冷却 455 秒",
+            "html": "T4 级超能<br> 基础冷却 455 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "堡垒",
+            "html": "堡垒"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/88bc2052de.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超能施放时：\n 为 15 米内的盟友提供 45 生命值的虚空覆盖护盾。\n \n 施放强化屏障时：\n 为自己与 15? 米内的盟友提供 45 生命值的虚空覆盖护盾。\n 强化屏障受到守护者的伤害提高 20%。\n \n 位于强化屏障后方时：\n 每秒生成 11 点虚空覆盖护盾。\n 仅限熔炉竞技场：巍峨屏障基础冷却覆盖为 100 秒，集结屏障覆盖为 80 秒。",
+            "html": "超能施放时：<br> 为 15 米内的<span class=\"enemy\">盟友</span>提供 45 <span class=\"health\">生命值</span>的<span class=\"el-void\">虚空覆盖护盾</span>。<br> <br> 施放强化屏障时：<br> 为<span class=\"enemy\">自己</span>与 <span class=\"unsure\">15?</span> 米内的<span class=\"enemy\">盟友</span>提供 45 <span class=\"health\">生命值</span>的<span class=\"el-void\">虚空覆盖护盾</span>。<br> 强化屏障受到<span class=\"bar-orange\">守护者</span>的伤害提高 20%。<br> <br> 位于强化屏障后方时：<br> 每秒生成 11 点<span class=\"el-void\">虚空覆盖护盾</span>。<br> <span class=\"note\">仅限熔炉竞技场：巍峨屏障基础冷却覆盖为 100 秒，集结屏障覆盖为 80 秒。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "克制破坏",
+            "html": "克制破坏"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d25b7ba958.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空技能伤害施加不稳定，而不稳定爆炸本身也计为虚空技能伤害。\n \n 不稳定爆炸为自己与 40 米内的盟友恢复 90 生命值。",
+            "html": "<span class=\"el-void\">虚空</span>技能伤害施加<span class=\"deb-void\">不稳定</span>，而<span class=\"deb-void\">不稳定</span>爆炸本身也计为<span class=\"el-void\">虚空</span>技能伤害。<br> <br> <span class=\"deb-void\">不稳定</span>爆炸为<span class=\"enemy\">自己</span>与 40 米内的<span class=\"enemy\">盟友</span>恢复 90 <span class=\"health\">生命值</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "进攻堡垒",
+            "html": "进攻堡垒"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7ae8554d07.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "为哨兵圣盾超能额外提供圣盾投掷。\n \n 虚空覆盖护盾激活时，或身处黎明护罩内时：\n 击杀提供 9% 手雷与 9% 近战技能能量。\n 近战伤害 +160% [20%]，近战突进射程提高到 5.5 米。\n 近战击杀生成 10 生命值的虚空覆盖护盾。\n 基础近战命中计为虚空充能近战命中（末日牙护肩与断绝末路除外）。",
+            "html": "为哨兵圣盾超能额外提供<span class=\"el-void\">圣盾投掷</span>。<br> <br> <span class=\"el-void\">虚空覆盖护盾</span>激活时，或身处黎明护罩内时：<br> 击杀提供 9% <span class=\"pickup\">手雷</span>与 9% <span class=\"pickup\">近战技能能量</span>。<br> 近战伤害 +160% <span class=\"pvp\">[20%]</span>，近战突进射程提高到 5.5 米。<br> 近战击杀生成 10 <span class=\"health\">生命值</span>的<span class=\"el-void\">虚空覆盖护盾</span>。<br> 基础近战命中计为<span class=\"el-void\">虚空</span>充能近战命中（末日牙护肩与<span class=\"exotic\">断绝末路</span>除外）。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "坚不可摧",
+            "html": "坚不可摧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/aad67e3608.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "按住［手雷］召唤虚空护盾，装备时手雷冷却覆盖为 152 秒。\n \n 护盾对格挡的伤害提供 95%? [64%] 抗性，并嘲讽正面的战斗人员；碰到护盾的战斗人员陷入迷失。\n 每秒生成 10 点虚空覆盖护盾，持续 5+2.5 秒，期间每秒消耗 7.5% 手雷能量。\n \n 格挡伤害会让前向移动速度降低 50%?（持续 0.5? 秒），同时提供手雷能量——回能逐渐降低（随时间，或随已格挡伤害?），? 秒后降到 ?%。\n 护盾本身没有移速惩罚，只是不能攀爬；冲刺会取消它。\n 装备哨兵圣盾时，格挡任意伤害都会为盟友生成一枚能量球，提供 2.5% 超能能量（4.5 秒内置冷却）。\n \n 松开［手雷］或耗尽手雷能量时：\n 释放一次正面爆炸，消耗 50% 手雷能量，对 11 米内的目标造成伤害。\n 未格挡任何伤害时最少 430 [64?]，随已格挡伤害提高，最高 1584 [178?]。\n \n 用坚不可摧击杀提供吞食，持续 10+5 秒。",
+            "html": "按住［手雷］召唤<span class=\"el-void\">虚空</span>护盾，装备时手雷冷却覆盖为 152 秒。<br> <br> 护盾对格挡的伤害提供 <span class=\"unsure\">95%?</span> <span class=\"pvp\">[64%]</span> 抗性，并嘲讽正面的<span class=\"enemy\">战斗人员</span>；碰到护盾的<span class=\"enemy\">战斗人员</span>陷入迷失。<br> 每秒生成 10 点<span class=\"el-void\">虚空覆盖护盾</span>，持续 5+2.5 秒，期间每秒消耗 7.5% <span class=\"pickup\">手雷能量</span>。<br> <br> 格挡伤害会让前向移动速度降低 <span class=\"unsure\">50%?</span>（持续 <span class=\"unsure\">0.5?</span> 秒），同时提供<span class=\"pickup\">手雷能量</span>——回能逐渐降低（随时间，或随已格挡伤害<span class=\"unsure\">?</span>），<span class=\"unsure\">?</span> 秒后降到 <span class=\"unsure\">?</span>%。<br> 护盾本身没有移速惩罚，只是不能攀爬；冲刺会取消它。<br> 装备哨兵圣盾时，格挡任意伤害都会为<span class=\"enemy\">盟友</span>生成一枚<span class=\"orb\">能量球</span>，提供 2.5% <span class=\"orb\">超能能量</span>（4.5 秒内置冷却）。<br> <br> 松开［手雷］或耗尽<span class=\"pickup\">手雷能量</span>时：<br> 释放一次正面爆炸，消耗 50% <span class=\"pickup\">手雷能量</span>，对 11 米内的目标造成伤害。<br> 未格挡任何伤害时最少 430 <span class=\"unsure\">[64?]</span>，随已格挡伤害提高，最高 1584 <span class=\"unsure\">[178?]</span>。<br> <br> 用<span class=\"el-void\">坚不可摧</span>击杀提供<span class=\"el-void\">吞食</span>，持续 10+5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "术士",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "口袋奇点",
+            "html": "口袋奇点"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/23284402f6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "固有 2 次近战技能充能。\n 发射一颗持续 2 秒的不稳定虚空能量球。\n \n 奇点追踪 2? 米内最近的战斗人员，接触时爆炸：\n 把 3.75 米内的战斗人员击退，造成 527 [60] 伤害并施加不稳定。\n \n 用自动近战使用时：\n 消耗一次充能发起近战突进，仍然造成击退与不稳定，但伤害按距离降低 65% 至 50%，越近越低。\n 被口袋奇点命中的守护者在 0.5 秒内无法近战突进，正在进行的滑铲也会被打断。",
+            "html": "固有 2 次近战技能充能。<br> 发射一颗持续 2 秒的<span class=\"deb-void\">不稳定</span><span class=\"el-void\">虚空</span><span class=\"orb\">能量球</span>。<br> <br> 奇点追踪 <span class=\"unsure\">2?</span> 米内最近的<span class=\"enemy\">战斗人员</span>，接触时爆炸：<br> 把 3.75 米内的<span class=\"enemy\">战斗人员</span>击退，造成 527 <span class=\"pvp\">[60]</span> 伤害并施加<span class=\"deb-void\">不稳定</span>。<br> <br> 用自动近战使用时：<br> 消耗一次充能发起近战突进，仍然造成击退与<span class=\"deb-void\">不稳定</span>，但伤害按距离降低 65% 至 50%，越近越低。<br> <span class=\"note\">被口袋奇点命中的守护者在 0.5 秒内无法近战突进，正在进行的滑铲也会被打断。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "新星炸弹：灾变",
+            "html": "新星炸弹：灾变"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e0e0603135.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [49%]\n \n 释放一颗缓慢移动、带追踪的新星炸弹，接触或被打爆时引爆，在 12 米半径内最多造成 3241 [?] 伤害。\n 炸弹本体有 400 构造体生命值，施法者对自己的炸弹造成的伤害提高 300%。\n \n 引爆时释放 6 枚追踪器缓慢追敌，每枚在约 4 米半径内最多造成 649 [?] 伤害，本体各有 100 构造体生命值。\n 炸弹与追踪器都可以被打伤后在半空中引爆，施法者对它们的伤害显著更高。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[49%]</span><br> <br> 释放一颗缓慢移动、带追踪的新星炸弹，接触或被打爆时引爆，在 12 米半径内最多造成 3241 <span class=\"unsure\">[?]</span> 伤害。<br> 炸弹本体有 400 构造体<span class=\"health\">生命值</span>，<span class=\"enemy\">施法者</span>对<span class=\"enemy\">自己</span>的炸弹造成的伤害提高 300%。<br> <br> 引爆时释放 6 枚追踪器缓慢追敌，每枚在约 4 米半径内最多造成 649 <span class=\"unsure\">[?]</span> 伤害，本体各有 100 构造体<span class=\"health\">生命值</span>。<br> <span class=\"note\">炸弹与追踪器都可以被打伤后在半空中引爆，施法者对它们的伤害显著更高。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T3 级超能\n 基础冷却 500 秒",
+            "html": "T3 级超能<br> 基础冷却 500 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "新星炸弹：涡流",
+            "html": "新星炸弹：涡流"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1e094243e6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [49%]\n \n 释放一颗快速移动、带弧线的新星炸弹，接触时引爆，在 ? 米范围内最多造成 3021 [?] 伤害。\n \n 引爆 0.43 秒后生成一团奇点，立即把战斗人员向内拉扯。\n 奇点对 ? 米内的战斗人员每 0.13 秒造成 52 [?] 伤害，持续 10 秒，并每 ? 秒把 ? 米内的战斗人员拉向自己。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[49%]</span><br> <br> 释放一颗快速移动、带弧线的新星炸弹，接触时引爆，在 <span class=\"unsure\">?</span> 米范围内最多造成 3021 <span class=\"unsure\">[?]</span> 伤害。<br> <br> 引爆 0.43 秒后生成一团奇点，立即把<span class=\"enemy\">战斗人员</span>向内拉扯。<br> 奇点对 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>每 0.13 秒造成 52 <span class=\"unsure\">[?]</span> 伤害，持续 10 秒，并每 <span class=\"unsure\">?</span> 秒把 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>拉向<span class=\"enemy\">自己</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T3 级超能\n 基础冷却 500 秒",
+            "html": "T3 级超能<br> 基础冷却 500 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "新星折跃",
+            "html": "新星折跃"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c18f069217.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [58%]\n 基础持续：24.5 秒，或每秒消耗 4.1% 超能能量\n \n 轻攻击 ｜ 消耗 5% 超能能量。\n 在 6 米半径内最多造成 964 [200] 伤害并施加不稳定，最大衰减降低 50% 伤害。\n 长按［开火］0.6 秒可蓄力，把约 14 米内的战斗人员拉向自己，并把伤害与半径线性提高 120%；蓄力期间移动速度下降 ?%。\n \n 重击 / 冲刺 ｜ 发动暗影瞬移，消耗 3.5% 超能能量。\n 朝输入方向快速加速并释放 4 枚虚弱追踪器（每个主方向一枚）。\n 追踪器瞄准 8 米内的战斗人员，接触造成 193 [?] 伤害并施加虚弱。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[58%]</span><br> 基础持续：24.5 秒，或每秒消耗 4.1% <span class=\"orb\">超能能量</span><br> <br> 轻攻击 ｜ 消耗 5% <span class=\"orb\">超能能量</span>。<br> 在 6 米半径内最多造成 964 <span class=\"pvp\">[200]</span> 伤害并施加<span class=\"deb-void\">不稳定</span>，最大衰减降低 50% 伤害。<br> 长按［开火］0.6 秒可蓄力，把约 14 米内的<span class=\"enemy\">战斗人员</span>拉向<span class=\"enemy\">自己</span>，并把伤害与半径线性提高 120%；蓄力期间移动速度下降 <span class=\"unsure\">?</span>%。<br> <br> 重击 / 冲刺 ｜ 发动暗影瞬移，消耗 3.5% <span class=\"orb\">超能能量</span>。<br> 朝输入方向快速加速并释放 4 枚<span class=\"deb-void\">虚弱</span>追踪器（每个主方向一枚）。<br> 追踪器瞄准 8 米内的<span class=\"enemy\">战斗人员</span>，接触造成 193 <span class=\"unsure\">[?]</span> 伤害并施加<span class=\"deb-void\">虚弱</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "混沌加速",
+            "html": "混沌加速"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/824cbafc99.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "按［手雷技能］给手雷过载，并额外提供一次手雷技能充能。\n \n 量子光束 ｜ 追踪目标从 2 个增至 4 个，飞得更快，伤害提高 25%，落地 1 秒后再触发一次。\n 散射 ｜ 多 4 枚子弹药共 12 枚，子弹药强力追踪 5 米内的战斗人员，对战斗人员伤害提高 25%。\n 涡流 ｜ 持续时间 +7.5%，半径 +70%，提前 0.275 秒开始造成伤害，提前 0.2 秒开始拉扯。\n 磁性、虚空尖刺、抑制与虚空墙壁 ｜ 改为释放一道短射程虚空爆炸并施加不稳定，被动提供 1.15 倍手雷充能速度。",
+            "html": "按［手雷技能］给手雷过载，并额外提供一次<span class=\"pickup\">手雷技能充能</span>。<br> <br> <span class=\"el-void\">量子光束</span> ｜ 追踪目标从 2 个增至 4 个，飞得更快，伤害提高 25%，落地 1 秒后再触发一次。<br> 散射 ｜ 多 4 枚子弹药共 12 枚，子弹药强力追踪 5 米内的<span class=\"enemy\">战斗人员</span>，对<span class=\"enemy\">战斗人员</span>伤害提高 25%。<br> 涡流 ｜ 持续时间 +7.5%，半径 +70%，提前 0.275 秒开始造成伤害，提前 0.2 秒开始拉扯。<br> 磁性、<span class=\"el-void\">虚空尖刺</span>、抑制与<span class=\"el-void\">虚空墙壁</span> ｜ 改为释放一道短射程<span class=\"el-void\">虚空</span>爆炸并施加<span class=\"deb-void\">不稳定</span>，被动提供 1.15 倍手雷充能速度。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "旧神之子",
+            "html": "旧神之子"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/64a464f451.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "施放裂痕时提供虚空灵魂就绪，持续 25 秒，最多叠 2 个。\n 武器命中战斗人员时会发射一个虚空伙伴飞过去，到达后投射吸取场域。\n \n 吸取场域每 0.7 秒对 10 米内的战斗人员造成 41 [10] 虚空手雷技能伤害并施加虚弱持续 4 [2.5] 秒，最长 9.25 秒。\n 范围内的战斗人员还会被压制。\n 伙伴本体有 150 生命值，可以被摧毁；开始主动消耗前有 ?% 伤害抗性。\n \n 虚空灵魂造成伤害期间按所选职业技能提供不同加成：\n 治愈裂痕 ｜ 每 1.4 秒提供 4% 手雷与近战能量。\n 强能裂痕 ｜ 每 1.4 秒恢复 25 生命值。\n \n 在吸取场域内被击杀的战斗人员按等级提供职业技能能量：\n T1 级战斗人员 10% ｜ T2 15% ｜ T3 20% ｜ T4 以上 50% ｜ 守护者 33.4%。",
+            "html": "施放裂痕时提供<span class=\"el-void\">虚空</span>灵魂就绪，持续 25 秒，最多叠 2 个。<br> 武器命中<span class=\"enemy\">战斗人员</span>时会发射一个<span class=\"el-void\">虚空</span>伙伴飞过去，到达后投射吸取场域。<br> <br> 吸取场域每 0.7 秒对 10 米内的<span class=\"enemy\">战斗人员</span>造成 41 <span class=\"pvp\">[10]</span> <span class=\"el-void\">虚空</span>手雷技能伤害并施加<span class=\"deb-void\">虚弱</span>持续 4 <span class=\"pvp\">[2.5]</span> 秒，最长 9.25 秒。<br> 范围内的<span class=\"enemy\">战斗人员</span>还会被<span class=\"deb-void\">压制</span>。<br> 伙伴本体有 150 <span class=\"health\">生命值</span>，可以被摧毁；开始主动消耗前有 <span class=\"unsure\">?</span>% 伤害抗性。<br> <br> <span class=\"el-void\">虚空</span>灵魂造成伤害期间按所选职业技能提供不同加成：<br> <span class=\"el-solar\">治愈</span>裂痕 ｜ 每 1.4 秒提供 4% <span class=\"pickup\">手雷与近战能量</span>。<br> 强能裂痕 ｜ 每 1.4 秒恢复 25 <span class=\"health\">生命值</span>。<br> <br> 在吸取场域内被击杀的<span class=\"enemy\">战斗人员</span>按等级提供<span class=\"pickup\">职业技能能量</span>：<br> <span class=\"enemy\">T1 级战斗人员</span> 10% ｜ <span class=\"enemy\">T2</span> 15% ｜ <span class=\"enemy\">T3</span> 20% ｜ <span class=\"enemy\">T4</span> 以上 50% ｜ <span class=\"bar-orange\">守护者</span> 33.4%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "虚空供养",
+            "html": "虚空供养"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dbc743c2b4.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空技能击杀提供吞食，并把它升级为强化吞食。\n \n 强化吞食：\n 激活时恢复 140 生命值，持续 10+5 秒；重新激活再恢复 140 生命值并刷新 5+3 秒。\n \n 强化吞食期间击杀：\n 恢复 140 生命值，获得双倍手雷技能能量，并刷新 5+3 秒。\n 击杀回能：T1 级战斗人员 15% ｜ T2 23.2% ｜ T3 27.5% ｜ T4 40% ｜ 守护者 40%。",
+            "html": "<span class=\"el-void\">虚空</span>技能击杀提供<span class=\"el-void\">吞食</span>，并把它升级为强化<span class=\"el-void\">吞食</span>。<br> <br> 强化<span class=\"el-void\">吞食</span>：<br> 激活时恢复 140 <span class=\"health\">生命值</span>，持续 10+5 秒；重新激活再恢复 140 <span class=\"health\">生命值</span>并刷新 5+3 秒。<br> <br> 强化<span class=\"el-void\">吞食</span>期间击杀：<br> 恢复 140 <span class=\"health\">生命值</span>，获得双倍<span class=\"pickup\">手雷技能能量</span>，并刷新 5+3 秒。<br> 击杀回能：<span class=\"enemy\">T1 级战斗人员</span> 15% ｜ <span class=\"enemy\">T2</span> 23.2% ｜ <span class=\"enemy\">T3</span> 27.5% ｜ <span class=\"enemy\">T4</span> 40% ｜ <span class=\"bar-orange\">守护者</span> 40%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "灵魂虹吸",
+            "html": "灵魂虹吸"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f6b6d1d418.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "充能近战命中后，近战技能被替换为灵魂虹吸，持续 20 秒。\n \n 使用时束缚 20 米内最多 4 名战斗人员，每 0.2 秒造成一跳递增的近战伤害，并在 3.2 秒内把它们拉向自己。\n 最后一次拉扯（首跳后 0.6 秒）必定使战斗人员踉跄。\n \n 每名战斗人员每跳提供 +15 虚空覆盖护盾（持续 15+7.5 秒）与 ?% 职业技能能量。\n 装备坚韧回声时，覆盖护盾时长只有在低于 15 秒时才能刷新到 22.5 秒。\n \n 伤害略有随机，平均每次施放对每名战斗人员约 1320 近战伤害，跳数为 2 / 11 / 26 / 62 / 100 / 137 加收尾 879，PvP 各档为 ? / ?? / ?? / ?? / ?? / ?? 加收尾 ?。",
+            "html": "充能近战命中后，近战技能被替换为<span class=\"el-void\">灵魂虹吸</span>，持续 20 秒。<br> <br> 使用时束缚 20 米内最多 4 名<span class=\"enemy\">战斗人员</span>，每 0.2 秒造成一跳递增的近战伤害，并在 3.2 秒内把它们拉向<span class=\"enemy\">自己</span>。<br> 最后一次拉扯（首跳后 0.6 秒）必定使<span class=\"enemy\">战斗人员</span>踉跄。<br> <br> 每名<span class=\"enemy\">战斗人员</span>每跳提供 +15 <span class=\"el-void\">虚空覆盖护盾</span>（持续 15+7.5 秒）与 <span class=\"unsure\">?</span>% <span class=\"pickup\">职业技能能量</span>。<br> <span class=\"note\">装备坚韧回声时，覆盖护盾时长只有在低于 15 秒时才能刷新到 22.5 秒。</span><br> <br> 伤害略有随机，平均每次施放对每名<span class=\"enemy\">战斗人员</span>约 1320 近战伤害，跳数为 2 / 11 / 26 / 62 / 100 / 137 加收尾 879，<span class=\"unsure\">PvP 各档为 ? / ?? / ?? / ?? / ?? / ?? 加收尾 ?</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "虚空 · Starside\n\nStarside\n/\n职业分支详解\n/\n虚空\n\n虚空\n\n效果\n\n名称\n图标\n说明\n\n吞食激活时恢复 70 生命值并提供吞食，持续 10+5 秒。\n 重新激活再恢复 70 生命值并刷新 5+3 秒。\n\n 吞食期间击杀：\n 恢复 70 生命值，获得手雷技能能量，并刷新 5+3 秒。\n 击杀回能：T1 级战斗人员 7.5% ｜ T2 11.6% ｜ T3 13.75% ｜ T4 20% ｜ 守护者 20%。\n\n隐身隐形并获得多项增益，同时最大雷达射程降到 24 米，持续 5+2 秒。做出攻势动作立即结束。\n 雷达增强装置模组可移除雷达缩减。重新施加隐身时，只要没破隐，会刷新持续最久的那一份。\n\n 战斗人员无法直接锁定使用者，通常朝最后可见的位置射击或干脆停火；做出高噪声动作时会追踪但不射击。\n 守护者看不到使用者的生命值条；使用者的雷达每 5 秒才脉冲 0.6 秒，做高噪声动作时也会脉冲。\n 会追踪（追踪投射物）或扫描（烈焰手雷）的武器与技能不会锁定使用者，已锁定的也会脱锁。\n\n 攻势动作（立即破隐）：\n 射击 ｜ 手雷、近战、超能或瞬移技能 ｜ 放置屏障或裂痕 ｜ 召唤载具。\n\n 高噪声动作（暴露位置但不破隐）：\n 开始冲刺 ｜ 非瞬移的移动技能 ｜ 猎人职业技能。\n\n覆盖护盾虚空覆盖护盾最多 45 生命值，持续 10+5 秒。\n\n 护盾的生命值部分对战斗人员有 70% 伤害抗性，等效约 150 生命值。\n 打在虚空覆盖护盾上的伤害不会中断生命值恢复。\n 可以与其它覆盖护盾叠加（还治彼身、职业属性给的那层等），多层按先进先出消耗。\n\n虚空裂口虚空元素拾取物。\n\n 拾取提供 11.25% 职业技能能量。\n 使用者生成的虚空裂口对盟友不生效。\n 停留 25 秒后消失，两次生成之间有 5 秒冷却。\n\n压制被压制的战斗人员被强制打断当前技能，10 [5] 秒内无法使用技能。\n\n 被压制的红血与橙血战斗人员还会陷入迷失、无法射击。\n 被压制的守护者被强制退出当前超能与超凡，并且无法使用手雷、近战、职业、超能、移动技能与超凡。\n\n 过载勇士被压制时进入眩晕。\n\n不稳定不稳定的战斗人员在累计受到 190 [200] 伤害后、或死亡时触发爆炸，在 5 米半径内最多造成 145 [80] 虚空技能伤害。\n\n 持续 10 [6] 秒，到期未触发则无害消失；爆炸触发后减益随之移除。\n 施加不稳定那一次命中的伤害不计入引爆阈值。\n 爆炸后需要 1 秒冷却才能对同一名战斗人员再次施加。\n\n不稳定弹药虚空武器造成伤害时施加不稳定。\n 不稳定子弹激活期间，对勇士的武器伤害提高 10%。\n\n虚弱被虚弱的战斗人员受到的伤害提高 15% [7.5%]，移动速度降低 20%，持续 6 [2.5] 秒。\n 被虚弱的战斗人员精度下降、动作变慢。\n\n 部分来源施加的是显著更强的虚弱，伤害提高 30%（PvP 通常 50%）：\n 暗影箭矢：莫比乌斯对被束缚的战斗人员提供 30% [50%]。\n 邪冬的头盔「领主之末」对受其虚弱爆裂影响的战斗人员提供 30% [30%]。\n 牵引器火炮的冲击波与法夫纳（量子新星激活时）提供 30% [50%]。\n 暗影箭矢：狩猎陷阱另成一档，提供 35% [50%?]。\n\n 法夫纳、费尔温特与牵引者的虚弱时长可以被任何其它虚弱效果延长。\n\n碎片\n\n碎片\n图标\n说明\n属性变化\n\n休止回声终结技对 ? 米内的战斗人员施加不稳定。\n 击杀不稳定的战斗人员生成虚空裂口。—\n\n扩张回声蹲伏速度固定为 4 米/秒，蹲伏时雷达分辨率翻倍。\n 蹲伏速度不会被压到 4 米/秒以下，与横越之步同理。+10 武器\n +10 超能\n\n霸道回声压制一名战斗人员：\n 提供 +30 武器属性、10 秒内 4% 前向移动加成，并补满已准备的武器（4 秒内置冷却）。\n\n 击杀被压制的战斗人员生成虚空裂口。+10 手雷\n\n交换回声近战击杀按战斗人员等级提供手雷技能能量：\n T1 级战斗人员 7.5% ｜ T2 11% ｜ T3 与守护者 16.25% ｜ T4、初级首领与首领 25%。+10 近战\n\n驱逐回声虚空技能击杀使战斗人员爆炸，在 7 米半径内最多造成 160 [130] 伤害。+10 超能\n\n收割回声击杀被虚弱的战斗人员：\n 生成一枚能量球（提供 2.5% 超能能量）与一枚虚空裂口。\n 生成能量球后有 10 秒冷却。—\n\n失稳回声手雷击杀为虚空武器提供不稳定子弹，持续 11.25 [7.5] 秒。\n 不要求是虚空手雷击杀。+10 近战\n\n吸吮回声近战击杀为自己与 ? 米内的盟友开始生命值恢复。+10 生命值\n\n朦胧回声终结技提供隐身，持续 5+2 秒。+10 职业\n\n坚韧回声施加给使用者的虚空增益持续更久：\n 吞食 +50% ｜ 隐身 +40% ｜ 虚空覆盖护盾 +50%。-10 武器（猎人）\n -10 生命值（泰坦）\n -10 职业（术士）\n\n补能回声手雷技能伤害提供近战技能能量，每次伤害实例只触发一次（同时命中多名战斗人员算一次）。\n\n 3% ｜ 散射、虚空尖刺、虚空墙壁、涡流。\n 8% ｜ 量子光束、手持超新星、磁性、抑制。\n 与坚不可摧不兼容。+10 手雷\n\n残存回声量子光束 ｜ 持续时间延长 ?%。\n 虚空尖刺 ｜ 持续时间 +50%，并提前 0.1 秒开始造成伤害。\n 虚空墙壁 ｜ 持续时间 +50%。\n 涡流手雷 ｜ 持续时间 +25%，并提前 0.13 秒开始造成伤害；被混沌加速强化过的涡流手雷 +55%。—\n\n报复回声8 米内被 3 名以上战斗人员腹背受敌时，击杀额外提供超能能量：\n 3 名 +0.3% ｜ 4 名 +0.65% ｜ 5 名 +1% ｜ 6 名 +1.6% ｜ 7 名 +2.3%。\n 两次激活之间有 1 秒冷却。—\n\n饥饿回声拾取能量球或虚空裂口提供吞食，持续 5+2.5 秒。-10 职业\n\n弱化回声虚空手雷命中时施加虚弱，持续 6 [2.5] 秒。-10 手雷\n\n警惕回声处于重伤时击杀：\n 提供虚空覆盖护盾，持续 5+2.5 秒。\n 激活后有 8 秒冷却。—\n\n手雷技能\n\n手雷\n图标\n说明\n基础冷却\n\n量子光束重型弹道 ｜ 扫描\n\n 接触时扫描 10 米视线内最多 2 名战斗人员，延迟 1 秒后放出减速飞行的量子光束追向它们。\n 光束造成 575 [65] 伤害，以 ? 米/秒的速度飞行、最长持续 ? 秒，本体有 10 生命值，可以被摧毁。\n\n 混沌加速：\n 扫描目标提高到 4 名、范围 12 米，光束飞行速度提高 ?%、伤害提高 25%，落地 1 秒后再触发一次。基础冷却 219.5 秒\n 回复倍率 0.5×\n\n手持超新星 装备磁性、虚空尖刺、抑制或虚空墙壁手雷、并带星相「混沌加速」时的形态\n\n 被动提供 1.154 倍手雷充能速度。\n 按住［手雷］蓄力 ? 秒后准备就绪，最多维持 4.5 秒。\n\n 松开［手雷］：\n 向前发出一道短射程虚空爆炸，造成 150 [50] 伤害并强力击退 12.5 米扇形内的战斗人员。\n 爆炸同时释放 9 发虚空矢弹，最远 12.5 米，每发在 3 米半径内造成 375 [15] 溅射伤害并施加不稳定。\n 9 发矢弹加初始爆炸全中时最多合计 3525 [185] 伤害。\n 对自身伤害降低 75%，也不会给自己施加不稳定。\n\n磁性手雷轻型弹道 ｜ 轻微追踪 ｜ 粘附 ｜ 快速\n\n 附着到战斗人员或表面上，1.2 秒后第一次爆炸，再过 0.6 秒二次爆炸。\n\n 每次爆炸在 5 米内最多造成 472 [75] 伤害，两次合计最多 946 [150]。基础冷却 151.5 秒\n 回复倍率 0.75×\n\n散射手雷重型弹道\n\n 接触时爆炸，造成 5 [1] 伤害并在 4 米范围内释放 8 枚子弹药。\n\n 每枚子弹药爆两次：第一次在 4 米内最多造成 70 [16] 伤害，0.5 秒后第二次最多造成 115 [20] 伤害。\n 8 枚全部打满时最多合计 1480 [288] 伤害。\n\n 混沌加速：\n 多 4 枚子弹药共 12 枚，子弹药强力追踪 5 米内的战斗人员，并对战斗人员伤害提高 25%。基础冷却 151.5 秒\n 回复倍率 0.75×\n\n抑制手雷中型弹道\n\n 速度降到足够低后爆炸，爆炸前有短暂延迟。\n\n 爆炸在 9 米范围内最多造成 863 [150] 伤害并施加压制，持续 10 [5] 秒。\n 使用者不会被自己压制。基础冷却 175.6 秒\n 回复倍率 0.625×\n\n虚空尖刺中型弹道 ｜ 壁挂\n\n 附着到表面和战斗人员身上，0.67−0.1 秒后开始投射虚空光能。\n\n 光能每 0.217 秒造成 80 [28] 伤害，最多 16+9 次，持续 3.5+1.75 秒。\n 持续时间内最多合计 1280（延长后 2000）[448（延长后 700）] 伤害。基础冷却 175.6 秒\n 回复倍率 0.625×\n\n虚空墙壁中型弹道 ｜ 持续伤害场域\n\n 接触时爆炸并立起一道跨度 ? 米、垂直的虚空光能墙，展开过程中最多造成 173 [46] 伤害。\n\n 生成 0.85 秒后开始造成伤害，每 0.2 秒 120 [35]，最多 18+9 次，持续 3.75+1.875 秒。\n 持续时间内最多合计 2160（延长后 3240）[630（延长后 945）] 伤害。基础冷却 175.6 秒\n 回复倍率 0.625×\n\n涡流手雷中型弹道 ｜ 持续伤害场域\n\n 接触时在 5 米内最多造成 195 [25] 伤害，并生成一团虚空涡流。\n\n 命中 0.833 秒后开始把 5? 米内的战斗人员往里拉。\n 生成 1.45−0.13 秒后开始伤害，每 0.267 秒对 4 米半径内的战斗人员造成 78 [20] 伤害，最多 12+7 次，持续 4+1 秒。第 13 至 20 跳有衰减，最多 54 [?] 伤害。\n 场域内最多合计 990（延长后 1536）[240（延长后 380）] 伤害。\n\n 混沌加速：\n 命中 0.617 秒后开始把 ? 米内的战斗人员往里拉，生成 1.2 秒后开始伤害，每 0.267 秒 78 [20] 伤害，最多 17+7 次，持续 4.3+2.3 秒，半径扩大到 7 米。\n 第 17 至 24 跳有衰减，最多 54 [?] 伤害。合计最多 1380（延长后 1926）[340（延长后 480）] 伤害。基础冷却 219.5 秒\n 回复倍率 0.5×\n\n 猎人\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n鬼灵激涌向前挥砍最远 12 米，对 2 米内的战斗人员造成 595 [?] 伤害并穿过它们。\n\n 每命中一名战斗人员提供 +10 虚空覆盖护盾。\n 对受虚空减益影响的战斗人员，或被「伺机而动」标记的战斗人员，伤害提高 100% [?%]。\n 击杀额外提供 +45 虚空覆盖护盾并返还 60% 近战技能能量。基础冷却 130.7 秒\n 回复倍率 0.9×\n\n陷阱炸弹烟幕弹可附着表面最多 9 秒，附着期间会在战斗人员雷达上脉冲。\n 为接触点 6 米内的盟友提供隐身，持续 5+2 秒。\n 探测到 ? 米内的战斗人员或直接命中战斗人员时爆炸，生成烟幕。\n\n 接触造成 33 [10] 伤害，爆炸在 ? 米范围内最多造成 120 + 24 [40 + ?] 伤害。\n 接触与爆炸都施加虚弱与迷失，持续 8 [2.5] 秒。\n\n 烟幕在引爆后停留 5 [2] 秒，每 0.6 秒造成一次持续伤害并使战斗人员迷失。\n 0.87 秒后起跳伤害 12.65 [?]，每跳提高 13%，第 9 跳最多 24.8 [?]，5 秒内合计最多 156.7 [?]。基础冷却 130.7 秒\n 回复倍率 0.9×\n\n超能技能\n\n鬼灵利刃伤害抗性：90% [隐身 59%? ｜ 可见 58%]\n 基础持续：23.5 秒，或每秒消耗 4.25% 超能能量；不处于隐身时消耗加快 50%\n\n 轻攻击 ｜ 消耗 5%? 超能能量。\n 造成 1107 [?] 伤害并解除隐身，每秒攻击 ? 次。连续命中最多提供 25%? 的近战攻速加成。\n\n 重击 ｜ 消耗 15%? 超能能量。\n 打出上勾拳，造成 1620 [?] 伤害，施加虚弱并提供隐身。\n\n 允许无限使用「捕猎者的伏击」，每次代价 15%? 超能能量。T2 级超能\n 基础冷却 556 秒\n\n暗影箭矢：狩猎陷阱伤害抗性：90% [53%]\n\n 发射一枚陷落锚，附着到表面或战斗人员身上，接触时把 12.5 米内的所有战斗人员拉向它。\n 锚在探测到 12.5 米内有战斗人员 1 秒后激活，或 30 秒后自动激活。\n\n 陷落锚接触造成 2583 [?] 伤害，对 ? 米内的战斗人员施加陷落虚弱与压制，锚本体有 ? 点构造体生命值。\n 锚 12.5 米内的战斗人员被束缚，施加陷落虚弱、压制与标记，持续 30 [10] 秒。\n 对被束缚战斗人员造成的身体伤害，50%（基础）会同时施加给其它被束缚的战斗人员。\n 陷落虚弱另成一档，使受到的伤害提高 35%。\n\n 陷落锚默认持续 12 秒，击杀被束缚的战斗人员延长 0.5 秒，最长 25 秒。T4 级超能\n 基础冷却 455 秒\n\n暗影箭矢：莫比乌斯箭袋伤害抗性：90% [53%]\n 基础持续：16 秒（装备奥菲斯钻机为 20 秒）\n\n 每次激活最多发射 2 轮，每轮 3 枚莫比乌斯锚。\n 激活期间造成伤害会线性提高莫比乌斯锚与弓箭武器的伤害，累计约 3000 伤害后达到上限：锚 +127%，弓箭 +150%（弩 +75%）。\n 伤害需求无视力量等级差，按实际造成的伤害计算。\n\n 莫比乌斯锚接触造成 1076 [?] 伤害，并施加压制、不稳定与虚弱，锚本体有 ? 点构造体生命值。\n 锚 7 米内的战斗人员被束缚，对它们的伤害提高 20%，并被施加虚弱与压制。\n 身体伤害的 50%（基础）同时施加给其它被束缚的战斗人员。\n\n 莫比乌斯锚默认持续 6 秒，击杀被束缚的战斗人员延长 0.5 秒，最长 25 秒。T3 级超能\n 基础冷却 500 秒\n\n星相\n\n伺机而动获得虚空隐身时，或距上次标记满 10 秒时：\n 把 45 [25] 米内一名非首领战斗人员标记为优先目标，优先选离准星更近的红血。\n 优先目标存活期间提供伺机而动增益，目标本身则无限期（PvP 15 秒）承受「追猎掠食」减益。\n\n 击杀优先目标：\n 在其死亡位置释放一团虚弱烟幕。\n 提供 1 层成功狩猎（持续 ? 秒，最多 3 层）与 ?% 手雷、近战与职业技能能量。\n 每层提供 +? 稳定性、+? 填装速度，换弹时长 ×0.?。\n\n 烟幕立即在 5 米范围内造成最多 133 [?] 虚空近战伤害。\n 接触到的战斗人员被虚弱 6? 秒，处在烟里时迷失。\n 使用者与盟友获得虚空隐身，持续 5+2 秒。\n 烟幕停留 7? 秒，范围 ? 米，每 0.6 秒造成一次递增的持续伤害：0.87 秒后起跳 12.65 [?]，每跳提高 ?%，第 9 跳最多 24.8 [?]，7 秒内合计最多 ? [?] 伤害。\n 功能上，烟幕就是一枚立即引爆、半径与时长更大的陷阱炸弹，甚至能触发近战相关效果。\n\n潇洒行刑者击杀受虚空减益影响的战斗人员：\n 提供隐身持续 8+3.2 秒，以及真实视界持续 4 秒。\n\n 隐身期间可以发动优雅处决：\n 近战攻击伤害提高 300% [20%]，使战斗人员虚弱持续 5 [2.5] 秒，并延长近战突进射程。\n 触发后会附带「过于优雅」，在 2 [12] 秒内阻止再次触发优雅处决。\n\n捕猎者的伏击按［空中移动］：\n 消耗一次职业技能充能触发快速坠落，并触发已装备职业技能的使用效果。\n 若隐身正生效，快速坠落会再次施加它。\n\n 快速坠落打出猛击，最多造成 630 [71 守护者 ｜ 700 构造体] 虚空伤害；有虚空增益时伤害提高 50%。\n 造成伤害时恢复生命值，击杀提供吞食持续 10+5 秒。\n\n 同时装备隐身步法时：\n 快速坠落改为施加迷失与虚弱，并为自己与 10 米内的盟友提供隐身。\n\n 星相伤害随超过 100 的职业属性缩放，200 属性时最多 +65%。\n\n隐身步法闪身动画替换为更快、更远的一种，并提供隐身，持续 5+2 秒。\n\n 泰坦\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n圣盾强袭与其它肩撞类技能共用的规则：\n 需要冲刺 1.25 秒；未命中战斗人员时消耗 15% 近战技能能量；开火状态下无法在滑铲期间使用；被肩撞直接命中的守护者近战突进失效 0.5 秒。\n\n 向前突进 6.8 米，自动瞄准射程内的战斗人员。\n\n 命中战斗人员：\n 造成 1073 [110] 直击伤害。\n 对命中目标后方最远 7 米的战斗人员造成 391 [40] 径向伤害。\n 对命中目标 2 米内的战斗人员施加压制。\n\n 用圣盾强袭击杀提供 45 生命值的虚空覆盖护盾，持续 10+5 秒。基础冷却 131.7 秒\n 回复倍率 0.7×\n\n圣盾投掷向前掷出虚空护盾，每次最多跳弹 4 次，会尝试追踪战斗人员并受重力影响。\n\n 每次命中造成 400 [70] 直击伤害，并提供 15 生命值的虚空覆盖护盾。基础冷却 131.7 秒\n 回复倍率 0.9×\n\n超能技能\n\n哨兵圣盾伤害抗性：90% [53%]\n 基础持续：17 秒，或每秒消耗 5.88% 超能能量\n\n 轻攻击 ｜ 每次消耗 4.5% 超能能量，连击最后一击消耗 2%。\n 扎根 3 连击造成 797 [?] 与 856 [?] 伤害；空中 2 连击造成 797 [?] 伤害。\n 连击最后一击在 ? 米锥形范围内造成 1516 [?] 伤害。\n\n 重击 ｜ 生成一面盟友可以射穿的坚不可摧屏障，代价是移动速度降低 20%。\n 施法者对所有正面伤害免疫，包括敌方守护者。触碰屏障的战斗人员每 0.05 秒受到 7 [?] 伤害。\n 格挡伤害会生成能量球，提供 2.5%? 超能能量（1.5 秒内置冷却）。\n 格挡越多，圣盾投掷伤害越高，累计格挡 ? 伤害后最高 +1787%；持续格挡还能延长超能时长，最多 ?%。\n 守护者的伤害被完全无效化，也不会在屏障上触发命中相关效果；技能伤害会扣超能能量，但同时部分延长超能。\n\n 站在屏障后方 5 米内的盟友：\n 获得 25% 伤害提高、45 生命值的虚空覆盖护盾、+50 操控性与 +50 填装速度，所有武器每 2.5 秒补满弹药。\n 他们的虚空覆盖护盾在 3 秒未受伤后按每秒 9 生命值恢复。\n 屏障后方的盟友越多，格挡时的被动超能能量吸收越少：1 名 20% ｜ 2 名 35% ｜ 3 名 ?% ｜ 4 名 ?% ｜ 5 名 50%。\n\n 手雷技能 ｜ 不消耗超能能量，两次投掷之间有 3 秒冷却。\n 投出哨兵圣盾，造成 723 [?] 伤害，可接触反弹最多 ? 次，并追踪 ? 米内的战斗人员。T2 级超能\n 基础冷却 556 秒\n\n暮光军火召唤 3 把虚空斧并朝准星方向抛出。\n\n 斧头接触时在 ? 米范围内最多造成 1250 [?] 伤害并把战斗人员向内拉扯，0.6 秒后爆炸，在 ? 米范围内最多造成 1750 [?] 伤害并施加虚弱。\n 爆炸后斧头落地成为可携带武器，最多停留 20 秒。\n\n 可携带的斧头有 10 发弹药，最多可持有 15 秒。\n 轻攻击 ｜ 挥砍造成 581 [175] 伤害并施加虚弱，消耗 1 发。\n 重击 ｜ 把斧头当爆炸弹体投出，消耗全部弹药。接触造成 1337 [?] 伤害，爆炸在 ? 米范围内最多造成 830 [250] 伤害并使受损战斗人员虚弱。\n 斧头伤害只能被虚空激涌修正与减益提高。T3 级超能\n 基础冷却 500 秒\n\n黎明护罩施法动画期间伤害抗性：?% [26.5%]\n\n 施放时提供一次手雷技能充能，并生成 3 枚能量球，每枚提供 2.3% 超能能量。\n\n 投出一座 8000 构造体生命值的防护穹顶，对战斗人员有 75%? 伤害抗性，内含一枚 200 生命值的核心。\n 穹顶以核心为中心覆盖 8 米半径，持续 30 秒；摧毁核心即摧毁护罩。\n 守护者对穹顶本身造成的伤害提高 50%，技能伤害另行缩放。\n 除非穹顶内有战斗人员，否则所有弹体无法进出；穹顶内有战斗人员时，施法者与盟友可以射穿。\n 部署或重新部署时会把 15 米内的战斗人员向内拉。超能属性最多把持续时间再延长 10 秒（200 超能）。\n\n 站在穹顶内：\n 施法者近战伤害 +50%，施法者的近战击杀会生成能量球（每次施放最多 5 枚）。\n 战斗人员持续虚弱，? 米内的战斗人员被嘲讽走向穹顶内的守护者。\n 光能护甲每秒生成 15 点虚空覆盖护盾，并提供 40% [?%] 伤害抗性、+50 操控性与 +50 填装速度。\n\n 重新部署：\n 核心在部署 3 秒后可由施法者拾起，每次施放最多两次，旋转的能量球表示剩余次数。\n 持有期间，剩余护罩时长每（77 ÷ 拾取时剩余的光能护甲秒数）减少 1 秒。T4 级超能\n 基础冷却 455 秒\n\n星相\n\n堡垒超能施放时：\n 为 15 米内的盟友提供 45 生命值的虚空覆盖护盾。\n\n 施放强化屏障时：\n 为自己与 15? 米内的盟友提供 45 生命值的虚空覆盖护盾。\n 强化屏障受到守护者的伤害提高 20%。\n\n 位于强化屏障后方时：\n 每秒生成 11 点虚空覆盖护盾。\n 仅限熔炉竞技场：巍峨屏障基础冷却覆盖为 100 秒，集结屏障覆盖为 80 秒。\n\n克制破坏虚空技能伤害施加不稳定，而不稳定爆炸本身也计为虚空技能伤害。\n\n 不稳定爆炸为自己与 40 米内的盟友恢复 90 生命值。\n\n进攻堡垒为哨兵圣盾超能额外提供圣盾投掷。\n\n 虚空覆盖护盾激活时，或身处黎明护罩内时：\n 击杀提供 9% 手雷与 9% 近战技能能量。\n 近战伤害 +160% [20%]，近战突进射程提高到 5.5 米。\n 近战击杀生成 10 生命值的虚空覆盖护盾。\n 基础近战命中计为虚空充能近战命中（末日牙护肩与断绝末路除外）。\n\n坚不可摧按住［手雷］召唤虚空护盾，装备时手雷冷却覆盖为 152 秒。\n\n 护盾对格挡的伤害提供 95%? [64%] 抗性，并嘲讽正面的战斗人员；碰到护盾的战斗人员陷入迷失。\n 每秒生成 10 点虚空覆盖护盾，持续 5+2.5 秒，期间每秒消耗 7.5% 手雷能量。\n\n 格挡伤害会让前向移动速度降低 50%?（持续 0.5? 秒），同时提供手雷能量——回能逐渐降低（随时间，或随已格挡伤害?），? 秒后降到 ?%。\n 护盾本身没有移速惩罚，只是不能攀爬；冲刺会取消它。\n 装备哨兵圣盾时，格挡任意伤害都会为盟友生成一枚能量球，提供 2.5% 超能能量（4.5 秒内置冷却）。\n\n 松开［手雷］或耗尽手雷能量时：\n 释放一次正面爆炸，消耗 50% 手雷能量，对 11 米内的目标造成伤害。\n 未格挡任何伤害时最少 430 [64?]，随已格挡伤害提高，最高 1584 [178?]。\n\n 用坚不可摧击杀提供吞食，持续 10+5 秒。\n\n 术士\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n口袋奇点固有 2 次近战技能充能。\n 发射一颗持续 2 秒的不稳定虚空能量球。\n\n 奇点追踪 2? 米内最近的战斗人员，接触时爆炸：\n 把 3.75 米内的战斗人员击退，造成 527 [60] 伤害并施加不稳定。\n\n 用自动近战使用时：\n 消耗一次充能发起近战突进，仍然造成击退与不稳定，但伤害按距离降低 65% 至 50%，越近越低。\n 被口袋奇点命中的守护者在 0.5 秒内无法近战突进，正在进行的滑铲也会被打断。基础冷却 131.7 秒\n 回复倍率 0.9×\n\n超能技能\n\n新星炸弹：灾变伤害抗性：90% [49%]\n\n 释放一颗缓慢移动、带追踪的新星炸弹，接触或被打爆时引爆，在 12 米半径内最多造成 3241 [?] 伤害。\n 炸弹本体有 400 构造体生命值，施法者对自己的炸弹造成的伤害提高 300%。\n\n 引爆时释放 6 枚追踪器缓慢追敌，每枚在约 4 米半径内最多造成 649 [?] 伤害，本体各有 100 构造体生命值。\n 炸弹与追踪器都可以被打伤后在半空中引爆，施法者对它们的伤害显著更高。T3 级超能\n 基础冷却 500 秒\n\n新星炸弹：涡流伤害抗性：90% [49%]\n\n 释放一颗快速移动、带弧线的新星炸弹，接触时引爆，在 ? 米范围内最多造成 3021 [?] 伤害。\n\n 引爆 0.43 秒后生成一团奇点，立即把战斗人员向内拉扯。\n 奇点对 ? 米内的战斗人员每 0.13 秒造成 52 [?] 伤害，持续 10 秒，并每 ? 秒把 ? 米内的战斗人员拉向自己。T3 级超能\n 基础冷却 500 秒\n\n新星折跃伤害抗性：90% [58%]\n 基础持续：24.5 秒，或每秒消耗 4.1% 超能能量\n\n 轻攻击 ｜ 消耗 5% 超能能量。\n 在 6 米半径内最多造成 964 [200] 伤害并施加不稳定，最大衰减降低 50% 伤害。\n 长按［开火］0.6 秒可蓄力，把约 14 米内的战斗人员拉向自己，并把伤害与半径线性提高 120%；蓄力期间移动速度下降 ?%。\n\n 重击 / 冲刺 ｜ 发动暗影瞬移，消耗 3.5% 超能能量。\n 朝输入方向快速加速并释放 4 枚虚弱追踪器（每个主方向一枚）。\n 追踪器瞄准 8 米内的战斗人员，接触造成 193 [?] 伤害并施加虚弱。T2 级超能\n 基础冷却 556 秒\n\n星相\n\n混沌加速按［手雷技能］给手雷过载，并额外提供一次手雷技能充能。\n\n 量子光束 ｜ 追踪目标从 2 个增至 4 个，飞得更快，伤害提高 25%，落地 1 秒后再触发一次。\n 散射 ｜ 多 4 枚子弹药共 12 枚，子弹药强力追踪 5 米内的战斗人员，对战斗人员伤害提高 25%。\n 涡流 ｜ 持续时间 +7.5%，半径 +70%，提前 0.275 秒开始造成伤害，提前 0.2 秒开始拉扯。\n 磁性、虚空尖刺、抑制与虚空墙壁 ｜ 改为释放一道短射程虚空爆炸并施加不稳定，被动提供 1.15 倍手雷充能速度。\n\n旧神之子施放裂痕时提供虚空灵魂就绪，持续 25 秒，最多叠 2 个。\n 武器命中战斗人员时会发射一个虚空伙伴飞过去，到达后投射吸取场域。\n\n 吸取场域每 0.7 秒对 10 米内的战斗人员造成 41 [10] 虚空手雷技能伤害并施加虚弱持续 4 [2.5] 秒，最长 9.25 秒。\n 范围内的战斗人员还会被压制。\n 伙伴本体有 150 生命值，可以被摧毁；开始主动消耗前有 ?% 伤害抗性。\n\n 虚空灵魂造成伤害期间按所选职业技能提供不同加成：\n 治愈裂痕 ｜ 每 1.4 秒提供 4% 手雷与近战能量。\n 强能裂痕 ｜ 每 1.4 秒恢复 25 生命值。\n\n 在吸取场域内被击杀的战斗人员按等级提供职业技能能量：\n T1 级战斗人员 10% ｜ T2 15% ｜ T3 20% ｜ T4 以上 50% ｜ 守护者 33.4%。\n\n虚空供养虚空技能击杀提供吞食，并把它升级为强化吞食。\n\n 强化吞食：\n 激活时恢复 140 生命值，持续 10+5 秒；重新激活再恢复 140 生命值并刷新 5+3 秒。\n\n 强化吞食期间击杀：\n 恢复 140 生命值，获得双倍手雷技能能量，并刷新 5+3 秒。\n 击杀回能：T1 级战斗人员 15% ｜ T2 23.2% ｜ T3 27.5% ｜ T4 40% ｜ 守护者 40%。\n\n灵魂虹吸充能近战命中后，近战技能被替换为灵魂虹吸，持续 20 秒。\n\n 使用时束缚 20 米内最多 4 名战斗人员，每 0.2 秒造成一跳递增的近战伤害，并在 3.2 秒内把它们拉向自己。\n 最后一次拉扯（首跳后 0.6 秒）必定使战斗人员踉跄。\n\n 每名战斗人员每跳提供 +15 虚空覆盖护盾（持续 15+7.5 秒）与 ?% 职业技能能量。\n 装备坚韧回声时，覆盖护盾时长只有在低于 15 秒时才能刷新到 22.5 秒。\n\n 伤害略有随机，平均每次施放对每名战斗人员约 1320 近战伤害，跳数为 2 / 11 / 26 / 62 / 100 / 137 加收尾 879，PvP 各档为 ? / ?? / ?? / ?? / ?? / ?? 加收尾 ?。\n\n更新 2026.8.30\n\n数据源：Destiny Data Compendium。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/elements/void/index.html",
+    "final_url": "https://starside.work/elements/void/index.html",
+    "path": "pages/elements/void/index.html",
+    "bytes": 62524,
+    "sha256": "6f42b148448638b28a401f4cbdb06be674846c5da4d1b3161f312d6a9aa2e13f",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:31.226753+00:00"
+  },
+  "links": [
+    "https://starside.work/elements/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/elements/style.css",
+    "https://starside.work/elements/void/icons/0566b8255d.webp",
+    "https://starside.work/elements/void/icons/077fdefd08.webp",
+    "https://starside.work/elements/void/icons/0b7287dfe2.webp",
+    "https://starside.work/elements/void/icons/0bbe7ceb65.webp",
+    "https://starside.work/elements/void/icons/0c75d0ba42.webp",
+    "https://starside.work/elements/void/icons/0f6a1a58e7.webp",
+    "https://starside.work/elements/void/icons/1e094243e6.webp",
+    "https://starside.work/elements/void/icons/23284402f6.webp",
+    "https://starside.work/elements/void/icons/26cce5074c.webp",
+    "https://starside.work/elements/void/icons/30b9440981.webp",
+    "https://starside.work/elements/void/icons/31c46f20a5.webp",
+    "https://starside.work/elements/void/icons/331e6e45bc.webp",
+    "https://starside.work/elements/void/icons/3610c97f35.webp",
+    "https://starside.work/elements/void/icons/3ca5afc0d3.webp",
+    "https://starside.work/elements/void/icons/3ed96daa22.webp",
+    "https://starside.work/elements/void/icons/48d3393af0.webp",
+    "https://starside.work/elements/void/icons/49d46ca870.webp",
+    "https://starside.work/elements/void/icons/4c80493410.webp",
+    "https://starside.work/elements/void/icons/55cbca69fd.webp",
+    "https://starside.work/elements/void/icons/5856baf475.webp",
+    "https://starside.work/elements/void/icons/5fc7a97f63.webp",
+    "https://starside.work/elements/void/icons/6236b2edc3.webp",
+    "https://starside.work/elements/void/icons/62bb64ca14.webp",
+    "https://starside.work/elements/void/icons/6387c0f4d8.webp",
+    "https://starside.work/elements/void/icons/64a464f451.webp",
+    "https://starside.work/elements/void/icons/68a6773b90.webp",
+    "https://starside.work/elements/void/icons/6c04bbc07b.webp",
+    "https://starside.work/elements/void/icons/6c52bb0ab8.webp",
+    "https://starside.work/elements/void/icons/74a706d010.webp",
+    "https://starside.work/elements/void/icons/790072b53c.webp",
+    "https://starside.work/elements/void/icons/7ae8554d07.webp",
+    "https://starside.work/elements/void/icons/824cbafc99.webp",
+    "https://starside.work/elements/void/icons/88bc2052de.webp",
+    "https://starside.work/elements/void/icons/8e4dbbda8c.webp",
+    "https://starside.work/elements/void/icons/901742a8ea.webp",
+    "https://starside.work/elements/void/icons/908f4e5a73.webp",
+    "https://starside.work/elements/void/icons/97b73a205e.webp",
+    "https://starside.work/elements/void/icons/99620cefe2.webp",
+    "https://starside.work/elements/void/icons/9b84895a8e.webp",
+    "https://starside.work/elements/void/icons/a0992b4d28.webp",
+    "https://starside.work/elements/void/icons/aad67e3608.webp",
+    "https://starside.work/elements/void/icons/ac4a159058.webp",
+    "https://starside.work/elements/void/icons/b1f7ceb49e.webp",
+    "https://starside.work/elements/void/icons/b2746f67a5.webp",
+    "https://starside.work/elements/void/icons/b7f5dd9aca.webp",
+    "https://starside.work/elements/void/icons/b9cb27f4c1.webp",
+    "https://starside.work/elements/void/icons/c151824cde.webp",
+    "https://starside.work/elements/void/icons/c18f069217.webp",
+    "https://starside.work/elements/void/icons/c78143215f.webp",
+    "https://starside.work/elements/void/icons/cf6c8a6a75.webp",
+    "https://starside.work/elements/void/icons/cfe053953c.webp",
+    "https://starside.work/elements/void/icons/d006f786a7.webp",
+    "https://starside.work/elements/void/icons/d25b7ba958.webp",
+    "https://starside.work/elements/void/icons/d4d2986dc7.webp",
+    "https://starside.work/elements/void/icons/d6b0443957.webp",
+    "https://starside.work/elements/void/icons/dbc743c2b4.webp",
+    "https://starside.work/elements/void/icons/e0e0603135.webp",
+    "https://starside.work/elements/void/icons/e2f44ea0a4.webp",
+    "https://starside.work/elements/void/icons/ef99f996a6.webp",
+    "https://starside.work/elements/void/icons/f4ba7c174c.webp",
+    "https://starside.work/elements/void/icons/f4dc76a627.webp",
+    "https://starside.work/elements/void/icons/f6b6d1d418.webp",
+    "https://starside.work/elements/void/style.css"
+  ]
+}

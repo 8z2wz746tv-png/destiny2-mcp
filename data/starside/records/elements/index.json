@@ -1,0 +1,382 @@
+{
+  "url": "https://starside.work/elements/index.html",
+  "title": "职业分支详解 · Starside",
+  "description": "Destiny 2 六个分支职业属性的速查入口——电弧、烈日、虚空、冰影、缚丝、棱镜，各页含效果、碎片、手雷与三职业的近战、超能与星相；另有一页职业技能。",
+  "category": "subclass",
+  "updated_at": "2026.8.23",
+  "data_src": "docs/elements",
+  "data_hash": "f60c57199896f2723815063fee53ac5578bc03dd",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "职业分支详解"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "打开"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "效果一览"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "每页有什么"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "效果一览",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性",
+            "html": "属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "buff"
+            },
+            "text": "增益",
+            "html": "增益"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "debuff"
+            },
+            "text": "减益",
+            "html": "减益"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "元素拾取物",
+            "html": "元素拾取物"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "增幅、电光充能",
+            "html": "<span class=\"el-arc\">增幅</span>、<span class=\"el-arc\">电光充能</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "致盲、震颤",
+            "html": "<span class=\"deb-arc\">致盲</span>、<span class=\"deb-arc\">震颤</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "离子轨迹",
+            "html": "离子轨迹"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-solar"
+            },
+            "text": "烈日",
+            "html": "烈日"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "治愈、焕光、恢复",
+            "html": "<span class=\"el-solar\">治愈</span>、<span class=\"el-solar\">焕光</span>、<span class=\"el-solar\">恢复</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "灼烧、点燃",
+            "html": "<span class=\"deb-solar\">灼烧</span>、<span class=\"deb-solar\">点燃</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-solar"
+            },
+            "text": "焰灵",
+            "html": "焰灵"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "吞食、隐身、虚空覆盖护盾",
+            "html": "<span class=\"el-void\">吞食</span>、<span class=\"el-void\">隐身</span>、<span class=\"el-void\">虚空覆盖护盾</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "压制、不稳定、虚弱",
+            "html": "<span class=\"deb-void\">压制</span>、<span class=\"deb-void\">不稳定</span>、<span class=\"deb-void\">虚弱</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空裂口",
+            "html": "虚空裂口"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-stasis"
+            },
+            "text": "冰影",
+            "html": "冰影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-stasis"
+            },
+            "text": "冰霜护甲",
+            "html": "冰霜护甲"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减速、冻结、碎裂",
+            "html": "<span class=\"deb-stasis\">减速</span>、<span class=\"deb-stasis\">冻结</span>、<span class=\"deb-stasis\">碎裂</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-stasis"
+            },
+            "text": "冰影碎片",
+            "html": "冰影碎片"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-strand"
+            },
+            "text": "缚丝",
+            "html": "缚丝"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-strand"
+            },
+            "text": "织造铠甲",
+            "html": "织造铠甲"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "割裂、悬停、瓦解",
+            "html": "<span class=\"deb-strand\">割裂</span>、<span class=\"deb-strand\">悬停</span>、<span class=\"deb-strand\">瓦解</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-strand"
+            },
+            "text": "缠结",
+            "html": "缠结"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "class": "el-prismatic"
+            },
+            "text": "棱镜",
+            "html": "棱镜"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超凡，光能与暗影混搭",
+            "html": "<span class=\"el-prismatic\">超凡</span>，光能与暗影混搭"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "光能与暗影全部减益",
+            "html": "光能与暗影全部<span class=\"debuff\">减益</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "上述全部",
+            "html": "上述全部"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "每页有什么",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "分节",
+            "html": "分节"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "内容",
+            "html": "内容"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "效果",
+            "html": "效果"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "该属性的增益、减益与元素拾取物：触发条件、数值、持续时间，以及对勇士的眩晕判定",
+            "html": "该属性的<span class=\"buff\">增益</span>、<span class=\"debuff\">减益</span>与元素拾取物：触发条件、数值、持续时间，以及对<span class=\"enemy\">勇士</span>的<span class=\"enemy\">眩晕</span>判定"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "碎片",
+            "html": "碎片"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "全部碎片的效果与属性增减",
+            "html": "全部碎片的效果与属性增减"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "手雷技能",
+            "html": "手雷技能"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "每种手雷的弹道、伤害、层数、基础冷却与回复倍率",
+            "html": "每种手雷的弹道、伤害、层数、基础冷却与回复倍率"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "猎人 / 泰坦 / 术士",
+            "html": "猎人 / 泰坦 / 术士"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "各自的职业技能、近战技能、超能技能与星相",
+            "html": "各自的职业技能、近战技能、超能技能与星相"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "职业分支详解 · Starside\n\nStarside\n/\n职业分支详解\n\n职业分支详解\n\n打开\n\n电弧 增幅提速，电光充能回能，致盲与震颤压场\n\n烈日 治愈与恢复回血，焕光增伤，灼烧攒满点燃\n\n虚空 吞食与隐身续航，虚弱增伤，压制定身\n\n冰影 冰霜护甲减伤，减速攒满冻结，冻结再碎裂\n\n缚丝 织造铠甲与割裂减伤，悬停定身，瓦解连锁\n\n棱镜 光能与暗影同持一身，两侧交替运用点亮超凡\n\n职业技能 三个职业的固有 Perk，以及闪身、屏障与裂痕的数值与冷却\n\n效果一览\n\n属性\n增益\n减益\n元素拾取物\n\n电弧增幅、电光充能致盲、震颤离子轨迹\n\n烈日治愈、焕光、恢复灼烧、点燃焰灵\n\n虚空吞食、隐身、虚空覆盖护盾压制、不稳定、虚弱虚空裂口\n\n冰影冰霜护甲减速、冻结、碎裂冰影碎片\n\n缚丝织造铠甲割裂、悬停、瓦解缠结\n\n棱镜超凡，光能与暗影混搭光能与暗影全部减益上述全部\n\n每页有什么\n\n分节\n内容\n\n效果该属性的增益、减益与元素拾取物：触发条件、数值、持续时间，以及对勇士的眩晕判定\n\n碎片全部碎片的效果与属性增减\n\n手雷技能每种手雷的弹道、伤害、层数、基础冷却与回复倍率\n\n猎人 / 泰坦 / 术士各自的职业技能、近战技能、超能技能与星相\n\n更新 2026.8.23\n\n数据源：Destiny Data Compendium。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/elements/index.html",
+    "final_url": "https://starside.work/elements/index.html",
+    "path": "pages/elements/index.html",
+    "bytes": 10137,
+    "sha256": "fa42af275c5c2146412cb2aba4fb393932c26872e7c01e880c3e4eaf29645578",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:41.091933+00:00"
+  },
+  "links": [
+    "https://starside.work/elements/arc/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/prismatic/index.html",
+    "https://starside.work/elements/solar/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/elements/strand/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/elements/style.css"
+  ]
+}

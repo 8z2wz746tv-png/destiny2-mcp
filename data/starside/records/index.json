@@ -1,0 +1,235 @@
+{
+  "url": "https://starside.work/index.html",
+  "title": "Starside · Destiny 2 资料台",
+  "description": "Destiny 2 中文资料台：护甲、武器、属性与副本的效果、数值与机制速查表。",
+  "category": "other",
+  "updated_at": "",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "Starside"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "配装成套配装推荐，以及自己填一份的工具"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "配装推荐"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "配装合集"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "配装工具"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "合集工具"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "档案武器、护甲与技能的效果与数值，以及首领血量"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "武器 PERK"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "武器框架"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护甲模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护甲套装效果"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "异域武器"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "异域护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业分支详解"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能冷却"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "首领生命值"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "终局分析刷取清单、副本攻略、每周轮换与实测输出排行"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "PVE 终局刷取指南"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "Raid 攻略"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "DPS 排行"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "切枪 DPS 排行"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能伤害排行"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "轮换速查表"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "机制伤害、能量与倍率的计算与叠加规则"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "增伤 & 易伤"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "游戏机制"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "弹药生成机制"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "压光伤害"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "战斗人员倍率"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "站务站点的改动记录、内容来源与全站配色"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "更新日志"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "数据源与鸣谢"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "配色总览"
+    }
+  ],
+  "tables": [],
+  "text": "Starside · Destiny 2 资料台\n\nStarside\n\nDestiny 2 中文资料台BY 日栎w发电\n\n护甲、武器、属性与副本的效果、数值与机制，按页整理成中文速查表。\n\n方括号内是 PvP 数值，如抵抗 x4（50% [10%]）中 10% 只在 PvP 生效；? 是原作者标的未测数值。\n\nQQ群 1095954157更新日志\n\n为它发电\n\n配装成套配装推荐，以及自己填一份的工具\n\n配装推荐\n\n读者投稿的成套配装，按强度、创意与 PVP 分组，点开即知每一格配什么。\n\n更新 2026.9.9\n\n配装83\n\n配装合集\n\n同一角色的多套配装合为一页，按场景切换使用，逐套列出技能、武器、护甲与神器模组。\n\n更新 2026.9.9\n\n合集7\n\n配装工具\n\n选完技能、武器、护甲与神器模组，页面直接生成标准配装文本，复制发来即可挂上站。\n\n更新 2026.9.9\n\n合集工具\n\n逐套选择装备，左侧目录可随时切换与复制，页面直接生成标准格式的合集文本。\n\n更新 2026.9.9\n\n档案武器、护甲与技能的效果与数值，以及首领血量\n\n武器 PERK\n\nPerk、模组、框架固有与起源特性共 406 条的触发条件与数值。\n\n更新 2026.8.30\n\nPERK406\n\n分节7\n\n武器框架\n\n各类武器框架的伤害、射速、填装、DPS 与评分，含勇士克制与逐条注解。\n\n更新 2026.8.22\n\n武器类18\n\n框架94\n\n护甲模组\n\n头盔、护臂、胸甲、腿部、职业物品的模组，外加副本与活动的传承模组。\n\n更新 2026.8.30\n\n部位5\n\n模组128\n\n护甲套装效果\n\n目的地、行动、突袭、地牢与活动的护甲套装，2 件与 4 件各给一条效果。\n\n更新 2026.9.7\n\n套装56\n\n效果112\n\n异域武器\n\n动能、能量、威能三个槽位共 146 把异域武器的机制与数值。\n\n更新 2026.8.30\n\n武器146\n\n槽位3\n\n异域护甲\n\n猎人、泰坦、术士各 45 件异域护甲的机制与数值，外加三个永劫教派与 36 枚职业物品之灵。\n\n更新 2026.8.30\n\n护甲135\n\n之灵36\n\n职业分支详解\n\n电弧、烈日、虚空、冰影、缚丝、棱镜的效果、碎片、手雷与三职业技能，另有一页职业技能。\n\n更新 2026.8.23\n\n属性6\n\n条目336\n\n神器模组\n\n历代赛季神器的模组，按一至三级分档，各自专注元素、武器类型与机制。\n\n更新 2026.9.7\n\n神器7\n\n模组147\n\n技能冷却\n\n手雷、近战与职业技能在 0 到 100 属性下的冷却秒数，分 PvE 与 PvP 两节，含回复倍率、属性倍率与技能能量的整块获取规则。\n\n更新 2026.8.25\n\n技能113\n\n属性档11\n\n首领生命值\n\n突袭与地牢首领的生命值、交战距离、输出时间与人均 DPS 门槛。\n\n更新 2026.8.30\n\n副本23\n\n首领61\n\n终局分析刷取清单、副本攻略、每周轮换与实测输出排行\n\nPVE 终局刷取指南\n\n终局刷取的清单与来源：两套武器评级清单，以及可锻造武器与异域装备的来源。\n\n更新 2026.9.6\n\n清单10\n\n武器1031\n\nRaid 攻略\n\n突袭与众神殿的图文攻略，一张卡一份文档，点开跳转到腾讯文档。\n\n更新 2026.8.30\n\n攻略12\n\n突袭10\n\nDPS 排行\n\n258 组配装的持续输出实测排行，含弹数、打空耗时、倍率拆解与逐条注解。\n\n更新 2026.8.25\n\n配装258\n\n武器类22\n\n切枪 DPS 排行\n\n198 组切枪配装的爆发输出排行，含倍率拆解与举枪、开火、收枪的逐段耗时。\n\n更新 2026.8.30\n\n配装198\n\n类型6\n\n技能伤害排行\n\n238 组技能配置的单次伤害实测排行，分手雷、近战、超能、杂项与无 200 属性实测五节，含伤害构成与测试条件。\n\n更新 2026.8.30\n\n配置238\n\n类别5\n\n轮换速查表\n\n突袭与地牢每周轮换，扭曲星球每小时轮换。一页查完两条轮换轴。\n\n更新 2026.8.30\n\n突袭9\n\n地牢10\n\n机制伤害、能量与倍率的计算与叠加规则\n\n增伤 & 易伤\n\n全局易伤、强化增益、武器激涌、放大类增益，另加世界与活动，共五类的触发、数值、时长与叠加规则。\n\n更新 2026.8.30\n\n效果118\n\n类别5\n\n游戏机制\n\n六项护甲属性、敏捷与生命值护盾、护甲充能、超能能量获取、活动修改器全表、战斗人员档位与祸因、三类勇士的难度分档与热量武器。\n\n更新 2026.8.30\n\n修改器66\n\n祸因22\n\n弹药生成机制\n\n击杀生成弹药的基础百分比，以及 Perk、模组与套装加成的叠加方式。\n\n更新 2026.8.25\n\n组合10\n\n增益14\n\n压光伤害\n\n−100 到 +100 每一点的伤害倍率，标准与传说战役两条曲线，0 记作 1 倍。\n\n更新 2026.8.14\n\n光等差201\n\n曲线2\n\n战斗人员倍率\n\n各类武器对载具、首领、勇士、初级首领、橙血与红血的伤害倍率，含单列的具名武器。\n\n更新 2026.8.14\n\n武器44\n\n战斗人员6\n\n站务站点的改动记录、内容来源与全站配色\n\n更新日志\n\n各资料页的内容改动记录，按日期倒序，每条写明改动类型、所在页面与改动内容。\n\n更新 2026.9.7\n\n条目111\n\n日期12\n\n数据源与鸣谢\n\n各资料页的数值出处与贡献者，一处来源一行，列出它支撑的页面。\n\n更新 2026.8.28\n\n数据源10\n\n鸣谢7\n\n配色总览\n\n全站着色的色板，每支渲染色列出色号、色样与用途，由闸门与样式表逐条比对。\n\n更新 2026.8.24\n\n渲染色27\n\n标记32\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/index.html",
+    "final_url": "https://starside.work/index.html",
+    "path": "pages/index.html",
+    "bytes": 30221,
+    "sha256": "f0763a912e6d207ca8b498b0375a207243604993eb880b664a3672eb5f6d949e",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:27.381536+00:00"
+  },
+  "links": [
+    "https://starside.work/ability-cooldown/index.html",
+    "https://starside.work/ammo/index.html",
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/boss-hp/index.html",
+    "https://starside.work/buff-debuffs/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/builds/new/index.html",
+    "https://starside.work/builds/new/set/index.html",
+    "https://starside.work/builds/sets/index.html",
+    "https://starside.work/changelog/index.html",
+    "https://starside.work/combatant-scalars/index.html",
+    "https://starside.work/dps/index.html",
+    "https://starside.work/elements/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/game-mechanics/index.html",
+    "https://starside.work/palette/index.html",
+    "https://starside.work/power-delta/index.html",
+    "https://starside.work/pve-farming/index.html",
+    "https://starside.work/raid-guides/index.html",
+    "https://starside.work/rotation/index.html",
+    "https://starside.work/skill-damage/index.html",
+    "https://starside.work/sources/index.html",
+    "https://starside.work/swap-dps/index.html",
+    "https://starside.work/weapon-frames/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://ifdian.net/a/eliver",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css"
+  ]
+}

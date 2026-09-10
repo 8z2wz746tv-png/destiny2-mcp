@@ -1,0 +1,3288 @@
+{
+  "url": "https://starside.work/boss-hp/index.html",
+  "title": "首领生命值 · Starside",
+  "description": "突袭与地牢全部首领的生命值、交战距离、输出时间与人均 DPS 门槛，按副本归组，含易伤、减伤与护盾数值。",
+  "category": "activities",
+  "updated_at": "2026.8.30",
+  "data_src": "docs/boss-hp",
+  "data_hash": "f6e78919eb3fd69467e0505e77cd47eefe117ee6",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "首领生命值"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "突袭"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "地牢"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "突袭",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "副本名称",
+            "html": "副本名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "首领名称",
+            "html": "首领名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "生命值",
+            "html": "生命值"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "距离",
+            "html": "距离"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "时间",
+            "html": "时间"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "击杀 DPS",
+            "html": "击杀 DPS"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "一波 DPS",
+            "html": "一波 DPS"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "注解",
+            "html": "注解"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "4"
+            },
+            "text": "最后一愿",
+            "html": "最后一愿"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被腐化的卡丽",
+            "html": "被腐化的卡丽"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "299440",
+            "html": "<span class=\"g\">299</span><span class=\"g\">440</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "72",
+            "html": "72"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "116",
+            "html": "116"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "347",
+            "html": "347"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "amp"
+            },
+            "text": "头部判定框受到 2 倍直击伤害",
+            "html": "头部判定框受到 2 倍直击伤害"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被腐化的秋·露知",
+            "html": "被腐化的秋·露知"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "253511",
+            "html": "<span class=\"g\">253</span><span class=\"g\">511</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12.883",
+            "html": "12.883"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "273",
+            "html": "273"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "273",
+            "html": "273"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "amp"
+            },
+            "text": "头部判定框受到 2 倍直击伤害",
+            "html": "头部判定框受到 2 倍直击伤害"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "守塔人摩格斯",
+            "html": "守塔人摩格斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "125126",
+            "html": "<span class=\"g\">125</span><span class=\"g\">126</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "30",
+            "html": "30"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "232",
+            "html": "232"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "695",
+            "html": "695"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "res"
+            },
+            "text": "睡者之吼 40% 减伤、狙击步枪 45% 减伤、霰弹枪 55% 减伤",
+            "html": "睡者之吼 40% 减伤、狙击步枪 45% 减伤、霰弹枪 55% 减伤"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "千语魅痕",
+            "html": "千语魅痕"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "170255",
+            "html": "<span class=\"g\">170</span><span class=\"g\">255</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "14.95",
+            "html": "14.95"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1898",
+            "html": "1898"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "睡者之吼 40% 减伤、狙击步枪 45% 减伤、霰弹枪 55% 减伤、面部判定框的 2 倍伤害只是显示效果",
+            "html": "<span class=\"res\">睡者之吼 40% 减伤、狙击步枪 45% 减伤、霰弹枪 55% 减伤</span>、面部判定框的 2 倍伤害<span class=\"note\">只是显示效果</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "救赎花园",
+            "html": "救赎花园"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "崇圣首脑·太阳系固有",
+            "html": "崇圣首脑·太阳系固有"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "153455",
+            "html": "<span class=\"g\">153</span><span class=\"g\">455</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "20.733",
+            "html": "20.733"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "411",
+            "html": "411"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1234",
+            "html": "1234"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "圣洁首脑·太阳系固有",
+            "html": "圣洁首脑·太阳系固有"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "196586",
+            "html": "<span class=\"g\">196</span><span class=\"g\">586</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "远",
+            "html": "远"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "17.417",
+            "html": "17.417"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "627",
+            "html": "627"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1881",
+            "html": "1881"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "打弱点下半部更稳定，神性力场出现在脚下",
+            "html": "打弱点下半部更稳定，<span class=\"buff\">神性</span>力场出现在脚下"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "3"
+            },
+            "text": "深岩墓室",
+            "html": "深岩墓室"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "墓穴安全",
+            "html": "墓穴安全"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "12117",
+            "html": "<span class=\"g\">12</span><span class=\"g\">117</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "不定",
+            "html": "不定"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "只结算武器基础伤害、假本体首领（精准伤害、激涌、大部分易伤、部分武器 perk 与 buff 不生效）",
+            "html": "<span class=\"res\">只结算武器基础伤害</span>、<span class=\"res\">假本体首领</span><span class=\"note\">（精准伤害、激涌、大部分易伤、部分武器 perk 与 buff 不生效）</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "阿特拉克斯-1·堕落者 EXO",
+            "html": "阿特拉克斯-1·堕落者 EXO"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "76035",
+            "html": "<span class=\"g\">76</span><span class=\"g\">035</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2.3",
+            "html": "2.3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "390",
+            "html": "390"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4683",
+            "html": "4683"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "假本体首领（精准伤害、激涌、大部分易伤、部分武器 perk 与 buff 不生效）",
+            "html": "<span class=\"res\">假本体首领</span><span class=\"note\">（精准伤害、激涌、大部分易伤、部分武器 perk 与 buff 不生效）</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "坦尼克斯·厌恶者",
+            "html": "坦尼克斯·厌恶者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "277639",
+            "html": "<span class=\"g\">277</span><span class=\"g\">639</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中",
+            "html": "中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "14",
+            "html": "14"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "104",
+            "html": "104"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "936",
+            "html": "936"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "玻璃拱顶",
+            "html": "玻璃拱顶"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "圣堂武士",
+            "html": "圣堂武士"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "182640",
+            "html": "<span class=\"g\">182</span><span class=\"g\">640</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "15",
+            "html": "15"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2029",
+            "html": "2029"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "非升起状态下受到的爆炸伤害降低（否定仪式）",
+            "html": "<span class=\"res\">非升起状态下受到的爆炸伤害降低</span><span class=\"note\">（否定仪式）</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "“时之汇流”埃希恩",
+            "html": "“时之汇流”埃希恩"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "247148",
+            "html": "<span class=\"g\">247</span><span class=\"g\">148</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "30",
+            "html": "30"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "92",
+            "html": "92"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "275",
+            "html": "275"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "当前受到 5 倍伤害（手雷伤害为 3 倍）",
+            "html": "<span class=\"amp\">当前受到 5 倍伤害</span><span class=\"note\">（手雷伤害为 3 倍）</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "门徒誓约",
+            "html": "门徒誓约"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "看护人",
+            "html": "看护人"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "663786",
+            "html": "<span class=\"g\">663</span><span class=\"g\">786</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "7.5",
+            "html": "7.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "697",
+            "html": "697"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6269",
+            "html": "6269"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "站在板上造成 2 倍伤害、超过阈值后的 25% 增伤是「虚假」增伤",
+            "html": "站在板上<span class=\"amp\">造成 2 倍伤害</span>、超过阈值后的 25% 增伤<span class=\"note\">是「虚假」增伤</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "见证者门徒·胡克",
+            "html": "见证者门徒·胡克"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "397638",
+            "html": "<span class=\"g\">397</span><span class=\"g\">638</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中",
+            "html": "中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "36",
+            "html": "36"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "614",
+            "html": "614"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1841",
+            "html": "1841"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "弱点爆炸只是视觉效果",
+            "html": "弱点爆炸<span class=\"note\">只是视觉效果</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "4"
+            },
+            "text": "国王的陨落",
+            "html": "国王的陨落"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战争祭祀",
+            "html": "战争祭祀"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "480831",
+            "html": "<span class=\"g\">480</span><span class=\"g\">831</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "45",
+            "html": "45"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "594",
+            "html": "594"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4452",
+            "html": "4452"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高尔格罗斯",
+            "html": "高尔格罗斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "409156",
+            "html": "<span class=\"g\">409</span><span class=\"g\">156</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "20",
+            "html": "20"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "189",
+            "html": "189"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3410",
+            "html": "3410"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "不稳定光能造成 13501 伤害",
+            "html": "<span class=\"buff\">不稳定光能</span>造成 <span class=\"amp\">13501 伤害</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "姐妹们",
+            "html": "姐妹们"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "167594",
+            "html": "<span class=\"g\">167</span><span class=\"g\">594</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中",
+            "html": "中"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "不定",
+            "html": "不定"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "邪神欧里克斯",
+            "html": "邪神欧里克斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "423189",
+            "html": "<span class=\"g\">423</span><span class=\"g\">189</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "远",
+            "html": "远"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "24.783",
+            "html": "24.783"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "711",
+            "html": "711"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2846",
+            "html": "2846"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "演出首领（弹射物追踪与虚空箭不生效）",
+            "html": "演出<span class=\"bar-yellow\">首领</span><span class=\"note\">（弹射物追踪与虚空箭不生效）</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "梦魇根源",
+            "html": "梦魇根源"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "星球阐释者·泽乌尔克",
+            "html": "星球阐释者·泽乌尔克"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "295535",
+            "html": "<span class=\"g\">295</span><span class=\"g\">535</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "10",
+            "html": "10"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "547",
+            "html": "547"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4926",
+            "html": "4926"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "终极苦痛之神·奈扎雷克",
+            "html": "终极苦痛之神·奈扎雷克"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "262082",
+            "html": "<span class=\"g\">262</span><span class=\"g\">082</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "30",
+            "html": "30"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "485",
+            "html": "485"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1456",
+            "html": "1456"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "克洛塔的末日",
+            "html": "克洛塔的末日"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "死亡歌者·伊尔·约特",
+            "html": "死亡歌者·伊尔·约特"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "288027",
+            "html": "<span class=\"g\">288</span><span class=\"g\">027</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "45",
+            "html": "45"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "356",
+            "html": "356"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1067",
+            "html": "1067"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "欧里克斯之子·克洛塔",
+            "html": "欧里克斯之子·克洛塔"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "480445",
+            "html": "<span class=\"g\">480</span><span class=\"g\">445</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "30",
+            "html": "30"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "890",
+            "html": "890"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2669",
+            "html": "2669"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "amp"
+            },
+            "text": "受到 135% 刀剑伤害",
+            "html": "受到 135% 刀剑伤害"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "救赎的边缘",
+            "html": "救赎的边缘"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "终局使者",
+            "html": "终局使者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "391079",
+            "html": "<span class=\"g\">391</span><span class=\"g\">079</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "30",
+            "html": "30"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "724",
+            "html": "724"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2173",
+            "html": "2173"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "见证者",
+            "html": "见证者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "543552",
+            "html": "<span class=\"g\">543</span><span class=\"g\">552</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "远",
+            "html": "远"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "45",
+            "html": "45"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "671",
+            "html": "671"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2013",
+            "html": "2013"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "演出首领（弹射物追踪与虚空箭不生效）",
+            "html": "演出<span class=\"bar-yellow\">首领</span><span class=\"note\">（弹射物追踪与虚空箭不生效）</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "4"
+            },
+            "text": "永恒沙漠",
+            "html": "永恒沙漠"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "固有者阿格莱奥斯",
+            "html": "固有者阿格莱奥斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "530451",
+            "html": "<span class=\"g\">530</span><span class=\"g\">451</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "不定",
+            "html": "不定"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "91.5",
+            "html": "91.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "358",
+            "html": "358"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1074",
+            "html": "1074"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "量子之主埃波普特斯",
+            "html": "量子之主埃波普特斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "537446",
+            "html": "<span class=\"g\">537</span><span class=\"g\">446</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "90.9",
+            "html": "90.9"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "365",
+            "html": "365"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1096",
+            "html": "1096"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "内转者伊亚特罗斯",
+            "html": "内转者伊亚特罗斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "250154",
+            "html": "<span class=\"g\">250</span><span class=\"g\">154</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "45.65",
+            "html": "45.65"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "338",
+            "html": "338"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1015",
+            "html": "1015"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "res"
+            },
+            "text": "对非超能伤害 35% 减伤",
+            "html": "对<span class=\"orb\">非超能</span>伤害 35% 减伤"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "世界线科雷戈斯",
+            "html": "世界线科雷戈斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "756068",
+            "html": "<span class=\"g\">756</span><span class=\"g\">068</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "80",
+            "html": "80"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "649",
+            "html": "649"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1946",
+            "html": "1946"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "不属于构造体，跳跃可触发生物强化与腹背受敌",
+            "html": "<span class=\"enemy\">不属于构造体</span>，跳跃可触发<span class=\"buff\">生物强化</span>与<span class=\"buff\">腹背受敌</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "4"
+            },
+            "text": "永恒沙漠（史诗）",
+            "html": "永恒沙漠（史诗）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "固有者阿格莱奥斯",
+            "html": "固有者阿格莱奥斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "339461",
+            "html": "<span class=\"g\">339</span><span class=\"g\">461</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至远",
+            "html": "近至远"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "量子之主埃波普特斯",
+            "html": "量子之主埃波普特斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "554669",
+            "html": "<span class=\"g\">554</span><span class=\"g\">669</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中",
+            "html": "中"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "内转者伊亚特罗斯",
+            "html": "内转者伊亚特罗斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "272822",
+            "html": "<span class=\"g\">272</span><span class=\"g\">822</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "世界线科雷戈斯",
+            "html": "世界线科雷戈斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "761063",
+            "html": "<span class=\"g\">761</span><span class=\"g\">063</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "7"
+            },
+            "text": "众神殿",
+            "html": "众神殿"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "“行星核心”阿尔戈斯",
+            "html": "“行星核心”阿尔戈斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "546424",
+            "html": "<span class=\"g\">546</span><span class=\"g\">424</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中至远",
+            "html": "中至远"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战争祭祀",
+            "html": "战争祭祀"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "868185",
+            "html": "<span class=\"g\">868</span><span class=\"g\">185</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中",
+            "html": "中"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "“忧愁承者”加尔兰",
+            "html": "“忧愁承者”加尔兰"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "494519",
+            "html": "<span class=\"g\">494</span><span class=\"g\">519</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中",
+            "html": "中"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "崇圣首脑",
+            "html": "崇圣首脑"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "387082",
+            "html": "<span class=\"g\">387</span><span class=\"g\">082</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中至远",
+            "html": "中至远"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "卡鲁斯大帝",
+            "html": "卡鲁斯大帝"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "13122129",
+            "html": "<span class=\"g\">13</span><span class=\"g\">122</span><span class=\"g\">129</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中",
+            "html": "中"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "获得 Buff 可增益巨额伤害（0–40 层 50%/10 层；50–70 层 100%/10 层；80–100 层 150%/10 层；100+ 层 200%/10 层）",
+            "html": "<span class=\"amp\">获得 Buff 可增益巨额伤害</span><span class=\"note\">（0–40 层 50%/10 层；50–70 层 100%/10 层；80–100 层 150%/10 层；100+ 层 200%/10 层）</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "摩格斯",
+            "html": "摩格斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "794380",
+            "html": "<span class=\"g\">794</span><span class=\"g\">380</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "凯尔的祸根·暴动首领",
+            "html": "凯尔的祸根·暴动首领"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "515675",
+            "html": "<span class=\"g\">515</span><span class=\"g\">675</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中至远",
+            "html": "中至远"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "未测",
+            "html": "未测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "地牢",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "副本名称",
+            "html": "副本名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "首领名称",
+            "html": "首领名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "生命值",
+            "html": "生命值"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "距离",
+            "html": "距离"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "时间",
+            "html": "时间"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "击杀 DPS",
+            "html": "击杀 DPS"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "一波 DPS",
+            "html": "一波 DPS"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "注解",
+            "html": "注解"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "破碎王座",
+            "html": "破碎王座"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "沃戈斯",
+            "html": "沃戈斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "23163",
+            "html": "<span class=\"g\">23</span><span class=\"g\">163</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "30",
+            "html": "30"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "86",
+            "html": "86"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "257",
+            "html": "257"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "杜兰卡鲁",
+            "html": "杜兰卡鲁"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "214959",
+            "html": "<span class=\"g\">214</span><span class=\"g\">959</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "45",
+            "html": "45"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "531",
+            "html": "531"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1592",
+            "html": "1592"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "视为橙血",
+            "html": "视为<span class=\"bar-orange\">橙血</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "异端深渊",
+            "html": "异端深渊"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "祖尔马克",
+            "html": "祖尔马克"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "61752",
+            "html": "<span class=\"g\">61</span><span class=\"g\">752</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "50",
+            "html": "50"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "137",
+            "html": "137"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "412",
+            "html": "412"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "预言",
+            "html": "预言"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "方阵士兵",
+            "html": "方阵士兵"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "49678",
+            "html": "<span class=\"g\">49</span><span class=\"g\">678</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "50",
+            "html": "50"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "110",
+            "html": "110"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "331",
+            "html": "331"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "凯尔回响",
+            "html": "凯尔回响"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "105803",
+            "html": "<span class=\"g\">105</span><span class=\"g\">803</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "远",
+            "html": "远"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "105",
+            "html": "105"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "112",
+            "html": "112"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "336",
+            "html": "336"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "团灭结算界面显示的伤害为实际的 2 倍",
+            "html": "团灭结算界面显示的伤害<span class=\"note\">为实际的 2 倍</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "贪婪之握",
+            "html": "贪婪之握"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "弗里吉亚",
+            "html": "弗里吉亚"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "2"
+            },
+            "text": "101053",
+            "html": "<span class=\"g\">101</span><span class=\"g\">053</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "30",
+            "html": "30"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "374",
+            "html": "374"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1123",
+            "html": "1123"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "阿瓦罗克斯",
+            "html": "阿瓦罗克斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "111700",
+            "html": "<span class=\"g\">111</span><span class=\"g\">700</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中",
+            "html": "中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "28",
+            "html": "28"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "443",
+            "html": "443"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1330",
+            "html": "1330"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "3"
+            },
+            "text": "二象性",
+            "html": "二象性"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "加尔兰梦魇",
+            "html": "加尔兰梦魇"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "133133",
+            "html": "<span class=\"g\">133</span><span class=\"g\">133</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "60",
+            "html": "60"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "247",
+            "html": "247"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "740",
+            "html": "740"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "不稳定精华提供 50% 额外伤害",
+            "html": "<span class=\"buff\">不稳定精华</span>提供 <span class=\"amp\">50% 额外伤害</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "保险库",
+            "html": "保险库"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "1"
+            },
+            "text": "21905",
+            "html": "<span class=\"g\">21</span><span class=\"g\">905</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "生命值不含元素护盾",
+            "html": "<span class=\"health\">生命值</span>不含元素护盾"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "查厄托梦魇",
+            "html": "查厄托梦魇"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "117486",
+            "html": "<span class=\"g\">117</span><span class=\"g\">486</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12",
+            "html": "12"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "363",
+            "html": "363"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3264",
+            "html": "3264"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "未持有苏醒共鸣时90% 减伤、精准倍率 ×1.5",
+            "html": "未持有<span class=\"buff\">苏醒共鸣</span>时<span class=\"res\">90% 减伤</span>、<span class=\"amp\">精准倍率 ×1.5</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "守望者尖塔",
+            "html": "守望者尖塔"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "阿克勒斯",
+            "html": "阿克勒斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "3"
+            },
+            "text": "112294",
+            "html": "<span class=\"g\">112</span><span class=\"g\">294</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "27.817",
+            "html": "27.817"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "449",
+            "html": "449"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1346",
+            "html": "1346"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "珀赛斯",
+            "html": "珀赛斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "148907",
+            "html": "<span class=\"g\">148</span><span class=\"g\">907</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "22.967",
+            "html": "22.967"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "720",
+            "html": "720"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2161",
+            "html": "2161"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "深渊机灵",
+            "html": "深渊机灵"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "艾克塔",
+            "html": "艾克塔"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "180621",
+            "html": "<span class=\"g\">180</span><span class=\"g\">621</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "40",
+            "html": "40"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "502",
+            "html": "502"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1505",
+            "html": "1505"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "生命值不含 约 10800 白盾",
+            "html": "<span class=\"health\">生命值</span>不含 <span class=\"el-kinetic\">约 10800 白盾</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "厄诺克鲁",
+            "html": "厄诺克鲁"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "144404",
+            "html": "<span class=\"g\">144</span><span class=\"g\">404</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "远",
+            "html": "远"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "45",
+            "html": "45"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "357",
+            "html": "357"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1070",
+            "html": "1070"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "生命值不含 约 10800 白盾",
+            "html": "<span class=\"health\">生命值</span>不含 <span class=\"el-kinetic\">约 10800 白盾</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "3"
+            },
+            "text": "战争领主的废墟",
+            "html": "战争领主的废墟"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "拉席尔",
+            "html": "拉席尔"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "4"
+            },
+            "text": "112393",
+            "html": "<span class=\"g\">112</span><span class=\"g\">393</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "20",
+            "html": "20"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "624",
+            "html": "624"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1873",
+            "html": "1873"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "哀嚎之地",
+            "html": "哀嚎之地"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "239073",
+            "html": "<span class=\"g\">239</span><span class=\"g\">073</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "15",
+            "html": "15"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "443",
+            "html": "443"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "5313",
+            "html": "5313"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "赫芬德",
+            "html": "赫芬德"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "254999",
+            "html": "<span class=\"g\">254</span><span class=\"g\">999</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中",
+            "html": "中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "20",
+            "html": "20"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "472",
+            "html": "472"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4250",
+            "html": "4250"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "晚星之主",
+            "html": "晚星之主"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "雷尼克斯联合",
+            "html": "雷尼克斯联合"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "7"
+            },
+            "text": "224291",
+            "html": "<span class=\"g\">224</span><span class=\"g\">291</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "15",
+            "html": "15"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "791",
+            "html": "791"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2373",
+            "html": "2373"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "全局约 65% 减伤、分体各自结算，但不是假本体首领",
+            "html": "<span class=\"res\">全局约 65% 减伤</span>、<span class=\"note\">分体各自结算，但不是假本体首领</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "腐化傀儡师",
+            "html": "腐化傀儡师"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "325278",
+            "html": "<span class=\"g\">325</span><span class=\"g\">278</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中至远",
+            "html": "中至远"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "95",
+            "html": "95"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "380",
+            "html": "380"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1141",
+            "html": "1141"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "分离教义",
+            "html": "分离教义"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "生命锁具",
+            "html": "生命锁具"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "205547",
+            "html": "<span class=\"g\">205</span><span class=\"g\">547</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "远",
+            "html": "远"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "81.567",
+            "html": "81.567"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "280",
+            "html": "280"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "840",
+            "html": "840"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "假本体首领（精准伤害、激涌、大部分易伤、部分武器 perk 与 buff 不生效）",
+            "html": "<span class=\"res\">假本体首领</span><span class=\"note\">（精准伤害、激涌、大部分易伤、部分武器 perk 与 buff 不生效）</span>"
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被抹去者·克瑞夫",
+            "html": "被抹去者·克瑞夫"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "8"
+            },
+            "text": "296370",
+            "html": "<span class=\"g\">296</span><span class=\"g\">370</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "45.2",
+            "html": "45.2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "729",
+            "html": "729"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2186",
+            "html": "2186"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row",
+              "rowspan": "2"
+            },
+            "text": "平衡",
+            "html": "平衡"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "德瑞捷学徒哈罗",
+            "html": "德瑞捷学徒哈罗"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "6"
+            },
+            "text": "206963",
+            "html": "<span class=\"g\">206</span><span class=\"g\">963</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近",
+            "html": "近"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "33.167",
+            "html": "33.167"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "693",
+            "html": "693"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2080",
+            "html": "2080"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "德瑞捷·赛尔",
+            "html": "德瑞捷·赛尔"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "data-tier": "5"
+            },
+            "text": "143884",
+            "html": "<span class=\"g\">143</span><span class=\"g\">884</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近至中",
+            "html": "近至中"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "37.45",
+            "html": "37.45"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "427",
+            "html": "427"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1281",
+            "html": "1281"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "首领生命值 · Starside\n\nStarside\n/\n首领生命值\n\n首领生命值\n\n突袭\n\n副本名称\n首领名称\n生命值\n距离\n时间\n击杀 DPS\n一波 DPS\n注解\n\n最后一愿被腐化的卡丽299440近72116347头部判定框受到 2 倍直击伤害\n\n被腐化的秋·露知253511近至中12.883273273头部判定框受到 2 倍直击伤害\n\n守塔人摩格斯125126近30232695睡者之吼 40% 减伤、狙击步枪 45% 减伤、霰弹枪 55% 减伤\n\n千语魅痕170255近14.951898睡者之吼 40% 减伤、狙击步枪 45% 减伤、霰弹枪 55% 减伤、面部判定框的 2 倍伤害只是显示效果\n\n救赎花园崇圣首脑·太阳系固有153455近至中20.7334111234\n\n圣洁首脑·太阳系固有196586远17.4176271881打弱点下半部更稳定，神性力场出现在脚下\n\n深岩墓室墓穴安全12117近不定只结算武器基础伤害、假本体首领（精准伤害、激涌、大部分易伤、部分武器 perk 与 buff 不生效）\n\n阿特拉克斯-1·堕落者 EXO76035近2.33904683假本体首领（精准伤害、激涌、大部分易伤、部分武器 perk 与 buff 不生效）\n\n坦尼克斯·厌恶者277639中14104936\n\n玻璃拱顶圣堂武士182640近至中152029非升起状态下受到的爆炸伤害降低（否定仪式）\n\n“时之汇流”埃希恩247148近3092275当前受到 5 倍伤害（手雷伤害为 3 倍）\n\n门徒誓约看护人663786近7.56976269站在板上造成 2 倍伤害、超过阈值后的 25% 增伤是「虚假」增伤\n\n见证者门徒·胡克397638中366141841弱点爆炸只是视觉效果\n\n国王的陨落战争祭祀480831近455944452\n\n高尔格罗斯409156近至中201893410不稳定光能造成 13501 伤害\n\n姐妹们167594中不定\n\n邪神欧里克斯423189远24.7837112846演出首领（弹射物追踪与虚空箭不生效）\n\n梦魇根源星球阐释者·泽乌尔克295535近至中105474926\n\n终极苦痛之神·奈扎雷克262082近304851456\n\n克洛塔的末日死亡歌者·伊尔·约特288027近至中453561067\n\n欧里克斯之子·克洛塔480445近至中308902669受到 135% 刀剑伤害\n\n救赎的边缘终局使者391079近至中307242173\n\n见证者543552远456712013演出首领（弹射物追踪与虚空箭不生效）\n\n永恒沙漠固有者阿格莱奥斯530451不定91.53581074\n\n量子之主埃波普特斯537446近至中90.93651096\n\n内转者伊亚特罗斯250154近至中45.653381015对非超能伤害 35% 减伤\n\n世界线科雷戈斯756068近806491946不属于构造体，跳跃可触发生物强化与腹背受敌\n\n永恒沙漠（史诗）固有者阿格莱奥斯339461近至远未测未测未测\n\n量子之主埃波普特斯554669中未测未测未测\n\n内转者伊亚特罗斯272822近未测未测未测\n\n世界线科雷戈斯761063近未测未测未测\n\n众神殿“行星核心”阿尔戈斯546424中至远未测未测未测\n\n战争祭祀868185中未测未测未测\n\n“忧愁承者”加尔兰494519中未测未测未测\n\n崇圣首脑387082中至远未测未测未测\n\n卡鲁斯大帝13122129中未测未测未测获得 Buff 可增益巨额伤害（0–40 层 50%/10 层；50–70 层 100%/10 层；80–100 层 150%/10 层；100+ 层 200%/10 层）\n\n摩格斯794380近至中未测未测未测\n\n凯尔的祸根·暴动首领515675中至远未测未测未测\n\n永恒沙漠与永恒沙漠（史诗）是同一副本的两档难度，首领相同、生命值不同，两档分别列出以便对照。\n\n地牢\n\n副本名称\n首领名称\n生命值\n距离\n时间\n击杀 DPS\n一波 DPS\n注解\n\n破碎王座沃戈斯23163近3086257\n\n杜兰卡鲁214959近455311592视为橙血\n\n异端深渊祖尔马克61752近50137412\n\n预言方阵士兵49678近50110331\n\n凯尔回响105803远105112336团灭结算界面显示的伤害为实际的 2 倍\n\n贪婪之握弗里吉亚101053近至中303741123\n\n阿瓦罗克斯111700中284431330\n\n二象性加尔兰梦魇133133近60247740不稳定精华提供 50% 额外伤害\n\n保险库21905近生命值不含元素护盾\n\n查厄托梦魇117486近123633264未持有苏醒共鸣时90% 减伤、精准倍率 ×1.5\n\n守望者尖塔阿克勒斯112294近至中27.8174491346\n\n珀赛斯148907近至中22.9677202161\n\n深渊机灵艾克塔180621近至中405021505生命值不含 约 10800 白盾\n\n厄诺克鲁144404远453571070生命值不含 约 10800 白盾\n\n战争领主的废墟拉席尔112393近206241873\n\n哀嚎之地239073近至中154435313\n\n赫芬德254999中204724250\n\n晚星之主雷尼克斯联合224291近157912373全局约 65% 减伤、分体各自结算，但不是假本体首领\n\n腐化傀儡师325278中至远953801141\n\n分离教义生命锁具205547远81.567280840假本体首领（精准伤害、激涌、大部分易伤、部分武器 perk 与 buff 不生效）\n\n被抹去者·克瑞夫296370近至中45.27292186\n\n平衡德瑞捷学徒哈罗206963近33.1676932080\n\n德瑞捷·赛尔143884近至中37.454271281\n\n更新 2026.8.30数值为固定难度下的实测值，不随光等浮动。\n\n数据源：Destiny 2: Boss Damage。本页在其基础上统一了术语、标点与排版。\n\n特别鸣谢：小黑盒用户“压力一直天满光”校对首领名称。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/boss-hp/index.html",
+    "final_url": "https://starside.work/boss-hp/index.html",
+    "path": "pages/boss-hp/index.html",
+    "bytes": 22260,
+    "sha256": "09503afe949f379ff4fc3c094851488d1b4d85be455823c1c742546af5676954",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:33.910536+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1_5wtBjRYHHxuF4oJKDb_iOGZs-wTkzB6RYbnyNLbuz4/htmlview#gid=1346678363",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/boss-hp/style.css"
+  ]
+}

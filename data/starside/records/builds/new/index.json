@@ -1,0 +1,130 @@
+{
+  "url": "https://starside.work/builds/new/index.html",
+  "title": "配装工具 · Starside",
+  "description": "填一份配装推荐：选完技能、武器、护甲与神器模组，页面直接生成标准配装文本，复制发给站长即可挂上站。",
+  "category": "builds",
+  "updated_at": "2026.9.9",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": ""
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能＋ 移动"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片−5+"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "选择神器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "配装文本"
+    }
+  ],
+  "tables": [],
+  "text": "配装工具 · Starside\n\nStarside\n/\n配装工具\n\n核心\n\n推荐者：\n\n在下方「职业」区域选择职业与元素S29 · 凯旋纪念碑\n\n类别\nmeta强度创意PVP\n\n适用环境\n突袭地牢宗师终极日常通用\n\n标签\n输出清怪续航功能通用\n\n审核意见\n\n职业\n\n职业\n\n职业\n\n元素\n\n超能\n\n+\n\n技能＋ 移动\n\n手雷\n\n近战\n\n职业技能\n\n移动\n\n星相\n\n+\n\n+\n\n碎片−5+\n\n+\n\n+\n\n+\n\n+\n\n+\n\n+\n\n武器\n\n异域武器\n\n传说武器PerkPerk起源特性＋\n\n传说武器PerkPerk起源特性＋\n\n神器模组\n\n选择神器\n\n+\n\n+\n\n+\n\n+\n\n+\n\n+\n\n+\n\n护甲\n\n异域护甲第二条异域词条\n\n套装\n\n套装（可选）\n\n生命~\n\n近战~\n\n手雷~\n\n超能~\n\n职业~\n\n武器~\n\n头盔\n\n+\n\n+\n\n+\n\n护臂\n\n+\n\n+\n\n+\n\n胸甲\n\n+\n\n+\n\n+\n\n腿部\n\n+\n\n+\n\n+\n\n职业物品\n\n+\n\n+\n\n+\n\n注解\n\n配装文本\n\n展开配装文本\n\n从配装文本导入\n\n粘贴一份已有的配装文本。可识别的装备会自动填入，无法识别的条目会跳过并在下方列出。导入将覆盖当前已填写的内容。\n\n预览配装\n详情开关\n\n复制配装\n截图\n\n导入配装\n投稿\n\n更新 2026.9.9，选项与站内资料页同一份词表，列得出来的名字生成器就查得到。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/new/index.html",
+    "final_url": "https://starside.work/builds/new/index.html",
+    "path": "pages/builds/new/index.html",
+    "bytes": 22038,
+    "sha256": "19659b5ac70a0566cd8ef5cb3217d972643641dd504544649c25f58aa1a2a56f",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:36.125482+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/new/form.js",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/builds/vocab.js"
+  ]
+}

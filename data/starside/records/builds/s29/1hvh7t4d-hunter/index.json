@@ -1,0 +1,185 @@
+{
+  "url": "https://starside.work/builds/s29/1hvh7t4d-hunter/index.html",
+  "title": "裂波者 觅敌矛隼猎 · 配装推荐 · Starside",
+  "description": "裂波者+vog套全程触发高增伤",
+  "category": "builds",
+  "updated_at": "2026.9.8",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 裂波者 觅敌矛隼猎\n\n推荐人：实力日天\n描述：裂波者+vog套全程触发高增伤\n更新：2026.9.8\n场景：宗师终极、日常\n定位：清怪、续航、通用\n分支：棱镜\n类别：强度\n核心：裂波者\n\n## 审核意见\n\n职业金二号位可以考虑虫头or蜘蛛头,然后腿上插吃球回技能来保持回转\n\n## 职业\n\n职业：猎人\n超能：暗影箭矢：狩猎陷阱\n星相：潇洒行刑者、飞升\n碎片：保护琢面、孤独琢面、黎明琢面、使命琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：裂波者\n传说武器：完美逆行 | 嫉妒军械库、切割、问题解决者\n传说武器：红鲱鱼 | 重建、爆炸光能\n\n## 护甲\n\n异域护甲：觅敌者之灵、矛隼之灵\n套装：埃希恩记忆 2 件 × 埃希恩记忆 4 件\n头盔：超能洗礼、特殊武器弹药搜寻者、重型弹药搜寻者\n护臂：专注打击、近战洗礼、手雷洗礼\n胸甲：谐振弹药生成、狙击伤害抗性、震荡阻尼器\n腿部：谐振回收器、武器洗礼、药到病除\n职业物品：特殊终结技、时间膨胀、职业洗礼\n\n## 神器\n\n神器：废墟石板\n模组：电介质、不稳定神枪手、严酷折射、群敌飞梭、邪恶收割、重型军械回复、崩解\n\n## 六维\n\n六维：生命 20+ ｜ 近战 70+ ｜ 手雷 ~ ｜ 超能 70+ ｜ 职业 100+ ｜ 武器 150+\n\n## 注解\n\n注意刚需vog套，触发裂波者吃球增伤特性\n1、配装优点\n高常态输出：吃球裂波者66%增伤、废墟石板35%、觅敌者之灵25%、焕光20%，常态dps可达2100+，压50能在勇士一次眩晕期间打进终结。\n强生存：不稳定神枪手给予大量职业技能能量（因此可舍弃希望琢面），邪恶收割和使命琢面给予大量虚空覆盖护盾，可常驻增幅和虚空覆盖护盾；孤独琢面和切割perk联动崩解，织造铠甲覆盖率高；高压情况多使用火箭筒，获得抵抗2。\n弹药经济优秀：裂波者催化增加弹药生成，高达80，日常使用完全支持双绿。\n30光以内割草：矛隼触发大量不稳定爆炸，按住左键一炸一大片。\n2、武器选择\n主手选择完美逆行是因为火箭脉冲弹药bug，日常使用可实现双绿电表倒转；威能选择了带自填和增伤perk的反屏障火箭筒红鲱鱼。\n主手可替换其他缚丝武器，例如融合（渐速音）、追踪（门齿），最好有增伤和切割perk；威能可替换虚空（轰鸣巨人）、缚丝火箭筒（注视焦点），perk选择自填和增伤，或者急切刀（骑士之火）、线融（揭纱露眼）、机枪（锤头）等。主手和威能一定要能反屏障和势不可挡。\n3、职业碎片选择\n选择棱镜职业获得多重元素增益。碎片保护琢面（更肉）、使命琢面（虚空覆盖护盾）、黎明琢面（全程焕光）、孤独琢面（提高割裂覆盖率），没有选择希望琢面（职业技能恢复）的因为实战测试后，发现职业回转已经足够，焕光和增幅基本能全程覆盖。\n4、护甲模组选择\n套装固定vog4件套。金装可替换成觅敌曲腹蛛（同时大招替换成火大）；也可以直接换成命运眷顾。属性方面武器越高越好；近战加上洗礼至少70+，最好能到90+，能做到没有怪时一次飞升回满；职业加上洗礼一定要满100保证回转；生命最好有一些保证软减。模组插上各种属性的洗礼；带药到病除补充软减不足；不携带激涌，因为和觅敌触发的激涌*4不叠加；根据实际带的武器调整对应属性的回收和弹药模组。\n5、使用方法\n烟雾弹命中战斗人员约1s可触发觅敌，钩爪和飞升都不能触发觅敌。因此烟雾弹-击杀-隐身-触发不稳定-职业能量-飞升-烟雾弹，完成循环。裂波者注意打头可提高织造铠甲覆盖率。飞升后注意快速击杀被震颤的小怪可回血。\n6、配装缺点\n软减和火大vog套相比逊色不少，在彪悍环境比较吃力。",
+  "source_blocks": [
+    "# 裂波者 觅敌矛隼猎\n\n推荐人：实力日天\n描述：裂波者+vog套全程触发高增伤\n更新：2026.9.8\n场景：宗师终极、日常\n定位：清怪、续航、通用\n分支：棱镜\n类别：强度\n核心：裂波者\n\n## 审核意见\n\n职业金二号位可以考虑虫头or蜘蛛头,然后腿上插吃球回技能来保持回转\n\n## 职业\n\n职业：猎人\n超能：暗影箭矢：狩猎陷阱\n星相：潇洒行刑者、飞升\n碎片：保护琢面、孤独琢面、黎明琢面、使命琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：裂波者\n传说武器：完美逆行 | 嫉妒军械库、切割、问题解决者\n传说武器：红鲱鱼 | 重建、爆炸光能\n\n## 护甲\n\n异域护甲：觅敌者之灵、矛隼之灵\n套装：埃希恩记忆 2 件 × 埃希恩记忆 4 件\n头盔：超能洗礼、特殊武器弹药搜寻者、重型弹药搜寻者\n护臂：专注打击、近战洗礼、手雷洗礼\n胸甲：谐振弹药生成、狙击伤害抗性、震荡阻尼器\n腿部：谐振回收器、武器洗礼、药到病除\n职业物品：特殊终结技、时间膨胀、职业洗礼\n\n## 神器\n\n神器：废墟石板\n模组：电介质、不稳定神枪手、严酷折射、群敌飞梭、邪恶收割、重型军械回复、崩解\n\n## 六维\n\n六维：生命 20+ ｜ 近战 70+ ｜ 手雷 ~ ｜ 超能 70+ ｜ 职业 100+ ｜ 武器 150+\n\n## 注解\n\n注意刚需vog套，触发裂波者吃球增伤特性\n1、配装优点\n高常态输出：吃球裂波者66%增伤、废墟石板35%、觅敌者之灵25%、焕光20%，常态dps可达2100+，压50能在勇士一次眩晕期间打进终结。\n强生存：不稳定神枪手给予大量职业技能能量（因此可舍弃希望琢面），邪恶收割和使命琢面给予大量虚空覆盖护盾，可常驻增幅和虚空覆盖护盾；孤独琢面和切割perk联动崩解，织造铠甲覆盖率高；高压情况多使用火箭筒，获得抵抗2。\n弹药经济优秀：裂波者催化增加弹药生成，高达80，日常使用完全支持双绿。\n30光以内割草：矛隼触发大量不稳定爆炸，按住左键一炸一大片。\n2、武器选择\n主手选择完美逆行是因为火箭脉冲弹药bug，日常使用可实现双绿电表倒转；威能选择了带自填和增伤perk的反屏障火箭筒红鲱鱼。\n主手可替换其他缚丝武器，例如融合（渐速音）、追踪（门齿），最好有增伤和切割perk；威能可替换虚空（轰鸣巨人）、缚丝火箭筒（注视焦点），perk选择自填和增伤，或者急切刀（骑士之火）、线融（揭纱露眼）、机枪（锤头）等。主手和威能一定要能反屏障和势不可挡。\n3、职业碎片选择\n选择棱镜职业获得多重元素增益。碎片保护琢面（更肉）、使命琢面（虚空覆盖护盾）、黎明琢面（全程焕光）、孤独琢面（提高割裂覆盖率），没有选择希望琢面（职业技能恢复）的因为实战测试后，发现职业回转已经足够，焕光和增幅基本能全程覆盖。\n4、护甲模组选择\n套装固定vog4件套。金装可替换成觅敌曲腹蛛（同时大招替换成火大）；也可以直接换成命运眷顾。属性方面武器越高越好；近战加上洗礼至少70+，最好能到90+，能做到没有怪时一次飞升回满；职业加上洗礼一定要满100保证回转；生命最好有一些保证软减。模组插上各种属性的洗礼；带药到病除补充软减不足；不携带激涌，因为和觅敌触发的激涌*4不叠加；根据实际带的武器调整对应属性的回收和弹药模组。\n5、使用方法\n烟雾弹命中战斗人员约1s可触发觅敌，钩爪和飞升都不能触发觅敌。因此烟雾弹-击杀-隐身-触发不稳定-职业能量-飞升-烟雾弹，完成循环。裂波者注意打头可提高织造铠甲覆盖率。飞升后注意快速击杀被震颤的小怪可回血。\n6、配装缺点\n软减和火大vog套相比逊色不少，在彪悍环境比较吃力。"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "裂波者 觅敌矛隼猎"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "废墟石板"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "裂波者 觅敌矛隼猎 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n裂波者 觅敌矛隼猎\n\n推荐者：\n实力日天\n\n裂波者 觅敌矛隼猎\n\n♥︎ 复制配装截图详情开关\n\n猎人 · 棱镜 · 强度S29 · 凯旋纪念碑\n\n裂波者+vog套全程触发高增伤\n\n适用环境\n\n宗师终极\n\n日常\n\n标签\n\n清怪\n\n续航\n\n通用\n\n# 裂波者 觅敌矛隼猎\n\n推荐人：实力日天\n描述：裂波者+vog套全程触发高增伤\n更新：2026.9.8\n场景：宗师终极、日常\n定位：清怪、续航、通用\n分支：棱镜\n类别：强度\n核心：裂波者\n\n## 审核意见\n\n职业金二号位可以考虑虫头or蜘蛛头,然后腿上插吃球回技能来保持回转\n\n## 职业\n\n职业：猎人\n超能：暗影箭矢：狩猎陷阱\n星相：潇洒行刑者、飞升\n碎片：保护琢面、孤独琢面、黎明琢面、使命琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：裂波者\n传说武器：完美逆行 | 嫉妒军械库、切割、问题解决者\n传说武器：红鲱鱼 | 重建、爆炸光能\n\n## 护甲\n\n异域护甲：觅敌者之灵、矛隼之灵\n套装：埃希恩记忆 2 件 × 埃希恩记忆 4 件\n头盔：超能洗礼、特殊武器弹药搜寻者、重型弹药搜寻者\n护臂：专注打击、近战洗礼、手雷洗礼\n胸甲：谐振弹药生成、狙击伤害抗性、震荡阻尼器\n腿部：谐振回收器、武器洗礼、药到病除\n职业物品：特殊终结技、时间膨胀、职业洗礼\n\n## 神器\n\n神器：废墟石板\n模组：电介质、不稳定神枪手、严酷折射、群敌飞梭、邪恶收割、重型军械回复、崩解\n\n## 六维\n\n六维：生命 20+ ｜ 近战 70+ ｜ 手雷 ~ ｜ 超能 70+ ｜ 职业 100+ ｜ 武器 150+\n\n## 注解\n\n注意刚需vog套，触发裂波者吃球增伤特性\n1、配装优点\n高常态输出：吃球裂波者66%增伤、废墟石板35%、觅敌者之灵25%、焕光20%，常态dps可达2100+，压50能在勇士一次眩晕期间打进终结。\n强生存：不稳定神枪手给予大量职业技能能量（因此可舍弃希望琢面），邪恶收割和使命琢面给予大量虚空覆盖护盾，可常驻增幅和虚空覆盖护盾；孤独琢面和切割perk联动崩解，织造铠甲覆盖率高；高压情况多使用火箭筒，获得抵抗2。\n弹药经济优秀：裂波者催化增加弹药生成，高达80，日常使用完全支持双绿。\n30光以内割草：矛隼触发大量不稳定爆炸，按住左键一炸一大片。\n2、武器选择\n主手选择完美逆行是因为火箭脉冲弹药bug，日常使用可实现双绿电表倒转；威能选择了带自填和增伤perk的反屏障火箭筒红鲱鱼。\n主手可替换其他缚丝武器，例如融合（渐速音）、追踪（门齿），最好有增伤和切割perk；威能可替换虚空（轰鸣巨人）、缚丝火箭筒（注视焦点），perk选择自填和增伤，或者急切刀（骑士之火）、线融（揭纱露眼）、机枪（锤头）等。主手和威能一定要能反屏障和势不可挡。\n3、职业碎片选择\n选择棱镜职业获得多重元素增益。碎片保护琢面（更肉）、使命琢面（虚空覆盖护盾）、黎明琢面（全程焕光）、孤独琢面（提高割裂覆盖率），没有选择希望琢面（职业技能恢复）的因为实战测试后，发现职业回转已经足够，焕光和增幅基本能全程覆盖。\n4、护甲模组选择\n套装固定vog4件套。金装可替换成觅敌曲腹蛛（同时大招替换成火大）；也可以直接换成命运眷顾。属性方面武器越高越好；近战加上洗礼至少70+，最好能到90+，能做到没有怪时一次飞升回满；职业加上洗礼一定要满100保证回转；生命最好有一些保证软减。模组插上各种属性的洗礼；带药到病除补充软减不足；不携带激涌，因为和觅敌触发的激涌*4不叠加；根据实际带的武器调整对应属性的回收和弹药模组。\n5、使用方法\n烟雾弹命中战斗人员约1s可触发觅敌，钩爪和飞升都不能触发觅敌。因此烟雾弹-击杀-隐身-触发不稳定-职业能量-飞升-烟雾弹，完成循环。裂波者注意打头可提高织造铠甲覆盖率。飞升后注意快速击杀被震颤的小怪可回血。\n6、配装缺点\n软减和火大vog套相比逊色不少，在彪悍环境比较吃力。\n\n审核意见\n\n职业金二号位可以考虑虫头or蜘蛛头,然后腿上插吃球回技能来保持回转\n\n职业\n\n职业\n\n猎人\n\n棱镜\n\n超能\n\n暗影箭矢：狩猎陷阱\n\n技能\n\n抓钩\n\n陷阱炸弹\n\n赌徒闪身\n\n星相\n\n潇洒行刑者\n\n飞升\n\n碎片\n\n保护琢面\n\n孤独琢面\n\n黎明琢面\n\n使命琢面\n\n武器\n\n裂波者\n\n完美逆行嫉妒军械库切割问题解决者\n\n红鲱鱼重建爆炸光能\n\n神器模组\n\n废墟石板\n\n电介质\n\n不稳定神枪手\n\n严酷折射\n\n群敌飞梭\n\n邪恶收割\n\n重型军械回复\n\n崩解\n\n护甲\n\n觅敌者之灵矛隼之灵\n\n埃希恩记忆玻璃拱顶2 件\n\n埃希恩记忆玻璃拱顶4 件\n\n生命20+\n\n近战70+\n\n手雷~\n\n超能70+\n\n职业100+\n\n武器150+\n\n头盔\n\n超能洗礼\n\n特殊武器弹药搜寻者弹药搜寻者\n\n重型弹药搜寻者弹药搜寻者\n\n护臂\n\n专注打击\n\n近战洗礼\n\n手雷洗礼\n\n胸甲\n\n谐振弹药生成弹药生成\n\n狙击伤害抗性抗性\n\n震荡阻尼器抗性\n\n腿部\n\n谐振回收器回收利用\n\n武器洗礼\n\n药到病除\n\n职业物品\n\n特殊终结技\n\n时间膨胀\n\n职业洗礼\n\n注解\n\n注意刚需vog套，触发裂波者吃球增伤特性\n1、配装优点\n高常态输出：吃球裂波者66%增伤、废墟石板35%、觅敌者之灵25%、焕光20%，常态dps可达2100+，压50能在勇士一次眩晕期间打进终结。\n强生存：不稳定神枪手给予大量职业技能能量（因此可舍弃希望琢面），邪恶收割和使命琢面给予大量虚空覆盖护盾，可常驻增幅和虚空覆盖护盾；孤独琢面和切割perk联动崩解，织造铠甲覆盖率高；高压情况多使用火箭筒，获得抵抗2。\n弹药经济优秀：裂波者催化增加弹药生成，高达80，日常使用完全支持双绿。\n30光以内割草：矛隼触发大量不稳定爆炸，按住左键一炸一大片。\n2、武器选择\n主手选择完美逆行是因为火箭脉冲弹药bug，日常使用可实现双绿电表倒转；威能选择了带自填和增伤perk的反屏障火箭筒红鲱鱼。\n主手可替换其他缚丝武器，例如融合（渐速音）、追踪（门齿），最好有增伤和切割perk；威能可替换虚空（轰鸣巨人）、缚丝火箭筒（注视焦点），perk选择自填和增伤，或者急切刀（骑士之火）、线融（揭纱露眼）、机枪（锤头）等。主手和威能一定要能反屏障和势不可挡。\n3、职业碎片选择\n选择棱镜职业获得多重元素增益。碎片保护琢面（更肉）、使命琢面（虚空覆盖护盾）、黎明琢面（全程焕光）、孤独琢面（提高割裂覆盖率），没有选择希望琢面（职业技能恢复）的因为实战测试后，发现职业回转已经足够，焕光和增幅基本能全程覆盖。\n4、护甲模组选择\n套装固定vog4件套。金装可替换成觅敌曲腹蛛（同时大招替换成火大）；也可以直接换成命运眷顾。属性方面武器越高越好；近战加上洗礼至少70+，最好能到90+，能做到没有怪时一次飞升回满；职业加上洗礼一定要满100保证回转；生命最好有一些保证软减。模组插上各种属性的洗礼；带药到病除补充软减不足；不携带激涌，因为和觅敌触发的激涌*4不叠加；根据实际带的武器调整对应属性的回收和弹药模组。\n5、使用方法\n烟雾弹命中战斗人员约1s可触发觅敌，钩爪和飞升都不能触发觅敌。因此烟雾弹-击杀-隐身-触发不稳定-职业能量-飞升-烟雾弹，完成循环。裂波者注意打头可提高织造铠甲覆盖率。飞升后注意快速击杀被震颤的小怪可回血。\n6、配装缺点\n软减和火大vog套相比逊色不少，在彪悍环境比较吃力。\n\n更新 2026.9.8\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/1hvh7t4d-hunter/index.html",
+    "final_url": "https://starside.work/builds/s29/1hvh7t4d-hunter/index.html",
+    "path": "pages/builds/s29/1hvh7t4d-hunter/index.html",
+    "bytes": 37625,
+    "sha256": "7f9d3af0c6cd30e7004ea51b2766176ba8b6f5a6e74629e562b150e839dd5970",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:59.334690+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/prismatic/index.html",
+    "https://starside.work/elements/strand/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-heavy/index.html",
+    "https://starside.work/shopping-other/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/19f8d7086a.webp",
+    "https://starside.work/armor-mods/icons/1f6f21330f.webp",
+    "https://starside.work/armor-mods/icons/2ee424e9c4.webp",
+    "https://starside.work/armor-mods/icons/328d80acfa.webp",
+    "https://starside.work/armor-mods/icons/346923d6cc.webp",
+    "https://starside.work/armor-mods/icons/37bedc55b8.webp",
+    "https://starside.work/armor-mods/icons/549322d88e.webp",
+    "https://starside.work/armor-mods/icons/7a002a3848.webp",
+    "https://starside.work/armor-mods/icons/b2c34e83e7.webp",
+    "https://starside.work/armor-mods/icons/c9476266a5.webp",
+    "https://starside.work/armor-mods/icons/cb61c2722b.webp",
+    "https://starside.work/armor-mods/icons/d482839737.webp",
+    "https://starside.work/armor-mods/icons/e10db37ad3.webp",
+    "https://starside.work/armor-mods/icons/e4238f1ad0.webp",
+    "https://starside.work/armor-mods/icons/f049892fbd.webp",
+    "https://starside.work/armor-sets/icons/071.png",
+    "https://starside.work/armor-sets/icons/072.png",
+    "https://starside.work/artifact-mods/icons/2552ea2c2f.webp",
+    "https://starside.work/artifact-mods/icons/41ee68d087.webp",
+    "https://starside.work/artifact-mods/icons/7b8ab43d4b.webp",
+    "https://starside.work/artifact-mods/icons/8e2db21458.webp",
+    "https://starside.work/artifact-mods/icons/8ed5f7d5d9.webp",
+    "https://starside.work/artifact-mods/icons/9a5ec863b6.webp",
+    "https://starside.work/artifact-mods/icons/c026769da3.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/8f9b85fb5d.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/65d4e919d1.webp",
+    "https://starside.work/elements/class-abilities/icons/cba8013059.webp",
+    "https://starside.work/elements/prismatic/icons/2b0c20c15a.webp",
+    "https://starside.work/elements/prismatic/icons/3cb69eea59.webp",
+    "https://starside.work/elements/prismatic/icons/67d91531a9.webp",
+    "https://starside.work/elements/prismatic/icons/6dadfe439a.webp",
+    "https://starside.work/elements/prismatic/icons/727574c917.webp",
+    "https://starside.work/elements/prismatic/icons/77096a21b5.webp",
+    "https://starside.work/elements/prismatic/icons/901742a8ea.webp",
+    "https://starside.work/elements/strand/icons/24b726319d.webp",
+    "https://starside.work/elements/void/icons/3ed96daa22.webp",
+    "https://starside.work/elements/void/icons/c78143215f.webp",
+    "https://starside.work/exotic-armor/icons/285a06ebd4.webp",
+    "https://starside.work/exotic-armor/icons/55cf124ba6.webp",
+    "https://starside.work/exotic-weapon/icons/c963bcc718.webp",
+    "https://starside.work/shopping-heavy/icons/71c59a4db7.webp",
+    "https://starside.work/shopping-other/icons/d53b47fdec.webp",
+    "https://starside.work/weapon-perks/icons/26d0b5700a.webp",
+    "https://starside.work/weapon-perks/icons/307d133e60.webp",
+    "https://starside.work/weapon-perks/icons/9ad13b2017.webp",
+    "https://starside.work/weapon-perks/icons/a4d0dbee15.webp",
+    "https://starside.work/weapon-perks/icons/d46df779c6.webp"
+  ]
+}

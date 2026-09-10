@@ -1,0 +1,2231 @@
+{
+  "url": "https://starside.work/elements/prismatic/index.html",
+  "title": "棱镜 · Starside",
+  "description": "棱镜分支职业速查表——超凡机制、光能与暗影动词一览，21 枚碎片，三职业的棱镜手雷、可自由搭配的共享技能与星相，带图标与全部数值。",
+  "category": "subclass",
+  "updated_at": "2026.8.30",
+  "data_src": "docs/prismatic",
+  "data_hash": "4b71dce6f464f82bf953bfe008bc3c49e514003b",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "棱镜"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "效果"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "术士"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "效果",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "超凡",
+            "html": "超凡"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/fbdfd33c31.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "独特技能，靠均衡使用光能与暗影两种伤害类型充能。\n \n 造成伤害与施加元素效果都能提供超凡能量；增益与减益都算，各自计入对应阵营。\n 动能伤害同时填充光能与暗影两条槽，效率降低 50%；一条槽已满时，动能伤害填充另一条槽的效率降低 40%。\n 溢出伤害不计入超凡获取。\n \n 超凡激活时：\n 立即充满 2 次手雷与近战技能充能。\n 手雷技能被替换为职业专属的棱镜手雷，同时带光能与暗影两种伤害类型。\n 武器伤害提高 5%，手雷与近战充能速度额外提高 10%，伤害抗性提高 20% [5%]，持续 20 秒。伤害提升可与一切效果叠加。\n \n 超凡期间：\n 造成手雷技能伤害时，近战充能速度提高到每秒固定 35% 近战技能能量，持续 2 秒。\n 造成近战技能伤害时，棱镜手雷充能速度提高到每秒固定 35%，持续 2 秒。\n \n 超凡期间的击杀延长其持续时间，随击杀次数递减：\n T1 与 T2 级战斗人员 5% ｜ T3 与 T4 10% ｜ 橙血、初级首领与首领 15% ｜ 守护者 ?%。\n 从第 2 次击杀起，每次的延长量累计乘以 0.9? 的惩罚。",
+            "html": "独特技能，靠均衡使用光能与暗影两种伤害类型充能。<br> <br> 造成伤害与施加元素效果都能提供<span class=\"el-prismatic\">超凡能量</span>；<span class=\"buff\">增益</span>与<span class=\"debuff\">减益</span>都算，各自计入对应阵营。<br> <span class=\"el-kinetic\">动能</span>伤害同时填充光能与暗影两条槽，效率降低 50%；一条槽已满时，<span class=\"el-kinetic\">动能</span>伤害填充另一条槽的效率降低 40%。<br> 溢出伤害不计入<span class=\"el-prismatic\">超凡</span>获取。<br> <br> <span class=\"el-prismatic\">超凡</span>激活时：<br> 立即充满 2 次<span class=\"pickup\">手雷与近战技能充能</span>。<br> 手雷技能被替换为职业专属的<span class=\"el-prismatic\">棱镜</span>手雷，同时带光能与暗影两种伤害类型。<br> 武器伤害提高 5%，<span class=\"pickup\">手雷与近战</span>充能速度额外提高 10%，伤害抗性提高 20% <span class=\"pvp\">[5%]</span>，持续 20 秒。伤害提升可与一切效果叠加。<br> <br> <span class=\"el-prismatic\">超凡</span>期间：<br> 造成手雷技能伤害时，近战充能速度提高到每秒固定 35% <span class=\"pickup\">近战技能能量</span>，持续 2 秒。<br> 造成近战技能伤害时，<span class=\"el-prismatic\">棱镜</span>手雷充能速度提高到每秒固定 35%，持续 2 秒。<br> <br> <span class=\"el-prismatic\">超凡</span>期间的击杀延长其持续时间，随击杀次数递减：<br> <span class=\"enemy\">T1 与 T2 级战斗人员</span> 5% ｜ <span class=\"enemy\">T3 与 T4</span> 10% ｜ <span class=\"bar-orange\">橙血</span>、<span class=\"bar-yellow\">初级首领</span>与<span class=\"bar-yellow\">首领</span> 15% ｜ <span class=\"bar-orange\">守护者</span> <span class=\"unsure\">?</span>%。<br> 从第 2 次击杀起，每次的延长量累计乘以 <span class=\"unsure\">0.9?</span> 的惩罚。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "元素效果",
+            "html": "元素效果"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico4"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dd3a0a4404.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\"> <img src=\"icons/eeb2527cfd.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\"> <img src=\"icons/e995f5dfc1.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <img src=\"icons/93a6c5c953.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "元素效果指各分支职业能施加的全部动词，对目标可以是正面（增益）也可以是负面（减益）。\n \n 装备任意电弧技能或星相即可通过多次电弧击杀获得增幅（推进器不计为电弧技能）。\n 装备任意缚丝技能或星相即可生成缠结，术士还能拥有停栖的线虫。\n \n 光能动词：\n 电弧 ｜ 增益 增幅、电光充能；减益 致盲、震颤；拾取物 离子轨迹。\n 烈日 ｜ 增益 治愈、焕光、恢复；减益 灼烧、点燃；拾取物 焰灵。\n 虚空 ｜ 增益 吞食、隐身、虚空覆盖护盾；减益 压制、不稳定、虚弱；拾取物 虚空裂口。\n \n 暗影动词：\n 冰影 ｜ 增益 冰霜护甲；减益 减速、冻结、碎裂；拾取物 冰影碎片。\n 缚丝 ｜ 增益 织造铠甲；减益 割裂、悬停、瓦解；拾取物 缠结。",
+            "html": "元素效果指各分支职业能施加的全部动词，对目标可以是正面（<span class=\"buff\">增益</span>）也可以是负面（<span class=\"debuff\">减益</span>）。<br> <br> 装备任意<span class=\"el-arc\">电弧</span>技能或星相即可通过多次<span class=\"el-arc\">电弧</span>击杀获得<span class=\"el-arc\">增幅</span>（<span class=\"note\">推进器不计为电弧技能</span>）。<br> 装备任意<span class=\"el-strand\">缚丝</span>技能或星相即可生成<span class=\"el-strand\">缠结</span>，术士还能拥有停栖的<span class=\"el-strand\">线虫</span>。<br> <br> 光能动词：<br> <span class=\"el-arc\">电弧</span> ｜ <span class=\"buff\">增益</span> <span class=\"el-arc\">增幅</span>、<span class=\"el-arc\">电光充能</span>；<span class=\"debuff\">减益</span> <span class=\"deb-arc\">致盲</span>、<span class=\"deb-arc\">震颤</span>；拾取物 <span class=\"el-arc\">离子轨迹</span>。<br> <span class=\"el-solar\">烈日</span> ｜ <span class=\"buff\">增益</span> <span class=\"el-solar\">治愈</span>、<span class=\"el-solar\">焕光</span>、<span class=\"el-solar\">恢复</span>；<span class=\"debuff\">减益</span> <span class=\"deb-solar\">灼烧</span>、<span class=\"deb-solar\">点燃</span>；拾取物 <span class=\"el-solar\">焰灵</span>。<br> <span class=\"el-void\">虚空</span> ｜ <span class=\"buff\">增益</span> <span class=\"el-void\">吞食</span>、<span class=\"el-void\">隐身</span>、<span class=\"el-void\">虚空覆盖护盾</span>；<span class=\"debuff\">减益</span> <span class=\"deb-void\">压制</span>、<span class=\"deb-void\">不稳定</span>、<span class=\"deb-void\">虚弱</span>；拾取物 <span class=\"el-void\">虚空裂口</span>。<br> <br> 暗影动词：<br> <span class=\"el-stasis\">冰影</span> ｜ <span class=\"buff\">增益</span> <span class=\"el-stasis\">冰霜护甲</span>；<span class=\"debuff\">减益</span> <span class=\"deb-stasis\">减速</span>、<span class=\"deb-stasis\">冻结</span>、<span class=\"deb-stasis\">碎裂</span>；拾取物 <span class=\"el-stasis\">冰影碎片</span>。<br> <span class=\"el-strand\">缚丝</span> ｜ <span class=\"buff\">增益</span> <span class=\"el-strand\">织造铠甲</span>；<span class=\"debuff\">减益</span> <span class=\"deb-strand\">割裂</span>、<span class=\"deb-strand\">悬停</span>、<span class=\"deb-strand\">瓦解</span>；拾取物 <span class=\"el-strand\">缠结</span>。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "移动与职业技能",
+            "html": "移动与职业技能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/65da718e9d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "通常受分支职业限制的移动技能与职业技能，在棱镜上可以自由选择。\n 猎人可以使用瞬移与特技闪身。\n 泰坦拥有推进器。\n 术士可以装备瞬移与凤凰俯冲。",
+            "html": "通常受分支职业限制的移动技能与职业技能，在<span class=\"el-prismatic\">棱镜</span>上可以自由选择。<br> 猎人可以使用瞬移与特技闪身。<br> 泰坦拥有推进器。<br> 术士可以装备瞬移与凤凰俯冲。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "熔炉竞技场调整",
+            "html": "熔炉竞技场调整"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/42fa7a8bb7.webp\" alt=\"\" width=\"56\" height=\"43\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "手雷、近战与职业技能 ｜ 充能速度降为 0.85 倍，回复倍率获取降为 0.8 倍。\n 该惩罚与熔炉竞技场基准的 0.8 倍充能速度叠加，实际为基准之上的 0.68 倍。\n \n 超能技能 ｜ 充能速度降为 0.95 倍。\n 与基准的 0.75 倍叠加，实际 0.71 倍。",
+            "html": "手雷、近战与职业技能 ｜ 充能速度降为 0.85 倍，回复倍率获取降为 0.8 倍。<br> 该惩罚与熔炉竞技场基准的 0.8 倍充能速度叠加，实际为基准之上的 0.68 倍。<br> <br> 超能技能 ｜ 充能速度降为 0.95 倍。<br> 与基准的 0.75 倍叠加，实际 0.71 倍。"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "碎片",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "碎片",
+            "html": "碎片"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性变化",
+            "html": "属性变化"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "觉醒琢面",
+            "html": "觉醒琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ed9d397e99.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6 秒内用元素伤害击杀 3 名战斗人员，或一次超能击杀：\n 生成对应元素的元素拾取物，类型由最后一击的伤害类型决定。\n 生成同一种非缠结拾取物之间有 5 秒冷却；冷却期间用该元素击杀，不计入生成另一种拾取物。",
+            "html": "6 秒内用元素伤害击杀 3 名<span class=\"enemy\">战斗人员</span>，或一次超能击杀：<br> 生成对应元素的<span class=\"pickup\">元素拾取物</span>，类型由最后一击的伤害类型决定。<br> <span class=\"note\">生成同一种非缠结拾取物之间有 5 秒冷却；冷却期间用该元素击杀，不计入生成另一种拾取物。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 生命值",
+            "html": "+10 <span class=\"health\">生命值</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "平衡琢面",
+            "html": "平衡琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5b6e2f0217.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3? 秒内用光能伤害击杀 3 名战斗人员提供 10% 近战能量。\n 3? 秒内用暗影伤害击杀 3 名战斗人员提供 10% 手雷能量。",
+            "html": "<span class=\"unsure\">3?</span> 秒内用光能伤害击杀 3 名<span class=\"enemy\">战斗人员</span>提供 10% <span class=\"pickup\">近战能量</span>。<br> <span class=\"unsure\">3?</span> 秒内用暗影伤害击杀 3 名<span class=\"enemy\">战斗人员</span>提供 10% <span class=\"pickup\">手雷能量</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "祝福琢面",
+            "html": "祝福琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f8fa0355bd.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近战击杀开始生命值恢复。\n 超凡期间，效果同时作用于 ? 米内的盟友。",
+            "html": "近战击杀开始<span class=\"health\">生命值</span>恢复。<br> <span class=\"el-prismatic\">超凡</span>期间，效果同时作用于 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">盟友</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "勇敢琢面",
+            "html": "勇敢琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1653e0640c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "手雷击杀为虚空武器提供不稳定子弹，持续 11.25 [7.5] 秒。\n 充能近战击杀为缚丝武器提供瓦解子弹，持续 11.25 [7.5] 秒。",
+            "html": "手雷击杀为<span class=\"el-void\">虚空</span>武器提供<span class=\"deb-void\">不稳定</span>子弹，持续 11.25 <span class=\"pvp\">[7.5]</span> 秒。<br> 充能近战击杀为<span class=\"el-strand\">缚丝</span>武器提供<span class=\"deb-strand\">瓦解</span>子弹，持续 11.25 <span class=\"pvp\">[7.5]</span> 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "指挥琢面",
+            "html": "指挥琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9184cd1ba7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冻结或压制一名战斗人员：\n 补满已准备的武器，并提供 +20? 稳定性、+? 瞄准辅助与 +40 空中效率，持续 11 秒（4 秒内置冷却）。\n \n 击杀被冻结或被压制的战斗人员，分别生成冰影碎片或虚空裂口。",
+            "html": "<span class=\"deb-stasis\">冻结</span>或<span class=\"deb-void\">压制</span>一名<span class=\"enemy\">战斗人员</span>：<br> 补满已准备的武器，并提供 <span class=\"unsure\">+20?</span> 稳定性、<span class=\"unsure\">+?</span> 瞄准辅助与 +40 空中效率，持续 11 秒（4 秒内置冷却）。<br> <br> 击杀被<span class=\"deb-stasis\">冻结</span>或被<span class=\"deb-void\">压制</span>的<span class=\"enemy\">战斗人员</span>，分别生成<span class=\"el-stasis\">冰影碎片</span>或<span class=\"el-void\">虚空裂口</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "勇气琢面",
+            "html": "勇气琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/48bc7ae6d4.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "对被冰影或缚丝元素减益影响的战斗人员：光能技能伤害提高 10%，光能充能近战技能伤害提高 50% [10%]。",
+            "html": "对被<span class=\"el-stasis\">冰影</span>或<span class=\"el-strand\">缚丝</span>元素<span class=\"debuff\">减益</span>影响的<span class=\"enemy\">战斗人员</span>：光能技能伤害提高 10%，光能充能近战技能伤害提高 50% <span class=\"pvp\">[10%]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 手雷",
+            "html": "+10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "黎明琢面",
+            "html": "黎明琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/77096a21b5.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "充能近战命中提供焕光，持续 5 秒。\n 充能近战击杀为自己与 ? 米内的盟友提供焕光，持续 5 秒。",
+            "html": "充能近战命中提供<span class=\"el-solar\">焕光</span>，持续 5 秒。<br> 充能近战击杀为<span class=\"enemy\">自己</span>与 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-solar\">焕光</span>，持续 5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 近战",
+            "html": "-10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "违抗琢面",
+            "html": "违抗琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/acf7dd5ac7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "终结技触发一次元素引爆，对 7 米内的战斗人员造成 135 点与超能匹配的元素伤害，并施加对应减益：\n 电弧 → 震颤 ｜ 烈日 → 40 层灼烧 ｜ 虚空 → 不稳定 ｜ 冰影 → ? 层减速，持续 ? 秒 ｜ 缚丝 → 割裂。",
+            "html": "<span class=\"enemy\">终结技</span>触发一次元素引爆，对 7 米内的<span class=\"enemy\">战斗人员</span>造成 135 点与超能匹配的元素伤害，并施加对应<span class=\"debuff\">减益</span>：<br> <span class=\"el-arc\">电弧</span> → <span class=\"deb-arc\">震颤</span> ｜ <span class=\"el-solar\">烈日</span> → 40 层<span class=\"deb-solar\">灼烧</span> ｜ <span class=\"el-void\">虚空</span> → <span class=\"deb-void\">不稳定</span> ｜ <span class=\"el-stasis\">冰影</span> → <span class=\"unsure\">?</span> 层<span class=\"deb-stasis\">减速</span>，持续 <span class=\"unsure\">?</span> 秒 ｜ <span class=\"el-strand\">缚丝</span> → <span class=\"deb-strand\">割裂</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 职业",
+            "html": "+10 职业"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "奉献琢面",
+            "html": "奉献琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b6c85947f8.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀受冰影或缚丝元素减益影响的战斗人员，额外提供光能超凡能量：\n 红血 1% ｜ 橙血 3% ｜ 初级首领 5% ｜ 守护者 ?%。",
+            "html": "击杀受<span class=\"el-stasis\">冰影</span>或<span class=\"el-strand\">缚丝</span>元素<span class=\"debuff\">减益</span>影响的<span class=\"enemy\">战斗人员</span>，额外提供光能<span class=\"el-prismatic\">超凡能量</span>：<br> <span class=\"bar-red\">红血</span> 1% ｜ <span class=\"bar-orange\">橙血</span> 3% ｜ <span class=\"bar-yellow\">初级首领</span> 5% ｜ <span class=\"bar-orange\">守护者</span> <span class=\"unsure\">?</span>%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "统御琢面",
+            "html": "统御琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1c6bcdee82.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空手雷技能伤害施加虚弱，持续 6 [?] 秒。\n 电弧手雷技能伤害施加震颤。\n 电弧之魂再次施加震颤前有 4 秒冷却。",
+            "html": "<span class=\"el-void\">虚空</span>手雷技能伤害施加<span class=\"deb-void\">虚弱</span>，持续 6 <span class=\"unsure\">[?]</span> 秒。<br> <span class=\"el-arc\">电弧</span>手雷技能伤害施加<span class=\"deb-arc\">震颤</span>。<br> <span class=\"note\">电弧之魂再次施加震颤前有 4 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 手雷",
+            "html": "-10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "慷慨琢面",
+            "html": "慷慨琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f090f014db.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超凡期间的击杀推进一个计数，达到阈值时生成能量球，每枚为盟友提供 7.15% 超能能量；每次超凡最多生成 4 枚。\n \n 计数推进：\n T1 级战斗人员 10% ｜ T2 15% ｜ T3 20% ｜ T4 34% ｜ 初级首领 40% ｜ 首领 50% ｜ 守护者 ?%。\n \n 生成阈值：\n 30%（第 1 枚）｜ 50%（第 2 枚）｜ 70%（第 3 枚）｜ 100%（第 4 枚）。",
+            "html": "<span class=\"el-prismatic\">超凡</span>期间的击杀推进一个计数，达到阈值时生成<span class=\"orb\">能量球</span>，每枚为<span class=\"enemy\">盟友</span>提供 7.15% <span class=\"orb\">超能能量</span>；每次<span class=\"el-prismatic\">超凡</span>最多生成 4 枚。<br> <br> 计数推进：<br> <span class=\"enemy\">T1 级战斗人员</span> 10% ｜ <span class=\"enemy\">T2</span> 15% ｜ <span class=\"enemy\">T3</span> 20% ｜ <span class=\"enemy\">T4</span> 34% ｜ <span class=\"bar-yellow\">初级首领</span> 40% ｜ <span class=\"bar-yellow\">首领</span> 50% ｜ <span class=\"bar-orange\">守护者</span> <span class=\"unsure\">?</span>%。<br> <br> 生成阈值：<br> 30%（第 1 枚）｜ 50%（第 2 枚）｜ 70%（第 3 枚）｜ 100%（第 4 枚）。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "恩惠琢面",
+            "html": "恩惠琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/66c73b3114.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "动能武器击杀额外提供 2% [?%] 超凡能量。\n 超能击杀为自己与 ? 米内的盟友额外提供 2% [?%] 超凡能量。",
+            "html": "<span class=\"el-kinetic\">动能</span>武器击杀额外提供 2% <span class=\"unsure\">[?%]</span> <span class=\"el-prismatic\">超凡能量</span>。<br> 超能击杀为<span class=\"enemy\">自己</span>与 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">盟友</span>额外提供 2% <span class=\"unsure\">[?%]</span> <span class=\"el-prismatic\">超凡能量</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 生命值",
+            "html": "-10 <span class=\"health\">生命值</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "荣耀琢面",
+            "html": "荣耀琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e5a8bbd27c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "拾取元素拾取物或摧毁缠结额外提供对应阵营的超凡能量：\n 离子轨迹、焰灵、虚空裂口 = 7.5% 光能能量 ｜ 冰影碎片 = 5% 暗影能量 ｜ 缠结 = 10% 暗影能量。",
+            "html": "拾取<span class=\"pickup\">元素拾取物</span>或摧毁<span class=\"el-strand\">缠结</span>额外提供对应阵营的<span class=\"el-prismatic\">超凡能量</span>：<br> <span class=\"el-arc\">离子轨迹</span>、<span class=\"el-solar\">焰灵</span>、<span class=\"el-void\">虚空裂口</span> = 7.5% 光能能量 ｜ <span class=\"el-stasis\">冰影碎片</span> = 5% 暗影能量 ｜ <span class=\"el-strand\">缠结</span> = 10% 暗影能量。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "希望琢面",
+            "html": "希望琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b5a97142a6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "按激活中的元素增益数量，额外提供职业技能基础充能速度：\n 1 个 +40% ｜ 2 个 +60%。",
+            "html": "按激活中的元素<span class=\"buff\">增益</span>数量，额外提供<span class=\"pickup\">职业技能</span>基础充能速度：<br> 1 个 +40% ｜ 2 个 +60%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "正义琢面",
+            "html": "正义琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/81ba5747a7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超凡期间的技能击杀触发一次与技能匹配的爆炸，对 ? 米内的战斗人员最多造成 130 [?] 伤害。",
+            "html": "<span class=\"el-prismatic\">超凡</span>期间的技能击杀触发一次与技能匹配的爆炸，对 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>最多造成 130 <span class=\"unsure\">[?]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 超能",
+            "html": "+10 超能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "修复琢面",
+            "html": "修复琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/915be32c68.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "手雷技能击杀提供 1 层治愈。\n 棱镜手雷击杀提供 2 层治愈。",
+            "html": "手雷技能击杀提供 1 层<span class=\"el-solar\">治愈</span>。<br> <span class=\"el-prismatic\">棱镜</span>手雷击杀提供 2 层<span class=\"el-solar\">治愈</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "保护琢面",
+            "html": "保护琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/727574c917.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "15 米内有 3 名战斗人员时提供 15% [?%] 伤害抗性。\n 游戏内描述有误：超凡期间本效果不会提高，而是 15% 与超凡的 20% 叠加，合计 32% 伤害抗性。",
+            "html": "15 米内有 3 名<span class=\"enemy\">战斗人员</span>时提供 15% <span class=\"unsure\">[?%]</span> 伤害抗性。<br> <span class=\"note\">游戏内描述有误：超凡期间本效果不会提高，而是 15% 与超凡的 20% 叠加，合计 32% 伤害抗性。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "使命琢面",
+            "html": "使命琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/67d91531a9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "拾取能量球时按已装备的超能提供对应的元素增益：\n \n 电弧 ｜ 1 层电光充能。\n 烈日 ｜ 1 层恢复，持续 5 秒。\n 虚空 ｜ 22.5 生命值的虚空覆盖护盾，持续 5 秒。\n 冰影 ｜ 2 层冰霜护甲，持续 5 秒。\n 缚丝 ｜ 织造铠甲，持续 5 秒。",
+            "html": "拾取<span class=\"orb\">能量球</span>时按已装备的超能提供对应的元素<span class=\"buff\">增益</span>：<br> <br> <span class=\"el-arc\">电弧</span> ｜ 1 层<span class=\"el-arc\">电光充能</span>。<br> <span class=\"el-solar\">烈日</span> ｜ 1 层<span class=\"el-solar\">恢复</span>，持续 5 秒。<br> <span class=\"el-void\">虚空</span> ｜ 22.5 <span class=\"health\">生命值</span>的<span class=\"el-void\">虚空覆盖护盾</span>，持续 5 秒。<br> <span class=\"el-stasis\">冰影</span> ｜ 2 层<span class=\"el-stasis\">冰霜护甲</span>，持续 5 秒。<br> <span class=\"el-strand\">缚丝</span> ｜ <span class=\"el-strand\">织造铠甲</span>，持续 5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 职业",
+            "html": "-10 职业"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "毁灭琢面",
+            "html": "毁灭琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e421ab5fa8.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "碎裂战斗人员或摧毁水晶时：\n 额外触发一次伤害实例，在 10 [8] 米半径内最多造成 25 [9] 伤害，衰减后最低 17 [4]。\n \n 点燃半径提高 25%。",
+            "html": "<span class=\"deb-stasis\">碎裂</span><span class=\"enemy\">战斗人员</span>或摧毁<span class=\"el-stasis\">水晶</span>时：<br> 额外触发一次伤害实例，在 10 <span class=\"pvp\">[8]</span> 米半径内最多造成 25 <span class=\"pvp\">[9]</span> 伤害，衰减后最低 17 <span class=\"pvp\">[4]</span>。<br> <br> <span class=\"deb-solar\">点燃</span>半径提高 25%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 武器",
+            "html": "+10 武器"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "牺牲琢面",
+            "html": "牺牲琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a87d312648.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "受电弧、烈日或虚空元素增益影响期间，技能击杀额外提供 1% [?%] 暗影超凡能量。",
+            "html": "受<span class=\"el-arc\">电弧</span>、<span class=\"el-solar\">烈日</span>或<span class=\"el-void\">虚空</span>元素<span class=\"buff\">增益</span>影响期间，技能击杀额外提供 1% <span class=\"unsure\">[?%]</span> 暗影<span class=\"el-prismatic\">超凡能量</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 手雷",
+            "html": "+10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "孤独琢面",
+            "html": "孤独琢面"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6dadfe439a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3 秒内精准命中次数达标后：\n 此后 3 秒内，任意来源的下一次伤害实例触发一次割裂爆裂，对 3 米内的战斗人员施加割裂；超凡期间半径提高到 6 米。\n 所需精准命中次数 = 弹匣容量的 20% + 1，向下取整；弓箭固定 2 次。\n 割裂后有 4 秒冷却，冷却期间的精准命中不计入。准备割裂爆裂的那次精准命中不会触发三体坐观者、高爆载荷这类 Perk。",
+            "html": "3 秒内<span class=\"stack\">精准命中</span>次数达标后：<br> 此后 3 秒内，任意来源的下一次伤害实例触发一次<span class=\"deb-strand\">割裂</span>爆裂，对 3 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-strand\">割裂</span>；<span class=\"el-prismatic\">超凡</span>期间半径提高到 6 米。<br> 所需<span class=\"stack\">精准命中</span>次数 = 弹匣容量的 20% + 1，向下取整；弓箭固定 2 次。<br> <span class=\"note\">割裂后有 4 秒冷却，冷却期间的精准命中不计入。准备割裂爆裂的那次精准命中不会触发三体坐观者、高爆载荷这类 Perk。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "猎人",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "棱镜手雷",
+            "html": "棱镜手雷"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰火尖刺",
+            "html": "冰火尖刺"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8728e47680.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "附着到表面或战斗人员身上，向最远 ? 米处释放一股冰影与烈日能量呈锥形扩散。\n \n 迸发成一场减速风暴，爆发时最多造成 78 [?] 伤害。\n 风暴每 0.25 秒造成 15.6 [?] 冰影伤害并施加 13? 层减速，持续 3.45 秒。\n \n 附着 3.45 秒后释放一道灼热旋风，每 0.25 秒造成 39 [?] 烈日伤害并施加 10 层灼烧，持续 4 秒。",
+            "html": "附着到表面或<span class=\"enemy\">战斗人员</span>身上，向最远 <span class=\"unsure\">?</span> 米处释放一股<span class=\"el-stasis\">冰影</span>与<span class=\"el-solar\">烈日</span>能量呈锥形扩散。<br> <br> 迸发成一场<span class=\"deb-stasis\">减速</span>风暴，爆发时最多造成 78 <span class=\"unsure\">[?]</span> 伤害。<br> 风暴每 0.25 秒造成 15.6 <span class=\"unsure\">[?]</span> <span class=\"el-stasis\">冰影伤害</span>并施加 <span class=\"unsure\">13?</span> 层<span class=\"deb-stasis\">减速</span>，持续 3.45 秒。<br> <br> 附着 3.45 秒后释放一道灼热旋风，每 0.25 秒造成 39 <span class=\"unsure\">[?]</span> <span class=\"el-solar\">烈日伤害</span>并施加 10 层<span class=\"deb-solar\">灼烧</span>，持续 4 秒。"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "猎人",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "lead"
+            },
+            "text": "共享技能\n 职业技能和移动技能都与原分支职业完全共享。",
+            "html": "共享技能<br> <span class=\"note\">职业技能和移动技能都与原分支职业完全共享。</span>"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-arc"
+            },
+            "text": "电弧",
+            "html": "<img src=\"icons/205bfcb812.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 电弧"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-solar"
+            },
+            "text": "烈日",
+            "html": "<img src=\"icons/8fff5c49b3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 烈日"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-void"
+            },
+            "text": "虚空",
+            "html": "<img src=\"icons/70caf4a733.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 虚空"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-stasis"
+            },
+            "text": "冰影",
+            "html": "<img src=\"icons/357ddde8cc.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 冰影"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-strand"
+            },
+            "text": "缚丝",
+            "html": "<img src=\"icons/120c0fddfd.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 缚丝"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "手雷",
+            "html": "手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-arc"
+            },
+            "text": "电光手雷",
+            "html": "<img src=\"icons/4876c4a36a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../arc/index.html?q=%E7%94%B5%E5%85%89%E6%89%8B%E9%9B%B7#sec-3\">电光手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-solar"
+            },
+            "text": "蜂群手雷",
+            "html": "<img src=\"icons/2b0a812a24.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../solar/index.html?q=%E8%9C%82%E7%BE%A4%E6%89%8B%E9%9B%B7#sec-3\">蜂群手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-void"
+            },
+            "text": "磁性手雷",
+            "html": "<img src=\"icons/666aa7ab79.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../void/index.html?q=%E7%A3%81%E6%80%A7%E6%89%8B%E9%9B%B7#sec-3\">磁性手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-stasis"
+            },
+            "text": "暮域手雷",
+            "html": "<img src=\"icons/9683ba474d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../stasis/index.html?q=%E6%9A%AE%E5%9F%9F%E6%89%8B%E9%9B%B7#sec-3\">暮域手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-strand"
+            },
+            "text": "抓钩",
+            "html": "<img src=\"icons/19164e5f21.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../strand/index.html?q=%E6%8A%93%E9%92%A9#sec-3\">抓钩</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "近战",
+            "html": "近战"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-arc"
+            },
+            "text": "组合打击",
+            "html": "<img src=\"icons/8e9f584dfa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../arc/index.html?q=%E7%BB%84%E5%90%88%E6%89%93%E5%87%BB#sec-4\">组合打击</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-solar"
+            },
+            "text": "飞刀戏法",
+            "html": "<img src=\"icons/f4acf7c211.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../solar/index.html?q=%E9%A3%9E%E5%88%80%E6%88%8F%E6%B3%95#sec-4\">飞刀戏法</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-void"
+            },
+            "text": "陷阱炸弹",
+            "html": "<img src=\"icons/6d42ed6dff.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../void/index.html?q=%E9%99%B7%E9%98%B1%E7%82%B8%E5%BC%B9#sec-4\">陷阱炸弹</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-stasis"
+            },
+            "text": "枯萎之刃",
+            "html": "<img src=\"icons/389076525f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../stasis/index.html?q=%E6%9E%AF%E8%90%8E%E4%B9%8B%E5%88%83#sec-4\">枯萎之刃</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-strand"
+            },
+            "text": "线织尖刺",
+            "html": "<img src=\"icons/f0eadb0c8a.webp\" alt=\"\" width=\"56\" height=\"53\" loading=\"lazy\"> <a href=\"../strand/index.html?q=%E7%BA%BF%E7%BB%87%E5%B0%96%E5%88%BA#sec-4\">线织尖刺</a>"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "猎人",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "星相",
+            "html": "星相"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "碎片槽位",
+            "html": "碎片槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "飞升",
+            "html": "飞升"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2b0c20c15a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在空中且拥有职业技能充能时：\n 按［空中移动］消耗一次充能，向上旋转电弧法杖，并触发已装备职业技能的效果；装备线织幽灵时也一并触发。\n 为自己与 10 米内的盟友提供增幅。\n 对 10 米内的战斗人员最多造成 181 [30] 伤害并施加震颤。",
+            "html": "在空中且拥有<span class=\"pickup\">职业技能充能</span>时：<br> 按［空中移动］消耗一次充能，向上旋转<span class=\"el-arc\">电弧</span>法杖，并触发已装备职业技能的效果；装备<span class=\"el-strand\">线织幽灵</span>时也一并触发。<br> 为<span class=\"enemy\">自己</span>与 10 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-arc\">增幅</span>。<br> 对 10 米内的<span class=\"enemy\">战斗人员</span>最多造成 181 <span class=\"pvp\">[30]</span> 伤害并施加<span class=\"deb-arc\">震颤</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "火药博弈",
+            "html": "火药博弈"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b4d7005b8d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀为简易爆炸物蓄力，攒够 6 次充能即可使用。\n 武器击杀 1 [2] ｜ 元素减益 3 [4] ｜ 技能击杀 4 ｜ 超能 6。\n \n 手雷技能被替换为棍上点燃：\n 被射击或 3 秒后触发点燃，伤害提高 50%。\n 射击炸药会让它的伤害提高 50% [5%]、半径提高 ?% 达到 ? 米，并释放 9 枚追踪子弹药，每枚最多造成 80 [?] 伤害。\n 只有自动引爆时才触发手雷效果。激活后有 6 秒冷却，冷却期间的击杀不提供充能。",
+            "html": "击杀为简易爆炸物蓄力，攒够 6 次充能即可使用。<br> 武器击杀 1 <span class=\"pvp\">[2]</span> ｜ 元素<span class=\"debuff\">减益</span> 3 <span class=\"pvp\">[4]</span> ｜ 技能击杀 4 ｜ 超能 6。<br> <br> 手雷技能被替换为棍上<span class=\"deb-solar\">点燃</span>：<br> 被射击或 3 秒后触发<span class=\"deb-solar\">点燃</span>，伤害提高 50%。<br> 射击炸药会让它的伤害提高 50% <span class=\"pvp\">[5%]</span>、半径提高 <span class=\"unsure\">?</span>% 达到 <span class=\"unsure\">?</span> 米，并释放 9 枚追踪子弹药，每枚最多造成 80 <span class=\"unsure\">[?]</span> 伤害。<br> <span class=\"note\">只有自动引爆时才触发手雷效果。激活后有 6 秒冷却，冷却期间的击杀不提供充能。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "潇洒行刑者",
+            "html": "潇洒行刑者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/901742a8ea.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀受任意元素减益影响的战斗人员：\n 提供隐身持续 8 秒，以及真实视界持续 4 秒。\n \n 隐身期间，以及因发动优雅处决脱离隐身后的 0.5 秒内：\n 近战攻击伤害提高 300% [20%]，使战斗人员虚弱持续 5 [2.5] 秒，并将近战突进射程延长到 ? 米。\n 触发后附加「过于优雅」，在 2 [12] 秒内阻止再次触发。",
+            "html": "击杀受任意元素<span class=\"debuff\">减益</span>影响的<span class=\"enemy\">战斗人员</span>：<br> 提供<span class=\"el-void\">隐身</span>持续 8 秒，以及真实视界持续 4 秒。<br> <br> <span class=\"el-void\">隐身</span>期间，以及因发动优雅处决脱离<span class=\"el-void\">隐身</span>后的 0.5 秒内：<br> 近战攻击伤害提高 300% <span class=\"pvp\">[20%]</span>，使<span class=\"enemy\">战斗人员</span><span class=\"deb-void\">虚弱</span>持续 5 <span class=\"pvp\">[2.5]</span> 秒，并将近战突进射程延长到 <span class=\"unsure\">?</span> 米。<br> 触发后附加「过于优雅」，在 2 <span class=\"pvp\">[12]</span> 秒内阻止再次触发。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "严冬帷幕",
+            "html": "严冬帷幕"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/481a86e7c6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "对一名战斗人员施加减速时：\n 职业技能基础充能速度额外 +300% [150%]，持续 3 秒。\n \n 使用职业技能：\n 对 9 [8] 米内的战斗人员施加 60 [40] 层减速，持续 8 [1.5] 秒。\n 对战斗人员提供 50% 伤害抗性，持续 4? 秒。",
+            "html": "对一名<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-stasis\">减速</span>时：<br> <span class=\"pickup\">职业技能</span>基础充能速度额外 +300% <span class=\"pvp\">[150%]</span>，持续 3 秒。<br> <br> 使用职业技能：<br> 对 9 <span class=\"pvp\">[8]</span> 米内的<span class=\"enemy\">战斗人员</span>施加 60 <span class=\"pvp\">[40]</span> 层<span class=\"deb-stasis\">减速</span>，持续 8 <span class=\"pvp\">[1.5]</span> 秒。<br> 对<span class=\"enemy\">战斗人员</span>提供 50% 伤害抗性，持续 <span class=\"unsure\">4?</span> 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "线织幽灵",
+            "html": "线织幽灵"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4f517c0390.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "使用职业技能生成一个缚丝诱饵。\n \n 诱饵有 175 生命值，最多持续 12 秒；战斗人员会被吸引去攻击它，它对战斗人员有 70% 伤害抗性。\n 盟友与施法者对它造成的技能与武器伤害提高 150%。\n 诱饵始终计为敌对目标，盟友、战斗人员与施法者都能伤害它，且不会触发任何击杀效果。\n \n 失去全部生命值或 ? 米内有战斗人员时爆炸，最多造成 600 [60 守护者 ｜ 121 物体] 伤害，范围 ? 米；战斗人员靠近触发的爆炸会生成 2 只线虫。\n 装备时被动施加 0.6 倍职业技能充能速度，装备特技闪身时除外。",
+            "html": "使用职业技能生成一个<span class=\"el-strand\">缚丝</span>诱饵。<br> <br> 诱饵有 175 <span class=\"health\">生命值</span>，最多持续 12 秒；<span class=\"enemy\">战斗人员</span>会被吸引去攻击它，它对<span class=\"enemy\">战斗人员</span>有 70% 伤害抗性。<br> <span class=\"enemy\">盟友</span>与<span class=\"enemy\">施法者</span>对它造成的技能与武器伤害提高 150%。<br> <span class=\"note\">诱饵始终计为敌对目标，盟友、战斗人员与施法者都能伤害它，且不会触发任何击杀效果。</span><br> <br> 失去全部<span class=\"health\">生命值</span>或 <span class=\"unsure\">?</span> 米内有<span class=\"enemy\">战斗人员</span>时爆炸，最多造成 600 <span class=\"pvp\">[60 守护者 ｜ 121 物体]</span> 伤害，范围 <span class=\"unsure\">?</span> 米；<span class=\"enemy\">战斗人员</span>靠近触发的爆炸会生成 2 只<span class=\"el-strand\">线虫</span>。<br> <span class=\"note\">装备时被动施加 0.6 倍职业技能充能速度，装备特技闪身时除外。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "泰坦",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "棱镜手雷",
+            "html": "棱镜手雷"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "电化陷阱",
+            "html": "电化陷阱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/128010d646.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "充能了电弧与缚丝能量的爆炸物。\n \n 释放一次超级充能的悬停爆裂，最多造成 105 [?] 伤害，对 ? 米内的战斗人员施加悬停。\n 被悬停的战斗人员每 ? 秒受到 ? 点伤害，持续 ? 秒，同时附加震颤。",
+            "html": "充能了<span class=\"el-arc\">电弧</span>与<span class=\"el-strand\">缚丝</span>能量的爆炸物。<br> <br> 释放一次超级充能的<span class=\"deb-strand\">悬停</span>爆裂，最多造成 105 <span class=\"unsure\">[?]</span> 伤害，对 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-strand\">悬停</span>。<br> 被<span class=\"deb-strand\">悬停</span>的<span class=\"enemy\">战斗人员</span>每 <span class=\"unsure\">?</span> 秒受到 <span class=\"unsure\">?</span> 点伤害，持续 <span class=\"unsure\">?</span> 秒，同时附加<span class=\"deb-arc\">震颤</span>。"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "泰坦",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "lead"
+            },
+            "text": "共享技能\n 职业技能和移动技能都与原分支职业完全共享。",
+            "html": "共享技能<br> <span class=\"note\">职业技能和移动技能都与原分支职业完全共享。</span>"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-arc"
+            },
+            "text": "电弧",
+            "html": "<img src=\"icons/d70650ed73.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 电弧"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-solar"
+            },
+            "text": "烈日",
+            "html": "<img src=\"icons/90ca587869.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 烈日"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-void"
+            },
+            "text": "虚空",
+            "html": "<img src=\"icons/d3a5c298cf.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 虚空"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-stasis"
+            },
+            "text": "冰影",
+            "html": "<img src=\"icons/6b8643428f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 冰影"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-strand"
+            },
+            "text": "缚丝",
+            "html": "<img src=\"icons/f479be4b19.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 缚丝"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "手雷",
+            "html": "手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-arc"
+            },
+            "text": "脉冲手雷",
+            "html": "<img src=\"icons/b77e1882d2.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../arc/index.html?q=%E8%84%89%E5%86%B2%E6%89%8B%E9%9B%B7#sec-3\">脉冲手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-solar"
+            },
+            "text": "铝热手雷",
+            "html": "<img src=\"icons/70ac7363f8.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../solar/index.html?q=%E9%93%9D%E7%83%AD%E6%89%8B%E9%9B%B7#sec-3\">铝热手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-void"
+            },
+            "text": "抑制手雷",
+            "html": "<img src=\"icons/ac8dcedd35.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../void/index.html?q=%E6%8A%91%E5%88%B6%E6%89%8B%E9%9B%B7#sec-3\">抑制手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-stasis"
+            },
+            "text": "冰川手雷",
+            "html": "<img src=\"icons/5b95925f9f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../stasis/index.html?q=%E5%86%B0%E5%B7%9D%E6%89%8B%E9%9B%B7#sec-3\">冰川手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-strand"
+            },
+            "text": "束缚手雷",
+            "html": "<img src=\"icons/6627a29f10.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../strand/index.html?q=%E6%9D%9F%E7%BC%9A%E6%89%8B%E9%9B%B7#sec-3\">束缚手雷</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "近战",
+            "html": "近战"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-arc"
+            },
+            "text": "雷霆一击",
+            "html": "<img src=\"icons/c403c6d31a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../arc/index.html?q=%E9%9B%B7%E9%9C%86%E4%B8%80%E5%87%BB#sec-5\">雷霆一击</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-solar"
+            },
+            "text": "战锤打击",
+            "html": "<img src=\"icons/86d4dc5fbe.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../solar/index.html?q=%E6%88%98%E9%94%A4%E6%89%93%E5%87%BB#sec-5\">战锤打击</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-void"
+            },
+            "text": "圣盾投掷",
+            "html": "<img src=\"icons/3f54abd89e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../void/index.html?q=%E5%9C%A3%E7%9B%BE%E6%8A%95%E6%8E%B7#sec-5\">圣盾投掷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-stasis"
+            },
+            "text": "战栗打击",
+            "html": "<img src=\"icons/7f49b0510d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../stasis/index.html?q=%E6%88%98%E6%A0%97%E6%89%93%E5%87%BB#sec-5\">战栗打击</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-strand"
+            },
+            "text": "狂暴利刃",
+            "html": "<img src=\"icons/04a6d170f3.webp\" alt=\"\" width=\"56\" height=\"53\" loading=\"lazy\"> <a href=\"../strand/index.html?q=%E7%8B%82%E6%9A%B4%E5%88%A9%E5%88%83#sec-5\">狂暴利刃</a>"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "泰坦",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "星相",
+            "html": "星相"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "碎片槽位",
+            "html": "碎片槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "重击",
+            "html": "重击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/947bf83419.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近战击杀：\n 0.1 秒内快速恢复一段生命值，开始生命值恢复，并提供增幅。\n 红血 50 ｜ 橙血 75 ｜ 初级首领 100 ｜ 守护者 30 生命值。\n \n 打破战斗人员护盾，或对生命值低于 30% 的战斗人员造成伤害：\n 提供重击，持续 6 秒。\n \n 重击期间：\n 基础与偃月近战伤害 +160% [30%]。\n 充能近战伤害 +160% [20%]。\n 基础近战攻击计为电弧充能近战命中。\n 对战斗人员的近战突进距离提高到 6 米。",
+            "html": "近战击杀：<br> 0.1 秒内快速恢复一段<span class=\"health\">生命值</span>，开始<span class=\"health\">生命值</span>恢复，并提供<span class=\"el-arc\">增幅</span>。<br> <span class=\"bar-red\">红血</span> 50 ｜ <span class=\"bar-orange\">橙血</span> 75 ｜ <span class=\"bar-yellow\">初级首领</span> 100 ｜ <span class=\"bar-orange\">守护者</span> 30 <span class=\"health\">生命值</span>。<br> <br> 打破<span class=\"enemy\">战斗人员</span>护盾，或对<span class=\"health\">生命值</span>低于 30% 的<span class=\"enemy\">战斗人员</span>造成伤害：<br> 提供<span class=\"el-arc\">重击</span>，持续 6 秒。<br> <br> <span class=\"el-arc\">重击</span>期间：<br> 基础与偃月近战伤害 +160% <span class=\"pvp\">[30%]</span>。<br> 充能近战伤害 +160% <span class=\"pvp\">[20%]</span>。<br> 基础近战攻击计为<span class=\"el-arc\">电弧</span>充能近战命中。<br> 对<span class=\"enemy\">战斗人员</span>的近战突进距离提高到 6 米。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "神圣献祭",
+            "html": "神圣献祭"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2b9c80567e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "滑铲时按［近战技能］：\n 向前发出一道 20 米的烈日能量波形，造成 40 [30] 伤害并施加 40 层灼烧。\n 未处于猛击状态时只消耗 50% 近战技能能量。\n 开火状态下无法在滑铲期间使用。\n \n 由此进入空中后按［近战技能］：\n 猛击地面，形成第二道更宽的波形向前 20 米，并碎裂水晶。\n 对非灼烧战斗人员造成 486 [120] 伤害。\n 命中灼烧的战斗人员则造成 472.5 [50] 伤害并触发点燃。\n \n 近战动画期间对非近战伤害提供 25% 伤害抗性。",
+            "html": "滑铲时按［近战技能］：<br> 向前发出一道 20 米的<span class=\"el-solar\">烈日</span>能量波形，造成 40 <span class=\"pvp\">[30]</span> 伤害并施加 40 层<span class=\"deb-solar\">灼烧</span>。<br> 未处于猛击状态时只消耗 50% <span class=\"pickup\">近战技能能量</span>。<br> <span class=\"note\">开火状态下无法在滑铲期间使用。</span><br> <br> 由此进入空中后按［近战技能］：<br> 猛击地面，形成第二道更宽的波形向前 20 米，并<span class=\"deb-stasis\">碎裂</span><span class=\"el-stasis\">水晶</span>。<br> 对<span class=\"deb-solar\">非灼烧</span><span class=\"enemy\">战斗人员</span>造成 486 <span class=\"pvp\">[120]</span> 伤害。<br> 命中<span class=\"deb-solar\">灼烧</span>的<span class=\"enemy\">战斗人员</span>则造成 472.5 <span class=\"pvp\">[50]</span> 伤害并触发<span class=\"deb-solar\">点燃</span>。<br> <br> 近战动画期间对非近战伤害提供 25% 伤害抗性。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "坚不可摧",
+            "html": "坚不可摧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/aad67e3608.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "按住［手雷］召唤虚空护盾；烈焰战锤或冰川震击激活时也可以召唤。\n 装备时手雷冷却覆盖为 152 秒。\n \n 护盾对格挡的伤害提供 95?% [64%] 抗性，并嘲讽正面的战斗人员；碰到护盾的战斗人员陷入迷失。\n 每秒生成 10 点虚空覆盖护盾，持续 5+2.5 秒，期间每秒消耗 7.5% 手雷能量。\n \n 格挡伤害会让前向移动速度降低 50?%，持续 0.5? 秒，同时提供手雷能量，回能逐渐降低（随时间，或随已格挡伤害?），最终降到 ?%，历时 ? 秒。\n 护盾本身没有移速惩罚，只是不能攀爬；冲刺会取消它。\n \n 松开［手雷］或耗尽手雷能量时：\n 释放一次正面爆炸，消耗 50% 手雷能量，对 11 米内的目标造成伤害。\n 未格挡任何伤害时最少 430 [64?]，随已格挡伤害提高，最高 1584 [178?]。\n \n 用坚不可摧击杀提供吞食，持续 10+5 秒。",
+            "html": "按住［手雷］召唤<span class=\"el-void\">虚空</span>护盾；<span class=\"el-solar\">烈焰战锤</span>或<span class=\"el-stasis\">冰川震击</span>激活时也可以召唤。<br> 装备时手雷冷却覆盖为 152 秒。<br> <br> 护盾对格挡的伤害提供 <span class=\"unsure\">95?</span>% <span class=\"pvp\">[64%]</span> 抗性，并嘲讽正面的<span class=\"enemy\">战斗人员</span>；碰到护盾的<span class=\"enemy\">战斗人员</span>陷入迷失。<br> 每秒生成 10 点<span class=\"el-void\">虚空覆盖护盾</span>，持续 5+2.5 秒，期间每秒消耗 7.5% <span class=\"pickup\">手雷能量</span>。<br> <br> 格挡伤害会让前向移动速度降低 <span class=\"unsure\">50?</span>%，持续 <span class=\"unsure\">0.5?</span> 秒，同时提供<span class=\"pickup\">手雷能量</span>，回能逐渐降低（随时间，或随已格挡伤害<span class=\"unsure\">?</span>），最终降到 <span class=\"unsure\">?</span>%，历时 <span class=\"unsure\">?</span> 秒。<br> 护盾本身没有移速惩罚，只是不能攀爬；冲刺会取消它。<br> <br> 松开［手雷］或耗尽<span class=\"pickup\">手雷能量</span>时：<br> 释放一次正面爆炸，消耗 50% <span class=\"pickup\">手雷能量</span>，对 11 米内的目标造成伤害。<br> 未格挡任何伤害时最少 430 <span class=\"unsure\">[64?]</span>，随已格挡伤害提高，最高 1584 <span class=\"unsure\">[178?]</span>。<br> <br> 用<span class=\"el-void\">坚不可摧</span>击杀提供<span class=\"el-void\">吞食</span>，持续 10+5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "钻石长矛",
+            "html": "钻石长矛"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/10ea99c436.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1 [3] 次冰影武器击杀、一次技能击杀，或一次碎裂击杀时：\n 生成一支冰影长矛。\n 重击灌注的非充能近战击杀守护者不会生成。\n 长矛是一次性武器，3 米内可拾取，最多持有 10 秒，在地面上最多停留 25 秒。\n \n ［开火］投出长矛 ｜ 冻结接触点 5 米内的战斗人员，直接接触时碎裂水晶，并造成 150 [45] 伤害。\n ［近战］猛击 ｜ 冻结 8 [6.75?] 米内的战斗人员，最多造成 200 [90] 伤害，并为自己与 ? 米内的盟友提供 2 层冰霜护甲。\n 钻石长矛伤害视为普通冰影技能伤害，既非手雷也非近战。生成后有 7 [17] 秒冷却。",
+            "html": "1 <span class=\"pvp\">[3]</span> 次<span class=\"el-stasis\">冰影</span>武器击杀、一次技能击杀，或一次<span class=\"deb-stasis\">碎裂</span>击杀时：<br> 生成一支<span class=\"el-stasis\">冰影</span>长矛。<br> <span class=\"note\">重击灌注的非充能近战击杀守护者不会生成。</span><br> 长矛是一次性武器，3 米内可拾取，最多持有 10 秒，在地面上最多停留 25 秒。<br> <br> ［开火］投出长矛 ｜ <span class=\"deb-stasis\">冻结</span>接触点 5 米内的<span class=\"enemy\">战斗人员</span>，直接接触时<span class=\"deb-stasis\">碎裂</span><span class=\"el-stasis\">水晶</span>，并造成 150 <span class=\"pvp\">[45]</span> 伤害。<br> ［近战］猛击 ｜ <span class=\"deb-stasis\">冻结</span> 8 <span class=\"unsure\">[6.75?]</span> 米内的<span class=\"enemy\">战斗人员</span>，最多造成 200 <span class=\"pvp\">[90]</span> 伤害，并为<span class=\"enemy\">自己</span>与 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">盟友</span>提供 2 层<span class=\"el-stasis\">冰霜护甲</span>。<br> <span class=\"note\">钻石长矛伤害视为普通冰影技能伤害，既非手雷也非近战。生成后有 7 [17] 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "勇士之鞭",
+            "html": "勇士之鞭"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1a18a55dd2.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀受元素减益影响的战斗人员提供 10% 职业技能能量。\n \n 放置屏障时：\n 释放一条缚丝鞭，向前飞行最远 30 米，追踪路径上的战斗人员，命中造成 60 [30] 伤害并施加悬停。\n \n 使用推进器职业技能时：\n 生成一枚缚丝结，? 秒后爆炸，最多造成 60 [30] 伤害并在 ? 米半径内施加悬停。",
+            "html": "击杀受元素<span class=\"debuff\">减益</span>影响的<span class=\"enemy\">战斗人员</span>提供 10% <span class=\"pickup\">职业技能能量</span>。<br> <br> 放置屏障时：<br> 释放一条<span class=\"el-strand\">缚丝</span>鞭，向前飞行最远 30 米，追踪路径上的<span class=\"enemy\">战斗人员</span>，命中造成 60 <span class=\"pvp\">[30]</span> 伤害并施加<span class=\"deb-strand\">悬停</span>。<br> <br> 使用推进器职业技能时：<br> 生成一枚<span class=\"el-strand\">缚丝</span>结，<span class=\"unsure\">?</span> 秒后爆炸，最多造成 60 <span class=\"pvp\">[30]</span> 伤害并在 <span class=\"unsure\">?</span> 米半径内施加<span class=\"deb-strand\">悬停</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "术士",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "棱镜手雷",
+            "html": "棱镜手雷"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰冻奇点",
+            "html": "冰冻奇点"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/11b1145e21.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "接触时最多造成 70 [26] 虚空伤害，把 12 米内的战斗人员拉向它，并生成一颗被减速冰环环绕的微型黑洞。\n \n 减速场域每 0.25 秒对 6 米内的战斗人员造成 18 [4] 冰影伤害并施加 13? 层减速，持续 3.65 秒。\n \n 命中 5 秒后黑洞内爆，施加压制并对 7 米内的战斗人员最多造成 570 [150] 虚空伤害。",
+            "html": "接触时最多造成 70 <span class=\"pvp\">[26]</span> <span class=\"el-void\">虚空伤害</span>，把 12 米内的<span class=\"enemy\">战斗人员</span>拉向它，并生成一颗被<span class=\"deb-stasis\">减速</span>冰环环绕的微型黑洞。<br> <br> <span class=\"deb-stasis\">减速</span>场域每 0.25 秒对 6 米内的<span class=\"enemy\">战斗人员</span>造成 18 <span class=\"pvp\">[4]</span> <span class=\"el-stasis\">冰影伤害</span>并施加 <span class=\"unsure\">13?</span> 层<span class=\"deb-stasis\">减速</span>，持续 3.65 秒。<br> <br> 命中 5 秒后黑洞内爆，施加<span class=\"deb-void\">压制</span>并对 7 米内的<span class=\"enemy\">战斗人员</span>最多造成 570 <span class=\"pvp\">[150]</span> <span class=\"el-void\">虚空伤害</span>。"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "术士",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "lead"
+            },
+            "text": "共享技能\n 职业技能和移动技能都与原分支职业完全共享。",
+            "html": "共享技能<br> <span class=\"note\">职业技能和移动技能都与原分支职业完全共享。</span>"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-arc"
+            },
+            "text": "电弧",
+            "html": "<img src=\"icons/11ca92f0ac.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 电弧"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-solar"
+            },
+            "text": "烈日",
+            "html": "<img src=\"icons/ddc8bb152d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 烈日"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-void"
+            },
+            "text": "虚空",
+            "html": "<img src=\"icons/9e43e17795.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 虚空"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-stasis"
+            },
+            "text": "冰影",
+            "html": "<img src=\"icons/f8e47a3c1f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 冰影"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "sk-strand"
+            },
+            "text": "缚丝",
+            "html": "<img src=\"icons/8e7f92abd0.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> 缚丝"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "手雷",
+            "html": "手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-arc"
+            },
+            "text": "风暴手雷",
+            "html": "<img src=\"icons/d8c8db6ffd.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../arc/index.html?q=%E9%A3%8E%E6%9A%B4%E6%89%8B%E9%9B%B7#sec-3\">风暴手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-solar"
+            },
+            "text": "治愈手雷",
+            "html": "<img src=\"icons/c7ca237c49.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../solar/index.html?q=%E6%B2%BB%E6%84%88%E6%89%8B%E9%9B%B7#sec-3\">治愈手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-void"
+            },
+            "text": "涡流手雷",
+            "html": "<img src=\"icons/2301d72e82.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../void/index.html?q=%E6%B6%A1%E6%B5%81%E6%89%8B%E9%9B%B7#sec-3\">涡流手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-stasis"
+            },
+            "text": "急冻手雷",
+            "html": "<img src=\"icons/3185031eae.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../stasis/index.html?q=%E6%80%A5%E5%86%BB%E6%89%8B%E9%9B%B7#sec-3\">急冻手雷</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-strand"
+            },
+            "text": "线虫手雷",
+            "html": "<img src=\"icons/fd2e3f9d9c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../strand/index.html?q=%E7%BA%BF%E8%99%AB%E6%89%8B%E9%9B%B7#sec-3\">线虫手雷</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "近战",
+            "html": "近战"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-arc"
+            },
+            "text": "连锁闪电",
+            "html": "<img src=\"icons/a75aae5a06.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../arc/index.html?q=%E8%BF%9E%E9%94%81%E9%97%AA%E7%94%B5#sec-6\">连锁闪电</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-solar"
+            },
+            "text": "焚烧响指",
+            "html": "<img src=\"icons/552c9c26e8.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../solar/index.html?q=%E7%84%9A%E7%83%A7%E5%93%8D%E6%8C%87#sec-6\">焚烧响指</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-void"
+            },
+            "text": "口袋奇点",
+            "html": "<img src=\"icons/62b6d96086.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../void/index.html?q=%E5%8F%A3%E8%A2%8B%E5%A5%87%E7%82%B9#sec-6\">口袋奇点</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-stasis"
+            },
+            "text": "半影冲击",
+            "html": "<img src=\"icons/9499d62138.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\"> <a href=\"../stasis/index.html?q=%E5%8D%8A%E5%BD%B1%E5%86%B2%E5%87%BB#sec-6\">半影冲击</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "sk-strand"
+            },
+            "text": "神秘织针",
+            "html": "<img src=\"icons/1e7c19f6a4.webp\" alt=\"\" width=\"56\" height=\"53\" loading=\"lazy\"> <a href=\"../strand/index.html?q=%E7%A5%9E%E7%A7%98%E7%BB%87%E9%92%88#sec-6\">神秘织针</a>"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "术士",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "星相",
+            "html": "星相"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "碎片槽位",
+            "html": "碎片槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "闪电激涌",
+            "html": "闪电激涌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1dd3dd05aa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "滑铲时按［近战技能］：\n 向前传送 10 米，在距出口点 7 米处呈五边形召唤 5 道闪电，每命中一名战斗人员提供 1 层电光充能。\n 使用时另提供增幅与 1 层电光充能。未命中时不会拿到超过 1 层。\n 使用后提供 ?% 战斗人员伤害抗性，持续 ? 秒。\n 开火状态下无法在滑铲期间使用。\n \n 闪电同时造成 634 + 127 = 761 [105 + 47 = 152] 伤害并施加震颤。",
+            "html": "滑铲时按［近战技能］：<br> 向前传送 10 米，在距出口点 7 米处呈五边形召唤 5 道闪电，每命中一名<span class=\"enemy\">战斗人员</span>提供 1 层<span class=\"el-arc\">电光充能</span>。<br> 使用时另提供<span class=\"el-arc\">增幅</span>与 1 层<span class=\"el-arc\">电光充能</span>。未命中时不会拿到超过 1 层。<br> 使用后提供 <span class=\"unsure\">?</span>% <span class=\"enemy\">战斗人员</span>伤害抗性，持续 <span class=\"unsure\">?</span> 秒。<br> <span class=\"note\">开火状态下无法在滑铲期间使用。</span><br> <br> 闪电同时造成 634 + 127 = 761 <span class=\"pvp\">[105 + 47 = 152]</span> 伤害并施加<span class=\"deb-arc\">震颤</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "地狱火",
+            "html": "地狱火"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/78ccb2d11f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "使用职业技能提供地狱火，持续 20 秒。\n \n 期间每 1.35 秒向最远 40 米外的战斗人员抛出一颗灼热的烈日弹体，最多造成 217 [38] 烈日手雷技能伤害，并在 4 米半径内施加 30 层灼烧。\n 可以触发手雷技能的交互效果。\n 地狱火施加的灼烧效果不随手雷伤害缩放。",
+            "html": "使用职业技能提供<span class=\"el-solar\">地狱火</span>，持续 20 秒。<br> <br> 期间每 1.35 秒向最远 40 米外的<span class=\"enemy\">战斗人员</span>抛出一颗灼热的<span class=\"el-solar\">烈日</span>弹体，最多造成 217 <span class=\"pvp\">[38]</span> <span class=\"el-solar\">烈日</span>手雷技能伤害，并在 4 米半径内施加 30 层<span class=\"deb-solar\">灼烧</span>。<br> 可以触发手雷技能的交互效果。<br> <span class=\"note\">地狱火施加的灼烧效果不随手雷伤害缩放。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "虚空供养",
+            "html": "虚空供养"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dbc743c2b4.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "技能击杀、冻结战斗人员碎裂击杀、不稳定爆炸击杀或缠结击杀时：\n 提供强化吞食，并把吞食升级为强化吞食。\n \n 强化吞食：\n 激活时恢复 140 生命值，持续 10 秒；重新激活再恢复 140 生命值并刷新 5 秒。\n \n 强化吞食期间击杀：\n 恢复 140 生命值，获得双倍手雷技能能量，并刷新 5 秒。\n 击杀回能：T1 级战斗人员 15% ｜ T2 23.2% ｜ T3 27.5% ｜ T4 40% ｜ 守护者 40%。",
+            "html": "技能击杀、<span class=\"deb-stasis\">冻结</span><span class=\"enemy\">战斗人员</span><span class=\"deb-stasis\">碎裂</span>击杀、<span class=\"deb-void\">不稳定</span>爆炸击杀或<span class=\"el-strand\">缠结</span>击杀时：<br> 提供强化<span class=\"el-void\">吞食</span>，并把<span class=\"el-void\">吞食</span>升级为强化<span class=\"el-void\">吞食</span>。<br> <br> 强化<span class=\"el-void\">吞食</span>：<br> 激活时恢复 140 <span class=\"health\">生命值</span>，持续 10 秒；重新激活再恢复 140 <span class=\"health\">生命值</span>并刷新 5 秒。<br> <br> 强化<span class=\"el-void\">吞食</span>期间击杀：<br> 恢复 140 <span class=\"health\">生命值</span>，获得双倍<span class=\"pickup\">手雷技能能量</span>，并刷新 5 秒。<br> 击杀回能：<span class=\"enemy\">T1 级战斗人员</span> 15% ｜ <span class=\"enemy\">T2</span> 23.2% ｜ <span class=\"enemy\">T3</span> 27.5% ｜ <span class=\"enemy\">T4</span> 40% ｜ <span class=\"bar-orange\">守护者</span> 40%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "凄凉观察者",
+            "html": "凄凉观察者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/64b6c96374.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "装备时手雷冷却覆盖为 159.6 秒，回复倍率继承当前装备的手雷。\n \n 按住［手雷］把手雷技能转成冰影炮塔：\n 炮塔每 2 秒向 35 米内的战斗人员自动发射一轮 5 发追踪弹体（持续 0.7 秒），每次命中施加 20 [10] 层减速，持续 4.5 [2] 秒。\n 炮塔持续 25 秒，拥有 150 构造体生命值，开火前获得 67% 伤害抗性。\n 凄凉观察者伤害计为冰影手雷技能伤害。",
+            "html": "装备时手雷冷却覆盖为 159.6 秒，回复倍率继承当前装备的手雷。<br> <br> 按住［手雷］把手雷技能转成<span class=\"el-stasis\">冰影</span>炮塔：<br> 炮塔每 2 秒向 35 米内的<span class=\"enemy\">战斗人员</span>自动发射一轮 5 发追踪弹体（持续 0.7 秒），每次命中施加 20 <span class=\"pvp\">[10]</span> 层<span class=\"deb-stasis\">减速</span>，持续 4.5 <span class=\"pvp\">[2]</span> 秒。<br> 炮塔持续 25 秒，拥有 150 构造体<span class=\"health\">生命值</span>，开火前获得 67% 伤害抗性。<br> <span class=\"note\">凄凉观察者伤害计为冰影手雷技能伤害。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "编织者之唤",
+            "html": "编织者之唤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9dbe20cbcd.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "线虫命中提供 10% 职业技能能量。\n \n 累计造成 700 [?] 伤害提供一只停栖的线虫；生成之间有 2 秒冷却，一次最多生成 1 只。\n 伤害需求按显示的伤害数字计算，并受力量等级差惩罚。\n \n 使用职业技能生成 3 只线虫，并部署全部停栖的线虫。\n \n 击杀推进一个计数，满 100% 提供一只停栖的线虫：\n 初级首领及以下 34% ｜ 首领 100% ｜ 守护者 67%。",
+            "html": "<span class=\"el-strand\">线虫</span>命中提供 10% <span class=\"pickup\">职业技能能量</span>。<br> <br> 累计造成 700 <span class=\"unsure\">[?]</span> 伤害提供一只停栖的<span class=\"el-strand\">线虫</span>；生成之间有 2 秒冷却，一次最多生成 1 只。<br> <span class=\"note\">伤害需求按显示的伤害数字计算，并受力量等级差惩罚。</span><br> <br> 使用职业技能生成 3 只<span class=\"el-strand\">线虫</span>，并部署全部停栖的<span class=\"el-strand\">线虫</span>。<br> <br> 击杀推进一个计数，满 100% 提供一只停栖的<span class=\"el-strand\">线虫</span>：<br> <span class=\"bar-yellow\">初级首领</span>及以下 34% ｜ <span class=\"bar-yellow\">首领</span> 100% ｜ <span class=\"bar-orange\">守护者</span> 67%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "棱镜 · Starside\n\nStarside\n/\n职业分支详解\n/\n棱镜\n\n棱镜\n\n效果\n\n名称\n图标\n说明\n\n超凡独特技能，靠均衡使用光能与暗影两种伤害类型充能。\n\n 造成伤害与施加元素效果都能提供超凡能量；增益与减益都算，各自计入对应阵营。\n 动能伤害同时填充光能与暗影两条槽，效率降低 50%；一条槽已满时，动能伤害填充另一条槽的效率降低 40%。\n 溢出伤害不计入超凡获取。\n\n 超凡激活时：\n 立即充满 2 次手雷与近战技能充能。\n 手雷技能被替换为职业专属的棱镜手雷，同时带光能与暗影两种伤害类型。\n 武器伤害提高 5%，手雷与近战充能速度额外提高 10%，伤害抗性提高 20% [5%]，持续 20 秒。伤害提升可与一切效果叠加。\n\n 超凡期间：\n 造成手雷技能伤害时，近战充能速度提高到每秒固定 35% 近战技能能量，持续 2 秒。\n 造成近战技能伤害时，棱镜手雷充能速度提高到每秒固定 35%，持续 2 秒。\n\n 超凡期间的击杀延长其持续时间，随击杀次数递减：\n T1 与 T2 级战斗人员 5% ｜ T3 与 T4 10% ｜ 橙血、初级首领与首领 15% ｜ 守护者 ?%。\n 从第 2 次击杀起，每次的延长量累计乘以 0.9? 的惩罚。\n\n元素效果 元素效果指各分支职业能施加的全部动词，对目标可以是正面（增益）也可以是负面（减益）。\n\n 装备任意电弧技能或星相即可通过多次电弧击杀获得增幅（推进器不计为电弧技能）。\n 装备任意缚丝技能或星相即可生成缠结，术士还能拥有停栖的线虫。\n\n 光能动词：\n 电弧 ｜ 增益 增幅、电光充能；减益 致盲、震颤；拾取物 离子轨迹。\n 烈日 ｜ 增益 治愈、焕光、恢复；减益 灼烧、点燃；拾取物 焰灵。\n 虚空 ｜ 增益 吞食、隐身、虚空覆盖护盾；减益 压制、不稳定、虚弱；拾取物 虚空裂口。\n\n 暗影动词：\n 冰影 ｜ 增益 冰霜护甲；减益 减速、冻结、碎裂；拾取物 冰影碎片。\n 缚丝 ｜ 增益 织造铠甲；减益 割裂、悬停、瓦解；拾取物 缠结。\n\n移动与职业技能通常受分支职业限制的移动技能与职业技能，在棱镜上可以自由选择。\n 猎人可以使用瞬移与特技闪身。\n 泰坦拥有推进器。\n 术士可以装备瞬移与凤凰俯冲。\n\n熔炉竞技场调整手雷、近战与职业技能 ｜ 充能速度降为 0.85 倍，回复倍率获取降为 0.8 倍。\n 该惩罚与熔炉竞技场基准的 0.8 倍充能速度叠加，实际为基准之上的 0.68 倍。\n\n 超能技能 ｜ 充能速度降为 0.95 倍。\n 与基准的 0.75 倍叠加，实际 0.71 倍。\n\n碎片\n\n碎片\n图标\n说明\n属性变化\n\n觉醒琢面6 秒内用元素伤害击杀 3 名战斗人员，或一次超能击杀：\n 生成对应元素的元素拾取物，类型由最后一击的伤害类型决定。\n 生成同一种非缠结拾取物之间有 5 秒冷却；冷却期间用该元素击杀，不计入生成另一种拾取物。+10 生命值\n\n平衡琢面3? 秒内用光能伤害击杀 3 名战斗人员提供 10% 近战能量。\n 3? 秒内用暗影伤害击杀 3 名战斗人员提供 10% 手雷能量。—\n\n祝福琢面近战击杀开始生命值恢复。\n 超凡期间，效果同时作用于 ? 米内的盟友。—\n\n勇敢琢面手雷击杀为虚空武器提供不稳定子弹，持续 11.25 [7.5] 秒。\n 充能近战击杀为缚丝武器提供瓦解子弹，持续 11.25 [7.5] 秒。—\n\n指挥琢面冻结或压制一名战斗人员：\n 补满已准备的武器，并提供 +20? 稳定性、+? 瞄准辅助与 +40 空中效率，持续 11 秒（4 秒内置冷却）。\n\n 击杀被冻结或被压制的战斗人员，分别生成冰影碎片或虚空裂口。—\n\n勇气琢面对被冰影或缚丝元素减益影响的战斗人员：光能技能伤害提高 10%，光能充能近战技能伤害提高 50% [10%]。+10 手雷\n\n黎明琢面充能近战命中提供焕光，持续 5 秒。\n 充能近战击杀为自己与 ? 米内的盟友提供焕光，持续 5 秒。-10 近战\n\n违抗琢面终结技触发一次元素引爆，对 7 米内的战斗人员造成 135 点与超能匹配的元素伤害，并施加对应减益：\n 电弧 → 震颤 ｜ 烈日 → 40 层灼烧 ｜ 虚空 → 不稳定 ｜ 冰影 → ? 层减速，持续 ? 秒 ｜ 缚丝 → 割裂。+10 职业\n\n奉献琢面击杀受冰影或缚丝元素减益影响的战斗人员，额外提供光能超凡能量：\n 红血 1% ｜ 橙血 3% ｜ 初级首领 5% ｜ 守护者 ?%。+10 近战\n\n统御琢面虚空手雷技能伤害施加虚弱，持续 6 [?] 秒。\n 电弧手雷技能伤害施加震颤。\n 电弧之魂再次施加震颤前有 4 秒冷却。-10 手雷\n\n慷慨琢面超凡期间的击杀推进一个计数，达到阈值时生成能量球，每枚为盟友提供 7.15% 超能能量；每次超凡最多生成 4 枚。\n\n 计数推进：\n T1 级战斗人员 10% ｜ T2 15% ｜ T3 20% ｜ T4 34% ｜ 初级首领 40% ｜ 首领 50% ｜ 守护者 ?%。\n\n 生成阈值：\n 30%（第 1 枚）｜ 50%（第 2 枚）｜ 70%（第 3 枚）｜ 100%（第 4 枚）。—\n\n恩惠琢面动能武器击杀额外提供 2% [?%] 超凡能量。\n 超能击杀为自己与 ? 米内的盟友额外提供 2% [?%] 超凡能量。-10 生命值\n\n荣耀琢面拾取元素拾取物或摧毁缠结额外提供对应阵营的超凡能量：\n 离子轨迹、焰灵、虚空裂口 = 7.5% 光能能量 ｜ 冰影碎片 = 5% 暗影能量 ｜ 缠结 = 10% 暗影能量。+10 近战\n\n希望琢面按激活中的元素增益数量，额外提供职业技能基础充能速度：\n 1 个 +40% ｜ 2 个 +60%。—\n\n正义琢面超凡期间的技能击杀触发一次与技能匹配的爆炸，对 ? 米内的战斗人员最多造成 130 [?] 伤害。+10 超能\n\n修复琢面手雷技能击杀提供 1 层治愈。\n 棱镜手雷击杀提供 2 层治愈。—\n\n保护琢面15 米内有 3 名战斗人员时提供 15% [?%] 伤害抗性。\n 游戏内描述有误：超凡期间本效果不会提高，而是 15% 与超凡的 20% 叠加，合计 32% 伤害抗性。+10 近战\n\n使命琢面拾取能量球时按已装备的超能提供对应的元素增益：\n\n 电弧 ｜ 1 层电光充能。\n 烈日 ｜ 1 层恢复，持续 5 秒。\n 虚空 ｜ 22.5 生命值的虚空覆盖护盾，持续 5 秒。\n 冰影 ｜ 2 层冰霜护甲，持续 5 秒。\n 缚丝 ｜ 织造铠甲，持续 5 秒。-10 职业\n\n毁灭琢面碎裂战斗人员或摧毁水晶时：\n 额外触发一次伤害实例，在 10 [8] 米半径内最多造成 25 [9] 伤害，衰减后最低 17 [4]。\n\n 点燃半径提高 25%。+10 武器\n\n牺牲琢面受电弧、烈日或虚空元素增益影响期间，技能击杀额外提供 1% [?%] 暗影超凡能量。+10 手雷\n\n孤独琢面3 秒内精准命中次数达标后：\n 此后 3 秒内，任意来源的下一次伤害实例触发一次割裂爆裂，对 3 米内的战斗人员施加割裂；超凡期间半径提高到 6 米。\n 所需精准命中次数 = 弹匣容量的 20% + 1，向下取整；弓箭固定 2 次。\n 割裂后有 4 秒冷却，冷却期间的精准命中不计入。准备割裂爆裂的那次精准命中不会触发三体坐观者、高爆载荷这类 Perk。—\n\n 猎人\n\n棱镜手雷\n图标\n说明\n\n冰火尖刺附着到表面或战斗人员身上，向最远 ? 米处释放一股冰影与烈日能量呈锥形扩散。\n\n 迸发成一场减速风暴，爆发时最多造成 78 [?] 伤害。\n 风暴每 0.25 秒造成 15.6 [?] 冰影伤害并施加 13? 层减速，持续 3.45 秒。\n\n 附着 3.45 秒后释放一道灼热旋风，每 0.25 秒造成 39 [?] 烈日伤害并施加 10 层灼烧，持续 4 秒。\n\n共享技能\n 职业技能和移动技能都与原分支职业完全共享。\n 电弧\n 烈日\n 虚空\n 冰影\n 缚丝\n\n手雷 电光手雷 蜂群手雷 磁性手雷 暮域手雷 抓钩\n\n近战 组合打击 飞刀戏法 陷阱炸弹 枯萎之刃 线织尖刺\n\n星相\n图标\n说明\n碎片槽位\n\n飞升在空中且拥有职业技能充能时：\n 按［空中移动］消耗一次充能，向上旋转电弧法杖，并触发已装备职业技能的效果；装备线织幽灵时也一并触发。\n 为自己与 10 米内的盟友提供增幅。\n 对 10 米内的战斗人员最多造成 181 [30] 伤害并施加震颤。\n\n火药博弈击杀为简易爆炸物蓄力，攒够 6 次充能即可使用。\n 武器击杀 1 [2] ｜ 元素减益 3 [4] ｜ 技能击杀 4 ｜ 超能 6。\n\n 手雷技能被替换为棍上点燃：\n 被射击或 3 秒后触发点燃，伤害提高 50%。\n 射击炸药会让它的伤害提高 50% [5%]、半径提高 ?% 达到 ? 米，并释放 9 枚追踪子弹药，每枚最多造成 80 [?] 伤害。\n 只有自动引爆时才触发手雷效果。激活后有 6 秒冷却，冷却期间的击杀不提供充能。\n\n潇洒行刑者击杀受任意元素减益影响的战斗人员：\n 提供隐身持续 8 秒，以及真实视界持续 4 秒。\n\n 隐身期间，以及因发动优雅处决脱离隐身后的 0.5 秒内：\n 近战攻击伤害提高 300% [20%]，使战斗人员虚弱持续 5 [2.5] 秒，并将近战突进射程延长到 ? 米。\n 触发后附加「过于优雅」，在 2 [12] 秒内阻止再次触发。\n\n严冬帷幕对一名战斗人员施加减速时：\n 职业技能基础充能速度额外 +300% [150%]，持续 3 秒。\n\n 使用职业技能：\n 对 9 [8] 米内的战斗人员施加 60 [40] 层减速，持续 8 [1.5] 秒。\n 对战斗人员提供 50% 伤害抗性，持续 4? 秒。\n\n线织幽灵使用职业技能生成一个缚丝诱饵。\n\n 诱饵有 175 生命值，最多持续 12 秒；战斗人员会被吸引去攻击它，它对战斗人员有 70% 伤害抗性。\n 盟友与施法者对它造成的技能与武器伤害提高 150%。\n 诱饵始终计为敌对目标，盟友、战斗人员与施法者都能伤害它，且不会触发任何击杀效果。\n\n 失去全部生命值或 ? 米内有战斗人员时爆炸，最多造成 600 [60 守护者 ｜ 121 物体] 伤害，范围 ? 米；战斗人员靠近触发的爆炸会生成 2 只线虫。\n 装备时被动施加 0.6 倍职业技能充能速度，装备特技闪身时除外。\n\n 泰坦\n\n棱镜手雷\n图标\n说明\n\n电化陷阱充能了电弧与缚丝能量的爆炸物。\n\n 释放一次超级充能的悬停爆裂，最多造成 105 [?] 伤害，对 ? 米内的战斗人员施加悬停。\n 被悬停的战斗人员每 ? 秒受到 ? 点伤害，持续 ? 秒，同时附加震颤。\n\n共享技能\n 职业技能和移动技能都与原分支职业完全共享。\n 电弧\n 烈日\n 虚空\n 冰影\n 缚丝\n\n手雷 脉冲手雷 铝热手雷 抑制手雷 冰川手雷 束缚手雷\n\n近战 雷霆一击 战锤打击 圣盾投掷 战栗打击 狂暴利刃\n\n星相\n图标\n说明\n碎片槽位\n\n重击近战击杀：\n 0.1 秒内快速恢复一段生命值，开始生命值恢复，并提供增幅。\n 红血 50 ｜ 橙血 75 ｜ 初级首领 100 ｜ 守护者 30 生命值。\n\n 打破战斗人员护盾，或对生命值低于 30% 的战斗人员造成伤害：\n 提供重击，持续 6 秒。\n\n 重击期间：\n 基础与偃月近战伤害 +160% [30%]。\n 充能近战伤害 +160% [20%]。\n 基础近战攻击计为电弧充能近战命中。\n 对战斗人员的近战突进距离提高到 6 米。\n\n神圣献祭滑铲时按［近战技能］：\n 向前发出一道 20 米的烈日能量波形，造成 40 [30] 伤害并施加 40 层灼烧。\n 未处于猛击状态时只消耗 50% 近战技能能量。\n 开火状态下无法在滑铲期间使用。\n\n 由此进入空中后按［近战技能］：\n 猛击地面，形成第二道更宽的波形向前 20 米，并碎裂水晶。\n 对非灼烧战斗人员造成 486 [120] 伤害。\n 命中灼烧的战斗人员则造成 472.5 [50] 伤害并触发点燃。\n\n 近战动画期间对非近战伤害提供 25% 伤害抗性。\n\n坚不可摧按住［手雷］召唤虚空护盾；烈焰战锤或冰川震击激活时也可以召唤。\n 装备时手雷冷却覆盖为 152 秒。\n\n 护盾对格挡的伤害提供 95?% [64%] 抗性，并嘲讽正面的战斗人员；碰到护盾的战斗人员陷入迷失。\n 每秒生成 10 点虚空覆盖护盾，持续 5+2.5 秒，期间每秒消耗 7.5% 手雷能量。\n\n 格挡伤害会让前向移动速度降低 50?%，持续 0.5? 秒，同时提供手雷能量，回能逐渐降低（随时间，或随已格挡伤害?），最终降到 ?%，历时 ? 秒。\n 护盾本身没有移速惩罚，只是不能攀爬；冲刺会取消它。\n\n 松开［手雷］或耗尽手雷能量时：\n 释放一次正面爆炸，消耗 50% 手雷能量，对 11 米内的目标造成伤害。\n 未格挡任何伤害时最少 430 [64?]，随已格挡伤害提高，最高 1584 [178?]。\n\n 用坚不可摧击杀提供吞食，持续 10+5 秒。\n\n钻石长矛1 [3] 次冰影武器击杀、一次技能击杀，或一次碎裂击杀时：\n 生成一支冰影长矛。\n 重击灌注的非充能近战击杀守护者不会生成。\n 长矛是一次性武器，3 米内可拾取，最多持有 10 秒，在地面上最多停留 25 秒。\n\n ［开火］投出长矛 ｜ 冻结接触点 5 米内的战斗人员，直接接触时碎裂水晶，并造成 150 [45] 伤害。\n ［近战］猛击 ｜ 冻结 8 [6.75?] 米内的战斗人员，最多造成 200 [90] 伤害，并为自己与 ? 米内的盟友提供 2 层冰霜护甲。\n 钻石长矛伤害视为普通冰影技能伤害，既非手雷也非近战。生成后有 7 [17] 秒冷却。\n\n勇士之鞭击杀受元素减益影响的战斗人员提供 10% 职业技能能量。\n\n 放置屏障时：\n 释放一条缚丝鞭，向前飞行最远 30 米，追踪路径上的战斗人员，命中造成 60 [30] 伤害并施加悬停。\n\n 使用推进器职业技能时：\n 生成一枚缚丝结，? 秒后爆炸，最多造成 60 [30] 伤害并在 ? 米半径内施加悬停。\n\n 术士\n\n棱镜手雷\n图标\n说明\n\n冰冻奇点接触时最多造成 70 [26] 虚空伤害，把 12 米内的战斗人员拉向它，并生成一颗被减速冰环环绕的微型黑洞。\n\n 减速场域每 0.25 秒对 6 米内的战斗人员造成 18 [4] 冰影伤害并施加 13? 层减速，持续 3.65 秒。\n\n 命中 5 秒后黑洞内爆，施加压制并对 7 米内的战斗人员最多造成 570 [150] 虚空伤害。\n\n共享技能\n 职业技能和移动技能都与原分支职业完全共享。\n 电弧\n 烈日\n 虚空\n 冰影\n 缚丝\n\n手雷 风暴手雷 治愈手雷 涡流手雷 急冻手雷 线虫手雷\n\n近战 连锁闪电 焚烧响指 口袋奇点 半影冲击 神秘织针\n\n星相\n图标\n说明\n碎片槽位\n\n闪电激涌滑铲时按［近战技能］：\n 向前传送 10 米，在距出口点 7 米处呈五边形召唤 5 道闪电，每命中一名战斗人员提供 1 层电光充能。\n 使用时另提供增幅与 1 层电光充能。未命中时不会拿到超过 1 层。\n 使用后提供 ?% 战斗人员伤害抗性，持续 ? 秒。\n 开火状态下无法在滑铲期间使用。\n\n 闪电同时造成 634 + 127 = 761 [105 + 47 = 152] 伤害并施加震颤。\n\n地狱火使用职业技能提供地狱火，持续 20 秒。\n\n 期间每 1.35 秒向最远 40 米外的战斗人员抛出一颗灼热的烈日弹体，最多造成 217 [38] 烈日手雷技能伤害，并在 4 米半径内施加 30 层灼烧。\n 可以触发手雷技能的交互效果。\n 地狱火施加的灼烧效果不随手雷伤害缩放。\n\n虚空供养技能击杀、冻结战斗人员碎裂击杀、不稳定爆炸击杀或缠结击杀时：\n 提供强化吞食，并把吞食升级为强化吞食。\n\n 强化吞食：\n 激活时恢复 140 生命值，持续 10 秒；重新激活再恢复 140 生命值并刷新 5 秒。\n\n 强化吞食期间击杀：\n 恢复 140 生命值，获得双倍手雷技能能量，并刷新 5 秒。\n 击杀回能：T1 级战斗人员 15% ｜ T2 23.2% ｜ T3 27.5% ｜ T4 40% ｜ 守护者 40%。\n\n凄凉观察者装备时手雷冷却覆盖为 159.6 秒，回复倍率继承当前装备的手雷。\n\n 按住［手雷］把手雷技能转成冰影炮塔：\n 炮塔每 2 秒向 35 米内的战斗人员自动发射一轮 5 发追踪弹体（持续 0.7 秒），每次命中施加 20 [10] 层减速，持续 4.5 [2] 秒。\n 炮塔持续 25 秒，拥有 150 构造体生命值，开火前获得 67% 伤害抗性。\n 凄凉观察者伤害计为冰影手雷技能伤害。\n\n编织者之唤线虫命中提供 10% 职业技能能量。\n\n 累计造成 700 [?] 伤害提供一只停栖的线虫；生成之间有 2 秒冷却，一次最多生成 1 只。\n 伤害需求按显示的伤害数字计算，并受力量等级差惩罚。\n\n 使用职业技能生成 3 只线虫，并部署全部停栖的线虫。\n\n 击杀推进一个计数，满 100% 提供一只停栖的线虫：\n 初级首领及以下 34% ｜ 首领 100% ｜ 守护者 67%。\n\n更新 2026.8.30\n\n数据源：Destiny Data Compendium。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/elements/prismatic/index.html",
+    "final_url": "https://starside.work/elements/prismatic/index.html",
+    "path": "pages/elements/prismatic/index.html",
+    "bytes": 54118,
+    "sha256": "35da65c6c391937c4024e6aca26bc67835ceaa23f10a19e7bb7f8b39ec126f68",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:30.258389+00:00"
+  },
+  "links": [
+    "https://starside.work/elements/arc/index.html",
+    "https://starside.work/elements/index.html",
+    "https://starside.work/elements/solar/index.html",
+    "https://starside.work/elements/stasis/index.html",
+    "https://starside.work/elements/strand/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/elements/prismatic/icons/04a6d170f3.webp",
+    "https://starside.work/elements/prismatic/icons/10ea99c436.webp",
+    "https://starside.work/elements/prismatic/icons/11b1145e21.webp",
+    "https://starside.work/elements/prismatic/icons/11ca92f0ac.webp",
+    "https://starside.work/elements/prismatic/icons/120c0fddfd.webp",
+    "https://starside.work/elements/prismatic/icons/128010d646.webp",
+    "https://starside.work/elements/prismatic/icons/1653e0640c.webp",
+    "https://starside.work/elements/prismatic/icons/19164e5f21.webp",
+    "https://starside.work/elements/prismatic/icons/1a18a55dd2.webp",
+    "https://starside.work/elements/prismatic/icons/1c6bcdee82.webp",
+    "https://starside.work/elements/prismatic/icons/1dc480bb5e.webp",
+    "https://starside.work/elements/prismatic/icons/1dd3dd05aa.webp",
+    "https://starside.work/elements/prismatic/icons/1e7c19f6a4.webp",
+    "https://starside.work/elements/prismatic/icons/205bfcb812.webp",
+    "https://starside.work/elements/prismatic/icons/2301d72e82.webp",
+    "https://starside.work/elements/prismatic/icons/283624ce70.webp",
+    "https://starside.work/elements/prismatic/icons/2b0a812a24.webp",
+    "https://starside.work/elements/prismatic/icons/2b0c20c15a.webp",
+    "https://starside.work/elements/prismatic/icons/2b9c80567e.webp",
+    "https://starside.work/elements/prismatic/icons/3185031eae.webp",
+    "https://starside.work/elements/prismatic/icons/357ddde8cc.webp",
+    "https://starside.work/elements/prismatic/icons/389076525f.webp",
+    "https://starside.work/elements/prismatic/icons/3cb69eea59.webp",
+    "https://starside.work/elements/prismatic/icons/3f54abd89e.webp",
+    "https://starside.work/elements/prismatic/icons/42fa7a8bb7.webp",
+    "https://starside.work/elements/prismatic/icons/481a86e7c6.webp",
+    "https://starside.work/elements/prismatic/icons/4876c4a36a.webp",
+    "https://starside.work/elements/prismatic/icons/48bc7ae6d4.webp",
+    "https://starside.work/elements/prismatic/icons/4f517c0390.webp",
+    "https://starside.work/elements/prismatic/icons/552c9c26e8.webp",
+    "https://starside.work/elements/prismatic/icons/5b6e2f0217.webp",
+    "https://starside.work/elements/prismatic/icons/5b95925f9f.webp",
+    "https://starside.work/elements/prismatic/icons/5fc7a97f63.webp",
+    "https://starside.work/elements/prismatic/icons/62b6d96086.webp",
+    "https://starside.work/elements/prismatic/icons/64b6c96374.webp",
+    "https://starside.work/elements/prismatic/icons/65da718e9d.webp",
+    "https://starside.work/elements/prismatic/icons/6627a29f10.webp",
+    "https://starside.work/elements/prismatic/icons/666aa7ab79.webp",
+    "https://starside.work/elements/prismatic/icons/66c73b3114.webp",
+    "https://starside.work/elements/prismatic/icons/67d91531a9.webp",
+    "https://starside.work/elements/prismatic/icons/6b8643428f.webp",
+    "https://starside.work/elements/prismatic/icons/6d42ed6dff.webp",
+    "https://starside.work/elements/prismatic/icons/6dadfe439a.webp",
+    "https://starside.work/elements/prismatic/icons/70ac7363f8.webp",
+    "https://starside.work/elements/prismatic/icons/70caf4a733.webp",
+    "https://starside.work/elements/prismatic/icons/727574c917.webp",
+    "https://starside.work/elements/prismatic/icons/77096a21b5.webp",
+    "https://starside.work/elements/prismatic/icons/78ccb2d11f.webp",
+    "https://starside.work/elements/prismatic/icons/7f49b0510d.webp",
+    "https://starside.work/elements/prismatic/icons/81ba5747a7.webp",
+    "https://starside.work/elements/prismatic/icons/86d4dc5fbe.webp",
+    "https://starside.work/elements/prismatic/icons/8728e47680.webp",
+    "https://starside.work/elements/prismatic/icons/8e7f92abd0.webp",
+    "https://starside.work/elements/prismatic/icons/8e9f584dfa.webp",
+    "https://starside.work/elements/prismatic/icons/8fff5c49b3.webp",
+    "https://starside.work/elements/prismatic/icons/901742a8ea.webp",
+    "https://starside.work/elements/prismatic/icons/90ca587869.webp",
+    "https://starside.work/elements/prismatic/icons/915be32c68.webp",
+    "https://starside.work/elements/prismatic/icons/9184cd1ba7.webp",
+    "https://starside.work/elements/prismatic/icons/93a6c5c953.webp",
+    "https://starside.work/elements/prismatic/icons/947bf83419.webp",
+    "https://starside.work/elements/prismatic/icons/9499d62138.webp",
+    "https://starside.work/elements/prismatic/icons/9683ba474d.webp",
+    "https://starside.work/elements/prismatic/icons/9dbe20cbcd.webp",
+    "https://starside.work/elements/prismatic/icons/9e43e17795.webp",
+    "https://starside.work/elements/prismatic/icons/a75aae5a06.webp",
+    "https://starside.work/elements/prismatic/icons/a87d312648.webp",
+    "https://starside.work/elements/prismatic/icons/aad67e3608.webp",
+    "https://starside.work/elements/prismatic/icons/ac8dcedd35.webp",
+    "https://starside.work/elements/prismatic/icons/acf7dd5ac7.webp",
+    "https://starside.work/elements/prismatic/icons/b4d7005b8d.webp",
+    "https://starside.work/elements/prismatic/icons/b5144f8083.webp",
+    "https://starside.work/elements/prismatic/icons/b5a97142a6.webp",
+    "https://starside.work/elements/prismatic/icons/b6c85947f8.webp",
+    "https://starside.work/elements/prismatic/icons/b77e1882d2.webp",
+    "https://starside.work/elements/prismatic/icons/c403c6d31a.webp",
+    "https://starside.work/elements/prismatic/icons/c7ca237c49.webp",
+    "https://starside.work/elements/prismatic/icons/cf6c8a6a75.webp",
+    "https://starside.work/elements/prismatic/icons/d3a5c298cf.webp",
+    "https://starside.work/elements/prismatic/icons/d70650ed73.webp",
+    "https://starside.work/elements/prismatic/icons/d8c8db6ffd.webp",
+    "https://starside.work/elements/prismatic/icons/dbc743c2b4.webp",
+    "https://starside.work/elements/prismatic/icons/dd3a0a4404.webp",
+    "https://starside.work/elements/prismatic/icons/ddc8bb152d.webp",
+    "https://starside.work/elements/prismatic/icons/e421ab5fa8.webp",
+    "https://starside.work/elements/prismatic/icons/e5a8bbd27c.webp",
+    "https://starside.work/elements/prismatic/icons/e995f5dfc1.webp",
+    "https://starside.work/elements/prismatic/icons/ed9d397e99.webp",
+    "https://starside.work/elements/prismatic/icons/eeb2527cfd.webp",
+    "https://starside.work/elements/prismatic/icons/f090f014db.webp",
+    "https://starside.work/elements/prismatic/icons/f0eadb0c8a.webp",
+    "https://starside.work/elements/prismatic/icons/f479be4b19.webp",
+    "https://starside.work/elements/prismatic/icons/f4acf7c211.webp",
+    "https://starside.work/elements/prismatic/icons/f8e47a3c1f.webp",
+    "https://starside.work/elements/prismatic/icons/f8fa0355bd.webp",
+    "https://starside.work/elements/prismatic/icons/fbdfd33c31.webp",
+    "https://starside.work/elements/prismatic/icons/fd2e3f9d9c.webp",
+    "https://starside.work/elements/prismatic/style.css",
+    "https://starside.work/elements/style.css"
+  ]
+}

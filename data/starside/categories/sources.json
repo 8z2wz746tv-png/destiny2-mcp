@@ -1,0 +1,32 @@
+[
+  {
+    "title": "更新日志 · Starside",
+    "url": "https://starside.work/changelog/index.html",
+    "updated_at": "2026.9.7",
+    "record": "records/changelog/index.json",
+    "text": "texts/sources/changelog/index.md",
+    "raw": "pages/changelog/index.html",
+    "source_blocks": 0,
+    "tables": 0
+  },
+  {
+    "title": "配色总览 · Starside",
+    "url": "https://starside.work/palette/index.html",
+    "updated_at": "2026.8.24",
+    "record": "records/palette/index.json",
+    "text": "texts/sources/palette/index.md",
+    "raw": "pages/palette/index.html",
+    "source_blocks": 0,
+    "tables": 4
+  },
+  {
+    "title": "数据源与鸣谢 · Starside",
+    "url": "https://starside.work/sources/index.html",
+    "updated_at": "2026.8.28",
+    "record": "records/sources/index.json",
+    "text": "texts/sources/sources/index.md",
+    "raw": "pages/sources/index.html",
+    "source_blocks": 0,
+    "tables": 2
+  }
+]

@@ -27,7 +27,11 @@ Thumbs.db
 # Data / manifests (generated / downloaded)
 manifest/
 destiny_mcp/data/dim_wishlists.json
-data/starside/
+# Starside 归档只入库 MCP 运行需要的部分（index/records/exports/texts）；
+# pages/ 是原始 HTML、assets/ 是 3824 个图标与前端资源，运行时都不读，
+# 需要时用 scripts/fetch_starside.py 重新抓取即可。
+data/starside/pages/
+data/starside/assets/
 share.zip
 
 # Logs

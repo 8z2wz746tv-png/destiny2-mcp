@@ -1,0 +1,2396 @@
+{
+  "url": "https://starside.work/elements/solar/index.html",
+  "title": "烈日 · Starside",
+  "description": "烈日分支职业速查表——治愈、焰灵、焕光、恢复、点燃、灼烧六个效果与一条灼烧伤害缩放，16 枚碎片，8 种手雷，以及猎人、泰坦、术士的近战、超能与星相，带图标与全部数值。",
+  "category": "subclass",
+  "updated_at": "2026.8.30",
+  "data_src": "docs/solar",
+  "data_hash": "76120c7245adc81b68371b751de06fc9f0abeb12",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "烈日"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "效果"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "手雷技能"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "术士"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "效果",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "治愈",
+            "html": "治愈"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/32e5c8f078.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "每层治愈在 0.1 秒内恢复 60 [30] 生命值。\n 两次激活之间有 1 秒冷却，冷却期间再次激活不恢复生命值。",
+            "html": "每层<span class=\"el-solar\">治愈</span>在 0.1 秒内恢复 60 <span class=\"pvp\">[30]</span> <span class=\"health\">生命值</span>。<br> 两次激活之间有 1 秒冷却，冷却期间再次激活不恢复<span class=\"health\">生命值</span>。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "焰灵",
+            "html": "焰灵"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/63aab56786.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日元素拾取物。\n \n 拾取提供 11.25% 手雷技能能量。\n 自己生成的焰灵对盟友不生效。\n 停留 25 秒后消失，两次生成之间有 5 秒冷却。",
+            "html": "<span class=\"el-solar\">烈日</span>元素拾取物。<br> <br> 拾取提供 11.25% <span class=\"pickup\">手雷技能能量</span>。<br> <span class=\"enemy\">自己</span>生成的<span class=\"el-solar\">焰灵</span>对<span class=\"enemy\">盟友</span>不生效。<br> 停留 25 秒后消失，两次生成之间有 5 秒冷却。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "焕光",
+            "html": "焕光"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a1a87fcb90.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "武器伤害提高 20% [10%]，持续 10 秒，默认最长可延到 15 秒。黄金枪的伤害同样受它影响。\n \n 重新施加焕光会把持续时间刷新到此前达到过的最长值。\n 焕光激活期间对勇士的武器伤害额外提高 10%。",
+            "html": "武器伤害提高 20% <span class=\"pvp\">[10%]</span>，持续 10 秒，默认最长可延到 15 秒。黄金枪的伤害同样受它影响。<br> <br> 重新施加<span class=\"el-solar\">焕光</span>会把持续时间刷新到此前达到过的最长值。<br> <span class=\"el-solar\">焕光</span>激活期间对<span class=\"enemy\">勇士</span>的武器伤害额外提高 10%。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "恢复",
+            "html": "恢复"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/30c8daa463.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "持续恢复生命值，效果不可中断，默认最长持续 15 秒。\n 1 层 = 35 [17.5] 生命值/秒 ｜ 2 层 = 50 [25] 生命值/秒。\n 治疗效果不与治愈裂痕叠加。\n \n 重新施加恢复把持续时间刷新到此前的最长值，并保留最高层数；若新的持续时间更长则采用新的。\n 至高天与慈悲属于延长效果，不计为重新施加；把持续时间延长到 15 秒以上时会被压回 15 秒。",
+            "html": "持续恢复<span class=\"health\">生命值</span>，效果不可中断，默认最长持续 15 秒。<br> 1 层 = 35 <span class=\"pvp\">[17.5]</span> <span class=\"health\">生命值</span>/秒 ｜ 2 层 = 50 <span class=\"pvp\">[25]</span> <span class=\"health\">生命值</span>/秒。<br> 治疗效果不与<span class=\"el-solar\">治愈</span>裂痕叠加。<br> <br> 重新施加<span class=\"el-solar\">恢复</span>把持续时间刷新到此前的最长值，并保留最高层数；若新的持续时间更长则采用新的。<br> 至高天与慈悲属于延长效果，不计为重新施加；把持续时间延长到 15 秒以上时会被压回 15 秒。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "点燃",
+            "html": "点燃"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1b74492fc3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在 8 米半径内引爆，造成 676 [120 守护者 ｜ 250 构造体] 烈日伤害，范围内无衰减。\n 点燃会清空全部灼烧层数，并在 1.6 秒内无法重新施加灼烧。\n \n 若最初施加灼烧的来源本身带伤害提升，点燃伤害也随之提高——例如真理之容 5 层 + 融合手雷 = 点燃伤害提高 100%。\n 近战伤害增益不缩放点燃与灼烧。\n \n 势不可挡勇士受到点燃伤害时进入眩晕。",
+            "html": "在 8 米半径内引爆，造成 676 <span class=\"pvp\">[120 守护者 ｜ 250 构造体]</span> <span class=\"el-solar\">烈日伤害</span>，范围内无衰减。<br> <span class=\"deb-solar\">点燃</span>会清空全部<span class=\"deb-solar\">灼烧</span>层数，并在 1.6 秒内无法重新施加<span class=\"deb-solar\">灼烧</span>。<br> <br> 若最初施加<span class=\"deb-solar\">灼烧</span>的来源本身带伤害提升，<span class=\"deb-solar\">点燃</span>伤害也随之提高——例如<span class=\"exotic\">真理之容</span> 5 层 + <span class=\"el-solar\">融合手雷</span> = <span class=\"deb-solar\">点燃</span>伤害提高 100%。<br> 近战伤害<span class=\"buff\">增益</span>不缩放<span class=\"deb-solar\">点燃</span>与<span class=\"deb-solar\">灼烧</span>。<br> <br> <span class=\"enemy\">势不可挡勇士</span>受到<span class=\"deb-solar\">点燃</span>伤害时进入<span class=\"enemy\">眩晕</span>。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "灼烧",
+            "html": "灼烧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/fe85b520a8.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "灼烧的战斗人员在 0.5 秒后开始受伤，此后每 0.56 秒跳一次伤害（第 2 跳有 0.93 秒延迟）。\n 层数攒到 100 层时清空并触发点燃。\n \n 每跳伤害 = 2.7 + 0.075 × 层数，非首领战斗人员再提高 20%：\n 1 层 = 3 ｜ 30 层 = 5 ｜ 50 层 = 6.5 ｜ 60 层 = 7.21 ｜ 80 层 = 8.64。\n 灼烧伤害不致命。\n 攒到 60 层以上时每跳多打 2.5%，界面上显示为黄色伤害数字。\n \n 衰减：\n 持续 2.3 秒后开始掉层，每 0.04 秒掉 1 层（约 25 层/秒），具体随难度浮动。",
+            "html": "<span class=\"deb-solar\">灼烧</span>的<span class=\"enemy\">战斗人员</span>在 0.5 秒后开始受伤，此后每 0.56 秒跳一次伤害（第 2 跳有 0.93 秒延迟）。<br> 层数攒到 100 层时清空并触发<span class=\"deb-solar\">点燃</span>。<br> <br> 每跳伤害 = 2.7 + 0.075 × 层数，非<span class=\"bar-yellow\">首领</span><span class=\"enemy\">战斗人员</span>再提高 20%：<br> 1 层 = 3 ｜ 30 层 = 5 ｜ 50 层 = 6.5 ｜ 60 层 = 7.21 ｜ 80 层 = 8.64。<br> <span class=\"deb-solar\">灼烧</span>伤害不致命。<br> 攒到 60 层以上时每跳多打 2.5%，界面上显示为黄色伤害数字。<br> <br> 衰减：<br> 持续 2.3 秒后开始掉层，每 0.04 秒掉 1 层（约 25 层/秒），具体随难度浮动。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "灼烧效果伤害缩放",
+            "html": "灼烧效果伤害缩放"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d30325aad9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "灼烧与点燃的伤害能被 Perk 和异域装备提高，但最初点燃它的那个来源决定它算哪一类伤害。\n \n 用武器施加（辉耀炽热、燃烧野心，或汤米的火柴盒、条件终局这类异域武器）：\n 算武器伤害，吃武器增益与只加武器的活动修正——其它伤害 Perk、武器属性、焕光、烈日武器激涌。\n 新装备加成对所有武器永久生效，所以对战斗人员的灼烧效果伤害始终比预期高 5%。\n \n 用技能施加（融合手雷、光焰之井）：\n 算烈日技能伤害，只吃手雷（真理之容）与超能（烈焰之心）各自的伤害提升。\n 近战伤害增益与 100 以上的近战属性都不提高它。\n \n 提高全部技能伤害的效果，对所有由烈日技能施加的灼烧效果都生效。\n 提高全部烈日伤害的活动修正（如烈日激涌）对灼烧效果一律生效，不分来源。",
+            "html": "<span class=\"deb-solar\">灼烧</span>与<span class=\"deb-solar\">点燃</span>的伤害能被 Perk 和<span class=\"exotic\">异域</span>装备提高，但<strong>最初<span class=\"deb-solar\">点燃</span>它的那个来源</strong>决定它算哪一类伤害。<br> <br> 用武器施加（<span class=\"perk\">辉耀炽热</span>、<span class=\"perk\">燃烧野心</span>，或<span class=\"exotic\">汤米的火柴盒</span>、<span class=\"exotic\">条件终局</span>这类<span class=\"exotic\">异域</span>武器）：<br> 算武器伤害，吃武器<span class=\"buff\">增益</span>与只加武器的活动修正——其它伤害 Perk、武器属性、<span class=\"el-solar\">焕光</span>、<span class=\"el-solar\">烈日</span>武器激涌。<br> 新装备加成对所有武器永久生效，所以对<span class=\"enemy\">战斗人员</span>的<span class=\"deb-solar\">灼烧效果</span>伤害始终比预期高 5%。<br> <br> 用技能施加（<span class=\"el-solar\">融合手雷</span>、光焰之井）：<br> 算<span class=\"el-solar\">烈日</span>技能伤害，只吃手雷（<span class=\"exotic\">真理之容</span>）与超能（<span class=\"art-perk\">烈焰之心</span>）各自的伤害提升。<br> 近战伤害<span class=\"buff\">增益</span>与 100 以上的近战属性都不提高它。<br> <br> 提高全部技能伤害的效果，对所有由<span class=\"el-solar\">烈日</span>技能施加的<span class=\"deb-solar\">灼烧效果</span>都生效。<br> 提高全部<span class=\"el-solar\">烈日</span>伤害的活动修正（如<span class=\"el-solar\">烈日</span>激涌）对<span class=\"deb-solar\">灼烧效果</span>一律生效，不分来源。"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "碎片",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "碎片",
+            "html": "碎片"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性变化",
+            "html": "属性变化"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "骨灰余烬",
+            "html": "骨灰余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b6ddf69351.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "施加的灼烧层数提高 50%，向上取整——3 层 → 5 层，40 层 → 60 层。\n 受它影响的来源会在常规层数旁用小字标出增量，例如 40+20。\n 部分来源不按 50% 走：卡利班之手 60+0、汤米的火柴盒 15+5、焚天者誓约 5+5。",
+            "html": "施加的<span class=\"deb-solar\">灼烧</span>层数提高 50%，向上取整——3 层 → 5 层，40 层 → 60 层。<br> 受它影响的来源会在常规层数旁用小字标出增量，例如 40+20。<br> <span class=\"note\">部分来源不按 50% 走：卡利班之手 60+0、汤米的火柴盒 15+5、焚天者誓约 5+5。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "光线余烬",
+            "html": "光线余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/18d61c6439.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日超能技能的弹体追踪更强。\n 目前只对利刃弹幕飞刀、黎明弹体，以及烈焰之歌弹体 ? 生效。",
+            "html": "<span class=\"el-solar\">烈日</span>超能技能的弹体追踪更强。<br> <span class=\"note\">目前只对利刃弹幕飞刀、黎明弹体，以及烈焰之歌弹体 ? 生效。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 超能",
+            "html": "+10 超能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "仁慈余烬",
+            "html": "仁慈余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a617191cc3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "为盟友赋予治愈、焕光、恢复或复活时：\n 手雷、近战与职业技能基础充能速度额外 +300%，持续 7 [4] 秒。\n \n 可触发：\n 光焰之井 ｜ 治愈裂痕 ｜ 流明与汇编器战靴的尊贵追踪器 ｜ 朱雀意图之刃的追踪器 ｜ 珍贵伤痕击杀 ｜ 烈日支援框架的恢复爆发。\n 光焰之井追踪器经装配工之靴强化后，可以自己触发一次仁慈。\n 不触发：强能裂痕、阿尔法·鲁皮之脊的治疗脉冲、蛾守护者的覆盖护盾飞蛾、非烈日支援框架自动步枪、护甲模组与 Perk、4 件套主动治疗。",
+            "html": "为<span class=\"enemy\">盟友</span>赋予<span class=\"el-solar\">治愈</span>、<span class=\"el-solar\">焕光</span>、<span class=\"el-solar\">恢复</span>或复活时：<br> <span class=\"pickup\">手雷、近战与职业技能</span>基础充能速度额外 +300%，持续 7 <span class=\"pvp\">[4]</span> 秒。<br> <br> 可触发：<br> 光焰之井 ｜ <span class=\"el-solar\">治愈</span>裂痕 ｜ <span class=\"exotic\">流明</span>与<span class=\"exotic\">汇编器战靴</span>的尊贵追踪器 ｜ <span class=\"exotic\">朱雀意图之刃</span>的追踪器 ｜ <span class=\"exotic\">珍贵伤痕</span>击杀 ｜ <span class=\"el-solar\">烈日</span>支援框架的恢复爆发。<br> 光焰之井追踪器经装配工之靴强化后，可以<span class=\"enemy\">自己</span>触发一次仁慈。<br> <span class=\"note\">不触发：强能裂痕、阿尔法·鲁皮之脊的治疗脉冲、蛾守护者的覆盖护盾飞蛾、非烈日支援框架自动步枪、护甲模组与 Perk、4 件套主动治疗。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 手雷",
+            "html": "-10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "起泡余烬",
+            "html": "起泡余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3cb886180b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "点燃击杀按战斗人员等级提供手雷技能能量：\n T1 级战斗人员 8% ｜ T2 12.25% ｜ T3 16.5% ｜ T4 25% ｜ 守护者 20.75%。",
+            "html": "<span class=\"deb-solar\">点燃</span>击杀按<span class=\"enemy\">战斗人员</span>等级提供<span class=\"pickup\">手雷技能能量</span>：<br> <span class=\"enemy\">T1 级战斗人员</span> 8% ｜ <span class=\"enemy\">T2</span> 12.25% ｜ <span class=\"enemy\">T3</span> 16.5% ｜ <span class=\"enemy\">T4</span> 25% ｜ <span class=\"bar-orange\">守护者</span> 20.75%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "烧焦余烬",
+            "html": "烧焦余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0179487041.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "点燃爆炸对被它伤害的战斗人员施加 40+20 层灼烧。\n 对已被点燃的战斗人员不生效。",
+            "html": "<span class=\"deb-solar\">点燃</span>爆炸对被它伤害的<span class=\"enemy\">战斗人员</span>施加 40+20 层<span class=\"deb-solar\">灼烧</span>。<br> <span class=\"note\">对已被点燃的战斗人员不生效。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 手雷",
+            "html": "+10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "燃烧余烬",
+            "html": "燃烧余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/997744695b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日超能击杀触发点燃并生成焰灵。\n 光焰之井会让施法者的武器伤害算作超能技能伤害，因此烈日武器击杀也计为烈日超能击杀。",
+            "html": "<span class=\"el-solar\">烈日</span>超能击杀触发<span class=\"deb-solar\">点燃</span>并生成<span class=\"el-solar\">焰灵</span>。<br> <span class=\"note\">光焰之井会让施法者的武器伤害算作超能技能伤害，因此烈日武器击杀也计为烈日超能击杀。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "至高天余烬",
+            "html": "至高天余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2514e155c7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日击杀延长恢复与焕光，增益时长不超过 15 秒；已经超过 15 秒时击杀反而会压回 15 秒。\n T1 级战斗人员 +1.5 秒 ｜ T2 +2.25 秒 ｜ T3 +3 秒 ｜ T4 +6 秒 ｜ 守护者 +3 秒。",
+            "html": "<span class=\"el-solar\">烈日</span>击杀延长<span class=\"el-solar\">恢复</span>与<span class=\"el-solar\">焕光</span>，<span class=\"buff\">增益</span>时长不超过 15 秒；已经超过 15 秒时击杀反而会压回 15 秒。<br> <span class=\"enemy\">T1 级战斗人员</span> +1.5 秒 ｜ <span class=\"enemy\">T2</span> +2.25 秒 ｜ <span class=\"enemy\">T3</span> +3 秒 ｜ <span class=\"enemy\">T4</span> +6 秒 ｜ <span class=\"bar-orange\">守护者</span> +3 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 生命值",
+            "html": "-10 <span class=\"health\">生命值</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "喷发余烬",
+            "html": "喷发余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e536e3ac27.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "点燃半径提高 25%，从 8 米到 10 米。",
+            "html": "<span class=\"deb-solar\">点燃</span>半径提高 25%，从 8 米到 10 米。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "慈悲余烬",
+            "html": "慈悲余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f0a201ae06.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "拾取焰灵：\n 提供 1 层恢复，持续 2+1 秒；已经生效时改为延长 2+1 秒。\n 计时超过 15 秒时拾取会压回 15 秒。\n \n 复活盟友时：\n 为自己与 ? 米内的盟友提供 1 层恢复，持续 5+2.5 秒。",
+            "html": "拾取<span class=\"el-solar\">焰灵</span>：<br> 提供 1 层<span class=\"el-solar\">恢复</span>，持续 2+1 秒；已经生效时改为延长 2+1 秒。<br> 计时超过 15 秒时拾取会压回 15 秒。<br> <br> 复活<span class=\"enemy\">盟友</span>时：<br> 为<span class=\"enemy\">自己</span>与 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">盟友</span>提供 1 层<span class=\"el-solar\">恢复</span>，持续 5+2.5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 生命值",
+            "html": "+10 <span class=\"health\">生命值</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "决心余烬",
+            "html": "决心余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/136730ac8e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "手雷击杀提供 1 层治愈。",
+            "html": "手雷击杀提供 1 层<span class=\"el-solar\">治愈</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "炽热余烬",
+            "html": "炽热余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6eaa26af13.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀灼烧的战斗人员：\n 生成焰灵，并按等级提供近战技能能量。\n T1 级战斗人员 8% ｜ T2 15% ｜ T3 17.5% ｜ T4 25% ｜ 守护者 20%。",
+            "html": "击杀<span class=\"deb-solar\">灼烧</span>的<span class=\"enemy\">战斗人员</span>：<br> 生成<span class=\"el-solar\">焰灵</span>，并按等级提供<span class=\"pickup\">近战技能能量</span>。<br> <span class=\"enemy\">T1 级战斗人员</span> 8% ｜ <span class=\"enemy\">T2</span> 15% ｜ <span class=\"enemy\">T3</span> 17.5% ｜ <span class=\"enemy\">T4</span> 25% ｜ <span class=\"bar-orange\">守护者</span> 20%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 职业",
+            "html": "+10 职业"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "焦燃余烬",
+            "html": "焦燃余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/04920ff432.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "对战斗人员施加灼烧后：\n 职业技能基础充能速度额外 +400%，持续 3 秒。\n 只有对尚未灼烧的战斗人员施加时才触发；战斗人员若死于这一击则不触发。",
+            "html": "对<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-solar\">灼烧</span>后：<br> <span class=\"pickup\">职业技能</span>基础充能速度额外 +400%，持续 3 秒。<br> <span class=\"note\">只有对尚未灼烧的战斗人员施加时才触发；战斗人员若死于这一击则不触发。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "抚慰余烬",
+            "html": "抚慰余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/856cf29a42.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "施加给自己的恢复与焕光持续时间延长 50%。\n 受它影响的来源会在常规时长旁用小字标出增量，例如 10+5 焕光、4+2 恢复。",
+            "html": "施加给<span class=\"enemy\">自己</span>的<span class=\"el-solar\">恢复</span>与<span class=\"el-solar\">焕光</span>持续时间延长 50%。<br> 受它影响的来源会在常规时长旁用小字标出增量，例如 10+5 <span class=\"el-solar\">焕光</span>、4+2 恢复。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "回火余烬",
+            "html": "回火余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3c01fcd01e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日武器击杀：\n 为自己与 15 米内的盟友提供 1 层回火余烬，持续 8 秒，最多 3 层。\n \n 回火余烬：\n +20 空中效率。\n 激活期间烈日武器击杀生成焰灵。\n 按层数提供 +20 / +40 / +60 生命值属性。",
+            "html": "<span class=\"el-solar\">烈日</span>武器击杀：<br> 为<span class=\"enemy\">自己</span>与 15 米内的<span class=\"enemy\">盟友</span>提供 1 层<span class=\"el-solar\">回火余烬</span>，持续 8 秒，最多 3 层。<br> <br> <span class=\"el-solar\">回火余烬</span>：<br> +20 空中效率。<br> 激活期间<span class=\"el-solar\">烈日</span>武器击杀生成<span class=\"el-solar\">焰灵</span>。<br> 按层数提供 +20 / +40 / +60 <span class=\"health\">生命值</span>属性。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 职业",
+            "html": "-10 职业"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "火炬余烬",
+            "html": "火炬余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/bf3e9ddba4.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "充能近战命中为自己与 8 米内的盟友提供焕光，持续 8+4 秒。",
+            "html": "充能近战命中为<span class=\"enemy\">自己</span>与 8 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-solar\">焕光</span>，持续 8+4 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 手雷",
+            "html": "-10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "惊奇余烬",
+            "html": "惊奇余烬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ad2d6450f6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "用点燃在 ? 秒内击杀 2 名战斗人员：\n 生成一枚能量球，提供 2.5% 超能能量。\n 生成能量球后有 10 秒冷却。",
+            "html": "用<span class=\"deb-solar\">点燃</span>在 <span class=\"unsure\">?</span> 秒内击杀 2 名<span class=\"enemy\">战斗人员</span>：<br> 生成一枚<span class=\"orb\">能量球</span>，提供 2.5% <span class=\"orb\">超能能量</span>。<br> 生成<span class=\"orb\">能量球</span>后有 10 秒冷却。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 生命值",
+            "html": "+10 <span class=\"health\">生命值</span>"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "手雷技能",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "手雷",
+            "html": "手雷"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "基础冷却",
+            "html": "基础冷却"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "烈焰手雷",
+            "html": "烈焰手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b71787cebe.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "重型弹道 ｜ 扫描\n \n 接触时扫描 8.5 米视线内最多 4 名战斗人员，1 秒后向它们发射烈日光能矢弹。\n 每发矢弹造成 337 [65] 伤害并施加 20+10 层灼烧。\n \n 火焰之触：\n 扫描范围提高到 12 米，最多瞄准 5 名战斗人员。",
+            "html": "<span class=\"note\">重型弹道 ｜ 扫描</span><br> <br> 接触时扫描 8.5 米视线内最多 4 名<span class=\"enemy\">战斗人员</span>，1 秒后向它们发射<span class=\"el-solar\">烈日</span>光能矢弹。<br> 每发矢弹造成 337 <span class=\"pvp\">[65]</span> 伤害并施加 20+10 层<span class=\"deb-solar\">灼烧</span>。<br> <br> <span class=\"el-solar\">火焰之触</span>：<br> 扫描范围提高到 12 米，最多瞄准 5 名<span class=\"enemy\">战斗人员</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 83.8 秒\n 回复倍率 1×",
+            "html": "基础冷却 83.8 秒<br> 回复倍率 1×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "融合手雷",
+            "html": "融合手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/bb6b04e268.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻型弹道 ｜ 轻微追踪 ｜ 粘附\n \n 附着到战斗人员或表面上，短暂延迟后爆炸。\n 爆炸在 6 米内最多造成 738 [130] 伤害并施加 40+20 层灼烧。\n \n 火焰之触：\n 0.5 秒后再爆一次，在 8 米半径内最多造成 851 [50] 伤害。\n 两次合计最多 1589 [180] 伤害，同样施加 40+20 层灼烧。",
+            "html": "<span class=\"note\">轻型弹道 ｜ 轻微追踪 ｜ 粘附</span><br> <br> 附着到<span class=\"enemy\">战斗人员</span>或表面上，短暂延迟后爆炸。<br> 爆炸在 6 米内最多造成 738 <span class=\"pvp\">[130]</span> 伤害并施加 40+20 层<span class=\"deb-solar\">灼烧</span>。<br> <br> <span class=\"el-solar\">火焰之触</span>：<br> 0.5 秒后再爆一次，在 8 米半径内最多造成 851 <span class=\"pvp\">[50]</span> 伤害。<br> 两次合计最多 1589 <span class=\"pvp\">[180]</span> 伤害，同样施加 40+20 层<span class=\"deb-solar\">灼烧</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 95.8 秒\n 回复倍率 1×",
+            "html": "基础冷却 95.8 秒<br> 回复倍率 1×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "治愈手雷",
+            "html": "治愈手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/fc12bd23be.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超轻型弹道 ｜ 强盟友追踪\n \n 为接触点 7.5 米内的自己与盟友施加 1 层治愈，并生成一枚持续 7.5 秒的恢复能量球。\n 恢复能量球拾取时施加 1 层恢复，持续 4+2 秒；拾取半径 7.5 米，自身 100 生命值。\n \n 火焰之触：\n 治愈改为 2 层，恢复能量球改为 2 层恢复，持续 4+2 秒。",
+            "html": "<span class=\"note\">超轻型弹道 ｜ 强盟友追踪</span><br> <br> 为接触点 7.5 米内的<span class=\"enemy\">自己</span>与<span class=\"enemy\">盟友</span>施加 1 层<span class=\"el-solar\">治愈</span>，并生成一枚持续 7.5 秒的恢复<span class=\"orb\">能量球</span>。<br> 恢复<span class=\"orb\">能量球</span>拾取时施加 1 层<span class=\"el-solar\">恢复</span>，持续 4+2 秒；拾取半径 7.5 米，自身 100 <span class=\"health\">生命值</span>。<br> <br> <span class=\"el-solar\">火焰之触</span>：<br> <span class=\"el-solar\">治愈</span>改为 2 层，恢复<span class=\"orb\">能量球</span>改为 2 层<span class=\"el-solar\">恢复</span>，持续 4+2 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 119.7 秒\n 回复倍率 0.875×",
+            "html": "基础冷却 119.7 秒<br> 回复倍率 0.875×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "燃烧手雷",
+            "html": "燃烧手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1f27425904.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道\n \n 速度降到足够低后爆炸，爆炸前有短暂延迟。\n \n 爆炸在 8 米内最多造成 814 [130] 伤害并施加 60+30 层灼烧。\n 战斗人员处在手雷 1 米内时伤害提高 31.5%，达到 1202 [173]。",
+            "html": "<span class=\"note\">中型弹道</span><br> <br> 速度降到足够低后爆炸，爆炸前有短暂延迟。<br> <br> 爆炸在 8 米内最多造成 814 <span class=\"pvp\">[130]</span> 伤害并施加 60+30 层<span class=\"deb-solar\">灼烧</span>。<br> <span class=\"enemy\">战斗人员</span>处在手雷 1 米内时伤害提高 31.5%，达到 1202 <span class=\"pvp\">[173]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 137.7 秒\n 回复倍率 0.75×",
+            "html": "基础冷却 137.7 秒<br> 回复倍率 0.75×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "烈日手雷",
+            "html": "烈日手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/af1805ac89.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 持续伤害场域\n \n 接触时对 5 米内的战斗人员最多造成 63 [20] 伤害并施加 17+4.5 [10+10] 层灼烧，同时生成一枚烈日信号弹。\n \n 信号弹生成 1 秒后才开始造成伤害，此后每 0.267 秒对 4 米半径内的战斗人员造成 78 [25] 伤害，共 13 次，4 秒内合计最多 1014 [325]。\n \n 施加节奏：\n 0.75 秒后 1 层灼烧，此后每 0.533 秒 7.5+2.5 层，持续时间内最多 53+27 层。\n 场域内不会立刻烧起来，信号弹失效时才对其中的战斗人员最多施加 17+13 层。\n \n 火焰之触：\n 持续时间延长到 6 秒，信号弹周围每隔 ? 秒抛出岩浆能量球，每个造成 125 [50] 无衰减伤害。",
+            "html": "<span class=\"note\">中型弹道 ｜ 持续伤害场域</span><br> <br> 接触时对 5 米内的<span class=\"enemy\">战斗人员</span>最多造成 63 <span class=\"pvp\">[20]</span> 伤害并施加 17+4.5 <span class=\"pvp\">[10+10]</span> 层<span class=\"deb-solar\">灼烧</span>，同时生成一枚<span class=\"el-solar\">烈日</span>信号弹。<br> <br> 信号弹生成 1 秒后才开始造成伤害，此后每 0.267 秒对 4 米半径内的<span class=\"enemy\">战斗人员</span>造成 78 <span class=\"pvp\">[25]</span> 伤害，共 13 次，4 秒内合计最多 1014 <span class=\"pvp\">[325]</span>。<br> <br> 施加节奏：<br> 0.75 秒后 1 层<span class=\"deb-solar\">灼烧</span>，此后每 0.533 秒 7.5+2.5 层，持续时间内最多 53+27 层。<br> 场域内不会立刻烧起来，信号弹失效时才对其中的<span class=\"enemy\">战斗人员</span>最多施加 17+13 层。<br> <br> <span class=\"el-solar\">火焰之触</span>：<br> 持续时间延长到 6 秒，信号弹周围每隔 <span class=\"unsure\">?</span> 秒抛出岩浆<span class=\"orb\">能量球</span>，每个造成 125 <span class=\"pvp\">[50]</span> 无衰减伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 199.5 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 199.5 秒<br> 回复倍率 0.5×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "蜂群手雷",
+            "html": "蜂群手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/52a6a8fdc9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 追踪器\n \n 接触时释放 9 枚追踪无人机。\n 无人机追逐 7 米内的战斗人员，接触即爆；没打到目标则 10–11 秒后自爆。\n \n 每枚造成 58 + 54 [8 + 8] 伤害并施加 5+3 层灼烧。\n 9 枚全中最多合计 1008 [144] 伤害与 45+27 层灼烧。",
+            "html": "<span class=\"note\">中型弹道 ｜ 追踪器</span><br> <br> 接触时释放 9 枚追踪无人机。<br> 无人机追逐 7 米内的<span class=\"enemy\">战斗人员</span>，接触即爆；没打到目标则 10–11 秒后自爆。<br> <br> 每枚造成 58 + 54 <span class=\"pvp\">[8 + 8]</span> 伤害并施加 5+3 层<span class=\"deb-solar\">灼烧</span>。<br> 9 枚全中最多合计 1008 <span class=\"pvp\">[144]</span> 伤害与 45+27 层<span class=\"deb-solar\">灼烧</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 137.7 秒\n 回复倍率 0.75×",
+            "html": "基础冷却 137.7 秒<br> 回复倍率 0.75×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "铝热手雷",
+            "html": "铝热手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5f68b2be3c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道\n \n 接触时发出一道烈日波形，此后每 1.45 秒再发一道，最多 3 道。\n \n 每道波形飞行最远 20 米，最多造成 246+206 [80 + 50] 伤害并施加 10+10 层灼烧。\n 4 道全部无衰减命中时最多合计 1808 [360] 伤害与 40+40 层灼烧。",
+            "html": "<span class=\"note\">中型弹道</span><br> <br> 接触时发出一道<span class=\"el-solar\">烈日</span>波形，此后每 1.45 秒再发一道，最多 3 道。<br> <br> 每道波形飞行最远 20 米，最多造成 246+206 <span class=\"pvp\">[80 + 50]</span> 伤害并施加 10+10 层<span class=\"deb-solar\">灼烧</span>。<br> 4 道全部无衰减命中时最多合计 1808 <span class=\"pvp\">[360]</span> 伤害与 40+40 层<span class=\"deb-solar\">灼烧</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 159.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 159.6 秒<br> 回复倍率 0.625×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "感应手雷",
+            "html": "感应手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a221a240cd.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 壁挂 ｜ 粘附\n \n 附着到表面上，每 ? 秒投射一次激光；粘到非表面会立刻触发。\n 战斗人员进入扫描锥（延伸 10 米、半径 7 米）时触发，或附着 10 秒后自动触发。\n \n 触发 1 秒后（或被摧毁时）在 ? 米内爆炸，最多造成 805 [140] 伤害并施加 40+20 层灼烧。",
+            "html": "<span class=\"note\">中型弹道 ｜ 壁挂 ｜ 粘附</span><br> <br> 附着到表面上，每 <span class=\"unsure\">?</span> 秒投射一次激光；粘到非表面会立刻触发。<br> <span class=\"enemy\">战斗人员</span>进入扫描锥（延伸 10 米、半径 7 米）时触发，或附着 10 秒后自动触发。<br> <br> 触发 1 秒后（或被摧毁时）在 <span class=\"unsure\">?</span> 米内爆炸，最多造成 805 <span class=\"pvp\">[140]</span> 伤害并施加 40+20 层<span class=\"deb-solar\">灼烧</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 159.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 159.6 秒<br> 回复倍率 0.625×"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "猎人",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "职业技能",
+            "html": "职业技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "特技闪身",
+            "html": "特技闪身"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f29b94e7a9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "空中翻跃。\n \n 落地时：\n 为自己与 10 米内的盟友提供焕光，持续 10+5 秒。\n 对 6.5 米内的战斗人员最多造成 40 [20] 烈日伤害。",
+            "html": "空中翻跃。<br> <br> 落地时：<br> 为<span class=\"enemy\">自己</span>与 10 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-solar\">焕光</span>，持续 10+5 秒。<br> 对 6.5 米内的<span class=\"enemy\">战斗人员</span>最多造成 40 <span class=\"pvp\">[20]</span> <span class=\"el-solar\">烈日伤害</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 56 [148.4] 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 56 <span class=\"pvp\">[148.4]</span> 秒<br> 回复倍率 0.5×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "飞刀戏法",
+            "html": "飞刀戏法"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dcce8c90d9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "扇形投出 3 把烈日飞刀。\n \n 每把造成 257 [38] 伤害（精准倍率 1.3×）并施加 20+10 层灼烧。\n 3 把全部精准命中时最多合计 1002 [147] 伤害与 60+30 层灼烧。",
+            "html": "扇形投出 3 把<span class=\"el-solar\">烈日</span>飞刀。<br> <br> 每把造成 257 <span class=\"pvp\">[38]</span> 伤害（精准倍率 1.3×）并施加 20+10 层<span class=\"deb-solar\">灼烧</span>。<br> 3 把全部<span class=\"stack\">精准命中</span>时最多合计 1002 <span class=\"pvp\">[147]</span> 伤害与 60+30 层<span class=\"deb-solar\">灼烧</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 118.8 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 118.8 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "轻质飞刀",
+            "html": "轻质飞刀"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cc1bebb49b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "固有 2 次技能充能。\n 快速投出一把以 40 米/秒飞行的轻质飞刀。\n \n 造成 408 [100] 伤害，精准倍率 1.5×。\n 精准命中提供焕光，持续 10 秒。",
+            "html": "固有 2 次技能充能。<br> 快速投出一把以 40 米/秒飞行的<span class=\"el-solar\">轻质飞刀</span>。<br> <br> 造成 408 <span class=\"pvp\">[100]</span> 伤害，精准倍率 1.5×。<br> <span class=\"stack\">精准命中</span>提供<span class=\"el-solar\">焕光</span>，持续 10 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 145.2 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 145.2 秒<br> 回复倍率 0.8×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "感应爆炸飞刀",
+            "html": "感应爆炸飞刀"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/151e2511c1.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "快速投出一把可附着表面最多 14 秒的爆炸刀。\n 探测到 5 米内的战斗人员时爆炸，直接粘到战斗人员身上也立即爆炸。\n \n 接触造成 306 [20] 伤害（精准倍率 1.3×）。\n 引爆在 6 米内最多造成 405 [100] 伤害。",
+            "html": "快速投出一把可附着表面最多 14 秒的爆炸刀。<br> 探测到 5 米内的<span class=\"enemy\">战斗人员</span>时爆炸，直接粘到<span class=\"enemy\">战斗人员</span>身上也立即爆炸。<br> <br> 接触造成 306 <span class=\"pvp\">[20]</span> 伤害（精准倍率 1.3×）。<br> 引爆在 6 米内最多造成 405 <span class=\"pvp\">[100]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 161.3 秒\n 回复倍率 0.7×",
+            "html": "基础冷却 161.3 秒<br> 回复倍率 0.7×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "权衡飞刀",
+            "html": "权衡飞刀"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c8b7a202dd.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "加重飞刀，投出前需蓄力 0.65 秒，整套动画 1.55 秒。\n \n 造成 571 [140] 伤害，精准倍率 1.5×。\n 精准击杀提供一次职业技能充能。\n 命中灼烧的战斗人员直接触发点燃。",
+            "html": "加重飞刀，投出前需蓄力 0.65 秒，整套动画 1.55 秒。<br> <br> 造成 571 <span class=\"pvp\">[140]</span> 伤害，精准倍率 1.5×。<br> 精准击杀提供一次<span class=\"pickup\">职业技能充能</span>。<br> 命中<span class=\"deb-solar\">灼烧</span>的<span class=\"enemy\">战斗人员</span>直接触发<span class=\"deb-solar\">点燃</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 197.9 秒\n 回复倍率 0.6×",
+            "html": "基础冷却 197.9 秒<br> 回复倍率 0.6×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "利刃弹幕",
+            "html": "利刃弹幕"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/75282a79bc.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90%? [49%]\n \n 释放两轮各 7 把追踪飞刀，共 14 把；装备星相「击败他们」时每轮多 3 把，共 20 把。\n \n 飞刀接触时嵌入，造成 99 [没多少?] 伤害，0.5 秒后引爆。\n 每把引爆在 4.25 米内额外造成最多 560 [基本团灭?] 伤害并施加 ?+? 层灼烧。\n 全部命中并引爆时合计最多 8512 [死] 伤害；配合「击败他们」可达 12160 [死 ×1.43]。",
+            "html": "伤害抗性：<span class=\"unsure\">90%?</span> <span class=\"pvp\">[49%]</span><br> <br> 释放两轮各 7 把追踪飞刀，共 14 把；装备星相「<span class=\"el-solar\">击败他们</span>」时每轮多 3 把，共 20 把。<br> <br> 飞刀接触时嵌入，造成 99 <span class=\"note\">[没多少?]</span> 伤害，0.5 秒后引爆。<br> 每把引爆在 4.25 米内额外造成最多 560 <span class=\"note\">[基本团灭?]</span> 伤害并施加 <span class=\"unsure\">?+?</span> 层<span class=\"deb-solar\">灼烧</span>。<br> 全部命中并引爆时合计最多 8512 <span class=\"note\">[死]</span> 伤害；配合「<span class=\"el-solar\">击败他们</span>」可达 12160 <span class=\"note\">[死 ×1.43]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T4 级超能\n 基础冷却 455 秒",
+            "html": "T4 级超能<br> 基础冷却 455 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "黄金枪：死亡射击",
+            "html": "黄金枪：死亡射击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/64309ea88b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：60% [0%]，带「击败他们」时 66% [15%]\n 基础持续：12 秒，或每秒消耗 8.34% 超能能量\n \n 6 发装。每发造成 1453 [393] 伤害并施加 40+10 层灼烧，本技能没有精准命中。\n 伤害从 26 米开始衰减，100 米处降到 34.5%；瞄准变焦不影响衰减（1× 瞄准标量）。\n 焕光的加成对它生效。\n \n 超能击杀会补一发子弹并返还超能能量：\n 首次约 80%，此后每次击杀递减约 10%，最低约 12%。",
+            "html": "伤害抗性：60% <span class=\"pvp\">[0%]</span>，带「<span class=\"el-solar\">击败他们</span>」时 66% <span class=\"pvp\">[15%]</span><br> 基础持续：12 秒，或每秒消耗 8.34% <span class=\"orb\">超能能量</span><br> <br> 6 发装。每发造成 1453 <span class=\"pvp\">[393]</span> 伤害并施加 40+10 层<span class=\"deb-solar\">灼烧</span>，本技能没有<span class=\"stack\">精准命中</span>。<br> 伤害从 26 米开始衰减，100 米处降到 34.5%；瞄准变焦不影响衰减（1× 瞄准标量）。<br> <span class=\"el-solar\">焕光</span>的加成对它生效。<br> <br> 超能击杀会补一发子弹并返还<span class=\"orb\">超能能量</span>：<br> 首次约 80%，此后每次击杀递减约 10%，最低约 12%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "黄金枪：神枪手",
+            "html": "黄金枪：神枪手"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0ee82bc44a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：60% [0%]\n 基础持续：12 秒，或每秒消耗 8.34% 超能能量；带「击败他们」时 16 秒、每秒 6.25%\n \n 3 发装。每发造成 1574 [426] 伤害并施加 40+10 层灼烧，精准倍率 2×。\n 焕光的加成对它生效。\n \n 精准命中提供 1 层列队（最多 2 层）并生成 2 枚能量球，增益持续到超能结束。\n 列队 1 层 ｜ 伤害提高 45.8%，被动消耗降低 25%?。\n 列队 2 层 ｜ 伤害提高 90%，被动消耗降低 50%?。\n \n 精准命中生成的能量球回能：\n 非首领战斗人员 3.57% ｜ 首领 2.85% ｜ 首领 + 噬星者之鳞 2.5%。",
+            "html": "伤害抗性：60% <span class=\"pvp\">[0%]</span><br> 基础持续：12 秒，或每秒消耗 8.34% <span class=\"orb\">超能能量</span>；带「<span class=\"el-solar\">击败他们</span>」时 16 秒、每秒 6.25%<br> <br> 3 发装。每发造成 1574 <span class=\"pvp\">[426]</span> 伤害并施加 40+10 层<span class=\"deb-solar\">灼烧</span>，精准倍率 2×。<br> <span class=\"el-solar\">焕光</span>的加成对它生效。<br> <br> <span class=\"stack\">精准命中</span>提供 1 层列队（最多 2 层）并生成 2 枚<span class=\"orb\">能量球</span>，<span class=\"buff\">增益</span>持续到超能结束。<br> 列队 1 层 ｜ 伤害提高 45.8%，被动消耗降低 <span class=\"unsure\">25%?</span>。<br> 列队 2 层 ｜ 伤害提高 90%，被动消耗降低 <span class=\"unsure\">50%?</span>。<br> <br> <span class=\"stack\">精准命中</span>生成的<span class=\"orb\">能量球</span>回能：<br> 非<span class=\"bar-yellow\">首领</span><span class=\"enemy\">战斗人员</span> 3.57% ｜ <span class=\"bar-yellow\">首领</span> 2.85% ｜ <span class=\"bar-yellow\">首领</span> + <span class=\"exotic\">噬星者之鳞</span> 2.5%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "速射神枪",
+            "html": "速射神枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cb1924c5f3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "准星悬停在 27 米内的战斗人员附近会给它打上标记，直到离开视线。\n \n 职业技能被替换为速射神枪闪身，冷却覆盖为射手闪身的数值，并触发已装备职业技能的效果。\n 可以在半空中使用，触发一阵速度爆发。\n \n 使用时在 1.2 秒内最多打出 3 发，平均 150 发/分钟（射速随帧率变化）。\n 每发灼热射击造成 354 [21] 伤害并施加 20+10 层灼烧；3 发全中提供 1 层治愈。\n \n 焕光使速射神枪对战斗人员的伤害提高 20%。空中闪身的焕光在开火之前就已施加。\n 伤害随超过 100 的职业属性缩放，200 属性时最多 +65% [10%]。\n 与星界夜鹰没有互动。",
+            "html": "准星悬停在 27 米内的<span class=\"enemy\">战斗人员</span>附近会给它打上标记，直到离开视线。<br> <br> 职业技能被替换为<span class=\"el-solar\">速射神枪</span>闪身，冷却覆盖为射手闪身的数值，并触发已装备职业技能的效果。<br> 可以在半空中使用，触发一阵速度爆发。<br> <br> 使用时在 1.2 秒内最多打出 3 发，平均 150 发/分钟（射速随帧率变化）。<br> 每发灼热射击造成 354 <span class=\"pvp\">[21]</span> 伤害并施加 20+10 层<span class=\"deb-solar\">灼烧</span>；3 发全中提供 1 层<span class=\"el-solar\">治愈</span>。<br> <br> <span class=\"el-solar\">焕光</span>使<span class=\"el-solar\">速射神枪</span>对<span class=\"enemy\">战斗人员</span>的伤害提高 20%。空中闪身的<span class=\"el-solar\">焕光</span>在开火之前就已施加。<br> 伤害随超过 100 的职业属性缩放，200 属性时最多 +65% <span class=\"pvp\">[10%]</span>。<br> <span class=\"note\">与星界夜鹰没有互动。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "火药博弈",
+            "html": "火药博弈"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b4d7005b8d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀为简易爆炸物蓄力，攒够 6 次充能即可使用。\n 武器击杀 1 [2] ｜ 点燃与灼烧 3 [4] ｜ 技能击杀 4 ｜ 超能 6。\n \n 手雷技能被替换为棍上点燃：\n 被射击或 3 秒后触发点燃，伤害提高 50%。\n 射击炸药会让它的伤害提高 50% [5%]、半径提高 ?% 至 ? 米，并释放 9 枚追踪子弹药，每枚最多造成 80 [?] 伤害。\n 激活后有 6 秒冷却，冷却期间的击杀不提供充能。",
+            "html": "击杀为简易爆炸物蓄力，攒够 6 次充能即可使用。<br> 武器击杀 1 <span class=\"pvp\">[2]</span> ｜ <span class=\"deb-solar\">点燃</span>与<span class=\"deb-solar\">灼烧</span> 3 <span class=\"pvp\">[4]</span> ｜ 技能击杀 4 ｜ 超能 6。<br> <br> 手雷技能被替换为棍上<span class=\"deb-solar\">点燃</span>：<br> 被射击或 3 秒后触发<span class=\"deb-solar\">点燃</span>，伤害提高 50%。<br> 射击炸药会让它的伤害提高 50% <span class=\"pvp\">[5%]</span>、半径提高 <span class=\"unsure\">?</span>% 至 <span class=\"unsure\">?</span> 米，并释放 9 枚追踪子弹药，每枚最多造成 80 <span class=\"unsure\">[?]</span> 伤害。<br> <span class=\"note\">激活后有 6 秒冷却，冷却期间的击杀不提供充能。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "击败他们",
+            "html": "击败他们"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5199892b7a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "焕光期间：\n 充能近战技能击杀在 0.2 秒延迟后返还 100% 近战技能能量；若焕光正是由这一击带来的，同样返还。\n \n 强化超能：\n 神枪手黄金枪持续时间 +4 秒 ｜ 死亡射击黄金枪获得 15% 伤害抗性 ｜ 利刃弹幕每轮多投 3 把飞刀。\n \n 超能激活时提供 1 层治愈。",
+            "html": "<span class=\"el-solar\">焕光</span>期间：<br> 充能近战技能击杀在 0.2 秒延迟后返还 100% <span class=\"pickup\">近战技能能量</span>；若<span class=\"el-solar\">焕光</span>正是由这一击带来的，同样返还。<br> <br> 强化超能：<br> 神枪手黄金枪持续时间 +4 秒 ｜ 死亡射击黄金枪获得 15% 伤害抗性 ｜ 利刃弹幕每轮多投 3 把飞刀。<br> <br> 超能激活时提供 1 层<span class=\"el-solar\">治愈</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "各就各位",
+            "html": "各就各位"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/285affb18c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精准击杀、精准命中或使用职业技能时：\n 为自己与 15 米内的盟友提供各就各位，持续 12 秒，最多 10 层。\n 精准击杀与手炮精准命中给 2 层 ｜ 职业技能使用给 1 层 ｜ 普通精准命中给 1 层（对守护者有 1 秒内置冷却）。\n \n 每层提供 +5 武器属性，以及填装速度与换弹时长的加成；满 10 层为 +50 武器属性、+? 填装速度，换弹时长 ×0.?。\n 满 10 层时，击杀提供 1 层恢复，持续 3+1.5 秒。",
+            "html": "精准击杀、<span class=\"stack\">精准命中</span>或使用职业技能时：<br> 为<span class=\"enemy\">自己</span>与 15 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-solar\">各就各位</span>，持续 12 秒，最多 10 层。<br> 精准击杀与手炮<span class=\"stack\">精准命中</span>给 2 层 ｜ 职业技能使用给 1 层 ｜ 普通<span class=\"stack\">精准命中</span>给 1 层（对<span class=\"bar-orange\">守护者</span>有 1 秒内置冷却）。<br> <br> 每层提供 +5 武器属性，以及填装速度与换弹时长的加成；满 10 层为 +50 武器属性、+<span class=\"unsure\">?</span> 填装速度，换弹时长 ×<span class=\"unsure\">0.?</span>。<br> 满 10 层时，击杀提供 1 层<span class=\"el-solar\">恢复</span>，持续 3+1.5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "泰坦",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "战锤打击",
+            "html": "战锤打击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9239a07add.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "与其它肩撞类技能共用的规则：\n 需要冲刺 1.25 秒；未命中战斗人员时消耗 15% 近战技能能量；开火状态下无法在滑铲期间使用；被肩撞直接命中的守护者近战突进失效 0.5 秒。\n \n 向前突进 6.8 米，自动瞄准射程内的战斗人员。\n \n 命中战斗人员：\n 造成 878 [90] 直击伤害并施加 40+20 层灼烧。\n 对命中目标后方 7 米内的战斗人员造成 586 [60] 径向伤害。\n 用战锤打击杀死被直接命中的战斗人员会触发点燃。",
+            "html": "与其它肩撞类技能共用的规则：<br> <span class=\"note\">需要冲刺 1.25 秒；未命中战斗人员时消耗 15% 近战技能能量；开火状态下无法在滑铲期间使用；被肩撞直接命中的守护者近战突进失效 0.5 秒。</span><br> <br> 向前突进 6.8 米，自动瞄准射程内的<span class=\"enemy\">战斗人员</span>。<br> <br> 命中<span class=\"enemy\">战斗人员</span>：<br> 造成 878 <span class=\"pvp\">[90]</span> 直击伤害并施加 40+20 层<span class=\"deb-solar\">灼烧</span>。<br> 对命中目标后方 7 米内的<span class=\"enemy\">战斗人员</span>造成 586 <span class=\"pvp\">[60]</span> 径向伤害。<br> 用<span class=\"el-solar\">战锤打击</span>杀死被直接命中的<span class=\"enemy\">战斗人员</span>会触发<span class=\"deb-solar\">点燃</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.8×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "投掷飞锤",
+            "html": "投掷飞锤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a8feb9c7da.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "快速投出一把烈日飞锤，造成 539 [90] 伤害。\n \n 伤害随飞行距离提高，35 米以上最多 +36%，与一切效果相乘叠加：\n 2 米以内 基础 ｜ 2–4 米 +6% ｜ 5–8 米 +12% ｜ 9–16 米 +18% ｜ 17–25 米 +24% ｜ 26–34 米 +30% ｜ 35 米以上 +36%。\n \n 飞锤可以从地面拾回，提供 121.5% 近战技能能量；命中后拾回还提供 1 层治愈。\n 落地 10 秒后自动爆炸，最多造成 325 [60] 伤害，爆炸计为近战伤害。",
+            "html": "快速投出一把<span class=\"el-solar\">烈日</span>飞锤，造成 539 <span class=\"pvp\">[90]</span> 伤害。<br> <br> 伤害随飞行距离提高，35 米以上最多 +36%，与一切效果相乘叠加：<br> 2 米以内 基础 ｜ 2–4 米 +6% ｜ 5–8 米 +12% ｜ 9–16 米 +18% ｜ 17–25 米 +24% ｜ 26–34 米 +30% ｜ 35 米以上 +36%。<br> <br> 飞锤可以从地面拾回，提供 121.5% <span class=\"pickup\">近战技能能量</span>；命中后拾回还提供 1 层<span class=\"el-solar\">治愈</span>。<br> 落地 10 秒后自动爆炸，最多造成 325 <span class=\"pvp\">[60]</span> 伤害，爆炸计为近战伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "燃烧锻锤",
+            "html": "燃烧锻锤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/47bebd00da.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [53%]\n 基础持续：25 秒，或每秒消耗 4% 超能能量\n 装备无敌索尔时，扎根施放会生成一团烈日耀斑，被动消耗降低 40%，持续时间提高到 42 秒（每秒 2.4%）。\n \n 轻攻击 ｜ 消耗 4% 超能能量。\n 旋转攻击造成 4 段 111 [?] 伤害，两次之间有 0.67 秒延迟。\n 连续命中获得 40% 攻速加成，直到断连为止。\n 累计命中 10 次生成一个旋风，每次超能最多生成 1 个。\n \n 重击 ｜ 消耗 8% 超能能量。\n 向下猛击并释放一枚接触即爆的追踪弹，造成 276 [?] 伤害并生成旋风。\n \n 旋风每 0.2 秒造成 24 [16] 伤害，每 0.56 秒施加 3+2 层灼烧，持续 4 秒。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[53%]</span><br> 基础持续：25 秒，或每秒消耗 4% <span class=\"orb\">超能能量</span><br> 装备<span class=\"el-solar\">无敌索尔</span>时，扎根施放会生成一团<span class=\"el-solar\">烈日</span>耀斑，被动消耗降低 40%，持续时间提高到 42 秒（每秒 2.4%）。<br> <br> 轻攻击 ｜ 消耗 4% <span class=\"orb\">超能能量</span>。<br> 旋转攻击造成 4 段 111 <span class=\"unsure\">[?]</span> 伤害，两次之间有 0.67 秒延迟。<br> 连续命中获得 40% 攻速加成，直到断连为止。<br> 累计命中 10 次生成一个旋风，每次超能最多生成 1 个。<br> <br> 重击 ｜ 消耗 8% <span class=\"orb\">超能能量</span>。<br> 向下猛击并释放一枚接触即爆的追踪弹，造成 276 <span class=\"unsure\">[?]</span> 伤害并生成旋风。<br> <br> 旋风每 0.2 秒造成 24 <span class=\"pvp\">[16]</span> 伤害，每 0.56 秒施加 3+2 层<span class=\"deb-solar\">灼烧</span>，持续 4 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T3 级超能\n 基础冷却 500 秒",
+            "html": "T3 级超能<br> 基础冷却 500 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "烈焰战锤",
+            "html": "烈焰战锤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/fd455cf574.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [51%]\n 基础持续：21 秒，或每秒消耗 4.75% 超能能量\n \n 轻攻击 ｜ 消耗 12% 超能能量。\n 投出接触即爆的飞锤，最多造成 445 [?] 伤害；两次投掷之间有 1.5 秒延迟。\n 爆炸释放 4 片弹片，每片最多造成 396 [?] 伤害。飞锤在空中 0.7 秒后视觉上升空，弹片增加到 5 片。\n \n 凤巢 ｜ 被动消耗降低 20%，持续时间提高到 26.25 秒（每秒 3.81%），轻攻击改为消耗 7.5% 超能能量，投掷间隔降到 1 秒。\n \n 罗蕾莱辉煌头盔 ｜ 被动消耗降低 40%，持续时间提高到 35 秒（每秒 2.85%），轻攻击消耗 8.2% 超能能量，投掷间隔降到 1 秒。\n 两种异域的数值都假设无敌索尔增益 100% 持续，实战未必做得到。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[51%]</span><br> 基础持续：21 秒，或每秒消耗 4.75% <span class=\"orb\">超能能量</span><br> <br> 轻攻击 ｜ 消耗 12% <span class=\"orb\">超能能量</span>。<br> 投出接触即爆的飞锤，最多造成 445 <span class=\"unsure\">[?]</span> 伤害；两次投掷之间有 1.5 秒延迟。<br> 爆炸释放 4 片弹片，每片最多造成 396 <span class=\"unsure\">[?]</span> 伤害。飞锤在空中 0.7 秒后视觉上升空，弹片增加到 5 片。<br> <br> <span class=\"exotic\">凤巢</span> ｜ 被动消耗降低 20%，持续时间提高到 26.25 秒（每秒 3.81%），轻攻击改为消耗 7.5% <span class=\"orb\">超能能量</span>，投掷间隔降到 1 秒。<br> <br> <span class=\"exotic\">罗蕾莱辉煌头盔</span> ｜ 被动消耗降低 40%，持续时间提高到 35 秒（每秒 2.85%），轻攻击消耗 8.2% <span class=\"orb\">超能能量</span>，投掷间隔降到 1 秒。<br> <span class=\"note\">两种异域的数值都假设无敌索尔增益 100% 持续，实战未必做得到。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "烈焰战锤（无敌索尔）",
+            "html": "烈焰战锤（无敌索尔）"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/67ba483289.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [51%]\n 基础持续：16.5 秒，或每秒消耗 6.06% 超能能量\n \n 扎根施放时生成一团烈日耀斑。\n \n 轻攻击 ｜ 消耗 9% 超能能量。\n 投出的飞锤造成 483 [?] 伤害并在接触时生成烈日耀斑；两次投掷之间有 1.5 秒延迟。\n 爆炸释放 3 片弹片，每片最多造成 429 [?] 伤害。\n \n 站在耀斑里：\n 被动消耗降低 40%，持续时间提高到 27.5 秒（每秒 3.63%），轻攻击消耗降到 5.5% 超能能量，投掷间隔降到 1 秒。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[51%]</span><br> 基础持续：16.5 秒，或每秒消耗 6.06% <span class=\"orb\">超能能量</span><br> <br> 扎根施放时生成一团<span class=\"el-solar\">烈日</span>耀斑。<br> <br> 轻攻击 ｜ 消耗 9% <span class=\"orb\">超能能量</span>。<br> 投出的飞锤造成 483 <span class=\"unsure\">[?]</span> 伤害并在接触时生成<span class=\"el-solar\">烈日</span>耀斑；两次投掷之间有 1.5 秒延迟。<br> 爆炸释放 3 片弹片，每片最多造成 429 <span class=\"unsure\">[?]</span> 伤害。<br> <br> 站在耀斑里：<br> 被动消耗降低 40%，持续时间提高到 27.5 秒（每秒 3.63%），轻攻击消耗降到 5.5% <span class=\"orb\">超能能量</span>，投掷间隔降到 1 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "神圣献祭",
+            "html": "神圣献祭"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2b9c80567e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "滑铲时按［近战技能］：\n 向前发出一道 20 米的烈日能量波形，造成 40 [30] 伤害并施加 40+20 层灼烧。\n 未处于猛击状态时只消耗 50% 近战技能能量。\n 开火状态下无法在滑铲期间使用。\n \n 由神圣献祭腾空后按［近战技能］：\n 猛击地面，形成第二道更宽的波形向前 20 米，并碎裂水晶。\n 对非灼烧战斗人员造成 486 [120] 伤害。\n 命中灼烧的战斗人员则造成 472.5 [50] 伤害并触发点燃。\n \n 近战动画期间对非近战伤害提供 25% 伤害抗性。",
+            "html": "滑铲时按［近战技能］：<br> 向前发出一道 20 米的<span class=\"el-solar\">烈日</span>能量波形，造成 40 <span class=\"pvp\">[30]</span> 伤害并施加 40+20 层<span class=\"deb-solar\">灼烧</span>。<br> 未处于猛击状态时只消耗 50% <span class=\"pickup\">近战技能能量</span>。<br> <span class=\"note\">开火状态下无法在滑铲期间使用。</span><br> <br> 由<span class=\"el-solar\">神圣献祭</span>腾空后按［近战技能］：<br> 猛击地面，形成第二道更宽的波形向前 20 米，并<span class=\"deb-stasis\">碎裂</span><span class=\"el-stasis\">水晶</span>。<br> 对<span class=\"deb-solar\">非灼烧</span><span class=\"enemy\">战斗人员</span>造成 486 <span class=\"pvp\">[120]</span> 伤害。<br> 命中<span class=\"deb-solar\">灼烧</span>的<span class=\"enemy\">战斗人员</span>则造成 472.5 <span class=\"pvp\">[50]</span> 伤害并触发<span class=\"deb-solar\">点燃</span>。<br> <br> 近战动画期间对非近战伤害提供 25% 伤害抗性。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "咆哮烈焰",
+            "html": "咆哮烈焰"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d479d4b267.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日技能击杀与点燃击杀：\n 提供 1 层咆哮烈焰，持续 20 秒，最多 3 层；再次击杀刷新时长。\n \n 每层提高烈日技能伤害：\n 近战伤害 +67% / +133% / +200%。\n 手雷与超能技能伤害 +20% [13%] / +44% [28%] / +73% [44%]。\n \n 咆哮烈焰激活期间，非充能近战命中施加 30+10 层灼烧并计为充能近战命中。",
+            "html": "<span class=\"el-solar\">烈日</span>技能击杀与<span class=\"deb-solar\">点燃</span>击杀：<br> 提供 1 层<span class=\"el-solar\">咆哮烈焰</span>，持续 20 秒，最多 3 层；再次击杀刷新时长。<br> <br> 每层提高<span class=\"el-solar\">烈日</span>技能伤害：<br> 近战伤害 +67% / +133% / +200%。<br> 手雷与超能技能伤害 +20% <span class=\"pvp\">[13%]</span> / +44% <span class=\"pvp\">[28%]</span> / +73% <span class=\"pvp\">[44%]</span>。<br> <br> <span class=\"el-solar\">咆哮烈焰</span>激活期间，非充能近战命中施加 30+10 层<span class=\"deb-solar\">灼烧</span>并计为充能近战命中。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "盾爆",
+            "html": "盾爆"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/31a7b14085.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "职业技能被覆盖为遥控引爆器：\n 放下屏障后再次使用即引爆，产生强力击退的爆炸。\n 爆炸对部分效果计为摧毁构造体；被自己的爆炸命中会触发屏障加速，落地前还能继续使用战锤打击。\n 遥控引爆器对多数效果计为职业技能使用，但职业属性超过 100 时不提供覆盖护盾。\n \n 放置巍峨屏障时：\n 屏障会先向前滑行最多 20 米并逐渐减速。\n 屏障直击伤害提高到 328 [?] 并施加 20+10 层灼烧（同一战斗人员每 2 秒只触发一次）。\n \n 位于集结屏障后方时：\n 为动能与烈日武器提供灼热子弹。\n \n 屏障激活期间被动积攒盾爆进度（高墙 34% ｜ 集束 10%），造成伤害按每秒约 100 点伤害额外积攒。\n \n 引爆时：\n 最多在 ? 米内造成 550 [?] 伤害并施加 50+25 层灼烧，自身伤害降低到 ?。\n 向 40? 米内的战斗人员抛出烈日弹片，每片造成 71 [?] 伤害并施加 5+5 层灼烧。\n 盾爆进度越满爆炸伤害越高，满进度时 +50%，并额外释放 3 道呈锥形扩散、最远 15 米的烈日波形，每道造成 141 [?] 烈日伤害。\n \n 星相伤害随超过 100 的职业属性缩放，200 属性时最多 +65%[?%]。",
+            "html": "职业技能被覆盖为遥控引爆器：<br> 放下屏障后再次使用即引爆，产生强力击退的爆炸。<br> 爆炸对部分效果计为摧毁构造体；被<span class=\"enemy\">自己</span>的爆炸命中会触发屏障加速，落地前还能继续使用<span class=\"el-solar\">战锤打击</span>。<br> <span class=\"note\">遥控引爆器对多数效果计为职业技能使用，但职业属性超过 100 时不提供覆盖护盾。</span><br> <br> 放置巍峨屏障时：<br> 屏障会先向前滑行最多 20 米并逐渐减速。<br> 屏障直击伤害提高到 328 <span class=\"unsure\">[?]</span> 并施加 20+10 层<span class=\"deb-solar\">灼烧</span>（同一<span class=\"enemy\">战斗人员</span>每 2 秒只触发一次）。<br> <br> 位于集结屏障后方时：<br> 为<span class=\"el-kinetic\">动能</span>与<span class=\"el-solar\">烈日</span>武器提供灼热子弹。<br> <br> 屏障激活期间被动积攒<span class=\"el-solar\">盾爆</span>进度（高墙 34% ｜ 集束 10%），造成伤害按每秒约 100 点伤害额外积攒。<br> <br> 引爆时：<br> 最多在 <span class=\"unsure\">?</span> 米内造成 550 <span class=\"unsure\">[?]</span> 伤害并施加 50+25 层<span class=\"deb-solar\">灼烧</span>，自身伤害降低到 <span class=\"unsure\">?</span>。<br> 向 <span class=\"unsure\">40?</span> 米内的<span class=\"enemy\">战斗人员</span>抛出<span class=\"el-solar\">烈日</span>弹片，每片造成 71 <span class=\"unsure\">[?]</span> 伤害并施加 5+5 层<span class=\"deb-solar\">灼烧</span>。<br> <span class=\"el-solar\">盾爆</span>进度越满爆炸伤害越高，满进度时 +50%，并额外释放 3 道呈锥形扩散、最远 15 米的<span class=\"el-solar\">烈日</span>波形，每道造成 141 <span class=\"unsure\">[?]</span> <span class=\"el-solar\">烈日伤害</span>。<br> <br> 星相伤害随超过 100 的职业属性缩放，200 属性时最多 +65%<span class=\"unsure\">[?%]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "无敌索尔",
+            "html": "无敌索尔"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/67ba483289.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "烈日技能击杀、击杀灼烧的战斗人员，以及烈焰战锤接触，都会生成烈日耀斑，持续 ? 秒。\n 站在耀斑里可以刷新它的持续时间，最长 12 秒。\n \n 耀斑提供无敌索尔持续 5 秒，并给 1 层恢复持续 5+2.5 秒。\n 耀斑每 0.167 秒造成 60 [22] 伤害并施加 5+3 层灼烧。\n \n 无敌索尔期间：\n 手雷与近战基础充能速度额外 +100%。\n 超能被动消耗降低 40%。",
+            "html": "<span class=\"el-solar\">烈日</span>技能击杀、击杀<span class=\"deb-solar\">灼烧</span>的<span class=\"enemy\">战斗人员</span>，以及<span class=\"el-solar\">烈焰战锤</span>接触，都会生成<span class=\"el-solar\">烈日</span>耀斑，持续 <span class=\"unsure\">?</span> 秒。<br> 站在耀斑里可以刷新它的持续时间，最长 12 秒。<br> <br> 耀斑提供<span class=\"el-solar\">无敌索尔</span>持续 5 秒，并给 1 层<span class=\"el-solar\">恢复</span>持续 5+2.5 秒。<br> 耀斑每 0.167 秒造成 60 <span class=\"pvp\">[22]</span> 伤害并施加 5+3 层<span class=\"deb-solar\">灼烧</span>。<br> <br> <span class=\"el-solar\">无敌索尔</span>期间：<br> <span class=\"pickup\">手雷与近战</span>基础充能速度额外 +100%。<br> 超能被动消耗降低 40%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "术士",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "职业技能",
+            "html": "职业技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "凤凰俯冲",
+            "html": "凤凰俯冲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/19a64f6631.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "俯冲，为自己与 9 米内的盟友施加 2 层治愈。\n \n 炙热升腾激活时：\n 俯冲改为施加 2 层恢复，持续 3+1.5 秒。\n 落地对 6.5 米内的战斗人员造成 100 伤害并施加 40+20 层灼烧。",
+            "html": "俯冲，为<span class=\"enemy\">自己</span>与 9 米内的<span class=\"enemy\">盟友</span>施加 2 层<span class=\"el-solar\">治愈</span>。<br> <br> <span class=\"el-solar\">炙热升腾</span>激活时：<br> 俯冲改为施加 2 层<span class=\"el-solar\">恢复</span>，持续 3+1.5 秒。<br> 落地对 6.5 米内的<span class=\"enemy\">战斗人员</span>造成 100 伤害并施加 40+20 层<span class=\"deb-solar\">灼烧</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 79.6 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 79.6 秒<br> 回复倍率 0.8×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "星界之火",
+            "html": "星界之火"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1720d5461a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发出 3 团追踪的烈日爆炸，呈螺旋前进。\n \n 每团最多造成 150 [35] 伤害并施加 10+5 层灼烧，范围 ? 米。\n 3 团全中最多合计 450 [105] 伤害与 30+15 层灼烧。",
+            "html": "发出 3 团追踪的<span class=\"el-solar\">烈日</span>爆炸，呈螺旋前进。<br> <br> 每团最多造成 150 <span class=\"pvp\">[35]</span> 伤害并施加 10+5 层<span class=\"deb-solar\">灼烧</span>，范围 <span class=\"unsure\">?</span> 米。<br> 3 团全中最多合计 450 <span class=\"pvp\">[105]</span> 伤害与 30+15 层<span class=\"deb-solar\">灼烧</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 162.6 秒\n 回复倍率 0.7×",
+            "html": "基础冷却 162.6 秒<br> 回复倍率 0.7×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "焚烧响指",
+            "html": "焚烧响指"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4cf11a3c66.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "扇形生成 5 发燃烧花火。\n \n 每发飞行 ? 米后爆炸，在 ? 米内最多造成 90 [27?] 伤害并施加 20+10 [10+5] 层灼烧。\n 5 发全中最多合计 450 [135?] 伤害与 100+50 [50+25] 层灼烧。",
+            "html": "扇形生成 5 发燃烧花火。<br> <br> 每发飞行 <span class=\"unsure\">?</span> 米后爆炸，在 <span class=\"unsure\">?</span> 米内最多造成 90 <span class=\"unsure\">[27?]</span> 伤害并施加 20+10 <span class=\"pvp\">[10+5]</span> 层<span class=\"deb-solar\">灼烧</span>。<br> 5 发全中最多合计 450 <span class=\"unsure\">[135?]</span> 伤害与 100+50 <span class=\"pvp\">[50+25]</span> 层<span class=\"deb-solar\">灼烧</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 119.8 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 119.8 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "烈焰之歌",
+            "html": "烈焰之歌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/15c9d59551.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [~50%?]\n 基础持续：25 秒，或每秒消耗 4% 超能能量\n \n 施法者获得 +100 手雷、+100 近战、+100 职业属性，以及焕光与灼热子弹；其武器击杀计为超能击杀（武器伤害不计为技能伤害）。\n 15 米内的盟友获得 30% [?%] 伤害抗性、灼热子弹，以及手雷、近战与职业技能每秒 15% 的固定能量。\n 超能结束时补满手雷与近战技能。\n \n 灼热子弹：\n 非持续伤害的动能或烈日武器命中会施加灼烧，层数与冷却随武器类型而定。\n 5+0 层 / 0.2 秒 ｜ 自动步枪、微型冲锋枪。\n 5+5 层 / 0.2 秒 ｜ 机枪、追踪步枪。\n 10+5 层 / 0.3 秒 ｜ 手炮、脉冲步枪、斥候步枪、手枪。\n 15+5 层 / 0.4 秒 ｜ 融合步枪、偃月、霰弹枪、狙击步枪、刀剑。\n 20+10 层 / 0.6? 秒 ｜ 弓箭、重型榴弹发射器、特殊榴弹发射器、线性融合步枪（含劲弩）、火箭发射器。\n 同时命中多名战斗人员时只烧其中一名。\n \n 手雷技能 ｜ 消耗 4.8% 超能能量，两次之间有 2 秒冷却。\n 发出一团接触即爆的烈日烈焰火苗，最多造成 685 [?] 伤害并施加 40+20 层灼烧，有 ? 点构造体生命值。\n 若 15? 米内还有战斗人员，会在接触位置再生成一团去追尚未伤到的最近战斗人员，每次最多多生成 3 团。\n 装备炙热升腾时消耗一团烈焰火苗，为自己与 9 米内的盟友提供 3 层治愈与 2 层恢复，持续 4+2 秒。\n \n 近战技能 ｜ 消耗 2.4% 超能能量，两次之间有 1.75 秒冷却。\n 星界之火改为发出 5 团爆炸，每团最多造成 200 [87] 伤害并施加 10+5 层灼烧。\n 焚烧响指改为释放 7 发花火，每发最多造成 155 [41] 伤害并施加 20+10 [10+5] 层灼烧。\n 装备焚烧响指时对近战突进距离内的战斗人员使用自动近战，会打出强化基础近战，造成 1000 [456] 烈日伤害并施加 60+30 层灼烧，同时消耗超能能量与一次近战技能充能。\n \n 职业技能 ｜ 消耗 6% 超能能量，两次之间有 2.85 秒冷却。\n 按所选职业技能发挥作用，以超能能量换取快速充能。",
+            "html": "伤害抗性：90% <span class=\"unsure\">[~50%?]</span><br> 基础持续：25 秒，或每秒消耗 4% <span class=\"orb\">超能能量</span><br> <br> <span class=\"enemy\">施法者</span>获得 +100 手雷、+100 近战、+100 职业属性，以及<span class=\"el-solar\">焕光</span>与灼热子弹；其武器击杀计为超能击杀（武器伤害不计为技能伤害）。<br> 15 米内的<span class=\"enemy\">盟友</span>获得 30% <span class=\"unsure\">[?%]</span> 伤害抗性、灼热子弹，以及<span class=\"pickup\">手雷、近战与职业技能</span>每秒 15% 的固定能量。<br> 超能结束时补满<span class=\"pickup\">手雷与近战技能</span>。<br> <br> 灼热子弹：<br> 非持续伤害的<span class=\"el-kinetic\">动能</span>或<span class=\"el-solar\">烈日</span>武器命中会施加<span class=\"deb-solar\">灼烧</span>，层数与冷却随武器类型而定。<br> 5+0 层 / 0.2 秒 ｜ 自动步枪、微型冲锋枪。<br> 5+5 层 / 0.2 秒 ｜ 机枪、追踪步枪。<br> 10+5 层 / 0.3 秒 ｜ 手炮、脉冲步枪、斥候步枪、手枪。<br> 15+5 层 / 0.4 秒 ｜ 融合步枪、偃月、霰弹枪、狙击步枪、刀剑。<br> 20+10 层 / <span class=\"unsure\">0.6?</span> 秒 ｜ 弓箭、重型榴弹发射器、特殊榴弹发射器、线性融合步枪（含<span class=\"exotic\">劲弩</span>）、火箭发射器。<br> 同时命中多名<span class=\"enemy\">战斗人员</span>时只烧其中一名。<br> <br> 手雷技能 ｜ 消耗 4.8% <span class=\"orb\">超能能量</span>，两次之间有 2 秒冷却。<br> 发出一团接触即爆的<span class=\"el-solar\">烈日</span>烈焰火苗，最多造成 685 <span class=\"unsure\">[?]</span> 伤害并施加 40+20 层<span class=\"deb-solar\">灼烧</span>，有 <span class=\"unsure\">?</span> 点构造体<span class=\"health\">生命值</span>。<br> 若 <span class=\"unsure\">15?</span> 米内还有<span class=\"enemy\">战斗人员</span>，会在接触位置再生成一团去追尚未伤到的最近<span class=\"enemy\">战斗人员</span>，每次最多多生成 3 团。<br> 装备<span class=\"el-solar\">炙热升腾</span>时消耗一团烈焰火苗，为<span class=\"enemy\">自己</span>与 9 米内的<span class=\"enemy\">盟友</span>提供 3 层<span class=\"el-solar\">治愈</span>与 2 层<span class=\"el-solar\">恢复</span>，持续 4+2 秒。<br> <br> 近战技能 ｜ 消耗 2.4% <span class=\"orb\">超能能量</span>，两次之间有 1.75 秒冷却。<br> <span class=\"el-solar\">星界之火</span>改为发出 5 团爆炸，每团最多造成 200 <span class=\"pvp\">[87]</span> 伤害并施加 10+5 层<span class=\"deb-solar\">灼烧</span>。<br> <span class=\"el-solar\">焚烧响指</span>改为释放 7 发花火，每发最多造成 155 <span class=\"pvp\">[41]</span> 伤害并施加 20+10 <span class=\"pvp\">[10+5]</span> 层<span class=\"deb-solar\">灼烧</span>。<br> 装备<span class=\"el-solar\">焚烧响指</span>时对近战突进距离内的<span class=\"enemy\">战斗人员</span>使用自动近战，会打出强化基础近战，造成 1000 <span class=\"pvp\">[456]</span> <span class=\"el-solar\">烈日伤害</span>并施加 60+30 层<span class=\"deb-solar\">灼烧</span>，同时消耗<span class=\"orb\">超能能量</span>与一次<span class=\"pickup\">近战技能充能</span>。<br> <br> 职业技能 ｜ 消耗 6% <span class=\"orb\">超能能量</span>，两次之间有 2.85 秒冷却。<br> 按所选职业技能发挥作用，以<span class=\"orb\">超能能量</span>换取快速充能。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "黎明",
+            "html": "黎明"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/02227462d5.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [51%]\n 基础持续：24 秒，或每秒消耗 4.167% 超能能量\n \n 轻攻击 ｜ 消耗 6.5% 超能能量，发射黎明弹体。\n 弹体造成 426 [?] 直击伤害，受到伤害时爆炸，最多造成 598 [?] 溅射伤害（衰减至 0%），在 5 米内施加 50+0 层灼烧，并在身后拉出一道火焰长流。\n 火焰条纹向前飞行；若弹体飞行至少 12 米，宽度从约 4 米放大到 9 米，命中最多造成 292 [?] 伤害。\n \n 允许无冷却使用强化伊卡洛斯突进，每次消耗 4.2% 超能能量。\n \n 凤凰俯冲被强化：\n 最多造成 642 [220?] 伤害（最低降至 292 [?]），并在 6 米半径内施加 60+30 层灼烧，最大衰减处仍有 45% 伤害。\n 其伤害吃超能伤害提升。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[51%]</span><br> 基础持续：24 秒，或每秒消耗 4.167% <span class=\"orb\">超能能量</span><br> <br> 轻攻击 ｜ 消耗 6.5% <span class=\"orb\">超能能量</span>，发射黎明弹体。<br> 弹体造成 426 <span class=\"unsure\">[?]</span> 直击伤害，受到伤害时爆炸，最多造成 598 <span class=\"unsure\">[?]</span> 溅射伤害（衰减至 0%），在 5 米内施加 50+0 层<span class=\"deb-solar\">灼烧</span>，并在身后拉出一道火焰长流。<br> 火焰条纹向前飞行；若弹体飞行至少 12 米，宽度从约 4 米放大到 9 米，命中最多造成 292 <span class=\"unsure\">[?]</span> 伤害。<br> <br> 允许无冷却使用强化<span class=\"el-solar\">伊卡洛斯突进</span>，每次消耗 4.2% <span class=\"orb\">超能能量</span>。<br> <br> 凤凰俯冲被强化：<br> 最多造成 642 <span class=\"unsure\">[220?]</span> 伤害（最低降至 292 <span class=\"unsure\">[?]</span>），并在 6 米半径内施加 60+30 层<span class=\"deb-solar\">灼烧</span>，最大衰减处仍有 45% 伤害。<br> 其伤害吃超能伤害提升。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "光焰之井",
+            "html": "光焰之井"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1f267ad07f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "放下一口持续 30 秒的光焰之井：\n 为施法者恢复 300 生命值。\n 对 8.5 米内的战斗人员最多造成 150 伤害并施加 40+20 层灼烧。\n 生成 3 枚能量球，每枚提供 3.6% 超能能量。\n 持续时间随超能属性缩放，200 超能时最长 40 秒。\n \n 井本身是拥有 800 生命值的构造体，可以被冻结，也会被碎裂伤到；战斗人员对它只造成 0.25 倍伤害。\n 它向 6 米内的施法者与盟友投射增益光环，离开光环时提供焕光持续 8+4 秒。\n \n 站在井里的守护者：\n 伤害提高 25%。\n 对战斗人员获得 20% 伤害抗性（对首领 10%）。\n 对特殊与威能武器及技能获得 50% 伤害抗性，主武器 40%。\n 免疫冰影效果，每秒恢复 50 生命值。\n 进入时会移除已有的恢复。\n \n 施法者在井里造成的武器伤害计为超能技能伤害，井内击杀最多生成 5 枚能量球。",
+            "html": "放下一口持续 30 秒的光焰之井：<br> 为<span class=\"enemy\">施法者</span>恢复 300 <span class=\"health\">生命值</span>。<br> 对 8.5 米内的<span class=\"enemy\">战斗人员</span>最多造成 150 伤害并施加 40+20 层<span class=\"deb-solar\">灼烧</span>。<br> 生成 3 枚<span class=\"orb\">能量球</span>，每枚提供 3.6% <span class=\"orb\">超能能量</span>。<br> 持续时间随超能属性缩放，200 超能时最长 40 秒。<br> <br> 井本身是拥有 800 <span class=\"health\">生命值</span>的构造体，可以被<span class=\"deb-stasis\">冻结</span>，也会被<span class=\"deb-stasis\">碎裂</span>伤到；<span class=\"enemy\">战斗人员</span>对它只造成 0.25 倍伤害。<br> 它向 6 米内的<span class=\"enemy\">施法者</span>与<span class=\"enemy\">盟友</span>投射<span class=\"buff\">增益</span>光环，离开光环时提供<span class=\"el-solar\">焕光</span>持续 8+4 秒。<br> <br> 站在井里的<span class=\"bar-orange\">守护者</span>：<br> 伤害提高 25%。<br> 对<span class=\"enemy\">战斗人员</span>获得 20% 伤害抗性（对<span class=\"bar-yellow\">首领</span> 10%）。<br> 对特殊与威能武器及技能获得 50% 伤害抗性，主武器 40%。<br> 免疫<span class=\"el-stasis\">冰影</span>效果，每秒恢复 50 <span class=\"health\">生命值</span>。<br> 进入时会移除已有的<span class=\"el-solar\">恢复</span>。<br> <br> <span class=\"enemy\">施法者</span>在井里造成的武器伤害计为超能技能伤害，井内击杀最多生成 5 枚<span class=\"orb\">能量球</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T4 级超能\n 基础冷却 455 秒",
+            "html": "T4 级超能<br> 基础冷却 455 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "炙热升腾",
+            "html": "炙热升腾"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d4dbb89f07.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被动 +20 空中效率，并允许滑翔期间使用武器与技能。\n \n 空中击杀按等级提供近战技能能量：\n T1 级战斗人员 20% ｜ T2 25% ｜ T3 35% ｜ T4 50% ｜ 守护者 50%。\n \n 按住［手雷］：\n 消耗一次手雷技能充能进入炙热升腾，并为自己与 9 米内的盟友释放 2 层治愈。\n 消耗治愈手雷时提升到 3 层。\n 消耗火焰之触强化过的治愈手雷还额外给 1 层恢复，持续 4+2 秒。\n 消耗烈焰之歌的烈焰火苗则给 3 层治愈与 2 层恢复。\n \n 炙热升腾：\n 提供 +50 空中效率与一种随移动技能变化的改良滑翔，持续 15 秒。\n 均衡滑翔 ｜ 强化方向控制与初始爆发。爆发滑翔 ｜ 强化方向控制与占领模式。专注滑翔 ｜ 强化初始爆发。\n 激活期间战斗人员对使用者的瞄准精度下降。\n 改良滑翔的维持与激活消耗降低 99%，最大滑翔时长延长 100 倍，并在 25 米内守护者的雷达上标出自己的位置。\n \n 激活期间的空中击杀延长时长，最长 30 秒：\n T1 +5 秒 ｜ T2T3 +10 秒 ｜ T4 +15 秒 ｜ 守护者 +5 秒。\n 消耗手雷总是把时长覆盖为 15 秒，即使原本更长。",
+            "html": "被动 +20 空中效率，并允许滑翔期间使用武器与技能。<br> <br> 空中击杀按等级提供<span class=\"pickup\">近战技能能量</span>：<br> <span class=\"enemy\">T1 级战斗人员</span> 20% ｜ <span class=\"enemy\">T2</span> 25% ｜ <span class=\"enemy\">T3</span> 35% ｜ <span class=\"enemy\">T4</span> 50% ｜ <span class=\"bar-orange\">守护者</span> 50%。<br> <br> 按住［手雷］：<br> 消耗一次<span class=\"pickup\">手雷技能充能</span>进入<span class=\"el-solar\">炙热升腾</span>，并为<span class=\"enemy\">自己</span>与 9 米内的<span class=\"enemy\">盟友</span>释放 2 层<span class=\"el-solar\">治愈</span>。<br> 消耗<span class=\"el-solar\">治愈手雷</span>时提升到 3 层。<br> 消耗<span class=\"el-solar\">火焰之触</span>强化过的<span class=\"el-solar\">治愈手雷</span>还额外给 1 层<span class=\"el-solar\">恢复</span>，持续 4+2 秒。<br> 消耗<span class=\"el-solar\">烈焰之歌</span>的烈焰火苗则给 3 层<span class=\"el-solar\">治愈</span>与 2 层<span class=\"el-solar\">恢复</span>。<br> <br> <span class=\"el-solar\">炙热升腾</span>：<br> 提供 +50 空中效率与一种随移动技能变化的改良滑翔，持续 15 秒。<br> 均衡滑翔 ｜ 强化方向控制与初始爆发。爆发滑翔 ｜ 强化方向控制与占领模式。专注滑翔 ｜ 强化初始爆发。<br> 激活期间<span class=\"enemy\">战斗人员</span>对使用者的瞄准精度下降。<br> 改良滑翔的维持与激活消耗降低 99%，最大滑翔时长延长 100 倍，并在 25 米内<span class=\"bar-orange\">守护者</span>的雷达上标出<span class=\"enemy\">自己</span>的位置。<br> <br> 激活期间的空中击杀延长时长，最长 30 秒：<br> <span class=\"enemy\">T1</span> +5 秒 ｜ <span class=\"enemy\">T2</span><span class=\"enemy\">T3</span> +10 秒 ｜ <span class=\"enemy\">T4</span> +15 秒 ｜ <span class=\"bar-orange\">守护者</span> +5 秒。<br> 消耗手雷总是把时长覆盖为 15 秒，即使原本更长。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "地狱火",
+            "html": "地狱火"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/78ccb2d11f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "使用职业技能提供地狱火，持续 20 秒。\n \n 期间每 1.35 秒向最远 32 米外的战斗人员抛出一颗灼热的烈日弹体，最多造成 217 [38] 烈日手雷技能伤害，并在 4 米半径内施加 30+10 层灼烧。\n 可以触发手雷技能的交互效果。\n 地狱火施加的灼烧效果不随手雷伤害缩放。",
+            "html": "使用职业技能提供<span class=\"el-solar\">地狱火</span>，持续 20 秒。<br> <br> 期间每 1.35 秒向最远 32 米外的<span class=\"enemy\">战斗人员</span>抛出一颗灼热的<span class=\"el-solar\">烈日</span>弹体，最多造成 217 <span class=\"pvp\">[38]</span> <span class=\"el-solar\">烈日</span>手雷技能伤害，并在 4 米半径内施加 30+10 层<span class=\"deb-solar\">灼烧</span>。<br> 可以触发手雷技能的交互效果。<br> <span class=\"note\">地狱火施加的灼烧效果不随手雷伤害缩放。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "伊卡洛斯突进",
+            "html": "伊卡洛斯突进"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b9c1ee2d4.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "水平冲刺 8 米，黎明期间距离提高 25%，使用后有 4 秒冷却。\n \n 炙热升腾激活时，或装备焚烧响指近战的烈焰之歌期间：\n 额外获得一次充能且两次同时充能，但冷却提高到 5 秒。\n 装备星界之火近战时，烈焰之歌中不会获得 2 次充能。\n \n 空中用武器或超能击杀推进计数，满 100% 提供 1 层治愈：\n 红血 34% ｜ 橙血 67% ｜ 初级首领 100% ｜ 守护者 67%。",
+            "html": "水平冲刺 8 米，黎明期间距离提高 25%，使用后有 4 秒冷却。<br> <br> <span class=\"el-solar\">炙热升腾</span>激活时，或装备<span class=\"el-solar\">焚烧响指</span>近战的<span class=\"el-solar\">烈焰之歌</span>期间：<br> 额外获得一次充能且两次同时充能，但冷却提高到 5 秒。<br> <span class=\"note\">装备星界之火近战时，烈焰之歌中不会获得 2 次充能。</span><br> <br> 空中用武器或超能击杀推进计数，满 100% 提供 1 层<span class=\"el-solar\">治愈</span>：<br> <span class=\"bar-red\">红血</span> 34% ｜ <span class=\"bar-orange\">橙血</span> 67% ｜ <span class=\"bar-yellow\">初级首领</span> 100% ｜ <span class=\"bar-orange\">守护者</span> 67%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "火焰之触",
+            "html": "火焰之触"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2c78d8c790.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "强化四种手雷：\n \n 治愈手雷 ｜ 提供 2 层治愈与 2 层恢复，持续 4+2 秒。\n 烈焰手雷 ｜ 搜寻半径提高 50% 至 12 米，最多瞄准 5 名战斗人员。\n 烈日手雷 ｜ 停留时间延长 2 秒，并释放岩浆能量球，每个造成 125 [50] 无衰减伤害。\n 融合手雷 ｜ 0.5 秒后再爆一次，在 8 米半径内最多造成 851 [50] 伤害。",
+            "html": "强化四种手雷：<br> <br> <span class=\"el-solar\">治愈手雷</span> ｜ 提供 2 层<span class=\"el-solar\">治愈</span>与 2 层<span class=\"el-solar\">恢复</span>，持续 4+2 秒。<br> <span class=\"el-solar\">烈焰手雷</span> ｜ 搜寻半径提高 50% 至 12 米，最多瞄准 5 名<span class=\"enemy\">战斗人员</span>。<br> <span class=\"el-solar\">烈日手雷</span> ｜ 停留时间延长 2 秒，并释放岩浆<span class=\"orb\">能量球</span>，每个造成 125 <span class=\"pvp\">[50]</span> 无衰减伤害。<br> <span class=\"el-solar\">融合手雷</span> ｜ 0.5 秒后再爆一次，在 8 米半径内最多造成 851 <span class=\"pvp\">[50]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "烈日 · Starside\n\nStarside\n/\n职业分支详解\n/\n烈日\n\n烈日\n\n效果\n\n名称\n图标\n说明\n\n治愈每层治愈在 0.1 秒内恢复 60 [30] 生命值。\n 两次激活之间有 1 秒冷却，冷却期间再次激活不恢复生命值。\n\n焰灵烈日元素拾取物。\n\n 拾取提供 11.25% 手雷技能能量。\n 自己生成的焰灵对盟友不生效。\n 停留 25 秒后消失，两次生成之间有 5 秒冷却。\n\n焕光武器伤害提高 20% [10%]，持续 10 秒，默认最长可延到 15 秒。黄金枪的伤害同样受它影响。\n\n 重新施加焕光会把持续时间刷新到此前达到过的最长值。\n 焕光激活期间对勇士的武器伤害额外提高 10%。\n\n恢复持续恢复生命值，效果不可中断，默认最长持续 15 秒。\n 1 层 = 35 [17.5] 生命值/秒 ｜ 2 层 = 50 [25] 生命值/秒。\n 治疗效果不与治愈裂痕叠加。\n\n 重新施加恢复把持续时间刷新到此前的最长值，并保留最高层数；若新的持续时间更长则采用新的。\n 至高天与慈悲属于延长效果，不计为重新施加；把持续时间延长到 15 秒以上时会被压回 15 秒。\n\n点燃在 8 米半径内引爆，造成 676 [120 守护者 ｜ 250 构造体] 烈日伤害，范围内无衰减。\n 点燃会清空全部灼烧层数，并在 1.6 秒内无法重新施加灼烧。\n\n 若最初施加灼烧的来源本身带伤害提升，点燃伤害也随之提高——例如真理之容 5 层 + 融合手雷 = 点燃伤害提高 100%。\n 近战伤害增益不缩放点燃与灼烧。\n\n 势不可挡勇士受到点燃伤害时进入眩晕。\n\n灼烧灼烧的战斗人员在 0.5 秒后开始受伤，此后每 0.56 秒跳一次伤害（第 2 跳有 0.93 秒延迟）。\n 层数攒到 100 层时清空并触发点燃。\n\n 每跳伤害 = 2.7 + 0.075 × 层数，非首领战斗人员再提高 20%：\n 1 层 = 3 ｜ 30 层 = 5 ｜ 50 层 = 6.5 ｜ 60 层 = 7.21 ｜ 80 层 = 8.64。\n 灼烧伤害不致命。\n 攒到 60 层以上时每跳多打 2.5%，界面上显示为黄色伤害数字。\n\n 衰减：\n 持续 2.3 秒后开始掉层，每 0.04 秒掉 1 层（约 25 层/秒），具体随难度浮动。\n\n灼烧效果伤害缩放灼烧与点燃的伤害能被 Perk 和异域装备提高，但最初点燃它的那个来源决定它算哪一类伤害。\n\n 用武器施加（辉耀炽热、燃烧野心，或汤米的火柴盒、条件终局这类异域武器）：\n 算武器伤害，吃武器增益与只加武器的活动修正——其它伤害 Perk、武器属性、焕光、烈日武器激涌。\n 新装备加成对所有武器永久生效，所以对战斗人员的灼烧效果伤害始终比预期高 5%。\n\n 用技能施加（融合手雷、光焰之井）：\n 算烈日技能伤害，只吃手雷（真理之容）与超能（烈焰之心）各自的伤害提升。\n 近战伤害增益与 100 以上的近战属性都不提高它。\n\n 提高全部技能伤害的效果，对所有由烈日技能施加的灼烧效果都生效。\n 提高全部烈日伤害的活动修正（如烈日激涌）对灼烧效果一律生效，不分来源。\n\n碎片\n\n碎片\n图标\n说明\n属性变化\n\n骨灰余烬施加的灼烧层数提高 50%，向上取整——3 层 → 5 层，40 层 → 60 层。\n 受它影响的来源会在常规层数旁用小字标出增量，例如 40+20。\n 部分来源不按 50% 走：卡利班之手 60+0、汤米的火柴盒 15+5、焚天者誓约 5+5。—\n\n光线余烬烈日超能技能的弹体追踪更强。\n 目前只对利刃弹幕飞刀、黎明弹体，以及烈焰之歌弹体 ? 生效。+10 超能\n\n仁慈余烬为盟友赋予治愈、焕光、恢复或复活时：\n 手雷、近战与职业技能基础充能速度额外 +300%，持续 7 [4] 秒。\n\n 可触发：\n 光焰之井 ｜ 治愈裂痕 ｜ 流明与汇编器战靴的尊贵追踪器 ｜ 朱雀意图之刃的追踪器 ｜ 珍贵伤痕击杀 ｜ 烈日支援框架的恢复爆发。\n 光焰之井追踪器经装配工之靴强化后，可以自己触发一次仁慈。\n 不触发：强能裂痕、阿尔法·鲁皮之脊的治疗脉冲、蛾守护者的覆盖护盾飞蛾、非烈日支援框架自动步枪、护甲模组与 Perk、4 件套主动治疗。-10 手雷\n\n起泡余烬点燃击杀按战斗人员等级提供手雷技能能量：\n T1 级战斗人员 8% ｜ T2 12.25% ｜ T3 16.5% ｜ T4 25% ｜ 守护者 20.75%。—\n\n烧焦余烬点燃爆炸对被它伤害的战斗人员施加 40+20 层灼烧。\n 对已被点燃的战斗人员不生效。+10 手雷\n\n燃烧余烬烈日超能击杀触发点燃并生成焰灵。\n 光焰之井会让施法者的武器伤害算作超能技能伤害，因此烈日武器击杀也计为烈日超能击杀。+10 近战\n\n至高天余烬烈日击杀延长恢复与焕光，增益时长不超过 15 秒；已经超过 15 秒时击杀反而会压回 15 秒。\n T1 级战斗人员 +1.5 秒 ｜ T2 +2.25 秒 ｜ T3 +3 秒 ｜ T4 +6 秒 ｜ 守护者 +3 秒。-10 生命值\n\n喷发余烬点燃半径提高 25%，从 8 米到 10 米。+10 近战\n\n慈悲余烬拾取焰灵：\n 提供 1 层恢复，持续 2+1 秒；已经生效时改为延长 2+1 秒。\n 计时超过 15 秒时拾取会压回 15 秒。\n\n 复活盟友时：\n 为自己与 ? 米内的盟友提供 1 层恢复，持续 5+2.5 秒。+10 生命值\n\n决心余烬手雷击杀提供 1 层治愈。—\n\n炽热余烬击杀灼烧的战斗人员：\n 生成焰灵，并按等级提供近战技能能量。\n T1 级战斗人员 8% ｜ T2 15% ｜ T3 17.5% ｜ T4 25% ｜ 守护者 20%。+10 职业\n\n焦燃余烬对战斗人员施加灼烧后：\n 职业技能基础充能速度额外 +400%，持续 3 秒。\n 只有对尚未灼烧的战斗人员施加时才触发；战斗人员若死于这一击则不触发。—\n\n抚慰余烬施加给自己的恢复与焕光持续时间延长 50%。\n 受它影响的来源会在常规时长旁用小字标出增量，例如 10+5 焕光、4+2 恢复。—\n\n回火余烬烈日武器击杀：\n 为自己与 15 米内的盟友提供 1 层回火余烬，持续 8 秒，最多 3 层。\n\n 回火余烬：\n +20 空中效率。\n 激活期间烈日武器击杀生成焰灵。\n 按层数提供 +20 / +40 / +60 生命值属性。-10 职业\n\n火炬余烬充能近战命中为自己与 8 米内的盟友提供焕光，持续 8+4 秒。-10 手雷\n\n惊奇余烬用点燃在 ? 秒内击杀 2 名战斗人员：\n 生成一枚能量球，提供 2.5% 超能能量。\n 生成能量球后有 10 秒冷却。+10 生命值\n\n手雷技能\n\n手雷\n图标\n说明\n基础冷却\n\n烈焰手雷重型弹道 ｜ 扫描\n\n 接触时扫描 8.5 米视线内最多 4 名战斗人员，1 秒后向它们发射烈日光能矢弹。\n 每发矢弹造成 337 [65] 伤害并施加 20+10 层灼烧。\n\n 火焰之触：\n 扫描范围提高到 12 米，最多瞄准 5 名战斗人员。基础冷却 83.8 秒\n 回复倍率 1×\n\n融合手雷轻型弹道 ｜ 轻微追踪 ｜ 粘附\n\n 附着到战斗人员或表面上，短暂延迟后爆炸。\n 爆炸在 6 米内最多造成 738 [130] 伤害并施加 40+20 层灼烧。\n\n 火焰之触：\n 0.5 秒后再爆一次，在 8 米半径内最多造成 851 [50] 伤害。\n 两次合计最多 1589 [180] 伤害，同样施加 40+20 层灼烧。基础冷却 95.8 秒\n 回复倍率 1×\n\n治愈手雷超轻型弹道 ｜ 强盟友追踪\n\n 为接触点 7.5 米内的自己与盟友施加 1 层治愈，并生成一枚持续 7.5 秒的恢复能量球。\n 恢复能量球拾取时施加 1 层恢复，持续 4+2 秒；拾取半径 7.5 米，自身 100 生命值。\n\n 火焰之触：\n 治愈改为 2 层，恢复能量球改为 2 层恢复，持续 4+2 秒。基础冷却 119.7 秒\n 回复倍率 0.875×\n\n燃烧手雷中型弹道\n\n 速度降到足够低后爆炸，爆炸前有短暂延迟。\n\n 爆炸在 8 米内最多造成 814 [130] 伤害并施加 60+30 层灼烧。\n 战斗人员处在手雷 1 米内时伤害提高 31.5%，达到 1202 [173]。基础冷却 137.7 秒\n 回复倍率 0.75×\n\n烈日手雷中型弹道 ｜ 持续伤害场域\n\n 接触时对 5 米内的战斗人员最多造成 63 [20] 伤害并施加 17+4.5 [10+10] 层灼烧，同时生成一枚烈日信号弹。\n\n 信号弹生成 1 秒后才开始造成伤害，此后每 0.267 秒对 4 米半径内的战斗人员造成 78 [25] 伤害，共 13 次，4 秒内合计最多 1014 [325]。\n\n 施加节奏：\n 0.75 秒后 1 层灼烧，此后每 0.533 秒 7.5+2.5 层，持续时间内最多 53+27 层。\n 场域内不会立刻烧起来，信号弹失效时才对其中的战斗人员最多施加 17+13 层。\n\n 火焰之触：\n 持续时间延长到 6 秒，信号弹周围每隔 ? 秒抛出岩浆能量球，每个造成 125 [50] 无衰减伤害。基础冷却 199.5 秒\n 回复倍率 0.5×\n\n蜂群手雷中型弹道 ｜ 追踪器\n\n 接触时释放 9 枚追踪无人机。\n 无人机追逐 7 米内的战斗人员，接触即爆；没打到目标则 10–11 秒后自爆。\n\n 每枚造成 58 + 54 [8 + 8] 伤害并施加 5+3 层灼烧。\n 9 枚全中最多合计 1008 [144] 伤害与 45+27 层灼烧。基础冷却 137.7 秒\n 回复倍率 0.75×\n\n铝热手雷中型弹道\n\n 接触时发出一道烈日波形，此后每 1.45 秒再发一道，最多 3 道。\n\n 每道波形飞行最远 20 米，最多造成 246+206 [80 + 50] 伤害并施加 10+10 层灼烧。\n 4 道全部无衰减命中时最多合计 1808 [360] 伤害与 40+40 层灼烧。基础冷却 159.6 秒\n 回复倍率 0.625×\n\n感应手雷中型弹道 ｜ 壁挂 ｜ 粘附\n\n 附着到表面上，每 ? 秒投射一次激光；粘到非表面会立刻触发。\n 战斗人员进入扫描锥（延伸 10 米、半径 7 米）时触发，或附着 10 秒后自动触发。\n\n 触发 1 秒后（或被摧毁时）在 ? 米内爆炸，最多造成 805 [140] 伤害并施加 40+20 层灼烧。基础冷却 159.6 秒\n 回复倍率 0.625×\n\n 猎人\n\n名称\n图标\n说明\n冷却与槽位\n\n职业技能\n\n特技闪身空中翻跃。\n\n 落地时：\n 为自己与 10 米内的盟友提供焕光，持续 10+5 秒。\n 对 6.5 米内的战斗人员最多造成 40 [20] 烈日伤害。基础冷却 56 [148.4] 秒\n 回复倍率 0.5×\n\n近战技能\n\n飞刀戏法扇形投出 3 把烈日飞刀。\n\n 每把造成 257 [38] 伤害（精准倍率 1.3×）并施加 20+10 层灼烧。\n 3 把全部精准命中时最多合计 1002 [147] 伤害与 60+30 层灼烧。基础冷却 118.8 秒\n 回复倍率 0.9×\n\n轻质飞刀固有 2 次技能充能。\n 快速投出一把以 40 米/秒飞行的轻质飞刀。\n\n 造成 408 [100] 伤害，精准倍率 1.5×。\n 精准命中提供焕光，持续 10 秒。基础冷却 145.2 秒\n 回复倍率 0.8×\n\n感应爆炸飞刀快速投出一把可附着表面最多 14 秒的爆炸刀。\n 探测到 5 米内的战斗人员时爆炸，直接粘到战斗人员身上也立即爆炸。\n\n 接触造成 306 [20] 伤害（精准倍率 1.3×）。\n 引爆在 6 米内最多造成 405 [100] 伤害。基础冷却 161.3 秒\n 回复倍率 0.7×\n\n权衡飞刀加重飞刀，投出前需蓄力 0.65 秒，整套动画 1.55 秒。\n\n 造成 571 [140] 伤害，精准倍率 1.5×。\n 精准击杀提供一次职业技能充能。\n 命中灼烧的战斗人员直接触发点燃。基础冷却 197.9 秒\n 回复倍率 0.6×\n\n超能技能\n\n利刃弹幕伤害抗性：90%? [49%]\n\n 释放两轮各 7 把追踪飞刀，共 14 把；装备星相「击败他们」时每轮多 3 把，共 20 把。\n\n 飞刀接触时嵌入，造成 99 [没多少?] 伤害，0.5 秒后引爆。\n 每把引爆在 4.25 米内额外造成最多 560 [基本团灭?] 伤害并施加 ?+? 层灼烧。\n 全部命中并引爆时合计最多 8512 [死] 伤害；配合「击败他们」可达 12160 [死 ×1.43]。T4 级超能\n 基础冷却 455 秒\n\n黄金枪：死亡射击伤害抗性：60% [0%]，带「击败他们」时 66% [15%]\n 基础持续：12 秒，或每秒消耗 8.34% 超能能量\n\n 6 发装。每发造成 1453 [393] 伤害并施加 40+10 层灼烧，本技能没有精准命中。\n 伤害从 26 米开始衰减，100 米处降到 34.5%；瞄准变焦不影响衰减（1× 瞄准标量）。\n 焕光的加成对它生效。\n\n 超能击杀会补一发子弹并返还超能能量：\n 首次约 80%，此后每次击杀递减约 10%，最低约 12%。T2 级超能\n 基础冷却 556 秒\n\n黄金枪：神枪手伤害抗性：60% [0%]\n 基础持续：12 秒，或每秒消耗 8.34% 超能能量；带「击败他们」时 16 秒、每秒 6.25%\n\n 3 发装。每发造成 1574 [426] 伤害并施加 40+10 层灼烧，精准倍率 2×。\n 焕光的加成对它生效。\n\n 精准命中提供 1 层列队（最多 2 层）并生成 2 枚能量球，增益持续到超能结束。\n 列队 1 层 ｜ 伤害提高 45.8%，被动消耗降低 25%?。\n 列队 2 层 ｜ 伤害提高 90%，被动消耗降低 50%?。\n\n 精准命中生成的能量球回能：\n 非首领战斗人员 3.57% ｜ 首领 2.85% ｜ 首领 + 噬星者之鳞 2.5%。T2 级超能\n 基础冷却 556 秒\n\n星相\n\n速射神枪准星悬停在 27 米内的战斗人员附近会给它打上标记，直到离开视线。\n\n 职业技能被替换为速射神枪闪身，冷却覆盖为射手闪身的数值，并触发已装备职业技能的效果。\n 可以在半空中使用，触发一阵速度爆发。\n\n 使用时在 1.2 秒内最多打出 3 发，平均 150 发/分钟（射速随帧率变化）。\n 每发灼热射击造成 354 [21] 伤害并施加 20+10 层灼烧；3 发全中提供 1 层治愈。\n\n 焕光使速射神枪对战斗人员的伤害提高 20%。空中闪身的焕光在开火之前就已施加。\n 伤害随超过 100 的职业属性缩放，200 属性时最多 +65% [10%]。\n 与星界夜鹰没有互动。\n\n火药博弈击杀为简易爆炸物蓄力，攒够 6 次充能即可使用。\n 武器击杀 1 [2] ｜ 点燃与灼烧 3 [4] ｜ 技能击杀 4 ｜ 超能 6。\n\n 手雷技能被替换为棍上点燃：\n 被射击或 3 秒后触发点燃，伤害提高 50%。\n 射击炸药会让它的伤害提高 50% [5%]、半径提高 ?% 至 ? 米，并释放 9 枚追踪子弹药，每枚最多造成 80 [?] 伤害。\n 激活后有 6 秒冷却，冷却期间的击杀不提供充能。\n\n击败他们焕光期间：\n 充能近战技能击杀在 0.2 秒延迟后返还 100% 近战技能能量；若焕光正是由这一击带来的，同样返还。\n\n 强化超能：\n 神枪手黄金枪持续时间 +4 秒 ｜ 死亡射击黄金枪获得 15% 伤害抗性 ｜ 利刃弹幕每轮多投 3 把飞刀。\n\n 超能激活时提供 1 层治愈。\n\n各就各位精准击杀、精准命中或使用职业技能时：\n 为自己与 15 米内的盟友提供各就各位，持续 12 秒，最多 10 层。\n 精准击杀与手炮精准命中给 2 层 ｜ 职业技能使用给 1 层 ｜ 普通精准命中给 1 层（对守护者有 1 秒内置冷却）。\n\n 每层提供 +5 武器属性，以及填装速度与换弹时长的加成；满 10 层为 +50 武器属性、+? 填装速度，换弹时长 ×0.?。\n 满 10 层时，击杀提供 1 层恢复，持续 3+1.5 秒。\n\n 泰坦\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n战锤打击与其它肩撞类技能共用的规则：\n 需要冲刺 1.25 秒；未命中战斗人员时消耗 15% 近战技能能量；开火状态下无法在滑铲期间使用；被肩撞直接命中的守护者近战突进失效 0.5 秒。\n\n 向前突进 6.8 米，自动瞄准射程内的战斗人员。\n\n 命中战斗人员：\n 造成 878 [90] 直击伤害并施加 40+20 层灼烧。\n 对命中目标后方 7 米内的战斗人员造成 586 [60] 径向伤害。\n 用战锤打击杀死被直接命中的战斗人员会触发点燃。基础冷却 131.7 秒\n 回复倍率 0.8×\n\n投掷飞锤快速投出一把烈日飞锤，造成 539 [90] 伤害。\n\n 伤害随飞行距离提高，35 米以上最多 +36%，与一切效果相乘叠加：\n 2 米以内 基础 ｜ 2–4 米 +6% ｜ 5–8 米 +12% ｜ 9–16 米 +18% ｜ 17–25 米 +24% ｜ 26–34 米 +30% ｜ 35 米以上 +36%。\n\n 飞锤可以从地面拾回，提供 121.5% 近战技能能量；命中后拾回还提供 1 层治愈。\n 落地 10 秒后自动爆炸，最多造成 325 [60] 伤害，爆炸计为近战伤害。基础冷却 131.7 秒\n 回复倍率 0.9×\n\n超能技能\n\n燃烧锻锤伤害抗性：90% [53%]\n 基础持续：25 秒，或每秒消耗 4% 超能能量\n 装备无敌索尔时，扎根施放会生成一团烈日耀斑，被动消耗降低 40%，持续时间提高到 42 秒（每秒 2.4%）。\n\n 轻攻击 ｜ 消耗 4% 超能能量。\n 旋转攻击造成 4 段 111 [?] 伤害，两次之间有 0.67 秒延迟。\n 连续命中获得 40% 攻速加成，直到断连为止。\n 累计命中 10 次生成一个旋风，每次超能最多生成 1 个。\n\n 重击 ｜ 消耗 8% 超能能量。\n 向下猛击并释放一枚接触即爆的追踪弹，造成 276 [?] 伤害并生成旋风。\n\n 旋风每 0.2 秒造成 24 [16] 伤害，每 0.56 秒施加 3+2 层灼烧，持续 4 秒。T3 级超能\n 基础冷却 500 秒\n\n烈焰战锤伤害抗性：90% [51%]\n 基础持续：21 秒，或每秒消耗 4.75% 超能能量\n\n 轻攻击 ｜ 消耗 12% 超能能量。\n 投出接触即爆的飞锤，最多造成 445 [?] 伤害；两次投掷之间有 1.5 秒延迟。\n 爆炸释放 4 片弹片，每片最多造成 396 [?] 伤害。飞锤在空中 0.7 秒后视觉上升空，弹片增加到 5 片。\n\n 凤巢 ｜ 被动消耗降低 20%，持续时间提高到 26.25 秒（每秒 3.81%），轻攻击改为消耗 7.5% 超能能量，投掷间隔降到 1 秒。\n\n 罗蕾莱辉煌头盔 ｜ 被动消耗降低 40%，持续时间提高到 35 秒（每秒 2.85%），轻攻击消耗 8.2% 超能能量，投掷间隔降到 1 秒。\n 两种异域的数值都假设无敌索尔增益 100% 持续，实战未必做得到。T2 级超能\n 基础冷却 556 秒\n\n烈焰战锤（无敌索尔）伤害抗性：90% [51%]\n 基础持续：16.5 秒，或每秒消耗 6.06% 超能能量\n\n 扎根施放时生成一团烈日耀斑。\n\n 轻攻击 ｜ 消耗 9% 超能能量。\n 投出的飞锤造成 483 [?] 伤害并在接触时生成烈日耀斑；两次投掷之间有 1.5 秒延迟。\n 爆炸释放 3 片弹片，每片最多造成 429 [?] 伤害。\n\n 站在耀斑里：\n 被动消耗降低 40%，持续时间提高到 27.5 秒（每秒 3.63%），轻攻击消耗降到 5.5% 超能能量，投掷间隔降到 1 秒。T2 级超能\n 基础冷却 556 秒\n\n星相\n\n神圣献祭滑铲时按［近战技能］：\n 向前发出一道 20 米的烈日能量波形，造成 40 [30] 伤害并施加 40+20 层灼烧。\n 未处于猛击状态时只消耗 50% 近战技能能量。\n 开火状态下无法在滑铲期间使用。\n\n 由神圣献祭腾空后按［近战技能］：\n 猛击地面，形成第二道更宽的波形向前 20 米，并碎裂水晶。\n 对非灼烧战斗人员造成 486 [120] 伤害。\n 命中灼烧的战斗人员则造成 472.5 [50] 伤害并触发点燃。\n\n 近战动画期间对非近战伤害提供 25% 伤害抗性。\n\n咆哮烈焰烈日技能击杀与点燃击杀：\n 提供 1 层咆哮烈焰，持续 20 秒，最多 3 层；再次击杀刷新时长。\n\n 每层提高烈日技能伤害：\n 近战伤害 +67% / +133% / +200%。\n 手雷与超能技能伤害 +20% [13%] / +44% [28%] / +73% [44%]。\n\n 咆哮烈焰激活期间，非充能近战命中施加 30+10 层灼烧并计为充能近战命中。\n\n盾爆职业技能被覆盖为遥控引爆器：\n 放下屏障后再次使用即引爆，产生强力击退的爆炸。\n 爆炸对部分效果计为摧毁构造体；被自己的爆炸命中会触发屏障加速，落地前还能继续使用战锤打击。\n 遥控引爆器对多数效果计为职业技能使用，但职业属性超过 100 时不提供覆盖护盾。\n\n 放置巍峨屏障时：\n 屏障会先向前滑行最多 20 米并逐渐减速。\n 屏障直击伤害提高到 328 [?] 并施加 20+10 层灼烧（同一战斗人员每 2 秒只触发一次）。\n\n 位于集结屏障后方时：\n 为动能与烈日武器提供灼热子弹。\n\n 屏障激活期间被动积攒盾爆进度（高墙 34% ｜ 集束 10%），造成伤害按每秒约 100 点伤害额外积攒。\n\n 引爆时：\n 最多在 ? 米内造成 550 [?] 伤害并施加 50+25 层灼烧，自身伤害降低到 ?。\n 向 40? 米内的战斗人员抛出烈日弹片，每片造成 71 [?] 伤害并施加 5+5 层灼烧。\n 盾爆进度越满爆炸伤害越高，满进度时 +50%，并额外释放 3 道呈锥形扩散、最远 15 米的烈日波形，每道造成 141 [?] 烈日伤害。\n\n 星相伤害随超过 100 的职业属性缩放，200 属性时最多 +65%[?%]。\n\n无敌索尔烈日技能击杀、击杀灼烧的战斗人员，以及烈焰战锤接触，都会生成烈日耀斑，持续 ? 秒。\n 站在耀斑里可以刷新它的持续时间，最长 12 秒。\n\n 耀斑提供无敌索尔持续 5 秒，并给 1 层恢复持续 5+2.5 秒。\n 耀斑每 0.167 秒造成 60 [22] 伤害并施加 5+3 层灼烧。\n\n 无敌索尔期间：\n 手雷与近战基础充能速度额外 +100%。\n 超能被动消耗降低 40%。\n\n 术士\n\n名称\n图标\n说明\n冷却与槽位\n\n职业技能\n\n凤凰俯冲俯冲，为自己与 9 米内的盟友施加 2 层治愈。\n\n 炙热升腾激活时：\n 俯冲改为施加 2 层恢复，持续 3+1.5 秒。\n 落地对 6.5 米内的战斗人员造成 100 伤害并施加 40+20 层灼烧。基础冷却 79.6 秒\n 回复倍率 0.8×\n\n近战技能\n\n星界之火发出 3 团追踪的烈日爆炸，呈螺旋前进。\n\n 每团最多造成 150 [35] 伤害并施加 10+5 层灼烧，范围 ? 米。\n 3 团全中最多合计 450 [105] 伤害与 30+15 层灼烧。基础冷却 162.6 秒\n 回复倍率 0.7×\n\n焚烧响指扇形生成 5 发燃烧花火。\n\n 每发飞行 ? 米后爆炸，在 ? 米内最多造成 90 [27?] 伤害并施加 20+10 [10+5] 层灼烧。\n 5 发全中最多合计 450 [135?] 伤害与 100+50 [50+25] 层灼烧。基础冷却 119.8 秒\n 回复倍率 0.9×\n\n超能技能\n\n烈焰之歌伤害抗性：90% [~50%?]\n 基础持续：25 秒，或每秒消耗 4% 超能能量\n\n 施法者获得 +100 手雷、+100 近战、+100 职业属性，以及焕光与灼热子弹；其武器击杀计为超能击杀（武器伤害不计为技能伤害）。\n 15 米内的盟友获得 30% [?%] 伤害抗性、灼热子弹，以及手雷、近战与职业技能每秒 15% 的固定能量。\n 超能结束时补满手雷与近战技能。\n\n 灼热子弹：\n 非持续伤害的动能或烈日武器命中会施加灼烧，层数与冷却随武器类型而定。\n 5+0 层 / 0.2 秒 ｜ 自动步枪、微型冲锋枪。\n 5+5 层 / 0.2 秒 ｜ 机枪、追踪步枪。\n 10+5 层 / 0.3 秒 ｜ 手炮、脉冲步枪、斥候步枪、手枪。\n 15+5 层 / 0.4 秒 ｜ 融合步枪、偃月、霰弹枪、狙击步枪、刀剑。\n 20+10 层 / 0.6? 秒 ｜ 弓箭、重型榴弹发射器、特殊榴弹发射器、线性融合步枪（含劲弩）、火箭发射器。\n 同时命中多名战斗人员时只烧其中一名。\n\n 手雷技能 ｜ 消耗 4.8% 超能能量，两次之间有 2 秒冷却。\n 发出一团接触即爆的烈日烈焰火苗，最多造成 685 [?] 伤害并施加 40+20 层灼烧，有 ? 点构造体生命值。\n 若 15? 米内还有战斗人员，会在接触位置再生成一团去追尚未伤到的最近战斗人员，每次最多多生成 3 团。\n 装备炙热升腾时消耗一团烈焰火苗，为自己与 9 米内的盟友提供 3 层治愈与 2 层恢复，持续 4+2 秒。\n\n 近战技能 ｜ 消耗 2.4% 超能能量，两次之间有 1.75 秒冷却。\n 星界之火改为发出 5 团爆炸，每团最多造成 200 [87] 伤害并施加 10+5 层灼烧。\n 焚烧响指改为释放 7 发花火，每发最多造成 155 [41] 伤害并施加 20+10 [10+5] 层灼烧。\n 装备焚烧响指时对近战突进距离内的战斗人员使用自动近战，会打出强化基础近战，造成 1000 [456] 烈日伤害并施加 60+30 层灼烧，同时消耗超能能量与一次近战技能充能。\n\n 职业技能 ｜ 消耗 6% 超能能量，两次之间有 2.85 秒冷却。\n 按所选职业技能发挥作用，以超能能量换取快速充能。T2 级超能\n 基础冷却 556 秒\n\n黎明伤害抗性：90% [51%]\n 基础持续：24 秒，或每秒消耗 4.167% 超能能量\n\n 轻攻击 ｜ 消耗 6.5% 超能能量，发射黎明弹体。\n 弹体造成 426 [?] 直击伤害，受到伤害时爆炸，最多造成 598 [?] 溅射伤害（衰减至 0%），在 5 米内施加 50+0 层灼烧，并在身后拉出一道火焰长流。\n 火焰条纹向前飞行；若弹体飞行至少 12 米，宽度从约 4 米放大到 9 米，命中最多造成 292 [?] 伤害。\n\n 允许无冷却使用强化伊卡洛斯突进，每次消耗 4.2% 超能能量。\n\n 凤凰俯冲被强化：\n 最多造成 642 [220?] 伤害（最低降至 292 [?]），并在 6 米半径内施加 60+30 层灼烧，最大衰减处仍有 45% 伤害。\n 其伤害吃超能伤害提升。T2 级超能\n 基础冷却 556 秒\n\n光焰之井放下一口持续 30 秒的光焰之井：\n 为施法者恢复 300 生命值。\n 对 8.5 米内的战斗人员最多造成 150 伤害并施加 40+20 层灼烧。\n 生成 3 枚能量球，每枚提供 3.6% 超能能量。\n 持续时间随超能属性缩放，200 超能时最长 40 秒。\n\n 井本身是拥有 800 生命值的构造体，可以被冻结，也会被碎裂伤到；战斗人员对它只造成 0.25 倍伤害。\n 它向 6 米内的施法者与盟友投射增益光环，离开光环时提供焕光持续 8+4 秒。\n\n 站在井里的守护者：\n 伤害提高 25%。\n 对战斗人员获得 20% 伤害抗性（对首领 10%）。\n 对特殊与威能武器及技能获得 50% 伤害抗性，主武器 40%。\n 免疫冰影效果，每秒恢复 50 生命值。\n 进入时会移除已有的恢复。\n\n 施法者在井里造成的武器伤害计为超能技能伤害，井内击杀最多生成 5 枚能量球。T4 级超能\n 基础冷却 455 秒\n\n星相\n\n炙热升腾被动 +20 空中效率，并允许滑翔期间使用武器与技能。\n\n 空中击杀按等级提供近战技能能量：\n T1 级战斗人员 20% ｜ T2 25% ｜ T3 35% ｜ T4 50% ｜ 守护者 50%。\n\n 按住［手雷］：\n 消耗一次手雷技能充能进入炙热升腾，并为自己与 9 米内的盟友释放 2 层治愈。\n 消耗治愈手雷时提升到 3 层。\n 消耗火焰之触强化过的治愈手雷还额外给 1 层恢复，持续 4+2 秒。\n 消耗烈焰之歌的烈焰火苗则给 3 层治愈与 2 层恢复。\n\n 炙热升腾：\n 提供 +50 空中效率与一种随移动技能变化的改良滑翔，持续 15 秒。\n 均衡滑翔 ｜ 强化方向控制与初始爆发。爆发滑翔 ｜ 强化方向控制与占领模式。专注滑翔 ｜ 强化初始爆发。\n 激活期间战斗人员对使用者的瞄准精度下降。\n 改良滑翔的维持与激活消耗降低 99%，最大滑翔时长延长 100 倍，并在 25 米内守护者的雷达上标出自己的位置。\n\n 激活期间的空中击杀延长时长，最长 30 秒：\n T1 +5 秒 ｜ T2T3 +10 秒 ｜ T4 +15 秒 ｜ 守护者 +5 秒。\n 消耗手雷总是把时长覆盖为 15 秒，即使原本更长。\n\n地狱火使用职业技能提供地狱火，持续 20 秒。\n\n 期间每 1.35 秒向最远 32 米外的战斗人员抛出一颗灼热的烈日弹体，最多造成 217 [38] 烈日手雷技能伤害，并在 4 米半径内施加 30+10 层灼烧。\n 可以触发手雷技能的交互效果。\n 地狱火施加的灼烧效果不随手雷伤害缩放。\n\n伊卡洛斯突进水平冲刺 8 米，黎明期间距离提高 25%，使用后有 4 秒冷却。\n\n 炙热升腾激活时，或装备焚烧响指近战的烈焰之歌期间：\n 额外获得一次充能且两次同时充能，但冷却提高到 5 秒。\n 装备星界之火近战时，烈焰之歌中不会获得 2 次充能。\n\n 空中用武器或超能击杀推进计数，满 100% 提供 1 层治愈：\n 红血 34% ｜ 橙血 67% ｜ 初级首领 100% ｜ 守护者 67%。\n\n火焰之触强化四种手雷：\n\n 治愈手雷 ｜ 提供 2 层治愈与 2 层恢复，持续 4+2 秒。\n 烈焰手雷 ｜ 搜寻半径提高 50% 至 12 米，最多瞄准 5 名战斗人员。\n 烈日手雷 ｜ 停留时间延长 2 秒，并释放岩浆能量球，每个造成 125 [50] 无衰减伤害。\n 融合手雷 ｜ 0.5 秒后再爆一次，在 8 米半径内最多造成 851 [50] 伤害。\n\n更新 2026.8.30\n\n数据源：Destiny Data Compendium。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/elements/solar/index.html",
+    "final_url": "https://starside.work/elements/solar/index.html",
+    "path": "pages/elements/solar/index.html",
+    "bytes": 64723,
+    "sha256": "f881a506ed7847f0a5eddde9874958e23ce0078d6b45608b2c742893d11bd327",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:30.508351+00:00"
+  },
+  "links": [
+    "https://starside.work/elements/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/elements/solar/icons/0179487041.webp",
+    "https://starside.work/elements/solar/icons/02227462d5.webp",
+    "https://starside.work/elements/solar/icons/04920ff432.webp",
+    "https://starside.work/elements/solar/icons/0ee82bc44a.webp",
+    "https://starside.work/elements/solar/icons/136730ac8e.webp",
+    "https://starside.work/elements/solar/icons/151e2511c1.webp",
+    "https://starside.work/elements/solar/icons/15c9d59551.webp",
+    "https://starside.work/elements/solar/icons/1720d5461a.webp",
+    "https://starside.work/elements/solar/icons/18d61c6439.webp",
+    "https://starside.work/elements/solar/icons/19a64f6631.webp",
+    "https://starside.work/elements/solar/icons/1b74492fc3.webp",
+    "https://starside.work/elements/solar/icons/1f267ad07f.webp",
+    "https://starside.work/elements/solar/icons/1f27425904.webp",
+    "https://starside.work/elements/solar/icons/2514e155c7.webp",
+    "https://starside.work/elements/solar/icons/251af07e32.webp",
+    "https://starside.work/elements/solar/icons/285affb18c.webp",
+    "https://starside.work/elements/solar/icons/2b9c80567e.webp",
+    "https://starside.work/elements/solar/icons/2c78d8c790.webp",
+    "https://starside.work/elements/solar/icons/30c8daa463.webp",
+    "https://starside.work/elements/solar/icons/31a7b14085.webp",
+    "https://starside.work/elements/solar/icons/32e5c8f078.webp",
+    "https://starside.work/elements/solar/icons/3af18cc4b7.webp",
+    "https://starside.work/elements/solar/icons/3c01fcd01e.webp",
+    "https://starside.work/elements/solar/icons/3cb886180b.webp",
+    "https://starside.work/elements/solar/icons/47bebd00da.webp",
+    "https://starside.work/elements/solar/icons/4cf11a3c66.webp",
+    "https://starside.work/elements/solar/icons/5199892b7a.webp",
+    "https://starside.work/elements/solar/icons/52a6a8fdc9.webp",
+    "https://starside.work/elements/solar/icons/5f68b2be3c.webp",
+    "https://starside.work/elements/solar/icons/5fc7a97f63.webp",
+    "https://starside.work/elements/solar/icons/63aab56786.webp",
+    "https://starside.work/elements/solar/icons/64309ea88b.webp",
+    "https://starside.work/elements/solar/icons/67ba483289.webp",
+    "https://starside.work/elements/solar/icons/6eaa26af13.webp",
+    "https://starside.work/elements/solar/icons/75282a79bc.webp",
+    "https://starside.work/elements/solar/icons/78ccb2d11f.webp",
+    "https://starside.work/elements/solar/icons/856cf29a42.webp",
+    "https://starside.work/elements/solar/icons/8a0117906e.webp",
+    "https://starside.work/elements/solar/icons/8b9c1ee2d4.webp",
+    "https://starside.work/elements/solar/icons/9239a07add.webp",
+    "https://starside.work/elements/solar/icons/997744695b.webp",
+    "https://starside.work/elements/solar/icons/a1a87fcb90.webp",
+    "https://starside.work/elements/solar/icons/a221a240cd.webp",
+    "https://starside.work/elements/solar/icons/a617191cc3.webp",
+    "https://starside.work/elements/solar/icons/a8feb9c7da.webp",
+    "https://starside.work/elements/solar/icons/ad2d6450f6.webp",
+    "https://starside.work/elements/solar/icons/af1805ac89.webp",
+    "https://starside.work/elements/solar/icons/b4d7005b8d.webp",
+    "https://starside.work/elements/solar/icons/b6ddf69351.webp",
+    "https://starside.work/elements/solar/icons/b71787cebe.webp",
+    "https://starside.work/elements/solar/icons/bb6b04e268.webp",
+    "https://starside.work/elements/solar/icons/bf3e9ddba4.webp",
+    "https://starside.work/elements/solar/icons/c8b7a202dd.webp",
+    "https://starside.work/elements/solar/icons/cb1924c5f3.webp",
+    "https://starside.work/elements/solar/icons/cc1bebb49b.webp",
+    "https://starside.work/elements/solar/icons/cf6c8a6a75.webp",
+    "https://starside.work/elements/solar/icons/d30325aad9.webp",
+    "https://starside.work/elements/solar/icons/d479d4b267.webp",
+    "https://starside.work/elements/solar/icons/d4dbb89f07.webp",
+    "https://starside.work/elements/solar/icons/dcce8c90d9.webp",
+    "https://starside.work/elements/solar/icons/e536e3ac27.webp",
+    "https://starside.work/elements/solar/icons/f0a201ae06.webp",
+    "https://starside.work/elements/solar/icons/f29b94e7a9.webp",
+    "https://starside.work/elements/solar/icons/fc12bd23be.webp",
+    "https://starside.work/elements/solar/icons/fd455cf574.webp",
+    "https://starside.work/elements/solar/icons/fe85b520a8.webp",
+    "https://starside.work/elements/solar/style.css",
+    "https://starside.work/elements/style.css"
+  ]
+}

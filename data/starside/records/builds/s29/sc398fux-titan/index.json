@@ -1,0 +1,163 @@
+{
+  "url": "https://starside.work/builds/s29/sc398fux-titan/index.html",
+  "title": "无序喝彩 · 配装推荐 · Starside",
+  "description": "电泰坦榴弹输出配置",
+  "category": "builds",
+  "updated_at": "2026.9.9",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 无序喝彩\n\n推荐人：臭脸老登章鱼哥\n描述：电泰坦榴弹输出配置\n更新：2026.9.9\n场景：突袭、地牢\n定位：输出\n分支：电弧\n类别：创意\n核心：拯救者的喝彩\n\n## 审核意见\n\n好玩但是伤害不理想的玩法，适合打些血少站桩的首领\n\n## 职业\n\n职业：泰坦\n超能：雷霆冲击\n星相：风暴要塞、重击\n碎片：离子火花、频率火花、抗性火花、放电火花\n手雷：闪光手雷\n近战：雷霆一击\n职业技能：集结屏障\n\n## 武器\n\n异域武器：混乱无序\n传说武器：拯救者的喝彩 | 涓流充能、斩首武器\n\n## 护甲\n\n异域护甲：阿尔法·鲁皮之脊\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：谐振瞄准性能\n护臂：装弹装置、灵巧\n腿部：电弧武器激涌、电弧武器激涌、电弧武器激涌\n职业物品：时间膨胀、时间膨胀、强力吸引\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：轨迹证据、置身其中、治疗能量球、削弱清敌、弱化波、电弧复合、动能冲击\n\n## 六维\n\n六维：生命 ~ ｜ 近战 ~ ｜ 手雷 ~ ｜ 超能 100+ ｜ 职业 100+ ｜ 武器 200\n\n## 注解\n\n受益于药剂师背包的对电属性榴弹输出的增益，加之“涓流充能”和风暴要塞的联动，得以让拯救者的喝彩可以一直射射射，搭配混乱无序的脱手实现闭环\n拯救者喝彩的增伤perk如果想凹数值就选集体行动或者换挡，如果想安逸一些就直接斩首，不用考虑触发条件\n输出阶段可以先切200超能陨星甲撞一下之后再切回来立盾输出",
+  "source_blocks": [
+    "# 无序喝彩\n\n推荐人：臭脸老登章鱼哥\n描述：电泰坦榴弹输出配置\n更新：2026.9.9\n场景：突袭、地牢\n定位：输出\n分支：电弧\n类别：创意\n核心：拯救者的喝彩\n\n## 审核意见\n\n好玩但是伤害不理想的玩法，适合打些血少站桩的首领\n\n## 职业\n\n职业：泰坦\n超能：雷霆冲击\n星相：风暴要塞、重击\n碎片：离子火花、频率火花、抗性火花、放电火花\n手雷：闪光手雷\n近战：雷霆一击\n职业技能：集结屏障\n\n## 武器\n\n异域武器：混乱无序\n传说武器：拯救者的喝彩 | 涓流充能、斩首武器\n\n## 护甲\n\n异域护甲：阿尔法·鲁皮之脊\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：谐振瞄准性能\n护臂：装弹装置、灵巧\n腿部：电弧武器激涌、电弧武器激涌、电弧武器激涌\n职业物品：时间膨胀、时间膨胀、强力吸引\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：轨迹证据、置身其中、治疗能量球、削弱清敌、弱化波、电弧复合、动能冲击\n\n## 六维\n\n六维：生命 ~ ｜ 近战 ~ ｜ 手雷 ~ ｜ 超能 100+ ｜ 职业 100+ ｜ 武器 200\n\n## 注解\n\n受益于药剂师背包的对电属性榴弹输出的增益，加之“涓流充能”和风暴要塞的联动，得以让拯救者的喝彩可以一直射射射，搭配混乱无序的脱手实现闭环\n拯救者喝彩的增伤perk如果想凹数值就选集体行动或者换挡，如果想安逸一些就直接斩首，不用考虑触发条件\n输出阶段可以先切200超能陨星甲撞一下之后再切回来立盾输出"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "无序喝彩"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "杀手公爵药剂师背包"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "无序喝彩 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n无序喝彩\n\n推荐者：\n臭脸老登章鱼哥\n\n无序喝彩\n\n♥︎ 复制配装截图详情开关\n\n泰坦 · 电弧 · 创意S29 · 凯旋纪念碑\n\n电泰坦榴弹输出配置\n\n适用环境\n\n突袭\n\n地牢\n\n标签\n\n输出\n\n# 无序喝彩\n\n推荐人：臭脸老登章鱼哥\n描述：电泰坦榴弹输出配置\n更新：2026.9.9\n场景：突袭、地牢\n定位：输出\n分支：电弧\n类别：创意\n核心：拯救者的喝彩\n\n## 审核意见\n\n好玩但是伤害不理想的玩法，适合打些血少站桩的首领\n\n## 职业\n\n职业：泰坦\n超能：雷霆冲击\n星相：风暴要塞、重击\n碎片：离子火花、频率火花、抗性火花、放电火花\n手雷：闪光手雷\n近战：雷霆一击\n职业技能：集结屏障\n\n## 武器\n\n异域武器：混乱无序\n传说武器：拯救者的喝彩 | 涓流充能、斩首武器\n\n## 护甲\n\n异域护甲：阿尔法·鲁皮之脊\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：谐振瞄准性能\n护臂：装弹装置、灵巧\n腿部：电弧武器激涌、电弧武器激涌、电弧武器激涌\n职业物品：时间膨胀、时间膨胀、强力吸引\n\n## 神器\n\n神器：杀手公爵药剂师背包\n模组：轨迹证据、置身其中、治疗能量球、削弱清敌、弱化波、电弧复合、动能冲击\n\n## 六维\n\n六维：生命 ~ ｜ 近战 ~ ｜ 手雷 ~ ｜ 超能 100+ ｜ 职业 100+ ｜ 武器 200\n\n## 注解\n\n受益于药剂师背包的对电属性榴弹输出的增益，加之“涓流充能”和风暴要塞的联动，得以让拯救者的喝彩可以一直射射射，搭配混乱无序的脱手实现闭环\n拯救者喝彩的增伤perk如果想凹数值就选集体行动或者换挡，如果想安逸一些就直接斩首，不用考虑触发条件\n输出阶段可以先切200超能陨星甲撞一下之后再切回来立盾输出\n\n审核意见\n\n好玩但是伤害不理想的玩法，适合打些血少站桩的首领\n\n职业\n\n职业\n\n泰坦\n\n电弧\n\n超能\n\n雷霆冲击\n\n技能\n\n闪光手雷\n\n雷霆一击\n\n集结屏障\n\n星相\n\n风暴要塞\n\n重击\n\n碎片\n\n离子火花\n\n频率火花\n\n抗性火花\n\n放电火花\n\n武器\n\n混乱无序\n\n拯救者的喝彩涓流充能斩首武器\n\n神器模组\n\n杀手公爵药剂师背包\n\n轨迹证据\n\n置身其中\n\n治疗能量球\n\n削弱清敌\n\n弱化波\n\n电弧复合\n\n动能冲击\n\n护甲\n\n阿尔法·鲁皮之脊\n\n玻璃拱顶埃希恩记忆2 件\n\n玻璃拱顶埃希恩记忆4 件\n\n生命~\n\n近战~\n\n手雷~\n\n超能100+\n\n职业100+\n\n武器200\n\n头盔\n\n谐振瞄准性能瞄准性能\n\n护臂\n\n装弹装置\n\n灵巧\n\n腿部\n\n电弧武器激涌武器激涌\n\n电弧武器激涌武器激涌\n\n电弧武器激涌武器激涌\n\n职业物品\n\n时间膨胀\n\n时间膨胀\n\n强力吸引\n\n注解\n\n受益于药剂师背包的对电属性榴弹输出的增益，加之“涓流充能”和风暴要塞的联动，得以让拯救者的喝彩可以一直射射射，搭配混乱无序的脱手实现闭环\n拯救者喝彩的增伤perk如果想凹数值就选集体行动或者换挡，如果想安逸一些就直接斩首，不用考虑触发条件\n输出阶段可以先切200超能陨星甲撞一下之后再切回来立盾输出\n\n更新 2026.9.9\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/sc398fux-titan/index.html",
+    "final_url": "https://starside.work/builds/s29/sc398fux-titan/index.html",
+    "path": "pages/builds/s29/sc398fux-titan/index.html",
+    "bytes": 27827,
+    "sha256": "fb06c81084630f2e8ce7d9136f83c349e577fe146efae795d108d7b93992acd0",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:28:43.876138+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/arc/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/1ca08d7545.webp",
+    "https://starside.work/armor-mods/icons/37bedc55b8.webp",
+    "https://starside.work/armor-mods/icons/5a6be432c9.webp",
+    "https://starside.work/armor-mods/icons/6def7c9c80.webp",
+    "https://starside.work/armor-mods/icons/9252b45235.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-sets/icons/071.png",
+    "https://starside.work/armor-sets/icons/072.png",
+    "https://starside.work/artifact-mods/icons/02db89df92.webp",
+    "https://starside.work/artifact-mods/icons/060edf607a.webp",
+    "https://starside.work/artifact-mods/icons/0e06632f31.webp",
+    "https://starside.work/artifact-mods/icons/8d3bb5366b.webp",
+    "https://starside.work/artifact-mods/icons/8e857c15d5.webp",
+    "https://starside.work/artifact-mods/icons/9ed0a859b2.webp",
+    "https://starside.work/artifact-mods/icons/a49b5612d9.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/934a3556a0.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/arc/icons/189887b13d.webp",
+    "https://starside.work/elements/arc/icons/503331b351.webp",
+    "https://starside.work/elements/arc/icons/54f5fd7a81.webp",
+    "https://starside.work/elements/arc/icons/57bcd1c47c.webp",
+    "https://starside.work/elements/arc/icons/6f78f00765.webp",
+    "https://starside.work/elements/arc/icons/7f930d12a2.webp",
+    "https://starside.work/elements/arc/icons/947bf83419.webp",
+    "https://starside.work/elements/arc/icons/c34f863873.webp",
+    "https://starside.work/elements/arc/icons/c43daf0acf.webp",
+    "https://starside.work/elements/arc/icons/f9625f59ee.webp",
+    "https://starside.work/elements/class-abilities/icons/9b7d9d8088.webp",
+    "https://starside.work/elements/class-abilities/icons/f267262f1f.webp",
+    "https://starside.work/exotic-armor/icons/065bb5471d.webp",
+    "https://starside.work/exotic-weapon/icons/f8216efc3a.webp",
+    "https://starside.work/shopping-special/icons/2a90af6c07.webp",
+    "https://starside.work/weapon-perks/icons/4642be3f3b.webp",
+    "https://starside.work/weapon-perks/icons/a54fa9a424.webp"
+  ]
+}

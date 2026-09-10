@@ -1,0 +1,174 @@
+{
+  "url": "https://starside.work/builds/s29/12iujhbp-hunter/index.html",
+  "title": "终局内容：命运眷顾真相输出 · 配装推荐 · Starside",
+  "description": "适配真相输出的突袭/地牢遭遇战",
+  "category": "builds",
+  "updated_at": "2026.9.8",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 终局内容：命运眷顾真相输出\n\n推荐人：Clovis\n描述：适配真相输出的突袭/地牢遭遇战\n更新：2026.9.8\n场景：突袭、地牢\n定位：输出\n分支：棱镜\n类别：meta\n核心：真相\n\n## 职业\n\n职业：猎人\n超能：暗影箭矢：狩猎陷阱\n星相：飞升、线织幽灵\n碎片：勇气琢面、保护琢面、希望琢面、使命琢面、黎明琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：特技闪身\n\n## 武器\n\n异域武器：真相\n传说武器：完美逆行 | 沙场备战、武器大师\n传说武器：绽放兰花 | 边打边劫、高爆载荷\n\n## 护甲\n\n异域护甲：命运眷顾\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：强力伙伴、超能洗礼、超能洗礼\n护臂：虚空装弹装置、专注打击、虚空灵巧\n胸甲：完全充能、震荡阻尼器、谐振抗性\n腿部：虚空武器激涌、虚空武器激涌、虚空武器激涌\n职业物品：时间膨胀、时间膨胀、强力吸引\n\n## 神器\n\n神器：女王兰香炉\n模组：银白重炮\n\n## 六维\n\n六维：生命 0 ｜ 近战 80+ ｜ 手雷 50+ ｜ 超能 80+ ｜ 职业 30+ ｜ 武器 200\n\n## 注解\n\n详细遭遇战（突袭）：\n永恒沙漠：固有者阿格莱奥斯（如果队友想玩近距离武器导致首领多动）\n克罗塔的末日：死亡歌者·伊尔·约特\n梦魇根源：终极苦痛之神·奈扎雷克\n国王的陨落：战争祭祀/姐妹花\n门徒誓约：见证者门徒·胡克\n玻璃拱顶：“时之汇流”埃希恩\n救赎花园：圣洁首脑·太阳系固有\n\n地牢输出场景：\n平衡：德瑞捷·赛尔\n分离教义：被抹去者·克瑞夫\n晚星之主：雷尼克斯联合/腐化傀儡师\n战争领主的废墟：赫芬德\n深渊机灵：厄诺克鲁\n贪婪之握：弗里吉亚/阿瓦罗克斯\n预言：凯尔回响\n\n真相的优势区间：使用简单,无需瞄准,优秀的武器性能/DPS \n适配场景需求：拥有安全输出空间/距离，方便叠收割者贡品（1发叠4层，不考虑提前触发原型真理探索者的情况），输出场景有重弹药盒边打边劫，不方便使用精准武器 /首领多动导致头部位移\n走机制的护甲套装/护甲模组根据具体遭遇战做调整例如：kf2溢冰2se2,对应抗性模组等，神器也可以在输出前使用其他更加方便产子弹/生存\n1号位2号位武器的选择也可以根据自己喜好去调整，推荐火箭脉冲一把，走机制/辅助清怪武器一把，边打边劫最优解是食莲者但绝版了。\n输出流程：飞升-超凡-虚空箭-真相打空/边打边劫\n对于大师难度会根据当周属性激涌做武器选择\n后续如果有补充会二编",
+  "source_blocks": [
+    "# 终局内容：命运眷顾真相输出\n\n推荐人：Clovis\n描述：适配真相输出的突袭/地牢遭遇战\n更新：2026.9.8\n场景：突袭、地牢\n定位：输出\n分支：棱镜\n类别：meta\n核心：真相\n\n## 职业\n\n职业：猎人\n超能：暗影箭矢：狩猎陷阱\n星相：飞升、线织幽灵\n碎片：勇气琢面、保护琢面、希望琢面、使命琢面、黎明琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：特技闪身\n\n## 武器\n\n异域武器：真相\n传说武器：完美逆行 | 沙场备战、武器大师\n传说武器：绽放兰花 | 边打边劫、高爆载荷\n\n## 护甲\n\n异域护甲：命运眷顾\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：强力伙伴、超能洗礼、超能洗礼\n护臂：虚空装弹装置、专注打击、虚空灵巧\n胸甲：完全充能、震荡阻尼器、谐振抗性\n腿部：虚空武器激涌、虚空武器激涌、虚空武器激涌\n职业物品：时间膨胀、时间膨胀、强力吸引\n\n## 神器\n\n神器：女王兰香炉\n模组：银白重炮\n\n## 六维\n\n六维：生命 0 ｜ 近战 80+ ｜ 手雷 50+ ｜ 超能 80+ ｜ 职业 30+ ｜ 武器 200\n\n## 注解\n\n详细遭遇战（突袭）：\n永恒沙漠：固有者阿格莱奥斯（如果队友想玩近距离武器导致首领多动）\n克罗塔的末日：死亡歌者·伊尔·约特\n梦魇根源：终极苦痛之神·奈扎雷克\n国王的陨落：战争祭祀/姐妹花\n门徒誓约：见证者门徒·胡克\n玻璃拱顶：“时之汇流”埃希恩\n救赎花园：圣洁首脑·太阳系固有\n\n地牢输出场景：\n平衡：德瑞捷·赛尔\n分离教义：被抹去者·克瑞夫\n晚星之主：雷尼克斯联合/腐化傀儡师\n战争领主的废墟：赫芬德\n深渊机灵：厄诺克鲁\n贪婪之握：弗里吉亚/阿瓦罗克斯\n预言：凯尔回响\n\n真相的优势区间：使用简单,无需瞄准,优秀的武器性能/DPS \n适配场景需求：拥有安全输出空间/距离，方便叠收割者贡品（1发叠4层，不考虑提前触发原型真理探索者的情况），输出场景有重弹药盒边打边劫，不方便使用精准武器 /首领多动导致头部位移\n走机制的护甲套装/护甲模组根据具体遭遇战做调整例如：kf2溢冰2se2,对应抗性模组等，神器也可以在输出前使用其他更加方便产子弹/生存\n1号位2号位武器的选择也可以根据自己喜好去调整，推荐火箭脉冲一把，走机制/辅助清怪武器一把，边打边劫最优解是食莲者但绝版了。\n输出流程：飞升-超凡-虚空箭-真相打空/边打边劫\n对于大师难度会根据当周属性激涌做武器选择\n后续如果有补充会二编"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "终局内容：命运眷顾真相输出"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "女王兰香炉"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "终局内容：命运眷顾真相输出 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n终局内容：命运眷顾真相输出\n\n推荐者：\nClovis\n\n终局内容：命运眷顾真相输出\n\n♥︎ 复制配装截图详情开关\n\n猎人 · 棱镜 · metaS29 · 凯旋纪念碑\n\n适配真相输出的突袭/地牢遭遇战\n\n适用环境\n\n突袭\n\n地牢\n\n标签\n\n输出\n\n# 终局内容：命运眷顾真相输出\n\n推荐人：Clovis\n描述：适配真相输出的突袭/地牢遭遇战\n更新：2026.9.8\n场景：突袭、地牢\n定位：输出\n分支：棱镜\n类别：meta\n核心：真相\n\n## 职业\n\n职业：猎人\n超能：暗影箭矢：狩猎陷阱\n星相：飞升、线织幽灵\n碎片：勇气琢面、保护琢面、希望琢面、使命琢面、黎明琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：特技闪身\n\n## 武器\n\n异域武器：真相\n传说武器：完美逆行 | 沙场备战、武器大师\n传说武器：绽放兰花 | 边打边劫、高爆载荷\n\n## 护甲\n\n异域护甲：命运眷顾\n套装：玻璃拱顶 2 件 × 玻璃拱顶 4 件\n头盔：强力伙伴、超能洗礼、超能洗礼\n护臂：虚空装弹装置、专注打击、虚空灵巧\n胸甲：完全充能、震荡阻尼器、谐振抗性\n腿部：虚空武器激涌、虚空武器激涌、虚空武器激涌\n职业物品：时间膨胀、时间膨胀、强力吸引\n\n## 神器\n\n神器：女王兰香炉\n模组：银白重炮\n\n## 六维\n\n六维：生命 0 ｜ 近战 80+ ｜ 手雷 50+ ｜ 超能 80+ ｜ 职业 30+ ｜ 武器 200\n\n## 注解\n\n详细遭遇战（突袭）：\n永恒沙漠：固有者阿格莱奥斯（如果队友想玩近距离武器导致首领多动）\n克罗塔的末日：死亡歌者·伊尔·约特\n梦魇根源：终极苦痛之神·奈扎雷克\n国王的陨落：战争祭祀/姐妹花\n门徒誓约：见证者门徒·胡克\n玻璃拱顶：“时之汇流”埃希恩\n救赎花园：圣洁首脑·太阳系固有\n\n地牢输出场景：\n平衡：德瑞捷·赛尔\n分离教义：被抹去者·克瑞夫\n晚星之主：雷尼克斯联合/腐化傀儡师\n战争领主的废墟：赫芬德\n深渊机灵：厄诺克鲁\n贪婪之握：弗里吉亚/阿瓦罗克斯\n预言：凯尔回响\n\n真相的优势区间：使用简单,无需瞄准,优秀的武器性能/DPS \n适配场景需求：拥有安全输出空间/距离，方便叠收割者贡品（1发叠4层，不考虑提前触发原型真理探索者的情况），输出场景有重弹药盒边打边劫，不方便使用精准武器 /首领多动导致头部位移\n走机制的护甲套装/护甲模组根据具体遭遇战做调整例如：kf2溢冰2se2,对应抗性模组等，神器也可以在输出前使用其他更加方便产子弹/生存\n1号位2号位武器的选择也可以根据自己喜好去调整，推荐火箭脉冲一把，走机制/辅助清怪武器一把，边打边劫最优解是食莲者但绝版了。\n输出流程：飞升-超凡-虚空箭-真相打空/边打边劫\n对于大师难度会根据当周属性激涌做武器选择\n后续如果有补充会二编\n\n职业\n\n职业\n\n猎人\n\n棱镜\n\n超能\n\n暗影箭矢：狩猎陷阱\n\n技能\n\n抓钩\n\n陷阱炸弹\n\n特技闪身\n\n星相\n\n飞升\n\n线织幽灵\n\n碎片\n\n勇气琢面\n\n保护琢面\n\n希望琢面\n\n使命琢面\n\n黎明琢面\n\n武器\n\n真相\n\n完美逆行沙场备战武器大师\n\n绽放兰花边打边劫高爆载荷\n\n神器模组\n\n女王兰香炉\n\n银白重炮\n\n护甲\n\n命运眷顾\n\n玻璃拱顶埃希恩记忆2 件\n\n玻璃拱顶埃希恩记忆4 件\n\n生命0\n\n近战80+\n\n手雷50+\n\n超能80+\n\n职业30+\n\n武器200\n\n头盔\n\n强力伙伴\n\n超能洗礼\n\n超能洗礼\n\n护臂\n\n虚空装弹装置装弹装置\n\n专注打击\n\n虚空灵巧灵巧\n\n胸甲\n\n完全充能\n\n震荡阻尼器抗性\n\n谐振抗性抗性\n\n腿部\n\n虚空武器激涌武器激涌\n\n虚空武器激涌武器激涌\n\n虚空武器激涌武器激涌\n\n职业物品\n\n时间膨胀\n\n时间膨胀\n\n强力吸引\n\n注解\n\n详细遭遇战（突袭）：\n永恒沙漠：固有者阿格莱奥斯（如果队友想玩近距离武器导致首领多动）\n克罗塔的末日：死亡歌者·伊尔·约特\n梦魇根源：终极苦痛之神·奈扎雷克\n国王的陨落：战争祭祀/姐妹花\n门徒誓约：见证者门徒·胡克\n玻璃拱顶：“时之汇流”埃希恩\n救赎花园：圣洁首脑·太阳系固有\n\n地牢输出场景：\n平衡：德瑞捷·赛尔\n分离教义：被抹去者·克瑞夫\n晚星之主：雷尼克斯联合/腐化傀儡师\n战争领主的废墟：赫芬德\n深渊机灵：厄诺克鲁\n贪婪之握：弗里吉亚/阿瓦罗克斯\n预言：凯尔回响\n\n真相的优势区间：使用简单,无需瞄准,优秀的武器性能/DPS \n适配场景需求：拥有安全输出空间/距离，方便叠收割者贡品（1发叠4层，不考虑提前触发原型真理探索者的情况），输出场景有重弹药盒边打边劫，不方便使用精准武器 /首领多动导致头部位移\n走机制的护甲套装/护甲模组根据具体遭遇战做调整例如：kf2溢冰2se2,对应抗性模组等，神器也可以在输出前使用其他更加方便产子弹/生存\n1号位2号位武器的选择也可以根据自己喜好去调整，推荐火箭脉冲一把，走机制/辅助清怪武器一把，边打边劫最优解是食莲者但绝版了。\n输出流程：飞升-超凡-虚空箭-真相打空/边打边劫\n对于大师难度会根据当周属性激涌做武器选择\n后续如果有补充会二编\n\n更新 2026.9.8\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/12iujhbp-hunter/index.html",
+    "final_url": "https://starside.work/builds/s29/12iujhbp-hunter/index.html",
+    "path": "pages/builds/s29/12iujhbp-hunter/index.html",
+    "bytes": 31584,
+    "sha256": "b435d7640d888d22f58f43837ea5e6a9f5c82dc6965c19902e086996dc208d21",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:56.984656+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/prismatic/index.html",
+    "https://starside.work/elements/strand/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-other/index.html",
+    "https://starside.work/shopping-primary/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/28daf2e5f9.webp",
+    "https://starside.work/armor-mods/icons/37bedc55b8.webp",
+    "https://starside.work/armor-mods/icons/3a25956d8d.webp",
+    "https://starside.work/armor-mods/icons/6aab4887e3.webp",
+    "https://starside.work/armor-mods/icons/7a002a3848.webp",
+    "https://starside.work/armor-mods/icons/9f535afcf7.webp",
+    "https://starside.work/armor-mods/icons/c9476266a5.webp",
+    "https://starside.work/armor-mods/icons/e10db37ad3.webp",
+    "https://starside.work/armor-mods/icons/e51a16abc6.webp",
+    "https://starside.work/armor-mods/icons/f1b3e428b9.webp",
+    "https://starside.work/armor-mods/icons/f28b2125ee.webp",
+    "https://starside.work/armor-sets/icons/071.png",
+    "https://starside.work/armor-sets/icons/072.png",
+    "https://starside.work/artifact-mods/icons/8531c7b770.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/5757d150c7.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/cba8013059.webp",
+    "https://starside.work/elements/class-abilities/icons/fad1ac3672.webp",
+    "https://starside.work/elements/prismatic/icons/2b0c20c15a.webp",
+    "https://starside.work/elements/prismatic/icons/3cb69eea59.webp",
+    "https://starside.work/elements/prismatic/icons/48bc7ae6d4.webp",
+    "https://starside.work/elements/prismatic/icons/4f517c0390.webp",
+    "https://starside.work/elements/prismatic/icons/67d91531a9.webp",
+    "https://starside.work/elements/prismatic/icons/727574c917.webp",
+    "https://starside.work/elements/prismatic/icons/77096a21b5.webp",
+    "https://starside.work/elements/prismatic/icons/b5a97142a6.webp",
+    "https://starside.work/elements/strand/icons/24b726319d.webp",
+    "https://starside.work/elements/void/icons/3ed96daa22.webp",
+    "https://starside.work/elements/void/icons/c78143215f.webp",
+    "https://starside.work/exotic-armor/icons/dce63279b7.webp",
+    "https://starside.work/exotic-weapon/icons/df6845d757.webp",
+    "https://starside.work/shopping-other/icons/d53b47fdec.webp",
+    "https://starside.work/shopping-primary/icons/d2470e70ef.webp",
+    "https://starside.work/weapon-perks/icons/18fb4658c2.webp",
+    "https://starside.work/weapon-perks/icons/20c9ec784d.webp",
+    "https://starside.work/weapon-perks/icons/4a19f71392.webp",
+    "https://starside.work/weapon-perks/icons/88294f7fbe.webp"
+  ]
+}

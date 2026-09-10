@@ -1,0 +1,2300 @@
+{
+  "url": "https://starside.work/elements/arc/index.html",
+  "title": "电弧 · Starside",
+  "description": "电弧分支职业速查表——增幅、电光充能、震颤、致盲、离子轨迹五个术语，16 枚碎片，7 种手雷，以及猎人、泰坦、术士的近战、超能与星相，带图标与全部数值。",
+  "category": "subclass",
+  "updated_at": "2026.8.30",
+  "data_src": "docs/arc",
+  "data_hash": "c4eda40f66c9fbb412cafb95b6faa91c495173ec",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "电弧"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "效果"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "手雷技能"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "术士"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "效果",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "增幅",
+            "html": "增幅"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e5ca5a41e7.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电弧分支职业的固有增益。\n 6 秒内用电弧击杀把计数推满即可获得，也可以由星相直接授予。\n 计数进度：红血 25% ｜ 橙血 50% ｜ 初级首领 100% ｜ 守护者 50%。\n \n 增幅：\n +50 敏捷，滑铲距离提高到 8.5 米，+40 操控性，操控动作时长 ×0.95，持续 15 秒。\n 激活期间战斗人员对使用者的瞄准精度下降，使用者获得 15% 战斗人员伤害抗性。\n 增幅状态下冲刺 2.5 秒进入速度加成。\n \n 速度加成：\n 移动速度拉满，滑铲距离提高到 11 米，跳跃高度提高 25%，并获得 15% 战斗人员伤害抗性。\n 停止冲刺后再停留 2 秒，增幅已经耗尽也照样停留。\n 用速度加成滑铲一次，基础滑铲距离从 6.5 米永久提高到 8.5 米，直到死亡为止。",
+            "html": "<span class=\"el-arc\">电弧</span>分支职业的固有<span class=\"buff\">增益</span>。<br> 6 秒内用<span class=\"el-arc\">电弧</span>击杀把计数推满即可获得，也可以由星相直接授予。<br> 计数进度：<span class=\"bar-red\">红血</span> 25% ｜ <span class=\"bar-orange\">橙血</span> 50% ｜ <span class=\"bar-yellow\">初级首领</span> 100% ｜ <span class=\"bar-orange\">守护者</span> 50%。<br> <br> <span class=\"el-arc\">增幅</span>：<br> +50 敏捷，滑铲距离提高到 8.5 米，+40 操控性，操控动作时长 ×0.95，持续 15 秒。<br> 激活期间<span class=\"enemy\">战斗人员</span>对使用者的瞄准精度下降，使用者获得 15% <span class=\"enemy\">战斗人员</span>伤害抗性。<br> <span class=\"el-arc\">增幅</span>状态下冲刺 2.5 秒进入<span class=\"el-arc\">速度加成</span>。<br> <br> <span class=\"el-arc\">速度加成</span>：<br> 移动速度拉满，滑铲距离提高到 11 米，跳跃高度提高 25%，并获得 15% <span class=\"enemy\">战斗人员</span>伤害抗性。<br> 停止冲刺后再停留 2 秒，<span class=\"el-arc\">增幅</span>已经耗尽也照样停留。<br> 用<span class=\"el-arc\">速度加成</span>滑铲一次，基础滑铲距离从 6.5 米永久提高到 8.5 米，直到死亡为止。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "电光充能",
+            "html": "电光充能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b9f574ded9.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电光充能生效期间，每在 5 秒内攒够规定次数的武器伤害实例：\n 下一次任意来源的伤害实例提供 1 层。\n 切换武器会重置计数，同一时刻的多个伤害实例最多只给 1 层。\n \n 攒够一层所需的伤害实例数：\n 弹匣容量的 15% 向下取整 + 1 ｜ 刀剑与榴弹发射器 2 次 ｜ 三发装狙击枪 1 次。\n \n 每获得一层提供 2.5% 近战技能能量，攒到放电所需的 10 层合计 25%。\n 超过 10 层照样按层数结算——9 层时一次获得 4 层，仍然给 10% 近战能量。\n \n 攒满 10 层后，技能命中或造成非充能近战伤害 0.5 秒后触发放电：\n 在被伤害的战斗人员上方落下一发电弧矢弹，最多 405 矢弹溅射 + 270 地面溅射 = 合计 675 [36 + 30] 电弧伤害，范围 ? 米。\n 不计为技能伤害，只算普通电弧伤害。\n \n 可以触发放电：\n 不稳定爆炸 ｜ 冻结碎裂（初级首领的自动碎裂不算）｜ 缠结爆炸 ｜ 线虫 ｜ 瓦解线 ｜ 初级首领身上的悬停急拽 ｜ 先驱者的巨岩。\n \n 不触发放电：\n 震颤的连锁闪电 ｜ 非技能来源的灼烧与点燃 ｜ 非技能来源的水晶碎裂 ｜ 天赋信念的爆炸物。",
+            "html": "<span class=\"el-arc\">电光充能</span>生效期间，每在 5 秒内攒够规定次数的武器伤害实例：<br> 下一次任意来源的伤害实例提供 <span class=\"stack\">1 层</span>。<br> 切换武器会重置计数，同一时刻的多个伤害实例最多只给 <span class=\"stack\">1 层</span>。<br> <br> 攒够一层所需的伤害实例数：<br> 弹匣容量的 15% 向下取整 + 1 ｜ 刀剑与榴弹发射器 2 次 ｜ 三发装狙击枪 1 次。<br> <br> 每获得一层提供 2.5% <span class=\"pickup\">近战技能能量</span>，攒到<span class=\"el-arc\">放电</span>所需的 <span class=\"stack\">10 层</span>合计 25%。<br> 超过 10 层照样按层数结算——9 层时一次获得 4 层，仍然给 10% <span class=\"pickup\">近战能量</span>。<br> <br> 攒满 <span class=\"stack\">10 层</span>后，技能命中或造成非充能近战伤害 0.5 秒后触发<span class=\"el-arc\">放电</span>：<br> 在被伤害的<span class=\"enemy\">战斗人员</span>上方落下一发<span class=\"el-arc\">电弧</span>矢弹，最多 405 矢弹溅射 + 270 地面溅射 = 合计 675 <span class=\"pvp\">[36 + 30]</span> <span class=\"el-arc\">电弧伤害</span>，范围 <span class=\"unsure\">?</span> 米。<br> 不计为技能伤害，只算普通<span class=\"el-arc\">电弧伤害</span>。<br> <br> 可以触发<span class=\"el-arc\">放电</span>：<br> <span class=\"deb-void\">不稳定</span>爆炸 ｜ <span class=\"deb-stasis\">冻结</span><span class=\"deb-stasis\">碎裂</span>（<span class=\"bar-yellow\">初级首领</span>的自动<span class=\"deb-stasis\">碎裂</span>不算）｜ <span class=\"el-strand\">缠结</span>爆炸 ｜ <span class=\"el-strand\">线虫</span> ｜ <span class=\"deb-strand\">瓦解</span>线 ｜ <span class=\"bar-yellow\">初级首领</span>身上的<span class=\"deb-strand\">悬停</span>急拽 ｜ <span class=\"exotic\">先驱者</span>的巨岩。<br> <br> 不触发<span class=\"el-arc\">放电</span>：<br> <span class=\"deb-arc\">震颤</span>的<span class=\"el-arc\">连锁闪电</span> ｜ 非技能来源的<span class=\"deb-solar\">灼烧</span>与<span class=\"deb-solar\">点燃</span> ｜ 非技能来源的<span class=\"el-stasis\">水晶</span><span class=\"deb-stasis\">碎裂</span> ｜ <span class=\"exotic\">天赋信念</span>的爆炸物。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "离子轨迹",
+            "html": "离子轨迹"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4935ec0db5.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电弧元素拾取物，以 6 米/秒的速度追踪使用者。\n \n 拾取提供 11.25% 手雷与近战技能能量，以及 13.5% 职业技能能量。\n 使用者生成的离子轨迹对盟友不生效。",
+            "html": "<span class=\"el-arc\">电弧</span>元素拾取物，以 6 米/秒的速度追踪使用者。<br> <br> 拾取提供 11.25% <span class=\"pickup\">手雷与近战技能能量</span>，以及 13.5% <span class=\"pickup\">职业技能能量</span>。<br> 使用者生成的<span class=\"el-arc\">离子轨迹</span>对<span class=\"enemy\">盟友</span>不生效。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "致盲",
+            "html": "致盲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fe44ec7eb.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被致盲的战斗人员陷入迷失，10 秒内无法攻击或使用技能。\n \n 被致盲的守护者 HUD 消失、屏幕变白、声音失真，持续 3 秒。\n \n 势不可挡勇士被致盲时进入眩晕。",
+            "html": "被<span class=\"deb-arc\">致盲</span>的<span class=\"enemy\">战斗人员</span>陷入迷失，10 秒内无法攻击或使用技能。<br> <br> 被<span class=\"deb-arc\">致盲</span>的<span class=\"bar-orange\">守护者</span> HUD 消失、屏幕变白、声音失真，持续 3 秒。<br> <br> <span class=\"enemy\">势不可挡勇士</span>被<span class=\"deb-arc\">致盲</span>时进入<span class=\"enemy\">眩晕</span>。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "震颤",
+            "html": "震颤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ab7174aa75.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "震颤的战斗人员每受到 115 [45] 伤害就释放一次连锁闪电，对 12 米内的所有战斗人员造成 119 [51] 电弧伤害，持续 10 [5] 秒。\n \n 重新施加震颤可以刷新持续时间，施加震颤那一次命中的伤害也计入伤害阈值。\n 两次连锁闪电之间有 0.8 秒冷却。\n \n 释放连锁闪电的守护者不吃自己的链击伤害，除非它打到了别的守护者。\n \n 过载勇士受到震颤伤害时进入眩晕。",
+            "html": "<span class=\"deb-arc\">震颤</span>的<span class=\"enemy\">战斗人员</span>每受到 115 <span class=\"pvp\">[45]</span> 伤害就释放一次<span class=\"el-arc\">连锁闪电</span>，对 12 米内的所有<span class=\"enemy\">战斗人员</span>造成 119 <span class=\"pvp\">[51]</span> <span class=\"el-arc\">电弧伤害</span>，持续 10 <span class=\"pvp\">[5]</span> 秒。<br> <br> 重新施加<span class=\"deb-arc\">震颤</span>可以刷新持续时间，施加<span class=\"deb-arc\">震颤</span>那一次命中的伤害也计入伤害阈值。<br> 两次<span class=\"el-arc\">连锁闪电</span>之间有 0.8 秒冷却。<br> <br> 释放<span class=\"el-arc\">连锁闪电</span>的<span class=\"bar-orange\">守护者</span>不吃<span class=\"enemy\">自己</span>的链击伤害，除非它打到了别的<span class=\"bar-orange\">守护者</span>。<br> <br> <span class=\"enemy\">过载勇士</span>受到<span class=\"deb-arc\">震颤</span>伤害时进入<span class=\"enemy\">眩晕</span>。"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "碎片",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "碎片",
+            "html": "碎片"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性变化",
+            "html": "属性变化"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "增幅火花",
+            "html": "增幅火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d868238c9d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "增幅期间：\n 4 秒内连续击杀 2 次，生成一枚能量球，提供 2.5% 超能能量。\n 用电弧击杀触发增幅时，那一次击杀计入这 2 次击杀的计数。\n 生成能量球后有 10 秒冷却，冷却期间的击杀不计数。",
+            "html": "<span class=\"el-arc\">增幅</span>期间：<br> 4 秒内连续击杀 2 次，生成一枚<span class=\"orb\">能量球</span>，提供 2.5% <span class=\"orb\">超能能量</span>。<br> 用<span class=\"el-arc\">电弧</span>击杀触发<span class=\"el-arc\">增幅</span>时，那一次击杀计入这 2 次击杀的计数。<br> 生成<span class=\"orb\">能量球</span>后有 10 秒冷却，冷却期间的击杀不计数。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "信标火花",
+            "html": "信标火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7f5d24e07e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "增幅期间：\n 用特殊弹药与威能弹药的电弧武器击杀会产生致盲爆炸，对 7.5 米内的战斗人员施加致盲。",
+            "html": "<span class=\"el-arc\">增幅</span>期间：<br> 用<span class=\"ammo-special\">特殊弹药</span>与<span class=\"ammo-heavy\">威能弹药</span>的<span class=\"el-arc\">电弧</span>武器击杀会产生<span class=\"deb-arc\">致盲</span>爆炸，对 7.5 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-arc\">致盲</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "光辉火花",
+            "html": "光辉火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a2175cf719.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精准击杀被致盲的战斗人员：\n 触发致盲爆炸，对 7.5 米内的战斗人员施加致盲。",
+            "html": "精准击杀被<span class=\"deb-arc\">致盲</span>的<span class=\"enemy\">战斗人员</span>：<br> 触发<span class=\"deb-arc\">致盲</span>爆炸，对 7.5 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-arc\">致盲</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 超能",
+            "html": "+10 超能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "放电火花",
+            "html": "放电火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/54f5fd7a81.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电弧武器击杀推进计数，满 100% 生成离子轨迹。\n 红血 34% ｜ 橙血 67% ｜ 初级首领 100% ｜ 守护者 67%。\n \n 拾取离子轨迹提供 1 层电光充能。",
+            "html": "<span class=\"el-arc\">电弧</span>武器击杀推进计数，满 100% 生成<span class=\"el-arc\">离子轨迹</span>。<br> <span class=\"bar-red\">红血</span> 34% ｜ <span class=\"bar-orange\">橙血</span> 67% ｜ <span class=\"bar-yellow\">初级首领</span> 100% ｜ <span class=\"bar-orange\">守护者</span> 67%。<br> <br> 拾取<span class=\"el-arc\">离子轨迹</span>提供 <span class=\"stack\">1 层</span><span class=\"el-arc\">电光充能</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 近战",
+            "html": "-10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "反馈火花",
+            "html": "反馈火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/17cb241fd1.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被近战攻击物理命中后：\n 5 秒内下一次近战命中的伤害提高 100% [50%]；重击激活期间为 [15%]。\n 该增益不可刷新。",
+            "html": "被近战攻击物理命中后：<br> 5 秒内下一次近战命中的伤害提高 100% <span class=\"pvp\">[50%]</span>；<span class=\"el-arc\">重击</span>激活期间为 <span class=\"pvp\">[15%]</span>。<br> <span class=\"note\">该增益不可刷新。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 生命值",
+            "html": "+10 <span class=\"health\">生命值</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "专注火花",
+            "html": "专注火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/97f8d18bf9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲刺 1.25 秒后，保持冲刺且移动速度不低于 5 米/秒时：\n 职业技能基础充能速度额外 +150%[75%]。\n 职业技能攒够 1 次充能即停止。",
+            "html": "冲刺 1.25 秒后，保持冲刺且移动速度不低于 5 米/秒时：<br> <span class=\"pickup\">职业技能</span>基础充能速度额外 +150%<span class=\"pvp\">[75%]</span>。<br> <span class=\"note\">职业技能攒够 1 次充能即停止。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 武器（猎人）\n -10 生命值（泰坦）\n -10 职业（术士）",
+            "html": "-10 武器（猎人）<br> -10 <span class=\"health\">生命值</span>（泰坦）<br> -10 职业（术士）"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "频率火花",
+            "html": "频率火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c34f863873.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近战命中时：\n +15 稳定性，+50 填装速度，换弹时长 ×0.8，持续 5.25 秒。\n \n 增幅期间：\n 几乎所有电光充能来源都额外多给 1 层。\n 游戏内提示称本碎片会提高碎片自身的效果，实测并非如此——至少填装速度加成不受影响。",
+            "html": "近战命中时：<br> +15 稳定性，+50 填装速度，换弹时长 ×0.8，持续 5.25 秒。<br> <br> <span class=\"el-arc\">增幅</span>期间：<br> 几乎所有<span class=\"el-arc\">电光充能</span>来源都额外多给 <span class=\"stack\">1 层</span>。<br> <span class=\"note\">游戏内提示称本碎片会提高碎片自身的效果，实测并非如此——至少填装速度加成不受影响。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "急速火花",
+            "html": "急速火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2f792360c9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲刺 1.25 秒后，保持冲刺且移动速度不低于 5 米/秒时：\n 提供 +50 生命值属性。",
+            "html": "冲刺 1.25 秒后，保持冲刺且移动速度不低于 5 米/秒时：<br> 提供 +50 <span class=\"health\">生命值</span>属性。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "直觉火花",
+            "html": "直觉火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/06924ab832.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "处于重伤时受到伤害：\n 释放一阵电弧能量，最多造成 46 [20] 伤害，并对 ? 米内的战斗人员施加震颤。\n 两次激活之间有 15? 秒冷却。",
+            "html": "处于重伤时受到伤害：<br> 释放一阵<span class=\"el-arc\">电弧</span>能量，最多造成 46 <span class=\"pvp\">[20]</span> 伤害，并对 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-arc\">震颤</span>。<br> 两次激活之间有 <span class=\"unsure\">15?</span> 秒冷却。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "离子火花",
+            "html": "离子火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c43daf0acf.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀震颤的战斗人员，或电光充能击杀：\n 生成离子轨迹。\n 两次生成之间有 10 秒冷却。",
+            "html": "击杀<span class=\"deb-arc\">震颤</span>的<span class=\"enemy\">战斗人员</span>，或<span class=\"el-arc\">电光充能</span>击杀：<br> 生成<span class=\"el-arc\">离子轨迹</span>。<br> 两次生成之间有 10 秒冷却。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "量级火花",
+            "html": "量级火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d9201a70c3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "闪电手雷多发一道闪电，最多 5 发矢弹。\n 脉冲手雷多释放 2 次脉冲，最多 8 次。\n 风暴手雷多召唤一轮弹幕。\n 星相「暴雷之触」强化过的风暴手雷，其漫游风暴持续时间延长 1.5 秒。",
+            "html": "<span class=\"el-arc\">闪电手雷</span>多发一道闪电，最多 5 发矢弹。<br> <span class=\"el-arc\">脉冲手雷</span>多释放 2 次脉冲，最多 8 次。<br> <span class=\"el-arc\">风暴手雷</span>多召唤一轮弹幕。<br> 星相「<span class=\"el-arc\">暴雷之触</span>」强化过的<span class=\"el-arc\">风暴手雷</span>，其漫游风暴持续时间延长 1.5 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "动量火花",
+            "html": "动量火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/411697fb74.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "滑铲经过弹药砖块、且对应类型未满时：\n 补满已装备的武器，并提供 3 层电光充能。",
+            "html": "滑铲经过弹药砖块、且对应类型未满时：<br> 补满已装备的武器，并提供 <span class=\"stack\">3 层</span><span class=\"el-arc\">电光充能</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "充能火花",
+            "html": "充能火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d27642e454.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "进入重伤时：\n 手雷与近战技能基础充能速度额外 +400%[200%]，持续到护盾完全恢复为止。",
+            "html": "进入重伤时：<br> <span class=\"pickup\">手雷与近战技能</span>基础充能速度额外 +400%<span class=\"pvp\">[200%]</span>，持续到护盾完全恢复为止。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "抗性火花",
+            "html": "抗性火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6f78f00765.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "15 米内有至少 3 名战斗人员时：\n 获得 25%[10%] 伤害抗性，条件不再满足后再停留 2 秒。",
+            "html": "15 米内有至少 3 名<span class=\"enemy\">战斗人员</span>时：<br> 获得 25%<span class=\"pvp\">[10%]</span> 伤害抗性，条件不再满足后再停留 2 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "震颤火花",
+            "html": "震颤火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9dac95e21c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电弧手雷命中时施加震颤。\n 电弧之魂与离子哨兵再次施加震颤前有 4 秒冷却。",
+            "html": "<span class=\"el-arc\">电弧</span>手雷命中时施加<span class=\"deb-arc\">震颤</span>。<br> <span class=\"note\">电弧之魂与离子哨兵再次施加震颤前有 4 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 手雷",
+            "html": "-10 手雷"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "伏特火花",
+            "html": "伏特火花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f0e03ee83a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "终结技提供增幅与 1 层电光充能。",
+            "html": "<span class=\"enemy\">终结技</span>提供<span class=\"el-arc\">增幅</span>与 <span class=\"stack\">1 层</span><span class=\"el-arc\">电光充能</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 职业",
+            "html": "+10 职业"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "手雷技能",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "手雷",
+            "html": "手雷"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "基础冷却",
+            "html": "基础冷却"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "电光手雷",
+            "html": "电光手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b248d2e1c2.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "重型弹道 ｜ 扫描\n \n 接触时扫描并瞄准 12 米视线内最近的战斗人员，1 秒后向它释放电弧闪电。\n 造成伤害后，闪电会连锁到 10 米内尚未被命中的最近战斗人员，重复到最多伤害 4 名战斗人员为止。\n \n 电弧闪电造成 521 [85] 伤害。",
+            "html": "<span class=\"note\">重型弹道 ｜ 扫描</span><br> <br> 接触时扫描并瞄准 12 米视线内最近的<span class=\"enemy\">战斗人员</span>，1 秒后向它释放<span class=\"el-arc\">电弧</span>闪电。<br> 造成伤害后，闪电会连锁到 10 米内尚未被命中的最近<span class=\"enemy\">战斗人员</span>，重复到最多伤害 4 名<span class=\"enemy\">战斗人员</span>为止。<br> <br> <span class=\"el-arc\">电弧</span>闪电造成 521 <span class=\"pvp\">[85]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 151.5 秒\n 回复倍率 0.75×",
+            "html": "基础冷却 151.5 秒<br> 回复倍率 0.75×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "闪光手雷",
+            "html": "闪光手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/189887b13d.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道\n \n 速度降到足够低后爆炸，爆炸前有短暂延迟。\n \n 爆炸最多造成 684 [120] 伤害，7.5 米半径内衰减至 0%，并对 10 米内的战斗人员施加致盲，最长 5 [3] 秒。\n 使用者不会被自己致盲。",
+            "html": "<span class=\"note\">中型弹道</span><br> <br> 速度降到足够低后爆炸，爆炸前有短暂延迟。<br> <br> 爆炸最多造成 684 <span class=\"pvp\">[120]</span> 伤害，7.5 米半径内衰减至 0%，并对 10 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-arc\">致盲</span>，最长 5 <span class=\"pvp\">[3]</span> 秒。<br> 使用者不会被<span class=\"enemy\">自己</span><span class=\"deb-arc\">致盲</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.875×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.875×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暴雷之触",
+            "html": "暴雷之触"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/33c6bebcfa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "接触时额外爆炸一次，最多造成 684 [?] 伤害，范围 7.5 米，并对 5 米内的战斗人员施加致盲。",
+            "html": "接触时额外爆炸一次，最多造成 684 <span class=\"unsure\">[?]</span> 伤害，范围 7.5 米，并对 5 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-arc\">致盲</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "粘性电浆手雷",
+            "html": "粘性电浆手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/badca474c4.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近乎直线弹道 ｜ 轻微追踪 ｜ 粘附\n \n 附着到战斗人员或表面上，1.7 秒后爆炸。\n \n 爆炸最多造成 901 [150] 伤害，引爆点 6 米半径内衰减至 0%。\n 粘在战斗人员身上时爆炸伤害提高 66.7%，达到 1500 [250]。",
+            "html": "<span class=\"note\">近乎直线弹道 ｜ 轻微追踪 ｜ 粘附</span><br> <br> 附着到<span class=\"enemy\">战斗人员</span>或表面上，1.7 秒后爆炸。<br> <br> 爆炸最多造成 901 <span class=\"pvp\">[150]</span> 伤害，引爆点 6 米半径内衰减至 0%。<br> 粘在<span class=\"enemy\">战斗人员</span>身上时爆炸伤害提高 66.7%，达到 1500 <span class=\"pvp\">[250]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 105.4 秒\n 回复倍率 0.875×",
+            "html": "基础冷却 105.4 秒<br> 回复倍率 0.875×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "闪电手雷",
+            "html": "闪电手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8be7a4f860.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 壁挂\n \n 附着到表面和战斗人员身上，投射激光 1 秒后开始触发，此后每 1.67 秒发射一道闪电，最多 4 道。\n \n 每道闪电造成 373 [120] 伤害，合计最多 1492 [480]。\n 装备碎片「量级火花」时最多 5 道，合计 1865 [600]。",
+            "html": "<span class=\"note\">中型弹道 ｜ 壁挂</span><br> <br> 附着到表面和<span class=\"enemy\">战斗人员</span>身上，投射激光 1 秒后开始触发，此后每 1.67 秒发射一道闪电，最多 4 道。<br> <br> 每道闪电造成 373 <span class=\"pvp\">[120]</span> 伤害，合计最多 1492 <span class=\"pvp\">[480]</span>。<br> 装备碎片「<span class=\"el-arc\">量级火花</span>」时最多 5 道，合计 1865 <span class=\"pvp\">[600]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 219.5 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 219.5 秒<br> 回复倍率 0.5×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暴雷之触",
+            "html": "暴雷之触"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/33c6bebcfa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "额外提供一次手雷技能充能。\n 首道之后的闪电命中时施加震颤。\n 造成伤害时提供 5 层电光充能，每道闪电最多触发一次。",
+            "html": "额外提供一次<span class=\"pickup\">手雷技能充能</span>。<br> 首道之后的闪电命中时施加<span class=\"deb-arc\">震颤</span>。<br> 造成伤害时提供 <span class=\"stack\">5 层</span><span class=\"el-arc\">电光充能</span>，每道闪电最多触发一次。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "脉冲手雷",
+            "html": "脉冲手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0aa7665080.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道\n \n 接触时引爆，在 6 米半径内最多造成 156 [50] 伤害。\n \n 此后每 0.7 秒脉冲一次，每次在 6 米半径内最多造成 249 [80] 伤害，共 5 次，合计最多 1245 [530]。\n 装备碎片「量级火花」时多脉冲 2 次，合计最多 1743 [690]。",
+            "html": "<span class=\"note\">中型弹道</span><br> <br> 接触时引爆，在 6 米半径内最多造成 156 <span class=\"pvp\">[50]</span> 伤害。<br> <br> 此后每 0.7 秒脉冲一次，每次在 6 米半径内最多造成 249 <span class=\"pvp\">[80]</span> 伤害，共 5 次，合计最多 1245 <span class=\"pvp\">[530]</span>。<br> 装备碎片「<span class=\"el-arc\">量级火花</span>」时多脉冲 2 次，合计最多 1743 <span class=\"pvp\">[690]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 175.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 175.6 秒<br> 回复倍率 0.625×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暴雷之触",
+            "html": "暴雷之触"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/33c6bebcfa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "脉冲命中会生成离子轨迹，两次生成之间有 1 秒冷却。\n \n 脉冲伤害逐次提高：\n 第 1 次 +2% ｜ 第 2 次 +9% ｜ 第 3 次 +18.5% ｜ 第 4 次 +24% ｜ 第 5 次起 +25%。",
+            "html": "脉冲命中会生成<span class=\"el-arc\">离子轨迹</span>，两次生成之间有 1 秒冷却。<br> <br> 脉冲伤害逐次提高：<br> 第 1 次 +2% ｜ 第 2 次 +9% ｜ 第 3 次 +18.5% ｜ 第 4 次 +24% ｜ 第 5 次起 +25%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "弹跳手雷",
+            "html": "弹跳手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/53ca71e5fc.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 追踪器\n \n 接触时分裂成 4 枚追踪弹体。\n 弹体追逐 6 米内的战斗人员，造成伤害后爆炸；若飞行速度过低，约 2 秒后自爆。\n \n 每枚弹体接触造成 2 次 24 [4] 伤害，随后爆炸最多造成 90 [15] 伤害。\n 4 枚全部命中最多合计 552 [92] 伤害。",
+            "html": "<span class=\"note\">中型弹道 ｜ 追踪器</span><br> <br> 接触时分裂成 4 枚追踪弹体。<br> 弹体追逐 6 米内的<span class=\"enemy\">战斗人员</span>，造成伤害后爆炸；若飞行速度过低，约 2 秒后自爆。<br> <br> 每枚弹体接触造成 2 次 24 <span class=\"pvp\">[4]</span> 伤害，随后爆炸最多造成 90 <span class=\"pvp\">[15]</span> 伤害。<br> 4 枚全部命中最多合计 552 <span class=\"pvp\">[92]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 151.5 秒\n 回复倍率 0.75×",
+            "html": "基础冷却 151.5 秒<br> 回复倍率 0.75×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "风暴手雷",
+            "html": "风暴手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1eb1f634ea.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道\n \n 接触时召唤一次聚焦打击，0.85 秒后命中，在 7 米半径内最多造成 440 [70] 伤害。\n \n 首次打击 0.6 秒后，在 7 米范围内呈 X 形召唤一轮矢弹弹幕，最多造成 311 [50] 伤害。\n 装备碎片「量级火花」时再多一轮呈 + 形的弹幕，同样最多 311 [50] 伤害。\n \n 战斗人员每轮弹幕只会被伤害一次，合计最多 751 伤害，装备碎片「量级火花」时 1062 伤害。\n 守护者每轮弹幕的每发矢弹也只受一次伤害，最多 120 伤害。",
+            "html": "<span class=\"note\">中型弹道</span><br> <br> 接触时召唤一次聚焦打击，0.85 秒后命中，在 7 米半径内最多造成 440 <span class=\"pvp\">[70]</span> 伤害。<br> <br> 首次打击 0.6 秒后，在 7 米范围内呈 X 形召唤一轮矢弹弹幕，最多造成 311 <span class=\"pvp\">[50]</span> 伤害。<br> 装备碎片「<span class=\"el-arc\">量级火花</span>」时再多一轮呈 + 形的弹幕，同样最多 311 <span class=\"pvp\">[50]</span> 伤害。<br> <br> <span class=\"enemy\">战斗人员</span>每轮弹幕只会被伤害一次，合计最多 751 伤害，装备碎片「<span class=\"el-arc\">量级火花</span>」时 1062 伤害。<br> <span class=\"bar-orange\">守护者</span>每轮弹幕的每发矢弹也只受一次伤害，最多 120 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 175.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 175.6 秒<br> 回复倍率 0.625×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暴雷之触",
+            "html": "暴雷之触"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/33c6bebcfa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "引爆后生成一个漫游风暴，持续 4+1.5 秒，以 2 [1.5] 米/秒的初速追逐战斗人员，1.3 秒后提速到 4 [3] 米/秒。\n 漫游风暴在自己下方发射闪电，造成 158 [30] 伤害，最多 11+4 次。",
+            "html": "引爆后生成一个漫游风暴，持续 4+1.5 秒，以 2 <span class=\"pvp\">[1.5]</span> 米/秒的初速追逐<span class=\"enemy\">战斗人员</span>，1.3 秒后提速到 4 <span class=\"pvp\">[3]</span> 米/秒。<br> 漫游风暴在<span class=\"enemy\">自己</span>下方发射闪电，造成 158 <span class=\"pvp\">[30]</span> 伤害，最多 11+4 次。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "猎人",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "组合打击",
+            "html": "组合打击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2835450b1e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近战击杀时：\n 提供 100% 职业技能能量，恢复 100 生命值，并获得 1 层组合打击，持续 20 秒，最多 3 层。\n 组合打击激活期间，基础近战攻击计为电弧灌注的近战伤害。\n 赌徒闪身要全额返还需要 70 职业属性。\n \n 1 层 ｜ 近战伤害 +133%[23%]，近战击杀恢复 80 生命值。\n 2 层 ｜ 近战伤害 +266%[51.3%]，近战击杀恢复 60 生命值。\n 3 层 ｜ 近战伤害 +400%[86%]，近战击杀恢复 40 生命值。",
+            "html": "近战击杀时：<br> 提供 100% <span class=\"pickup\">职业技能能量</span>，恢复 100 <span class=\"health\">生命值</span>，并获得 <span class=\"stack\">1 层</span><span class=\"el-arc\">组合打击</span>，持续 20 秒，最多 <span class=\"stack\">3 层</span>。<br> <span class=\"el-arc\">组合打击</span>激活期间，基础近战攻击计为<span class=\"el-arc\">电弧</span>灌注的近战伤害。<br> <span class=\"note\">赌徒闪身要全额返还需要 70 职业属性。</span><br> <br> <span class=\"stack\">1 层</span> ｜ 近战伤害 +133%<span class=\"pvp\">[23%]</span>，近战击杀恢复 80 <span class=\"health\">生命值</span>。<br> <span class=\"stack\">2 层</span> ｜ 近战伤害 +266%<span class=\"pvp\">[51.3%]</span>，近战击杀恢复 60 <span class=\"health\">生命值</span>。<br> <span class=\"stack\">3 层</span> ｜ 近战伤害 +400%<span class=\"pvp\">[86%]</span>，近战击杀恢复 40 <span class=\"health\">生命值</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 58.1 秒\n 回复倍率 1×",
+            "html": "基础冷却 58.1 秒<br> 回复倍率 1×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "迷失一击",
+            "html": "迷失一击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/26ca0c33b9.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "造成 162 [?] 直击伤害，以及最多 976 [?] 溅射伤害，7 米内衰减至 ?%。\n \n 命中时：\n 对 9.6 米内的战斗人员施加致盲，持续 8.5 秒。\n 提供增幅与 2 层电光充能。",
+            "html": "造成 162 <span class=\"unsure\">[?]</span> 直击伤害，以及最多 976 <span class=\"unsure\">[?]</span> 溅射伤害，7 米内衰减至 <span class=\"unsure\">?</span>%。<br> <br> 命中时：<br> 对 9.6 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-arc\">致盲</span>，持续 8.5 秒。<br> 提供<span class=\"el-arc\">增幅</span>与 <span class=\"stack\">2 层</span><span class=\"el-arc\">电光充能</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 118.8 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 118.8 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "电弧法杖",
+            "html": "电弧法杖"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b0f5c1fb1b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90%[53%]\n 基础持续：20 秒，或每秒消耗 5% 超能能量\n \n 击杀提供 1 层电光充能。\n \n 空中与扎根轻攻击 ｜ 消耗 2.5% 超能能量。\n 命中对 8 米内的目标造成 864 [?] 伤害，扎根攻击最多连锁命中 3 次。\n \n 扎根重击 ｜ 消耗 8% 超能能量。\n 在约 45°、最远 8 米的扇形范围内造成 1264 [?] 伤害。\n \n 空中重击 ｜ 消耗 8%? 超能能量。\n 造成 1264 [?] 伤害，并对 7 米范围内的战斗人员施加致盲。\n \n 掌击 ｜ 轻-轻-重击连招。\n 在约 45°、最远 8 米的扇形范围内造成 2950 [?] 伤害并施加致盲。\n \n 格挡 ｜ 每秒额外消耗 ?% 超能能量。\n 完全格挡并反射 180°? 范围内的所有攻击，每反射一次提供 1 层电光充能。\n 被反射的投射物重新导向准星，对战斗人员造成的伤害提高 100%。\n \n 职业技能 ｜ 不消耗超能能量。\n 闪避闪身，期间提供 ?% [?%] 伤害抗性。\n 装备星相「飞升」时可以反复使用飞升，代价是 ?% 超能能量。",
+            "html": "伤害抗性：90%<span class=\"pvp\">[53%]</span><br> 基础持续：20 秒，或每秒消耗 5% <span class=\"orb\">超能能量</span><br> <br> 击杀提供 <span class=\"stack\">1 层</span><span class=\"el-arc\">电光充能</span>。<br> <br> 空中与扎根轻攻击 ｜ 消耗 2.5% <span class=\"orb\">超能能量</span>。<br> 命中对 8 米内的目标造成 864 <span class=\"unsure\">[?]</span> 伤害，扎根攻击最多连锁命中 3 次。<br> <br> 扎根重击 ｜ 消耗 8% <span class=\"orb\">超能能量</span>。<br> 在约 45°、最远 8 米的扇形范围内造成 1264 <span class=\"unsure\">[?]</span> 伤害。<br> <br> 空中重击 ｜ 消耗 <span class=\"unsure\">8%?</span> <span class=\"orb\">超能能量</span>。<br> 造成 1264 <span class=\"unsure\">[?]</span> 伤害，并对 7 米范围内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-arc\">致盲</span>。<br> <br> 掌击 ｜ 轻-轻-重击连招。<br> 在约 45°、最远 8 米的扇形范围内造成 2950 <span class=\"unsure\">[?]</span> 伤害并施加<span class=\"deb-arc\">致盲</span>。<br> <br> 格挡 ｜ 每秒额外消耗 <span class=\"unsure\">?</span>% <span class=\"orb\">超能能量</span>。<br> 完全格挡并反射 <span class=\"unsure\">180°?</span> 范围内的所有攻击，每反射一次提供 <span class=\"stack\">1 层</span><span class=\"el-arc\">电光充能</span>。<br> 被反射的投射物重新导向准星，对<span class=\"enemy\">战斗人员</span>造成的伤害提高 100%。<br> <br> 职业技能 ｜ 不消耗<span class=\"orb\">超能能量</span>。<br> 闪避闪身，期间提供 <span class=\"unsure\">?</span>% <span class=\"unsure\">[?%]</span> 伤害抗性。<br> 装备星相「<span class=\"el-arc\">飞升</span>」时可以反复使用<span class=\"el-arc\">飞升</span>，代价是 <span class=\"unsure\">?</span>% <span class=\"orb\">超能能量</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "风起云涌",
+            "html": "风起云涌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/02ef086b27.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90%[49%]\n \n 向前掷出一根电弧法杖，接触时爆炸并嵌入所命中的物体。\n 接触造成 544 [300] 伤害并施加震颤，爆炸在 10 米半径内最多造成 608 [?] 伤害。\n 2 秒后，法杖被闪电击中，在 10 米半径内最多造成 1350 [500] 伤害。\n 再过 1.2 秒，法杖发出伤害场域，在 10 米半径内每 0.7 秒造成 446 [60] 伤害，持续 8 秒。",
+            "html": "伤害抗性：90%<span class=\"pvp\">[49%]</span><br> <br> 向前掷出一根<span class=\"el-arc\">电弧</span>法杖，接触时爆炸并嵌入所命中的物体。<br> 接触造成 544 <span class=\"pvp\">[300]</span> 伤害并施加<span class=\"deb-arc\">震颤</span>，爆炸在 10 米半径内最多造成 608 <span class=\"unsure\">[?]</span> 伤害。<br> 2 秒后，法杖被闪电击中，在 10 米半径内最多造成 1350 <span class=\"pvp\">[500]</span> 伤害。<br> 再过 1.2 秒，法杖发出伤害场域，在 10 米半径内每 0.7 秒造成 446 <span class=\"pvp\">[60]</span> 伤害，持续 8 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T3 级超能\n 基础冷却 500 秒",
+            "html": "T3 级超能<br> 基础冷却 500 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "风暴边缘",
+            "html": "风暴边缘"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1064a66bec.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90%[45%]\n 基础持续：? 秒，或每秒消耗 ?% 超能能量\n \n 掷出一把追踪飞刀，造成 90 [?] 直击伤害，并对接触点 3 米内的战斗人员造成最多 171 [45?] 径向伤害，随后传送到该位置。\n 传送后大范围回旋打击，对 6 米内的战斗人员造成 1440 × 2 [300?] 伤害。\n 每投掷一把飞刀消耗 ?% 超能能量，每次超能激活最多 3 次。",
+            "html": "伤害抗性：90%<span class=\"pvp\">[45%]</span><br> 基础持续：<span class=\"unsure\">?</span> 秒，或每秒消耗 <span class=\"unsure\">?</span>% <span class=\"orb\">超能能量</span><br> <br> 掷出一把追踪飞刀，造成 90 <span class=\"unsure\">[?]</span> 直击伤害，并对接触点 3 米内的<span class=\"enemy\">战斗人员</span>造成最多 171 <span class=\"unsure\">[45?]</span> 径向伤害，随后传送到该位置。<br> 传送后大范围回旋打击，对 6 米内的<span class=\"enemy\">战斗人员</span>造成 1440 × 2 <span class=\"unsure\">[300?]</span> 伤害。<br> 每投掷一把飞刀消耗 <span class=\"unsure\">?</span>% <span class=\"orb\">超能能量</span>，每次超能激活最多 3 次。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T1 级超能\n 基础冷却 625 秒",
+            "html": "T1 级超能<br> 基础冷却 625 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "飞升",
+            "html": "飞升"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2b0c20c15a.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在空中且有职业技能充能时：\n 按［空中移动］消耗一次职业技能充能，向上挥出电弧法杖旋转攻击，并触发已装备职业技能的使用效果。\n 为使用者与 10 米内的盟友提供增幅。\n 对 10 米内的战斗人员最多造成 181 [?] 伤害并施加震颤。\n \n 星相伤害随超过 100 的职业属性缩放，200 属性时最多 +65%[?%]。",
+            "html": "在空中且有<span class=\"pickup\">职业技能充能</span>时：<br> 按［空中移动］消耗一次<span class=\"pickup\">职业技能充能</span>，向上挥出<span class=\"el-arc\">电弧</span>法杖旋转攻击，并触发已装备职业技能的使用效果。<br> 为使用者与 10 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-arc\">增幅</span>。<br> 对 10 米内的<span class=\"enemy\">战斗人员</span>最多造成 181 <span class=\"unsure\">[?]</span> 伤害并施加<span class=\"deb-arc\">震颤</span>。<br> <br> 星相伤害随超过 100 的职业属性缩放，200 属性时最多 +65%<span class=\"unsure\">[?%]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "流动状态",
+            "html": "流动状态"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ae4b8ef272.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀震颤的战斗人员提供增幅。\n \n 增幅期间：\n 职业技能基础恢复速率额外 +200%。\n +50 填装速度，换弹时长 ×0.8。\n \n 闪身动画期间获得 66%[32%] 伤害抗性。",
+            "html": "击杀<span class=\"deb-arc\">震颤</span>的<span class=\"enemy\">战斗人员</span>提供<span class=\"el-arc\">增幅</span>。<br> <br> <span class=\"el-arc\">增幅</span>期间：<br> <span class=\"pickup\">职业技能</span>基础恢复速率额外 +200%。<br> +50 填装速度，换弹时长 ×0.8。<br> <br> 闪身动画期间获得 66%<span class=\"pvp\">[32%]</span> 伤害抗性。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "致命电流",
+            "html": "致命电流"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/655e3dc947.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "直接近战命中震颤的战斗人员时施加致盲。\n \n 使用职业技能后：\n 近战突进距离提高到 7 米。\n 10 秒内下一次近战或裂空打击命中会施加震颤，并触发一次伤害余震，对 6 米内的战斗人员造成 195 [?] 伤害。",
+            "html": "直接近战命中<span class=\"deb-arc\">震颤</span>的<span class=\"enemy\">战斗人员</span>时施加<span class=\"deb-arc\">致盲</span>。<br> <br> 使用职业技能后：<br> 近战突进距离提高到 7 米。<br> 10 秒内下一次近战或<span class=\"el-arc\">裂空打击</span>命中会施加<span class=\"deb-arc\">震颤</span>，并触发一次伤害余震，对 6 米内的<span class=\"enemy\">战斗人员</span>造成 195 <span class=\"unsure\">[?]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "裂空打击",
+            "html": "裂空打击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/bf53df0ab7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀震颤的战斗人员提供 1 层电光充能，不与「电介质」的 1 层叠加。\n \n 滑铲时按［近战技能］：\n 打出一记上勾拳，沿地面发射一道最远 22 米的电弧波形，造成 739 [125] 伤害并施加震颤。\n 使用后对战斗人员提供 75% 伤害抗性，持续 4? 秒。\n 开火状态下无法在滑铲期间使用。\n \n 可以触发「组合打击」的效果并吃到它的伤害提高，但不与「迷失一击」互动。",
+            "html": "击杀<span class=\"deb-arc\">震颤</span>的<span class=\"enemy\">战斗人员</span>提供 <span class=\"stack\">1 层</span><span class=\"el-arc\">电光充能</span>，不与「<span class=\"art-perk\">电介质</span>」的 <span class=\"stack\">1 层</span>叠加。<br> <br> 滑铲时按［近战技能］：<br> 打出一记上勾拳，沿地面发射一道最远 22 米的<span class=\"el-arc\">电弧</span>波形，造成 739 <span class=\"pvp\">[125]</span> 伤害并施加<span class=\"deb-arc\">震颤</span>。<br> 使用后对<span class=\"enemy\">战斗人员</span>提供 75% 伤害抗性，持续 <span class=\"unsure\">4?</span> 秒。<br> <span class=\"note\">开火状态下无法在滑铲期间使用。</span><br> <br> 可以触发「<span class=\"el-arc\">组合打击</span>」的效果并吃到它的伤害提高，但不与「<span class=\"el-arc\">迷失一击</span>」互动。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "泰坦",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "职业技能",
+            "html": "职业技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "推进器",
+            "html": "推进器"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ee49d5b3a9.webp\" alt=\"\" width=\"44\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "以第一人称冲刺的形式进行闪避，期间移除战斗人员的弹体追踪?与对守护者的瞄准辅助。\n \n 朝当前保持的移动方向快速冲刺 8 米；不输入方向则向后冲刺 4 米。",
+            "html": "以第一人称冲刺的形式进行闪避，期间移除<span class=\"enemy\">战斗人员</span>的<span class=\"unsure\">弹体追踪?</span>与对<span class=\"bar-orange\">守护者</span>的瞄准辅助。<br> <br> 朝当前保持的移动方向快速冲刺 8 米；不输入方向则向后冲刺 4 米。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 52.1 秒\n 回复倍率 1×",
+            "html": "基础冷却 52.1 秒<br> 回复倍率 1×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "弹道猛击",
+            "html": "弹道猛击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9f1b87183e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在空中冲刺 0.03 秒后：\n 快速下降并打击地面，对 8 米内的战斗人员造成至少 210 [65] 的无衰减伤害。\n 每命中一名战斗人员提供 3% 超能能量与 3 层电光充能。\n 伤害随坠落时间缩放，从最大跳跃高度斜向猛击约造成 1000 伤害。\n 落地后 0.9 秒内无法进行近战攻击。",
+            "html": "在空中冲刺 0.03 秒后：<br> 快速下降并打击地面，对 8 米内的<span class=\"enemy\">战斗人员</span>造成至少 210 <span class=\"pvp\">[65]</span> 的无衰减伤害。<br> 每命中一名<span class=\"enemy\">战斗人员</span>提供 3% <span class=\"orb\">超能能量</span>与 <span class=\"stack\">3 层</span><span class=\"el-arc\">电光充能</span>。<br> 伤害随坠落时间缩放，从最大跳跃高度斜向猛击约造成 1000 伤害。<br> <span class=\"note\">落地后 0.9 秒内无法进行近战攻击。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 164.6 秒\n 回复倍率 0.7×",
+            "html": "基础冷却 164.6 秒<br> 回复倍率 0.7×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "地震打击",
+            "html": "地震打击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3089089bee.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "与其它肩撞类技能共用的规则：\n 需要冲刺 1.25 秒；未命中战斗人员时消耗 15% 近战技能能量；开火状态下无法在滑铲期间使用；被肩撞直接命中的守护者近战突进失效 0.5 秒。\n \n 向前突进 6.8 米，自动瞄准射程内的战斗人员。\n \n 命中战斗人员：\n 造成 1073 [110] 直击伤害。\n 对 6 米内的战斗人员造成 391 [40] 径向伤害，并施加致盲持续 8 [1.6] 秒。\n \n 增幅期间：\n 致盲半径提高到 10 米，持续时间提高到 10 [3] 秒。",
+            "html": "与其它肩撞类技能共用的规则：<br> <span class=\"note\">需要冲刺 1.25 秒；未命中战斗人员时消耗 15% 近战技能能量；开火状态下无法在滑铲期间使用；被肩撞直接命中的守护者近战突进失效 0.5 秒。</span><br> <br> 向前突进 6.8 米，自动瞄准射程内的<span class=\"enemy\">战斗人员</span>。<br> <br> 命中<span class=\"enemy\">战斗人员</span>：<br> 造成 1073 <span class=\"pvp\">[110]</span> 直击伤害。<br> 对 6 米内的<span class=\"enemy\">战斗人员</span>造成 391 <span class=\"pvp\">[40]</span> 径向伤害，并施加<span class=\"deb-arc\">致盲</span>持续 8 <span class=\"pvp\">[1.6]</span> 秒。<br> <br> <span class=\"el-arc\">增幅</span>期间：<br> <span class=\"deb-arc\">致盲</span>半径提高到 10 米，持续时间提高到 10 <span class=\"pvp\">[3]</span> 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.8×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "雷霆一击",
+            "html": "雷霆一击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7f930d12a2.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "可蓄力的近战攻击。\n 在 7.5 米宽、最远 16 米的锥形范围内造成 703 [120] 伤害，蓄力 2 秒可逐渐把伤害提高到最多 +100%（乘算）。\n 动画期间对战斗人员提供 80% 伤害抗性，使用后再持续 ? 秒。",
+            "html": "可蓄力的近战攻击。<br> 在 7.5 米宽、最远 16 米的锥形范围内造成 703 <span class=\"pvp\">[120]</span> 伤害，蓄力 2 秒可逐渐把伤害提高到最多 +100%<span class=\"note\">（乘算）</span>。<br> 动画期间对<span class=\"enemy\">战斗人员</span>提供 80% 伤害抗性，使用后再持续 <span class=\"unsure\">?</span> 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "浩劫之拳",
+            "html": "浩劫之拳"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c9da424180.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90%[58%]\n 基础持续：25 秒，或每秒消耗 4% 超能能量\n \n 轻攻击 ｜ 消耗 6% 超能能量。\n 命中造成 499 [?] 伤害并强力击退战斗人员。\n 命中一次轻攻击后，下一次重击命中额外造成 4 段伤害，每段 273 [?]。\n \n 重击 ｜ 消耗 12% 超能能量。\n 向下猛击，在 11 米半径内造成 1619 [?] 伤害并施加致盲。超能施放本身也会猛击，但不产生余震。\n 若在动画中停留至少 1 秒，猛击额外造成 4 段伤害，每段 273 [?]，且每段需要输入方向键。\n 最多生成 4 道余震，每道最多造成 292 [?] 伤害。",
+            "html": "伤害抗性：90%<span class=\"pvp\">[58%]</span><br> 基础持续：25 秒，或每秒消耗 4% <span class=\"orb\">超能能量</span><br> <br> 轻攻击 ｜ 消耗 6% <span class=\"orb\">超能能量</span>。<br> 命中造成 499 <span class=\"unsure\">[?]</span> 伤害并强力击退<span class=\"enemy\">战斗人员</span>。<br> 命中一次轻攻击后，下一次重击命中额外造成 4 段伤害，每段 273 <span class=\"unsure\">[?]</span>。<br> <br> 重击 ｜ 消耗 12% <span class=\"orb\">超能能量</span>。<br> 向下猛击，在 11 米半径内造成 1619 <span class=\"unsure\">[?]</span> 伤害并施加<span class=\"deb-arc\">致盲</span>。超能施放本身也会猛击，但不产生余震。<br> 若在动画中停留至少 1 秒，猛击额外造成 4 段伤害，每段 273 <span class=\"unsure\">[?]</span>，且每段需要输入方向键。<br> 最多生成 4 道余震，每道最多造成 292 <span class=\"unsure\">[?]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "雷霆冲击",
+            "html": "雷霆冲击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f9625f59ee.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90%[25%]\n 基础持续：最长 4.5 秒，或每秒消耗 22.2% 超能能量\n \n 飞行途中贴得非常近的战斗人员受到 150 [?] 碰撞伤害。\n \n 与表面或战斗人员接触时引爆：\n 造成 180 [?] 直击伤害，以及覆盖 10 米、最多 8260 [?] 的爆炸伤害。\n 接触 0.75 秒后爆炸释放余震，每秒最多造成 108 [?] 伤害，持续 4 秒。",
+            "html": "伤害抗性：90%<span class=\"pvp\">[25%]</span><br> 基础持续：最长 4.5 秒，或每秒消耗 22.2% <span class=\"orb\">超能能量</span><br> <br> 飞行途中贴得非常近的<span class=\"enemy\">战斗人员</span>受到 150 <span class=\"unsure\">[?]</span> 碰撞伤害。<br> <br> 与表面或<span class=\"enemy\">战斗人员</span>接触时引爆：<br> 造成 180 <span class=\"unsure\">[?]</span> 直击伤害，以及覆盖 10 米、最多 8260 <span class=\"unsure\">[?]</span> 的爆炸伤害。<br> 接触 0.75 秒后爆炸释放余震，每秒最多造成 108 <span class=\"unsure\">[?]</span> 伤害，持续 4 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "无畏护甲",
+            "html": "无畏护甲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a20f6b74a2.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲刺、移动速度高于约 4 米/秒且职业技能能量已满时：\n 提供一面 50 生命值的正面覆盖护盾吸收伤害，每格挡一次攻击提供 1 层电光充能。\n 增幅期间覆盖护盾获得 33% 伤害抗性，有效生命值提高到 75。\n 激活期间另有 60%[10%] 溅射伤害抗性与 10% 战斗人员伤害抗性。\n \n 覆盖护盾在被摧毁前能完整吸收最后一次命中，代价是耗尽全部职业技能能量。\n 可以与其它覆盖护盾叠加。",
+            "html": "冲刺、移动速度高于约 4 米/秒且<span class=\"pickup\">职业技能能量</span>已满时：<br> 提供一面 50 <span class=\"health\">生命值</span>的正面<span class=\"pickup\">覆盖护盾</span>吸收伤害，每格挡一次攻击提供 <span class=\"stack\">1 层</span><span class=\"el-arc\">电光充能</span>。<br> <span class=\"el-arc\">增幅</span>期间<span class=\"pickup\">覆盖护盾</span>获得 33% 伤害抗性，有效<span class=\"health\">生命值</span>提高到 75。<br> 激活期间另有 60%<span class=\"pvp\">[10%]</span> 溅射伤害抗性与 10% <span class=\"enemy\">战斗人员</span>伤害抗性。<br> <br> <span class=\"pickup\">覆盖护盾</span>在被摧毁前能完整吸收最后一次命中，代价是耗尽全部<span class=\"pickup\">职业技能能量</span>。<br> 可以与其它<span class=\"pickup\">覆盖护盾</span>叠加。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "重击",
+            "html": "重击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/947bf83419.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近战击杀时：\n 0.1 秒内快速恢复一段生命值，开始生命值恢复，并提供增幅。\n 红血 50 ｜ 橙血 75 ｜ 初级首领 100 ｜ 守护者 30 生命值。\n \n 打破战斗人员护盾，或对生命值低于 30% 的战斗人员造成伤害：\n 提供重击，持续 6 秒。\n \n 重击期间：\n 基础与偃月近战伤害 +160%[30%]。\n 充能近战伤害 +160%[20%]。\n 基础近战攻击计为电弧充能近战命中。\n 对战斗人员的近战突进距离提高到 6 米。",
+            "html": "近战击杀时：<br> 0.1 秒内快速恢复一段<span class=\"health\">生命值</span>，开始<span class=\"health\">生命值</span>恢复，并提供<span class=\"el-arc\">增幅</span>。<br> <span class=\"bar-red\">红血</span> 50 ｜ <span class=\"bar-orange\">橙血</span> 75 ｜ <span class=\"bar-yellow\">初级首领</span> 100 ｜ <span class=\"bar-orange\">守护者</span> 30 <span class=\"health\">生命值</span>。<br> <br> 打破<span class=\"enemy\">战斗人员</span>护盾，或对<span class=\"health\">生命值</span>低于 30% 的<span class=\"enemy\">战斗人员</span>造成伤害：<br> 提供<span class=\"el-arc\">重击</span>，持续 6 秒。<br> <br> <span class=\"el-arc\">重击</span>期间：<br> 基础与偃月近战伤害 +160%<span class=\"pvp\">[30%]</span>。<br> 充能近战伤害 +160%<span class=\"pvp\">[20%]</span>。<br> 基础近战攻击计为<span class=\"el-arc\">电弧</span>充能近战命中。<br> 对<span class=\"enemy\">战斗人员</span>的近战突进距离提高到 6 米。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "风暴要塞",
+            "html": "风暴要塞"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/503331b351.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "使用职业技能：\n 提供 4 层电光充能，用推进器则提供 6 层。\n \n 位于屏障后方时：\n 每 0.6 秒提供 1 层电光充能。\n 电光充能此时可以由武器伤害触发。\n 碎片「频率火花」不会提高本星相给出的层数，多面屏障也不叠加。",
+            "html": "使用职业技能：<br> 提供 <span class=\"stack\">4 层</span><span class=\"el-arc\">电光充能</span>，用推进器则提供 <span class=\"stack\">6 层</span>。<br> <br> 位于屏障后方时：<br> 每 0.6 秒提供 <span class=\"stack\">1 层</span><span class=\"el-arc\">电光充能</span>。<br> <span class=\"el-arc\">电光充能</span>此时可以由武器伤害触发。<br> <span class=\"note\">碎片「频率火花」不会提高本星相给出的层数，多面屏障也不叠加。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暴雷之触",
+            "html": "暴雷之触"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cfa33ed23c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "强化闪光、闪电、脉冲、风暴四种手雷，逐条效果见「手雷技能」一节。",
+            "html": "强化闪光、闪电、脉冲、风暴四种手雷，逐条效果见「手雷技能」一节。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "术士",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "球形闪电",
+            "html": "球形闪电"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a60806be91.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "向前发射一颗最远 35 米的球形闪电。\n 飞到最远距离、接触物体，或下方 4? 米内出现战斗人员时，释放一次闪电打击。\n \n 闪电打击在 2? 米内造成 271 [70] 伤害。\n 直接命中战斗人员额外造成 117 [30] 伤害。\n \n 增幅期间：\n 额外生成 2 道闪电打击，每道造成 163 [?] 伤害。\n 3 道全部直接命中时最多合计 714 [240] 伤害。",
+            "html": "向前发射一颗最远 35 米的<span class=\"el-arc\">球形闪电</span>。<br> 飞到最远距离、接触物体，或下方 <span class=\"unsure\">4?</span> 米内出现<span class=\"enemy\">战斗人员</span>时，释放一次闪电打击。<br> <br> 闪电打击在 <span class=\"unsure\">2?</span> 米内造成 271 <span class=\"pvp\">[70]</span> 伤害。<br> 直接命中<span class=\"enemy\">战斗人员</span>额外造成 117 <span class=\"pvp\">[30]</span> 伤害。<br> <br> <span class=\"el-arc\">增幅</span>期间：<br> 额外生成 2 道闪电打击，每道造成 163 <span class=\"unsure\">[?]</span> 伤害。<br> 3 道全部直接命中时最多合计 714 <span class=\"pvp\">[240]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 164.6 秒\n 回复倍率 0.7×",
+            "html": "基础冷却 164.6 秒<br> 回复倍率 0.7×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "连锁闪电",
+            "html": "连锁闪电"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ebe677de56.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "突进距离延长到 6 米的近战攻击。\n 电弧分支职业专属，拥有 2 次技能充能。\n \n 直接打击战斗人员：\n 造成 490? [100] 伤害，施加震颤，并使其释放连锁闪电。\n 连锁闪电对 9 米内的战斗人员造成 266? [54] 伤害，最多连锁 5 次，但无法连回最近一次瞄准的战斗人员。\n \n 增幅期间：\n 释放两轮连锁闪电，各自瞄准不同的战斗人员，命中战斗人员的上限翻倍。\n 同一名战斗人员仍然只会被连锁闪电命中一次。",
+            "html": "突进距离延长到 6 米的近战攻击。<br> <span class=\"el-arc\">电弧</span>分支职业专属，拥有 2 次技能充能。<br> <br> 直接打击<span class=\"enemy\">战斗人员</span>：<br> 造成 <span class=\"unsure\">490?</span> <span class=\"pvp\">[100]</span> 伤害，施加<span class=\"deb-arc\">震颤</span>，并使其释放<span class=\"el-arc\">连锁闪电</span>。<br> <span class=\"el-arc\">连锁闪电</span>对 9 米内的<span class=\"enemy\">战斗人员</span>造成 <span class=\"unsure\">266?</span> <span class=\"pvp\">[54]</span> 伤害，最多连锁 5 次，但无法连回最近一次瞄准的<span class=\"enemy\">战斗人员</span>。<br> <br> <span class=\"el-arc\">增幅</span>期间：<br> 释放两轮<span class=\"el-arc\">连锁闪电</span>，各自瞄准不同的<span class=\"enemy\">战斗人员</span>，命中<span class=\"enemy\">战斗人员</span>的上限翻倍。<br> 同一名<span class=\"enemy\">战斗人员</span>仍然只会被<span class=\"el-arc\">连锁闪电</span>命中一次。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.9×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.9×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "混沌之触",
+            "html": "混沌之触"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b39ca82cc6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90%[55%]\n 基础持续：4 秒，或每秒消耗 25% 超能能量\n 移动速度：4.5 米/秒\n \n 向准星方向持续发射长射程光线，每 0.13 秒造成 378 [?] 伤害，动画前 0.67 秒不造成伤害。\n 对同一名战斗人员命中 7 次会在其位置召唤一次震颤闪电打击，造成 202 [?] 伤害。\n \n 提前停用会部分返还超能能量，立即取消最多返还 30%。",
+            "html": "伤害抗性：90%<span class=\"pvp\">[55%]</span><br> 基础持续：4 秒，或每秒消耗 25% <span class=\"orb\">超能能量</span><br> 移动速度：4.5 米/秒<br> <br> 向准星方向持续发射长射程光线，每 0.13 秒造成 378 <span class=\"unsure\">[?]</span> 伤害，动画前 0.67 秒不造成伤害。<br> 对同一名<span class=\"enemy\">战斗人员</span>命中 7 次会在其位置召唤一次<span class=\"deb-arc\">震颤</span>闪电打击，造成 202 <span class=\"unsure\">[?]</span> 伤害。<br> <br> 提前停用会部分返还<span class=\"orb\">超能能量</span>，立即取消最多返还 30%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T4 级超能\n 基础冷却 455 秒",
+            "html": "T4 级超能<br> 基础冷却 455 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "雷霆万钧",
+            "html": "雷霆万钧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4caa7bebff.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90%[58%]\n 基础持续：16 秒，或每秒消耗 6.25% 超能能量\n \n 超能施放时：\n 在 6 米半径内最多造成 690 [?] 伤害并击退战斗人员，同时在自己周围释放 5 枚闪电追踪弹。\n 追踪弹造成 440 [150] 伤害并施加震颤，持续 16 秒。\n \n 轻攻击 ｜ 消耗 ?% 超能能量。\n 瞄准 12 米内的战斗人员释放锁链闪电，每 0.34 秒造成 178 [90] 伤害。\n 伤害随时间攀升，每 0.33 秒提高 5%，3.33 秒后达到最高 +65%；停止造成伤害 2 秒后提升开始衰减。\n \n 重击 ｜ 冲刺时进行风驰电掣。\n 消耗 6.25% 超能能量，朝当前输入方向传送最多 7 米。",
+            "html": "伤害抗性：90%<span class=\"pvp\">[58%]</span><br> 基础持续：16 秒，或每秒消耗 6.25% <span class=\"orb\">超能能量</span><br> <br> 超能施放时：<br> 在 6 米半径内最多造成 690 <span class=\"unsure\">[?]</span> 伤害并击退<span class=\"enemy\">战斗人员</span>，同时在<span class=\"enemy\">自己</span>周围释放 5 枚闪电追踪弹。<br> 追踪弹造成 440 <span class=\"pvp\">[150]</span> 伤害并施加<span class=\"deb-arc\">震颤</span>，持续 16 秒。<br> <br> 轻攻击 ｜ 消耗 <span class=\"unsure\">?</span>% <span class=\"orb\">超能能量</span>。<br> 瞄准 12 米内的<span class=\"enemy\">战斗人员</span>释放锁链闪电，每 0.34 秒造成 178 <span class=\"pvp\">[90]</span> 伤害。<br> 伤害随时间攀升，每 0.33 秒提高 5%，3.33 秒后达到最高 +65%；停止造成伤害 2 秒后提升开始衰减。<br> <br> 重击 ｜ 冲刺时进行风驰电掣。<br> 消耗 6.25% <span class=\"orb\">超能能量</span>，朝当前输入方向传送最多 7 米。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "电弧之魂",
+            "html": "电弧之魂"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3fdf5e28aa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "使用者生成的裂痕会为自己与穿过它的盟友提供电弧之魂，重新踏入裂痕可以刷新持续时间。\n \n 电弧伙伴持续 15 秒，以 100 发/分钟的速率向 24 米内的战斗人员进行 3 连发追踪弹体，每发造成 69 [11] 电弧手雷伤害。\n 可以触发手雷技能的交互效果。\n \n 身边 15? 米内有盟友时，提供额外的职业技能基础充能速度：\n 1 名 +40%[20%] ｜ 2 名 +80%[40%] ｜ 3 名 +120%[60%]。\n \n 增幅期间：\n 改为 5 发连射，整体射速提高到 225 发/分钟。",
+            "html": "使用者生成的裂痕会为<span class=\"enemy\">自己</span>与穿过它的<span class=\"enemy\">盟友</span>提供<span class=\"el-arc\">电弧之魂</span>，重新踏入裂痕可以刷新持续时间。<br> <br> <span class=\"el-arc\">电弧</span>伙伴持续 15 秒，以 100 发/分钟的速率向 24 米内的<span class=\"enemy\">战斗人员</span>进行 3 连发追踪弹体，每发造成 69 <span class=\"pvp\">[11]</span> <span class=\"el-arc\">电弧</span>手雷伤害。<br> 可以触发手雷技能的交互效果。<br> <br> 身边 <span class=\"unsure\">15?</span> 米内有<span class=\"enemy\">盟友</span>时，提供额外的<span class=\"pickup\">职业技能</span>基础充能速度：<br> 1 名 +40%<span class=\"pvp\">[20%]</span> ｜ 2 名 +80%<span class=\"pvp\">[40%]</span> ｜ 3 名 +120%<span class=\"pvp\">[60%]</span>。<br> <br> <span class=\"el-arc\">增幅</span>期间：<br> 改为 5 发连射，整体射速提高到 225 发/分钟。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "电荷思维",
+            "html": "电荷思维"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/fce2131630.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电弧技能击杀，以及击杀带有电弧减益的战斗人员，生成离子轨迹。\n 两次生成之间有 1? 秒冷却。\n \n 拾取离子轨迹提供增幅。",
+            "html": "<span class=\"el-arc\">电弧</span>技能击杀，以及击杀带有<span class=\"el-arc\">电弧</span><span class=\"debuff\">减益</span>的<span class=\"enemy\">战斗人员</span>，生成<span class=\"el-arc\">离子轨迹</span>。<br> 两次生成之间有 <span class=\"unsure\">1?</span> 秒冷却。<br> <br> 拾取<span class=\"el-arc\">离子轨迹</span>提供<span class=\"el-arc\">增幅</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "离子哨兵",
+            "html": "离子哨兵"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c7fe4de729.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电弧击杀与动能击杀为离子哨兵蓄力，攒够 6 次充能即可使用。\n 武器击杀 1 [2] ｜ 技能击杀 2 [?]。\n \n 手雷技能被替换为离子哨兵。\n 它计为电弧手雷技能伤害，会触发手雷技能的交互效果。\n \n 离子哨兵：\n 落地时对 5 米内的战斗人员施加致盲，持续 10? [3?] 秒。\n 此后每秒自动向 16 米内的战斗人员发射连锁闪电，造成 202 [50] 电弧伤害。\n 闪电会连锁到最初命中目标 6 米内的另一名战斗人员，命中提供 1 层电光充能。\n 持续 15 秒，有 ? 点构造体生命值。使用者不会被自己致盲。\n 激活后有 6 秒冷却，冷却期间的击杀不提供充能。",
+            "html": "<span class=\"el-arc\">电弧</span>击杀与<span class=\"el-kinetic\">动能</span>击杀为<span class=\"el-arc\">离子哨兵</span>蓄力，攒够 6 次充能即可使用。<br> 武器击杀 1 <span class=\"pvp\">[2]</span> ｜ 技能击杀 2 <span class=\"unsure\">[?]</span>。<br> <br> 手雷技能被替换为<span class=\"el-arc\">离子哨兵</span>。<br> 它计为<span class=\"el-arc\">电弧</span>手雷技能伤害，会触发手雷技能的交互效果。<br> <br> <span class=\"el-arc\">离子哨兵</span>：<br> 落地时对 5 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-arc\">致盲</span>，持续 <span class=\"unsure\">10?</span> <span class=\"unsure\">[3?]</span> 秒。<br> 此后每秒自动向 16 米内的<span class=\"enemy\">战斗人员</span>发射<span class=\"el-arc\">连锁闪电</span>，造成 202 <span class=\"pvp\">[50]</span> <span class=\"el-arc\">电弧伤害</span>。<br> 闪电会连锁到最初命中目标 6 米内的另一名<span class=\"enemy\">战斗人员</span>，命中提供 <span class=\"stack\">1 层</span><span class=\"el-arc\">电光充能</span>。<br> 持续 15 秒，有 <span class=\"unsure\">?</span> 点构造体<span class=\"health\">生命值</span>。使用者不会被<span class=\"enemy\">自己</span><span class=\"deb-arc\">致盲</span>。<br> <span class=\"note\">激活后有 6 秒冷却，冷却期间的击杀不提供充能。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "闪电激涌",
+            "html": "闪电激涌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1dd3dd05aa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "滑铲时按［近战技能］：\n 把使用者向前传送 10 米，在距出口点 7 米处呈五边形召唤 5 道闪电，每命中一名战斗人员提供 1 层电光充能。\n 使用时另提供增幅。未命中时不会拿到超过 1 层。\n 使用后对战斗人员提供 ?% 伤害抗性，持续 ? 秒。\n 开火状态下无法在滑铲期间使用。\n \n 闪电同时造成 634 + 127 = 761 [105 + 47 = 152] 伤害并施加震颤。",
+            "html": "滑铲时按［近战技能］：<br> 把使用者向前传送 10 米，在距出口点 7 米处呈五边形召唤 5 道闪电，每命中一名<span class=\"enemy\">战斗人员</span>提供 <span class=\"stack\">1 层</span><span class=\"el-arc\">电光充能</span>。<br> 使用时另提供<span class=\"el-arc\">增幅</span>。未命中时不会拿到超过 <span class=\"stack\">1 层</span>。<br> 使用后对<span class=\"enemy\">战斗人员</span>提供 <span class=\"unsure\">?</span>% 伤害抗性，持续 <span class=\"unsure\">?</span> 秒。<br> <span class=\"note\">开火状态下无法在滑铲期间使用。</span><br> <br> 闪电同时造成 634 + 127 = 761 <span class=\"pvp\">[105 + 47 = 152]</span> 伤害并施加<span class=\"deb-arc\">震颤</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "电弧 · Starside\n\nStarside\n/\n职业分支详解\n/\n电弧\n\n电弧\n\n效果\n\n名称\n图标\n说明\n\n增幅电弧分支职业的固有增益。\n 6 秒内用电弧击杀把计数推满即可获得，也可以由星相直接授予。\n 计数进度：红血 25% ｜ 橙血 50% ｜ 初级首领 100% ｜ 守护者 50%。\n\n 增幅：\n +50 敏捷，滑铲距离提高到 8.5 米，+40 操控性，操控动作时长 ×0.95，持续 15 秒。\n 激活期间战斗人员对使用者的瞄准精度下降，使用者获得 15% 战斗人员伤害抗性。\n 增幅状态下冲刺 2.5 秒进入速度加成。\n\n 速度加成：\n 移动速度拉满，滑铲距离提高到 11 米，跳跃高度提高 25%，并获得 15% 战斗人员伤害抗性。\n 停止冲刺后再停留 2 秒，增幅已经耗尽也照样停留。\n 用速度加成滑铲一次，基础滑铲距离从 6.5 米永久提高到 8.5 米，直到死亡为止。\n\n电光充能电光充能生效期间，每在 5 秒内攒够规定次数的武器伤害实例：\n 下一次任意来源的伤害实例提供 1 层。\n 切换武器会重置计数，同一时刻的多个伤害实例最多只给 1 层。\n\n 攒够一层所需的伤害实例数：\n 弹匣容量的 15% 向下取整 + 1 ｜ 刀剑与榴弹发射器 2 次 ｜ 三发装狙击枪 1 次。\n\n 每获得一层提供 2.5% 近战技能能量，攒到放电所需的 10 层合计 25%。\n 超过 10 层照样按层数结算——9 层时一次获得 4 层，仍然给 10% 近战能量。\n\n 攒满 10 层后，技能命中或造成非充能近战伤害 0.5 秒后触发放电：\n 在被伤害的战斗人员上方落下一发电弧矢弹，最多 405 矢弹溅射 + 270 地面溅射 = 合计 675 [36 + 30] 电弧伤害，范围 ? 米。\n 不计为技能伤害，只算普通电弧伤害。\n\n 可以触发放电：\n 不稳定爆炸 ｜ 冻结碎裂（初级首领的自动碎裂不算）｜ 缠结爆炸 ｜ 线虫 ｜ 瓦解线 ｜ 初级首领身上的悬停急拽 ｜ 先驱者的巨岩。\n\n 不触发放电：\n 震颤的连锁闪电 ｜ 非技能来源的灼烧与点燃 ｜ 非技能来源的水晶碎裂 ｜ 天赋信念的爆炸物。\n\n离子轨迹电弧元素拾取物，以 6 米/秒的速度追踪使用者。\n\n 拾取提供 11.25% 手雷与近战技能能量，以及 13.5% 职业技能能量。\n 使用者生成的离子轨迹对盟友不生效。\n\n致盲被致盲的战斗人员陷入迷失，10 秒内无法攻击或使用技能。\n\n 被致盲的守护者 HUD 消失、屏幕变白、声音失真，持续 3 秒。\n\n 势不可挡勇士被致盲时进入眩晕。\n\n震颤震颤的战斗人员每受到 115 [45] 伤害就释放一次连锁闪电，对 12 米内的所有战斗人员造成 119 [51] 电弧伤害，持续 10 [5] 秒。\n\n 重新施加震颤可以刷新持续时间，施加震颤那一次命中的伤害也计入伤害阈值。\n 两次连锁闪电之间有 0.8 秒冷却。\n\n 释放连锁闪电的守护者不吃自己的链击伤害，除非它打到了别的守护者。\n\n 过载勇士受到震颤伤害时进入眩晕。\n\n碎片\n\n碎片\n图标\n说明\n属性变化\n\n增幅火花增幅期间：\n 4 秒内连续击杀 2 次，生成一枚能量球，提供 2.5% 超能能量。\n 用电弧击杀触发增幅时，那一次击杀计入这 2 次击杀的计数。\n 生成能量球后有 10 秒冷却，冷却期间的击杀不计数。—\n\n信标火花增幅期间：\n 用特殊弹药与威能弹药的电弧武器击杀会产生致盲爆炸，对 7.5 米内的战斗人员施加致盲。—\n\n光辉火花精准击杀被致盲的战斗人员：\n 触发致盲爆炸，对 7.5 米内的战斗人员施加致盲。+10 超能\n\n放电火花电弧武器击杀推进计数，满 100% 生成离子轨迹。\n 红血 34% ｜ 橙血 67% ｜ 初级首领 100% ｜ 守护者 67%。\n\n 拾取离子轨迹提供 1 层电光充能。-10 近战\n\n反馈火花被近战攻击物理命中后：\n 5 秒内下一次近战命中的伤害提高 100% [50%]；重击激活期间为 [15%]。\n 该增益不可刷新。+10 生命值\n\n专注火花冲刺 1.25 秒后，保持冲刺且移动速度不低于 5 米/秒时：\n 职业技能基础充能速度额外 +150%[75%]。\n 职业技能攒够 1 次充能即停止。-10 武器（猎人）\n -10 生命值（泰坦）\n -10 职业（术士）\n\n频率火花近战命中时：\n +15 稳定性，+50 填装速度，换弹时长 ×0.8，持续 5.25 秒。\n\n 增幅期间：\n 几乎所有电光充能来源都额外多给 1 层。\n 游戏内提示称本碎片会提高碎片自身的效果，实测并非如此——至少填装速度加成不受影响。—\n\n急速火花冲刺 1.25 秒后，保持冲刺且移动速度不低于 5 米/秒时：\n 提供 +50 生命值属性。—\n\n直觉火花处于重伤时受到伤害：\n 释放一阵电弧能量，最多造成 46 [20] 伤害，并对 ? 米内的战斗人员施加震颤。\n 两次激活之间有 15? 秒冷却。—\n\n离子火花击杀震颤的战斗人员，或电光充能击杀：\n 生成离子轨迹。\n 两次生成之间有 10 秒冷却。—\n\n量级火花闪电手雷多发一道闪电，最多 5 发矢弹。\n 脉冲手雷多释放 2 次脉冲，最多 8 次。\n 风暴手雷多召唤一轮弹幕。\n 星相「暴雷之触」强化过的风暴手雷，其漫游风暴持续时间延长 1.5 秒。—\n\n动量火花滑铲经过弹药砖块、且对应类型未满时：\n 补满已装备的武器，并提供 3 层电光充能。—\n\n充能火花进入重伤时：\n 手雷与近战技能基础充能速度额外 +400%[200%]，持续到护盾完全恢复为止。—\n\n抗性火花15 米内有至少 3 名战斗人员时：\n 获得 25%[10%] 伤害抗性，条件不再满足后再停留 2 秒。+10 近战\n\n震颤火花电弧手雷命中时施加震颤。\n 电弧之魂与离子哨兵再次施加震颤前有 4 秒冷却。-10 手雷\n\n伏特火花终结技提供增幅与 1 层电光充能。+10 职业\n\n手雷技能\n\n手雷\n图标\n说明\n基础冷却\n\n电光手雷重型弹道 ｜ 扫描\n\n 接触时扫描并瞄准 12 米视线内最近的战斗人员，1 秒后向它释放电弧闪电。\n 造成伤害后，闪电会连锁到 10 米内尚未被命中的最近战斗人员，重复到最多伤害 4 名战斗人员为止。\n\n 电弧闪电造成 521 [85] 伤害。基础冷却 151.5 秒\n 回复倍率 0.75×\n\n闪光手雷中型弹道\n\n 速度降到足够低后爆炸，爆炸前有短暂延迟。\n\n 爆炸最多造成 684 [120] 伤害，7.5 米半径内衰减至 0%，并对 10 米内的战斗人员施加致盲，最长 5 [3] 秒。\n 使用者不会被自己致盲。基础冷却 131.7 秒\n 回复倍率 0.875×\n\n暴雷之触接触时额外爆炸一次，最多造成 684 [?] 伤害，范围 7.5 米，并对 5 米内的战斗人员施加致盲。\n\n粘性电浆手雷近乎直线弹道 ｜ 轻微追踪 ｜ 粘附\n\n 附着到战斗人员或表面上，1.7 秒后爆炸。\n\n 爆炸最多造成 901 [150] 伤害，引爆点 6 米半径内衰减至 0%。\n 粘在战斗人员身上时爆炸伤害提高 66.7%，达到 1500 [250]。基础冷却 105.4 秒\n 回复倍率 0.875×\n\n闪电手雷中型弹道 ｜ 壁挂\n\n 附着到表面和战斗人员身上，投射激光 1 秒后开始触发，此后每 1.67 秒发射一道闪电，最多 4 道。\n\n 每道闪电造成 373 [120] 伤害，合计最多 1492 [480]。\n 装备碎片「量级火花」时最多 5 道，合计 1865 [600]。基础冷却 219.5 秒\n 回复倍率 0.5×\n\n暴雷之触额外提供一次手雷技能充能。\n 首道之后的闪电命中时施加震颤。\n 造成伤害时提供 5 层电光充能，每道闪电最多触发一次。\n\n脉冲手雷中型弹道\n\n 接触时引爆，在 6 米半径内最多造成 156 [50] 伤害。\n\n 此后每 0.7 秒脉冲一次，每次在 6 米半径内最多造成 249 [80] 伤害，共 5 次，合计最多 1245 [530]。\n 装备碎片「量级火花」时多脉冲 2 次，合计最多 1743 [690]。基础冷却 175.6 秒\n 回复倍率 0.625×\n\n暴雷之触脉冲命中会生成离子轨迹，两次生成之间有 1 秒冷却。\n\n 脉冲伤害逐次提高：\n 第 1 次 +2% ｜ 第 2 次 +9% ｜ 第 3 次 +18.5% ｜ 第 4 次 +24% ｜ 第 5 次起 +25%。\n\n弹跳手雷中型弹道 ｜ 追踪器\n\n 接触时分裂成 4 枚追踪弹体。\n 弹体追逐 6 米内的战斗人员，造成伤害后爆炸；若飞行速度过低，约 2 秒后自爆。\n\n 每枚弹体接触造成 2 次 24 [4] 伤害，随后爆炸最多造成 90 [15] 伤害。\n 4 枚全部命中最多合计 552 [92] 伤害。基础冷却 151.5 秒\n 回复倍率 0.75×\n\n风暴手雷中型弹道\n\n 接触时召唤一次聚焦打击，0.85 秒后命中，在 7 米半径内最多造成 440 [70] 伤害。\n\n 首次打击 0.6 秒后，在 7 米范围内呈 X 形召唤一轮矢弹弹幕，最多造成 311 [50] 伤害。\n 装备碎片「量级火花」时再多一轮呈 + 形的弹幕，同样最多 311 [50] 伤害。\n\n 战斗人员每轮弹幕只会被伤害一次，合计最多 751 伤害，装备碎片「量级火花」时 1062 伤害。\n 守护者每轮弹幕的每发矢弹也只受一次伤害，最多 120 伤害。基础冷却 175.6 秒\n 回复倍率 0.625×\n\n暴雷之触引爆后生成一个漫游风暴，持续 4+1.5 秒，以 2 [1.5] 米/秒的初速追逐战斗人员，1.3 秒后提速到 4 [3] 米/秒。\n 漫游风暴在自己下方发射闪电，造成 158 [30] 伤害，最多 11+4 次。\n\n 猎人\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n组合打击近战击杀时：\n 提供 100% 职业技能能量，恢复 100 生命值，并获得 1 层组合打击，持续 20 秒，最多 3 层。\n 组合打击激活期间，基础近战攻击计为电弧灌注的近战伤害。\n 赌徒闪身要全额返还需要 70 职业属性。\n\n 1 层 ｜ 近战伤害 +133%[23%]，近战击杀恢复 80 生命值。\n 2 层 ｜ 近战伤害 +266%[51.3%]，近战击杀恢复 60 生命值。\n 3 层 ｜ 近战伤害 +400%[86%]，近战击杀恢复 40 生命值。基础冷却 58.1 秒\n 回复倍率 1×\n\n迷失一击造成 162 [?] 直击伤害，以及最多 976 [?] 溅射伤害，7 米内衰减至 ?%。\n\n 命中时：\n 对 9.6 米内的战斗人员施加致盲，持续 8.5 秒。\n 提供增幅与 2 层电光充能。基础冷却 118.8 秒\n 回复倍率 0.9×\n\n超能技能\n\n电弧法杖伤害抗性：90%[53%]\n 基础持续：20 秒，或每秒消耗 5% 超能能量\n\n 击杀提供 1 层电光充能。\n\n 空中与扎根轻攻击 ｜ 消耗 2.5% 超能能量。\n 命中对 8 米内的目标造成 864 [?] 伤害，扎根攻击最多连锁命中 3 次。\n\n 扎根重击 ｜ 消耗 8% 超能能量。\n 在约 45°、最远 8 米的扇形范围内造成 1264 [?] 伤害。\n\n 空中重击 ｜ 消耗 8%? 超能能量。\n 造成 1264 [?] 伤害，并对 7 米范围内的战斗人员施加致盲。\n\n 掌击 ｜ 轻-轻-重击连招。\n 在约 45°、最远 8 米的扇形范围内造成 2950 [?] 伤害并施加致盲。\n\n 格挡 ｜ 每秒额外消耗 ?% 超能能量。\n 完全格挡并反射 180°? 范围内的所有攻击，每反射一次提供 1 层电光充能。\n 被反射的投射物重新导向准星，对战斗人员造成的伤害提高 100%。\n\n 职业技能 ｜ 不消耗超能能量。\n 闪避闪身，期间提供 ?% [?%] 伤害抗性。\n 装备星相「飞升」时可以反复使用飞升，代价是 ?% 超能能量。T2 级超能\n 基础冷却 556 秒\n\n风起云涌伤害抗性：90%[49%]\n\n 向前掷出一根电弧法杖，接触时爆炸并嵌入所命中的物体。\n 接触造成 544 [300] 伤害并施加震颤，爆炸在 10 米半径内最多造成 608 [?] 伤害。\n 2 秒后，法杖被闪电击中，在 10 米半径内最多造成 1350 [500] 伤害。\n 再过 1.2 秒，法杖发出伤害场域，在 10 米半径内每 0.7 秒造成 446 [60] 伤害，持续 8 秒。T3 级超能\n 基础冷却 500 秒\n\n风暴边缘伤害抗性：90%[45%]\n 基础持续：? 秒，或每秒消耗 ?% 超能能量\n\n 掷出一把追踪飞刀，造成 90 [?] 直击伤害，并对接触点 3 米内的战斗人员造成最多 171 [45?] 径向伤害，随后传送到该位置。\n 传送后大范围回旋打击，对 6 米内的战斗人员造成 1440 × 2 [300?] 伤害。\n 每投掷一把飞刀消耗 ?% 超能能量，每次超能激活最多 3 次。T1 级超能\n 基础冷却 625 秒\n\n星相\n\n飞升在空中且有职业技能充能时：\n 按［空中移动］消耗一次职业技能充能，向上挥出电弧法杖旋转攻击，并触发已装备职业技能的使用效果。\n 为使用者与 10 米内的盟友提供增幅。\n 对 10 米内的战斗人员最多造成 181 [?] 伤害并施加震颤。\n\n 星相伤害随超过 100 的职业属性缩放，200 属性时最多 +65%[?%]。\n\n流动状态击杀震颤的战斗人员提供增幅。\n\n 增幅期间：\n 职业技能基础恢复速率额外 +200%。\n +50 填装速度，换弹时长 ×0.8。\n\n 闪身动画期间获得 66%[32%] 伤害抗性。\n\n致命电流直接近战命中震颤的战斗人员时施加致盲。\n\n 使用职业技能后：\n 近战突进距离提高到 7 米。\n 10 秒内下一次近战或裂空打击命中会施加震颤，并触发一次伤害余震，对 6 米内的战斗人员造成 195 [?] 伤害。\n\n裂空打击击杀震颤的战斗人员提供 1 层电光充能，不与「电介质」的 1 层叠加。\n\n 滑铲时按［近战技能］：\n 打出一记上勾拳，沿地面发射一道最远 22 米的电弧波形，造成 739 [125] 伤害并施加震颤。\n 使用后对战斗人员提供 75% 伤害抗性，持续 4? 秒。\n 开火状态下无法在滑铲期间使用。\n\n 可以触发「组合打击」的效果并吃到它的伤害提高，但不与「迷失一击」互动。\n\n 泰坦\n\n名称\n图标\n说明\n冷却与槽位\n\n职业技能\n\n推进器以第一人称冲刺的形式进行闪避，期间移除战斗人员的弹体追踪?与对守护者的瞄准辅助。\n\n 朝当前保持的移动方向快速冲刺 8 米；不输入方向则向后冲刺 4 米。基础冷却 52.1 秒\n 回复倍率 1×\n\n近战技能\n\n弹道猛击在空中冲刺 0.03 秒后：\n 快速下降并打击地面，对 8 米内的战斗人员造成至少 210 [65] 的无衰减伤害。\n 每命中一名战斗人员提供 3% 超能能量与 3 层电光充能。\n 伤害随坠落时间缩放，从最大跳跃高度斜向猛击约造成 1000 伤害。\n 落地后 0.9 秒内无法进行近战攻击。基础冷却 164.6 秒\n 回复倍率 0.7×\n\n地震打击与其它肩撞类技能共用的规则：\n 需要冲刺 1.25 秒；未命中战斗人员时消耗 15% 近战技能能量；开火状态下无法在滑铲期间使用；被肩撞直接命中的守护者近战突进失效 0.5 秒。\n\n 向前突进 6.8 米，自动瞄准射程内的战斗人员。\n\n 命中战斗人员：\n 造成 1073 [110] 直击伤害。\n 对 6 米内的战斗人员造成 391 [40] 径向伤害，并施加致盲持续 8 [1.6] 秒。\n\n 增幅期间：\n 致盲半径提高到 10 米，持续时间提高到 10 [3] 秒。基础冷却 131.7 秒\n 回复倍率 0.8×\n\n雷霆一击可蓄力的近战攻击。\n 在 7.5 米宽、最远 16 米的锥形范围内造成 703 [120] 伤害，蓄力 2 秒可逐渐把伤害提高到最多 +100%（乘算）。\n 动画期间对战斗人员提供 80% 伤害抗性，使用后再持续 ? 秒。基础冷却 131.7 秒\n 回复倍率 0.9×\n\n超能技能\n\n浩劫之拳伤害抗性：90%[58%]\n 基础持续：25 秒，或每秒消耗 4% 超能能量\n\n 轻攻击 ｜ 消耗 6% 超能能量。\n 命中造成 499 [?] 伤害并强力击退战斗人员。\n 命中一次轻攻击后，下一次重击命中额外造成 4 段伤害，每段 273 [?]。\n\n 重击 ｜ 消耗 12% 超能能量。\n 向下猛击，在 11 米半径内造成 1619 [?] 伤害并施加致盲。超能施放本身也会猛击，但不产生余震。\n 若在动画中停留至少 1 秒，猛击额外造成 4 段伤害，每段 273 [?]，且每段需要输入方向键。\n 最多生成 4 道余震，每道最多造成 292 [?] 伤害。T2 级超能\n 基础冷却 556 秒\n\n雷霆冲击伤害抗性：90%[25%]\n 基础持续：最长 4.5 秒，或每秒消耗 22.2% 超能能量\n\n 飞行途中贴得非常近的战斗人员受到 150 [?] 碰撞伤害。\n\n 与表面或战斗人员接触时引爆：\n 造成 180 [?] 直击伤害，以及覆盖 10 米、最多 8260 [?] 的爆炸伤害。\n 接触 0.75 秒后爆炸释放余震，每秒最多造成 108 [?] 伤害，持续 4 秒。T2 级超能\n 基础冷却 556 秒\n\n星相\n\n无畏护甲冲刺、移动速度高于约 4 米/秒且职业技能能量已满时：\n 提供一面 50 生命值的正面覆盖护盾吸收伤害，每格挡一次攻击提供 1 层电光充能。\n 增幅期间覆盖护盾获得 33% 伤害抗性，有效生命值提高到 75。\n 激活期间另有 60%[10%] 溅射伤害抗性与 10% 战斗人员伤害抗性。\n\n 覆盖护盾在被摧毁前能完整吸收最后一次命中，代价是耗尽全部职业技能能量。\n 可以与其它覆盖护盾叠加。\n\n重击近战击杀时：\n 0.1 秒内快速恢复一段生命值，开始生命值恢复，并提供增幅。\n 红血 50 ｜ 橙血 75 ｜ 初级首领 100 ｜ 守护者 30 生命值。\n\n 打破战斗人员护盾，或对生命值低于 30% 的战斗人员造成伤害：\n 提供重击，持续 6 秒。\n\n 重击期间：\n 基础与偃月近战伤害 +160%[30%]。\n 充能近战伤害 +160%[20%]。\n 基础近战攻击计为电弧充能近战命中。\n 对战斗人员的近战突进距离提高到 6 米。\n\n风暴要塞使用职业技能：\n 提供 4 层电光充能，用推进器则提供 6 层。\n\n 位于屏障后方时：\n 每 0.6 秒提供 1 层电光充能。\n 电光充能此时可以由武器伤害触发。\n 碎片「频率火花」不会提高本星相给出的层数，多面屏障也不叠加。\n\n暴雷之触强化闪光、闪电、脉冲、风暴四种手雷，逐条效果见「手雷技能」一节。\n\n 术士\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n球形闪电向前发射一颗最远 35 米的球形闪电。\n 飞到最远距离、接触物体，或下方 4? 米内出现战斗人员时，释放一次闪电打击。\n\n 闪电打击在 2? 米内造成 271 [70] 伤害。\n 直接命中战斗人员额外造成 117 [30] 伤害。\n\n 增幅期间：\n 额外生成 2 道闪电打击，每道造成 163 [?] 伤害。\n 3 道全部直接命中时最多合计 714 [240] 伤害。基础冷却 164.6 秒\n 回复倍率 0.7×\n\n连锁闪电突进距离延长到 6 米的近战攻击。\n 电弧分支职业专属，拥有 2 次技能充能。\n\n 直接打击战斗人员：\n 造成 490? [100] 伤害，施加震颤，并使其释放连锁闪电。\n 连锁闪电对 9 米内的战斗人员造成 266? [54] 伤害，最多连锁 5 次，但无法连回最近一次瞄准的战斗人员。\n\n 增幅期间：\n 释放两轮连锁闪电，各自瞄准不同的战斗人员，命中战斗人员的上限翻倍。\n 同一名战斗人员仍然只会被连锁闪电命中一次。基础冷却 131.7 秒\n 回复倍率 0.9×\n\n超能技能\n\n混沌之触伤害抗性：90%[55%]\n 基础持续：4 秒，或每秒消耗 25% 超能能量\n 移动速度：4.5 米/秒\n\n 向准星方向持续发射长射程光线，每 0.13 秒造成 378 [?] 伤害，动画前 0.67 秒不造成伤害。\n 对同一名战斗人员命中 7 次会在其位置召唤一次震颤闪电打击，造成 202 [?] 伤害。\n\n 提前停用会部分返还超能能量，立即取消最多返还 30%。T4 级超能\n 基础冷却 455 秒\n\n雷霆万钧伤害抗性：90%[58%]\n 基础持续：16 秒，或每秒消耗 6.25% 超能能量\n\n 超能施放时：\n 在 6 米半径内最多造成 690 [?] 伤害并击退战斗人员，同时在自己周围释放 5 枚闪电追踪弹。\n 追踪弹造成 440 [150] 伤害并施加震颤，持续 16 秒。\n\n 轻攻击 ｜ 消耗 ?% 超能能量。\n 瞄准 12 米内的战斗人员释放锁链闪电，每 0.34 秒造成 178 [90] 伤害。\n 伤害随时间攀升，每 0.33 秒提高 5%，3.33 秒后达到最高 +65%；停止造成伤害 2 秒后提升开始衰减。\n\n 重击 ｜ 冲刺时进行风驰电掣。\n 消耗 6.25% 超能能量，朝当前输入方向传送最多 7 米。T2 级超能\n 基础冷却 556 秒\n\n星相\n\n电弧之魂使用者生成的裂痕会为自己与穿过它的盟友提供电弧之魂，重新踏入裂痕可以刷新持续时间。\n\n 电弧伙伴持续 15 秒，以 100 发/分钟的速率向 24 米内的战斗人员进行 3 连发追踪弹体，每发造成 69 [11] 电弧手雷伤害。\n 可以触发手雷技能的交互效果。\n\n 身边 15? 米内有盟友时，提供额外的职业技能基础充能速度：\n 1 名 +40%[20%] ｜ 2 名 +80%[40%] ｜ 3 名 +120%[60%]。\n\n 增幅期间：\n 改为 5 发连射，整体射速提高到 225 发/分钟。\n\n电荷思维电弧技能击杀，以及击杀带有电弧减益的战斗人员，生成离子轨迹。\n 两次生成之间有 1? 秒冷却。\n\n 拾取离子轨迹提供增幅。\n\n离子哨兵电弧击杀与动能击杀为离子哨兵蓄力，攒够 6 次充能即可使用。\n 武器击杀 1 [2] ｜ 技能击杀 2 [?]。\n\n 手雷技能被替换为离子哨兵。\n 它计为电弧手雷技能伤害，会触发手雷技能的交互效果。\n\n 离子哨兵：\n 落地时对 5 米内的战斗人员施加致盲，持续 10? [3?] 秒。\n 此后每秒自动向 16 米内的战斗人员发射连锁闪电，造成 202 [50] 电弧伤害。\n 闪电会连锁到最初命中目标 6 米内的另一名战斗人员，命中提供 1 层电光充能。\n 持续 15 秒，有 ? 点构造体生命值。使用者不会被自己致盲。\n 激活后有 6 秒冷却，冷却期间的击杀不提供充能。\n\n闪电激涌滑铲时按［近战技能］：\n 把使用者向前传送 10 米，在距出口点 7 米处呈五边形召唤 5 道闪电，每命中一名战斗人员提供 1 层电光充能。\n 使用时另提供增幅。未命中时不会拿到超过 1 层。\n 使用后对战斗人员提供 ?% 伤害抗性，持续 ? 秒。\n 开火状态下无法在滑铲期间使用。\n\n 闪电同时造成 634 + 127 = 761 [105 + 47 = 152] 伤害并施加震颤。\n\n更新 2026.8.30\n\n数据源：Destiny Data Compendium。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/elements/arc/index.html",
+    "final_url": "https://starside.work/elements/arc/index.html",
+    "path": "pages/elements/arc/index.html",
+    "bytes": 55151,
+    "sha256": "e49b56018a5a83ef0936ad961013e5e8ef3a341e5a24f25a293c7fa0a8bfebf6",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:30.049198+00:00"
+  },
+  "links": [
+    "https://starside.work/elements/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/elements/arc/icons/02ef086b27.webp",
+    "https://starside.work/elements/arc/icons/06924ab832.webp",
+    "https://starside.work/elements/arc/icons/0a14a770d4.webp",
+    "https://starside.work/elements/arc/icons/0aa7665080.webp",
+    "https://starside.work/elements/arc/icons/1064a66bec.webp",
+    "https://starside.work/elements/arc/icons/17b2bea8da.webp",
+    "https://starside.work/elements/arc/icons/17cb241fd1.webp",
+    "https://starside.work/elements/arc/icons/189887b13d.webp",
+    "https://starside.work/elements/arc/icons/1dd3dd05aa.webp",
+    "https://starside.work/elements/arc/icons/1eb1f634ea.webp",
+    "https://starside.work/elements/arc/icons/26ca0c33b9.webp",
+    "https://starside.work/elements/arc/icons/2835450b1e.webp",
+    "https://starside.work/elements/arc/icons/2b0c20c15a.webp",
+    "https://starside.work/elements/arc/icons/2f792360c9.webp",
+    "https://starside.work/elements/arc/icons/3089089bee.webp",
+    "https://starside.work/elements/arc/icons/33c6bebcfa.webp",
+    "https://starside.work/elements/arc/icons/3fdf5e28aa.webp",
+    "https://starside.work/elements/arc/icons/411697fb74.webp",
+    "https://starside.work/elements/arc/icons/4935ec0db5.webp",
+    "https://starside.work/elements/arc/icons/4caa7bebff.webp",
+    "https://starside.work/elements/arc/icons/503331b351.webp",
+    "https://starside.work/elements/arc/icons/53ca71e5fc.webp",
+    "https://starside.work/elements/arc/icons/54f5fd7a81.webp",
+    "https://starside.work/elements/arc/icons/57bcd1c47c.webp",
+    "https://starside.work/elements/arc/icons/5fc7a97f63.webp",
+    "https://starside.work/elements/arc/icons/5fe44ec7eb.webp",
+    "https://starside.work/elements/arc/icons/655e3dc947.webp",
+    "https://starside.work/elements/arc/icons/6f78f00765.webp",
+    "https://starside.work/elements/arc/icons/7f5d24e07e.webp",
+    "https://starside.work/elements/arc/icons/7f930d12a2.webp",
+    "https://starside.work/elements/arc/icons/8be7a4f860.webp",
+    "https://starside.work/elements/arc/icons/947bf83419.webp",
+    "https://starside.work/elements/arc/icons/97f8d18bf9.webp",
+    "https://starside.work/elements/arc/icons/9dac95e21c.webp",
+    "https://starside.work/elements/arc/icons/9f1b87183e.webp",
+    "https://starside.work/elements/arc/icons/a20f6b74a2.webp",
+    "https://starside.work/elements/arc/icons/a2175cf719.webp",
+    "https://starside.work/elements/arc/icons/a60806be91.webp",
+    "https://starside.work/elements/arc/icons/ab7174aa75.webp",
+    "https://starside.work/elements/arc/icons/ae4b8ef272.webp",
+    "https://starside.work/elements/arc/icons/b0f5c1fb1b.webp",
+    "https://starside.work/elements/arc/icons/b248d2e1c2.webp",
+    "https://starside.work/elements/arc/icons/b39ca82cc6.webp",
+    "https://starside.work/elements/arc/icons/b9f574ded9.webp",
+    "https://starside.work/elements/arc/icons/badca474c4.webp",
+    "https://starside.work/elements/arc/icons/bf53df0ab7.webp",
+    "https://starside.work/elements/arc/icons/c34f863873.webp",
+    "https://starside.work/elements/arc/icons/c43daf0acf.webp",
+    "https://starside.work/elements/arc/icons/c7fe4de729.webp",
+    "https://starside.work/elements/arc/icons/c9da424180.webp",
+    "https://starside.work/elements/arc/icons/cf6c8a6a75.webp",
+    "https://starside.work/elements/arc/icons/cfa33ed23c.webp",
+    "https://starside.work/elements/arc/icons/d27642e454.webp",
+    "https://starside.work/elements/arc/icons/d868238c9d.webp",
+    "https://starside.work/elements/arc/icons/d9201a70c3.webp",
+    "https://starside.work/elements/arc/icons/e5ca5a41e7.webp",
+    "https://starside.work/elements/arc/icons/ebe677de56.webp",
+    "https://starside.work/elements/arc/icons/ee49d5b3a9.webp",
+    "https://starside.work/elements/arc/icons/f0e03ee83a.webp",
+    "https://starside.work/elements/arc/icons/f9625f59ee.webp",
+    "https://starside.work/elements/arc/icons/fce2131630.webp",
+    "https://starside.work/elements/arc/style.css",
+    "https://starside.work/elements/style.css"
+  ]
+}

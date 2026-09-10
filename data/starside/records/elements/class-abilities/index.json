@@ -1,0 +1,571 @@
+{
+  "url": "https://starside.work/elements/class-abilities/index.html",
+  "title": "职业技能 · Starside",
+  "description": "猎人、泰坦、术士三个职业的固有 Perk 与各自三个职业技能：效果、数值、基础冷却与回复倍率。",
+  "category": "subclass",
+  "updated_at": "2026.8.19",
+  "data_src": "docs/class-abilities",
+  "data_hash": "9f922fd1f5ef709c234617ecaa5bb723d7f557c4",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "职业技能"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "术士"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "猎人",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却",
+            "html": "冷却"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "固有 Perk",
+            "html": "固有 Perk"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0ebd16171b.webp\" alt=\"\" width=\"64\" height=\"64\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "相对泰坦与术士的固有优势：\n \n 基础疾跑速度 8.5 米每秒，另两个职业是 8 米每秒。\n 基准敏捷 100 [70]，取出与收起动画时长 0.9× [0.95×]。\n 这份疾跑加速等同于异域护甲提供的那一份，只与轻质框架武器叠加。",
+            "html": "相对泰坦与术士的固有优势：<br> <br> 基础疾跑速度 8.5 米每秒，另两个职业是 8 米每秒。<br> 基准敏捷 100 <span class=\"pvp\">[70]</span>，取出与收起动画时长 0.9× <span class=\"pvp\">[0.95×]</span>。<br> <span class=\"note\">这份疾跑加速等同于异域护甲提供的那一份，只与轻质框架武器叠加。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "特技闪身",
+            "html": "特技闪身"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/fad1ac3672.webp\" alt=\"\" width=\"59\" height=\"59\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "做出一次杂技式跳跃，落地时为自己与 10 米内的盟友提供焕光，持续 10+5 秒。\n 落地对 6.5 米内的战斗人员造成最多 40 [20] 烈日伤害。",
+            "html": "做出一次杂技式跳跃，落地时为<span class=\"enemy\">自己</span>与 10 米内的<span class=\"enemy\">盟友</span>提供<span class=\"el-solar\">焕光</span>，持续 10+5 秒。<br> 落地对 6.5 米内的<span class=\"enemy\">战斗人员</span>造成最多 40 <span class=\"pvp\">[20]</span> <span class=\"el-solar\">烈日</span>伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 56 [148.4] 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 56 <span class=\"pvp\">[148.4]</span> 秒<br> 回复倍率 0.5×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "赌徒闪身",
+            "html": "赌徒闪身"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/65d4e919d1.webp\" alt=\"\" width=\"64\" height=\"64\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "做出一次利落翻滚，每点近战属性提供 1% [0.35%] 近战技能能量；100 点近战属性时提供 100% [35%]。\n 在战斗人员 15 米内闪身，获得的技能能量翻倍。这一份不受回复倍率与属性倍率影响。\n 闪身动画期间移除战斗人员弹道的追踪，以及对守护者的自动瞄准辅助。",
+            "html": "做出一次利落翻滚，每点近战属性提供 1% <span class=\"pvp\">[0.35%]</span> <span class=\"pickup\">近战技能能量</span>；100 点近战属性时提供 100% <span class=\"pvp\">[35%]</span>。<br> 在<span class=\"enemy\">战斗人员</span> 15 米内闪身，获得的技能能量翻倍。<span class=\"note\">这一份不受回复倍率与属性倍率影响。</span><br> 闪身动画期间移除<span class=\"enemy\">战斗人员</span>弹道的追踪，以及对<span class=\"bar-orange\">守护者</span>的自动瞄准辅助。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 56 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 56 秒<br> 回复倍率 0.8×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "射手闪身",
+            "html": "射手闪身"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dc62a7c73b.webp\" alt=\"\" width=\"64\" height=\"64\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "做出一次规避动作，填装全部武器，并拾取 15 米内的弹药块。\n 闪身动画期间移除战斗人员弹道的追踪，以及对守护者的自动瞄准辅助。",
+            "html": "做出一次规避动作，填装全部武器，并拾取 15 米内的弹药块。<br> 闪身动画期间移除<span class=\"enemy\">战斗人员</span>弹道的追踪，以及对<span class=\"bar-orange\">守护者</span>的自动瞄准辅助。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 42 秒\n 回复倍率 1×",
+            "html": "基础冷却 42 秒<br> 回复倍率 1×"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "泰坦",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却",
+            "html": "冷却"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "固有 Perk",
+            "html": "固有 Perk"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2b9f780c57.webp\" alt=\"\" width=\"64\" height=\"64\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "相对猎人与术士的固有优势：\n \n 基础近战伤害提高 20% [5%]。该提升为乘算。",
+            "html": "相对猎人与术士的固有优势：<br> <br> 基础近战伤害提高 20% <span class=\"pvp\">[5%]</span>。<span class=\"note\">该提升为乘算。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "集结屏障",
+            "html": "集结屏障"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f267262f1f.webp\" alt=\"\" width=\"64\" height=\"64\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在施法者面前生成一道低矮的弧形屏障，挡下打在它身上的全部伤害。\n 放置动画期间提供 20% [20%] 伤害抗性。\n \n 屏障持续 20 秒，结构生命值 500。对战斗人员有 90% 伤害抗性，对首领为 ?%。\n 穿过屏障的战斗人员每 ? 秒快速受到 ? [?] 非致命伤害。\n \n 位于集结屏障后方 ? 米内时：\n 对战斗人员的溅射伤害获得 80% 伤害抗性。\n 屏障前方 ? 米内的战斗人员被吸引仇恨。\n 稳定性 +30，填装速度 +100，填装时长 0.9×，伤害衰减距离提高 10%，受击抖动抗性 50%。",
+            "html": "在<span class=\"enemy\">施法者</span>面前生成一道低矮的弧形屏障，挡下打在它身上的全部伤害。<br> 放置动画期间提供 20% <span class=\"pvp\">[20%]</span> 伤害抗性。<br> <br> 屏障持续 20 秒，结构<span class=\"health\">生命值</span> 500。对<span class=\"enemy\">战斗人员</span>有 90% 伤害抗性，对<span class=\"bar-yellow\">首领</span>为 <span class=\"unsure\">?</span>%。<br> 穿过屏障的<span class=\"enemy\">战斗人员</span>每 <span class=\"unsure\">?</span> 秒快速受到 <span class=\"unsure\">?</span> <span class=\"unsure\">[?]</span> 非致命伤害。<br> <br> 位于集结屏障后方 <span class=\"unsure\">?</span> 米内时：<br> 对<span class=\"enemy\">战斗人员</span>的溅射伤害获得 80% 伤害抗性。<br> 屏障前方 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>被吸引仇恨。<br> 稳定性 +30，填装速度 +100，填装时长 0.9×，伤害衰减距离提高 10%，受击抖动抗性 50%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 55.1 秒\n 回复倍率 1×",
+            "html": "基础冷却 55.1 秒<br> 回复倍率 1×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "推进器",
+            "html": "推进器"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/83243e1980.webp\" alt=\"\" width=\"64\" height=\"74\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "做出一次第一人称的规避冲刺，移除战斗人员弹道的追踪?，以及对守护者的自动瞄准辅助。\n \n 朝当前按住的移动方向快速冲刺 8 米；没有输入移动方向时向后冲刺 4 米。\n 只能在地面上使用。",
+            "html": "做出一次第一人称的规避冲刺，移除<span class=\"enemy\">战斗人员</span>弹道的追踪<span class=\"unsure\">?</span>，以及对<span class=\"bar-orange\">守护者</span>的自动瞄准辅助。<br> <br> 朝当前按住的移动方向快速冲刺 8 米；没有输入移动方向时向后冲刺 4 米。<br> <span class=\"note\">只能在地面上使用。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 52.1 秒\n 回复倍率 1×",
+            "html": "基础冷却 52.1 秒<br> 回复倍率 1×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "巍峨屏障",
+            "html": "巍峨屏障"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dc6210c147.webp\" alt=\"\" width=\"64\" height=\"64\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在施法者面前生成一道高大、略带弧度的屏障，挡下打在它身上的全部伤害。\n 放置动画期间提供 20% [20%] 伤害抗性。\n \n 屏障持续 20 秒，结构生命值 500。对非首领的战斗人员有 90% 伤害抗性，对首领为 ?%。\n 穿过屏障的战斗人员每 ? 秒快速受到 ? [?] 非致命伤害。\n \n 位于巍峨屏障后方 ? 米内时：\n 对战斗人员的溅射伤害获得 80% 伤害抗性。\n 屏障前方 ? 米内的战斗人员被吸引仇恨。",
+            "html": "在<span class=\"enemy\">施法者</span>面前生成一道高大、略带弧度的屏障，挡下打在它身上的全部伤害。<br> 放置动画期间提供 20% <span class=\"pvp\">[20%]</span> 伤害抗性。<br> <br> 屏障持续 20 秒，结构<span class=\"health\">生命值</span> 500。对<span class=\"bar-yellow\">非首领</span>的<span class=\"enemy\">战斗人员</span>有 90% 伤害抗性，对<span class=\"bar-yellow\">首领</span>为 <span class=\"unsure\">?</span>%。<br> 穿过屏障的<span class=\"enemy\">战斗人员</span>每 <span class=\"unsure\">?</span> 秒快速受到 <span class=\"unsure\">?</span> <span class=\"unsure\">[?]</span> 非致命伤害。<br> <br> 位于巍峨屏障后方 <span class=\"unsure\">?</span> 米内时：<br> 对<span class=\"enemy\">战斗人员</span>的溅射伤害获得 80% 伤害抗性。<br> 屏障前方 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>被吸引仇恨。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 101.3 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 101.3 秒<br> 回复倍率 0.5×"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "术士",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却",
+            "html": "冷却"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "固有 Perk",
+            "html": "固有 Perk"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4ec68715cd.webp\" alt=\"\" width=\"64\" height=\"64\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "相对泰坦与猎人的固有优势：\n \n 手雷回复速度 1.1×。\n 手雷技能伤害提高 5% [2.5%]。",
+            "html": "相对泰坦与猎人的固有优势：<br> <br> 手雷回复速度 1.1×。<br> 手雷技能伤害提高 5% <span class=\"pvp\">[2.5%]</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "强能裂痕",
+            "html": "强能裂痕"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b9739b3762.webp\" alt=\"\" width=\"64\" height=\"64\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在施法者脚下生成一道强能裂痕，持续 15 秒。\n \n 裂痕 5 米半径内：伤害提高 20% [15%]，手雷与近战基础回复速度额外提高 260% [104%]，职业技能基础回复速度额外提高 230% [92%]。\n 在裂痕内击杀提供 1.15× 弹药生成倍率。该倍率与弹药搜寻者的倍率加算。\n \n 放置动画期间提供 20% 伤害抗性，并可以 ? 米每秒的速度移动。",
+            "html": "在<span class=\"enemy\">施法者</span>脚下生成一道强能裂痕，持续 15 秒。<br> <br> 裂痕 5 米半径内：伤害提高 20% <span class=\"pvp\">[15%]</span>，手雷与近战基础回复速度额外提高 260% <span class=\"pvp\">[104%]</span>，职业技能基础回复速度额外提高 230% <span class=\"pvp\">[92%]</span>。<br> 在裂痕内击杀提供 1.15× 弹药生成倍率。<span class=\"note\">该倍率与弹药搜寻者的倍率加算。</span><br> <br> 放置动画期间提供 20% 伤害抗性，并可以 <span class=\"unsure\">?</span> 米每秒的速度移动。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 118.7 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 118.7 秒<br> 回复倍率 0.5×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "治愈裂痕",
+            "html": "治愈裂痕"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/66f2293d9c.webp\" alt=\"\" width=\"64\" height=\"64\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在施法者脚下生成一道治愈裂痕，5 米半径内每秒恢复 40 [35] 生命值，持续 15 秒。\n \n 生命值全满时：\n 治愈裂痕每秒生成 3 点覆盖护盾，最多 15 点。已有虚空覆盖护盾时不再生成。\n 可与其他来源的覆盖护盾叠加，如还治彼身与职业属性给的那一份；层与层之间按先进先出结算。\n 在 Perk 交互的判定上，处于治愈裂痕中即视为拥有覆盖护盾。\n \n 放置动画期间提供 20% 伤害抗性，并可以 ? 米每秒的速度移动。",
+            "html": "在<span class=\"enemy\">施法者</span>脚下生成一道<span class=\"el-solar\">治愈</span>裂痕，5 米半径内每秒恢复 40 <span class=\"pvp\">[35]</span> <span class=\"health\">生命值</span>，持续 15 秒。<br> <br> <span class=\"health\">生命值</span>全满时：<br> <span class=\"el-solar\">治愈</span>裂痕每秒生成 3 点<span class=\"pickup\">覆盖护盾</span>，最多 15 点。已有<span class=\"el-void\">虚空覆盖护盾</span>时不再生成。<br> <span class=\"note\">可与其他来源的覆盖护盾叠加，如还治彼身与职业属性给的那一份；层与层之间按先进先出结算。</span><br> <span class=\"note\">在 Perk 交互的判定上，处于治愈裂痕中即视为拥有覆盖护盾。</span><br> <br> 放置动画期间提供 20% 伤害抗性，并可以 <span class=\"unsure\">?</span> 米每秒的速度移动。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 118.7 秒\n 回复倍率 0.5×",
+            "html": "基础冷却 118.7 秒<br> 回复倍率 0.5×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "凤凰俯冲",
+            "html": "凤凰俯冲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d50e6be2ce.webp\" alt=\"\" width=\"64\" height=\"64\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "向下俯冲，为自己与 9 米内的盟友施加 2 层治愈。\n \n 炙热升腾激活期间：\n 俯冲时施加 2 层恢复，持续 3+1.5 秒。\n 落地对 5 米内的战斗人员造成 100 伤害与 40+20 层灼烧。",
+            "html": "向下俯冲，为<span class=\"enemy\">自己</span>与 9 米内的<span class=\"enemy\">盟友</span>施加 <span class=\"stack\">2 层</span><span class=\"el-solar\">治愈</span>。<br> <br> <span class=\"el-solar\">炙热升腾</span>激活期间：<br> 俯冲时施加 <span class=\"stack\">2 层</span><span class=\"el-solar\">恢复</span>，持续 3+1.5 秒。<br> 落地对 5 米内的<span class=\"enemy\">战斗人员</span>造成 100 伤害与 <span class=\"stack\">40+20 层</span><span class=\"deb-solar\">灼烧</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 79.6 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 79.6 秒<br> 回复倍率 0.8×"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "职业技能 · Starside\n\nStarside\n/\n职业分支详解\n/\n职业技能\n\n职业技能\n\n 猎人\n\n名称\n图标\n说明\n冷却\n\n固有 Perk相对泰坦与术士的固有优势：\n\n 基础疾跑速度 8.5 米每秒，另两个职业是 8 米每秒。\n 基准敏捷 100 [70]，取出与收起动画时长 0.9× [0.95×]。\n 这份疾跑加速等同于异域护甲提供的那一份，只与轻质框架武器叠加。\n\n特技闪身做出一次杂技式跳跃，落地时为自己与 10 米内的盟友提供焕光，持续 10+5 秒。\n 落地对 6.5 米内的战斗人员造成最多 40 [20] 烈日伤害。基础冷却 56 [148.4] 秒\n 回复倍率 0.5×\n\n赌徒闪身做出一次利落翻滚，每点近战属性提供 1% [0.35%] 近战技能能量；100 点近战属性时提供 100% [35%]。\n 在战斗人员 15 米内闪身，获得的技能能量翻倍。这一份不受回复倍率与属性倍率影响。\n 闪身动画期间移除战斗人员弹道的追踪，以及对守护者的自动瞄准辅助。基础冷却 56 秒\n 回复倍率 0.8×\n\n射手闪身做出一次规避动作，填装全部武器，并拾取 15 米内的弹药块。\n 闪身动画期间移除战斗人员弹道的追踪，以及对守护者的自动瞄准辅助。基础冷却 42 秒\n 回复倍率 1×\n\n 泰坦\n\n名称\n图标\n说明\n冷却\n\n固有 Perk相对猎人与术士的固有优势：\n\n 基础近战伤害提高 20% [5%]。该提升为乘算。\n\n集结屏障在施法者面前生成一道低矮的弧形屏障，挡下打在它身上的全部伤害。\n 放置动画期间提供 20% [20%] 伤害抗性。\n\n 屏障持续 20 秒，结构生命值 500。对战斗人员有 90% 伤害抗性，对首领为 ?%。\n 穿过屏障的战斗人员每 ? 秒快速受到 ? [?] 非致命伤害。\n\n 位于集结屏障后方 ? 米内时：\n 对战斗人员的溅射伤害获得 80% 伤害抗性。\n 屏障前方 ? 米内的战斗人员被吸引仇恨。\n 稳定性 +30，填装速度 +100，填装时长 0.9×，伤害衰减距离提高 10%，受击抖动抗性 50%。基础冷却 55.1 秒\n 回复倍率 1×\n\n推进器做出一次第一人称的规避冲刺，移除战斗人员弹道的追踪?，以及对守护者的自动瞄准辅助。\n\n 朝当前按住的移动方向快速冲刺 8 米；没有输入移动方向时向后冲刺 4 米。\n 只能在地面上使用。基础冷却 52.1 秒\n 回复倍率 1×\n\n巍峨屏障在施法者面前生成一道高大、略带弧度的屏障，挡下打在它身上的全部伤害。\n 放置动画期间提供 20% [20%] 伤害抗性。\n\n 屏障持续 20 秒，结构生命值 500。对非首领的战斗人员有 90% 伤害抗性，对首领为 ?%。\n 穿过屏障的战斗人员每 ? 秒快速受到 ? [?] 非致命伤害。\n\n 位于巍峨屏障后方 ? 米内时：\n 对战斗人员的溅射伤害获得 80% 伤害抗性。\n 屏障前方 ? 米内的战斗人员被吸引仇恨。基础冷却 101.3 秒\n 回复倍率 0.5×\n\n 术士\n\n名称\n图标\n说明\n冷却\n\n固有 Perk相对泰坦与猎人的固有优势：\n\n 手雷回复速度 1.1×。\n 手雷技能伤害提高 5% [2.5%]。\n\n强能裂痕在施法者脚下生成一道强能裂痕，持续 15 秒。\n\n 裂痕 5 米半径内：伤害提高 20% [15%]，手雷与近战基础回复速度额外提高 260% [104%]，职业技能基础回复速度额外提高 230% [92%]。\n 在裂痕内击杀提供 1.15× 弹药生成倍率。该倍率与弹药搜寻者的倍率加算。\n\n 放置动画期间提供 20% 伤害抗性，并可以 ? 米每秒的速度移动。基础冷却 118.7 秒\n 回复倍率 0.5×\n\n治愈裂痕在施法者脚下生成一道治愈裂痕，5 米半径内每秒恢复 40 [35] 生命值，持续 15 秒。\n\n 生命值全满时：\n 治愈裂痕每秒生成 3 点覆盖护盾，最多 15 点。已有虚空覆盖护盾时不再生成。\n 可与其他来源的覆盖护盾叠加，如还治彼身与职业属性给的那一份；层与层之间按先进先出结算。\n 在 Perk 交互的判定上，处于治愈裂痕中即视为拥有覆盖护盾。\n\n 放置动画期间提供 20% 伤害抗性，并可以 ? 米每秒的速度移动。基础冷却 118.7 秒\n 回复倍率 0.5×\n\n凤凰俯冲向下俯冲，为自己与 9 米内的盟友施加 2 层治愈。\n\n 炙热升腾激活期间：\n 俯冲时施加 2 层恢复，持续 3+1.5 秒。\n 落地对 5 米内的战斗人员造成 100 伤害与 40+20 层灼烧。基础冷却 79.6 秒\n 回复倍率 0.8×\n\n更新 2026.8.19\n\n数据源：Destiny Data Compendium。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/elements/class-abilities/index.html",
+    "final_url": "https://starside.work/elements/class-abilities/index.html",
+    "path": "pages/elements/class-abilities/index.html",
+    "bytes": 15121,
+    "sha256": "c857362c33462560916ba32b6bf48bca07cefa77c53f5d56f1ff911d681c36d5",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:54.323125+00:00"
+  },
+  "links": [
+    "https://starside.work/elements/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/elements/class-abilities/icons/0ebd16171b.webp",
+    "https://starside.work/elements/class-abilities/icons/20d0864b80.webp",
+    "https://starside.work/elements/class-abilities/icons/2b9f780c57.webp",
+    "https://starside.work/elements/class-abilities/icons/4ec68715cd.webp",
+    "https://starside.work/elements/class-abilities/icons/65d4e919d1.webp",
+    "https://starside.work/elements/class-abilities/icons/66f2293d9c.webp",
+    "https://starside.work/elements/class-abilities/icons/83243e1980.webp",
+    "https://starside.work/elements/class-abilities/icons/9b7d9d8088.webp",
+    "https://starside.work/elements/class-abilities/icons/b9739b3762.webp",
+    "https://starside.work/elements/class-abilities/icons/cba8013059.webp",
+    "https://starside.work/elements/class-abilities/icons/d50e6be2ce.webp",
+    "https://starside.work/elements/class-abilities/icons/dc6210c147.webp",
+    "https://starside.work/elements/class-abilities/icons/dc62a7c73b.webp",
+    "https://starside.work/elements/class-abilities/icons/f267262f1f.webp",
+    "https://starside.work/elements/class-abilities/icons/fad1ac3672.webp",
+    "https://starside.work/elements/class-abilities/style.css",
+    "https://starside.work/elements/style.css"
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "title": "首领生命值 · Starside",
+    "url": "https://starside.work/boss-hp/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/boss-hp/index.json",
+    "text": "texts/activities/boss-hp/index.md",
+    "raw": "pages/boss-hp/index.html",
+    "source_blocks": 0,
+    "tables": 2
+  },
+  {
+    "title": "锻造武器来源 · Starside",
+    "url": "https://starside.work/crafting/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/crafting/index.json",
+    "text": "texts/activities/crafting/index.md",
+    "raw": "pages/crafting/index.html",
+    "source_blocks": 0,
+    "tables": 5
+  },
+  {
+    "title": "DPS 排行 · Starside",
+    "url": "https://starside.work/dps/index.html",
+    "updated_at": "2026.8.25",
+    "record": "records/dps/index.json",
+    "text": "texts/activities/dps/index.md",
+    "raw": "pages/dps/index.html",
+    "source_blocks": 0,
+    "tables": 1
+  },
+  {
+    "title": "PVE 终局刷取指南 · Starside",
+    "url": "https://starside.work/pve-farming/index.html",
+    "updated_at": "2026.9.6",
+    "record": "records/pve-farming/index.json",
+    "text": "texts/activities/pve-farming/index.md",
+    "raw": "pages/pve-farming/index.html",
+    "source_blocks": 0,
+    "tables": 0
+  },
+  {
+    "title": "Raid 攻略 · Starside",
+    "url": "https://starside.work/raid-guides/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/raid-guides/index.json",
+    "text": "texts/activities/raid-guides/index.md",
+    "raw": "pages/raid-guides/index.html",
+    "source_blocks": 0,
+    "tables": 0
+  },
+  {
+    "title": "轮换速查表 · Starside",
+    "url": "https://starside.work/rotation/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/rotation/index.json",
+    "text": "texts/activities/rotation/index.md",
+    "raw": "pages/rotation/index.html",
+    "source_blocks": 0,
+    "tables": 2
+  },
+  {
+    "title": "技能伤害排行 · Starside",
+    "url": "https://starside.work/skill-damage/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/skill-damage/index.json",
+    "text": "texts/activities/skill-damage/index.md",
+    "raw": "pages/skill-damage/index.html",
+    "source_blocks": 0,
+    "tables": 5
+  },
+  {
+    "title": "切枪 DPS 排行 · Starside",
+    "url": "https://starside.work/swap-dps/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/swap-dps/index.json",
+    "text": "texts/activities/swap-dps/index.md",
+    "raw": "pages/swap-dps/index.html",
+    "source_blocks": 0,
+    "tables": 1
+  }
+]

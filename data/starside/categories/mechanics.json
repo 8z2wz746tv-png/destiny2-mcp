@@ -1,0 +1,62 @@
+[
+  {
+    "title": "技能冷却 · Starside",
+    "url": "https://starside.work/ability-cooldown/index.html",
+    "updated_at": "2026.8.25",
+    "record": "records/ability-cooldown/index.json",
+    "text": "texts/mechanics/ability-cooldown/index.md",
+    "raw": "pages/ability-cooldown/index.html",
+    "source_blocks": 0,
+    "tables": 4
+  },
+  {
+    "title": "弹药生成机制 · Starside",
+    "url": "https://starside.work/ammo/index.html",
+    "updated_at": "2026.8.25",
+    "record": "records/ammo/index.json",
+    "text": "texts/mechanics/ammo/index.md",
+    "raw": "pages/ammo/index.html",
+    "source_blocks": 0,
+    "tables": 1
+  },
+  {
+    "title": "增伤 & 易伤 · Starside",
+    "url": "https://starside.work/buff-debuffs/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/buff-debuffs/index.json",
+    "text": "texts/mechanics/buff-debuffs/index.md",
+    "raw": "pages/buff-debuffs/index.html",
+    "source_blocks": 0,
+    "tables": 6
+  },
+  {
+    "title": "战斗人员倍率 · Starside",
+    "url": "https://starside.work/combatant-scalars/index.html",
+    "updated_at": "2026.8.14",
+    "record": "records/combatant-scalars/index.json",
+    "text": "texts/mechanics/combatant-scalars/index.md",
+    "raw": "pages/combatant-scalars/index.html",
+    "source_blocks": 0,
+    "tables": 3
+  },
+  {
+    "title": "游戏机制 · Starside",
+    "url": "https://starside.work/game-mechanics/index.html",
+    "updated_at": "2026.8.30",
+    "record": "records/game-mechanics/index.json",
+    "text": "texts/mechanics/game-mechanics/index.md",
+    "raw": "pages/game-mechanics/index.html",
+    "source_blocks": 0,
+    "tables": 22
+  },
+  {
+    "title": "压光伤害 · Starside",
+    "url": "https://starside.work/power-delta/index.html",
+    "updated_at": "2026.8.14",
+    "record": "records/power-delta/index.json",
+    "text": "texts/mechanics/power-delta/index.md",
+    "raw": "pages/power-delta/index.html",
+    "source_blocks": 0,
+    "tables": 1
+  }
+]

@@ -1,0 +1,549 @@
+[
+  {
+    "url": "https://beian.miit.gov.cn/",
+    "referenced_by": [
+      "https://starside.work/ability-cooldown/index.html",
+      "https://starside.work/ammo/index.html",
+      "https://starside.work/armor-mods/index.html",
+      "https://starside.work/armor-sets/index.html",
+      "https://starside.work/artifact-mods/index.html",
+      "https://starside.work/boss-hp/index.html",
+      "https://starside.work/buff-debuffs/index.html",
+      "https://starside.work/builds/index.html",
+      "https://starside.work/builds/new/index.html",
+      "https://starside.work/builds/new/set/index.html",
+      "https://starside.work/builds/s29/00vivy2a-hunter/index.html",
+      "https://starside.work/builds/s29/0cqrj1m0-hunter/index.html",
+      "https://starside.work/builds/s29/0n05dhek-hunter/index.html",
+      "https://starside.work/builds/s29/0rzn1rj2-warlock/index.html",
+      "https://starside.work/builds/s29/12iujhbp-hunter/index.html",
+      "https://starside.work/builds/s29/16gnj6n4-warlock/index.html",
+      "https://starside.work/builds/s29/1846gzu2-warlock/index.html",
+      "https://starside.work/builds/s29/1hvh7t4d-hunter/index.html",
+      "https://starside.work/builds/s29/26x3zxkz-hunter/index.html",
+      "https://starside.work/builds/s29/3p44o63u-warlock/index.html",
+      "https://starside.work/builds/s29/45oqarm4-hunter/index.html",
+      "https://starside.work/builds/s29/6o3okjt4-titan/index.html",
+      "https://starside.work/builds/s29/76ko496i-warlock/index.html",
+      "https://starside.work/builds/s29/7b5y8phc-hunter/index.html",
+      "https://starside.work/builds/s29/8p1f06qc-hunter/index.html",
+      "https://starside.work/builds/s29/9m6612x5-hunter/index.html",
+      "https://starside.work/builds/s29/acdzuqsl-warlock/index.html",
+      "https://starside.work/builds/s29/bcndfero-hunter/index.html",
+      "https://starside.work/builds/s29/clama-he-titan/index.html",
+      "https://starside.work/builds/s29/cub5k5v5-warlock/index.html",
+      "https://starside.work/builds/s29/cw92ebx7-warlock/index.html",
+      "https://starside.work/builds/s29/d4xktql3-titan/index.html",
+      "https://starside.work/builds/s29/dwu56wqi-titan/index.html",
+      "https://starside.work/builds/s29/e4jm22gv-hunter/index.html",
+      "https://starside.work/builds/s29/ec4h23xa-titan/index.html",
+      "https://starside.work/builds/s29/em3ruaaj-titan/index.html",
+      "https://starside.work/builds/s29/epfu2cst-hunter/index.html",
+      "https://starside.work/builds/s29/etcdnfru-hunter/index.html",
+      "https://starside.work/builds/s29/fc797wcs-hunter/index.html",
+      "https://starside.work/builds/s29/fhbpgwnh-titan/index.html",
+      "https://starside.work/builds/s29/fnsnwbr3-hunter/index.html",
+      "https://starside.work/builds/s29/hemhwhoe-hunter/index.html",
+      "https://starside.work/builds/s29/hl9zhtio-warlock/index.html",
+      "https://starside.work/builds/s29/hqq17mla-hunter/index.html",
+      "https://starside.work/builds/s29/ig7y9i5n-warlock/index.html",
+      "https://starside.work/builds/s29/irneezm3-warlock/index.html",
+      "https://starside.work/builds/s29/iuhsh3n7-warlock/index.html",
+      "https://starside.work/builds/s29/j53igc67-hunter/index.html",
+      "https://starside.work/builds/s29/j5lws37e-hunter/index.html",
+      "https://starside.work/builds/s29/jianqi-fengbao-warlock/index.html",
+      "https://starside.work/builds/s29/jianqi-kongjufusi-warlock/index.html",
+      "https://starside.work/builds/s29/jianqi-shuangpaoyi-warlock/index.html",
+      "https://starside.work/builds/s29/k9b88zv0-warlock/index.html",
+      "https://starside.work/builds/s29/kvy77e2g-titan/index.html",
+      "https://starside.work/builds/s29/lndho5sd-hunter/index.html",
+      "https://starside.work/builds/s29/lp6n569t-titan/index.html",
+      "https://starside.work/builds/s29/lxg8i6ue-hunter/index.html",
+      "https://starside.work/builds/s29/madoka-yuansudashi-hunter/index.html",
+      "https://starside.work/builds/s29/mbgvkw8f-titan/index.html",
+      "https://starside.work/builds/s29/mc17h8dh-warlock/index.html",
+      "https://starside.work/builds/s29/mengdong-hechengstasis-titan/index.html",
+      "https://starside.work/builds/s29/mkguedf2-hunter/index.html",
+      "https://starside.work/builds/s29/mo1r9kvu-warlock/index.html",
+      "https://starside.work/builds/s29/nbq988rq-warlock/index.html",
+      "https://starside.work/builds/s29/ne0agkms-titan/index.html",
+      "https://starside.work/builds/s29/niangaoming-hexieqingping-warlock/index.html",
+      "https://starside.work/builds/s29/nianqingren-hexiaodi-hunter/index.html",
+      "https://starside.work/builds/s29/nightcore-baolei-hunter/index.html",
+      "https://starside.work/builds/s29/nightcore-swxsjz-hunter/index.html",
+      "https://starside.work/builds/s29/ozytwawh-titan/index.html",
+      "https://starside.work/builds/s29/pkz20gm1-warlock/index.html",
+      "https://starside.work/builds/s29/q01swvbe-titan/index.html",
+      "https://starside.work/builds/s29/q9y0mpko-titan/index.html",
+      "https://starside.work/builds/s29/qz9gs029-warlock/index.html",
+      "https://starside.work/builds/s29/rdrctsdn-warlock/index.html",
+      "https://starside.work/builds/s29/rnoxx0b1-warlock/index.html",
+      "https://starside.work/builds/s29/s5imk2yw-hunter/index.html",
+      "https://starside.work/builds/s29/sc398fux-titan/index.html",
+      "https://starside.work/builds/s29/swyr3tgz-warlock/index.html",
+      "https://starside.work/builds/s29/tniihk60-warlock/index.html",
+      "https://starside.work/builds/s29/tz4vvv6j-warlock/index.html",
+      "https://starside.work/builds/s29/v623u209-hunter/index.html",
+      "https://starside.work/builds/s29/vc0q45kd-hunter/index.html",
+      "https://starside.work/builds/s29/vl8gam9n-titan/index.html",
+      "https://starside.work/builds/s29/w0q7ss18-hunter/index.html",
+      "https://starside.work/builds/s29/xiaoning-xukongpvp-hunter/index.html",
+      "https://starside.work/builds/s29/xk3o6vpu-hunter/index.html",
+      "https://starside.work/builds/s29/xukonvoid-xinghuo-warlock/index.html",
+      "https://starside.work/builds/s29/yester-bguipen-titan/index.html",
+      "https://starside.work/builds/s29/yester-guidao-hunter/index.html",
+      "https://starside.work/builds/s29/yester-jtys-warlock/index.html",
+      "https://starside.work/builds/s29/yester-rendongdiudiu-hunter/index.html",
+      "https://starside.work/builds/s29/yester-xukongjiansheng-titan/index.html",
+      "https://starside.work/builds/s29/yiwangmelt-ggggdamage-hunter/index.html",
+      "https://starside.work/builds/s29/yiwangmelt-shoudian-hunter/index.html",
+      "https://starside.work/builds/s29/yiwangmelt-twjqg-hunter/index.html",
+      "https://starside.work/builds/s29/yiwangmelt-weiyiqingguai2-hunter/index.html",
+      "https://starside.work/builds/s29/ynwgmvks-warlock/index.html",
+      "https://starside.work/builds/s29/zf43l1v8-titan/index.html",
+      "https://starside.work/builds/s29/zqqoqjsb-warlock/index.html",
+      "https://starside.work/builds/sets/index.html",
+      "https://starside.work/changelog/index.html",
+      "https://starside.work/combatant-scalars/index.html",
+      "https://starside.work/crafting/index.html",
+      "https://starside.work/dps/index.html",
+      "https://starside.work/elements/arc/index.html",
+      "https://starside.work/elements/class-abilities/index.html",
+      "https://starside.work/elements/index.html",
+      "https://starside.work/elements/prismatic/index.html",
+      "https://starside.work/elements/solar/index.html",
+      "https://starside.work/elements/stasis/index.html",
+      "https://starside.work/elements/strand/index.html",
+      "https://starside.work/elements/void/index.html",
+      "https://starside.work/exotic-armor/index.html",
+      "https://starside.work/exotic-weapon/index.html",
+      "https://starside.work/exotic-weapons/index.html",
+      "https://starside.work/farming-sets/index.html",
+      "https://starside.work/game-mechanics/index.html",
+      "https://starside.work/index.html",
+      "https://starside.work/legendary-heavy/index.html",
+      "https://starside.work/legendary-primary/index.html",
+      "https://starside.work/legendary-special/index.html",
+      "https://starside.work/palette/index.html",
+      "https://starside.work/power-delta/index.html",
+      "https://starside.work/pve-farming/index.html",
+      "https://starside.work/raid-guides/index.html",
+      "https://starside.work/rotation/index.html",
+      "https://starside.work/shopping-heavy/index.html",
+      "https://starside.work/shopping-other/index.html",
+      "https://starside.work/shopping-primary/index.html",
+      "https://starside.work/shopping-special/index.html",
+      "https://starside.work/skill-damage/index.html",
+      "https://starside.work/sources/index.html",
+      "https://starside.work/swap-dps/index.html",
+      "https://starside.work/weapon-frames/index.html",
+      "https://starside.work/weapon-perks/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://discord.com/channels/591927598255439873/1453807417430245518",
+    "referenced_by": [
+      "https://starside.work/ammo/index.html",
+      "https://starside.work/sources/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/d/1JM-0SlxVDAi-C6rGVlLxa-J1WGewEeL8Qvq4htWZHhY",
+    "referenced_by": [
+      "https://starside.work/shopping-heavy/index.html",
+      "https://starside.work/shopping-other/index.html",
+      "https://starside.work/shopping-primary/index.html",
+      "https://starside.work/shopping-special/index.html",
+      "https://starside.work/sources/index.html",
+      "https://starside.work/weapon-frames/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/d/1b57Hb8m1L3daFfUckQQqvvN6VOpD03KEssvQLMFpC5I/edit",
+    "referenced_by": [
+      "https://starside.work/game-mechanics/index.html",
+      "https://starside.work/sources/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/d/1b57Hb8m1L3daFfUckQQqvvN6VOpD03KEssvQLMFpC5I/edit#gid=1386975095",
+    "referenced_by": [
+      "https://starside.work/combatant-scalars/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/d/1b57Hb8m1L3daFfUckQQqvvN6VOpD03KEssvQLMFpC5I/edit?gid=1252789129#gid=1252789129",
+    "referenced_by": [
+      "https://starside.work/power-delta/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/d/1lEOY_Z0v5ZZVZJ1SVLJyleMBEG2a7KLq4aLIQA9zk0A",
+    "referenced_by": [
+      "https://starside.work/ability-cooldown/index.html",
+      "https://starside.work/sources/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/d/1qsKGrRzCePGaIM5gNtAQNh949d3OsMJ6qV6Fqtpj22k/htmlview",
+    "referenced_by": [
+      "https://starside.work/exotic-weapons/index.html",
+      "https://starside.work/farming-sets/index.html",
+      "https://starside.work/sources/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "referenced_by": [
+      "https://starside.work/armor-mods/index.html",
+      "https://starside.work/armor-sets/index.html",
+      "https://starside.work/artifact-mods/index.html",
+      "https://starside.work/elements/arc/index.html",
+      "https://starside.work/elements/class-abilities/index.html",
+      "https://starside.work/elements/index.html",
+      "https://starside.work/elements/prismatic/index.html",
+      "https://starside.work/elements/solar/index.html",
+      "https://starside.work/elements/stasis/index.html",
+      "https://starside.work/elements/strand/index.html",
+      "https://starside.work/elements/void/index.html",
+      "https://starside.work/exotic-armor/index.html",
+      "https://starside.work/exotic-weapon/index.html",
+      "https://starside.work/game-mechanics/index.html",
+      "https://starside.work/sources/index.html",
+      "https://starside.work/weapon-perks/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/u/0/d/1_5wtBjRYHHxuF4oJKDb_iOGZs-wTkzB6RYbnyNLbuz4/htmlview",
+    "referenced_by": [
+      "https://starside.work/dps/index.html",
+      "https://starside.work/skill-damage/index.html",
+      "https://starside.work/sources/index.html",
+      "https://starside.work/swap-dps/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/u/0/d/1_5wtBjRYHHxuF4oJKDb_iOGZs-wTkzB6RYbnyNLbuz4/htmlview#gid=1346678363",
+    "referenced_by": [
+      "https://starside.work/boss-hp/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.google.com/spreadsheets/u/0/d/1i1KUwgVkd8qhwYj481gkV9sZNJQCE-C3Q-dpQutPCi4/htmlview",
+    "referenced_by": [
+      "https://starside.work/buff-debuffs/index.html",
+      "https://starside.work/game-mechanics/index.html",
+      "https://starside.work/sources/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ01qTUVKWVp6UEVO",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ0RORUpxRWJ3SmFG",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ0x6b3FXcnp1TGtP",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ0xZZWNGRVdNeW10",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ1hoQXpSTU5MVVFE",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ21BU3pZd1B5Qmp6",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ21GY3BIV3ZJa1hz",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ2VhRXFrZ3pxZkNj",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ2ZKcENkWVRUYkRx",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ2hTZkpKbVpuTEV5",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ2pLUGx1bW5MQ0FS",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://docs.qq.com/doc/DQ3NGU2FnUVhzYUVy",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://ifdian.net/a/eliver",
+    "referenced_by": [
+      "https://starside.work/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://linktr.ee/CourtProjects",
+    "referenced_by": [
+      "https://starside.work/game-mechanics/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://space.bilibili.com/169548478",
+    "referenced_by": [
+      "https://starside.work/exotic-weapons/index.html",
+      "https://starside.work/farming-sets/index.html",
+      "https://starside.work/legendary-heavy/index.html",
+      "https://starside.work/legendary-primary/index.html",
+      "https://starside.work/legendary-special/index.html",
+      "https://starside.work/sources/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://space.bilibili.com/2135345999",
+    "referenced_by": [
+      "https://starside.work/dps/index.html",
+      "https://starside.work/shopping-heavy/index.html",
+      "https://starside.work/shopping-other/index.html",
+      "https://starside.work/shopping-primary/index.html",
+      "https://starside.work/shopping-special/index.html",
+      "https://starside.work/skill-damage/index.html",
+      "https://starside.work/sources/index.html",
+      "https://starside.work/swap-dps/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://space.bilibili.com/26117485",
+    "referenced_by": [
+      "https://starside.work/ability-cooldown/index.html",
+      "https://starside.work/ammo/index.html",
+      "https://starside.work/armor-mods/index.html",
+      "https://starside.work/armor-sets/index.html",
+      "https://starside.work/artifact-mods/index.html",
+      "https://starside.work/boss-hp/index.html",
+      "https://starside.work/buff-debuffs/index.html",
+      "https://starside.work/builds/index.html",
+      "https://starside.work/builds/new/index.html",
+      "https://starside.work/builds/new/set/index.html",
+      "https://starside.work/builds/s29/00vivy2a-hunter/index.html",
+      "https://starside.work/builds/s29/0cqrj1m0-hunter/index.html",
+      "https://starside.work/builds/s29/0n05dhek-hunter/index.html",
+      "https://starside.work/builds/s29/0rzn1rj2-warlock/index.html",
+      "https://starside.work/builds/s29/12iujhbp-hunter/index.html",
+      "https://starside.work/builds/s29/16gnj6n4-warlock/index.html",
+      "https://starside.work/builds/s29/1846gzu2-warlock/index.html",
+      "https://starside.work/builds/s29/1hvh7t4d-hunter/index.html",
+      "https://starside.work/builds/s29/26x3zxkz-hunter/index.html",
+      "https://starside.work/builds/s29/3p44o63u-warlock/index.html",
+      "https://starside.work/builds/s29/45oqarm4-hunter/index.html",
+      "https://starside.work/builds/s29/6o3okjt4-titan/index.html",
+      "https://starside.work/builds/s29/76ko496i-warlock/index.html",
+      "https://starside.work/builds/s29/7b5y8phc-hunter/index.html",
+      "https://starside.work/builds/s29/8p1f06qc-hunter/index.html",
+      "https://starside.work/builds/s29/9m6612x5-hunter/index.html",
+      "https://starside.work/builds/s29/acdzuqsl-warlock/index.html",
+      "https://starside.work/builds/s29/bcndfero-hunter/index.html",
+      "https://starside.work/builds/s29/clama-he-titan/index.html",
+      "https://starside.work/builds/s29/cub5k5v5-warlock/index.html",
+      "https://starside.work/builds/s29/cw92ebx7-warlock/index.html",
+      "https://starside.work/builds/s29/d4xktql3-titan/index.html",
+      "https://starside.work/builds/s29/dwu56wqi-titan/index.html",
+      "https://starside.work/builds/s29/e4jm22gv-hunter/index.html",
+      "https://starside.work/builds/s29/ec4h23xa-titan/index.html",
+      "https://starside.work/builds/s29/em3ruaaj-titan/index.html",
+      "https://starside.work/builds/s29/epfu2cst-hunter/index.html",
+      "https://starside.work/builds/s29/etcdnfru-hunter/index.html",
+      "https://starside.work/builds/s29/fc797wcs-hunter/index.html",
+      "https://starside.work/builds/s29/fhbpgwnh-titan/index.html",
+      "https://starside.work/builds/s29/fnsnwbr3-hunter/index.html",
+      "https://starside.work/builds/s29/hemhwhoe-hunter/index.html",
+      "https://starside.work/builds/s29/hl9zhtio-warlock/index.html",
+      "https://starside.work/builds/s29/hqq17mla-hunter/index.html",
+      "https://starside.work/builds/s29/ig7y9i5n-warlock/index.html",
+      "https://starside.work/builds/s29/irneezm3-warlock/index.html",
+      "https://starside.work/builds/s29/iuhsh3n7-warlock/index.html",
+      "https://starside.work/builds/s29/j53igc67-hunter/index.html",
+      "https://starside.work/builds/s29/j5lws37e-hunter/index.html",
+      "https://starside.work/builds/s29/jianqi-fengbao-warlock/index.html",
+      "https://starside.work/builds/s29/jianqi-kongjufusi-warlock/index.html",
+      "https://starside.work/builds/s29/jianqi-shuangpaoyi-warlock/index.html",
+      "https://starside.work/builds/s29/k9b88zv0-warlock/index.html",
+      "https://starside.work/builds/s29/kvy77e2g-titan/index.html",
+      "https://starside.work/builds/s29/lndho5sd-hunter/index.html",
+      "https://starside.work/builds/s29/lp6n569t-titan/index.html",
+      "https://starside.work/builds/s29/lxg8i6ue-hunter/index.html",
+      "https://starside.work/builds/s29/madoka-yuansudashi-hunter/index.html",
+      "https://starside.work/builds/s29/mbgvkw8f-titan/index.html",
+      "https://starside.work/builds/s29/mc17h8dh-warlock/index.html",
+      "https://starside.work/builds/s29/mengdong-hechengstasis-titan/index.html",
+      "https://starside.work/builds/s29/mkguedf2-hunter/index.html",
+      "https://starside.work/builds/s29/mo1r9kvu-warlock/index.html",
+      "https://starside.work/builds/s29/nbq988rq-warlock/index.html",
+      "https://starside.work/builds/s29/ne0agkms-titan/index.html",
+      "https://starside.work/builds/s29/niangaoming-hexieqingping-warlock/index.html",
+      "https://starside.work/builds/s29/nianqingren-hexiaodi-hunter/index.html",
+      "https://starside.work/builds/s29/nightcore-baolei-hunter/index.html",
+      "https://starside.work/builds/s29/nightcore-swxsjz-hunter/index.html",
+      "https://starside.work/builds/s29/ozytwawh-titan/index.html",
+      "https://starside.work/builds/s29/pkz20gm1-warlock/index.html",
+      "https://starside.work/builds/s29/q01swvbe-titan/index.html",
+      "https://starside.work/builds/s29/q9y0mpko-titan/index.html",
+      "https://starside.work/builds/s29/qz9gs029-warlock/index.html",
+      "https://starside.work/builds/s29/rdrctsdn-warlock/index.html",
+      "https://starside.work/builds/s29/rnoxx0b1-warlock/index.html",
+      "https://starside.work/builds/s29/s5imk2yw-hunter/index.html",
+      "https://starside.work/builds/s29/sc398fux-titan/index.html",
+      "https://starside.work/builds/s29/swyr3tgz-warlock/index.html",
+      "https://starside.work/builds/s29/tniihk60-warlock/index.html",
+      "https://starside.work/builds/s29/tz4vvv6j-warlock/index.html",
+      "https://starside.work/builds/s29/v623u209-hunter/index.html",
+      "https://starside.work/builds/s29/vc0q45kd-hunter/index.html",
+      "https://starside.work/builds/s29/vl8gam9n-titan/index.html",
+      "https://starside.work/builds/s29/w0q7ss18-hunter/index.html",
+      "https://starside.work/builds/s29/xiaoning-xukongpvp-hunter/index.html",
+      "https://starside.work/builds/s29/xk3o6vpu-hunter/index.html",
+      "https://starside.work/builds/s29/xukonvoid-xinghuo-warlock/index.html",
+      "https://starside.work/builds/s29/yester-bguipen-titan/index.html",
+      "https://starside.work/builds/s29/yester-guidao-hunter/index.html",
+      "https://starside.work/builds/s29/yester-jtys-warlock/index.html",
+      "https://starside.work/builds/s29/yester-rendongdiudiu-hunter/index.html",
+      "https://starside.work/builds/s29/yester-xukongjiansheng-titan/index.html",
+      "https://starside.work/builds/s29/yiwangmelt-ggggdamage-hunter/index.html",
+      "https://starside.work/builds/s29/yiwangmelt-shoudian-hunter/index.html",
+      "https://starside.work/builds/s29/yiwangmelt-twjqg-hunter/index.html",
+      "https://starside.work/builds/s29/yiwangmelt-weiyiqingguai2-hunter/index.html",
+      "https://starside.work/builds/s29/ynwgmvks-warlock/index.html",
+      "https://starside.work/builds/s29/zf43l1v8-titan/index.html",
+      "https://starside.work/builds/s29/zqqoqjsb-warlock/index.html",
+      "https://starside.work/builds/sets/index.html",
+      "https://starside.work/changelog/index.html",
+      "https://starside.work/combatant-scalars/index.html",
+      "https://starside.work/crafting/index.html",
+      "https://starside.work/dps/index.html",
+      "https://starside.work/elements/arc/index.html",
+      "https://starside.work/elements/class-abilities/index.html",
+      "https://starside.work/elements/index.html",
+      "https://starside.work/elements/prismatic/index.html",
+      "https://starside.work/elements/solar/index.html",
+      "https://starside.work/elements/stasis/index.html",
+      "https://starside.work/elements/strand/index.html",
+      "https://starside.work/elements/void/index.html",
+      "https://starside.work/exotic-armor/index.html",
+      "https://starside.work/exotic-weapon/index.html",
+      "https://starside.work/exotic-weapons/index.html",
+      "https://starside.work/farming-sets/index.html",
+      "https://starside.work/game-mechanics/index.html",
+      "https://starside.work/index.html",
+      "https://starside.work/legendary-heavy/index.html",
+      "https://starside.work/legendary-primary/index.html",
+      "https://starside.work/legendary-special/index.html",
+      "https://starside.work/palette/index.html",
+      "https://starside.work/power-delta/index.html",
+      "https://starside.work/pve-farming/index.html",
+      "https://starside.work/raid-guides/index.html",
+      "https://starside.work/rotation/index.html",
+      "https://starside.work/shopping-heavy/index.html",
+      "https://starside.work/shopping-other/index.html",
+      "https://starside.work/shopping-primary/index.html",
+      "https://starside.work/shopping-special/index.html",
+      "https://starside.work/skill-damage/index.html",
+      "https://starside.work/sources/index.html",
+      "https://starside.work/swap-dps/index.html",
+      "https://starside.work/weapon-frames/index.html",
+      "https://starside.work/weapon-perks/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://space.bilibili.com/3706960595650983",
+    "referenced_by": [
+      "https://starside.work/raid-guides/index.html",
+      "https://starside.work/sources/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://www.bilibili.com/video/BV1ah4Z6HEpr",
+    "referenced_by": [
+      "https://starside.work/legendary-heavy/index.html",
+      "https://starside.work/legendary-primary/index.html",
+      "https://starside.work/legendary-special/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://www.bilibili.com/video/BV1na8u6MEZ9",
+    "referenced_by": [
+      "https://starside.work/exotic-weapons/index.html"
+    ],
+    "downloaded": false
+  },
+  {
+    "url": "https://www.d2clarity.com/blog/destiny-science-6/chunk-energy-scalars-breakdown-12",
+    "referenced_by": [
+      "https://starside.work/ability-cooldown/index.html",
+      "https://starside.work/sources/index.html"
+    ],
+    "downloaded": false
+  }
+]

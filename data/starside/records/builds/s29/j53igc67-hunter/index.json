@@ -1,0 +1,183 @@
+{
+  "url": "https://starside.work/builds/s29/j53igc67-hunter/index.html",
+  "title": "棱镜光剑猎 · 配装推荐 · Starside",
+  "description": "肉的发昏的棱镜光剑猎人，携带翻新兼顾近点和远点的清杂输出能力",
+  "category": "builds",
+  "updated_at": "2026.9.8",
+  "data_src": "",
+  "data_hash": "",
+  "source_text": "# 棱镜光剑猎\n\n推荐人：皮皮晓迪螺#4205\n描述：肉的发昏的棱镜光剑猎人，携带翻新兼顾近点和远点的清杂输出能力\n更新：2026.9.8\n场景：宗师终极\n定位：通用\n分支：棱镜\n类别：meta\n核心：英勇利刃\n\n## 审核意见\n\n也可以带焕光闪身+勇气琢面的组合\n有光剑的情况下裁决定论的伤害并没有那么重要了,可以考虑带工具枪或白弹\n没有圣贤2王冠2可以用vog4,但就只能绑定光能蜘蛛头了\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：线织幽灵、飞升\n碎片：保护琢面、毁灭琢面、希望琢面、黎明琢面、使命琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：英勇利刃\n传说武器：裁决定论 | 战嚎炮管、聚合充能\n传说武器：翻新 A499 | 速射瞄准、聚合充能\n\n## 护甲\n\n异域护甲：曲腹蛛之灵、至纯光能之灵\n套装：圣贤保护者 2 件 × 双重王冠 2 件\n头盔：超能洗礼、超能洗礼、动能虹吸\n护臂：手雷洗礼、近战洗礼、鼓舞爆弹\n胸甲：电弧抗性、灼烧抗性、狙击伤害抗性\n腿部：动能武器激涌、动能武器激涌、层层不绝\n职业物品：收割者、职业洗礼、感应护盾\n\n## 神器\n\n神器：加密数据盘\n模组：动能合成、苦痛之力、护甲匠、组合银白利刃、电介质、狙击手冥想、刀剑风暴连击\n\n## 六维\n\n六维：生命 0 ｜ 近战 80+ ｜ 手雷 80+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 150+\n\n## 注解\n\n光剑选择：进攻形态+冲击核心+超利刃\n这套配装通过格挡伤害和飞升获取增幅，通过使用手雷获取织造铠甲，通过冲击核心命中获取恢复。圣贤套给的手雷及职业能量能保证职业技能和手雷的高效覆盖，光剑作为动能武器提供的高额超凡进度条可以频繁开启超凡，生存和清杂能力进一步提升。在有绿弹之后使用光剑复读三左一右连招，配合进攻形态和动能合成神器模组拥有无限弹药。对于远点的战斗人员，翻新+狙击手冥想也能高效处理。在高难本中注意远离自爆怪，频繁使用烟雾弹致盲战斗人员控场，避免承受太多伤害，并优先处理高威胁的战斗人员\n\n这套装备有几个门槛：1.试炼的双重王冠2件套；2.vog的裁决定论\n六维可以用护甲模组来凑，护甲主要堆武器属性\n二号位若没有裁决定论随意携带一把晕势不可挡的绿弹用于补伤害即可，如果无弹药开局二号位也可以带白弹武器和绿弹终结来启动\n如果实在没有双重王冠，可以选择4vog套 / 2圣贤2空降灭火，彪悍环境实在回不上血也可以带虫骸+至纯或者虫骸+复兴\n职业金也可以选择复兴曲腹蛛组合，手雷带沐浴雷，生存更加变态",
+  "source_blocks": [
+    "# 棱镜光剑猎\n\n推荐人：皮皮晓迪螺#4205\n描述：肉的发昏的棱镜光剑猎人，携带翻新兼顾近点和远点的清杂输出能力\n更新：2026.9.8\n场景：宗师终极\n定位：通用\n分支：棱镜\n类别：meta\n核心：英勇利刃\n\n## 审核意见\n\n也可以带焕光闪身+勇气琢面的组合\n有光剑的情况下裁决定论的伤害并没有那么重要了,可以考虑带工具枪或白弹\n没有圣贤2王冠2可以用vog4,但就只能绑定光能蜘蛛头了\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：线织幽灵、飞升\n碎片：保护琢面、毁灭琢面、希望琢面、黎明琢面、使命琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：英勇利刃\n传说武器：裁决定论 | 战嚎炮管、聚合充能\n传说武器：翻新 A499 | 速射瞄准、聚合充能\n\n## 护甲\n\n异域护甲：曲腹蛛之灵、至纯光能之灵\n套装：圣贤保护者 2 件 × 双重王冠 2 件\n头盔：超能洗礼、超能洗礼、动能虹吸\n护臂：手雷洗礼、近战洗礼、鼓舞爆弹\n胸甲：电弧抗性、灼烧抗性、狙击伤害抗性\n腿部：动能武器激涌、动能武器激涌、层层不绝\n职业物品：收割者、职业洗礼、感应护盾\n\n## 神器\n\n神器：加密数据盘\n模组：动能合成、苦痛之力、护甲匠、组合银白利刃、电介质、狙击手冥想、刀剑风暴连击\n\n## 六维\n\n六维：生命 0 ｜ 近战 80+ ｜ 手雷 80+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 150+\n\n## 注解\n\n光剑选择：进攻形态+冲击核心+超利刃\n这套配装通过格挡伤害和飞升获取增幅，通过使用手雷获取织造铠甲，通过冲击核心命中获取恢复。圣贤套给的手雷及职业能量能保证职业技能和手雷的高效覆盖，光剑作为动能武器提供的高额超凡进度条可以频繁开启超凡，生存和清杂能力进一步提升。在有绿弹之后使用光剑复读三左一右连招，配合进攻形态和动能合成神器模组拥有无限弹药。对于远点的战斗人员，翻新+狙击手冥想也能高效处理。在高难本中注意远离自爆怪，频繁使用烟雾弹致盲战斗人员控场，避免承受太多伤害，并优先处理高威胁的战斗人员\n\n这套装备有几个门槛：1.试炼的双重王冠2件套；2.vog的裁决定论\n六维可以用护甲模组来凑，护甲主要堆武器属性\n二号位若没有裁决定论随意携带一把晕势不可挡的绿弹用于补伤害即可，如果无弹药开局二号位也可以带白弹武器和绿弹终结来启动\n如果实在没有双重王冠，可以选择4vog套 / 2圣贤2空降灭火，彪悍环境实在回不上血也可以带虫骸+至纯或者虫骸+复兴\n职业金也可以选择复兴曲腹蛛组合，手雷带沐浴雷，生存更加变态"
+  ],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "棱镜光剑猎"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "超能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "技能"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "星相"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "神器模组"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "加密数据盘"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "头盔"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "护臂"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "胸甲"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "腿部"
+    },
+    {
+      "level": "h3",
+      "id": "",
+      "text": "职业物品"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [],
+  "text": "棱镜光剑猎 · 配装推荐 · Starside\n\nStarside\n/\n配装推荐\n/\n凯旋纪念碑\n/\n棱镜光剑猎\n\n推荐者：\n皮皮晓迪螺#4205\n\n棱镜光剑猎\n\n♥︎ 复制配装截图详情开关\n\n猎人 · 棱镜 · metaS29 · 凯旋纪念碑\n\n肉的发昏的棱镜光剑猎人，携带翻新兼顾近点和远点的清杂输出能力\n\n适用环境\n\n宗师终极\n\n标签\n\n通用\n\n# 棱镜光剑猎\n\n推荐人：皮皮晓迪螺#4205\n描述：肉的发昏的棱镜光剑猎人，携带翻新兼顾近点和远点的清杂输出能力\n更新：2026.9.8\n场景：宗师终极\n定位：通用\n分支：棱镜\n类别：meta\n核心：英勇利刃\n\n## 审核意见\n\n也可以带焕光闪身+勇气琢面的组合\n有光剑的情况下裁决定论的伤害并没有那么重要了,可以考虑带工具枪或白弹\n没有圣贤2王冠2可以用vog4,但就只能绑定光能蜘蛛头了\n\n## 职业\n\n职业：猎人\n超能：黄金枪：神枪手\n星相：线织幽灵、飞升\n碎片：保护琢面、毁灭琢面、希望琢面、黎明琢面、使命琢面\n手雷：抓钩\n近战：陷阱炸弹\n职业技能：赌徒闪身\n\n## 武器\n\n异域武器：英勇利刃\n传说武器：裁决定论 | 战嚎炮管、聚合充能\n传说武器：翻新 A499 | 速射瞄准、聚合充能\n\n## 护甲\n\n异域护甲：曲腹蛛之灵、至纯光能之灵\n套装：圣贤保护者 2 件 × 双重王冠 2 件\n头盔：超能洗礼、超能洗礼、动能虹吸\n护臂：手雷洗礼、近战洗礼、鼓舞爆弹\n胸甲：电弧抗性、灼烧抗性、狙击伤害抗性\n腿部：动能武器激涌、动能武器激涌、层层不绝\n职业物品：收割者、职业洗礼、感应护盾\n\n## 神器\n\n神器：加密数据盘\n模组：动能合成、苦痛之力、护甲匠、组合银白利刃、电介质、狙击手冥想、刀剑风暴连击\n\n## 六维\n\n六维：生命 0 ｜ 近战 80+ ｜ 手雷 80+ ｜ 超能 70+ ｜ 职业 80+ ｜ 武器 150+\n\n## 注解\n\n光剑选择：进攻形态+冲击核心+超利刃\n这套配装通过格挡伤害和飞升获取增幅，通过使用手雷获取织造铠甲，通过冲击核心命中获取恢复。圣贤套给的手雷及职业能量能保证职业技能和手雷的高效覆盖，光剑作为动能武器提供的高额超凡进度条可以频繁开启超凡，生存和清杂能力进一步提升。在有绿弹之后使用光剑复读三左一右连招，配合进攻形态和动能合成神器模组拥有无限弹药。对于远点的战斗人员，翻新+狙击手冥想也能高效处理。在高难本中注意远离自爆怪，频繁使用烟雾弹致盲战斗人员控场，避免承受太多伤害，并优先处理高威胁的战斗人员\n\n这套装备有几个门槛：1.试炼的双重王冠2件套；2.vog的裁决定论\n六维可以用护甲模组来凑，护甲主要堆武器属性\n二号位若没有裁决定论随意携带一把晕势不可挡的绿弹用于补伤害即可，如果无弹药开局二号位也可以带白弹武器和绿弹终结来启动\n如果实在没有双重王冠，可以选择4vog套 / 2圣贤2空降灭火，彪悍环境实在回不上血也可以带虫骸+至纯或者虫骸+复兴\n职业金也可以选择复兴曲腹蛛组合，手雷带沐浴雷，生存更加变态\n\n审核意见\n\n也可以带焕光闪身+勇气琢面的组合\n有光剑的情况下裁决定论的伤害并没有那么重要了,可以考虑带工具枪或白弹\n没有圣贤2王冠2可以用vog4,但就只能绑定光能蜘蛛头了\n\n职业\n\n职业\n\n猎人\n\n棱镜\n\n超能\n\n黄金枪：神枪手\n\n技能\n\n抓钩\n\n陷阱炸弹\n\n赌徒闪身\n\n星相\n\n线织幽灵\n\n飞升\n\n碎片\n\n保护琢面\n\n毁灭琢面\n\n希望琢面\n\n黎明琢面\n\n使命琢面\n\n武器\n\n英勇利刃\n\n裁决定论战嚎炮管聚合充能\n\n翻新 A499速射瞄准聚合充能\n\n神器模组\n\n加密数据盘\n\n动能合成\n\n苦痛之力\n\n护甲匠\n\n组合银白利刃\n\n电介质\n\n狙击手冥想\n\n刀剑风暴连击\n\n护甲\n\n曲腹蛛之灵至纯光能之灵\n\n圣贤保护者平衡2 件\n\n双重王冠2 件\n\n生命0\n\n近战80+\n\n手雷80+\n\n超能70+\n\n职业80+\n\n武器150+\n\n头盔\n\n超能洗礼\n\n超能洗礼\n\n动能虹吸虹吸\n\n护臂\n\n手雷洗礼\n\n近战洗礼\n\n鼓舞爆弹\n\n胸甲\n\n电弧抗性抗性\n\n灼烧抗性抗性\n\n狙击伤害抗性抗性\n\n腿部\n\n动能武器激涌武器激涌\n\n动能武器激涌武器激涌\n\n层层不绝\n\n职业物品\n\n收割者\n\n职业洗礼\n\n感应护盾\n\n注解\n\n光剑选择：进攻形态+冲击核心+超利刃\n这套配装通过格挡伤害和飞升获取增幅，通过使用手雷获取织造铠甲，通过冲击核心命中获取恢复。圣贤套给的手雷及职业能量能保证职业技能和手雷的高效覆盖，光剑作为动能武器提供的高额超凡进度条可以频繁开启超凡，生存和清杂能力进一步提升。在有绿弹之后使用光剑复读三左一右连招，配合进攻形态和动能合成神器模组拥有无限弹药。对于远点的战斗人员，翻新+狙击手冥想也能高效处理。在高难本中注意远离自爆怪，频繁使用烟雾弹致盲战斗人员控场，避免承受太多伤害，并优先处理高威胁的战斗人员\n\n这套装备有几个门槛：1.试炼的双重王冠2件套；2.vog的裁决定论\n六维可以用护甲模组来凑，护甲主要堆武器属性\n二号位若没有裁决定论随意携带一把晕势不可挡的绿弹用于补伤害即可，如果无弹药开局二号位也可以带白弹武器和绿弹终结来启动\n如果实在没有双重王冠，可以选择4vog套 / 2圣贤2空降灭火，彪悍环境实在回不上血也可以带虫骸+至纯或者虫骸+复兴\n职业金也可以选择复兴曲腹蛛组合，手雷带沐浴雷，生存更加变态\n\n更新 2026.9.8\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/builds/s29/j53igc67-hunter/index.html",
+    "final_url": "https://starside.work/builds/s29/j53igc67-hunter/index.html",
+    "path": "pages/builds/s29/j53igc67-hunter/index.html",
+    "bytes": 34364,
+    "sha256": "efc24a50f11e877ebd8fb1fdf5d7641ecaf555dbcf17c049355d80fbca7c2f38",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:28:19.635583+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/builds/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/prismatic/index.html",
+    "https://starside.work/elements/solar/index.html",
+    "https://starside.work/elements/strand/index.html",
+    "https://starside.work/elements/void/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/shopping-other/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/armor-mods/icons/1db6e3cbc8.webp",
+    "https://starside.work/armor-mods/icons/2ee424e9c4.webp",
+    "https://starside.work/armor-mods/icons/346923d6cc.webp",
+    "https://starside.work/armor-mods/icons/5406be54a5.webp",
+    "https://starside.work/armor-mods/icons/7a002a3848.webp",
+    "https://starside.work/armor-mods/icons/8c22cf983d.webp",
+    "https://starside.work/armor-mods/icons/b0ccd9cbcf.webp",
+    "https://starside.work/armor-mods/icons/cbfd0cd511.webp",
+    "https://starside.work/armor-mods/icons/cee9e0f613.webp",
+    "https://starside.work/armor-mods/icons/d482839737.webp",
+    "https://starside.work/armor-mods/icons/e4238f1ad0.webp",
+    "https://starside.work/armor-mods/icons/ebc8826474.webp",
+    "https://starside.work/armor-mods/icons/fd06023f70.webp",
+    "https://starside.work/armor-sets/icons/051.png",
+    "https://starside.work/armor-sets/icons/109.png",
+    "https://starside.work/artifact-mods/icons/376b28ea97.webp",
+    "https://starside.work/artifact-mods/icons/48c4d61945.webp",
+    "https://starside.work/artifact-mods/icons/77d21b0974.webp",
+    "https://starside.work/artifact-mods/icons/8ed5f7d5d9.webp",
+    "https://starside.work/artifact-mods/icons/97ef185661.webp",
+    "https://starside.work/artifact-mods/icons/9ab65ca51d.webp",
+    "https://starside.work/artifact-mods/icons/cbe95c5f3b.webp",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/builds/icons/2d9ac155cf.webp",
+    "https://starside.work/builds/style.css",
+    "https://starside.work/builds/tip.js",
+    "https://starside.work/elements/class-abilities/icons/65d4e919d1.webp",
+    "https://starside.work/elements/class-abilities/icons/cba8013059.webp",
+    "https://starside.work/elements/prismatic/icons/2b0c20c15a.webp",
+    "https://starside.work/elements/prismatic/icons/3cb69eea59.webp",
+    "https://starside.work/elements/prismatic/icons/4f517c0390.webp",
+    "https://starside.work/elements/prismatic/icons/67d91531a9.webp",
+    "https://starside.work/elements/prismatic/icons/727574c917.webp",
+    "https://starside.work/elements/prismatic/icons/77096a21b5.webp",
+    "https://starside.work/elements/prismatic/icons/b5a97142a6.webp",
+    "https://starside.work/elements/prismatic/icons/e421ab5fa8.webp",
+    "https://starside.work/elements/solar/icons/0ee82bc44a.webp",
+    "https://starside.work/elements/strand/icons/24b726319d.webp",
+    "https://starside.work/elements/void/icons/3ed96daa22.webp",
+    "https://starside.work/exotic-armor/icons/094d23ba92.webp",
+    "https://starside.work/exotic-armor/icons/9ee4859dac.webp",
+    "https://starside.work/exotic-weapon/icons/f44d0f5ca3.webp",
+    "https://starside.work/shopping-other/icons/8a126a8a14.webp",
+    "https://starside.work/shopping-special/icons/3d0491b9e1.webp",
+    "https://starside.work/weapon-perks/icons/2b657455ac.webp",
+    "https://starside.work/weapon-perks/icons/e0749cfc0e.webp",
+    "https://starside.work/weapon-perks/icons/e94d2a7d2d.webp"
+  ]
+}

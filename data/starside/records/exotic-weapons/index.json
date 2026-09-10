@@ -1,0 +1,5484 @@
+{
+  "url": "https://starside.work/exotic-weapons/index.html",
+  "title": "刷取清单-异域武器 · Starside",
+  "description": "85 把异域武器的输出、清怪与高难评级，含实测总伤与 DPS，以及每一档评级的理由。",
+  "category": "weapons",
+  "updated_at": "2026.9.6",
+  "data_src": "docs/exotic-weapons",
+  "data_hash": "bcc95bdf93d5ce81699fc44e71de569dae71584c",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "刷取清单-异域武器"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "评级"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "评级",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级",
+            "html": "评级"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "总伤",
+            "html": "总伤"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "DPS",
+            "html": "DPS"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "理由一",
+            "html": "理由一"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "理由二",
+            "html": "理由二"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "理由三",
+            "html": "理由三"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "牵引器火炮",
+            "html": "牵引器火炮"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/aa357661db.webp\" alt=\"\" width=\"69\" height=\"69\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出工具枪",
+            "html": "输出工具枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "无法替代的最泛用 30% 易伤武器，除远程以外的任何输出场景基本都需要一个推推位，“科学方法”有加移速效果，是最适合执行输出过程中机制的角色，可用枯萎凝视续易伤",
+            "html": "无法替代的最泛用 30% 易伤武器，除远程以外的任何输出场景基本都需要一个推推位，“科学方法”有加移速效果，是最适合执行输出过程中机制的角色，可用<span class=\"perk\">枯萎凝视</span>续易伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "过机制时面对一些难以处理的初级首领可以推上易伤压制协助团队处理",
+            "html": "过机制时面对一些难以处理的<span class=\"bar-yellow\">初级首领</span>可以推上易伤<span class=\"deb-void\">压制</span>协助团队处理"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "真相",
+            "html": "真相"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dfbdfcbffb.webp\" alt=\"\" width=\"69\" height=\"69\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T0\n高难：T0.5",
+            "html": "输出：T0<br>高难：T0.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "119636",
+            "html": "119636"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "8973",
+            "html": "8973"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "真相一键删除了命运 80% 的输出场景，除了超长轴、精准武器输出场景和类似锁具的特殊首领之外，都可以使用他，注意在输出前需要提前叠层",
+            "html": "<span class=\"exotic\">真相</span>一键删除了命运 80% 的输出场景，除了超长轴、精准武器输出场景和类似锁具的特殊<span class=\"bar-yellow\">首领</span>之外，都可以使用他，注意在输出前需要提前叠层"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "捡一盒强化重弹 4 发，而其他筒子都是 3 发，自身 Perk 也能在连续命中 3 发后回复一发，最好的弹药经济筒子，注意把控距离不要炸死自己",
+            "html": "捡一盒强化重弹 4 发，而其他筒子都是 3 发，自身 Perk 也能在连续命中 3 发后回复一发，最好的弹药经济筒子，注意把控距离不要炸死<span class=\"enemy\">自己</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "赫沃斯托夫 7G-0X",
+            "html": "赫沃斯托夫 7G-0X"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d005b35c7f.webp\" alt=\"\" width=\"69\" height=\"69\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T0\n高难：T0",
+            "html": "清怪：T0<br>高难：T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "跳弹清红血很快，与猎人日志相性很高攒大招效率高，羸弱边打最佳工具 perk",
+            "html": "跳弹清<span class=\"bar-red\">红血</span>很快，与猎人日志相性很高攒大招效率高，羸弱边打最佳工具 perk"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "同上，并且能反 50 光屏障",
+            "html": "同上，并且能反 50 光屏障"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "单人合唱",
+            "html": "单人合唱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b1afd3af3e.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T0\n输出：T1.5\n高难：T3",
+            "html": "清怪：T0<br>输出：T1.5<br>高难：T3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "76676",
+            "html": "76676"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4320",
+            "html": "4320"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "NPA 量身定制武器，建议选择猛攻，右键清小怪左键清橙血最好的机制枪，弹药生成 15 可能需要带虚空弹药生成补足",
+            "html": "NPA 量身定制武器，建议选择猛攻，右键清小怪左键清<span class=\"bar-orange\">橙血</span>最好的机制枪，弹药生成 15 可能需要带<span class=\"el-void\">虚空</span>弹药生成补足"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "腰射绿弹补输出 DPS 很不错，无需精准没有距离限制",
+            "html": "腰射绿弹补输出 DPS 很不错，无需精准没有距离限制"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "用左键没有弹药经济，用右键没有伤害，杀红血还可以",
+            "html": "用左键没有弹药经济，用右键没有伤害，杀<span class=\"bar-red\">红血</span>还可以"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "英勇利刃",
+            "html": "英勇利刃"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8461a83ccd.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T0\n清怪：T0.5\n输出：T3",
+            "html": "高难：T0<br>清怪：T0.5<br>输出：T3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "∞",
+            "html": "∞"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4062",
+            "html": "4062"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难本最无脑最强大的武器，任何缺伤害的配装都能带一把光剑解决，能使用火属性就使用火属性",
+            "html": "高难本最无脑最强大的武器，任何缺伤害的配装都能带一把光剑解决，能使用火属性就使用火属性"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "经常会与翻新 a499 搭配过机制时使用，有极高的下限，考虑到手短并且清怪效率并没有那么高略微降低评级",
+            "html": "经常会与翻新 a499 搭配过机制时使用，有极高的下限，考虑到手短并且清怪效率并没有那么高略微降低评级"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害还算可以，多人会抢点燃，在有如此多优秀伤害选择的情况下基本没有太多出场空间",
+            "html": "伤害还算可以，多人会抢<span class=\"deb-solar\">点燃</span>，在有如此多优秀伤害选择的情况下基本没有太多出场空间"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "混乱无序",
+            "html": "混乱无序"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3abbce2cb9.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T0\n输出：T1\n清怪：T1",
+            "html": "高难：T0<br>输出：T1<br>清怪：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "299097",
+            "html": "299097"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1325",
+            "html": "1325"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "混乱无序极致的总伤，最高的脱手持续 DPS，除光剑之外的最泛用武器伤害来源",
+            "html": "<span class=\"exotic\">混乱无序</span>极致的总伤，最高的脱手持续 DPS，除光剑之外的最泛用武器伤害来源"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "混乱无序裁决定论最合适的搭配",
+            "html": "<span class=\"exotic\">混乱无序</span>裁决定论最合适的搭配"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "钉橙血，钉刷怪点效果不错",
+            "html": "钉<span class=\"bar-orange\">橙血</span>，钉刷怪点效果不错"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "千语",
+            "html": "千语"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0966b364cc.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T0.5\n高难：T0.5",
+            "html": "输出：T0.5<br>高难：T0.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "97543",
+            "html": "97543"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "5321",
+            "html": "5321"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "千语是火职业以及电泰坦的无脑输出选择，由于点燃占出伤的一部分，需要保证队伍中不会抢点燃，也意味着最好不要多把千语一起使用，黎明副歌的伤害最高，然而大部分情况需要使用汇编腿辅助队友。枯萎囤积能提高傀儡射弹至双倍伤害，需要携带骨灰余烬，不能携带烧焦余烬（点燃扩散）会抢自己的点燃倍率反而降低伤害",
+            "html": "<span class=\"exotic\">千语</span>是火职业以及电泰坦的无脑输出选择，由于<span class=\"deb-solar\">点燃</span>占出伤的一部分，需要保证队伍中不会抢<span class=\"deb-solar\">点燃</span>，也意味着最好不要多把<span class=\"exotic\">千语</span>一起使用，<span class=\"exotic\">黎明副歌</span>的伤害最高，然而大部分情况需要使用汇编腿辅助队友。<span class=\"exotic\">枯萎囤积</span>能提高傀儡射弹至双倍伤害，需要携带<span class=\"el-solar\">骨灰余烬</span>，不能携带<span class=\"el-solar\">烧焦余烬</span>（<span class=\"deb-solar\">点燃</span>扩散）会抢<span class=\"enemy\">自己</span>的<span class=\"deb-solar\">点燃</span>倍率反而降低伤害"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害高且有 100 弹药生成，千语本身就相当不错，在搭配松身裤猎人和乔木电泰坦时高频的 dot 伤害能高频回转闪身和释放电光充能",
+            "html": "伤害高且有 100 弹药生成，<span class=\"exotic\">千语</span>本身就相当不错，在搭配松身裤猎人和乔木电泰坦时高频的 dot 伤害能高频回转闪身和释放<span class=\"el-arc\">电光充能</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "狼毒",
+            "html": "狼毒"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/92105c140a.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T0\n高难：T1",
+            "html": "输出：T0<br>高难：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "253859",
+            "html": "253859"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "5296",
+            "html": "5296"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "最常用的刀剑顶级输出选择，注意 DPS 是打完所有子弹的DPS，仅打一两轮爆发伤害会更高，建议羸弱能量球。燃烧野心能和黎明副歌搭配。纳米突袭形态一右+两左循环，电泰坦电盾可一右一左循环，快结束时切枪可返还一半纳米突袭能量",
+            "html": "最常用的刀剑顶级输出选择，注意 DPS 是打完所有子弹的DPS，仅打一两轮爆发伤害会更高，建议<span class=\"perk\">羸弱能量球</span>。<span class=\"perk\">燃烧野心</span>能和<span class=\"exotic\">黎明副歌</span>搭配。纳米突袭形态一右+两左循环，电泰坦电盾可一右一左循环，快结束时切枪可返还一半纳米突袭能量"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "仅推荐天赋信念猎人使用，持刀飞升天赋信念小球被视作刀剑伤害能自动给狼毒叠层，切刀返还纳米突袭层数使得只需要完成第一次叠层，后续就可以频繁进入纳米突袭状态了",
+            "html": "仅推荐<span class=\"exotic\">天赋信念</span>猎人使用，持刀<span class=\"el-arc\">飞升</span><span class=\"exotic\">天赋信念</span>小球被视作刀剑伤害能自动给<span class=\"exotic\">狼毒</span>叠层，切刀返还纳米突袭层数使得只需要完成第一次叠层，后续就可以频繁进入纳米突袭状态了"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "隐秘追猎",
+            "html": "隐秘追猎"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ce399705aa.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T0\n高难：T2.5",
+            "html": "输出：T0<br>高难：T2.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "133562",
+            "html": "133562"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "7567",
+            "html": "7567"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "金枪头猎人专武，vog 套的收益者，多人输出时只要每轮捡2 颗能量球就可以无需换弹，可带急切走机制，只扣金狙就是最顶级的伤害",
+            "html": "金枪头猎人专武，vog 套的收益者，多人输出时只要每轮捡2 颗<span class=\"orb\">能量球</span>就可以无需换弹，可带急切走机制，只扣金狙就是最顶级的伤害"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "vog 套减少精准伤害的需求，对瞄准要求高",
+            "html": "vog 套减少精准伤害的需求，对瞄准要求高"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "死亡信使",
+            "html": "死亡信使"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/45a6563f7c.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T0\n高难：T1\n输出：T2.5",
+            "html": "清怪：T0<br>高难：T1<br>输出：T2.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "88586",
+            "html": "88586"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3008",
+            "html": "3008"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0 级别的清怪效率，很适合蹲刷怪点使用，可以同时吃到三道波的伤害也让他不虚初级首领，70 弹药生成，爆破专家还治彼身，基本法则让他成为最顶级的清怪枪之一，基本法则的最简单触发方法是突破清场",
+            "html": "T0 级别的清怪效率，很适合蹲刷怪点使用，可以同时吃到三道波的伤害也让他不虚<span class=\"bar-yellow\">初级首领</span>，70 弹药生成，<span class=\"perk\">爆破专家</span><span class=\"perk\">还治彼身</span>，基本法则让他成为最顶级的清怪枪之一，基本法则的最简单触发方法是突破清场"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "同上，吃三道波的伤害能力在高压环境也能上场",
+            "html": "同上，吃三道波的伤害能力在高压环境也能上场"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "保证每一发都是三道波的 DPS 合格，但没有太多运用环境",
+            "html": "保证每一发都是三道波的 DPS 合格，但没有太多运用环境"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "堡垒",
+            "html": "堡垒"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/ba774d583a.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T0.5\n清怪：T1\n高难：T1",
+            "html": "输出：T0.5<br>清怪：T1<br>高难：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "119327",
+            "html": "119327"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4008",
+            "html": "4008"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "邪冬头火歌星界之火堡垒在不使用严冬手叠层也已经超越大部分输出手段，本身也是个优秀的补输出绿弹",
+            "html": "邪冬头火歌<span class=\"el-solar\">星界之火</span>堡垒在不使用严冬手叠层也已经超越大部分输出手段，本身也是个优秀的补输出绿弹"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "堡垒清理初级首领的能力优秀，就是有点手短",
+            "html": "堡垒清理<span class=\"bar-yellow\">初级首领</span>的能力优秀，就是有点手短"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "弹药经济舒适，能承担清理初级首领、勇士、输出首领的角色非常适合飞蛾术士使用",
+            "html": "弹药经济舒适，能承担清理<span class=\"bar-yellow\">初级首领</span>、<span class=\"enemy\">勇士</span>、输出<span class=\"bar-yellow\">首领</span>的角色非常适合飞蛾术士使用"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "神圣裁决",
+            "html": "神圣裁决"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2a8dfac12f.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出工具枪",
+            "html": "输出工具枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "75483",
+            "html": "75483"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2256",
+            "html": "2256"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "造 15% 易伤大弱点注定了他在打精准输出时的不可替代性震颤反馈不仅让他自己吃到严酷折射，火术只需要带上火炮台就能让队友吃满聚合充能，符合他工具枪的定义",
+            "html": "造 15% 易伤大弱点注定了他在打精准输出时的不可替代性<span class=\"perk\">震颤反馈</span>不仅让他<span class=\"enemy\">自己</span>吃到<span class=\"art-perk\">严酷折射</span>，火术只需要带上火炮台就能让队友吃满<span class=\"perk\">聚合充能</span>，符合他工具枪的定义"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "叛贼",
+            "html": "叛贼"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/074be01ffe.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T0\n清怪：T1",
+            "html": "输出：T0<br>清怪：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "118926",
+            "html": "118926"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "13514",
+            "html": "13514"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "叛贼 bug，在触发了叛贼 buff 后开脱手大，大招结束后马上切到爆炸武器会把叛贼的 30% 增伤转移到该武器上左侧的 DPS 是在触发了叛贼 buff 后的双增伤光芒复仇是目前游戏中能够被实际应用的最高 DPS",
+            "html": "<span class=\"exotic\">叛贼</span> bug，在触发了<span class=\"exotic\">叛贼</span> buff 后开脱手大，大招结束后马上切到爆炸武器会把<span class=\"exotic\">叛贼</span>的 30% 增伤转移到该武器上左侧的 DPS 是在触发了<span class=\"exotic\">叛贼</span> buff 后的双增伤光芒复仇是目前游戏中能够被实际应用的最高 DPS"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "叛贼“潜藏能量”进度快，能够频繁进入“释放力量”模式释放力量模式自带虚弱高爆弹药，邪恶收割虚空覆盖护盾弥补了持续扣血的不足",
+            "html": "<span class=\"exotic\">叛贼</span>“潜藏能量”进度快，能够频繁进入“释放力量”模式释放力量模式自带<span class=\"deb-void\">虚弱</span><span class=\"perk\">高爆弹药</span>，<span class=\"art-perk\">邪恶收割</span><span class=\"el-void\">虚空覆盖护盾</span>弥补了持续扣血的不足"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "Vex 揭秘者",
+            "html": "Vex 揭秘者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dc19811d47.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T0.5\n高难：T2",
+            "html": "清怪：T0.5<br>高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "本身伤害够高，手长，能吃粒子解构，反屏障，线融模式方便清理九头蛇炮台等大怪。猎人松身裤可以快速回转闪身焕光闪身+飞升+线织幽灵是非常团队和提高生存能力的配置使用跳舞机也可以",
+            "html": "本身伤害够高，手长，能吃粒子解构，反屏障，线融模式方便清理九头蛇炮台等大怪。猎人松身裤可以快速回转闪身<span class=\"el-solar\">焕光</span>闪身+<span class=\"el-arc\">飞升</span>+<span class=\"el-strand\">线织幽灵</span>是非常团队和提高生存能力的配置使用跳舞机也可以"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "绑定松身裤玩法，常态比较一般",
+            "html": "绑定松身裤玩法，常态比较一般"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "烈日弹丸",
+            "html": "烈日弹丸"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e15340cb88.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T0.5",
+            "html": "清怪：T0.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高爆弹药和烈日爆炸都是非常不错的清怪组件",
+            "html": "<span class=\"perk\">高爆弹药</span>和<span class=\"el-solar\">烈日</span>爆炸都是非常不错的清怪组件"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "利维坦之息",
+            "html": "利维坦之息"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/829adc3246.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T0",
+            "html": "输出：T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "223610",
+            "html": "223610"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12904",
+            "html": "12904"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空三箭猎人专属顶级输出武器，使用好奇之器，命运眷顾素体换弹为 0，建议携带手部填装，有泰坦小盾、术士月鞋会更舒适",
+            "html": "<span class=\"el-void\">虚空</span>三箭猎人专属顶级输出武器，使用好奇之器，<span class=\"exotic\">命运眷顾</span>素体换弹为 0，建议携带手部填装，有泰坦小盾、术士月鞋会更舒适"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "加拉尔号角",
+            "html": "加拉尔号角"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/934f9ea9de.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出工具枪\n清怪：T0\n高难：T2",
+            "html": "输出工具枪<br>清怪：T0<br>高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "鉴于光芒复仇的强大，相当于对紫筒子输出增益 26% 左右的加拉尔号角的地位也随之提升，在一些追求极限输出的场景会有推推炮切加拉尔号角枯萎凝视续易伤的全辅助位",
+            "html": "鉴于光芒复仇的强大，相当于对紫筒子输出<span class=\"buff\">增益</span> 26% 左右的<span class=\"exotic\">加拉尔号角</span>的地位也随之提升，在一些追求极限输出的场景会有推推炮切<span class=\"exotic\">加拉尔号角</span><span class=\"perk\">枯萎凝视</span>续易伤的全辅助位"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "狼群弹药自动追踪清怪，最迅速的清怪武器，速通竞赛常客",
+            "html": "狼群弹药自动追踪清怪，最迅速的清怪武器，速通竞赛常客"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "本体伤害不够看，主要配合松身裤猎人使用",
+            "html": "本体伤害不够看，主要配合松身裤猎人使用"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "裂波者",
+            "html": "裂波者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/84b40079a2.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T0.5\n高难：T1.5\n输出：T3",
+            "html": "清怪：T0.5<br>高难：T1.5<br>输出：T3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "88666",
+            "html": "88666"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2728",
+            "html": "2728"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "vog 套最大受益者，废墟石板如虎添翼，本身伤害不低，弹药生成 80，转职业技能（不稳定神枪手），虚空大招（元素超充器），严酷折射提供更高伤害，追踪本身也是优秀的机制枪，相当之全面",
+            "html": "vog 套最大受益者，废墟石板如虎添翼，本身伤害不低，弹药生成 80，转职业技能（<span class=\"art-perk\">不稳定神枪手</span>），<span class=\"el-void\">虚空</span>大招（<span class=\"art-perk\">元素超充器</span>），<span class=\"art-perk\">严酷折射</span>提供更高伤害，追踪本身也是优秀的机制枪，相当之全面"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "绑定 vog 石板，搭配常见的配装都不错（光能曲阜蛛、逃逸手等）又或者觅敌矛隼，星云之歌这样的不稳定特化配装",
+            "html": "绑定 vog 石板，搭配常见的配装都不错（光能曲阜蛛、逃逸手等）又或者觅敌矛隼，<span class=\"exotic\">星云之歌</span>这样的<span class=\"deb-void\">不稳定</span>特化配装"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "补输出伤害与融合步枪相近，不是特别厉害",
+            "html": "补输出伤害与融合步枪相近，不是特别厉害"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "寄生虫",
+            "html": "寄生虫"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/fd02e278d8.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T1\n清怪：T1\n高难：T1",
+            "html": "输出：T1<br>清怪：T1<br>高难：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰区域拒止+星界虚无+寄生虫的单人 DPS 能达到 5500 的水平建议配合药剂包寒风凛凛+突破清场+动能冲击极致 DPS：威胁等级+双发独头+寄生虫，PVP2 件套，动能合成沙漠尾王可以使用",
+            "html": "冰区域拒止+星界虚无+<span class=\"exotic\">寄生虫</span>的单人 DPS 能达到 5500 的水平建议配合药剂包寒风凛凛+突破清场+<span class=\"art-perk\">动能冲击</span>极致 DPS：威胁等级+双发独头+<span class=\"exotic\">寄生虫</span>，PVP2 件套，<span class=\"art-perk\">动能合成</span>沙漠尾王可以使用"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "经常会用在纯机制关掏出来一发秒初级首领，但不能使用枪套之后需要两把枪命中换弹手感略差",
+            "html": "经常会用在纯机制关掏出来一发秒<span class=\"bar-yellow\">初级首领</span>，但不能使用枪套之后需要两把枪命中换弹手感略差"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "攒层使他的理论总伤非常高，处理初级首领和输出首领都很不错，要注意不要炸死自己，反屏障",
+            "html": "攒层使他的理论总伤非常高，处理<span class=\"bar-yellow\">初级首领</span>和输出<span class=\"bar-yellow\">首领</span>都很不错，要注意不要炸死<span class=\"enemy\">自己</span>，反屏障"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "需求层级",
+            "html": "需求层级"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8d4634a7a9.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T0\n高难：T2",
+            "html": "输出：T0<br>高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "∞",
+            "html": "∞"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "10964",
+            "html": "10964"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空三箭猎专属顶级输出武器，三人一起使用时伤害最高搭配好奇之器，大部分情况下使用箭袋腿",
+            "html": "<span class=\"el-void\">虚空</span>三箭猎专属顶级输出武器，三人一起使用时伤害最高搭配好奇之器，大部分情况下使用箭袋腿"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "宗师少数能刮得动的白弹，没出圈时手感很差",
+            "html": "宗师少数能刮得动的白弹，没出圈时手感很差"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "伊邪那岐的重担",
+            "html": "伊邪那岐的重担"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/29afe67492.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T1\n清怪：T2.5\n高难：T4",
+            "html": "输出：T1<br>清怪：T2.5<br>高难：T4"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "56856",
+            "html": "56856"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6623",
+            "html": "6623"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "翻新 A499 剑狙双切的组合相当不错，比单扣翻新 dps 高使用数据盘的远程填装动能合成、狙击手冥想和动能裂口，剑狙打裂口会造成双倍伤害，副手可带边打边劫续航",
+            "html": "翻新 A499 剑狙双切的组合相当不错，比单扣翻新 dps 高使用数据盘的远程填装<span class=\"art-perk\">动能合成</span>、<span class=\"art-perk\">狙击手冥想</span>和<span class=\"art-perk\">动能裂口</span>，剑狙打裂口会造成双倍伤害，副手可带<span class=\"perk\">边打边劫</span>续航"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在面对炮台和死灵等橙血可快速解决，不过容错太低只有速通内容会使用，翻新会更合适代替这个角色",
+            "html": "在面对炮台和死灵等<span class=\"bar-orange\">橙血</span>可快速解决，不过容错太低只有速通内容会使用，翻新会更合适代替这个角色"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "弹药经济劣势，狙击在高难宗师内容打出精准伤害对瞄准有相当程度的要求",
+            "html": "弹药经济劣势，狙击在高难宗师内容打出精准伤害对瞄准有相当程度的要求"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "杀手之牙",
+            "html": "杀手之牙"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/bcf6437217.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T1\n清怪：T1\n输出：T2.5",
+            "html": "高难：T1<br>清怪：T1<br>输出：T2.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "83139",
+            "html": "83139"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3524",
+            "html": "3524"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "不错的伤害，优秀的弹药经济，击杀上虚弱配合邪恶收割可以一直上虚空覆盖护盾，b 计划电泰坦和松身裤猎人的好伙伴可快速叠加电光充能和回转闪身",
+            "html": "不错的伤害，优秀的弹药经济，击杀上<span class=\"deb-void\">虚弱</span>配合<span class=\"art-perk\">邪恶收割</span>可以一直上<span class=\"el-void\">虚空覆盖护盾</span>，b 计划电泰坦和松身裤猎人的好伙伴可快速叠加<span class=\"el-arc\">电光充能</span>和回转闪身"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "同上，配合元素超充器可回转超能",
+            "html": "同上，配合<span class=\"art-perk\">元素超充器</span>可回转超能"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "电泰坦 b 计划 solo 情况可以玩，但是推推炮裁决定论应该更好",
+            "html": "电泰坦 b 计划 solo 情况可以玩，但是推推炮裁决定论应该更好"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "法夫纳",
+            "html": "法夫纳"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2f5a9c2472.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出工具枪",
+            "html": "输出工具枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "唯一的远程 30 易伤工具枪，易伤 buff 时间收起武器时停止计时，施加易伤时间 5 秒不适合枯萎凝视续，所以在超过 25 秒的长轴需要切枪输出，可以在类似见证者的场景使用输出手法：斩首火线阴谋淬砺 3 枪+法夫纳一枪，或任意其他虚空狙",
+            "html": "唯一的远程 30 易伤工具枪，易伤 buff 时间收起武器时停止计时，施加易伤时间 5 秒不适合<span class=\"perk\">枯萎凝视</span>续，所以在超过 25 秒的长轴需要切枪输出，可以在类似见证者的场景使用输出手法：斩首火线阴谋淬砺 3 枪+<span class=\"exotic\">法夫纳</span>一枪，或任意其他<span class=\"el-void\">虚空</span>狙"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "故我在\n（意外缓刑）\n涡流",
+            "html": "故我在<br>（意外缓刑）<br>涡流"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b3f87b5fb9.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T0.5\n输出：T1",
+            "html": "高难：T0.5<br>输出：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "108087",
+            "html": "108087"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "5147",
+            "html": "5147"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害非常高，保证超凡回转就等于无限弹药，涡流增强的受益者",
+            "html": "伤害非常高，保证<span class=\"el-prismatic\">超凡</span>回转就等于无限弹药，涡流增强的受益者"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "仅限于超凡持续时间内伤害高，适合 20 秒的短轴猎人日志 vog 套输出手法：一直右键，不打左键",
+            "html": "仅限于<span class=\"el-prismatic\">超凡</span>持续时间内伤害高，适合 20 秒的短轴猎人日志 vog 套输出手法：一直右键，不打左键"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "故我在\n（纯五度）\n铸造",
+            "html": "故我在<br>（纯五度）<br>铸造"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b3f87b5fb9.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T0.5\n输出：T1.5",
+            "html": "高难：T0.5<br>输出：T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "92644",
+            "html": "92644"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "5264",
+            "html": "5264"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害不错，配合黎明副歌伤害很高，更重要的是反屏障",
+            "html": "伤害不错，配合<span class=\"exotic\">黎明副歌</span>伤害很高，更重要的是反屏障"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "仅限于超凡持续时间内伤害高，适合 20 秒的短轴绑定黎明副歌，猎人日志 vog 套输出手法：一重+二轻，带火炮台一重一轻",
+            "html": "仅限于<span class=\"el-prismatic\">超凡</span>持续时间内伤害高，适合 20 秒的短轴绑定<span class=\"exotic\">黎明副歌</span>，猎人日志 vog 套输出手法：一重+二轻，带火炮台一重一轻"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "故我在\n（电弧导体）\n波形",
+            "html": "故我在<br>（<span class=\"el-arc\">电弧</span>导体）<br>波形"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b3f87b5fb9.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1\n高难：T2",
+            "html": "清怪：T1<br>高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "有减伤且高效的清怪武器，过载也能配合元素超充器转电大触发光子耀斑频繁电弧致盲",
+            "html": "有减伤且高效的清怪武器，过载也能配合<span class=\"art-perk\">元素超充器</span>转电大触发<span class=\"art-perk\">光子耀斑</span>频繁<span class=\"el-arc\">电弧</span><span class=\"deb-arc\">致盲</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "棱镜分支的专属武器，适合清理红血与初级首领",
+            "html": "<span class=\"el-prismatic\">棱镜</span>分支的专属武器，适合清理<span class=\"bar-red\">红血</span>与<span class=\"bar-yellow\">初级首领</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "故我在\n（意外缓刑）\n轻质",
+            "html": "故我在<br>（意外缓刑）<br>轻质"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b3f87b5fb9.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T1",
+            "html": "输出：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "98852",
+            "html": "98852"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4842",
+            "html": "4842"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害比涡流略低但更容易吃满土味子弹猎人日志 vog 套输出手法：一重+二轻",
+            "html": "伤害比涡流略低但更容易吃满土味子弹猎人日志 vog 套输出手法：一重+二轻"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "故我在\n（狼群弹药）\n任意",
+            "html": "故我在<br>（狼群弹药）<br>任意"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b3f87b5fb9.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "紫刀剑和故我在的辅助武器。",
+            "html": "紫刀剑和<span class=\"exotic\">故我在</span>的辅助武器。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "阿格尔的权杖",
+            "html": "阿格尔的权杖"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/006e337344.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T0.5\n高难：T2.5\n输出：T3",
+            "html": "清怪：T0.5<br>高难：T2.5<br>输出：T3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "120982",
+            "html": "120982"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3841",
+            "html": "3841"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "擅长清理红血怪，击杀冻结效果很不错，同时可以触发严酷折射，如果你玩泰坦有转冰大招的需求，可以考虑用它与元素超充器配合（废墟石板）",
+            "html": "擅长清理<span class=\"bar-red\">红血</span>怪，击杀<span class=\"deb-stasis\">冻结</span>效果很不错，同时可以触发<span class=\"art-perk\">严酷折射</span>，如果你玩泰坦有转冰大招的需求，可以考虑用它与<span class=\"art-perk\">元素超充器</span>配合（废墟石板）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "只有在触发催化消耗大招时伤害才够看，常态很一般绑定需求大招回转，绑定严酷折射",
+            "html": "只有在触发催化消耗大招时伤害才够看，常态很一般绑定需求大招回转，绑定<span class=\"art-perk\">严酷折射</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虽然触发催化之后配合指挥琢面的伤害和总伤够看，但很明显你不应该为此牺牲一个脱手大",
+            "html": "虽然触发催化之后配合<span class=\"el-prismatic\">指挥琢面</span>的伤害和总伤够看，但很明显你不应该为此牺牲一个脱手大"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "集体义务",
+            "html": "集体义务"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9eb6214ab.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1",
+            "html": "清怪：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "27 次命中可以获得不稳定、虚弱、压制，配合废墟石板不稳定神枪手和邪恶收割获得职业技能回转和虚空覆盖护盾",
+            "html": "27 次命中可以获得<span class=\"deb-void\">不稳定</span>、<span class=\"deb-void\">虚弱</span>、<span class=\"deb-void\">压制</span>，配合废墟石板<span class=\"art-perk\">不稳定神枪手</span>和<span class=\"art-perk\">邪恶收割</span>获得职业技能回转和<span class=\"el-void\">虚空覆盖护盾</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冷酷无情",
+            "html": "冷酷无情"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2a6dd4fe93.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T1",
+            "html": "输出：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "54552",
+            "html": "54552"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4341",
+            "html": "4341"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在有战斗人员触发杀戮弹匣时 DPS 会更高，直接射 DPS 也不错适合搭配双增伤光芒复仇抱射结束后的 DPS",
+            "html": "在有<span class=\"enemy\">战斗人员</span>触发<span class=\"perk\">杀戮弹匣</span>时 DPS 会更高，直接射 DPS 也不错适合搭配双增伤光芒复仇抱射结束后的 DPS"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "维王者之剑",
+            "html": "维王者之剑"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/682140db15.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1\n高难：T1",
+            "html": "清怪：T1<br>高难：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虫手泰坦下限极高的过机制武器，举盾时给予盟友虚空覆盖护盾保证团队生存，NPA 神器为其量身定做",
+            "html": "虫手泰坦下限极高的过机制武器，举盾时给予盟友<span class=\"el-void\">虚空覆盖护盾</span>保证团队生存，NPA 神器为其量身定做"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虫手泰坦和组合打击电猎",
+            "html": "虫手泰坦和<span class=\"el-arc\">组合打击</span>电猎"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "三体坐观者",
+            "html": "三体坐观者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9d9fce23de.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1",
+            "html": "清怪：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "只有当电弧连锁伤害能连锁死小怪时，才应该使用三体非压光内容清怪效率奇高",
+            "html": "只有当<span class=\"el-arc\">电弧</span>连锁伤害能连锁死小怪时，才应该使用三体非压光内容清怪效率奇高"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "第四骑士",
+            "html": "第四骑士"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9a3ab05aff.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T1\n清怪：T1",
+            "html": "输出：T1<br>清怪：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "8496",
+            "html": "8496"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "速通和输出 rush 中会被使用",
+            "html": "速通和输出 rush 中会被使用"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "回旋喝彩",
+            "html": "回旋喝彩"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/86d9823bc4.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T1\n高难：T1.5",
+            "html": "输出：T1<br>高难：T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4403",
+            "html": "4403"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "长时间蓄力给了阴谋淬砺冷却的时间，可以单人两波见证者",
+            "html": "长时间蓄力给了阴谋淬砺冷却的时间，可以单人两波见证者"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "可以把他看作缚丝但是需要蓄力的寄生虫，弹药经济优秀，反屏障",
+            "html": "可以把他看作<span class=\"el-strand\">缚丝</span>但是需要蓄力的<span class=\"exotic\">寄生虫</span>，弹药经济优秀，反屏障"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "阿克瑞斯传说",
+            "html": "阿克瑞斯传说"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2cd39e790d.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T1",
+            "html": "输出：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "112507",
+            "html": "112507"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "5533",
+            "html": "5533"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "顶级的近身输出选择，但在有裁决定论+混乱无序的组合已经没有那么常用了",
+            "html": "顶级的近身输出选择，但在有裁决定论+<span class=\"exotic\">混乱无序</span>的组合已经没有那么常用了"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "新马尔帕伊斯",
+            "html": "新马尔帕伊斯"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4c437e4481.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1\n输出：T3\n高难：T3",
+            "html": "清怪：T1<br>输出：T3<br>高难：T3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "77113",
+            "html": "77113"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3127",
+            "html": "3127"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "新马针对初级首领与红血清怪仍然相当不错，与好奇之器相性极高在 vog 单进，晚星杀 4 分身等地方有特殊用途",
+            "html": "新马针对<span class=\"bar-yellow\">初级首领</span>与<span class=\"bar-red\">红血</span>清怪仍然相当不错，与好奇之器相性极高在 vog 单进，晚星杀 4 分身等地方有特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "作为补输出的绿弹他是合格的",
+            "html": "作为补输出的绿弹他是合格的"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "泰拉巴",
+            "html": "泰拉巴"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c668d5f1b7.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1（火伤场景更合适）",
+            "html": "清怪：T1（火伤场景更合适）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适合搭配女王香炉的发热寒颤与火种扳机、精密射线快速进入野兽模式，获得火伤抗性。本身 100 弹药生成，非常不错的清怪枪",
+            "html": "适合搭配女王香炉的<span class=\"art-perk\">发热寒颤</span>与<span class=\"art-perk\">火种扳机</span>、精密射线快速进入野兽模式，获得火伤抗性。本身 100 弹药生成，非常不错的清怪枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "赴险者",
+            "html": "赴险者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b6c2aa61c2.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1（电伤场景）",
+            "html": "清怪：T1（电伤场景）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "唯一有连锁反应的白弹，只建议在战斗人员是电弧伤害时触发电弧导体使用",
+            "html": "唯一有<span class=\"perk\">连锁反应</span>的白弹，只建议在<span class=\"enemy\">战斗人员</span>是<span class=\"el-arc\">电弧</span>伤害时触发<span class=\"el-arc\">电弧</span>导体使用"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "异星噬菌",
+            "html": "异星噬菌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a48072452d.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1",
+            "html": "清怪：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "机炮的定位类似于重弹位的火箭脉冲，除了不能输出首领以外可以适应远近距离的清怪环境",
+            "html": "机炮的定位类似于重弹位的火箭脉冲，除了不能输出<span class=\"bar-yellow\">首领</span>以外可以适应远近距离的清怪环境"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "越橘",
+            "html": "越橘"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c8f47ee9fd.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1",
+            "html": "清怪：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "狂暴和动能震颤使其成为不错的清怪选择100 弹药生成锦上添花",
+            "html": "狂暴和<span class=\"perk\">动能震颤</span>使其成为不错的清怪选择100 弹药生成锦上添花"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "引力子长枪",
+            "html": "引力子长枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/094d73a1a9.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1",
+            "html": "清怪：T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "与烈日弹丸定位类似，但引力子手感用起来没那么舒适",
+            "html": "与<span class=\"exotic\">烈日弹丸</span>定位类似，但引力子手感用起来没那么舒适"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "墓园双星",
+            "html": "墓园双星"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/282acd495d.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1.5",
+            "html": "清怪：T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "荒疫追踪弹可以轻松融化大片初级首领可惜弹药生成只有 32",
+            "html": "荒疫追踪弹可以轻松融化大片<span class=\"bar-yellow\">初级首领</span>可惜弹药生成只有 32"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "彼岸新域",
+            "html": "彼岸新域"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cbb300de35.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2\n清怪：T2\n高难：T2",
+            "html": "输出：T2<br>清怪：T2<br>高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "198345",
+            "html": "198345"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3562",
+            "html": "3562"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "配合数据盘不错的补输出高总伤武器",
+            "html": "配合数据盘不错的补输出高总伤武器"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "优秀的弹药经济，优秀的机制枪，也适合处理方便打精准的初级首领",
+            "html": "优秀的弹药经济，优秀的机制枪，也适合处理方便打精准的<span class=\"bar-yellow\">初级首领</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虽然打高难宗师等内容大部分精准武器都要降低优先级然而彼岸新域以优秀的总伤和伤害成为其中的佼佼者，而且反屏障",
+            "html": "虽然打高难宗师等内容大部分精准武器都要降低优先级然而<span class=\"exotic\">彼岸新域</span>以优秀的总伤和伤害成为其中的佼佼者，而且反屏障"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "传家宝",
+            "html": "传家宝"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e1883118c8.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T1\n高难：T1.5",
+            "html": "输出：T1<br>高难：T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "166743",
+            "html": "166743"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2648",
+            "html": "2648"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出绑定好建议技巧纬线虚空三箭，只有单人叠单人特工追求极限 DPS 时会有上场空间",
+            "html": "输出绑定好建议技巧纬线<span class=\"el-void\">虚空</span>三箭，只有单人叠<span class=\"art-perk\">单人特工</span>追求极限 DPS 时会有上场空间"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "三蓄的总伤和弹药经济相当不错，点燃倍率高",
+            "html": "三蓄的总伤和弹药经济相当不错，<span class=\"deb-solar\">点燃</span>倍率高"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "心影",
+            "html": "心影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3e7fea20e2.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T2\n输出：T2",
+            "html": "高难：T2<br>输出：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "猎人的烟雾弹隐身改版让心影更方便地吃到暗地一击增伤适配失重引力子，自带易伤适合邪恶收割或者拓展深渊",
+            "html": "猎人的烟雾弹<span class=\"el-void\">隐身</span>改版让<span class=\"exotic\">心影</span>更方便地吃到暗地一击增伤适配<span class=\"exotic\">失重引力子</span>，自带易伤适合<span class=\"art-perk\">邪恶收割</span>或者拓展深渊"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "重建元素磨砺猝死和心影双切搭配猎人日志银白利刃拓展深渊能达到 5000+DPS 水平输出手法：刀右键->喷->刀右键",
+            "html": "重建<span class=\"perk\">元素磨砺</span>猝死和<span class=\"exotic\">心影</span>双切搭配猎人日志<span class=\"art-perk\">银白利刃</span>拓展深渊能达到 5000+DPS 水平输出手法：刀右键-&gt;喷-&gt;刀右键"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "龙息",
+            "html": "龙息"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/851921e35c.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T1.5",
+            "html": "高难：T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "绑定火职业骨灰余烬使用，松身裤火猎使用强度不错，总伤高",
+            "html": "绑定火职业<span class=\"el-solar\">骨灰余烬</span>使用，松身裤火猎使用强度不错，总伤高"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "挽歌",
+            "html": "挽歌"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/33299fb931.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2\n高难：T2",
+            "html": "输出：T2<br>高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "176080",
+            "html": "176080"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4646",
+            "html": "4646"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "本身伤害还不错，但被狼毒压了一头，可搭配黎明副歌输出手法：格挡三轻一重+一普通轻击加密数据盘银白利刃，剑刃风暴",
+            "html": "本身伤害还不错，但被<span class=\"exotic\">狼毒</span>压了一头，可搭配<span class=\"exotic\">黎明副歌</span>输出手法：格挡三轻一重+一普通轻击加密数据盘<span class=\"art-perk\">银白利刃</span>，剑刃风暴"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "吸血提供部分生存能力，反屏障",
+            "html": "吸血提供部分生存能力，反屏障"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "不祥之兆",
+            "html": "不祥之兆"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7c85728f81.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2\n高难：T2\n清怪：T2",
+            "html": "输出：T2<br>高难：T2<br>清怪：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "59890",
+            "html": "59890"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "2710",
+            "html": "2710"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "仅限于给电榴弹电筒子吃电弧复合增伤本体 DPS 合格（没算上电弧复合）",
+            "html": "仅限于给电榴弹电筒子吃<span class=\"art-perk\">电弧复合</span>增伤本体 DPS 合格（没算上<span class=\"art-perk\">电弧复合</span>）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "猎人飞蛾手最合适，常态中规中矩，虽然有 70 弹药生成拾取弹药盒回的子弹也比较少，有时候飞蛾会出现绕着怪转圈的逆天索敌",
+            "html": "猎人飞蛾手最合适，常态中规中矩，虽然有 70 弹药生成拾取弹药盒回的子弹也比较少，有时候飞蛾会出现绕着怪转圈的逆天索敌"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "增幅的获取手段之一，电飞蛾致盲虚空飞蛾覆盖护盾提供生存能力，但是弹道手感不好",
+            "html": "<span class=\"el-arc\">增幅</span>的获取手段之一，电飞蛾<span class=\"deb-arc\">致盲</span><span class=\"el-void\">虚空</span>飞蛾<span class=\"pickup\">覆盖护盾</span>提供生存能力，但是弹道手感不好"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "狼王",
+            "html": "狼王"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/46ca3c79af.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1.5\n高难：T2\n输出：T2",
+            "html": "清怪：T1.5<br>高难：T2<br>输出：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "86586",
+            "html": "86586"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4238",
+            "html": "4238"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "100 弹药生成，高伤害和开镜灼烧爆炸有不错的清怪效率",
+            "html": "100 弹药生成，高伤害和开镜<span class=\"deb-solar\">灼烧</span>爆炸有不错的清怪效率"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "尽管弹药生成高但每次捡弹药盒给的子弹很少，只有松身裤玩法比较合适",
+            "html": "尽管弹药生成高但每次捡弹药盒给的子弹很少，只有松身裤玩法比较合适"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "近身+精准的使用条件过于局限，DPS 还是不错的",
+            "html": "近身+精准的使用条件过于局限，DPS 还是不错的"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "普罗米修斯透镜",
+            "html": "普罗米修斯透镜"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/61585b5b1f.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T1.5",
+            "html": "清怪：T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "上灼烧、辉耀炽热自给自足严酷折射100 弹药生成，反过载让火术等烈日大招可以利用元素超充器转大招",
+            "html": "上<span class=\"deb-solar\">灼烧</span>、<span class=\"perk\">辉耀炽热</span>自给自足<span class=\"art-perk\">严酷折射</span>100 弹药生成，反过载让火术等<span class=\"el-solar\">烈日</span>大招可以利用<span class=\"art-perk\">元素超充器</span>转大招"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "枯骨鳞片",
+            "html": "枯骨鳞片"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a527731969.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2",
+            "html": "清怪：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪效率勉强，毒爆范围有点小，毒伤只能打动红血，可和毒手联动",
+            "html": "清怪效率勉强，毒爆范围有点小，毒伤只能打动<span class=\"bar-red\">红血</span>，可和毒手联动"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "枯萎囤积",
+            "html": "枯萎囤积"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/554df7aabe.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2",
+            "html": "输出：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被枯萎囤积命中的战斗人员会被视作傀儡单位，提高所有傀儡武器的伤害，千语的傀儡射弹伤害会被直接翻倍，由于区域拒止框架无法叠加伤害，在有队友使用时可以改用枯萎囤积",
+            "html": "被<span class=\"exotic\">枯萎囤积</span>命中的<span class=\"enemy\">战斗人员</span>会被视作傀儡单位，提高所有傀儡武器的伤害，<span class=\"exotic\">千语</span>的傀儡射弹伤害会被直接翻倍，由于区域拒止框架无法叠加伤害，在有队友使用时可以改用<span class=\"exotic\">枯萎囤积</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "二象性",
+            "html": "二象性"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e6ca216b07.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2\n清怪：T2",
+            "html": "输出：T2<br>清怪：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "73569",
+            "html": "73569"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4892",
+            "html": "4892"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "DPS 不错但需要近身精准伤害",
+            "html": "DPS 不错但需要近身精准伤害"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "擅长清理方便打头的初级首领",
+            "html": "擅长清理方便打头的<span class=\"bar-yellow\">初级首领</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "悦耳之声",
+            "html": "悦耳之声"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d4c51e35de.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2\n高难：T3\n清怪：T4",
+            "html": "输出：T2<br>高难：T3<br>清怪：T4"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "128701",
+            "html": "128701"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4088",
+            "html": "4088"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "好奇之器集体战术让悦耳之声实际上成为线融当中数一数二的 DPS 选择，在搭配上缚丝术和进化丝线之后 DPS 会更高需要蹭队友的粒子解构，补输出只建议长轴使用",
+            "html": "好奇之器集体战术让<span class=\"exotic\">悦耳之声</span>实际上成为线融当中数一数二的 DPS 选择，在搭配上<span class=\"el-strand\">缚丝</span>术和<span class=\"el-strand\">进化丝线</span>之后 DPS 会更高需要蹭队友的粒子解构，补输出只建议长轴使用"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "反屏障，群敌飞梭和崩解能触发切割和拆解和织造铠甲总伤不错，缺点需要叠层，刚需精准伤害有废墟石板星云之歌编织者叠层的玩法",
+            "html": "反屏障，<span class=\"art-perk\">群敌飞梭</span>和<span class=\"art-perk\">崩解</span>能触发切割和拆解和<span class=\"el-strand\">织造铠甲</span>总伤不错，缺点需要叠层，刚需精准伤害有废墟石板<span class=\"exotic\">星云之歌</span>编织者叠层的玩法"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "不应该拿他处理橙血",
+            "html": "不应该拿他处理<span class=\"bar-orange\">橙血</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "缩影",
+            "html": "缩影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/4e6e51fc68.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T2\n输出：T3",
+            "html": "高难：T2<br>输出：T3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "102579",
+            "html": "102579"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3552",
+            "html": "3552"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "常态很弱，完全不值得为反屏障带这一把枪给到这个评级是因为他能很好地和威胁等级搭配吃动能合成对小蓝和小绿有特殊增伤倍率",
+            "html": "常态很弱，完全不值得为反屏障带这一把枪给到这个评级是因为他能很好地和威胁等级搭配吃<span class=\"art-perk\">动能合成</span>对小蓝和小绿有特殊增伤倍率"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "对重弹来说 DPS 低总伤也不太够看，而且只有放大招后的 20s 增伤",
+            "html": "对重弹来说 DPS 低总伤也不太够看，而且只有放大招后的 20s 增伤"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "终局螺旋钻",
+            "html": "终局螺旋钻"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c8655203ea.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T2\n输出：T2",
+            "html": "高难：T2<br>输出：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "203955",
+            "html": "203955"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1230",
+            "html": "1230"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "使用场景与混乱无序类似，但在伤害层面和功能性都比不上混乱无序",
+            "html": "使用场景与<span class=\"exotic\">混乱无序</span>类似，但在伤害层面和功能性都比不上<span class=\"exotic\">混乱无序</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超能回转被砍的受害者之一，如今成为混乱无序的下位替代",
+            "html": "超能回转被砍的受害者之一，如今成为<span class=\"exotic\">混乱无序</span>的下位替代"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "爱莲娜之誓",
+            "html": "爱莲娜之誓"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f432260cac.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T2",
+            "html": "高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "绑定幸运裤和废墟石板，无爱双切，暴发伤害稳定一轮击杀勇士，·破屏障触发的点燃能吃幸运裤和武器增伤，直接炸死屏障勇士",
+            "html": "绑定<span class=\"exotic\">幸运裤</span>和废墟石板，无爱双切，暴发伤害稳定一轮击杀<span class=\"enemy\">勇士</span>，·破屏障触发的<span class=\"deb-solar\">点燃</span>能吃<span class=\"exotic\">幸运裤</span>和武器增伤，直接炸死<span class=\"enemy\">屏障勇士</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "D.A.R.C.I",
+            "html": "D.A.R.C.I"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2d581349a5.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2（狙击辅助工具枪）",
+            "html": "输出：T2（狙击辅助工具枪）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "73429",
+            "html": "73429"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3566",
+            "html": "3566"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "作为一把工具枪，达西对紫狙的增幅只有 15%，带达西的收益可能跟一起带翻新的收益一样",
+            "html": "作为一把工具枪，达西对紫狙的<span class=\"el-arc\">增幅</span>只有 15%，带达西的收益可能跟一起带翻新的收益一样"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "血色浪漫",
+            "html": "血色浪漫"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7c94f757f5.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2",
+            "html": "清怪：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "100 弹药生成，自带回血，清怪能力合格",
+            "html": "100 弹药生成，自带回血，清怪能力合格"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "精致坟墓",
+            "html": "精致坟墓"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/65012d5da1.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2（电术电荷思维）",
+            "html": "清怪：T2（电术<span class=\"el-arc\">电荷思维</span>）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "仅限电术电荷思维使用，地磁安定靴废墟石板贪婪套转大招，npa 放大招",
+            "html": "仅限电术<span class=\"el-arc\">电荷思维</span>使用，<span class=\"exotic\">地磁安定靴</span>废墟石板贪婪套转大招，npa 放大招"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "大序曲",
+            "html": "大序曲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d42c74e0fe.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2",
+            "html": "输出：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "187194",
+            "html": "187194"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4373",
+            "html": "4373"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "需要提前叠 20 层的输出才够看，但是叠层的手感实在太差也不一定有那么多怪给所有人叠层，适合在晚星之主等大长轴使用搭配药剂包突破清场+电弧复合",
+            "html": "需要提前叠 20 层的输出才够看，但是叠层的手感实在太差也不一定有那么多怪给所有人叠层，适合在晚星之主等大长轴使用搭配药剂包突破清场+<span class=\"art-perk\">电弧复合</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "破冰者",
+            "html": "破冰者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e9bb0cb049.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T2",
+            "html": "高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "绑定贪婪套刺激低语冰泰坦，本身并不是特别强",
+            "html": "绑定贪婪套刺激低语冰泰坦，本身并不是特别强"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "战狮",
+            "html": "战狮"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/eba4079f51.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T2",
+            "html": "高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "绑定贪婪套刺激低语冰泰坦，本身并不是特别强",
+            "html": "绑定贪婪套刺激低语冰泰坦，本身并不是特别强"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "库尔之影",
+            "html": "库尔之影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6b727a8106.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2",
+            "html": "清怪：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "主手类似偃月的角色。可以给虫手泰坦戳戳戳，毒伤可以与毒手联动",
+            "html": "主手类似偃月的角色。可以给虫手泰坦戳戳戳，毒伤可以与毒手联动"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "改造版猩红死命",
+            "html": "改造版猩红死命"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/852ef5713b.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2",
+            "html": "清怪：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀给治愈 2 回大口血很不错，但是伤害和手感都一般",
+            "html": "击杀给<span class=\"el-solar\">治愈</span> 2 回大口血很不错，但是伤害和手感都一般"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "蠕虫低语",
+            "html": "蠕虫低语"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6d3e7e3e11.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2",
+            "html": "输出：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "134676",
+            "html": "134676"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4544",
+            "html": "4544"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "翻新是他的全方位上位，且容错率更高，现在已经没有太多的出场空间了",
+            "html": "翻新是他的全方位上位，且容错率更高，现在已经没有太多的出场空间了"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "青龙协同之刃",
+            "html": "青龙协同之刃"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/31f8e4229b.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2\n高难：T3",
+            "html": "清怪：T2<br>高难：T3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "增强后清怪可把他视作大蒙恩的角色，偃月能承担一部分抗伤角色",
+            "html": "增强后清怪可把他视作大蒙恩的角色，偃月能承担一部分抗伤角色"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "按 R 的强力射击伤害可观",
+            "html": "按 R 的强力射击伤害可观"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "入侵者",
+            "html": "入侵者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a92514f5ec.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2",
+            "html": "清怪：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "无限循环超爆发伤害不错",
+            "html": "无限循环超爆发伤害不错"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "蒙特卡洛",
+            "html": "蒙特卡洛"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1a96c62966.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2\n高难：T3",
+            "html": "清怪：T2<br>高难：T3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "本身伤害不错，马尔可夫链以及刺刀近战都可以转近战，非高难几乎没有初级首领能抗住近战一刀",
+            "html": "本身伤害不错，马尔可夫链以及刺刀近战都可以转近战，非高难几乎没有<span class=\"bar-yellow\">初级首领</span>能抗住近战一刀"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "群居者",
+            "html": "群居者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5ea55d02e2.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2",
+            "html": "清怪：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "类虫机器人自动索敌清怪很舒适，自身 100 弹药生成",
+            "html": "类虫机器人自动索敌清怪很舒适，自身 100 弹药生成"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "寒冬之啮",
+            "html": "寒冬之啮"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/054e3d0dac.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高难：T2",
+            "html": "高难：T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虫手泰坦和偃月手猎人可以用",
+            "html": "虫手泰坦和偃月手猎人可以用"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "狂飙",
+            "html": "狂飙"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f7cbef39b5.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2.5",
+            "html": "清怪：T2.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "强行绑定绿弹手枪事故（金中二元轨道）能触发 300% 的增伤弹药生成和手感不错，但占用两把枪和金枪位是很大的限制",
+            "html": "强行绑定绿弹手枪事故（金中<span class=\"perk\">二元轨道</span>）能触发 300% 的增伤弹药生成和手感不错，但占用两把枪和金枪位是很大的限制"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "监护人",
+            "html": "监护人"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5aeaa5bfbb.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T2.5",
+            "html": "输出：T2.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "∞",
+            "html": "∞"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4997",
+            "html": "4997"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "绑定动能合成，刚需精准，理论 DPS 看起来很美好然而实战需要绑定神性或者熔炉 2 件套，这并不值得威胁等级的打法类似并且伤害比他更高",
+            "html": "绑定<span class=\"art-perk\">动能合成</span>，刚需精准，理论 DPS 看起来很美好然而实战需要绑定神性或者熔炉 2 件套，这并不值得威胁等级的打法类似并且伤害比他更高"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "荆棘",
+            "html": "荆棘"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2d4f4bc5f0.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "清怪：T2.5",
+            "html": "清怪：T2.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "绑定毒手的清怪选择",
+            "html": "绑定毒手的清怪选择"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "同调",
+            "html": "同调"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f14708b949.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "输出：T3",
+            "html": "输出：T3"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "同调本身的闪电打击伤害被视作武器伤害能吃到所有武器增伤能和电盾、火中的施法者叠加同时释放 2、3 道闪电打击，电泰坦可单人两波晚星之主尾王",
+            "html": "同调本身的闪电打击伤害被视作武器伤害能吃到所有武器增伤能和电盾、火中的<span class=\"enemy\">施法者</span>叠加同时释放 2、3 道闪电打击，电泰坦可单人两波晚星之主尾王"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "阿莱索尼姆",
+            "html": "阿莱索尼姆"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5d997c7c8a.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "打本时没子弹会用他山巅跳赶路现在输出的时候不太会用它产子弹",
+            "html": "打本时没子弹会用他山巅跳赶路现在输出的时候不太会用它产子弹"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "玄武行动之刃",
+            "html": "玄武行动之刃"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cca596e4e9.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "小泡泡 buff 有 5% 独立增伤为盟友提供生存避风港",
+            "html": "小泡泡 buff 有 5% 独立增伤为盟友提供生存避风港"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "劲弩",
+            "html": "劲弩"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/377f96c7d4.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "卡鲁斯最后阶段破盾，深渊机灵破盾，但对深渊机灵而言前两波盾不厚，可以直接用输出武器破盾",
+            "html": "卡鲁斯最后阶段破盾，深渊机灵破盾，但对深渊机灵而言前两波盾不厚，可以直接用输出武器破盾"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "流明",
+            "html": "流明"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/81869903b2.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在没有汇编腿的情况给予队友高尚弹药 35% 增伤也有流明勾爪的玩法",
+            "html": "在没有汇编腿的情况给予队友高尚弹药 35% 增伤也有<span class=\"exotic\">流明</span>勾爪的玩法"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "救赎之握",
+            "html": "救赎之握"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1b3b75e16c.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "oob 造地形、卡出生点",
+            "html": "oob 造地形、卡出生点"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "条件终局",
+            "html": "条件终局"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dea7e3555f.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "玻璃拱顶守门人冰白盾",
+            "html": "玻璃拱顶守门人冰白盾"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "蝎狮",
+            "html": "蝎狮"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f68ae9985f.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "本身伤害一般，但能让任何伤害在滞空时触发蝎狮的虚空覆盖护盾，比较合适的有黎明副歌火术",
+            "html": "本身伤害一般，但能让任何伤害在滞空时触发<span class=\"exotic\">蝎狮</span>的<span class=\"el-void\">虚空覆盖护盾</span>，比较合适的有<span class=\"exotic\">黎明副歌</span>火术"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冥府三头犬+1",
+            "html": "冥府三头犬+1"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b4197527a0.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "在众神殿卡鲁斯关内场使用可以用于清理卡鲁斯吐出的骷髅头，本身也有一定清怪能力",
+            "html": "在众神殿卡鲁斯关内场使用可以用于清理卡鲁斯吐出的骷髅头，本身也有一定清怪能力"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "邪恶符咒",
+            "html": "邪恶符咒"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5201f8c4a5.webp\" alt=\"\" width=\"69\" height=\"69\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "特殊用途",
+            "html": "特殊用途"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "刷大招",
+            "html": "刷大招"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "刷取清单-异域武器 · Starside\n\nStarside\n/\n刷取清单-异域武器\n\n刷取清单-异域武器\n\n评级\n\n配套视频：【命运2】购物清单 金枪部分杂谈\n\n武器\n图标\n评级\n总伤\nDPS\n勇士\n理由一\n理由二\n理由三\n\n牵引器火炮输出工具枪无法替代的最泛用 30% 易伤武器，除远程以外的任何输出场景基本都需要一个推推位，“科学方法”有加移速效果，是最适合执行输出过程中机制的角色，可用枯萎凝视续易伤过机制时面对一些难以处理的初级首领可以推上易伤压制协助团队处理\n\n真相输出：T0\n高难：T0.51196368973真相一键删除了命运 80% 的输出场景，除了超长轴、精准武器输出场景和类似锁具的特殊首领之外，都可以使用他，注意在输出前需要提前叠层捡一盒强化重弹 4 发，而其他筒子都是 3 发，自身 Perk 也能在连续命中 3 发后回复一发，最好的弹药经济筒子，注意把控距离不要炸死自己\n\n赫沃斯托夫 7G-0X清怪：T0\n高难：T0跳弹清红血很快，与猎人日志相性很高攒大招效率高，羸弱边打最佳工具 perk同上，并且能反 50 光屏障\n\n单人合唱清怪：T0\n输出：T1.5\n高难：T3766764320NPA 量身定制武器，建议选择猛攻，右键清小怪左键清橙血最好的机制枪，弹药生成 15 可能需要带虚空弹药生成补足腰射绿弹补输出 DPS 很不错，无需精准没有距离限制用左键没有弹药经济，用右键没有伤害，杀红血还可以\n\n英勇利刃高难：T0\n清怪：T0.5\n输出：T3∞4062高难本最无脑最强大的武器，任何缺伤害的配装都能带一把光剑解决，能使用火属性就使用火属性经常会与翻新 a499 搭配过机制时使用，有极高的下限，考虑到手短并且清怪效率并没有那么高略微降低评级伤害还算可以，多人会抢点燃，在有如此多优秀伤害选择的情况下基本没有太多出场空间\n\n混乱无序高难：T0\n输出：T1\n清怪：T12990971325混乱无序极致的总伤，最高的脱手持续 DPS，除光剑之外的最泛用武器伤害来源混乱无序裁决定论最合适的搭配钉橙血，钉刷怪点效果不错\n\n千语输出：T0.5\n高难：T0.5975435321千语是火职业以及电泰坦的无脑输出选择，由于点燃占出伤的一部分，需要保证队伍中不会抢点燃，也意味着最好不要多把千语一起使用，黎明副歌的伤害最高，然而大部分情况需要使用汇编腿辅助队友。枯萎囤积能提高傀儡射弹至双倍伤害，需要携带骨灰余烬，不能携带烧焦余烬（点燃扩散）会抢自己的点燃倍率反而降低伤害伤害高且有 100 弹药生成，千语本身就相当不错，在搭配松身裤猎人和乔木电泰坦时高频的 dot 伤害能高频回转闪身和释放电光充能\n\n狼毒输出：T0\n高难：T12538595296最常用的刀剑顶级输出选择，注意 DPS 是打完所有子弹的DPS，仅打一两轮爆发伤害会更高，建议羸弱能量球。燃烧野心能和黎明副歌搭配。纳米突袭形态一右+两左循环，电泰坦电盾可一右一左循环，快结束时切枪可返还一半纳米突袭能量仅推荐天赋信念猎人使用，持刀飞升天赋信念小球被视作刀剑伤害能自动给狼毒叠层，切刀返还纳米突袭层数使得只需要完成第一次叠层，后续就可以频繁进入纳米突袭状态了\n\n隐秘追猎输出：T0\n高难：T2.51335627567金枪头猎人专武，vog 套的收益者，多人输出时只要每轮捡2 颗能量球就可以无需换弹，可带急切走机制，只扣金狙就是最顶级的伤害vog 套减少精准伤害的需求，对瞄准要求高\n\n死亡信使清怪：T0\n高难：T1\n输出：T2.5885863008T0 级别的清怪效率，很适合蹲刷怪点使用，可以同时吃到三道波的伤害也让他不虚初级首领，70 弹药生成，爆破专家还治彼身，基本法则让他成为最顶级的清怪枪之一，基本法则的最简单触发方法是突破清场同上，吃三道波的伤害能力在高压环境也能上场保证每一发都是三道波的 DPS 合格，但没有太多运用环境\n\n堡垒输出：T0.5\n清怪：T1\n高难：T11193274008邪冬头火歌星界之火堡垒在不使用严冬手叠层也已经超越大部分输出手段，本身也是个优秀的补输出绿弹堡垒清理初级首领的能力优秀，就是有点手短弹药经济舒适，能承担清理初级首领、勇士、输出首领的角色非常适合飞蛾术士使用\n\n神圣裁决输出工具枪754832256造 15% 易伤大弱点注定了他在打精准输出时的不可替代性震颤反馈不仅让他自己吃到严酷折射，火术只需要带上火炮台就能让队友吃满聚合充能，符合他工具枪的定义\n\n叛贼输出：T0\n清怪：T111892613514叛贼 bug，在触发了叛贼 buff 后开脱手大，大招结束后马上切到爆炸武器会把叛贼的 30% 增伤转移到该武器上左侧的 DPS 是在触发了叛贼 buff 后的双增伤光芒复仇是目前游戏中能够被实际应用的最高 DPS叛贼“潜藏能量”进度快，能够频繁进入“释放力量”模式释放力量模式自带虚弱高爆弹药，邪恶收割虚空覆盖护盾弥补了持续扣血的不足\n\nVex 揭秘者清怪：T0.5\n高难：T2本身伤害够高，手长，能吃粒子解构，反屏障，线融模式方便清理九头蛇炮台等大怪。猎人松身裤可以快速回转闪身焕光闪身+飞升+线织幽灵是非常团队和提高生存能力的配置使用跳舞机也可以绑定松身裤玩法，常态比较一般\n\n烈日弹丸清怪：T0.5高爆弹药和烈日爆炸都是非常不错的清怪组件\n\n利维坦之息输出：T022361012904虚空三箭猎人专属顶级输出武器，使用好奇之器，命运眷顾素体换弹为 0，建议携带手部填装，有泰坦小盾、术士月鞋会更舒适\n\n加拉尔号角输出工具枪\n清怪：T0\n高难：T2鉴于光芒复仇的强大，相当于对紫筒子输出增益 26% 左右的加拉尔号角的地位也随之提升，在一些追求极限输出的场景会有推推炮切加拉尔号角枯萎凝视续易伤的全辅助位狼群弹药自动追踪清怪，最迅速的清怪武器，速通竞赛常客本体伤害不够看，主要配合松身裤猎人使用\n\n裂波者清怪：T0.5\n高难：T1.5\n输出：T3886662728vog 套最大受益者，废墟石板如虎添翼，本身伤害不低，弹药生成 80，转职业技能（不稳定神枪手），虚空大招（元素超充器），严酷折射提供更高伤害，追踪本身也是优秀的机制枪，相当之全面绑定 vog 石板，搭配常见的配装都不错（光能曲阜蛛、逃逸手等）又或者觅敌矛隼，星云之歌这样的不稳定特化配装补输出伤害与融合步枪相近，不是特别厉害\n\n寄生虫输出：T1\n清怪：T1\n高难：T1冰区域拒止+星界虚无+寄生虫的单人 DPS 能达到 5500 的水平建议配合药剂包寒风凛凛+突破清场+动能冲击极致 DPS：威胁等级+双发独头+寄生虫，PVP2 件套，动能合成沙漠尾王可以使用经常会用在纯机制关掏出来一发秒初级首领，但不能使用枪套之后需要两把枪命中换弹手感略差攒层使他的理论总伤非常高，处理初级首领和输出首领都很不错，要注意不要炸死自己，反屏障\n\n需求层级输出：T0\n高难：T2∞10964虚空三箭猎专属顶级输出武器，三人一起使用时伤害最高搭配好奇之器，大部分情况下使用箭袋腿宗师少数能刮得动的白弹，没出圈时手感很差\n\n伊邪那岐的重担输出：T1\n清怪：T2.5\n高难：T4568566623翻新 A499 剑狙双切的组合相当不错，比单扣翻新 dps 高使用数据盘的远程填装动能合成、狙击手冥想和动能裂口，剑狙打裂口会造成双倍伤害，副手可带边打边劫续航在面对炮台和死灵等橙血可快速解决，不过容错太低只有速通内容会使用，翻新会更合适代替这个角色弹药经济劣势，狙击在高难宗师内容打出精准伤害对瞄准有相当程度的要求\n\n杀手之牙高难：T1\n清怪：T1\n输出：T2.5831393524不错的伤害，优秀的弹药经济，击杀上虚弱配合邪恶收割可以一直上虚空覆盖护盾，b 计划电泰坦和松身裤猎人的好伙伴可快速叠加电光充能和回转闪身同上，配合元素超充器可回转超能电泰坦 b 计划 solo 情况可以玩，但是推推炮裁决定论应该更好\n\n法夫纳输出工具枪唯一的远程 30 易伤工具枪，易伤 buff 时间收起武器时停止计时，施加易伤时间 5 秒不适合枯萎凝视续，所以在超过 25 秒的长轴需要切枪输出，可以在类似见证者的场景使用输出手法：斩首火线阴谋淬砺 3 枪+法夫纳一枪，或任意其他虚空狙\n\n故我在\n（意外缓刑）\n涡流高难：T0.5\n输出：T11080875147伤害非常高，保证超凡回转就等于无限弹药，涡流增强的受益者仅限于超凡持续时间内伤害高，适合 20 秒的短轴猎人日志 vog 套输出手法：一直右键，不打左键\n\n故我在\n（纯五度）\n铸造高难：T0.5\n输出：T1.5926445264伤害不错，配合黎明副歌伤害很高，更重要的是反屏障仅限于超凡持续时间内伤害高，适合 20 秒的短轴绑定黎明副歌，猎人日志 vog 套输出手法：一重+二轻，带火炮台一重一轻\n\n故我在\n（电弧导体）\n波形清怪：T1\n高难：T2有减伤且高效的清怪武器，过载也能配合元素超充器转电大触发光子耀斑频繁电弧致盲棱镜分支的专属武器，适合清理红血与初级首领\n\n故我在\n（意外缓刑）\n轻质输出：T1988524842伤害比涡流略低但更容易吃满土味子弹猎人日志 vog 套输出手法：一重+二轻\n\n故我在\n（狼群弹药）\n任意特殊用途紫刀剑和故我在的辅助武器。\n\n阿格尔的权杖清怪：T0.5\n高难：T2.5\n输出：T31209823841擅长清理红血怪，击杀冻结效果很不错，同时可以触发严酷折射，如果你玩泰坦有转冰大招的需求，可以考虑用它与元素超充器配合（废墟石板）只有在触发催化消耗大招时伤害才够看，常态很一般绑定需求大招回转，绑定严酷折射虽然触发催化之后配合指挥琢面的伤害和总伤够看，但很明显你不应该为此牺牲一个脱手大\n\n集体义务清怪：T127 次命中可以获得不稳定、虚弱、压制，配合废墟石板不稳定神枪手和邪恶收割获得职业技能回转和虚空覆盖护盾\n\n冷酷无情输出：T1545524341在有战斗人员触发杀戮弹匣时 DPS 会更高，直接射 DPS 也不错适合搭配双增伤光芒复仇抱射结束后的 DPS\n\n维王者之剑清怪：T1\n高难：T1虫手泰坦下限极高的过机制武器，举盾时给予盟友虚空覆盖护盾保证团队生存，NPA 神器为其量身定做虫手泰坦和组合打击电猎\n\n三体坐观者清怪：T1只有当电弧连锁伤害能连锁死小怪时，才应该使用三体非压光内容清怪效率奇高\n\n第四骑士输出：T1\n清怪：T18496速通和输出 rush 中会被使用\n\n回旋喝彩输出：T1\n高难：T1.54403长时间蓄力给了阴谋淬砺冷却的时间，可以单人两波见证者可以把他看作缚丝但是需要蓄力的寄生虫，弹药经济优秀，反屏障\n\n阿克瑞斯传说输出：T11125075533顶级的近身输出选择，但在有裁决定论+混乱无序的组合已经没有那么常用了\n\n新马尔帕伊斯清怪：T1\n输出：T3\n高难：T3771133127新马针对初级首领与红血清怪仍然相当不错，与好奇之器相性极高在 vog 单进，晚星杀 4 分身等地方有特殊用途作为补输出的绿弹他是合格的\n\n泰拉巴清怪：T1（火伤场景更合适）适合搭配女王香炉的发热寒颤与火种扳机、精密射线快速进入野兽模式，获得火伤抗性。本身 100 弹药生成，非常不错的清怪枪\n\n赴险者清怪：T1（电伤场景）唯一有连锁反应的白弹，只建议在战斗人员是电弧伤害时触发电弧导体使用\n\n异星噬菌清怪：T1机炮的定位类似于重弹位的火箭脉冲，除了不能输出首领以外可以适应远近距离的清怪环境\n\n越橘清怪：T1狂暴和动能震颤使其成为不错的清怪选择100 弹药生成锦上添花\n\n引力子长枪清怪：T1与烈日弹丸定位类似，但引力子手感用起来没那么舒适\n\n墓园双星清怪：T1.5荒疫追踪弹可以轻松融化大片初级首领可惜弹药生成只有 32\n\n彼岸新域输出：T2\n清怪：T2\n高难：T21983453562配合数据盘不错的补输出高总伤武器优秀的弹药经济，优秀的机制枪，也适合处理方便打精准的初级首领虽然打高难宗师等内容大部分精准武器都要降低优先级然而彼岸新域以优秀的总伤和伤害成为其中的佼佼者，而且反屏障\n\n传家宝输出：T1\n高难：T1.51667432648输出绑定好建议技巧纬线虚空三箭，只有单人叠单人特工追求极限 DPS 时会有上场空间三蓄的总伤和弹药经济相当不错，点燃倍率高\n\n心影高难：T2\n输出：T2猎人的烟雾弹隐身改版让心影更方便地吃到暗地一击增伤适配失重引力子，自带易伤适合邪恶收割或者拓展深渊重建元素磨砺猝死和心影双切搭配猎人日志银白利刃拓展深渊能达到 5000+DPS 水平输出手法：刀右键->喷->刀右键\n\n龙息高难：T1.5绑定火职业骨灰余烬使用，松身裤火猎使用强度不错，总伤高\n\n挽歌输出：T2\n高难：T21760804646本身伤害还不错，但被狼毒压了一头，可搭配黎明副歌输出手法：格挡三轻一重+一普通轻击加密数据盘银白利刃，剑刃风暴吸血提供部分生存能力，反屏障\n\n不祥之兆输出：T2\n高难：T2\n清怪：T2598902710仅限于给电榴弹电筒子吃电弧复合增伤本体 DPS 合格（没算上电弧复合）猎人飞蛾手最合适，常态中规中矩，虽然有 70 弹药生成拾取弹药盒回的子弹也比较少，有时候飞蛾会出现绕着怪转圈的逆天索敌增幅的获取手段之一，电飞蛾致盲虚空飞蛾覆盖护盾提供生存能力，但是弹道手感不好\n\n狼王清怪：T1.5\n高难：T2\n输出：T2865864238100 弹药生成，高伤害和开镜灼烧爆炸有不错的清怪效率尽管弹药生成高但每次捡弹药盒给的子弹很少，只有松身裤玩法比较合适近身+精准的使用条件过于局限，DPS 还是不错的\n\n普罗米修斯透镜清怪：T1.5上灼烧、辉耀炽热自给自足严酷折射100 弹药生成，反过载让火术等烈日大招可以利用元素超充器转大招\n\n枯骨鳞片清怪：T2清怪效率勉强，毒爆范围有点小，毒伤只能打动红血，可和毒手联动\n\n枯萎囤积输出：T2被枯萎囤积命中的战斗人员会被视作傀儡单位，提高所有傀儡武器的伤害，千语的傀儡射弹伤害会被直接翻倍，由于区域拒止框架无法叠加伤害，在有队友使用时可以改用枯萎囤积\n\n二象性输出：T2\n清怪：T2735694892DPS 不错但需要近身精准伤害擅长清理方便打头的初级首领\n\n悦耳之声输出：T2\n高难：T3\n清怪：T41287014088好奇之器集体战术让悦耳之声实际上成为线融当中数一数二的 DPS 选择，在搭配上缚丝术和进化丝线之后 DPS 会更高需要蹭队友的粒子解构，补输出只建议长轴使用反屏障，群敌飞梭和崩解能触发切割和拆解和织造铠甲总伤不错，缺点需要叠层，刚需精准伤害有废墟石板星云之歌编织者叠层的玩法不应该拿他处理橙血\n\n缩影高难：T2\n输出：T31025793552常态很弱，完全不值得为反屏障带这一把枪给到这个评级是因为他能很好地和威胁等级搭配吃动能合成对小蓝和小绿有特殊增伤倍率对重弹来说 DPS 低总伤也不太够看，而且只有放大招后的 20s 增伤\n\n终局螺旋钻高难：T2\n输出：T22039551230使用场景与混乱无序类似，但在伤害层面和功能性都比不上混乱无序超能回转被砍的受害者之一，如今成为混乱无序的下位替代\n\n爱莲娜之誓高难：T2绑定幸运裤和废墟石板，无爱双切，暴发伤害稳定一轮击杀勇士，·破屏障触发的点燃能吃幸运裤和武器增伤，直接炸死屏障勇士\n\nD.A.R.C.I输出：T2（狙击辅助工具枪）734293566作为一把工具枪，达西对紫狙的增幅只有 15%，带达西的收益可能跟一起带翻新的收益一样\n\n血色浪漫清怪：T2100 弹药生成，自带回血，清怪能力合格\n\n精致坟墓清怪：T2（电术电荷思维）仅限电术电荷思维使用，地磁安定靴废墟石板贪婪套转大招，npa 放大招\n\n大序曲输出：T21871944373需要提前叠 20 层的输出才够看，但是叠层的手感实在太差也不一定有那么多怪给所有人叠层，适合在晚星之主等大长轴使用搭配药剂包突破清场+电弧复合\n\n破冰者高难：T2绑定贪婪套刺激低语冰泰坦，本身并不是特别强\n\n战狮高难：T2绑定贪婪套刺激低语冰泰坦，本身并不是特别强\n\n库尔之影清怪：T2主手类似偃月的角色。可以给虫手泰坦戳戳戳，毒伤可以与毒手联动\n\n改造版猩红死命清怪：T2击杀给治愈 2 回大口血很不错，但是伤害和手感都一般\n\n蠕虫低语输出：T21346764544翻新是他的全方位上位，且容错率更高，现在已经没有太多的出场空间了\n\n青龙协同之刃清怪：T2\n高难：T3增强后清怪可把他视作大蒙恩的角色，偃月能承担一部分抗伤角色按 R 的强力射击伤害可观\n\n入侵者清怪：T2无限循环超爆发伤害不错\n\n蒙特卡洛清怪：T2\n高难：T3本身伤害不错，马尔可夫链以及刺刀近战都可以转近战，非高难几乎没有初级首领能抗住近战一刀\n\n群居者清怪：T2类虫机器人自动索敌清怪很舒适，自身 100 弹药生成\n\n寒冬之啮高难：T2虫手泰坦和偃月手猎人可以用\n\n狂飙清怪：T2.5强行绑定绿弹手枪事故（金中二元轨道）能触发 300% 的增伤弹药生成和手感不错，但占用两把枪和金枪位是很大的限制\n\n监护人输出：T2.5∞4997绑定动能合成，刚需精准，理论 DPS 看起来很美好然而实战需要绑定神性或者熔炉 2 件套，这并不值得威胁等级的打法类似并且伤害比他更高\n\n荆棘清怪：T2.5绑定毒手的清怪选择\n\n同调输出：T3同调本身的闪电打击伤害被视作武器伤害能吃到所有武器增伤能和电盾、火中的施法者叠加同时释放 2、3 道闪电打击，电泰坦可单人两波晚星之主尾王\n\n阿莱索尼姆特殊用途打本时没子弹会用他山巅跳赶路现在输出的时候不太会用它产子弹\n\n玄武行动之刃特殊用途小泡泡 buff 有 5% 独立增伤为盟友提供生存避风港\n\n劲弩特殊用途卡鲁斯最后阶段破盾，深渊机灵破盾，但对深渊机灵而言前两波盾不厚，可以直接用输出武器破盾\n\n流明特殊用途在没有汇编腿的情况给予队友高尚弹药 35% 增伤也有流明勾爪的玩法\n\n救赎之握特殊用途oob 造地形、卡出生点\n\n条件终局特殊用途玻璃拱顶守门人冰白盾\n\n蝎狮特殊用途本身伤害一般，但能让任何伤害在滞空时触发蝎狮的虚空覆盖护盾，比较合适的有黎明副歌火术\n\n冥府三头犬+1特殊用途在众神殿卡鲁斯关内场使用可以用于清理卡鲁斯吐出的骷髅头，本身也有一定清怪能力\n\n邪恶符咒特殊用途刷大招\n\n更新 2026.9.6\n\n数据源：刷取清单。本页在其基础上统一了术语、标点与排版。\n\n特别鸣谢：小棒猪-LGpig 整理全部评级、数值与评语。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/exotic-weapons/index.html",
+    "final_url": "https://starside.work/exotic-weapons/index.html",
+    "path": "pages/exotic-weapons/index.html",
+    "bytes": 55815,
+    "sha256": "ff6d73bb89048bed69919703a0171d94bdf3a202dd72efa44373edaea6b5b4ce",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:31.473080+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/d/1qsKGrRzCePGaIM5gNtAQNh949d3OsMJ6qV6Fqtpj22k/htmlview",
+    "https://space.bilibili.com/169548478",
+    "https://space.bilibili.com/26117485",
+    "https://www.bilibili.com/video/BV1na8u6MEZ9"
+  ],
+  "assets": [
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/exotic-weapons/icons/006e337344.webp",
+    "https://starside.work/exotic-weapons/icons/054e3d0dac.webp",
+    "https://starside.work/exotic-weapons/icons/074be01ffe.webp",
+    "https://starside.work/exotic-weapons/icons/094d73a1a9.webp",
+    "https://starside.work/exotic-weapons/icons/0966b364cc.webp",
+    "https://starside.work/exotic-weapons/icons/1a96c62966.webp",
+    "https://starside.work/exotic-weapons/icons/1b3b75e16c.webp",
+    "https://starside.work/exotic-weapons/icons/282acd495d.webp",
+    "https://starside.work/exotic-weapons/icons/29afe67492.webp",
+    "https://starside.work/exotic-weapons/icons/2a6dd4fe93.webp",
+    "https://starside.work/exotic-weapons/icons/2a8dfac12f.webp",
+    "https://starside.work/exotic-weapons/icons/2cd39e790d.webp",
+    "https://starside.work/exotic-weapons/icons/2d4f4bc5f0.webp",
+    "https://starside.work/exotic-weapons/icons/2d581349a5.webp",
+    "https://starside.work/exotic-weapons/icons/2f5a9c2472.webp",
+    "https://starside.work/exotic-weapons/icons/31f8e4229b.webp",
+    "https://starside.work/exotic-weapons/icons/33299fb931.webp",
+    "https://starside.work/exotic-weapons/icons/377f96c7d4.webp",
+    "https://starside.work/exotic-weapons/icons/3abbce2cb9.webp",
+    "https://starside.work/exotic-weapons/icons/3e7fea20e2.webp",
+    "https://starside.work/exotic-weapons/icons/45a6563f7c.webp",
+    "https://starside.work/exotic-weapons/icons/46ca3c79af.webp",
+    "https://starside.work/exotic-weapons/icons/4c437e4481.webp",
+    "https://starside.work/exotic-weapons/icons/4e6e51fc68.webp",
+    "https://starside.work/exotic-weapons/icons/5201f8c4a5.webp",
+    "https://starside.work/exotic-weapons/icons/554df7aabe.webp",
+    "https://starside.work/exotic-weapons/icons/5aeaa5bfbb.webp",
+    "https://starside.work/exotic-weapons/icons/5d997c7c8a.webp",
+    "https://starside.work/exotic-weapons/icons/5ea55d02e2.webp",
+    "https://starside.work/exotic-weapons/icons/61585b5b1f.webp",
+    "https://starside.work/exotic-weapons/icons/65012d5da1.webp",
+    "https://starside.work/exotic-weapons/icons/682140db15.webp",
+    "https://starside.work/exotic-weapons/icons/6b727a8106.webp",
+    "https://starside.work/exotic-weapons/icons/6d3e7e3e11.webp",
+    "https://starside.work/exotic-weapons/icons/7c85728f81.webp",
+    "https://starside.work/exotic-weapons/icons/7c94f757f5.webp",
+    "https://starside.work/exotic-weapons/icons/81869903b2.webp",
+    "https://starside.work/exotic-weapons/icons/829adc3246.webp",
+    "https://starside.work/exotic-weapons/icons/8461a83ccd.webp",
+    "https://starside.work/exotic-weapons/icons/84b40079a2.webp",
+    "https://starside.work/exotic-weapons/icons/851921e35c.webp",
+    "https://starside.work/exotic-weapons/icons/852ef5713b.webp",
+    "https://starside.work/exotic-weapons/icons/86d9823bc4.webp",
+    "https://starside.work/exotic-weapons/icons/8b37bb6db2.webp",
+    "https://starside.work/exotic-weapons/icons/8d4634a7a9.webp",
+    "https://starside.work/exotic-weapons/icons/92105c140a.webp",
+    "https://starside.work/exotic-weapons/icons/934f9ea9de.webp",
+    "https://starside.work/exotic-weapons/icons/9a3ab05aff.webp",
+    "https://starside.work/exotic-weapons/icons/9d9fce23de.webp",
+    "https://starside.work/exotic-weapons/icons/a48072452d.webp",
+    "https://starside.work/exotic-weapons/icons/a527731969.webp",
+    "https://starside.work/exotic-weapons/icons/a92514f5ec.webp",
+    "https://starside.work/exotic-weapons/icons/a9911a3dfe.webp",
+    "https://starside.work/exotic-weapons/icons/a9eb6214ab.webp",
+    "https://starside.work/exotic-weapons/icons/aa357661db.webp",
+    "https://starside.work/exotic-weapons/icons/b1afd3af3e.webp",
+    "https://starside.work/exotic-weapons/icons/b3f87b5fb9.webp",
+    "https://starside.work/exotic-weapons/icons/b4197527a0.webp",
+    "https://starside.work/exotic-weapons/icons/b6c2aa61c2.webp",
+    "https://starside.work/exotic-weapons/icons/b7c4048b87.webp",
+    "https://starside.work/exotic-weapons/icons/ba774d583a.webp",
+    "https://starside.work/exotic-weapons/icons/bcf6437217.webp",
+    "https://starside.work/exotic-weapons/icons/c668d5f1b7.webp",
+    "https://starside.work/exotic-weapons/icons/c8655203ea.webp",
+    "https://starside.work/exotic-weapons/icons/c8f47ee9fd.webp",
+    "https://starside.work/exotic-weapons/icons/cbb300de35.webp",
+    "https://starside.work/exotic-weapons/icons/cca596e4e9.webp",
+    "https://starside.work/exotic-weapons/icons/ce399705aa.webp",
+    "https://starside.work/exotic-weapons/icons/d005b35c7f.webp",
+    "https://starside.work/exotic-weapons/icons/d42c74e0fe.webp",
+    "https://starside.work/exotic-weapons/icons/d4c51e35de.webp",
+    "https://starside.work/exotic-weapons/icons/dc19811d47.webp",
+    "https://starside.work/exotic-weapons/icons/dea7e3555f.webp",
+    "https://starside.work/exotic-weapons/icons/dfbdfcbffb.webp",
+    "https://starside.work/exotic-weapons/icons/e15340cb88.webp",
+    "https://starside.work/exotic-weapons/icons/e1883118c8.webp",
+    "https://starside.work/exotic-weapons/icons/e6ca216b07.webp",
+    "https://starside.work/exotic-weapons/icons/e9bb0cb049.webp",
+    "https://starside.work/exotic-weapons/icons/eba4079f51.webp",
+    "https://starside.work/exotic-weapons/icons/f14708b949.webp",
+    "https://starside.work/exotic-weapons/icons/f432260cac.webp",
+    "https://starside.work/exotic-weapons/icons/f68ae9985f.webp",
+    "https://starside.work/exotic-weapons/icons/f7cbef39b5.webp",
+    "https://starside.work/exotic-weapons/icons/fd02e278d8.webp",
+    "https://starside.work/exotic-weapons/style.css"
+  ]
+}

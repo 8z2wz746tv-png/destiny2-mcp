@@ -1,0 +1,397 @@
+{
+  "url": "https://starside.work/ammo/index.html",
+  "title": "弹药生成机制 · Starside",
+  "description": "击杀生成弹药的基础百分比、技能与手雷的固定值，以及 Perk、模组、套装加成的叠加方式。",
+  "category": "mechanics",
+  "updated_at": "2026.8.25",
+  "data_src": "docs/ammo",
+  "data_hash": "8b4a3eddade8f806759eb0094f075ff33debbcd2",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "弹药生成机制"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器弹药生成"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "技能弹药生成"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "武器 Perk"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲模组"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "护甲套装加成"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "注解"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "武器弹药生成",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "弹药生成属性",
+            "html": "弹药生成属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "bar-red"
+            },
+            "text": "红血",
+            "html": "红血"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "bar-orange"
+            },
+            "text": "橙血",
+            "html": "橙血"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col",
+              "class": "bar-yellow"
+            },
+            "text": "初级首领",
+            "html": "初级首领"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "白弹 → 绿弹",
+            "html": "<span class=\"el-kinetic\">白弹</span> → <span class=\"el-strand\">绿弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6%–16%",
+            "html": "6%–16%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12%–24%",
+            "html": "12%–24%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "24%–50%",
+            "html": "24%–50%"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "白弹 → 重弹",
+            "html": "<span class=\"el-kinetic\">白弹</span> → <span class=\"ammo-heavy\">重弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3%–8%",
+            "html": "3%–8%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6%–16%",
+            "html": "6%–16%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12%–32%",
+            "html": "12%–32%"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "绿弹 → 绿弹",
+            "html": "<span class=\"el-strand\">绿弹</span> → <span class=\"el-strand\">绿弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3%–12%",
+            "html": "3%–12%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6%–18%",
+            "html": "6%–18%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12%–40%",
+            "html": "12%–40%"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "绿弹 → 重弹",
+            "html": "<span class=\"el-strand\">绿弹</span> → <span class=\"ammo-heavy\">重弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3%–8%",
+            "html": "3%–8%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6%–16%",
+            "html": "6%–16%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12%–32%",
+            "html": "12%–32%"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "重弹 → 绿弹",
+            "html": "<span class=\"ammo-heavy\">重弹</span> → <span class=\"el-strand\">绿弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3%–16%",
+            "html": "3%–16%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6%–24%",
+            "html": "6%–24%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12%–50%",
+            "html": "12%–50%"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "重弹 → 重弹",
+            "html": "<span class=\"ammo-heavy\">重弹</span> → <span class=\"ammo-heavy\">重弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "3%–4%",
+            "html": "3%–4%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6%–8%",
+            "html": "6%–8%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12%–16%",
+            "html": "12%–16%"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "技能 → 绿弹",
+            "html": "技能 → <span class=\"el-strand\">绿弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4%",
+            "html": "4%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "8%",
+            "html": "8%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "16%",
+            "html": "16%"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "技能 → 重弹",
+            "html": "技能 → <span class=\"ammo-heavy\">重弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4%",
+            "html": "4%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "8%",
+            "html": "8%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "16%",
+            "html": "16%"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "手雷 → 绿弹",
+            "html": "手雷 → <span class=\"el-strand\">绿弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "6%",
+            "html": "6%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "12%",
+            "html": "12%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "24%",
+            "html": "24%"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "手雷 → 重弹",
+            "html": "手雷 → <span class=\"ammo-heavy\">重弹</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "4%",
+            "html": "4%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "8%",
+            "html": "8%"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "16%",
+            "html": "16%"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "弹药生成机制 · Starside\n\nStarside\n/\n弹药生成机制\n\n弹药生成机制\n\n武器弹药生成\n\n击杀战斗人员按一个基础百分比生成弹药。这个百分比由四项决定：击杀所用的弹药类型、生成的弹药类型、战斗人员等级，以及武器的弹药生成属性。\n\n弹药生成属性\n红血\n橙血\n初级首领\n\n白弹 → 绿弹6%–16%12%–24%24%–50%\n\n白弹 → 重弹3%–8%6%–16%12%–32%\n\n绿弹 → 绿弹3%–12%6%–18%12%–40%\n\n绿弹 → 重弹3%–8%6%–16%12%–32%\n\n重弹 → 绿弹3%–16%6%–24%12%–50%\n\n重弹 → 重弹3%–4%6%–8%12%–16%\n\n技能 → 绿弹4%8%16%\n\n技能 → 重弹4%8%16%\n\n手雷 → 绿弹6%12%24%\n\n手雷 → 重弹4%8%16%\n\n表中的区间随武器的弹药生成属性线性变化。弹药生成属性 100 的特殊武器击杀一名橙血战斗人员，生成 18% 的特殊弹药与 16% 的威能弹药，两者都落在各自区间的上限。\n\n三档战斗人员之间大致成倍数关系：橙血约为红血的两倍，初级首领约为四倍。记住红血一列，其余两列可以推算。\n\n技能弹药生成\n\n技能生成的弹药远少于弹药生成属性合格的武器，靠技能补弹的收益有限。几乎所有技能对红血、橙血、初级首领战斗人员分别生成 4%、8%、16% 的特殊弹药与威能弹药。\n\n唯一的例外是手雷：它生成特殊弹药的速度高出 50%，对三档战斗人员分别给 6%、12%、24%。威能弹药那一档与其他技能相同。\n\n武器 Perk\n\n光中藏弹\n特殊弹药生成系数 ×1.25（当前版本存在 Bug：加成对所有武器生效，且其他武器开火不消耗层数）。\n即兴弹药\n特殊弹药生成系数 ×1.15，威能弹药生成系数 ×1.1。\n\n护甲模组\n\n特殊弹药搜寻者\n特殊弹药生成系数 ×1.25 | ×1.40 | ×1.50\n威能弹药搜寻者\n威能弹药生成系数 ×1.25 | ×1.40 | ×1.50\n\n这些加成同时装在多把武器上可以叠加，且不是逐项相乘，而是把各自的增量相加后一次作用于基础百分比。\n\n两把枪各带一个光中藏弹，因上述 Bug 会同时计入两个 ×1.25；再带一把即兴弹药的武器，追加 ×1.15；头盔上三个特殊弹药搜寻者按 ×1.50 计。用带即兴弹药的武器击杀红血战斗人员，特殊弹药生成率为：\n\n12% × (1 + 0.5 + 0.25 + 0.25 + 0.15) = 25.8%\n\n护甲套装加成\n\n56 套护甲里有 10 条效果直接作用于弹药：8 条给弹药进度，2 条抬高弹药生成属性。以下只摘与弹药有关的部分，完整触发条件与其余效果见护甲套装效果。\n\n直接给弹药进度：\n\n再补给溢冰 2 件\n造成最后一击时 特殊弹药 +20%、威能弹药 +20%，并生成一颗含 1% 超能能量的能量球。12 秒内置冷却。\n钢铁的历练欧里克斯记忆 2 件\n消灭守护者、橙血或更高级战斗人员时 特殊弹药 +12%、威能弹药 +7.5%。\n丰富弹药虚无赛博毒蛇 4 件\n肾上腺素充沛激活时，特殊弹药进度按目标分档：红血 +3%，橙血或更高级 +16%，傀儡橙血或更高级 +24%，守护者 +?%。破坏可摧毁物件与构造体同样触发，给 +16%。\n年事已高空降灭火 4 件\n对橙血或更高级战斗人员使用终结技时 特殊弹药 +16%，并恢复 32 生命值。\n傀儡武装伟大狩猎 4 件\n手雷最后一击时 威能弹药 +10%。\n致命编织积雨云 4 件\n对瓦解的战斗人员造成最后一击、且手雷技能能量已满时 特殊弹药 +10%。\n能量填装最后纪律 4 件\n拾取能量球时 特殊弹药 +6%（无法被加成）。\n白手起家铁能 4 件\n特殊弹药储量低于 20% 时，主武器击杀给 +3% 特殊弹药进度；威能弹药储量低于 20% 时，特殊武器击杀给 +2% 威能弹药进度。这部分额外进度不受搜寻者影响。\n\n抬高弹药生成属性：\n\n房间清空兴旺幸存者 4 件\n4 秒内用热量武器或主武器造成 3 次最后一击后，热量武器与主武器 +40 弹药生成，持续 10 秒。\n钢铁信念铁甲 4 件\n濒死时 +35 弹药生成属性，持续 7 秒。\n\n另有 7 条套装效果挂在弹药盒拾取上（自动收集、拾取时填装、拾取叠层），改变的是捡取与收益，不改变弹药生成本身，未列入上表。\n\n早期社区实测另给出年事已高终结橙血战斗人员 +15%、终结初级首领 +20%，以及白手起家 ×1.2 弹药生成加成，与《护甲套装效果》页的写法对不上，此处以该页为准。\n\n注解\n\n未充能近战把战斗人员打到终结状态后，终结不提供任何弹药能量。双特殊武器靠技能补弹这条路因此走不通。\n\n终结的弹药生成难以复现出一致结果。目前的判断是：生成量取决于终结当下所持的武器，而不是造成终结的手段。\n\n更新 2026.8.25\n\n数据源：DIM 社区的弹药生成实测（链接指向 Discord 频道内页，需登录并已加入该服务器）。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/ammo/index.html",
+    "final_url": "https://starside.work/ammo/index.html",
+    "path": "pages/ammo/index.html",
+    "bytes": 15414,
+    "sha256": "a049f370b5904cc93b69f2b2ffc58aaa9be0e7b974c95bb199c904301c38d0c2",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:29.699550+00:00"
+  },
+  "links": [
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://discord.com/channels/591927598255439873/1453807417430245518",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/ammo/style.css",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css"
+  ]
+}

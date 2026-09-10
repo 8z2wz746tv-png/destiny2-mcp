@@ -1,0 +1,4957 @@
+{
+  "url": "https://starside.work/legendary-primary/index.html",
+  "title": "刷取清单-白弹紫枪 · Starside",
+  "description": "56 把白弹位传说武器按枪械类型分档，含框架、属性、勇士克制、推荐 Perk、获取地点与每一把的评级理由。",
+  "category": "weapons",
+  "updated_at": "2026.9.6",
+  "data_src": "docs/legendary-primary",
+  "data_hash": "333b2fbd032ed905d0f1895ffcb8aa6d80ac231c",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "刷取清单-白弹紫枪"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "评级说明"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "自动步枪（奶枪）"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "自动步枪"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "手枪"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "微型冲锋枪"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "手炮"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "脉冲步枪"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "弓箭"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "斥候"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "自动步枪（奶枪）",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级",
+            "html": "评级"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "框架\n射速",
+            "html": "框架<br>射速"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性",
+            "html": "属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 三号位",
+            "html": "Perk 三号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 四号位",
+            "html": "Perk 四号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取地点",
+            "html": "获取地点"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级理由",
+            "html": "评级理由"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "毫不迟疑",
+            "html": "毫不迟疑"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b54013a28f.webp\" alt=\"\" width=\"96\" height=\"96\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "支援\n600",
+            "html": "支援<br>600"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-solar"
+            },
+            "text": "烈日",
+            "html": "烈日"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "医治",
+            "html": "医治"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "羸弱能量球\n混沌重塑",
+            "html": "<span class=\"perk\">羸弱能量球</span><br><span class=\"perk\">混沌重塑</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "苍白之心",
+            "html": "苍白之心"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "医治 perk 给予自己和队友恢复 1，能和仁慈余烬联动。苍白之心起源特性加上反过载元素超充器快速回转火大招",
+            "html": "医治 perk 给予<span class=\"enemy\">自己</span>和队友恢复 1，能和<span class=\"el-solar\">仁慈余烬</span>联动。苍白之心起源特性加上反过载<span class=\"art-perk\">元素超充器</span>快速回转火大招"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "迪凯特 02",
+            "html": "迪凯特 02"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/da7defdc17.webp\" alt=\"\" width=\"96\" height=\"96\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "支援\n600",
+            "html": "支援<br>600"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-stasis"
+            },
+            "text": "冰影",
+            "html": "冰影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "医治\n羸弱能量球",
+            "html": "医治<br><span class=\"perk\">羸弱能量球</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "互惠",
+            "html": "互惠"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "扭曲",
+            "html": "扭曲"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "医治+互惠一次给予自己和队友两层冰霜护甲的同时还有治疗，兼顾软硬减的优质奶枪",
+            "html": "医治+互惠一次给予<span class=\"enemy\">自己</span>和队友两层<span class=\"el-stasis\">冰霜护甲</span>的同时还有治疗，兼顾软硬减的优质奶枪"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "光鳃之调",
+            "html": "光鳃之调"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5f53326388.webp\" alt=\"\" width=\"96\" height=\"96\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "支援\n600",
+            "html": "支援<br>600"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "医治\n震颤反馈",
+            "html": "医治<br><span class=\"perk\">震颤反馈</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "超充弹匣\n羸弱能量球",
+            "html": "<span class=\"perk\">超充弹匣</span><br><span class=\"perk\">羸弱能量球</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "破碎王座",
+            "html": "破碎王座"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虽然给予的增幅只有五秒，但是可以续别的 15s 增幅，输出场景可用来触发 NPA 雷霆反击，震颤反馈+羸弱可以用来清怪",
+            "html": "虽然给予的<span class=\"el-arc\">增幅</span>只有五秒，但是可以续别的 15s <span class=\"el-arc\">增幅</span>，输出场景可用来触发 NPA <span class=\"art-perk\">雷霆反击</span>，<span class=\"perk\">震颤反馈</span>+羸弱可以用来清怪"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "永恒之尖",
+            "html": "永恒之尖"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/55eee72e3c.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "支援\n600",
+            "html": "支援<br>600"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "羸弱能量球\n互惠\n冲击支撑",
+            "html": "<span class=\"perk\">羸弱能量球</span><br>互惠<br><span class=\"perk\">冲击支撑</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "枯萎凝视\n不稳定弹药",
+            "html": "<span class=\"perk\">枯萎凝视</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "永恒沙漠（史诗）",
+            "html": "永恒沙漠（史诗）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "没有医治，一次给队友 1/3 的虚空盾太少了。枯萎凝视和羸弱能量球有一定功能性",
+            "html": "没有医治，一次给队友 1/3 的<span class=\"el-void\">虚空</span>盾太少了。<span class=\"perk\">枯萎凝视</span>和<span class=\"perk\">羸弱能量球</span>有一定功能性"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "金刚磐石",
+            "html": "金刚磐石"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/940be005d6.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T2",
+            "html": "T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "支援\n600",
+            "html": "支援<br>600"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-strand"
+            },
+            "text": "缚丝",
+            "html": "缚丝"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "切割\n互惠",
+            "html": "切割<br>互惠"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "orb"
+            },
+            "text": "能量球",
+            "html": "能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "仄",
+            "html": "仄"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "由于给的是拆解而不是织造铠甲成为功能性最差的奶枪，新版 T5 反而把切割取消了只能仄 roll",
+            "html": "由于给的是拆解而不是<span class=\"el-strand\">织造铠甲</span>成为功能性最差的奶枪，新版 T5 反而把切割取消了只能仄 roll"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "自动步枪",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级",
+            "html": "评级"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "框架\n射速",
+            "html": "框架<br>射速"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性",
+            "html": "属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 三号位",
+            "html": "Perk 三号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 四号位",
+            "html": "Perk 四号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取地点",
+            "html": "获取地点"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级理由",
+            "html": "评级理由"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "红衣威尔",
+            "html": "红衣威尔"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/665cb010e5.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n600",
+            "html": "适配<br>600"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "羸弱能量球",
+            "html": "羸弱能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "动能震颤",
+            "html": "动能震颤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "反屏障，适配框架也是所有自动步枪中最优秀的框架。动能自带除首领以外战斗人员 15% 增伤。羸弱能量球+动能震颤是最合适的组合",
+            "html": "反屏障，适配框架也是所有自动步枪中最优秀的框架。<span class=\"el-kinetic\">动能</span>自带除<span class=\"bar-yellow\">首领</span>以外<span class=\"enemy\">战斗人员</span> 15% 增伤。<span class=\"perk\">羸弱能量球</span>+<span class=\"perk\">动能震颤</span>是最合适的组合"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "痛苦的饥饿",
+            "html": "痛苦的饥饿"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/19db261d0d.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n600",
+            "html": "适配<br>600"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲击支撑\n爆破专家\n枯萎凝视",
+            "html": "<span class=\"perk\">冲击支撑</span><br><span class=\"perk\">爆破专家</span><br><span class=\"perk\">枯萎凝视</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "武器大师\n狂暴\n不稳定弹药",
+            "html": "<span class=\"perk\">武器大师</span><br>狂暴<br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "智谋",
+            "html": "智谋"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空属性武器是除动能之外最优秀的清怪属性。虚空自动步枪吃满了 NPA 神器",
+            "html": "<span class=\"el-void\">虚空</span>属性武器是除<span class=\"el-kinetic\">动能</span>之外最优秀的清怪属性。<span class=\"el-void\">虚空</span>自动步枪吃满了 NPA 神器"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "VS 热电推进",
+            "html": "VS 热电推进"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1e0109ecf6.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0.5",
+            "html": "T0.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n600",
+            "html": "适配<br>600"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "羸弱能量球",
+            "html": "羸弱能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "震颤反馈",
+            "html": "震颤反馈"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "晚星之主",
+            "html": "晚星之主"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "雷古斯克之誓",
+            "html": "雷古斯克之誓"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/666e348804.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0.5",
+            "html": "T0.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "速射\n720",
+            "html": "速射<br>720"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "即兴弹药\n不稳定弹药",
+            "html": "<span class=\"perk\">即兴弹药</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲击支撑\n羸弱能量球\n杀戮弹匣\n斗剑士",
+            "html": "<span class=\"perk\">冲击支撑</span><br><span class=\"perk\">羸弱能量球</span><br><span class=\"perk\">杀戮弹匣</span><br><span class=\"perk\">斗剑士</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "铁旗",
+            "html": "铁旗"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "唯一一把即兴弹药虚空白弹",
+            "html": "唯一一把<span class=\"perk\">即兴弹药</span><span class=\"el-void\">虚空</span>白弹"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "狙猎 Mk.47",
+            "html": "狙猎 Mk.47"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7674e9b6e5.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n720",
+            "html": "轻质<br>720"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "震颤反馈",
+            "html": "震颤反馈"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "羸弱能量球\n混沌重塑",
+            "html": "<span class=\"perk\">羸弱能量球</span><br><span class=\"perk\">混沌重塑</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "赛雀联赛",
+            "html": "赛雀联赛"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质框架+轻量级起源特性跑起来很快",
+            "html": "轻质框架+轻量级起源特性跑起来很快"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "鲁莽神谕",
+            "html": "鲁莽神谕"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cd17c3a763.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "速射\n720",
+            "html": "速射<br>720"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "维度偏移\n不稳定弹药",
+            "html": "<span class=\"perk\">维度偏移</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "混沌重塑\n冲击支撑",
+            "html": "<span class=\"perk\">混沌重塑</span><br><span class=\"perk\">冲击支撑</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "众神殿",
+            "html": "众神殿"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "众神殿版本 perk 池比花园版本好，起源特性优秀",
+            "html": "众神殿版本 perk 池比花园版本好，起源特性优秀"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "手枪",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级",
+            "html": "评级"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "框架\n射速",
+            "html": "框架<br>射速"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性",
+            "html": "属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 三号位",
+            "html": "Perk 三号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 四号位",
+            "html": "Perk 四号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取地点",
+            "html": "获取地点"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级理由",
+            "html": "评级理由"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "袖珍卫士",
+            "html": "袖珍卫士"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/aa76fe9f8a.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "动态热量\n360",
+            "html": "动态热量<br>360"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冷却饰品（vog 套）\n不稳定弹药",
+            "html": "冷却饰品（vog 套）<br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲击支撑\n狂乱\n杀戮弹匣",
+            "html": "<span class=\"perk\">冲击支撑</span><br>狂乱<br><span class=\"perk\">杀戮弹匣</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "无序边界",
+            "html": "无序边界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害最高的白弹中伤害最高的框架",
+            "html": "伤害最高的白弹中伤害最高的框架"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "黄铜攻击",
+            "html": "黄铜攻击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/04d24424f9.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "重型点射\n325",
+            "html": "重型点射<br>325"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "冲击支撑",
+            "html": "冲击支撑"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "狂乱\n不稳定弹药",
+            "html": "狂乱<br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "世界\n暗屋之声",
+            "html": "世界<br>暗屋之声"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "不错的框架，原始特性能叠到 15% 减伤非常厉害",
+            "html": "不错的框架，原始特性能叠到 15% 减伤非常厉害"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "傍晚 SI4",
+            "html": "傍晚 SI4"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/919eea660c.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0.5",
+            "html": "T0.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配点射\n491",
+            "html": "适配点射<br>491"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-solar"
+            },
+            "text": "烈日",
+            "html": "烈日"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "治疗弹匣\n即兴弹药",
+            "html": "<span class=\"perk\">治疗弹匣</span><br><span class=\"perk\">即兴弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "辉耀炽热\n邪剑守则\n燃烧野心",
+            "html": "<span class=\"perk\">辉耀炽热</span><br><span class=\"perk\">邪剑守则</span><br><span class=\"perk\">燃烧野心</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "先锋",
+            "html": "先锋"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害最高的手枪。高到能轻松反 50 光屏障",
+            "html": "伤害最高的手枪。高到能轻松反 50 光屏障"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "麦克尔的崇敬",
+            "html": "麦克尔的崇敬"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/111f368048.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "速射",
+            "html": "速射"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-strand"
+            },
+            "text": "缚丝",
+            "html": "缚丝"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "切割",
+            "html": "切割"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "武器大师\n二元轨道/狂乱\n超因果亲和",
+            "html": "<span class=\"perk\">武器大师</span><br><span class=\"perk\">二元轨道</span>/狂乱<br><span class=\"perk\">超因果亲和</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "梦魇根源",
+            "html": "梦魇根源"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "少数主手不错的 perk 池",
+            "html": "少数主手不错的 perk 池"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "日心 QSc",
+            "html": "日心 QSc"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/aed10024c7.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n360",
+            "html": "轻质<br>360"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-solar"
+            },
+            "text": "烈日",
+            "html": "烈日"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "治疗弹匣",
+            "html": "治疗弹匣"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "腹背受敌\n辉耀炽热\n狂乱",
+            "html": "<span class=\"perk\">腹背受敌</span><br><span class=\"perk\">辉耀炽热</span><br>狂乱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "世界掉落",
+            "html": "世界掉落"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "框架还行，轻质跑得快",
+            "html": "框架还行，轻质跑得快"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "难以逾越",
+            "html": "难以逾越"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1c07d78d5b.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1.5",
+            "html": "T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精密\n260",
+            "html": "精密<br>260"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "羸弱能量球",
+            "html": "羸弱能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "腹背受敌\n不稳定弹药",
+            "html": "<span class=\"perk\">腹背受敌</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "枪匠兑换\n凯尔之陨",
+            "html": "枪匠兑换<br>凯尔之陨"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "最差的框架但是是理论白弹最快产球",
+            "html": "最差的框架但是是理论白弹最快产球"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "无名之秋",
+            "html": "无名之秋"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7754ffde42.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1.5",
+            "html": "T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n360",
+            "html": "轻质<br>360"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "羸弱能量球",
+            "html": "羸弱能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伏特子弹\n腹背受敌\n狂乱",
+            "html": "<span class=\"perk\">伏特子弹</span><br><span class=\"perk\">腹背受敌</span><br>狂乱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "熔炉",
+            "html": "熔炉"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "微型冲锋枪",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级",
+            "html": "评级"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "框架\n射速",
+            "html": "框架<br>射速"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性",
+            "html": "属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 三号位",
+            "html": "Perk 三号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 四号位",
+            "html": "Perk 四号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取地点",
+            "html": "获取地点"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级理由",
+            "html": "评级理由"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "多机系统 CCX",
+            "html": "多机系统 CCX"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/61ae0ccd4c.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n900",
+            "html": "轻质<br>900"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "羸弱能量球",
+            "html": "羸弱能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "动能震颤",
+            "html": "动能震颤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "铁旗",
+            "html": "铁旗"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "唯一的 900 羸弱动能震颤微冲",
+            "html": "唯一的 900 羸弱<span class=\"perk\">动能震颤</span>微冲"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "岁时之巅",
+            "html": "岁时之巅"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/43a3b366d2.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n900",
+            "html": "轻质<br>900"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-solar"
+            },
+            "text": "烈日",
+            "html": "烈日"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "羸弱能量球\n治疗弹匣",
+            "html": "<span class=\"perk\">羸弱能量球</span><br><span class=\"perk\">治疗弹匣</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "混沌重塑\n燃烧野心\n辉耀炽热",
+            "html": "<span class=\"perk\">混沌重塑</span><br><span class=\"perk\">燃烧野心</span><br><span class=\"perk\">辉耀炽热</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "至日",
+            "html": "至日"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "羸弱能量球+混沌重塑和优秀的特克斯厂起源特性让他成为副手最优秀的微冲，手感优秀，perk 池豪华，燃烧野心是给松身裤火猎的特殊选择",
+            "html": "<span class=\"perk\">羸弱能量球</span>+<span class=\"perk\">混沌重塑</span>和优秀的特克斯厂起源特性让他成为副手最优秀的微冲，手感优秀，perk 池豪华，<span class=\"perk\">燃烧野心</span>是给松身裤火猎的特殊选择"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "不可饶恕",
+            "html": "不可饶恕"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/93b304d765.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "攻击\n720",
+            "html": "攻击<br>720"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "羸弱能量球\n不稳定弹药",
+            "html": "<span class=\"perk\">羸弱能量球</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "混沌重塑\n冲击支撑",
+            "html": "<span class=\"perk\">混沌重塑</span><br><span class=\"perk\">冲击支撑</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "二象性",
+            "html": "二象性"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虚空属性有许多虚空相关神器选择，攻击框架本身也是微冲伤害最高的框架，起源特性加填装，弹药生成略低",
+            "html": "<span class=\"el-void\">虚空</span>属性有许多<span class=\"el-void\">虚空</span>相关神器选择，攻击框架本身也是微冲伤害最高的框架，起源特性加填装，弹药生成略低"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "超前",
+            "html": "超前"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0cafe6abf9.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n900",
+            "html": "适配<br>900"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "回转弹药",
+            "html": "回转弹药"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "目标锁定",
+            "html": "目标锁定"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "沙漠",
+            "html": "沙漠"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "微冲腿泰坦的最佳紫武器，常与药剂包驱逐引擎混乱无序配合使用",
+            "html": "微冲腿泰坦的最佳紫武器，常与药剂包驱逐引擎<span class=\"exotic\">混乱无序</span>配合使用"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "驯顺",
+            "html": "驯顺"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c31aac2768.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n900",
+            "html": "轻质<br>900"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "动能震颤",
+            "html": "动能震颤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "混沌重塑",
+            "html": "混沌重塑"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "门徒",
+            "html": "门徒"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "动能震颤+混沌重塑伤害很高，起源特性可以回血",
+            "html": "<span class=\"perk\">动能震颤</span>+<span class=\"perk\">混沌重塑</span>伤害很高，起源特性可以回血"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "隐士",
+            "html": "隐士"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/716ea4a7d1.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n900",
+            "html": "轻质<br>900"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "冲击支撑",
+            "html": "冲击支撑"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "混沌重塑\n武器大师\n不稳定弹药",
+            "html": "<span class=\"perk\">混沌重塑</span><br><span class=\"perk\">武器大师</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "猛攻",
+            "html": "猛攻"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "起源特性可回转手雷能量",
+            "html": "起源特性可回转手雷能量"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "紧急求生包",
+            "html": "紧急求生包"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6068493e30.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n900",
+            "html": "适配<br>900"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "羸弱能量球\n冲击支撑",
+            "html": "<span class=\"perk\">羸弱能量球</span><br><span class=\"perk\">冲击支撑</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "狂乱\n集体行动\n不稳定弹药",
+            "html": "狂乱<br><span class=\"perk\">集体行动</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "智谋",
+            "html": "智谋"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "",
+            "html": ""
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "越界",
+            "html": "越界"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2a627a5143.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n900",
+            "html": "轻质<br>900"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "伏特子弹",
+            "html": "伏特子弹"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "狂乱\n震颤反馈",
+            "html": "狂乱<br><span class=\"perk\">震颤反馈</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "熔炉",
+            "html": "熔炉"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伏特子弹+狂乱的快速换弹组合",
+            "html": "<span class=\"perk\">伏特子弹</span>+狂乱的快速换弹组合"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "迫近",
+            "html": "迫近"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e9088c45d1.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n900",
+            "html": "轻质<br>900"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-strand"
+            },
+            "text": "缚丝",
+            "html": "缚丝"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "切割",
+            "html": "切割"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "混沌重塑",
+            "html": "混沌重塑"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "救赎的边缘",
+            "html": "救赎的边缘"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "切割很独特",
+            "html": "切割很独特"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "帕拉贝伦",
+            "html": "帕拉贝伦"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/effbeff89c.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n900",
+            "html": "适配<br>900"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-solar"
+            },
+            "text": "烈日",
+            "html": "烈日"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "治疗弹匣\n回转弹药",
+            "html": "<span class=\"perk\">治疗弹匣</span><br><span class=\"perk\">回转弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "羸弱能量球\n集体行动\n辉耀炽热",
+            "html": "<span class=\"perk\">羸弱能量球</span><br><span class=\"perk\">集体行动</span><br><span class=\"perk\">辉耀炽热</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "欧洲无人区",
+            "html": "欧洲无人区"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "起源特性疲惫爆炸很优秀。回转弹药可以破 50 光屏障",
+            "html": "起源特性疲惫爆炸很优秀。<span class=\"perk\">回转弹药</span>可以破 50 光屏障"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "判决",
+            "html": "判决"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/33d1a3f683.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精密\n600",
+            "html": "精密<br>600"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "羸弱能量球",
+            "html": "羸弱能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "动能震颤",
+            "html": "动能震颤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "预言",
+            "html": "预言"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虽然是最差的精密框架。但是动能属性和起源特性增伤弥补了这一点",
+            "html": "虽然是最差的精密框架。但是<span class=\"el-kinetic\">动能</span>属性和起源特性增伤弥补了这一点"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "手炮",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级",
+            "html": "评级"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "框架\n射速",
+            "html": "框架<br>射速"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性",
+            "html": "属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 三号位",
+            "html": "Perk 三号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 四号位",
+            "html": "Perk 四号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取地点",
+            "html": "获取地点"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级理由",
+            "html": "评级理由"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "星狐座",
+            "html": "星狐座"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c5091062ed.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精密\n180",
+            "html": "精密<br>180"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-stasis"
+            },
+            "text": "冰影",
+            "html": "冰影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "边打边劫",
+            "html": "边打边劫"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "高爆载荷",
+            "html": "高爆载荷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "破碎王座",
+            "html": "破碎王座"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "最常使用的边打边劫工具枪。手感射速优秀，起源特性还加操作，主手白弹边打边劫的最优选",
+            "html": "最常使用的<span class=\"perk\">边打边劫</span>工具枪。手感射速优秀，起源特性还加操作，主手白弹<span class=\"perk\">边打边劫</span>的最优选"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "绽放兰花",
+            "html": "绽放兰花"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f5a1527830.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n140",
+            "html": "适配<br>140"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲击支撑\n杀戮弹匣\n边打边劫\n即兴弹药",
+            "html": "<span class=\"perk\">冲击支撑</span><br><span class=\"perk\">杀戮弹匣</span><br><span class=\"perk\">边打边劫</span><br><span class=\"perk\">即兴弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高爆载荷\n武器大师\n狂暴\n不稳定弹药",
+            "html": "<span class=\"perk\">高爆载荷</span><br><span class=\"perk\">武器大师</span><br>狂暴<br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "竞技场",
+            "html": "竞技场"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "豪华的 perk 池和起源特性，虚空属性让他成为最强的白弹清怪手炮",
+            "html": "豪华的 perk 池和起源特性，<span class=\"el-void\">虚空</span>属性让他成为最强的白弹清怪手炮"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "克洛塔之语",
+            "html": "克洛塔之语"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/47a805a5c2.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精密\n180",
+            "html": "精密<br>180"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲击支撑\n爆破专家",
+            "html": "<span class=\"perk\">冲击支撑</span><br><span class=\"perk\">爆破专家</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "狂乱\n武器大师\n不稳定弹药",
+            "html": "狂乱<br><span class=\"perk\">武器大师</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "克洛塔的末日",
+            "html": "克洛塔的末日"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "180 的最佳之选",
+            "html": "180 的最佳之选"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "无爱",
+            "html": "无爱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/75d2a96e94.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "重型点射\n257",
+            "html": "重型点射<br>257"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-strand"
+            },
+            "text": "缚丝",
+            "html": "缚丝"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高强度备弹\n快速命中",
+            "html": "高强度备弹<br><span class=\"perk\">快速命中</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "元素磨砺",
+            "html": "元素磨砺"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "分离教义",
+            "html": "分离教义"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "虽然幸运裤已不复往日荣光，顶级的 perk 池和顶级的原始特性让他成为最好的双发手炮，通常与艾莲娜一起使用，缚丝属性适合废墟石板神器",
+            "html": "虽然<span class=\"exotic\">幸运裤</span>已不复往日荣光，顶级的 perk 池和顶级的原始特性让他成为最好的双发手炮，通常与艾莲娜一起使用，<span class=\"el-strand\">缚丝</span>属性适合废墟石板神器"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "艾恩伍德 03",
+            "html": "艾恩伍德 03"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1522c4a98c.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "散射\n100",
+            "html": "散射<br>100"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲击支撑\n威胁移除器",
+            "html": "<span class=\"perk\">冲击支撑</span><br><span class=\"perk\">威胁移除器</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "腹背受敌\n集体行动\n武器大师/雪上加霜\n不稳定弹药",
+            "html": "<span class=\"perk\">腹背受敌</span><br><span class=\"perk\">集体行动</span><br><span class=\"perk\">武器大师</span>/<span class=\"perk\">雪上加霜</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "扭曲",
+            "html": "扭曲"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "最高 DPS 框架的虚空属性，perk 池优秀",
+            "html": "最高 DPS 框架的<span class=\"el-void\">虚空</span>属性，perk 池优秀"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "金质消除者",
+            "html": "金质消除者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3093e6820a.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0",
+            "html": "T0"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "散射\n100",
+            "html": "散射<br>100"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "威胁探测\n威胁移除器\n盗墓者",
+            "html": "<span class=\"perk\">威胁探测</span><br><span class=\"perk\">威胁移除器</span><br><span class=\"perk\">盗墓者</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战壕炮管\n级联点",
+            "html": "战壕炮管<br><span class=\"perk\">级联点</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "试炼",
+            "html": "试炼"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "作为动能属性是最高的散射手炮伤害\n替代：三冠得主（守护者游戏）",
+            "html": "作为<span class=\"el-kinetic\">动能</span>属性是最高的散射手炮伤害<br>替代：三冠得主（守护者游戏）"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "后代",
+            "html": "后代"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/187a595f89.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精密\n180",
+            "html": "精密<br>180"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "伏特子弹",
+            "html": "伏特子弹"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高爆载荷\n狂乱",
+            "html": "<span class=\"perk\">高爆载荷</span><br>狂乱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "深岩墓室",
+            "html": "深岩墓室"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伏特+高爆的组合非常适合清怪",
+            "html": "伏特+高爆的组合非常适合清怪"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "野兽国度",
+            "html": "野兽国度"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/450b9cdebc.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n140",
+            "html": "适配<br>140"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "换档",
+            "html": "换档"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "集体行动",
+            "html": "集体行动"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "最后一愿",
+            "html": "最后一愿"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "仅限药剂包幸运裤的玩法",
+            "html": "仅限药剂包<span class=\"exotic\">幸运裤</span>的玩法"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "命运终结者",
+            "html": "命运终结者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/17789ee30d.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n140",
+            "html": "适配<br>140"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高爆载荷\n动能震颤",
+            "html": "<span class=\"perk\">高爆载荷</span><br><span class=\"perk\">动能震颤</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "狂乱\n元素磨砺\n萤火虫",
+            "html": "狂乱<br><span class=\"perk\">元素磨砺</span><br><span class=\"perk\">萤火虫</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "玻璃拱顶",
+            "html": "玻璃拱顶"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "手感好，perk 池和起源特性优秀",
+            "html": "手感好，perk 池和起源特性优秀"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "扎乌利的克星",
+            "html": "扎乌利的克星"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f31ee3f087.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n140",
+            "html": "适配<br>140"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-solar"
+            },
+            "text": "烈日",
+            "html": "烈日"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高爆载荷\n转向（王陨版本）",
+            "html": "<span class=\"perk\">高爆载荷</span><br>转向（王陨版本）"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "混沌重塑\n辉耀炽热",
+            "html": "<span class=\"perk\">混沌重塑</span><br><span class=\"perk\">辉耀炽热</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "众神殿\n国王的陨落",
+            "html": "众神殿<br>国王的陨落"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "分为众神殿和王陨两种版本，众神殿起源特性提供额外的弹药生成和面板，王陨起源在有盟友时有额外填装效果，众神殿版本同时拥有两种起源特性，王陨版本有转向",
+            "html": "分为众神殿和王陨两种版本，众神殿起源特性提供额外的弹药生成和面板，王陨起源在有盟友时有额外填装效果，众神殿版本同时拥有两种起源特性，王陨版本有转向"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "改装 B-7 手枪",
+            "html": "改装 B-7 手枪"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b77227234a.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1.5",
+            "html": "T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "动态热量\n180",
+            "html": "动态热量<br>180"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-stasis"
+            },
+            "text": "冰影",
+            "html": "冰影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "萤火虫",
+            "html": "萤火虫"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "墓碑",
+            "html": "墓碑"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "无序边界",
+            "html": "无序边界"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "替代\n鹰月/庄严追忆",
+            "html": "替代<br>鹰月/庄严追忆"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "死从天降",
+            "html": "死从天降"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9b1e5b9e78.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T2",
+            "html": "T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "适配\n140",
+            "html": "适配<br>140"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "高爆载荷",
+            "html": "高爆载荷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "羸弱能量球",
+            "html": "羸弱能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "先锋",
+            "html": "先锋"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高爆+羸弱能 4 下产能量球，但除此之外没什么用了，伤害不够看",
+            "html": "高爆+羸弱能 4 下产<span class=\"orb\">能量球</span>，但除此之外没什么用了，伤害不够看"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "脉冲步枪",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级",
+            "html": "评级"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "框架\n射速",
+            "html": "框架<br>射速"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性",
+            "html": "属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 三号位",
+            "html": "Perk 三号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 四号位",
+            "html": "Perk 四号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取地点",
+            "html": "获取地点"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级理由",
+            "html": "评级理由"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "乔科斯的长剑",
+            "html": "乔科斯的长剑"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/61b9a0fcb2.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T0.5",
+            "html": "T0.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "重型点射\n324",
+            "html": "重型点射<br>324"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲击支撑\n边打边劫\n爆破专家",
+            "html": "<span class=\"perk\">冲击支撑</span><br><span class=\"perk\">边打边劫</span><br><span class=\"perk\">爆破专家</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "亡命之徒\n杀戮弹匣\n枯萎凝视\n不稳定弹药",
+            "html": "<span class=\"perk\">亡命之徒</span><br><span class=\"perk\">杀戮弹匣</span><br><span class=\"perk\">枯萎凝视</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "熔炉",
+            "html": "熔炉"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害最高最好的脉冲框架，perk 池优秀，边打边劫+枯萎凝视的组合可作为工具枪",
+            "html": "伤害最高最好的脉冲框架，perk 池优秀，<span class=\"perk\">边打边劫</span>+<span class=\"perk\">枯萎凝视</span>的组合可作为工具枪"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "格网队长",
+            "html": "格网队长"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5a0d1937ad.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "速射\n540",
+            "html": "速射<br>540"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲击支撑\n爆破专家",
+            "html": "<span class=\"perk\">冲击支撑</span><br><span class=\"perk\">爆破专家</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "狂乱\n铤而走险\n不稳定弹药",
+            "html": "狂乱<br><span class=\"perk\">铤而走险</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "世界\n班西",
+            "html": "世界<br>班西"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "框架优秀，手感非常舒服，perk 池优秀",
+            "html": "框架优秀，手感非常舒服，perk 池优秀"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "唠叨龙骨",
+            "html": "唠叨龙骨"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/954d2e8850.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n450",
+            "html": "轻质<br>450"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "羸弱能量球",
+            "html": "羸弱能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "动能震颤",
+            "html": "动能震颤"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "众神殿",
+            "html": "众神殿"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "最好的羸弱+动能脉冲，优质起源特性",
+            "html": "最好的羸弱+<span class=\"el-kinetic\">动能</span>脉冲，优质起源特性"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "作废",
+            "html": "作废"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1d21351501.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "重型点射\n324",
+            "html": "重型点射<br>324"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-solar"
+            },
+            "text": "烈日",
+            "html": "烈日"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b7c4048b87.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "治疗弹匣\n爆破专家\n燃烧野心",
+            "html": "<span class=\"perk\">治疗弹匣</span><br><span class=\"perk\">爆破专家</span><br><span class=\"perk\">燃烧野心</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "混沌重塑\n辉耀炽热\n羸弱能量球",
+            "html": "<span class=\"perk\">混沌重塑</span><br><span class=\"perk\">辉耀炽热</span><br><span class=\"perk\">羸弱能量球</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "救赎的边缘",
+            "html": "救赎的边缘"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害最高最好的脉冲框架，perk 池优秀",
+            "html": "伤害最高最好的脉冲框架，perk 池优秀"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "莱德瑞克斯穿甲剑",
+            "html": "莱德瑞克斯穿甲剑"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/204c061d1f.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1.5",
+            "html": "T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "传承 PR-55\n450",
+            "html": "传承 PR-55<br>450"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-stasis"
+            },
+            "text": "冰影",
+            "html": "冰影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "萤火虫\n爆破专家",
+            "html": "<span class=\"perk\">萤火虫</span><br><span class=\"perk\">爆破专家</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "墓碑\n狂乱\n元素磨砺",
+            "html": "墓碑<br>狂乱<br><span class=\"perk\">元素磨砺</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "熔炉",
+            "html": "熔炉"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "萤火虫+墓碑，传承 PR-55 框架的 AA 很高适合打头",
+            "html": "<span class=\"perk\">萤火虫</span>+墓碑，传承 PR-55 框架的 AA 很高适合打头"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "弓箭",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级",
+            "html": "评级"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "框架\n射速",
+            "html": "框架<br>射速"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性",
+            "html": "属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 三号位",
+            "html": "Perk 三号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 四号位",
+            "html": "Perk 四号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取地点",
+            "html": "获取地点"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级理由",
+            "html": "评级理由"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "刺骨寒风",
+            "html": "刺骨寒风"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b3cfde9b56.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1",
+            "html": "T1"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精密",
+            "html": "精密"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "迷惑爆发\n即兴弹药",
+            "html": "迷惑爆发<br><span class=\"perk\">即兴弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "小试牛刀\n爆炸箭头\n动能震颤",
+            "html": "<span class=\"perk\">小试牛刀</span><br><span class=\"perk\">爆炸箭头</span><br><span class=\"perk\">动能震颤</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "木卫二",
+            "html": "木卫二"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "迷惑爆发+小试牛刀在弓箭上真的是非常有意思而且有强度的组合，最好的弓箭框架",
+            "html": "迷惑爆发+<span class=\"perk\">小试牛刀</span>在弓箭上真的是非常有意思而且有强度的组合，最好的弓箭框架"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "恶意尖牙",
+            "html": "恶意尖牙"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0e7284c672.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1.5",
+            "html": "T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质",
+            "html": "轻质"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-stasis"
+            },
+            "text": "冰影",
+            "html": "冰影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "墓碑\n即兴弹药\n小试牛刀",
+            "html": "墓碑<br><span class=\"perk\">即兴弹药</span><br><span class=\"perk\">小试牛刀</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "萤火虫\n爆炸箭头\n狂乱",
+            "html": "<span class=\"perk\">萤火虫</span><br><span class=\"perk\">爆炸箭头</span><br>狂乱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "竞技场",
+            "html": "竞技场"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "墓碑+萤火虫，弓箭的 AA 很高适合打头，顶级原始特性",
+            "html": "墓碑+<span class=\"perk\">萤火虫</span>，弓箭的 AA 很高适合打头，顶级原始特性"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "牡鹿之角",
+            "html": "牡鹿之角"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1b5c259b17.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T1.5",
+            "html": "T1.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精密",
+            "html": "精密"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "小试牛刀",
+            "html": "小试牛刀"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "伏特子弹",
+            "html": "伏特子弹"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "铁旗",
+            "html": "铁旗"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "小试牛刀+伏特子弹 cos 三体坐观者\n同类替代：救赎的边缘（终焉将至）",
+            "html": "<span class=\"perk\">小试牛刀</span>+<span class=\"perk\">伏特子弹</span> cos <span class=\"exotic\">三体坐观者</span><br>同类替代：救赎的边缘（终焉将至）"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "累积救赎",
+            "html": "累积救赎"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9cd7d2cde0.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T2",
+            "html": "T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精密",
+            "html": "精密"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-kinetic"
+            },
+            "text": "动能",
+            "html": "动能"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "羸弱能量球",
+            "html": "羸弱能量球"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "动能震颤\n爆炸箭头",
+            "html": "<span class=\"perk\">动能震颤</span><br><span class=\"perk\">爆炸箭头</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "花园",
+            "html": "花园"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "羸弱能量球+动能震颤两发一个球，原始特性方便破屏障",
+            "html": "<span class=\"perk\">羸弱能量球</span>+<span class=\"perk\">动能震颤</span>两发一个球，原始特性方便破屏障"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "幸运星",
+            "html": "幸运星"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/3c062b27b7.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T2",
+            "html": "T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质",
+            "html": "轻质"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冲击支撑\n即兴弹药\n小试牛刀",
+            "html": "<span class=\"perk\">冲击支撑</span><br><span class=\"perk\">即兴弹药</span><br><span class=\"perk\">小试牛刀</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "爆炸箭头\n不稳定弹药",
+            "html": "<span class=\"perk\">爆炸箭头</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "至日",
+            "html": "至日"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "没有优秀虚空精密弓的下位替代",
+            "html": "没有优秀<span class=\"el-void\">虚空</span>精密弓的下位替代"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "斥候",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "武器",
+            "html": "武器"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级",
+            "html": "评级"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "框架\n射速",
+            "html": "框架<br>射速"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性",
+            "html": "属性"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "勇士",
+            "html": "勇士"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 三号位",
+            "html": "Perk 三号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "Perk 四号位",
+            "html": "Perk 四号位"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "获取地点",
+            "html": "获取地点"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "评级理由",
+            "html": "评级理由"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "允诺",
+            "html": "允诺"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/bf6d594d17.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T2",
+            "html": "T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质\n200",
+            "html": "轻质<br>200"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-void"
+            },
+            "text": "虚空",
+            "html": "虚空"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "边打边劫\n冲击支撑",
+            "html": "<span class=\"perk\">边打边劫</span><br><span class=\"perk\">冲击支撑</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "高爆弹药\n枯萎凝视\n不稳定弹药",
+            "html": "<span class=\"perk\">高爆弹药</span><br><span class=\"perk\">枯萎凝视</span><br><span class=\"perk\">不稳定弹药</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "幽梦之城",
+            "html": "幽梦之城"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "轻质的高操作让他成为最合适的劫子弹斥候",
+            "html": "轻质的高操作让他成为最合适的劫子弹斥候"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "无视",
+            "html": "无视"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f9946cf300.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T2",
+            "html": "T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "速射\n260",
+            "html": "速射<br>260"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "萤火虫",
+            "html": "萤火虫"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伏特子弹\n狂乱",
+            "html": "<span class=\"perk\">伏特子弹</span><br>狂乱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "分离教义",
+            "html": "分离教义"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "最好的框架和顶级原始特性",
+            "html": "最好的框架和顶级原始特性"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "伏打阴影",
+            "html": "伏打阴影"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/83e7e5f1e2.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T2",
+            "html": "T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "平衡热量\n260",
+            "html": "平衡热量<br>260"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "震颤反馈",
+            "html": "震颤反馈"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "狂乱",
+            "html": "狂乱"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "平衡",
+            "html": "平衡"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "不错的长弹匣输出能力",
+            "html": "不错的长弹匣输出能力"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "受托",
+            "html": "受托"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/df8794ed9f.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T2",
+            "html": "T2"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "速射\n260",
+            "html": "速射<br>260"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-solar"
+            },
+            "text": "烈日",
+            "html": "烈日"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8b37bb6db2.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "治疗弹匣",
+            "html": "治疗弹匣"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "辉耀炽热\n转向\n燃烧野心",
+            "html": "<span class=\"perk\">辉耀炽热</span><br>转向<br><span class=\"perk\">燃烧野心</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "深岩墓室",
+            "html": "深岩墓室"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "最好的框架和顶级的手感",
+            "html": "最好的框架和顶级的手感"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "无感",
+            "html": "无感"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/0efb4ca8de.webp\" alt=\"\" width=\"96\" height=\"96\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "T2.5",
+            "html": "T2.5"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "精密\n180",
+            "html": "精密<br>180"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "el-arc"
+            },
+            "text": "电弧",
+            "html": "电弧"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "champ"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a9911a3dfe.webp\" alt=\"\" width=\"42\" height=\"42\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "集体爆破",
+            "html": "集体爆破"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "perk"
+            },
+            "text": "高爆载荷",
+            "html": "高爆载荷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "src"
+            },
+            "text": "竞技场",
+            "html": "竞技场"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "唯一还算可观手雷回转的白弹，高爆载荷能触发两次集体爆破，虽然是伤害最低的框架",
+            "html": "唯一还算可观手雷回转的白弹，<span class=\"perk\">高爆载荷</span>能触发两次<span class=\"perk\">集体爆破</span>，虽然是伤害最低的框架"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "刷取清单-白弹紫枪 · Starside\n\nStarside\n/\n刷取清单-白弹紫枪\n\n刷取清单-白弹紫枪\n\n评级说明\n\n配套视频：【命运 2】购物清单 紫枪部分杂谈\n\n在不同场景下，不同武器的推荐分级会出现变化。主要区分场景：高难宗师、副本清怪／机制、副本输出。伤害 DPS 参考武器框架页。\n\nT0：无替代性，独一档\nT1：强力，不错的选择\nT2：能用\nT3：一般\nT4：不建议使用\n\n为了更精细化评级，会出现 T0.5／T1.5 的小数点评级。评级只是为了提供衡量强度的标准，请勿上纲上线。不会出现 PVP 枪，不会出现基本没有用途的枪。\n\n如何衡量一把武器的价值？\n\n清怪／高难宗师等：\n①武器形态优秀，对精准伤害要求不高\n②武器伤害合格\n③武器弹药经济优秀：弹药生成属性高，每盒弹药总伤高\n④功能性：技能回转（超凡／大招），硬减软减获取，高频率 dot，辅助队友（奶枪／切割／疲惫）……\n\n输出：\n①伤害高：DPS 高，切换 DPS 高\n②总伤高\n③爆发高\n④功能性：劫子弹，高频率 dot，技能回转……\n\n冲击支撑如果不带神器废墟石板的不稳定神枪手和 NPA 的不稳定流动，则一定要和不稳定弹药 Perk 搭配。面对红血怪的 DPS 从高到低：手枪、手炮、自动步枪／脉冲／弓箭、斥候、微冲。在有 vog 套的情况下比起羸弱能量球会更倾向带增伤 Perk。\n\n动能武器：如果不反感 pve 打精准的话，可以尝试萤火虫+墓碑，萤火虫可以自动碎掉墓碑的冰块造成高伤范围爆炸，而萤火虫又是火属性武器伤害，就实现了一把枪触发预言 4 的抵抗 3 效果和回复 16% 近战手雷能量，携带药剂师或女王香炉的迎接风暴还可以同时射出减速弹片，也可利用寒风凛凛获取冰霜护甲。\n\n通常动能和虚空是最佳的清怪传说白弹：虚空因为不稳定弹药给予的清怪能力，冲击支撑给予的生存能力，动能因为羸弱能量球+动能震颤和天生的对非首领战斗人员有天生的 15% 增伤。\n\n自动步枪（奶枪）\n\n类型评级 T0。猎人日志和 NPA 神器有自动步枪神器可获得抵抗 2 和增伤，自动步枪本身也是不错的白弹框架，奶枪又有作为工具枪的不可替代性\n\n武器\n图标\n评级\n框架\n射速\n属性\n勇士\nPerk 三号位\nPerk 四号位\n获取地点\n评级理由\n\n毫不迟疑T0支援\n600烈日医治羸弱能量球\n混沌重塑苍白之心医治 perk 给予自己和队友恢复 1，能和仁慈余烬联动。苍白之心起源特性加上反过载元素超充器快速回转火大招\n\n迪凯特 02T0支援\n600冰影医治\n羸弱能量球互惠扭曲医治+互惠一次给予自己和队友两层冰霜护甲的同时还有治疗，兼顾软硬减的优质奶枪\n\n光鳃之调T1支援\n600电弧医治\n震颤反馈超充弹匣\n羸弱能量球破碎王座虽然给予的增幅只有五秒，但是可以续别的 15s 增幅，输出场景可用来触发 NPA 雷霆反击，震颤反馈+羸弱可以用来清怪\n\n永恒之尖T1支援\n600虚空羸弱能量球\n互惠\n冲击支撑枯萎凝视\n不稳定弹药永恒沙漠（史诗）没有医治，一次给队友 1/3 的虚空盾太少了。枯萎凝视和羸弱能量球有一定功能性\n\n金刚磐石T2支援\n600缚丝切割\n互惠能量球仄由于给的是拆解而不是织造铠甲成为功能性最差的奶枪，新版 T5 反而把切割取消了只能仄 roll\n\n自动步枪\n\n类型评级 T0。自动步枪无论伤害还是手感都是中上级别，给到最高评级是因为猎人日志和 NPA 神器有自动步枪神器可获得抵抗 2 和增伤，注意抵抗 2 需要 10 次自动步枪命中，所以射速越快触发越快，射速高有天生优势\n\n武器\n图标\n评级\n框架\n射速\n属性\n勇士\nPerk 三号位\nPerk 四号位\n获取地点\n评级理由\n\n红衣威尔T0适配\n600动能羸弱能量球动能震颤欧洲无人区反屏障，适配框架也是所有自动步枪中最优秀的框架。动能自带除首领以外战斗人员 15% 增伤。羸弱能量球+动能震颤是最合适的组合\n\n痛苦的饥饿T0适配\n600虚空冲击支撑\n爆破专家\n枯萎凝视武器大师\n狂暴\n不稳定弹药智谋虚空属性武器是除动能之外最优秀的清怪属性。虚空自动步枪吃满了 NPA 神器\n\nVS 热电推进T0.5适配\n600电弧羸弱能量球震颤反馈晚星之主\n\n雷古斯克之誓T0.5速射\n720虚空即兴弹药\n不稳定弹药冲击支撑\n羸弱能量球\n杀戮弹匣\n斗剑士铁旗唯一一把即兴弹药虚空白弹\n\n狙猎 Mk.47T1轻质\n720电弧震颤反馈羸弱能量球\n混沌重塑赛雀联赛轻质框架+轻量级起源特性跑起来很快\n\n鲁莽神谕T1速射\n720虚空维度偏移\n不稳定弹药混沌重塑\n冲击支撑众神殿众神殿版本 perk 池比花园版本好，起源特性优秀\n\n手枪\n\n类型评级 T0。伤害最高的白弹类型。可惜没有优秀的产球枪\n\n武器\n图标\n评级\n框架\n射速\n属性\n勇士\nPerk 三号位\nPerk 四号位\n获取地点\n评级理由\n\n袖珍卫士T0动态热量\n360虚空冷却饰品（vog 套）\n不稳定弹药冲击支撑\n狂乱\n杀戮弹匣无序边界伤害最高的白弹中伤害最高的框架\n\n黄铜攻击T0重型点射\n325虚空冲击支撑狂乱\n不稳定弹药世界\n暗屋之声不错的框架，原始特性能叠到 15% 减伤非常厉害\n\n傍晚 SI4T0.5适配点射\n491烈日治疗弹匣\n即兴弹药辉耀炽热\n邪剑守则\n燃烧野心先锋伤害最高的手枪。高到能轻松反 50 光屏障\n\n麦克尔的崇敬T1速射缚丝切割武器大师\n二元轨道/狂乱\n超因果亲和梦魇根源少数主手不错的 perk 池\n\n日心 QScT1轻质\n360烈日治疗弹匣腹背受敌\n辉耀炽热\n狂乱世界掉落框架还行，轻质跑得快\n\n难以逾越T1.5精密\n260虚空羸弱能量球腹背受敌\n不稳定弹药枪匠兑换\n凯尔之陨最差的框架但是是理论白弹最快产球\n\n无名之秋T1.5轻质\n360电弧羸弱能量球伏特子弹\n腹背受敌\n狂乱熔炉\n\n微型冲锋枪\n\n类型评级 T1。尽管作为伤害最低的白弹，但他是最快的羸弱能量球触发器，手感优秀受到多数人青睐\n\n武器\n图标\n评级\n框架\n射速\n属性\n勇士\nPerk 三号位\nPerk 四号位\n获取地点\n评级理由\n\n多机系统 CCXT0轻质\n900动能羸弱能量球动能震颤铁旗唯一的 900 羸弱动能震颤微冲\n\n岁时之巅T0轻质\n900烈日羸弱能量球\n治疗弹匣混沌重塑\n燃烧野心\n辉耀炽热至日羸弱能量球+混沌重塑和优秀的特克斯厂起源特性让他成为副手最优秀的微冲，手感优秀，perk 池豪华，燃烧野心是给松身裤火猎的特殊选择\n\n不可饶恕T0攻击\n720虚空羸弱能量球\n不稳定弹药混沌重塑\n冲击支撑二象性虚空属性有许多虚空相关神器选择，攻击框架本身也是微冲伤害最高的框架，起源特性加填装，弹药生成略低\n\n超前T0适配\n900电弧回转弹药目标锁定沙漠微冲腿泰坦的最佳紫武器，常与药剂包驱逐引擎混乱无序配合使用\n\n驯顺T0轻质\n900动能动能震颤混沌重塑门徒动能震颤+混沌重塑伤害很高，起源特性可以回血\n\n隐士T0轻质\n900虚空冲击支撑混沌重塑\n武器大师\n不稳定弹药猛攻起源特性可回转手雷能量\n\n紧急求生包T0适配\n900虚空羸弱能量球\n冲击支撑狂乱\n集体行动\n不稳定弹药智谋\n\n越界T1轻质\n900电弧伏特子弹狂乱\n震颤反馈熔炉伏特子弹+狂乱的快速换弹组合\n\n迫近T1轻质\n900缚丝切割混沌重塑救赎的边缘切割很独特\n\n帕拉贝伦T1适配\n900烈日治疗弹匣\n回转弹药羸弱能量球\n集体行动\n辉耀炽热欧洲无人区起源特性疲惫爆炸很优秀。回转弹药可以破 50 光屏障\n\n判决T1精密\n600动能羸弱能量球动能震颤预言虽然是最差的精密框架。但是动能属性和起源特性增伤弥补了这一点\n\n手炮\n\n类型评级 T1。手炮是伤害等级第二高的白弹，手感不错，中距离射程也是其优势之一，有最好的劫子弹工具枪和所有武器中最高伤害的白弹\n\n武器\n图标\n评级\n框架\n射速\n属性\n勇士\nPerk 三号位\nPerk 四号位\n获取地点\n评级理由\n\n星狐座T0精密\n180冰影边打边劫高爆载荷破碎王座最常使用的边打边劫工具枪。手感射速优秀，起源特性还加操作，主手白弹边打边劫的最优选\n\n绽放兰花T0适配\n140虚空冲击支撑\n杀戮弹匣\n边打边劫\n即兴弹药高爆载荷\n武器大师\n狂暴\n不稳定弹药竞技场豪华的 perk 池和起源特性，虚空属性让他成为最强的白弹清怪手炮\n\n克洛塔之语T0精密\n180虚空冲击支撑\n爆破专家狂乱\n武器大师\n不稳定弹药克洛塔的末日180 的最佳之选\n\n无爱T0重型点射\n257缚丝高强度备弹\n快速命中元素磨砺分离教义虽然幸运裤已不复往日荣光，顶级的 perk 池和顶级的原始特性让他成为最好的双发手炮，通常与艾莲娜一起使用，缚丝属性适合废墟石板神器\n\n艾恩伍德 03T0散射\n100虚空冲击支撑\n威胁移除器腹背受敌\n集体行动\n武器大师/雪上加霜\n不稳定弹药扭曲最高 DPS 框架的虚空属性，perk 池优秀\n\n金质消除者T0散射\n100动能威胁探测\n威胁移除器\n盗墓者战壕炮管\n级联点试炼作为动能属性是最高的散射手炮伤害\n替代：三冠得主（守护者游戏）\n\n后代T1精密\n180电弧伏特子弹高爆载荷\n狂乱深岩墓室伏特+高爆的组合非常适合清怪\n\n野兽国度T1适配\n140电弧换档集体行动最后一愿仅限药剂包幸运裤的玩法\n\n命运终结者T1适配\n140动能高爆载荷\n动能震颤狂乱\n元素磨砺\n萤火虫玻璃拱顶手感好，perk 池和起源特性优秀\n\n扎乌利的克星T1适配\n140烈日高爆载荷\n转向（王陨版本）混沌重塑\n辉耀炽热众神殿\n国王的陨落分为众神殿和王陨两种版本，众神殿起源特性提供额外的弹药生成和面板，王陨起源在有盟友时有额外填装效果，众神殿版本同时拥有两种起源特性，王陨版本有转向\n\n改装 B-7 手枪T1.5动态热量\n180冰影萤火虫墓碑无序边界替代\n鹰月/庄严追忆\n\n死从天降T2适配\n140动能高爆载荷羸弱能量球先锋高爆+羸弱能 4 下产能量球，但除此之外没什么用了，伤害不够看\n\n脉冲步枪\n\n类型评级 T1.5。脉冲步枪的伤害中等偏上，适合中远距离的清怪环境，由于方便打精准伤害多用于叠加单人特工层数\n\n武器\n图标\n评级\n框架\n射速\n属性\n勇士\nPerk 三号位\nPerk 四号位\n获取地点\n评级理由\n\n乔科斯的长剑T0.5重型点射\n324虚空冲击支撑\n边打边劫\n爆破专家亡命之徒\n杀戮弹匣\n枯萎凝视\n不稳定弹药熔炉伤害最高最好的脉冲框架，perk 池优秀，边打边劫+枯萎凝视的组合可作为工具枪\n\n格网队长T1速射\n540虚空冲击支撑\n爆破专家狂乱\n铤而走险\n不稳定弹药世界\n班西框架优秀，手感非常舒服，perk 池优秀\n\n唠叨龙骨T1轻质\n450动能羸弱能量球动能震颤众神殿最好的羸弱+动能脉冲，优质起源特性\n\n作废T1重型点射\n324烈日治疗弹匣\n爆破专家\n燃烧野心混沌重塑\n辉耀炽热\n羸弱能量球救赎的边缘伤害最高最好的脉冲框架，perk 池优秀\n\n莱德瑞克斯穿甲剑T1.5传承 PR-55\n450冰影萤火虫\n爆破专家墓碑\n狂乱\n元素磨砺熔炉萤火虫+墓碑，传承 PR-55 框架的 AA 很高适合打头\n\n弓箭\n\n类型评级 T2。弓箭也是伤害中等偏上的武器类型，但是碍于需要不断的拉弓和较低的伤害转化效率通用程度不高\n\n武器\n图标\n评级\n框架\n射速\n属性\n勇士\nPerk 三号位\nPerk 四号位\n获取地点\n评级理由\n\n刺骨寒风T1精密动能迷惑爆发\n即兴弹药小试牛刀\n爆炸箭头\n动能震颤木卫二迷惑爆发+小试牛刀在弓箭上真的是非常有意思而且有强度的组合，最好的弓箭框架\n\n恶意尖牙T1.5轻质冰影墓碑\n即兴弹药\n小试牛刀萤火虫\n爆炸箭头\n狂乱竞技场墓碑+萤火虫，弓箭的 AA 很高适合打头，顶级原始特性\n\n牡鹿之角T1.5精密电弧小试牛刀伏特子弹铁旗小试牛刀+伏特子弹 cos 三体坐观者\n同类替代：救赎的边缘（终焉将至）\n\n累积救赎T2精密动能羸弱能量球动能震颤\n爆炸箭头花园羸弱能量球+动能震颤两发一个球，原始特性方便破屏障\n\n幸运星T2轻质虚空冲击支撑\n即兴弹药\n小试牛刀爆炸箭头\n不稳定弹药至日没有优秀虚空精密弓的下位替代\n\n斥候\n\n类型评级 T3。倒数第二的伤害水平，适合远距离作战，唯一上场机会是作为劫子弹工具枪\n\n武器\n图标\n评级\n框架\n射速\n属性\n勇士\nPerk 三号位\nPerk 四号位\n获取地点\n评级理由\n\n允诺T2轻质\n200虚空边打边劫\n冲击支撑高爆弹药\n枯萎凝视\n不稳定弹药幽梦之城轻质的高操作让他成为最合适的劫子弹斥候\n\n无视T2速射\n260电弧萤火虫伏特子弹\n狂乱分离教义最好的框架和顶级原始特性\n\n伏打阴影T2平衡热量\n260电弧震颤反馈狂乱平衡不错的长弹匣输出能力\n\n受托T2速射\n260烈日治疗弹匣辉耀炽热\n转向\n燃烧野心深岩墓室最好的框架和顶级的手感\n\n无感T2.5精密\n180电弧集体爆破高爆载荷竞技场唯一还算可观手雷回转的白弹，高爆载荷能触发两次集体爆破，虽然是伤害最低的框架\n\n更新 2026.9.6\n\n特别鸣谢：小棒猪-LGpig 整理全部评级与评语。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/legendary-primary/index.html",
+    "final_url": "https://starside.work/legendary-primary/index.html",
+    "path": "pages/legendary-primary/index.html",
+    "bytes": 47603,
+    "sha256": "5026ab5eb5d7e9b817a99daec4a0f522285af91380c1b4dcbef2d509b3e6eeb8",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:32.313550+00:00"
+  },
+  "links": [
+    "https://starside.work/index.html",
+    "https://starside.work/weapon-frames/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://space.bilibili.com/169548478",
+    "https://space.bilibili.com/26117485",
+    "https://www.bilibili.com/video/BV1ah4Z6HEpr"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/legendary-primary/icons/04d24424f9.webp",
+    "https://starside.work/legendary-primary/icons/0cafe6abf9.webp",
+    "https://starside.work/legendary-primary/icons/0e7284c672.webp",
+    "https://starside.work/legendary-primary/icons/0efb4ca8de.webp",
+    "https://starside.work/legendary-primary/icons/111f368048.webp",
+    "https://starside.work/legendary-primary/icons/1522c4a98c.webp",
+    "https://starside.work/legendary-primary/icons/17789ee30d.webp",
+    "https://starside.work/legendary-primary/icons/187a595f89.webp",
+    "https://starside.work/legendary-primary/icons/19db261d0d.webp",
+    "https://starside.work/legendary-primary/icons/1b5c259b17.webp",
+    "https://starside.work/legendary-primary/icons/1c07d78d5b.webp",
+    "https://starside.work/legendary-primary/icons/1d21351501.webp",
+    "https://starside.work/legendary-primary/icons/1e0109ecf6.webp",
+    "https://starside.work/legendary-primary/icons/204c061d1f.webp",
+    "https://starside.work/legendary-primary/icons/2a627a5143.webp",
+    "https://starside.work/legendary-primary/icons/3093e6820a.webp",
+    "https://starside.work/legendary-primary/icons/33d1a3f683.webp",
+    "https://starside.work/legendary-primary/icons/3c062b27b7.webp",
+    "https://starside.work/legendary-primary/icons/43a3b366d2.webp",
+    "https://starside.work/legendary-primary/icons/450b9cdebc.webp",
+    "https://starside.work/legendary-primary/icons/47a805a5c2.webp",
+    "https://starside.work/legendary-primary/icons/55eee72e3c.webp",
+    "https://starside.work/legendary-primary/icons/5a0d1937ad.webp",
+    "https://starside.work/legendary-primary/icons/5f53326388.webp",
+    "https://starside.work/legendary-primary/icons/6068493e30.webp",
+    "https://starside.work/legendary-primary/icons/61ae0ccd4c.webp",
+    "https://starside.work/legendary-primary/icons/61b9a0fcb2.webp",
+    "https://starside.work/legendary-primary/icons/665cb010e5.webp",
+    "https://starside.work/legendary-primary/icons/666e348804.webp",
+    "https://starside.work/legendary-primary/icons/716ea4a7d1.webp",
+    "https://starside.work/legendary-primary/icons/75d2a96e94.webp",
+    "https://starside.work/legendary-primary/icons/7674e9b6e5.webp",
+    "https://starside.work/legendary-primary/icons/7754ffde42.webp",
+    "https://starside.work/legendary-primary/icons/83e7e5f1e2.webp",
+    "https://starside.work/legendary-primary/icons/8b37bb6db2.webp",
+    "https://starside.work/legendary-primary/icons/919eea660c.webp",
+    "https://starside.work/legendary-primary/icons/93b304d765.webp",
+    "https://starside.work/legendary-primary/icons/940be005d6.webp",
+    "https://starside.work/legendary-primary/icons/954d2e8850.webp",
+    "https://starside.work/legendary-primary/icons/9b1e5b9e78.webp",
+    "https://starside.work/legendary-primary/icons/9cd7d2cde0.webp",
+    "https://starside.work/legendary-primary/icons/a9911a3dfe.webp",
+    "https://starside.work/legendary-primary/icons/aa76fe9f8a.webp",
+    "https://starside.work/legendary-primary/icons/aed10024c7.webp",
+    "https://starside.work/legendary-primary/icons/b3cfde9b56.webp",
+    "https://starside.work/legendary-primary/icons/b54013a28f.webp",
+    "https://starside.work/legendary-primary/icons/b77227234a.webp",
+    "https://starside.work/legendary-primary/icons/b7c4048b87.webp",
+    "https://starside.work/legendary-primary/icons/bf6d594d17.webp",
+    "https://starside.work/legendary-primary/icons/c31aac2768.webp",
+    "https://starside.work/legendary-primary/icons/c5091062ed.webp",
+    "https://starside.work/legendary-primary/icons/cd17c3a763.webp",
+    "https://starside.work/legendary-primary/icons/da7defdc17.webp",
+    "https://starside.work/legendary-primary/icons/df8794ed9f.webp",
+    "https://starside.work/legendary-primary/icons/e9088c45d1.webp",
+    "https://starside.work/legendary-primary/icons/effbeff89c.webp",
+    "https://starside.work/legendary-primary/icons/f31ee3f087.webp",
+    "https://starside.work/legendary-primary/icons/f5a1527830.webp",
+    "https://starside.work/legendary-primary/icons/f9946cf300.webp",
+    "https://starside.work/legendary-primary/style.css"
+  ]
+}

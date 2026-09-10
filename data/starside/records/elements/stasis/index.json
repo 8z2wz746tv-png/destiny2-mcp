@@ -1,0 +1,1797 @@
+{
+  "url": "https://starside.work/elements/stasis/index.html",
+  "title": "冰影 · Starside",
+  "description": "冰影分支职业速查表——冰影碎片、冰影水晶、冰霜护甲、减速、冻结、碎裂六个效果，16 枚碎片，4 种手雷，以及猎人、泰坦、术士的近战、超能与星相，带图标与全部数值。",
+  "category": "subclass",
+  "updated_at": "2026.8.30",
+  "data_src": "docs/stasis",
+  "data_hash": "4f2df6625ec803a41e0d62c6033a47079c72c835",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "冰影"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "效果"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "碎片"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "手雷技能"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "猎人"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "泰坦"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "术士"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "效果",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰影碎片",
+            "html": "冰影碎片"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b27ed50869.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰影分支职业固有。\n 碎裂一块冰影水晶或一名被冻结的战斗人员，或击杀受冰影减益（减速、冻结）影响的战斗人员，会生成一枚冰影碎片。\n 红血掉小型碎片；橙血、初级首领、首领与守护者掉大型碎片。\n \n 拾取提供近战技能能量：小型 10%，大型 50%。\n 破碎状态持续 20 秒，盟友能拿到使用者生成的每一份。\n \n 装备冰川收获、冷酷收割或构造收割时：\n 小型碎片额外恢复 10 生命值并提供 1 层冰霜护甲；大型碎片恢复 20 生命值并提供 3 层。",
+            "html": "<span class=\"el-stasis\">冰影</span>分支职业固有。<br> <span class=\"deb-stasis\">碎裂</span>一块<span class=\"el-stasis\">冰影水晶</span>或一名被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>，或击杀受<span class=\"el-stasis\">冰影</span><span class=\"debuff\">减益</span>（<span class=\"deb-stasis\">减速</span>、<span class=\"deb-stasis\">冻结</span>）影响的<span class=\"enemy\">战斗人员</span>，会生成一枚<span class=\"el-stasis\">冰影碎片</span>。<br> <span class=\"bar-red\">红血</span>掉小型碎片；<span class=\"bar-orange\">橙血</span>、<span class=\"bar-yellow\">初级首领</span>、<span class=\"bar-yellow\">首领</span>与<span class=\"bar-orange\">守护者</span>掉大型碎片。<br> <br> 拾取提供<span class=\"pickup\">近战技能能量</span>：小型 10%，大型 50%。<br> 破碎状态持续 20 秒，<span class=\"enemy\">盟友</span>能拿到使用者生成的每一份。<br> <br> 装备<span class=\"el-stasis\">冰川收获</span>、<span class=\"el-stasis\">冷酷收割</span>或<span class=\"el-stasis\">构造收割</span>时：<br> 小型碎片额外恢复 10 <span class=\"health\">生命值</span>并提供 1 层<span class=\"el-stasis\">冰霜护甲</span>；大型碎片恢复 20 <span class=\"health\">生命值</span>并提供 3 层。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰影水晶",
+            "html": "冰影水晶"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8ec6ca9f42.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "可在表面生成的实心柱，生命值随体型而定（小型 ? ｜ 中型 ? ｜ 大型 ?），最长存在 15 秒。\n \n 生成时对 2.6 米内的战斗人员施加冻结（PvP 为 15 层减速，持续 1.5+0.5 秒）。\n 打空生命值即可摧毁，在 8 米半径内最多造成 158 [25] 伤害。\n 使用者对自己的水晶造成双倍伤害。",
+            "html": "可在表面生成的实心柱，<span class=\"health\">生命值</span>随体型而定（小型 <span class=\"unsure\">?</span> ｜ 中型 <span class=\"unsure\">?</span> ｜ 大型 <span class=\"unsure\">?</span>），最长存在 15 秒。<br> <br> 生成时对 2.6 米内的<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-stasis\">冻结</span>（PvP 为 15 层<span class=\"deb-stasis\">减速</span>，持续 1.5+0.5 秒）。<br> 打空<span class=\"health\">生命值</span>即可摧毁，在 8 米半径内最多造成 158 <span class=\"pvp\">[25]</span> 伤害。<br> <span class=\"note\">使用者对自己的水晶造成双倍伤害。</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰霜护甲",
+            "html": "冰霜护甲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/215173a0b3.webp\" alt=\"\" width=\"56\" height=\"56\" fetchpriority=\"high\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "每层提供 7% [2%] 伤害抗性，5 层时最高 31.25% [10%]。每 5 秒衰减 1 层。\n \n 超能期间每层提供的抗性会降低到 ?% [?%]。\n 装备碎片「韵律之吟」时上限提高到 7 层，最高抗性 50% [16%?]，每层持续时间变为 6 秒。",
+            "html": "每层提供 7% <span class=\"pvp\">[2%]</span> 伤害抗性，5 层时最高 31.25% <span class=\"pvp\">[10%]</span>。每 5 秒衰减 1 层。<br> <br> 超能期间每层提供的抗性会降低到 <span class=\"unsure\">?</span>% <span class=\"unsure\">[?%]</span>。<br> 装备碎片「<span class=\"el-stasis\">韵律之吟</span>」时上限提高到 7 层，最高抗性 50% <span class=\"unsure\">[16%?]</span>，每层持续时间变为 6 秒。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "减速",
+            "html": "减速"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/38b307d5c3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被减速的战斗人员在移动与武器性能上受多项惩罚；层数攒到 100 层即冻结。\n \n 被减速的战斗人员移动速度降低 50%，精度下降。\n 被减速的守护者移动速度与跳跃高度各降 50%，无法使用移动技能，受到的退缩提高 ?%，武器属性也受惩罚。\n \n 武器属性惩罚：\n 稳定性、操控性、填装速度与后坐方向降低 75%。\n 惩罚在武器 Perk 结算之后施加，施加前属性视为无上限——例如 160 填装速度会降到 40，80 操控性会降到 20。\n \n 过载勇士受到任意层数减速时进入眩晕。",
+            "html": "被<span class=\"deb-stasis\">减速</span>的<span class=\"enemy\">战斗人员</span>在移动与武器性能上受多项惩罚；层数攒到 100 层即<span class=\"deb-stasis\">冻结</span>。<br> <br> 被<span class=\"deb-stasis\">减速</span>的<span class=\"enemy\">战斗人员</span>移动速度降低 50%，精度下降。<br> 被<span class=\"deb-stasis\">减速</span>的<span class=\"bar-orange\">守护者</span>移动速度与跳跃高度各降 50%，无法使用移动技能，受到的退缩提高 <span class=\"unsure\">?</span>%，武器属性也受惩罚。<br> <br> 武器属性惩罚：<br> 稳定性、操控性、填装速度与后坐方向降低 75%。<br> 惩罚在武器 Perk 结算之后施加，施加前属性视为无上限——例如 160 填装速度会降到 40，80 操控性会降到 20。<br> <br> <span class=\"enemy\">过载勇士</span>受到任意层数<span class=\"deb-stasis\">减速</span>时进入<span class=\"enemy\">眩晕</span>。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冻结",
+            "html": "冻结"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8dcd191fa1.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被冻结的战斗人员被完全定身，无法射击、使用技能或移动。\n \n 它们受到特殊与威能武器的伤害提高 10%，受到电弧、烈日与虚空技能的伤害提高 5%，受到主武器的伤害降低 5% [60%]。\n 被冻结的红血、橙血与守护者另外承受 +120% 的基础与偃月近战伤害。\n 被冻结的战斗人员在受到伤害后碎裂，PvP 固定 200 伤害。\n \n 定身时长 6 [1.35 至 4.75] 秒；首领不受冻结阻碍，3 秒后自动碎裂。扎根的守护者可以立即施放超能挣脱。\n 短暂冻结 ｜ 被其它守护者冻结，持续 1.35 秒。\n 长时间冻结 ｜ 被战斗人员或冰影超能冻结，持续 4.75 秒。\n \n 被冻结的守护者职业技能被替换为突围，可以用 ? 生命值换取挣脱持久冻结。\n 漫游超能期间被冻结的守护者 1 秒后自动挣脱；一次性超能若在施放动画中被冻结则会被停用。",
+            "html": "被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>被完全定身，无法射击、使用技能或移动。<br> <br> 它们受到特殊与威能武器的伤害提高 10%，受到<span class=\"el-arc\">电弧</span>、<span class=\"el-solar\">烈日</span>与<span class=\"el-void\">虚空</span>技能的伤害提高 5%，受到主武器的伤害降低 5% <span class=\"pvp\">[60%]</span>。<br> 被<span class=\"deb-stasis\">冻结</span>的<span class=\"bar-red\">红血</span>、<span class=\"bar-orange\">橙血</span>与<span class=\"bar-orange\">守护者</span>另外承受 +120% 的基础与偃月近战伤害。<br> 被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>在受到伤害后<span class=\"deb-stasis\">碎裂</span>，PvP 固定 200 伤害。<br> <br> 定身时长 6 <span class=\"pvp\">[1.35 至 4.75]</span> 秒；<span class=\"bar-yellow\">首领</span>不受<span class=\"deb-stasis\">冻结</span>阻碍，3 秒后自动<span class=\"deb-stasis\">碎裂</span>。扎根的<span class=\"bar-orange\">守护者</span>可以立即施放超能挣脱。<br> 短暂<span class=\"deb-stasis\">冻结</span> ｜ 被其它<span class=\"bar-orange\">守护者</span><span class=\"deb-stasis\">冻结</span>，持续 1.35 秒。<br> 长时间<span class=\"deb-stasis\">冻结</span> ｜ 被<span class=\"enemy\">战斗人员</span>或<span class=\"el-stasis\">冰影</span>超能<span class=\"deb-stasis\">冻结</span>，持续 4.75 秒。<br> <br> 被<span class=\"deb-stasis\">冻结</span>的<span class=\"bar-orange\">守护者</span>职业技能被替换为突围，可以用 <span class=\"unsure\">?</span> <span class=\"health\">生命值</span>换取挣脱持久<span class=\"deb-stasis\">冻结</span>。<br> 漫游超能期间被<span class=\"deb-stasis\">冻结</span>的<span class=\"bar-orange\">守护者</span> 1 秒后自动挣脱；一次性超能若在施放动画中被<span class=\"deb-stasis\">冻结</span>则会被停用。"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "碎裂",
+            "html": "碎裂"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/2e21927786.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "被冻结的战斗人员可以被伤害打碎裂，也可以由特定冰影星相直接引爆，对 ? 米内的战斗人员最多造成 361 [?] 伤害。\n 势不可挡勇士受到碎裂伤害时进入眩晕。",
+            "html": "被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>可以被伤害打<span class=\"deb-stasis\">碎裂</span>，也可以由特定<span class=\"el-stasis\">冰影</span>星相直接引爆，对 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span>最多造成 361 <span class=\"unsure\">[?]</span> 伤害。<br> <span class=\"enemy\">势不可挡勇士</span>受到<span class=\"deb-stasis\">碎裂</span>伤害时进入<span class=\"enemy\">眩晕</span>。"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "碎片",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "碎片",
+            "html": "碎片"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "属性变化",
+            "html": "属性变化"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "束缚之吟",
+            "html": "束缚之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/12de61a569.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀被冻结的战斗人员生成一枚能量球，提供 2.5% 超能能量。\n 生成能量球后有 10 秒冷却。",
+            "html": "击杀被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>生成一枚<span class=\"orb\">能量球</span>，提供 2.5% <span class=\"orb\">超能能量</span>。<br> <span class=\"note\">生成能量球后有 10 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 超能",
+            "html": "-10 超能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "锁链的低语",
+            "html": "锁链的低语"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c9480b9a0b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰霜护甲激活期间的击杀推进计数，满 100% 生成一枚小型冰影碎片。\n 红血 34% ｜ 橙血 67% ｜ 初级首领 100% ｜ 守护者 ?%。",
+            "html": "<span class=\"el-stasis\">冰霜护甲</span>激活期间的击杀推进计数，满 100% 生成一枚小型<span class=\"el-stasis\">冰影碎片</span>。<br> <span class=\"bar-red\">红血</span> 34% ｜ <span class=\"bar-orange\">橙血</span> 67% ｜ <span class=\"bar-yellow\">初级首领</span> 100% ｜ <span class=\"bar-orange\">守护者</span> <span class=\"unsure\">?</span>%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 职业",
+            "html": "+10 职业"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰冷之吟",
+            "html": "冰冷之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b074701a2f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰影武器击杀推进计数，满 100% 生成一枚小型冰影碎片。\n 红血 34% ｜ 橙血 67% ｜ 初级首领 100% ｜ 守护者 67%。\n 生成碎片后有 5? 秒冷却，冷却期间的击杀不推进计数。",
+            "html": "<span class=\"el-stasis\">冰影</span>武器击杀推进计数，满 100% 生成一枚小型<span class=\"el-stasis\">冰影碎片</span>。<br> <span class=\"bar-red\">红血</span> 34% ｜ <span class=\"bar-orange\">橙血</span> 67% ｜ <span class=\"bar-yellow\">初级首领</span> 100% ｜ <span class=\"bar-orange\">守护者</span> 67%。<br> <span class=\"note\">生成碎片后有 5? 秒冷却，冷却期间的击杀不推进计数。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "传导之吟",
+            "html": "传导之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/93cf350c0b.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "15 米内的冰影碎片在 1 秒延迟后被拉向使用者。",
+            "html": "15 米内的<span class=\"el-stasis\">冰影碎片</span>在 1 秒延迟后被拉向使用者。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 生命值\n +10 超能",
+            "html": "+10 <span class=\"health\">生命值</span><br> +10 超能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "耐久之吟",
+            "html": "耐久之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/d41cd404fa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "减速减益与部分技能持续更久。\n 受影响的来源会在常规时长或层数旁用小字标出增量，例如 25 秒 → 25+5。",
+            "html": "<span class=\"deb-stasis\">减速</span><span class=\"debuff\">减益</span>与部分技能持续更久。<br> 受影响的来源会在常规时长或层数旁用小字标出增量，例如 25 秒 → 25+5。"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 近战",
+            "html": "+10 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "裂隙之吟",
+            "html": "裂隙之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/6ded4a097e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "碎裂战斗人员或摧毁水晶时：\n 额外造成一次伤害实例，在 10 [8] 米半径内最多造成 25 [9] 伤害。\n 衰减后最低仍有 15 [4] 伤害。",
+            "html": "<span class=\"deb-stasis\">碎裂</span><span class=\"enemy\">战斗人员</span>或摧毁<span class=\"el-stasis\">水晶</span>时：<br> 额外造成一次伤害实例，在 10 <span class=\"pvp\">[8]</span> 米半径内最多造成 25 <span class=\"pvp\">[9]</span> 伤害。<br> 衰减后最低仍有 15 <span class=\"pvp\">[4]</span> 伤害。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "脆弱的低语",
+            "html": "脆弱的低语"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b62db0107f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "用近战伤害碎裂一名战斗人员时提供 1 层冰霜护甲。",
+            "html": "用近战伤害<span class=\"deb-stasis\">碎裂</span>一名<span class=\"enemy\">战斗人员</span>时提供 1 层<span class=\"el-stasis\">冰霜护甲</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "晶石之吟",
+            "html": "晶石之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/026317a5ec.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冻结一名战斗人员提供 +? 操控性与 +30 生命值，持续 11 秒。",
+            "html": "<span class=\"deb-stasis\">冻结</span>一名<span class=\"enemy\">战斗人员</span>提供 +<span class=\"unsure\">?</span> 操控性与 +30 <span class=\"health\">生命值</span>，持续 11 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "饥饿之吟",
+            "html": "饥饿之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/533b665598.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰影碎片提供的近战能量提高 60%。\n 与其它来源（例如渴望回响的满溢金库 +260%）相加。",
+            "html": "<span class=\"el-stasis\">冰影碎片</span>提供的<span class=\"pickup\">近战能量</span>提高 60%。<br> <span class=\"note\">与其它来源（例如渴望回响的满溢金库 +260%）相加。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-20 近战",
+            "html": "-20 近战"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "刺激的低语",
+            "html": "刺激的低语"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dcb861ec73.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "造成充能近战伤害时补满所有武器并提供 +40 操控性，持续 5 秒。\n 增益持续时间即为冷却时间。",
+            "html": "造成充能近战伤害时补满所有武器并提供 +40 操控性，持续 5 秒。<br> <span class=\"note\">增益持续时间即为冷却时间。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "+10 生命值",
+            "html": "+10 <span class=\"health\">生命值</span>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "折角之吟",
+            "html": "折角之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7b08bfe0ff.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "击杀受冰影效果影响的战斗人员，按等级提供职业技能能量：\n T1 级战斗人员 9% ｜ T2 13% ｜ 守护者 15% ｜ T3 20% ｜ T4 30% ｜ 初级首领 40% ｜ 首领 50%。",
+            "html": "击杀受<span class=\"el-stasis\">冰影</span>效果影响的<span class=\"enemy\">战斗人员</span>，按等级提供<span class=\"pickup\">职业技能能量</span>：<br> <span class=\"enemy\">T1 级战斗人员</span> 9% ｜ <span class=\"enemy\">T2</span> 13% ｜ <span class=\"bar-orange\">守护者</span> 15% ｜ <span class=\"enemy\">T3</span> 20% ｜ <span class=\"enemy\">T4</span> 30% ｜ <span class=\"bar-yellow\">初级首领</span> 40% ｜ <span class=\"bar-yellow\">首领</span> 50%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "裂解之吟",
+            "html": "裂解之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b4a3f6320f.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "主武器弹药的武器对冰影水晶伤害提高 100%，对被冻结的战斗人员伤害提高 50%。\n 包括战狮、零号修订、Vex 揭秘者，以及它们各自的开火模式。",
+            "html": "主武器弹药的武器对<span class=\"el-stasis\">冰影水晶</span>伤害提高 100%，对被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>伤害提高 50%。<br> <span class=\"note\">包括战狮、零号修订、Vex 揭秘者，以及它们各自的开火模式。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "逆转之吟",
+            "html": "逆转之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/398bde59d1.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冰霜护甲激活期间，造成或受到物理近战伤害都会施加 10? 层减速，持续 ?+? [?+?] 秒。\n 偃月近战同样适用。",
+            "html": "<span class=\"el-stasis\">冰霜护甲</span>激活期间，造成或受到物理近战伤害都会施加 <span class=\"unsure\">10?</span> 层<span class=\"deb-stasis\">减速</span>，持续 <span class=\"unsure\">?+?</span> <span class=\"unsure\">[?+?]</span> 秒。<br> <span class=\"note\">偃月近战同样适用。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "韵律之吟",
+            "html": "韵律之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f84b6c172e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "强化冰霜护甲：上限提高到 7 层（伤害抗性 50% [16%?]），每层持续时间变为 6 秒。",
+            "html": "强化<span class=\"el-stasis\">冰霜护甲</span>：上限提高到 7 层（伤害抗性 50% <span class=\"unsure\">[16%?]</span>），每层持续时间变为 6 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "破碎之吟",
+            "html": "破碎之吟"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1ce9063ff7.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "摧毁一块冰影水晶时，手雷基础充能速度额外 +500% [150%]，持续 6 秒，最长 11 秒。",
+            "html": "摧毁一块<span class=\"el-stasis\">冰影水晶</span>时，<span class=\"pickup\">手雷</span>基础充能速度额外 +500% <span class=\"pvp\">[150%]</span>，持续 6 秒，最长 11 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "na"
+            },
+            "text": "—",
+            "html": "—"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "折磨的低语",
+            "html": "折磨的低语"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/e8ddad0788.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "受到伤害时提供 7% 手雷技能能量；冰霜护甲激活期间提高到 12%。\n 两次回能之间有 1 秒冷却。",
+            "html": "受到伤害时提供 7% <span class=\"pickup\">手雷技能能量</span>；<span class=\"el-stasis\">冰霜护甲</span>激活期间提高到 12%。<br> <span class=\"note\">两次回能之间有 1 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "-10 手雷",
+            "html": "-10 手雷"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "手雷技能",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "手雷",
+            "html": "手雷"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "基础冷却",
+            "html": "基础冷却"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "急冻手雷",
+            "html": "急冻手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/72a47e98d5.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 追踪器\n \n 直接命中战斗人员施加 50 [?] 层减速，持续 4+2 秒，并计为冰影手雷技能伤害。\n \n 撞地 0.8 秒后生成一枚追踪器，以 17 米/秒追踪 20 米内最近的战斗人员，持续 1 秒，追踪强度逐渐减弱。\n 追踪器到达战斗人员或到期时引爆，造成 20 [20] 伤害并冻结 3 [1.75] 米内的战斗人员。\n 若追踪器冻结了一名战斗人员，会再生成一枚瞄准另一名战斗人员，最多连锁 2 次。\n \n 冬日之触：\n 追踪器每冻结一名战斗人员就复制一枚；连锁 1、2、3 次后引爆时分别生成小型、中型与大型冰影水晶。",
+            "html": "<span class=\"note\">中型弹道 ｜ 追踪器</span><br> <br> 直接命中<span class=\"enemy\">战斗人员</span>施加 50 <span class=\"unsure\">[?]</span> 层<span class=\"deb-stasis\">减速</span>，持续 4+2 秒，并计为<span class=\"el-stasis\">冰影</span>手雷技能伤害。<br> <br> 撞地 0.8 秒后生成一枚追踪器，以 17 米/秒追踪 20 米内最近的<span class=\"enemy\">战斗人员</span>，持续 1 秒，追踪强度逐渐减弱。<br> 追踪器到达<span class=\"enemy\">战斗人员</span>或到期时引爆，造成 20 <span class=\"pvp\">[20]</span> 伤害并<span class=\"deb-stasis\">冻结</span> 3 <span class=\"pvp\">[1.75]</span> 米内的<span class=\"enemy\">战斗人员</span>。<br> 若追踪器<span class=\"deb-stasis\">冻结</span>了一名<span class=\"enemy\">战斗人员</span>，会再生成一枚瞄准另一名<span class=\"enemy\">战斗人员</span>，最多连锁 2 次。<br> <br> <span class=\"el-stasis\">冬日之触</span>：<br> 追踪器每<span class=\"deb-stasis\">冻结</span>一名<span class=\"enemy\">战斗人员</span>就复制一枚；连锁 1、2、3 次后引爆时分别生成小型、中型与大型<span class=\"el-stasis\">冰影水晶</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 175.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 175.6 秒<br> 回复倍率 0.625×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "暮域手雷",
+            "html": "暮域手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c0c58d0bc0.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 持续伤害场域\n \n 接触时引爆，在 ? 米半径内最多造成 20 [20] 伤害并施加 20 [10] 层减速（持续 2+2 秒），同时生成一片减速场域。\n \n 场域每 0.35 [0.3] 秒在 4 米半径内造成 1 伤害并施加 10 [5] 层减速（持续 2+2 秒），自身持续 7+2 秒。\n \n 冬日之触：\n 场域半径提高 50% 至 6 米，接触时额外生成小型冰影水晶。",
+            "html": "<span class=\"note\">中型弹道 ｜ 持续伤害场域</span><br> <br> 接触时引爆，在 <span class=\"unsure\">?</span> 米半径内最多造成 20 <span class=\"pvp\">[20]</span> 伤害并施加 20 <span class=\"pvp\">[10]</span> 层<span class=\"deb-stasis\">减速</span>（持续 2+2 秒），同时生成一片<span class=\"deb-stasis\">减速</span>场域。<br> <br> 场域每 0.35 <span class=\"pvp\">[0.3]</span> 秒在 4 米半径内造成 1 伤害并施加 10 <span class=\"pvp\">[5]</span> 层<span class=\"deb-stasis\">减速</span>（持续 2+2 秒），自身持续 7+2 秒。<br> <br> <span class=\"el-stasis\">冬日之触</span>：<br> 场域半径提高 50% 至 6 米，接触时额外生成小型<span class=\"el-stasis\">冰影水晶</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 131.7 秒\n 回复倍率 0.875×",
+            "html": "基础冷却 131.7 秒<br> 回复倍率 0.875×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰川手雷",
+            "html": "冰川手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/849beb7009.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道\n \n 接触时沿垂直于投掷方向的直线生成 5 块冰影水晶。\n \n 这些水晶被碎裂时最多造成 158 [?] 冰影手雷伤害，8 米内衰减至 66%。\n \n 冬日之触：\n 改为呈七边形生成 7 块冰影水晶。",
+            "html": "<span class=\"note\">中型弹道</span><br> <br> 接触时沿垂直于投掷方向的直线生成 5 块<span class=\"el-stasis\">冰影水晶</span>。<br> <br> 这些水晶被<span class=\"deb-stasis\">碎裂</span>时最多造成 158 <span class=\"unsure\">[?]</span> <span class=\"el-stasis\">冰影</span>手雷伤害，8 米内衰减至 66%。<br> <br> <span class=\"el-stasis\">冬日之触</span>：<br> 改为呈七边形生成 7 块<span class=\"el-stasis\">冰影水晶</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 175.6 秒\n 回复倍率 0.625×",
+            "html": "基础冷却 175.6 秒<br> 回复倍率 0.625×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "碎裂手雷",
+            "html": "碎裂手雷"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/dbaa5e6414.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "中型弹道 ｜ 粘附\n \n 附着到战斗人员身上，直接命中即施加冻结（PvP 为 ? 层减速）。\n \n ? 秒后爆炸，在 ? 米范围内最多造成 325? [?] 伤害，并以 3 组、每组 3 枚呈 Y 形释放 9 枚追踪冰影弹片。\n 每枚弹片造成 216 [?] 伤害，可弹跳 ? 次。\n 粘在已被冻结的战斗人员身上会瞬时爆炸，爆炸伤害提高 100%。\n \n 冬日之触：\n 额外生成 9 枚弹片。\n 直接命中被冻结的战斗人员时按帧率返还手雷技能能量——30 帧 42% ｜ 60 帧 30% ｜ 120 帧以上 28%。",
+            "html": "<span class=\"note\">中型弹道 ｜ 粘附</span><br> <br> 附着到<span class=\"enemy\">战斗人员</span>身上，直接命中即施加<span class=\"deb-stasis\">冻结</span>（PvP 为 <span class=\"unsure\">?</span> 层<span class=\"deb-stasis\">减速</span>）。<br> <br> <span class=\"unsure\">?</span> 秒后爆炸，在 <span class=\"unsure\">?</span> 米范围内最多造成 <span class=\"unsure\">325?</span> <span class=\"unsure\">[?]</span> 伤害，并以 3 组、每组 3 枚呈 Y 形释放 9 枚追踪<span class=\"el-stasis\">冰影</span>弹片。<br> 每枚弹片造成 216 <span class=\"unsure\">[?]</span> 伤害，可弹跳 <span class=\"unsure\">?</span> 次。<br> 粘在已被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>身上会瞬时爆炸，爆炸伤害提高 100%。<br> <br> <span class=\"el-stasis\">冬日之触</span>：<br> 额外生成 9 枚弹片。<br> 直接命中被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>时按帧率返还<span class=\"pickup\">手雷技能能量</span>——30 帧 42% ｜ 60 帧 30% ｜ 120 帧以上 28%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 105 秒\n 回复倍率 ?",
+            "html": "基础冷却 105 秒<br> 回复倍率 <span class=\"unsure\">?</span>"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "猎人",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "枯萎之刃",
+            "html": "枯萎之刃"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c7be215908.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "固有 2 次近战技能充能。\n 快速抛出一枚冰影手里剑。\n \n 手里剑可以从表面反弹最多 3 次，或瞄准最多 4 名战斗人员，追踪 12 [8] 米内的目标。\n 命中造成 296 [72] 伤害并施加 60 [40] 层减速，持续 3.5+3.5 [1.5+0.5] 秒。",
+            "html": "固有 2 次近战技能充能。<br> 快速抛出一枚<span class=\"el-stasis\">冰影</span>手里剑。<br> <br> 手里剑可以从表面反弹最多 3 次，或瞄准最多 4 名<span class=\"enemy\">战斗人员</span>，追踪 12 <span class=\"pvp\">[8]</span> 米内的目标。<br> 命中造成 296 <span class=\"pvp\">[72]</span> 伤害并施加 60 <span class=\"pvp\">[40]</span> 层<span class=\"deb-stasis\">减速</span>，持续 3.5+3.5 <span class=\"pvp\">[1.5+0.5]</span> 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 145.2 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 145.2 秒<br> 回复倍率 0.8×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "沉默狂啸",
+            "html": "沉默狂啸"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/f33df47fea.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [53%]\n \n 沉默 ｜ 接触造成 338 [847] 伤害并冻结 8.5 米内的战斗人员。\n \n 狂啸 ｜ 接触造成 338 [847] 伤害，并在引爆时生成一场冰影风暴。\n 冰影风暴持续 14+2 秒，每 0.1 [0.17] 秒在 5.5 米半径内造成 28 [14] 伤害并施加 20 层减速（持续 1 秒），风暴本身覆盖 6 秒。\n \n 对被冻结的非首领战斗人员伤害提高 300%。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[53%]</span><br> <br> 沉默 ｜ 接触造成 338 <span class=\"pvp\">[847]</span> 伤害并<span class=\"deb-stasis\">冻结</span> 8.5 米内的<span class=\"enemy\">战斗人员</span>。<br> <br> 狂啸 ｜ 接触造成 338 <span class=\"pvp\">[847]</span> 伤害，并在引爆时生成一场<span class=\"el-stasis\">冰影</span>风暴。<br> <span class=\"el-stasis\">冰影</span>风暴持续 14+2 秒，每 0.1 <span class=\"pvp\">[0.17]</span> 秒在 5.5 米半径内造成 28 <span class=\"pvp\">[14]</span> 伤害并施加 20 层<span class=\"deb-stasis\">减速</span>（持续 1 秒），风暴本身覆盖 6 秒。<br> <br> 对被<span class=\"deb-stasis\">冻结</span>的非<span class=\"bar-yellow\">首领</span><span class=\"enemy\">战斗人员</span>伤害提高 300%。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T4 级超能\n 基础冷却 455 秒",
+            "html": "T4 级超能<br> 基础冷却 455 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冷酷收割",
+            "html": "冷酷收割"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/af3dbaccb3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "拾取冰影碎片：\n 小型恢复 10 生命值并提供 1 层冰霜护甲；大型恢复 ? 生命值并提供 3 层。\n \n 冰霜护甲激活期间：\n 动能与冰影武器击杀推进计数，满 100% 时该次击杀触发冰影碎裂。\n 护甲层数越高，每次击杀推进得越多。\n \n 受到伤害提供 ?% 职业技能能量，每秒最多一次?。\n 仅限熔炉竞技场：? 秒内生成 6 份破碎后进入 10 秒冷却，期间收割类星相不再生成冰影碎片；计数与冷却在整个火力小队内共享。",
+            "html": "拾取<span class=\"el-stasis\">冰影碎片</span>：<br> 小型恢复 10 <span class=\"health\">生命值</span>并提供 1 层<span class=\"el-stasis\">冰霜护甲</span>；大型恢复 <span class=\"unsure\">?</span> <span class=\"health\">生命值</span>并提供 3 层。<br> <br> <span class=\"el-stasis\">冰霜护甲</span>激活期间：<br> <span class=\"el-kinetic\">动能</span>与<span class=\"el-stasis\">冰影</span>武器击杀推进计数，满 100% 时该次击杀触发<span class=\"el-stasis\">冰影</span><span class=\"deb-stasis\">碎裂</span>。<br> 护甲层数越高，每次击杀推进得越多。<br> <br> 受到伤害提供 <span class=\"unsure\">?</span>% <span class=\"pickup\">职业技能能量</span>，每秒最多一次<span class=\"unsure\">?</span>。<br> <span class=\"note\">仅限熔炉竞技场：? 秒内生成 6 份破碎后进入 10 秒冷却，期间收割类星相不再生成冰影碎片；计数与冷却在整个火力小队内共享。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "破碎俯冲",
+            "html": "破碎俯冲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/b30869e0cb.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "按［空中移动］俯冲：\n 最多造成 50 伤害，并碎裂 8.5 米半径内被冻结的战斗人员与冰影水晶。\n 对被冻结的战斗人员伤害提高到 180；碎裂一名被冻结的战斗人员额外造成 250 碎裂伤害，显示为黄色数字。\n 碎裂冰影水晶或被冻结的战斗人员提供满层冰霜护甲。\n \n 俯冲期间提供 ?% 冰影碎裂伤害抗性与坠落伤害免疫。\n 每次激活之间有 4 秒冷却。",
+            "html": "按［空中移动］俯冲：<br> 最多造成 50 伤害，并<span class=\"deb-stasis\">碎裂</span> 8.5 米半径内被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>与<span class=\"el-stasis\">冰影水晶</span>。<br> 对被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>伤害提高到 180；<span class=\"deb-stasis\">碎裂</span>一名被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>额外造成 250 <span class=\"deb-stasis\">碎裂</span>伤害，显示为黄色数字。<br> <span class=\"deb-stasis\">碎裂</span><span class=\"el-stasis\">冰影水晶</span>或被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>提供满层<span class=\"el-stasis\">冰霜护甲</span>。<br> <br> 俯冲期间提供 <span class=\"unsure\">?</span>% <span class=\"el-stasis\">冰影</span><span class=\"deb-stasis\">碎裂</span>伤害抗性与坠落伤害免疫。<br> <span class=\"note\">每次激活之间有 4 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冬日之触",
+            "html": "冬日之触"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/1ab84be020.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "强化四种冰影手雷：\n \n 急冻手雷 ｜ 追踪器每冻结一名战斗人员就复制一枚；连锁 1、2、3 次后引爆时分别生成小型、中型与大型冰影水晶。\n 暮域手雷 ｜ 接触时生成小型冰影水晶，减速场域半径提高 50%。\n 冰川手雷 ｜ 水晶排布改为七边形，并额外生成 2 块大型冰影水晶。\n 碎裂手雷 ｜ 额外释放 9 枚弹片；直接命中被冻结的战斗人员返还约 30% 手雷技能能量。",
+            "html": "强化四种<span class=\"el-stasis\">冰影</span>手雷：<br> <br> <span class=\"el-stasis\">急冻手雷</span> ｜ 追踪器每<span class=\"deb-stasis\">冻结</span>一名<span class=\"enemy\">战斗人员</span>就复制一枚；连锁 1、2、3 次后引爆时分别生成小型、中型与大型<span class=\"el-stasis\">冰影水晶</span>。<br> <span class=\"el-stasis\">暮域手雷</span> ｜ 接触时生成小型<span class=\"el-stasis\">冰影水晶</span>，<span class=\"deb-stasis\">减速</span>场域半径提高 50%。<br> <span class=\"el-stasis\">冰川手雷</span> ｜ 水晶排布改为七边形，并额外生成 2 块大型<span class=\"el-stasis\">冰影水晶</span>。<br> <span class=\"el-stasis\">碎裂手雷</span> ｜ 额外释放 9 枚弹片；直接命中被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>返还约 30% <span class=\"pickup\">手雷技能能量</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "严冬帷幕",
+            "html": "严冬帷幕"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/481a86e7c6.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "对一名战斗人员施加减速时：\n 职业技能基础充能速度额外 +300% [150%]，持续 3 秒。\n \n 使用职业技能：\n 对 9 [8] 米内的战斗人员施加 60 [40] 层减速，持续 8+4? [1.5+0.5] 秒。\n 对战斗人员提供 50% 伤害抗性 4? 秒。",
+            "html": "对一名<span class=\"enemy\">战斗人员</span>施加<span class=\"deb-stasis\">减速</span>时：<br> <span class=\"pickup\">职业技能</span>基础充能速度额外 +300% <span class=\"pvp\">[150%]</span>，持续 3 秒。<br> <br> 使用职业技能：<br> 对 9 <span class=\"pvp\">[8]</span> 米内的<span class=\"enemy\">战斗人员</span>施加 60 <span class=\"pvp\">[40]</span> 层<span class=\"deb-stasis\">减速</span>，持续 8+<span class=\"unsure\">4?</span> <span class=\"pvp\">[1.5+0.5]</span> 秒。<br> 对<span class=\"enemy\">战斗人员</span>提供 50% 伤害抗性 <span class=\"unsure\">4?</span> 秒。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "泰坦",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "战栗打击",
+            "html": "战栗打击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/a56a8163a3.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "跃过空中，发动突进距离延长的近战攻击，接触时碎裂冰影水晶。\n 未命中返还 80% [40%] 近战技能能量。\n \n 命中战斗人员：\n 造成 511 [105] 直击伤害，强力[中等]击退战斗人员并施加 50 [40] 层减速。\n 附着一枚延迟冰影爆炸物，1 秒后最多造成 219 [?] 爆炸伤害并施加 100 [40] 层减速，8 米内衰减至 20%。\n 伤害与爆炸都吃近战伤害提高；直击伤害非致命。被直接命中的守护者近战突进失效 0.5 秒。",
+            "html": "跃过空中，发动突进距离延长的近战攻击，接触时<span class=\"deb-stasis\">碎裂</span><span class=\"el-stasis\">冰影水晶</span>。<br> 未命中返还 80% <span class=\"pvp\">[40%]</span> <span class=\"pickup\">近战技能能量</span>。<br> <br> 命中<span class=\"enemy\">战斗人员</span>：<br> 造成 511 <span class=\"pvp\">[105]</span> 直击伤害，强力<span class=\"pvp\">[中等]</span>击退<span class=\"enemy\">战斗人员</span>并施加 50 <span class=\"pvp\">[40]</span> 层<span class=\"deb-stasis\">减速</span>。<br> 附着一枚延迟<span class=\"el-stasis\">冰影</span>爆炸物，1 秒后最多造成 219 <span class=\"unsure\">[?]</span> 爆炸伤害并施加 100 <span class=\"pvp\">[40]</span> 层<span class=\"deb-stasis\">减速</span>，8 米内衰减至 20%。<br> <span class=\"note\">伤害与爆炸都吃近战伤害提高；直击伤害非致命。被直接命中的守护者近战突进失效 0.5 秒。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 146.3 秒\n 回复倍率 0.7×",
+            "html": "基础冷却 146.3 秒<br> 回复倍率 0.7×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰川震击",
+            "html": "冰川震击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/47b7881b6e.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [47%]\n 基础持续：25 秒，或每秒消耗 4% 超能能量\n \n 期间跳跃高度提高，且寒冰断破没有冷却。\n 施放时冻结 8 [6] 米内的战斗人员；超能结束时提供 3 次近战技能充能。\n 激活期间以任何方式击杀都会生成能量球，每枚提供 7.15% 技能能量，每次施放最多 7 枚。\n 被冻结的战斗人员与冰影水晶接触时每 0.15 秒受到 300 冰影超能伤害，几乎立即碎裂。\n 所有冰影伤害（轻攻击与直击伤害除外）对被冻结的战斗人员提高 310%，计为超能伤害并显示为黄色数字。\n \n 轻攻击 ｜ 消耗 7.45% 超能能量。\n 向前跃出，造成 1838 [210] 直击伤害并强力击退。\n 命中附着延迟冰影爆炸物，1 秒后最多造成 897 [?] 爆炸伤害并施加 100? [?] 层减速，8 米内衰减至 20%。直击伤害非致命。\n \n 重击 ｜ 消耗 7.45% 超能能量。\n 猛击地面，造成 73 [50] 伤害并冻结 9 米范围，同时生成 3 道冰影水晶波形，每道由小型、中型与大型水晶组成。\n 前方约 45° 锥形内的战斗人员最多受到 579 [?] 伤害，8 米内衰减至 0%。\n 水晶最多造成 158 [?] 冰影超能伤害，可随 100 以上的超能属性与其它超能伤害提升缩放。\n \n 风暴怒吼｜ 消耗 15% 超能能量，每次施放最多 5 次。\n 行为与伤害同普通星相，但视为超能近战伤害。\n 冰川震击对被冻结战斗人员的 310% 提高，与咆哮固有的对被冻结非首领战斗人员的 1.5 倍伤害相乘。\n 风暴怒吼伤害还可以随 100 以上的超能属性、超能近战伤害增益（护甲匠、护盾粉碎、没有 B 计划）与超能伤害增益（合成感受器）缩放，这些增益彼此相乘，其中没有 B 计划与护甲匠／护盾粉碎相加。\n 合成感受器增益期间，风暴怒吼对被冻结战斗人员会失去泰坦固有的 1.2 倍近战伤害，只提供 +25% 而非预期的 50%。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[47%]</span><br> 基础持续：25 秒，或每秒消耗 4% <span class=\"orb\">超能能量</span><br> <br> 期间跳跃高度提高，且<span class=\"el-stasis\">寒冰断破</span>没有冷却。<br> 施放时<span class=\"deb-stasis\">冻结</span> 8 <span class=\"pvp\">[6]</span> 米内的<span class=\"enemy\">战斗人员</span>；超能结束时提供 3 次<span class=\"pickup\">近战技能充能</span>。<br> 激活期间以任何方式击杀都会生成<span class=\"orb\">能量球</span>，每枚提供 7.15% 技能能量，每次施放最多 7 枚。<br> 被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>与<span class=\"el-stasis\">冰影水晶</span>接触时每 0.15 秒受到 300 <span class=\"el-stasis\">冰影</span>超能伤害，几乎立即<span class=\"deb-stasis\">碎裂</span>。<br> 所有<span class=\"el-stasis\">冰影</span>伤害（轻攻击与直击伤害除外）对被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>提高 310%，计为超能伤害并显示为黄色数字。<br> <br> 轻攻击 ｜ 消耗 7.45% <span class=\"orb\">超能能量</span>。<br> 向前跃出，造成 1838 <span class=\"pvp\">[210]</span> 直击伤害并强力击退。<br> 命中附着延迟<span class=\"el-stasis\">冰影</span>爆炸物，1 秒后最多造成 897 <span class=\"unsure\">[?]</span> 爆炸伤害并施加 <span class=\"unsure\">100?</span> <span class=\"unsure\">[?]</span> 层<span class=\"deb-stasis\">减速</span>，8 米内衰减至 20%。直击伤害非致命。<br> <br> 重击 ｜ 消耗 7.45% <span class=\"orb\">超能能量</span>。<br> 猛击地面，造成 73 <span class=\"pvp\">[50]</span> 伤害并<span class=\"deb-stasis\">冻结</span> 9 米范围，同时生成 3 道<span class=\"el-stasis\">冰影水晶</span>波形，每道由小型、中型与大型水晶组成。<br> 前方约 45° 锥形内的<span class=\"enemy\">战斗人员</span>最多受到 579 <span class=\"unsure\">[?]</span> 伤害，8 米内衰减至 0%。<br> 水晶最多造成 158 <span class=\"unsure\">[?]</span> <span class=\"el-stasis\">冰影</span>超能伤害，可随 100 以上的超能属性与其它超能伤害提升缩放。<br> <br> <span class=\"el-stasis\">风暴怒吼</span>｜ 消耗 15% <span class=\"orb\">超能能量</span>，每次施放最多 5 次。<br> 行为与伤害同普通星相，但视为超能近战伤害。<br> <span class=\"el-stasis\">冰川震击</span>对被<span class=\"deb-stasis\">冻结</span><span class=\"enemy\">战斗人员</span>的 310% 提高，与咆哮固有的对被<span class=\"deb-stasis\">冻结</span>非<span class=\"bar-yellow\">首领</span><span class=\"enemy\">战斗人员</span>的 1.5 倍伤害相乘。<br> <span class=\"el-stasis\">风暴怒吼</span>伤害还可以随 100 以上的超能属性、超能近战伤害<span class=\"buff\">增益</span>（<span class=\"art-perk\">护甲匠</span>、<span class=\"art-perk\">护盾粉碎</span>、<span class=\"exotic\">没有 B 计划</span>）与超能伤害<span class=\"buff\">增益</span>（<span class=\"exotic\">合成感受器</span>）缩放，这些<span class=\"buff\">增益</span>彼此相乘，其中<span class=\"exotic\">没有 B 计划</span>与<span class=\"art-perk\">护甲匠</span>／<span class=\"art-perk\">护盾粉碎</span>相加。<br> <span class=\"note\">合成感受器增益期间，风暴怒吼对被冻结战斗人员会失去泰坦固有的 1.2 倍近战伤害，只提供 +25% 而非预期的 50%。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "寒冰断破",
+            "html": "寒冰断破"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5b37c9bc19.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "滑铲撞进冰影水晶与被冻结的战斗人员时，接触即碎裂。\n \n 被动把滑铲距离从 6.5 米提高到 11 米，延长滑铲后有 2 秒冷却。\n 滑铲会发射一道冰影波形，造成 18 [?] 伤害并碎裂冰影水晶与被冻结的战斗人员。",
+            "html": "滑铲撞进<span class=\"el-stasis\">冰影水晶</span>与被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>时，接触即<span class=\"deb-stasis\">碎裂</span>。<br> <br> 被动把滑铲距离从 6.5 米提高到 11 米，延长滑铲后有 2 秒冷却。<br> 滑铲会发射一道<span class=\"el-stasis\">冰影</span>波形，造成 18 <span class=\"unsure\">[?]</span> 伤害并<span class=\"deb-stasis\">碎裂</span><span class=\"el-stasis\">冰影水晶</span>与被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "钻石长矛",
+            "html": "钻石长矛"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/10ea99c436.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "1 [3] 次冰影武器击杀、一次冰影技能击杀，或一次碎裂击杀后：\n 生成一支冰影长矛。\n 长矛是一次性武器，3 米内可拾取，最多持有 10 秒，在地面上最多停留 25 秒。\n \n ［开火］投出长矛 ｜ 冻结接触点 5 米内的战斗人员，直接接触时碎裂水晶，并造成 136 [45] 伤害。\n ［近战］猛击 ｜ 冻结 8 [6.75?] 米内的战斗人员，最多造成 180 [90] 伤害，并为自己与 ? 米内的盟友提供 2 层冰霜护甲。\n \n 钻石长矛伤害到冰影水晶时立即碎裂它们；其伤害视为普通冰影技能伤害，既非手雷也非近战。\n 生成长矛后有 7 [17] 秒冷却，之后才能再生成一支。",
+            "html": "1 <span class=\"pvp\">[3]</span> 次<span class=\"el-stasis\">冰影</span>武器击杀、一次<span class=\"el-stasis\">冰影</span>技能击杀，或一次<span class=\"deb-stasis\">碎裂</span>击杀后：<br> 生成一支<span class=\"el-stasis\">冰影</span>长矛。<br> 长矛是一次性武器，3 米内可拾取，最多持有 10 秒，在地面上最多停留 25 秒。<br> <br> ［开火］投出长矛 ｜ <span class=\"deb-stasis\">冻结</span>接触点 5 米内的<span class=\"enemy\">战斗人员</span>，直接接触时<span class=\"deb-stasis\">碎裂</span><span class=\"el-stasis\">水晶</span>，并造成 136 <span class=\"pvp\">[45]</span> 伤害。<br> ［近战］猛击 ｜ <span class=\"deb-stasis\">冻结</span> 8 <span class=\"unsure\">[6.75?]</span> 米内的<span class=\"enemy\">战斗人员</span>，最多造成 180 <span class=\"pvp\">[90]</span> 伤害，并为<span class=\"enemy\">自己</span>与 <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">盟友</span>提供 2 层<span class=\"el-stasis\">冰霜护甲</span>。<br> <br> <span class=\"el-stasis\">钻石长矛</span>伤害到<span class=\"el-stasis\">冰影水晶</span>时立即<span class=\"deb-stasis\">碎裂</span>它们；其伤害视为普通<span class=\"el-stasis\">冰影</span>技能伤害，既非手雷也非近战。<br> <span class=\"note\">生成长矛后有 7 [17] 秒冷却，之后才能再生成一支。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "风暴怒吼",
+            "html": "风暴怒吼"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/8d6fa9f3a1.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "额外提供一次近战技能充能。\n 对被冻结的非首领战斗人员造成 1.5 倍伤害（若尼芙神燃烧之拳激活则不适用）。\n \n 滑铲时按［近战技能］：\n 打出上勾拳，造成 146 [?] 近战伤害，冻结 ? 米内的战斗人员[PvP 改为减速]，并在使用者前方呈 V 形生成 2 块小型、4 块中型与 2 块大型冰影水晶。\n 上勾拳伤害随近战属性与近战伤害增益缩放。\n 开火状态下无法在滑铲期间使用。\n \n 这些水晶造成 158 [?] 充能冰影近战伤害，8 米内衰减至 45%；伤害计为充能冰影近战伤害，正常随近战伤害增益缩放，但不随 100 以上的近战属性缩放。\n 冰川震击期间的风暴怒吼另有一套缩放，详见冰川震击一条。",
+            "html": "额外提供一次<span class=\"pickup\">近战技能充能</span>。<br> 对被<span class=\"deb-stasis\">冻结</span>的非<span class=\"bar-yellow\">首领</span><span class=\"enemy\">战斗人员</span>造成 1.5 倍伤害（若尼芙神<span class=\"exotic\">燃烧之拳</span>激活则不适用）。<br> <br> 滑铲时按［近战技能］：<br> 打出上勾拳，造成 146 <span class=\"unsure\">[?]</span> 近战伤害，<span class=\"deb-stasis\">冻结</span> <span class=\"unsure\">?</span> 米内的<span class=\"enemy\">战斗人员</span><span class=\"unsure\">[PvP 改为减速]</span>，并在使用者前方呈 V 形生成 2 块小型、4 块中型与 2 块大型<span class=\"el-stasis\">冰影水晶</span>。<br> 上勾拳伤害随近战属性与近战伤害<span class=\"buff\">增益</span>缩放。<br> <span class=\"note\">开火状态下无法在滑铲期间使用。</span><br> <br> 这些水晶造成 158 <span class=\"unsure\">[?]</span> 充能<span class=\"el-stasis\">冰影</span>近战伤害，8 米内衰减至 45%；伤害计为充能<span class=\"el-stasis\">冰影</span>近战伤害，正常随近战伤害<span class=\"buff\">增益</span>缩放，但不随 100 以上的近战属性缩放。<br> <span class=\"note\">冰川震击期间的风暴怒吼另有一套缩放，详见冰川震击一条。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "构造收割",
+            "html": "构造收割"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/224d56a6aa.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "拾取冰影碎片：\n 小型恢复 10 生命值并提供 1 层冰霜护甲；大型恢复 ? 生命值并提供 3 层。\n \n 冰霜护甲激活期间：\n 动能与冰影武器击杀推进计数，满 100% 时该次击杀触发冰影碎裂。\n 护甲层数越高，每次击杀推进得越多。\n \n 受到伤害提供 ?% 近战技能能量，每秒最多一次?。\n 仅限熔炉竞技场：? 秒内生成 6 份破碎后进入 10 秒冷却，期间收割类星相不再生成冰影碎片；计数与冷却在整个火力小队内共享。",
+            "html": "拾取<span class=\"el-stasis\">冰影碎片</span>：<br> 小型恢复 10 <span class=\"health\">生命值</span>并提供 1 层<span class=\"el-stasis\">冰霜护甲</span>；大型恢复 <span class=\"unsure\">?</span> <span class=\"health\">生命值</span>并提供 3 层。<br> <br> <span class=\"el-stasis\">冰霜护甲</span>激活期间：<br> <span class=\"el-kinetic\">动能</span>与<span class=\"el-stasis\">冰影</span>武器击杀推进计数，满 100% 时该次击杀触发<span class=\"el-stasis\">冰影</span><span class=\"deb-stasis\">碎裂</span>。<br> 护甲层数越高，每次击杀推进得越多。<br> <br> 受到伤害提供 <span class=\"unsure\">?</span>% <span class=\"pickup\">近战技能能量</span>，每秒最多一次<span class=\"unsure\">?</span>。<br> <span class=\"note\">仅限熔炉竞技场：? 秒内生成 6 份破碎后进入 10 秒冷却，期间收割类星相不再生成冰影碎片；计数与冷却在整个火力小队内共享。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "术士",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "名称",
+            "html": "名称"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "图标",
+            "html": "图标"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "说明",
+            "html": "说明"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "冷却与槽位",
+            "html": "冷却与槽位"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "近战技能",
+            "html": "近战技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "半影冲击",
+            "html": "半影冲击"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/c4e0fdae02.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "发出一颗飞行 22 米后自动引爆的冻结弹体。\n \n 弹体接触时引爆，最多造成 240 [30] 伤害，并冻结引爆点 2.7 [2] 米内的战斗人员。",
+            "html": "发出一颗飞行 22 米后自动引爆的<span class=\"deb-stasis\">冻结</span>弹体。<br> <br> 弹体接触时引爆，最多造成 240 <span class=\"pvp\">[30]</span> 伤害，并<span class=\"deb-stasis\">冻结</span>引爆点 2.7 <span class=\"pvp\">[2]</span> 米内的<span class=\"enemy\">战斗人员</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "基础冷却 146.3 秒\n 回复倍率 0.8×",
+            "html": "基础冷却 146.3 秒<br> 回复倍率 0.8×"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "超能技能",
+            "html": "超能技能"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "严冬之怒",
+            "html": "严冬之怒"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/830791501c.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "伤害抗性：90% [51%]\n 基础持续：24.5 秒，或每秒消耗 4.08% 超能能量\n \n 滑翔变为无时长限制的专注滑翔。\n \n 轻攻击 ｜ 每次双重破碎消耗 4.5% 超能能量。\n 一前一后释放两颗冻结追踪弹，每颗造成 11 直击伤害，并在 ? 米内造成最多 50 [33] 溅射伤害。\n 对已被冻结的战斗人员伤害降低 90%。\n \n 重击 ｜ 不消耗超能能量。\n 释放一道以 45 米/秒传播的冲击波，造成 45 [? ｜ 非致命] 伤害并使 30 米内的战斗人员强力踉跄。\n 被冲击波扫到的冰影水晶与被冻结的战斗人员直接碎裂，造成 3453 [?] 碎裂伤害；战斗人员再额外吃一次 361 伤害，合计 3814。",
+            "html": "伤害抗性：90% <span class=\"pvp\">[51%]</span><br> 基础持续：24.5 秒，或每秒消耗 4.08% <span class=\"orb\">超能能量</span><br> <br> 滑翔变为无时长限制的专注滑翔。<br> <br> 轻攻击 ｜ 每次双重破碎消耗 4.5% <span class=\"orb\">超能能量</span>。<br> 一前一后释放两颗<span class=\"deb-stasis\">冻结</span>追踪弹，每颗造成 11 直击伤害，并在 <span class=\"unsure\">?</span> 米内造成最多 50 <span class=\"pvp\">[33]</span> 溅射伤害。<br> 对已被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>伤害降低 90%。<br> <br> 重击 ｜ 不消耗<span class=\"orb\">超能能量</span>。<br> 释放一道以 45 米/秒传播的冲击波，造成 45 <span class=\"unsure\">[? ｜ 非致命]</span> 伤害并使 30 米内的<span class=\"enemy\">战斗人员</span>强力踉跄。<br> 被冲击波扫到的<span class=\"el-stasis\">冰影水晶</span>与被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>直接<span class=\"deb-stasis\">碎裂</span>，造成 3453 <span class=\"unsure\">[?]</span> <span class=\"deb-stasis\">碎裂</span>伤害；<span class=\"enemy\">战斗人员</span>再额外吃一次 361 伤害，合计 3814。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "cd"
+            },
+            "text": "T2 级超能\n 基础冷却 556 秒",
+            "html": "T2 级超能<br> 基础冷却 556 秒"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "colspan": "4",
+              "scope": "colgroup"
+            },
+            "text": "星相",
+            "html": "星相"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "凄凉观察者",
+            "html": "凄凉观察者"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/64b6c96374.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "装备时，手雷基础冷却与回复倍率变为冰川手雷的数值。\n \n 按住［手雷］把手雷技能转成冰影炮塔：\n 炮塔每 2 秒向 35 米内的战斗人员自动发射一轮 5 发追踪弹体（持续 0.7 秒），每次命中施加 20 [10] 层减速，持续 4.5+4.5 [2+1.75] 秒。\n 炮塔持续 25+5 秒，拥有 150 构造体生命值，开火前获得 67% 伤害抗性。\n 凄凉观察者伤害计为冰影手雷技能伤害。",
+            "html": "装备时，手雷基础冷却与回复倍率变为<span class=\"el-stasis\">冰川手雷</span>的数值。<br> <br> 按住［手雷］把手雷技能转成<span class=\"el-stasis\">冰影</span>炮塔：<br> 炮塔每 2 秒向 35 米内的<span class=\"enemy\">战斗人员</span>自动发射一轮 5 发追踪弹体（持续 0.7 秒），每次命中施加 20 <span class=\"pvp\">[10]</span> 层<span class=\"deb-stasis\">减速</span>，持续 4.5+4.5 <span class=\"pvp\">[2+1.75]</span> 秒。<br> 炮塔持续 25+5 秒，拥有 150 构造体<span class=\"health\">生命值</span>，开火前获得 67% 伤害抗性。<br> <span class=\"note\">凄凉观察者伤害计为冰影手雷技能伤害。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰霜脉冲",
+            "html": "冰霜脉冲"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/7e46064dc2.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "冻结一名战斗人员提供 11% 职业技能能量。\n \n 施放职业技能：\n 冻结 8.5 [5] 米内的战斗人员，并提供 +2.5 米近战突进距离，持续 1.2 秒。\n （PvP 中 5–8 米内的守护者改为受到 50 层减速，持续 ?+? 秒。）\n \n 用冰霜脉冲冻结一名战斗人员提供 5 层冰霜护甲。",
+            "html": "<span class=\"deb-stasis\">冻结</span>一名<span class=\"enemy\">战斗人员</span>提供 11% <span class=\"pickup\">职业技能能量</span>。<br> <br> 施放职业技能：<br> <span class=\"deb-stasis\">冻结</span> 8.5 <span class=\"pvp\">[5]</span> 米内的<span class=\"enemy\">战斗人员</span>，并提供 +2.5 米近战突进距离，持续 1.2 秒。<br> （PvP 中 5–8 米内的<span class=\"bar-orange\">守护者</span>改为受到 50 层<span class=\"deb-stasis\">减速</span>，持续 <span class=\"unsure\">?+?</span> 秒。）<br> <br> 用<span class=\"el-stasis\">冰霜脉冲</span><span class=\"deb-stasis\">冻结</span>一名<span class=\"enemy\">战斗人员</span>提供 5 层<span class=\"el-stasis\">冰霜护甲</span>。"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/cf6c8a6a75.webp\" alt=\"\" width=\"100\" height=\"33\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰川收获",
+            "html": "冰川收获"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/529909e116.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "拾取冰影碎片：\n 小型恢复 10 生命值并提供 1 层冰霜护甲；大型恢复 ? 生命值并提供 3 层。\n \n 冰霜护甲激活期间：\n 动能与冰影武器击杀有几率让该次击杀触发冰影碎裂，几率随护甲层数提高。\n 1 层 10?% ｜ 2 层 15?% ｜ 3 层 ?% ｜ 4 层 ?% ｜ 5 层 50?% ｜ 6 层 85?% ｜ 7 层 100%。\n \n 受到伤害提供 ?% 手雷技能能量，每秒最多一次?。\n 仅限熔炉竞技场：? 秒内生成 6 份破碎后进入 10 秒冷却，期间收割类星相不再生成冰影碎片；计数与冷却在整个火力小队内共享。",
+            "html": "拾取<span class=\"el-stasis\">冰影碎片</span>：<br> 小型恢复 10 <span class=\"health\">生命值</span>并提供 1 层<span class=\"el-stasis\">冰霜护甲</span>；大型恢复 <span class=\"unsure\">?</span> <span class=\"health\">生命值</span>并提供 3 层。<br> <br> <span class=\"el-stasis\">冰霜护甲</span>激活期间：<br> <span class=\"el-kinetic\">动能</span>与<span class=\"el-stasis\">冰影</span>武器击杀有几率让该次击杀触发<span class=\"el-stasis\">冰影</span><span class=\"deb-stasis\">碎裂</span>，几率随护甲层数提高。<br> 1 层 <span class=\"unsure\">10?%</span> ｜ 2 层 <span class=\"unsure\">15?%</span> ｜ 3 层 <span class=\"unsure\">?%</span> ｜ 4 层 <span class=\"unsure\">?%</span> ｜ 5 层 <span class=\"unsure\">50?%</span> ｜ 6 层 <span class=\"unsure\">85?%</span> ｜ 7 层 100%。<br> <br> 受到伤害提供 <span class=\"unsure\">?</span>% <span class=\"pickup\">手雷技能能量</span>，每秒最多一次<span class=\"unsure\">?</span>。<br> <span class=\"note\">仅限熔炉竞技场：? 秒内生成 6 份破碎后进入 10 秒冷却，期间收割类星相不再生成冰影碎片；计数与冷却在整个火力小队内共享。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "冰焰飞弹",
+            "html": "冰焰飞弹"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "ico"
+            },
+            "text": "",
+            "html": "<img src=\"icons/9912f851ba.webp\" alt=\"\" width=\"56\" height=\"56\" loading=\"lazy\">"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "碎裂一名被冻结的战斗人员：\n 生成一枚追踪器，瞄准 12 米内最近的战斗人员。\n 追踪器到达战斗人员或到期时引爆，冻结 3 [1.75] 米内的战斗人员。\n 生成 7 [1] 枚追踪器后有 8 秒冷却。",
+            "html": "<span class=\"deb-stasis\">碎裂</span>一名被<span class=\"deb-stasis\">冻结</span>的<span class=\"enemy\">战斗人员</span>：<br> 生成一枚追踪器，瞄准 12 米内最近的<span class=\"enemy\">战斗人员</span>。<br> 追踪器到达<span class=\"enemy\">战斗人员</span>或到期时引爆，<span class=\"deb-stasis\">冻结</span> 3 <span class=\"pvp\">[1.75]</span> 米内的<span class=\"enemy\">战斗人员</span>。<br> <span class=\"note\">生成 7 [1] 枚追踪器后有 8 秒冷却。</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {
+              "class": "slot"
+            },
+            "text": "",
+            "html": "<img src=\"icons/5fc7a97f63.webp\" alt=\"\" width=\"100\" height=\"50\" loading=\"lazy\">"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "冰影 · Starside\n\nStarside\n/\n职业分支详解\n/\n冰影\n\n冰影\n\n效果\n\n名称\n图标\n说明\n\n冰影碎片冰影分支职业固有。\n 碎裂一块冰影水晶或一名被冻结的战斗人员，或击杀受冰影减益（减速、冻结）影响的战斗人员，会生成一枚冰影碎片。\n 红血掉小型碎片；橙血、初级首领、首领与守护者掉大型碎片。\n\n 拾取提供近战技能能量：小型 10%，大型 50%。\n 破碎状态持续 20 秒，盟友能拿到使用者生成的每一份。\n\n 装备冰川收获、冷酷收割或构造收割时：\n 小型碎片额外恢复 10 生命值并提供 1 层冰霜护甲；大型碎片恢复 20 生命值并提供 3 层。\n\n冰影水晶可在表面生成的实心柱，生命值随体型而定（小型 ? ｜ 中型 ? ｜ 大型 ?），最长存在 15 秒。\n\n 生成时对 2.6 米内的战斗人员施加冻结（PvP 为 15 层减速，持续 1.5+0.5 秒）。\n 打空生命值即可摧毁，在 8 米半径内最多造成 158 [25] 伤害。\n 使用者对自己的水晶造成双倍伤害。\n\n冰霜护甲每层提供 7% [2%] 伤害抗性，5 层时最高 31.25% [10%]。每 5 秒衰减 1 层。\n\n 超能期间每层提供的抗性会降低到 ?% [?%]。\n 装备碎片「韵律之吟」时上限提高到 7 层，最高抗性 50% [16%?]，每层持续时间变为 6 秒。\n\n减速被减速的战斗人员在移动与武器性能上受多项惩罚；层数攒到 100 层即冻结。\n\n 被减速的战斗人员移动速度降低 50%，精度下降。\n 被减速的守护者移动速度与跳跃高度各降 50%，无法使用移动技能，受到的退缩提高 ?%，武器属性也受惩罚。\n\n 武器属性惩罚：\n 稳定性、操控性、填装速度与后坐方向降低 75%。\n 惩罚在武器 Perk 结算之后施加，施加前属性视为无上限——例如 160 填装速度会降到 40，80 操控性会降到 20。\n\n 过载勇士受到任意层数减速时进入眩晕。\n\n冻结被冻结的战斗人员被完全定身，无法射击、使用技能或移动。\n\n 它们受到特殊与威能武器的伤害提高 10%，受到电弧、烈日与虚空技能的伤害提高 5%，受到主武器的伤害降低 5% [60%]。\n 被冻结的红血、橙血与守护者另外承受 +120% 的基础与偃月近战伤害。\n 被冻结的战斗人员在受到伤害后碎裂，PvP 固定 200 伤害。\n\n 定身时长 6 [1.35 至 4.75] 秒；首领不受冻结阻碍，3 秒后自动碎裂。扎根的守护者可以立即施放超能挣脱。\n 短暂冻结 ｜ 被其它守护者冻结，持续 1.35 秒。\n 长时间冻结 ｜ 被战斗人员或冰影超能冻结，持续 4.75 秒。\n\n 被冻结的守护者职业技能被替换为突围，可以用 ? 生命值换取挣脱持久冻结。\n 漫游超能期间被冻结的守护者 1 秒后自动挣脱；一次性超能若在施放动画中被冻结则会被停用。\n\n碎裂被冻结的战斗人员可以被伤害打碎裂，也可以由特定冰影星相直接引爆，对 ? 米内的战斗人员最多造成 361 [?] 伤害。\n 势不可挡勇士受到碎裂伤害时进入眩晕。\n\n碎片\n\n碎片\n图标\n说明\n属性变化\n\n束缚之吟击杀被冻结的战斗人员生成一枚能量球，提供 2.5% 超能能量。\n 生成能量球后有 10 秒冷却。-10 超能\n\n锁链的低语冰霜护甲激活期间的击杀推进计数，满 100% 生成一枚小型冰影碎片。\n 红血 34% ｜ 橙血 67% ｜ 初级首领 100% ｜ 守护者 ?%。+10 职业\n\n冰冷之吟冰影武器击杀推进计数，满 100% 生成一枚小型冰影碎片。\n 红血 34% ｜ 橙血 67% ｜ 初级首领 100% ｜ 守护者 67%。\n 生成碎片后有 5? 秒冷却，冷却期间的击杀不推进计数。—\n\n传导之吟15 米内的冰影碎片在 1 秒延迟后被拉向使用者。+10 生命值\n +10 超能\n\n耐久之吟减速减益与部分技能持续更久。\n 受影响的来源会在常规时长或层数旁用小字标出增量，例如 25 秒 → 25+5。+10 近战\n\n裂隙之吟碎裂战斗人员或摧毁水晶时：\n 额外造成一次伤害实例，在 10 [8] 米半径内最多造成 25 [9] 伤害。\n 衰减后最低仍有 15 [4] 伤害。—\n\n脆弱的低语用近战伤害碎裂一名战斗人员时提供 1 层冰霜护甲。—\n\n晶石之吟冻结一名战斗人员提供 +? 操控性与 +30 生命值，持续 11 秒。—\n\n饥饿之吟冰影碎片提供的近战能量提高 60%。\n 与其它来源（例如渴望回响的满溢金库 +260%）相加。-20 近战\n\n刺激的低语造成充能近战伤害时补满所有武器并提供 +40 操控性，持续 5 秒。\n 增益持续时间即为冷却时间。+10 生命值\n\n折角之吟击杀受冰影效果影响的战斗人员，按等级提供职业技能能量：\n T1 级战斗人员 9% ｜ T2 13% ｜ 守护者 15% ｜ T3 20% ｜ T4 30% ｜ 初级首领 40% ｜ 首领 50%。—\n\n裂解之吟主武器弹药的武器对冰影水晶伤害提高 100%，对被冻结的战斗人员伤害提高 50%。\n 包括战狮、零号修订、Vex 揭秘者，以及它们各自的开火模式。—\n\n逆转之吟冰霜护甲激活期间，造成或受到物理近战伤害都会施加 10? 层减速，持续 ?+? [?+?] 秒。\n 偃月近战同样适用。—\n\n韵律之吟强化冰霜护甲：上限提高到 7 层（伤害抗性 50% [16%?]），每层持续时间变为 6 秒。—\n\n破碎之吟摧毁一块冰影水晶时，手雷基础充能速度额外 +500% [150%]，持续 6 秒，最长 11 秒。—\n\n折磨的低语受到伤害时提供 7% 手雷技能能量；冰霜护甲激活期间提高到 12%。\n 两次回能之间有 1 秒冷却。-10 手雷\n\n手雷技能\n\n手雷\n图标\n说明\n基础冷却\n\n急冻手雷中型弹道 ｜ 追踪器\n\n 直接命中战斗人员施加 50 [?] 层减速，持续 4+2 秒，并计为冰影手雷技能伤害。\n\n 撞地 0.8 秒后生成一枚追踪器，以 17 米/秒追踪 20 米内最近的战斗人员，持续 1 秒，追踪强度逐渐减弱。\n 追踪器到达战斗人员或到期时引爆，造成 20 [20] 伤害并冻结 3 [1.75] 米内的战斗人员。\n 若追踪器冻结了一名战斗人员，会再生成一枚瞄准另一名战斗人员，最多连锁 2 次。\n\n 冬日之触：\n 追踪器每冻结一名战斗人员就复制一枚；连锁 1、2、3 次后引爆时分别生成小型、中型与大型冰影水晶。基础冷却 175.6 秒\n 回复倍率 0.625×\n\n暮域手雷中型弹道 ｜ 持续伤害场域\n\n 接触时引爆，在 ? 米半径内最多造成 20 [20] 伤害并施加 20 [10] 层减速（持续 2+2 秒），同时生成一片减速场域。\n\n 场域每 0.35 [0.3] 秒在 4 米半径内造成 1 伤害并施加 10 [5] 层减速（持续 2+2 秒），自身持续 7+2 秒。\n\n 冬日之触：\n 场域半径提高 50% 至 6 米，接触时额外生成小型冰影水晶。基础冷却 131.7 秒\n 回复倍率 0.875×\n\n冰川手雷中型弹道\n\n 接触时沿垂直于投掷方向的直线生成 5 块冰影水晶。\n\n 这些水晶被碎裂时最多造成 158 [?] 冰影手雷伤害，8 米内衰减至 66%。\n\n 冬日之触：\n 改为呈七边形生成 7 块冰影水晶。基础冷却 175.6 秒\n 回复倍率 0.625×\n\n碎裂手雷中型弹道 ｜ 粘附\n\n 附着到战斗人员身上，直接命中即施加冻结（PvP 为 ? 层减速）。\n\n ? 秒后爆炸，在 ? 米范围内最多造成 325? [?] 伤害，并以 3 组、每组 3 枚呈 Y 形释放 9 枚追踪冰影弹片。\n 每枚弹片造成 216 [?] 伤害，可弹跳 ? 次。\n 粘在已被冻结的战斗人员身上会瞬时爆炸，爆炸伤害提高 100%。\n\n 冬日之触：\n 额外生成 9 枚弹片。\n 直接命中被冻结的战斗人员时按帧率返还手雷技能能量——30 帧 42% ｜ 60 帧 30% ｜ 120 帧以上 28%。基础冷却 105 秒\n 回复倍率 ?\n\n 猎人\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n枯萎之刃固有 2 次近战技能充能。\n 快速抛出一枚冰影手里剑。\n\n 手里剑可以从表面反弹最多 3 次，或瞄准最多 4 名战斗人员，追踪 12 [8] 米内的目标。\n 命中造成 296 [72] 伤害并施加 60 [40] 层减速，持续 3.5+3.5 [1.5+0.5] 秒。基础冷却 145.2 秒\n 回复倍率 0.8×\n\n超能技能\n\n沉默狂啸伤害抗性：90% [53%]\n\n 沉默 ｜ 接触造成 338 [847] 伤害并冻结 8.5 米内的战斗人员。\n\n 狂啸 ｜ 接触造成 338 [847] 伤害，并在引爆时生成一场冰影风暴。\n 冰影风暴持续 14+2 秒，每 0.1 [0.17] 秒在 5.5 米半径内造成 28 [14] 伤害并施加 20 层减速（持续 1 秒），风暴本身覆盖 6 秒。\n\n 对被冻结的非首领战斗人员伤害提高 300%。T4 级超能\n 基础冷却 455 秒\n\n星相\n\n冷酷收割拾取冰影碎片：\n 小型恢复 10 生命值并提供 1 层冰霜护甲；大型恢复 ? 生命值并提供 3 层。\n\n 冰霜护甲激活期间：\n 动能与冰影武器击杀推进计数，满 100% 时该次击杀触发冰影碎裂。\n 护甲层数越高，每次击杀推进得越多。\n\n 受到伤害提供 ?% 职业技能能量，每秒最多一次?。\n 仅限熔炉竞技场：? 秒内生成 6 份破碎后进入 10 秒冷却，期间收割类星相不再生成冰影碎片；计数与冷却在整个火力小队内共享。\n\n破碎俯冲按［空中移动］俯冲：\n 最多造成 50 伤害，并碎裂 8.5 米半径内被冻结的战斗人员与冰影水晶。\n 对被冻结的战斗人员伤害提高到 180；碎裂一名被冻结的战斗人员额外造成 250 碎裂伤害，显示为黄色数字。\n 碎裂冰影水晶或被冻结的战斗人员提供满层冰霜护甲。\n\n 俯冲期间提供 ?% 冰影碎裂伤害抗性与坠落伤害免疫。\n 每次激活之间有 4 秒冷却。\n\n冬日之触强化四种冰影手雷：\n\n 急冻手雷 ｜ 追踪器每冻结一名战斗人员就复制一枚；连锁 1、2、3 次后引爆时分别生成小型、中型与大型冰影水晶。\n 暮域手雷 ｜ 接触时生成小型冰影水晶，减速场域半径提高 50%。\n 冰川手雷 ｜ 水晶排布改为七边形，并额外生成 2 块大型冰影水晶。\n 碎裂手雷 ｜ 额外释放 9 枚弹片；直接命中被冻结的战斗人员返还约 30% 手雷技能能量。\n\n严冬帷幕对一名战斗人员施加减速时：\n 职业技能基础充能速度额外 +300% [150%]，持续 3 秒。\n\n 使用职业技能：\n 对 9 [8] 米内的战斗人员施加 60 [40] 层减速，持续 8+4? [1.5+0.5] 秒。\n 对战斗人员提供 50% 伤害抗性 4? 秒。\n\n 泰坦\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n战栗打击跃过空中，发动突进距离延长的近战攻击，接触时碎裂冰影水晶。\n 未命中返还 80% [40%] 近战技能能量。\n\n 命中战斗人员：\n 造成 511 [105] 直击伤害，强力[中等]击退战斗人员并施加 50 [40] 层减速。\n 附着一枚延迟冰影爆炸物，1 秒后最多造成 219 [?] 爆炸伤害并施加 100 [40] 层减速，8 米内衰减至 20%。\n 伤害与爆炸都吃近战伤害提高；直击伤害非致命。被直接命中的守护者近战突进失效 0.5 秒。基础冷却 146.3 秒\n 回复倍率 0.7×\n\n超能技能\n\n冰川震击伤害抗性：90% [47%]\n 基础持续：25 秒，或每秒消耗 4% 超能能量\n\n 期间跳跃高度提高，且寒冰断破没有冷却。\n 施放时冻结 8 [6] 米内的战斗人员；超能结束时提供 3 次近战技能充能。\n 激活期间以任何方式击杀都会生成能量球，每枚提供 7.15% 技能能量，每次施放最多 7 枚。\n 被冻结的战斗人员与冰影水晶接触时每 0.15 秒受到 300 冰影超能伤害，几乎立即碎裂。\n 所有冰影伤害（轻攻击与直击伤害除外）对被冻结的战斗人员提高 310%，计为超能伤害并显示为黄色数字。\n\n 轻攻击 ｜ 消耗 7.45% 超能能量。\n 向前跃出，造成 1838 [210] 直击伤害并强力击退。\n 命中附着延迟冰影爆炸物，1 秒后最多造成 897 [?] 爆炸伤害并施加 100? [?] 层减速，8 米内衰减至 20%。直击伤害非致命。\n\n 重击 ｜ 消耗 7.45% 超能能量。\n 猛击地面，造成 73 [50] 伤害并冻结 9 米范围，同时生成 3 道冰影水晶波形，每道由小型、中型与大型水晶组成。\n 前方约 45° 锥形内的战斗人员最多受到 579 [?] 伤害，8 米内衰减至 0%。\n 水晶最多造成 158 [?] 冰影超能伤害，可随 100 以上的超能属性与其它超能伤害提升缩放。\n\n 风暴怒吼｜ 消耗 15% 超能能量，每次施放最多 5 次。\n 行为与伤害同普通星相，但视为超能近战伤害。\n 冰川震击对被冻结战斗人员的 310% 提高，与咆哮固有的对被冻结非首领战斗人员的 1.5 倍伤害相乘。\n 风暴怒吼伤害还可以随 100 以上的超能属性、超能近战伤害增益（护甲匠、护盾粉碎、没有 B 计划）与超能伤害增益（合成感受器）缩放，这些增益彼此相乘，其中没有 B 计划与护甲匠／护盾粉碎相加。\n 合成感受器增益期间，风暴怒吼对被冻结战斗人员会失去泰坦固有的 1.2 倍近战伤害，只提供 +25% 而非预期的 50%。T2 级超能\n 基础冷却 556 秒\n\n星相\n\n寒冰断破滑铲撞进冰影水晶与被冻结的战斗人员时，接触即碎裂。\n\n 被动把滑铲距离从 6.5 米提高到 11 米，延长滑铲后有 2 秒冷却。\n 滑铲会发射一道冰影波形，造成 18 [?] 伤害并碎裂冰影水晶与被冻结的战斗人员。\n\n钻石长矛1 [3] 次冰影武器击杀、一次冰影技能击杀，或一次碎裂击杀后：\n 生成一支冰影长矛。\n 长矛是一次性武器，3 米内可拾取，最多持有 10 秒，在地面上最多停留 25 秒。\n\n ［开火］投出长矛 ｜ 冻结接触点 5 米内的战斗人员，直接接触时碎裂水晶，并造成 136 [45] 伤害。\n ［近战］猛击 ｜ 冻结 8 [6.75?] 米内的战斗人员，最多造成 180 [90] 伤害，并为自己与 ? 米内的盟友提供 2 层冰霜护甲。\n\n 钻石长矛伤害到冰影水晶时立即碎裂它们；其伤害视为普通冰影技能伤害，既非手雷也非近战。\n 生成长矛后有 7 [17] 秒冷却，之后才能再生成一支。\n\n风暴怒吼额外提供一次近战技能充能。\n 对被冻结的非首领战斗人员造成 1.5 倍伤害（若尼芙神燃烧之拳激活则不适用）。\n\n 滑铲时按［近战技能］：\n 打出上勾拳，造成 146 [?] 近战伤害，冻结 ? 米内的战斗人员[PvP 改为减速]，并在使用者前方呈 V 形生成 2 块小型、4 块中型与 2 块大型冰影水晶。\n 上勾拳伤害随近战属性与近战伤害增益缩放。\n 开火状态下无法在滑铲期间使用。\n\n 这些水晶造成 158 [?] 充能冰影近战伤害，8 米内衰减至 45%；伤害计为充能冰影近战伤害，正常随近战伤害增益缩放，但不随 100 以上的近战属性缩放。\n 冰川震击期间的风暴怒吼另有一套缩放，详见冰川震击一条。\n\n构造收割拾取冰影碎片：\n 小型恢复 10 生命值并提供 1 层冰霜护甲；大型恢复 ? 生命值并提供 3 层。\n\n 冰霜护甲激活期间：\n 动能与冰影武器击杀推进计数，满 100% 时该次击杀触发冰影碎裂。\n 护甲层数越高，每次击杀推进得越多。\n\n 受到伤害提供 ?% 近战技能能量，每秒最多一次?。\n 仅限熔炉竞技场：? 秒内生成 6 份破碎后进入 10 秒冷却，期间收割类星相不再生成冰影碎片；计数与冷却在整个火力小队内共享。\n\n 术士\n\n名称\n图标\n说明\n冷却与槽位\n\n近战技能\n\n半影冲击发出一颗飞行 22 米后自动引爆的冻结弹体。\n\n 弹体接触时引爆，最多造成 240 [30] 伤害，并冻结引爆点 2.7 [2] 米内的战斗人员。基础冷却 146.3 秒\n 回复倍率 0.8×\n\n超能技能\n\n严冬之怒伤害抗性：90% [51%]\n 基础持续：24.5 秒，或每秒消耗 4.08% 超能能量\n\n 滑翔变为无时长限制的专注滑翔。\n\n 轻攻击 ｜ 每次双重破碎消耗 4.5% 超能能量。\n 一前一后释放两颗冻结追踪弹，每颗造成 11 直击伤害，并在 ? 米内造成最多 50 [33] 溅射伤害。\n 对已被冻结的战斗人员伤害降低 90%。\n\n 重击 ｜ 不消耗超能能量。\n 释放一道以 45 米/秒传播的冲击波，造成 45 [? ｜ 非致命] 伤害并使 30 米内的战斗人员强力踉跄。\n 被冲击波扫到的冰影水晶与被冻结的战斗人员直接碎裂，造成 3453 [?] 碎裂伤害；战斗人员再额外吃一次 361 伤害，合计 3814。T2 级超能\n 基础冷却 556 秒\n\n星相\n\n凄凉观察者装备时，手雷基础冷却与回复倍率变为冰川手雷的数值。\n\n 按住［手雷］把手雷技能转成冰影炮塔：\n 炮塔每 2 秒向 35 米内的战斗人员自动发射一轮 5 发追踪弹体（持续 0.7 秒），每次命中施加 20 [10] 层减速，持续 4.5+4.5 [2+1.75] 秒。\n 炮塔持续 25+5 秒，拥有 150 构造体生命值，开火前获得 67% 伤害抗性。\n 凄凉观察者伤害计为冰影手雷技能伤害。\n\n冰霜脉冲冻结一名战斗人员提供 11% 职业技能能量。\n\n 施放职业技能：\n 冻结 8.5 [5] 米内的战斗人员，并提供 +2.5 米近战突进距离，持续 1.2 秒。\n （PvP 中 5–8 米内的守护者改为受到 50 层减速，持续 ?+? 秒。）\n\n 用冰霜脉冲冻结一名战斗人员提供 5 层冰霜护甲。\n\n冰川收获拾取冰影碎片：\n 小型恢复 10 生命值并提供 1 层冰霜护甲；大型恢复 ? 生命值并提供 3 层。\n\n 冰霜护甲激活期间：\n 动能与冰影武器击杀有几率让该次击杀触发冰影碎裂，几率随护甲层数提高。\n 1 层 10?% ｜ 2 层 15?% ｜ 3 层 ?% ｜ 4 层 ?% ｜ 5 层 50?% ｜ 6 层 85?% ｜ 7 层 100%。\n\n 受到伤害提供 ?% 手雷技能能量，每秒最多一次?。\n 仅限熔炉竞技场：? 秒内生成 6 份破碎后进入 10 秒冷却，期间收割类星相不再生成冰影碎片；计数与冷却在整个火力小队内共享。\n\n冰焰飞弹碎裂一名被冻结的战斗人员：\n 生成一枚追踪器，瞄准 12 米内最近的战斗人员。\n 追踪器到达战斗人员或到期时引爆，冻结 3 [1.75] 米内的战斗人员。\n 生成 7 [1] 枚追踪器后有 8 秒冷却。\n\n更新 2026.8.30\n\n数据源：Destiny Data Compendium。本页在其基础上统一了术语、标点与排版。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/elements/stasis/index.html",
+    "final_url": "https://starside.work/elements/stasis/index.html",
+    "path": "pages/elements/stasis/index.html",
+    "bytes": 49399,
+    "sha256": "6d84a9c4c77f7a4293df24262df59668574d8a613bbfb1b1463ab5ea12b89800",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:35:30.725804+00:00"
+  },
+  "links": [
+    "https://starside.work/elements/index.html",
+    "https://starside.work/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://space.bilibili.com/26117485"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/elements/stasis/icons/026317a5ec.webp",
+    "https://starside.work/elements/stasis/icons/10ea99c436.webp",
+    "https://starside.work/elements/stasis/icons/12de61a569.webp",
+    "https://starside.work/elements/stasis/icons/1ab84be020.webp",
+    "https://starside.work/elements/stasis/icons/1ce9063ff7.webp",
+    "https://starside.work/elements/stasis/icons/215173a0b3.webp",
+    "https://starside.work/elements/stasis/icons/224d56a6aa.webp",
+    "https://starside.work/elements/stasis/icons/27386d7cc8.webp",
+    "https://starside.work/elements/stasis/icons/2e21927786.webp",
+    "https://starside.work/elements/stasis/icons/38b307d5c3.webp",
+    "https://starside.work/elements/stasis/icons/398bde59d1.webp",
+    "https://starside.work/elements/stasis/icons/47b7881b6e.webp",
+    "https://starside.work/elements/stasis/icons/481a86e7c6.webp",
+    "https://starside.work/elements/stasis/icons/4ef3a870f7.webp",
+    "https://starside.work/elements/stasis/icons/529909e116.webp",
+    "https://starside.work/elements/stasis/icons/533b665598.webp",
+    "https://starside.work/elements/stasis/icons/5b37c9bc19.webp",
+    "https://starside.work/elements/stasis/icons/5fc7a97f63.webp",
+    "https://starside.work/elements/stasis/icons/64b6c96374.webp",
+    "https://starside.work/elements/stasis/icons/6ded4a097e.webp",
+    "https://starside.work/elements/stasis/icons/72a47e98d5.webp",
+    "https://starside.work/elements/stasis/icons/79e30c47a4.webp",
+    "https://starside.work/elements/stasis/icons/7b08bfe0ff.webp",
+    "https://starside.work/elements/stasis/icons/7e46064dc2.webp",
+    "https://starside.work/elements/stasis/icons/830791501c.webp",
+    "https://starside.work/elements/stasis/icons/849beb7009.webp",
+    "https://starside.work/elements/stasis/icons/8d6fa9f3a1.webp",
+    "https://starside.work/elements/stasis/icons/8dcd191fa1.webp",
+    "https://starside.work/elements/stasis/icons/8ec6ca9f42.webp",
+    "https://starside.work/elements/stasis/icons/93cf350c0b.webp",
+    "https://starside.work/elements/stasis/icons/9912f851ba.webp",
+    "https://starside.work/elements/stasis/icons/a56a8163a3.webp",
+    "https://starside.work/elements/stasis/icons/af3dbaccb3.webp",
+    "https://starside.work/elements/stasis/icons/b074701a2f.webp",
+    "https://starside.work/elements/stasis/icons/b27ed50869.webp",
+    "https://starside.work/elements/stasis/icons/b30869e0cb.webp",
+    "https://starside.work/elements/stasis/icons/b4a3f6320f.webp",
+    "https://starside.work/elements/stasis/icons/b62db0107f.webp",
+    "https://starside.work/elements/stasis/icons/c0c58d0bc0.webp",
+    "https://starside.work/elements/stasis/icons/c4e0fdae02.webp",
+    "https://starside.work/elements/stasis/icons/c7be215908.webp",
+    "https://starside.work/elements/stasis/icons/c9480b9a0b.webp",
+    "https://starside.work/elements/stasis/icons/cf6c8a6a75.webp",
+    "https://starside.work/elements/stasis/icons/d41cd404fa.webp",
+    "https://starside.work/elements/stasis/icons/dbaa5e6414.webp",
+    "https://starside.work/elements/stasis/icons/dcb861ec73.webp",
+    "https://starside.work/elements/stasis/icons/e8ddad0788.webp",
+    "https://starside.work/elements/stasis/icons/f33df47fea.webp",
+    "https://starside.work/elements/stasis/icons/f84b6c172e.webp",
+    "https://starside.work/elements/stasis/style.css",
+    "https://starside.work/elements/style.css"
+  ]
+}

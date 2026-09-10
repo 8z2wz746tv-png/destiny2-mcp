@@ -1,0 +1,532 @@
+{
+  "url": "https://starside.work/sources/index.html",
+  "title": "数据源与鸣谢 · Starside",
+  "description": "Starside 各资料页的数值出处与贡献者，一处来源一行，列出它支撑的页面。",
+  "category": "sources",
+  "updated_at": "2026.8.28",
+  "data_src": "docs/sources",
+  "data_hash": "171286b57773fcf9045973273f3763bac411054b",
+  "source_text": "",
+  "source_blocks": [],
+  "headings": [
+    {
+      "level": "h1",
+      "id": "",
+      "text": "数据源与鸣谢"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "数据源"
+    },
+    {
+      "level": "h2",
+      "id": "",
+      "text": "鸣谢"
+    }
+  ],
+  "tables": [
+    {
+      "heading": "数据源",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "来源",
+            "html": "来源"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "提供内容",
+            "html": "提供内容"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "使用页面",
+            "html": "使用页面"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "Destiny Data Compendium",
+            "html": "<a href=\"https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4\" target=\"_blank\" rel=\"noopener\">Destiny Data Compendium</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "装备、模组、职业与底层机制的全部基础数值",
+            "html": "装备、模组、职业与底层机制的全部基础数值"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "武器 PERK 详解、护甲模组、护甲套装、神器模组、异域武器详解、异域护甲详解、职业分支详解、职业技能、游戏机制",
+            "html": "<a href=\"../weapon-perks/index.html\">武器 PERK 详解</a>、<a href=\"../armor-mods/index.html\">护甲模组</a>、<a href=\"../armor-sets/index.html\">护甲套装</a>、<a href=\"../artifact-mods/index.html\">神器模组</a>、<a href=\"../exotic-weapon/index.html\"><span class=\"exotic\">异域</span>武器详解</a>、<a href=\"../exotic-armor/index.html\"><span class=\"exotic\">异域</span>护甲详解</a>、<a href=\"../elements/index.html\">职业分支详解</a>、<a href=\"../elements/class-abilities/index.html\">职业技能</a>、<a href=\"../game-mechanics/index.html\">游戏机制</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "Destiny 2: Boss Damage",
+            "html": "<a href=\"https://docs.google.com/spreadsheets/u/0/d/1_5wtBjRYHHxuF4oJKDb_iOGZs-wTkzB6RYbnyNLbuz4/htmlview\" target=\"_blank\" rel=\"noopener\">Destiny 2: Boss Damage</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "首领生命值、交战距离与持续输出、切枪输出实测",
+            "html": "<span class=\"bar-yellow\">首领</span><span class=\"health\">生命值</span>、交战距离与持续输出、切枪输出实测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "首领生命值、DPS 排行、切枪 DPS 排行",
+            "html": "<a href=\"../boss-hp/index.html\"><span class=\"bar-yellow\">首领</span><span class=\"health\">生命值</span></a>、<a href=\"../dps/index.html\">DPS 排行</a>、<a href=\"../swap-dps/index.html\">切枪 DPS 排行</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "MossyMax 的 Destiny 2 Damage Scaling Spreadsheet",
+            "html": "MossyMax 的 <a href=\"https://docs.google.com/spreadsheets/d/1b57Hb8m1L3daFfUckQQqvvN6VOpD03KEssvQLMFpC5I/edit\" target=\"_blank\" rel=\"noopener\">Destiny 2 Damage Scaling Spreadsheet</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战斗人员伤害倍率与光等差伤害曲线",
+            "html": "<span class=\"enemy\">战斗人员</span>伤害倍率与光等差伤害曲线"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "战斗人员倍率、压光伤害、游戏机制",
+            "html": "<a href=\"../combatant-scalars/index.html\"><span class=\"enemy\">战斗人员</span>倍率</a>、<a href=\"../power-delta/index.html\">压光伤害</a>、<a href=\"../game-mechanics/index.html\">游戏机制</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "CourtProjects 的 Destiny 2 Damage Buffs/Debuffs",
+            "html": "CourtProjects 的 <a href=\"https://docs.google.com/spreadsheets/u/0/d/1i1KUwgVkd8qhwYj481gkV9sZNJQCE-C3Q-dpQutPCi4/htmlview\" target=\"_blank\" rel=\"noopener\">Destiny 2 Damage Buffs/Debuffs</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "增益与易伤的数值、持续时间与叠加规则",
+            "html": "<span class=\"buff\">增益</span>与易伤的数值、持续时间与叠加规则"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "增伤 & 易伤",
+            "html": "<a href=\"../buff-debuffs/index.html\">增伤 &amp; 易伤</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "Destiny 2: Endgame Analysis",
+            "html": "<a href=\"https://docs.google.com/spreadsheets/d/1JM-0SlxVDAi-C6rGVlLxa-J1WGewEeL8Qvq4htWZHhY\" target=\"_blank\" rel=\"noopener\">Destiny 2: Endgame Analysis</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "武器框架的伤害、射速、DPS 与评分，各武器类型的梯队评级",
+            "html": "武器框架的伤害、射速、DPS 与评分，各武器类型的梯队评级"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "武器框架、购物清单-白弹、购物清单-绿弹、购物清单-威能、购物清单-其他",
+            "html": "<a href=\"../weapon-frames/index.html\">武器框架</a>、<a href=\"../shopping-primary/index.html\">购物清单-白弹</a>、<a href=\"../shopping-special/index.html\">购物清单-绿弹</a>、<a href=\"../shopping-heavy/index.html\">购物清单-威能</a>、<a href=\"../shopping-other/index.html\">购物清单-其他</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "刷取清单",
+            "html": "<a href=\"https://docs.google.com/spreadsheets/d/1qsKGrRzCePGaIM5gNtAQNh949d3OsMJ6qV6Fqtpj22k/htmlview\" target=\"_blank\" rel=\"noopener\">刷取清单</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "异域武器与传说武器的输出、清怪与高难评级，护甲套装的刷取排序与场景",
+            "html": "<span class=\"exotic\">异域</span>武器与传说武器的输出、清怪与高难评级，护甲套装的刷取排序与场景"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "刷取清单-异域武器、刷取清单-白弹紫枪、刷取清单-绿弹紫枪、刷取清单-威能紫枪、刷取清单-护甲套装",
+            "html": "<a href=\"../exotic-weapons/index.html\">刷取清单-<span class=\"exotic\">异域</span>武器</a>、<a href=\"../legendary-primary/index.html\">刷取清单-白弹紫枪</a>、<a href=\"../legendary-special/index.html\">刷取清单-绿弹紫枪</a>、<a href=\"../legendary-heavy/index.html\">刷取清单-威能紫枪</a>、<a href=\"../farming-sets/index.html\">刷取清单-护甲套装</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "DIM 社区",
+            "html": "<a href=\"https://discord.com/channels/591927598255439873/1453807417430245518\" target=\"_blank\" rel=\"noopener\">DIM 社区</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "弹药生成的测试支持",
+            "html": "弹药生成的测试支持"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "弹药生成机制",
+            "html": "<a href=\"../ammo/index.html\">弹药生成机制</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "Aegis 的 Destiny 2: Boss Damage 技能分页",
+            "html": "Aegis 的 <a href=\"https://docs.google.com/spreadsheets/u/0/d/1_5wtBjRYHHxuF4oJKDb_iOGZs-wTkzB6RYbnyNLbuz4/htmlview\" target=\"_blank\" rel=\"noopener\">Destiny 2: Boss Damage</a> 技能分页"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "手雷、近战、超能与杂项技能的单次伤害实测",
+            "html": "手雷、近战、超能与杂项技能的单次伤害实测"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "技能伤害排行",
+            "html": "<a href=\"../skill-damage/index.html\">技能伤害排行</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "Ability Cooldowns & Scalers",
+            "html": "<a href=\"https://docs.google.com/spreadsheets/d/1lEOY_Z0v5ZZVZJ1SVLJyleMBEG2a7KLq4aLIQA9zk0A\" target=\"_blank\" rel=\"noopener\">Ability Cooldowns &amp; Scalers</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "各技能的基础冷却、基础回复单位与属性倍率",
+            "html": "各技能的基础冷却、基础回复单位与属性倍率"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "技能冷却",
+            "html": "<a href=\"../ability-cooldown/index.html\">技能冷却</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "Clarity 的 Chunk Energy Scalars",
+            "html": "Clarity 的 <a href=\"https://www.d2clarity.com/blog/destiny-science-6/chunk-energy-scalars-breakdown-12\" target=\"_blank\" rel=\"noopener\">Chunk Energy Scalars</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "整块系数的分档规则、职业物品模组的第二层系数与例外",
+            "html": "整块系数的分档规则、职业物品模组的第二层系数与例外"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "技能冷却",
+            "html": "<a href=\"../ability-cooldown/index.html\">技能冷却</a>"
+          }
+        ]
+      ]
+    },
+    {
+      "heading": "鸣谢",
+      "rows": [
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "贡献者",
+            "html": "贡献者"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "贡献",
+            "html": "贡献"
+          },
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "col"
+            },
+            "text": "页面",
+            "html": "页面"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "小棒猪-LGpig",
+            "html": "<a href=\"https://space.bilibili.com/169548478\" target=\"_blank\" rel=\"noopener\">小棒猪-LGpig</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "整理全部评级、数值、排序、场景与评语",
+            "html": "整理全部评级、数值、排序、场景与评语"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "刷取清单-异域武器、刷取清单-白弹紫枪、刷取清单-绿弹紫枪、刷取清单-威能紫枪、刷取清单-护甲套装",
+            "html": "<a href=\"../exotic-weapons/index.html\">刷取清单-<span class=\"exotic\">异域</span>武器</a>、<a href=\"../legendary-primary/index.html\">刷取清单-白弹紫枪</a>、<a href=\"../legendary-special/index.html\">刷取清单-绿弹紫枪</a>、<a href=\"../legendary-heavy/index.html\">刷取清单-威能紫枪</a>、<a href=\"../farming-sets/index.html\">刷取清单-护甲套装</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "両儀式織",
+            "html": "<a href=\"https://space.bilibili.com/2135345999\" target=\"_blank\" rel=\"noopener\">両儀式織</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "排行三页整理注解并校对数值，购物四页校对注解",
+            "html": "排行三页整理注解并校对数值，购物四页校对注解"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "DPS 排行、切枪 DPS 排行、技能伤害排行、购物清单-白弹、购物清单-绿弹、购物清单-威能、购物清单-其他",
+            "html": "<a href=\"../dps/index.html\">DPS 排行</a>、<a href=\"../swap-dps/index.html\">切枪 DPS 排行</a>、<a href=\"../skill-damage/index.html\">技能伤害排行</a>、<a href=\"../shopping-primary/index.html\">购物清单-白弹</a>、<a href=\"../shopping-special/index.html\">购物清单-绿弹</a>、<a href=\"../shopping-heavy/index.html\">购物清单-威能</a>、<a href=\"../shopping-other/index.html\">购物清单-其他</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "MossyMax",
+            "html": "<a href=\"https://docs.google.com/spreadsheets/d/1b57Hb8m1L3daFfUckQQqvvN6VOpD03KEssvQLMFpC5I/edit\" target=\"_blank\" rel=\"noopener\">MossyMax</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "实测并整理全部压光数值",
+            "html": "实测并整理全部压光数值"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "压光伤害",
+            "html": "<a href=\"../power-delta/index.html\">压光伤害</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "遗忘Melt",
+            "html": "<a href=\"https://space.bilibili.com/3706960595650983\" target=\"_blank\" rel=\"noopener\">遗忘Melt</a>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "编写并维护全部图文攻略",
+            "html": "编写并维护全部图文攻略"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "Raid 攻略",
+            "html": "<a href=\"../raid-guides/index.html\">Raid 攻略</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "蜃零#7456",
+            "html": "蜃零#7456"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "整理全部来源与掉落",
+            "html": "整理全部来源与掉落"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "锻造武器来源",
+            "html": "<a href=\"../crafting/index.html\">锻造武器来源</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "Flamia#5238",
+            "html": "Flamia#5238"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "部分翻译和排版",
+            "html": "部分翻译和排版"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "护甲套装",
+            "html": "<a href=\"../armor-sets/index.html\">护甲套装</a>"
+          }
+        ],
+        [
+          {
+            "tag": "th",
+            "attrs": {
+              "scope": "row"
+            },
+            "text": "小黑盒用户“压力一直天满光”",
+            "html": "小黑盒用户<span class=\"buff\">“压力一直天满光”</span>"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "校对首领名称",
+            "html": "校对<span class=\"bar-yellow\">首领</span>名称"
+          },
+          {
+            "tag": "td",
+            "attrs": {},
+            "text": "首领生命值",
+            "html": "<a href=\"../boss-hp/index.html\"><span class=\"bar-yellow\">首领</span><span class=\"health\">生命值</span></a>"
+          }
+        ]
+      ]
+    }
+  ],
+  "text": "数据源与鸣谢 · Starside\n\nStarside\n/\n数据源与鸣谢\n\n数据源与鸣谢\n\n数据源\n\n来源\n提供内容\n使用页面\n\nDestiny Data Compendium装备、模组、职业与底层机制的全部基础数值武器 PERK 详解、护甲模组、护甲套装、神器模组、异域武器详解、异域护甲详解、职业分支详解、职业技能、游戏机制\n\nDestiny 2: Boss Damage首领生命值、交战距离与持续输出、切枪输出实测首领生命值、DPS 排行、切枪 DPS 排行\n\nMossyMax 的 Destiny 2 Damage Scaling Spreadsheet战斗人员伤害倍率与光等差伤害曲线战斗人员倍率、压光伤害、游戏机制\n\nCourtProjects 的 Destiny 2 Damage Buffs/Debuffs增益与易伤的数值、持续时间与叠加规则增伤 & 易伤\n\nDestiny 2: Endgame Analysis武器框架的伤害、射速、DPS 与评分，各武器类型的梯队评级武器框架、购物清单-白弹、购物清单-绿弹、购物清单-威能、购物清单-其他\n\n刷取清单异域武器与传说武器的输出、清怪与高难评级，护甲套装的刷取排序与场景刷取清单-异域武器、刷取清单-白弹紫枪、刷取清单-绿弹紫枪、刷取清单-威能紫枪、刷取清单-护甲套装\n\nDIM 社区弹药生成的测试支持弹药生成机制\n\nAegis 的 Destiny 2: Boss Damage 技能分页手雷、近战、超能与杂项技能的单次伤害实测技能伤害排行\n\nAbility Cooldowns & Scalers各技能的基础冷却、基础回复单位与属性倍率技能冷却\n\nClarity 的 Chunk Energy Scalars整块系数的分档规则、职业物品模组的第二层系数与例外技能冷却\n\n来自 Destiny Data Compendium 的页面在其基础上统一了术语、标点与排版。DIM 社区那个链接指向 Discord 频道内页，需登录并已加入该服务器才能打开。\n\n鸣谢\n\n贡献者\n贡献\n页面\n\n小棒猪-LGpig整理全部评级、数值、排序、场景与评语刷取清单-异域武器、刷取清单-白弹紫枪、刷取清单-绿弹紫枪、刷取清单-威能紫枪、刷取清单-护甲套装\n\n両儀式織排行三页整理注解并校对数值，购物四页校对注解DPS 排行、切枪 DPS 排行、技能伤害排行、购物清单-白弹、购物清单-绿弹、购物清单-威能、购物清单-其他\n\nMossyMax实测并整理全部压光数值压光伤害\n\n遗忘Melt编写并维护全部图文攻略Raid 攻略\n\n蜃零#7456整理全部来源与掉落锻造武器来源\n\nFlamia#5238部分翻译和排版护甲套装\n\n小黑盒用户“压力一直天满光”校对首领名称首领生命值\n\n更新 2026.8.28各页页脚写着自己那一份出处，这里是全站汇总。\n\n© 2026 日栎w · 哔哩哔哩\n\nStarside 为非官方资料站，与 Bungie, Inc. 无从属关系。Destiny 2 及相关名称、标识为 Bungie, Inc. 的商标。\n\n鲁ICP备2026052166号-1",
+  "archive": {
+    "url": "https://starside.work/sources/index.html",
+    "final_url": "https://starside.work/sources/index.html",
+    "path": "pages/sources/index.html",
+    "bytes": 13234,
+    "sha256": "978e267d6ba30404404e54e8a8902081c98e5e6d92ea5b7c2aef9540d73038eb",
+    "content_type": "cached",
+    "fetched_at": "2026-09-09T05:27:48.743648+00:00"
+  },
+  "links": [
+    "https://starside.work/ability-cooldown/index.html",
+    "https://starside.work/ammo/index.html",
+    "https://starside.work/armor-mods/index.html",
+    "https://starside.work/armor-sets/index.html",
+    "https://starside.work/artifact-mods/index.html",
+    "https://starside.work/boss-hp/index.html",
+    "https://starside.work/buff-debuffs/index.html",
+    "https://starside.work/combatant-scalars/index.html",
+    "https://starside.work/crafting/index.html",
+    "https://starside.work/dps/index.html",
+    "https://starside.work/elements/class-abilities/index.html",
+    "https://starside.work/elements/index.html",
+    "https://starside.work/exotic-armor/index.html",
+    "https://starside.work/exotic-weapon/index.html",
+    "https://starside.work/exotic-weapons/index.html",
+    "https://starside.work/farming-sets/index.html",
+    "https://starside.work/game-mechanics/index.html",
+    "https://starside.work/index.html",
+    "https://starside.work/legendary-heavy/index.html",
+    "https://starside.work/legendary-primary/index.html",
+    "https://starside.work/legendary-special/index.html",
+    "https://starside.work/power-delta/index.html",
+    "https://starside.work/raid-guides/index.html",
+    "https://starside.work/shopping-heavy/index.html",
+    "https://starside.work/shopping-other/index.html",
+    "https://starside.work/shopping-primary/index.html",
+    "https://starside.work/shopping-special/index.html",
+    "https://starside.work/skill-damage/index.html",
+    "https://starside.work/swap-dps/index.html",
+    "https://starside.work/weapon-frames/index.html",
+    "https://starside.work/weapon-perks/index.html"
+  ],
+  "external_links": [
+    "https://beian.miit.gov.cn/",
+    "https://discord.com/channels/591927598255439873/1453807417430245518",
+    "https://docs.google.com/spreadsheets/d/1JM-0SlxVDAi-C6rGVlLxa-J1WGewEeL8Qvq4htWZHhY",
+    "https://docs.google.com/spreadsheets/d/1b57Hb8m1L3daFfUckQQqvvN6VOpD03KEssvQLMFpC5I/edit",
+    "https://docs.google.com/spreadsheets/d/1lEOY_Z0v5ZZVZJ1SVLJyleMBEG2a7KLq4aLIQA9zk0A",
+    "https://docs.google.com/spreadsheets/d/1qsKGrRzCePGaIM5gNtAQNh949d3OsMJ6qV6Fqtpj22k/htmlview",
+    "https://docs.google.com/spreadsheets/u/0/d/1WaxvbLx7UoSZaBqdFr1u32F2uWVLo-CJunJB4nlGUE4",
+    "https://docs.google.com/spreadsheets/u/0/d/1_5wtBjRYHHxuF4oJKDb_iOGZs-wTkzB6RYbnyNLbuz4/htmlview",
+    "https://docs.google.com/spreadsheets/u/0/d/1i1KUwgVkd8qhwYj481gkV9sZNJQCE-C3Q-dpQutPCi4/htmlview",
+    "https://space.bilibili.com/169548478",
+    "https://space.bilibili.com/2135345999",
+    "https://space.bilibili.com/26117485",
+    "https://space.bilibili.com/3706960595650983",
+    "https://www.d2clarity.com/blog/destiny-science-6/chunk-energy-scalars-breakdown-12"
+  ],
+  "assets": [
+    "https://starside.work/assets/app.js",
+    "https://starside.work/assets/favicon.svg",
+    "https://starside.work/assets/fonts/chakra-petch-600.woff2",
+    "https://starside.work/assets/site.css",
+    "https://starside.work/sources/style.css"
+  ]
+}
