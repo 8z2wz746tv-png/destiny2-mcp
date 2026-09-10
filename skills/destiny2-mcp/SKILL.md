@@ -19,7 +19,7 @@ This is a platform-neutral usage guide. An agent may read this file directly fro
 
 Read only the relevant reference before a complex request:
 
-- [routing.md](references/routing.md) for tool and intent selection.
+- [routing.md](references/routing.md) for the per-tool intent index, the parameter rules, community categories, and the rating scales.
 - [evidence-and-completeness.md](references/evidence-and-completeness.md) for scope, pagination, missing data, and warnings.
 - [community-builds.md](references/community-builds.md) for Starside templates and inventory matching.
 - [account-loadouts.md](references/account-loadouts.md) for local and Bungie official loadouts.
@@ -33,6 +33,8 @@ Read only the relevant reference before a complex request:
 4. `build_template`, community records, `farm_options`, and `solver_handoff` are not executable builds.
 5. Only a server-returned, instance-bound `canonical_build` may be sent to `equip_build`.
 6. If a response is incomplete, failed, or has an uncertainty/coverage warning, report that limitation instead of filling it from model memory.
+7. A parameter the chosen `intent` does not read is rejected with `ignored_parameter`; switch to the intent named in the message instead of retrying the same call.
+8. The `community` intent of `weapon`, `build`, `subclass` and `activity` searches only its own category. A zero result there does not mean the archive lacks the topic; retry with `world_assistant(intent="community")` and name the category searched.
 
 ## Installation handoff
 

@@ -115,6 +115,14 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         ),
         suggestion=None,
     ),
+    ("world_assistant", "item_name"): ParameterContract(
+        intents=frozenset({"community", "collectible_item"}),
+        hint=(
+            '查收藏品状态用 intent="collectible_item"；查自己有没有这件东西用 '
+            'inventory_assistant(intent="search")；intent="vendor" 返回整个货架，不按物品过滤。'
+        ),
+        suggestion=None,
+    ),
 }
 
 
@@ -153,7 +161,7 @@ def check_parameter_ownership(
 
     details = " ".join(f"{name}（{contract.hint}）" for name, contract in rejected)
     names = "、".join(name for name, _ in rejected)
-    suggestions: list[dict[str, Any]] = [
+    suggestions: list[dict[str, Any] | str] = [
         {
             "label": f'改用 {contract.suggestion[0]} intent="{contract.suggestion[1]}"',
             "tool": contract.suggestion[0],

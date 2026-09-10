@@ -29,6 +29,14 @@ Destiny 2 装备管理 MCP Server — 通过 AI Agent 管理武器和装备。
 
 Skill 文件放在 GitHub 仓库中，不代表已经自动安装到某个平台的 Skill 目录。是否自动发现取决于 Agent 平台；如果平台不会自动发现，请按下面的提示让 Agent 直接读取这些 Markdown 文件。
 
+Codex 这类宿主只自动加载 `~/.codex/skills/` 下的目录，所以仓库里这份文档要显式装一次（仓库始终是唯一源头，脚本只做镜像复制，不改宿主配置）：
+
+```bash
+.venv/bin/python scripts/install_skill.py --dry-run          # 先看会改哪些文件
+.venv/bin/python scripts/install_skill.py                    # 装到 ~/.codex/skills/destiny2-mcp
+.venv/bin/python scripts/install_skill.py --target <目录>     # 其它宿主指到它自己的 skills 目录
+```
+
 ### 使用任意 Agent 安装
 
 支持 `AGENTS.md` 的 Agent 通常会读取仓库级指引；其他 Agent 请把下面的提示直接发送给它：

@@ -23,6 +23,10 @@ from ._build_confirmation import (
 from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from ._param_contracts import check_intent_parameters
+from ._param_docs import (
+    Character, CharacterOptional, ItemInstanceId, ItemInstanceIds,
+    ItemName, ItemType, Location, PlayerName, TypeName, WeaponName,
+)
 from ._requests import (
     ActivityIntent, BuildIntent, InventoryIntent, LoadoutIntent, PlayerIntent,
     SubclassIntent, WeaponIntent, WorldIntent,
@@ -166,7 +170,7 @@ def _confirmation_required(intent: str, payload: dict[str, Any]) -> dict[str, An
 @check_intent_parameters
 async def player_assistant(
     intent: PlayerIntent = "profile",
-    player_name: str | None = None,
+    player_name: PlayerName = None,
     name_prefix: str = "",
     ctx: Context = None,
 ) -> dict:
@@ -201,19 +205,19 @@ async def player_assistant(
 @check_intent_parameters
 async def inventory_assistant(
     intent: InventoryIntent = "summary",
-    player_name: str | None = None,
-    location: str = "",
-    item_name: str = "",
-    item_type: str = "",
+    player_name: PlayerName = None,
+    location: Location = "",
+    item_name: ItemName = "",
+    item_type: ItemType = "",
     armor_slot: str = "",
     rarity: str = "",
-    type_name: str = "",
-    item_instance_id: str = "",
-    item_instance_ids: list[str] | None = None,
+    type_name: TypeName = "",
+    item_instance_id: ItemInstanceId = "",
+    item_instance_ids: ItemInstanceIds = None,
     to_character: str = "",
     from_character: str | None = None,
     destination: str = "",
-    character: str = "",
+    character: Character = "",
     equip: bool = False,
     locked: bool = True,
     tracked: bool = True,
@@ -387,19 +391,19 @@ async def weapon_assistant(
         "catalog=从全量 Manifest 按武器类型和 Perk 查找，不限账号是否拥有；"
         "filter_rolls=只筛选账号持有副本；community=本地社区武器/Perk/DPS 资料搜索或详情。"
     ))] = "analyze",
-    player_name: str | None = None,
-    weapon_name: str = "",
+    player_name: PlayerName = None,
+    weapon_name: WeaponName = "",
     weapon_type: Annotated[
         str, Field(description="武器类型；filter_rolls 留空扫描全部持有武器。")
     ] = "",
     perk_name: Annotated[
         str, Field(description="单个 Perk 名称（中英文）；未传 required_perks 时作为必需 Perk。")
     ] = "",
-    item_instance_id: str = "",
+    item_instance_id: ItemInstanceId = "",
     required_perks: list[str] | str | None = None,
     any_perks: list[str] | str | None = None,
     excluded_perks: list[str] | str | None = None,
-    location: str = "",
+    location: Location = "",
     include_inventory: bool = True,
     limit: int = 50,
     knowledge_id: str = "",
@@ -621,7 +625,7 @@ async def build_assistant(
         "*_target 都是硬约束；community=本地社区配装模板；无解时不得自动降低，"
         "必须先询问玩家。"
     ))] = "recommend",
-    player_name: str | None = None,
+    player_name: PlayerName = None,
     character: Annotated[str, Field(description=(
         "目标职业：hunter/warlock/titan，或猎人/术士/泰坦。"
     ))] = "",
@@ -1048,8 +1052,8 @@ async def loadout_assistant(
         "save=保存当前账号配装；equip_loadout=装备已存配装；"
         "社区配装不走此入口，使用 build_assistant(intent=community)。"
     ))] = "list",
-    player_name: str | None = None,
-    character: str = "",
+    player_name: PlayerName = None,
+    character: Character = "",
     loadout_id: str = "",
     name: str = "",
     notes: str = "",
@@ -1146,8 +1150,8 @@ async def loadout_assistant(
 @check_intent_parameters
 async def subclass_assistant(
     intent: SubclassIntent = "get",
-    player_name: str | None = None,
-    character: str = "",
+    player_name: PlayerName = None,
+    character: Character = "",
     element: str = "",
     component: str = "",
     fragment_name: str = "",
@@ -1240,8 +1244,8 @@ async def activity_assistant(
         "aggregate=活动累计排行；leaderboards=玩家排行榜；"
         "clan_leaderboards=公会排行榜。"
     ))] = "history",
-    player_name: str | None = None,
-    character: str | None = None,
+    player_name: PlayerName = None,
+    character: CharacterOptional = None,
     mode: str | None = None,
     activity_id: str = "",
     group_id: str = "",
@@ -1310,11 +1314,11 @@ async def activity_assistant(
 @check_intent_parameters
 async def world_assistant(
     intent: WorldIntent = "weekly",
-    player_name: str | None = None,
-    character: str = "",
+    player_name: PlayerName = None,
+    character: Character = "",
     vendor_name: str = "",
     query: str = "",
-    item_name: str = "",
+    item_name: ItemName = "",
     collectible_node_hash: int = 0,
     include_invisible: bool = False,
     limit: int = 12,

@@ -9,6 +9,13 @@ For any agent, not only Codex:
 - Read `skills/destiny-mcp-setup/SKILL.md` only for installation, OAuth, registration, or setup troubleshooting.
 - Run `scripts/verify_mcp.py` for the real MCP handshake; do not treat registration alone as proof of readiness.
 
+## Skill maintenance
+
+`skills/destiny2-mcp/` is the single source for the agent-facing guide; hosts only load a copy from their own skills directory.
+
+- After editing anything under `skills/destiny2-mcp/`, run `scripts/install_skill.py` so the installed copy keeps up.
+- `tests/test_skill_contracts.py` checks `references/routing.md` against the code: intent coverage, parameter ownership, write intents, community categories. A red test there means the document is stale, not that the check is too strict.
+
 ## Setup-related tasks
 
 For installation, reinstallation, OAuth login, Codex MCP registration, or setup troubleshooting:

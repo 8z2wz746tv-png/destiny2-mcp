@@ -185,6 +185,39 @@ async def test_non_owner_intents_reject_the_parameter(tool: str, parameter: str)
     )
 
 
+# 模型只看得见 schema 的那几个参数：以前它们一个字说明都没有。
+DESCRIBED_PARAMETERS = (
+    {parameter for _, parameter in contracts.PARAMETER_OWNERS}
+    | {"location", "character", "player_name"}
+)
+
+
+def _description(annotation: object) -> str:
+    for item in getattr(annotation, "__metadata__", ()):
+        text = getattr(item, "description", None)
+        if text:
+            return str(text)
+    return ""
+
+
+def test_high_risk_parameters_are_described_in_the_schema() -> None:
+    """说明必须挂在每个使用点上：新加的同名参数不能再变成没说明的状态。
+
+    只查 8 个 assistant，也就是默认工具面。69 个历史工具里同名参数同样没有说明，
+    但它们只在 full/expert profile 下出现，属于另一件事（见 README 的工具面说明）。
+    """
+    missing = []
+    for tool, function in sorted(TOOLS.items()):
+        if not tool.endswith("_assistant"):
+            continue
+        parameters = inspect.signature(function, eval_str=True).parameters
+        for name, parameter in parameters.items():
+            if name in DESCRIBED_PARAMETERS and not _description(parameter.annotation):
+                missing.append(f"{tool}.{name}")
+
+    assert not missing, f"这些参数在 schema 里没有说明：{missing}"
+
+
 @pytest.mark.parametrize("tool,parameter", sorted(contracts.PARAMETER_OWNERS))
 async def test_owner_intents_really_read_the_parameter(tool: str, parameter: str) -> None:
     """认领了就必须真读：哨兵值要出现在服务层的调用参数里。
