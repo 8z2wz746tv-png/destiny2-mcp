@@ -37,6 +37,94 @@ def _service(tmp_path: Path, share_text: str = LIST_MARKDOWN) -> StarsideService
     return StarsideService(None, archive, share_root=share)
 
 
+def _archive_page(
+    root: Path, page: str, title: str, headers: list[str], rows: list[list[str]]
+) -> None:
+    """写一份最小清单页记录：首列是武器名，其余是普通单元格。"""
+    url = f"https://starside.work/{page}"
+    record = {
+        "url": url,
+        "title": title,
+        "category": "weapons",
+        "updated_at": "2026.8.30",
+        "text": title,
+        "source_blocks": [],
+        "tables": [
+            {
+                "caption": "",
+                "heading": "",
+                "rows": [
+                    [{"tag": "th", "text": head, "html": head, "attrs": {}} for head in headers],
+                    *[
+                        [
+                            {
+                                "tag": "th" if index == 0 else "td",
+                                "text": cell,
+                                "html": cell,
+                                "attrs": {},
+                            }
+                            for index, cell in enumerate(row)
+                        ]
+                        for row in rows
+                    ],
+                ],
+            }
+        ],
+        "external_links": [],
+        "archive": {
+            "fetched_at": "2026-09-09T00:00:00Z",
+            "sha256": sha256(url.encode()).hexdigest(),
+        },
+    }
+    path = root / f"records/{page.removesuffix('/index.html')}/index.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
+
+
+def _archive_index(root: Path, *pages: str) -> None:
+    """写只含指定页面的最小可用 schema v2 归档索引。"""
+    (root / "exports").mkdir(exist_ok=True)
+    (root / "exports/starsideIndex.json").write_text("[]", encoding="utf-8")
+    (root / "exports/starsideDesc.json").write_text("{}", encoding="utf-8")
+    (root / "index.json").write_text(
+        json.dumps(
+            {
+                "schema_version": 2,
+                "provider": "starside",
+                "status": "complete",
+                "updated_at": "2026-09-09T05:57:18+00:00",
+                "categories": {
+                    "weapons": [
+                        {
+                            "url": f"https://starside.work/{page}",
+                            "record": (
+                                f"records/{page.removesuffix('/index.html')}/index.json"
+                            ),
+                            "source_blocks": 0,
+                        }
+                        for page in pages
+                    ]
+                },
+                "failures": [],
+                "pending_urls": [],
+                "public_exports": [
+                    "exports/starsideIndex.json",
+                    "exports/starsideDesc.json",
+                ],
+                "crawler": {"pages_saved": len(pages), "pending": 0},
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+
+SHOPPING_HEADERS = [
+    "武器", "图标", "排名", "评级", "属性", "框架", "赛季", "来源", "勇士",
+    "弹药生成", "枪管", "弹匣", "大师", "Perk 1", "Perk 2", "起源特性", "注解",
+]
+
+
 def test_lookup_returns_structured_row(tmp_path: Path) -> None:
     result = _service(tmp_path).lookup_farming("迷失信号")
 
@@ -80,6 +168,7 @@ def test_lookup_deduplicates_and_respects_limit(tmp_path: Path) -> None:
 
     assert result["matched_count"] == 2
     assert result["returned_count"] == 1
+    assert result["truncated"] is True
     assert len(result["results"]) == 1
 
 
@@ -154,37 +243,7 @@ def test_archive_only_list_resolves_by_url_key(tmp_path: Path) -> None:
     record_path = root / "records/exotic-weapons/index.json"
     record_path.parent.mkdir(parents=True)
     record_path.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
-    (root / "exports").mkdir()
-    (root / "exports/starsideIndex.json").write_text("[]", encoding="utf-8")
-    (root / "exports/starsideDesc.json").write_text("{}", encoding="utf-8")
-    (root / "index.json").write_text(
-        json.dumps(
-            {
-                "schema_version": 2,
-                "provider": "starside",
-                "status": "complete",
-                "updated_at": "2026-09-09T05:57:18+00:00",
-                "categories": {
-                    "weapons": [
-                        {
-                            "url": url,
-                            "record": "records/exotic-weapons/index.json",
-                            "source_blocks": 0,
-                        }
-                    ]
-                },
-                "failures": [],
-                "pending_urls": [],
-                "public_exports": [
-                    "exports/starsideIndex.json",
-                    "exports/starsideDesc.json",
-                ],
-                "crawler": {"pages_saved": 1, "pending": 0},
-            },
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
+    _archive_index(root, "exotic-weapons/index.html")
 
     service = StarsideService(None, root, share_root=None)
     result = service.lookup_farming(["真相", "牵引器火炮"])
@@ -198,6 +257,101 @@ def test_archive_only_list_resolves_by_url_key(tmp_path: Path) -> None:
     assert row["dps"] == "8973"
     assert row["source_ref"]["source_type"] == "web_archive_v2"
     assert list(service._farming_index()) == ["真相"]
+
+
+def test_tier_list_is_a_labelled_fallback(tmp_path: Path) -> None:
+    """精选刷取清单没有这把时，回退到购物清单的梯队，并带上自己的刻度与名次。"""
+    root = tmp_path / "archive"
+    root.mkdir()
+    _archive_page(
+        root,
+        "shopping-heavy/index.html",
+        "购物清单-威能",
+        SHOPPING_HEADERS,
+        [
+            [
+                "迎驾", "", "33", "D", "虚空", "精密", "13", "萨瓦拉", "", "45",
+                "高速发射", "冲击弹壳", "操控性", "自动填装枪套",
+                "持久印象 集束炸弹 小丑皇弹药筒", "先锋平反", "整体略差于巴尔米拉-B",
+            ]
+        ],
+    )
+    _archive_index(root, "shopping-heavy/index.html")
+
+    result = StarsideService(None, root, share_root=None).lookup_farming("迎驾")
+
+    assert result["lists"] == ["购物清单-威能"]
+    row = result["results"][0]
+    assert row["list"] == "购物清单-威能"
+    assert row["scale"] == "S-F"
+    assert row["tier"] == "D"
+    assert row["rank"] == "33"
+    assert row["source"] == "萨瓦拉"
+    assert row["note"] == "整体略差于巴尔米拉-B"
+    assert row["perks"] == {
+        "三号位": "自动填装枪套",
+        "四号位": "持久印象 集束炸弹 小丑皇弹药筒",
+    }
+
+
+def test_farm_list_wins_over_tier_list(tmp_path: Path) -> None:
+    """两边都有：只返回精选刷取清单那一行，刻度是 T，不给出两套不可比的刻度。"""
+    root = tmp_path / "archive"
+    root.mkdir()
+    _archive_page(
+        root,
+        "shopping-heavy/index.html",
+        "购物清单-威能",
+        SHOPPING_HEADERS,
+        [
+            [
+                "翻新 A499", "", "1", "S", "动能", "干扰", "28", "反叛", "", "26",
+                "槽化枪管", "广口弹匣", "填装", "速射瞄准", "聚合充能", "加速突击", "很强",
+            ]
+        ],
+    )
+    _archive_page(
+        root,
+        "legendary-heavy/index.html",
+        "刷取清单-威能紫枪",
+        [
+            "武器", "图标", "评级", "框架", "属性", "勇士",
+            "Perk 三号位", "Perk 四号位", "获取地点", "评级理由",
+        ],
+        [
+            [
+                "翻新 A499", "", "T0", "干扰武器 72", "动能", "",
+                "速射瞄准", "聚合充能", "无序边界", "版本答案",
+            ]
+        ],
+    )
+    _archive_index(root, "shopping-heavy/index.html", "legendary-heavy/index.html")
+
+    result = StarsideService(None, root, share_root=None).lookup_farming("翻新 A499")
+
+    assert result["matched_count"] == 1
+    assert result["lists"] == ["刷取清单-威能紫枪", "购物清单-威能"]
+    row = result["results"][0]
+    assert row["list"] == "刷取清单-威能紫枪"
+    assert row["scale"] == "T"
+    assert row["tier"] == "T0"
+
+
+def test_tier_qualifier_is_kept_and_role_stays_separate(tmp_path: Path) -> None:
+    """评级列混着档位和定位标签：档位带限定词要保留，定位标签不能当档位。"""
+    marked = LIST_MARKDOWN.replace(
+        "| 翻新 A499 | | T2.5 |",
+        "| 旧版枪 | | T0（旧） | 区域拒止 72 | 烈日 | | 医治 | 互惠 | 扭曲 | 旧版本 |\n"
+        "| 工具枪 | | 输出工具枪 | 区域拒止 72 | 虚空 | | 压制 | 爆破专家 | 苍白之心 | 工具定位 |\n"
+        "| 翻新 A499 | | T2.5 |",
+    )
+    service = _service(tmp_path, share_text=marked)
+
+    rows = {row["name"]: row for row in service.lookup_farming(["旧版枪", "工具枪"])["results"]}
+    assert rows["旧版枪"]["tier"] == "T0（旧）"
+    assert "role" not in rows["旧版枪"]
+    assert rows["工具枪"]["role"] == "输出工具枪"
+    assert "tier" not in rows["工具枪"]
 
 
 def test_group_rows_are_not_weapons(tmp_path: Path) -> None:

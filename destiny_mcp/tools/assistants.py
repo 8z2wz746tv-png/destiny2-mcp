@@ -93,8 +93,8 @@ def _community_enrichment(service: Any, query: str, category: str) -> dict:
         }
 
 
-def _farming_reference(service: Any, names: str | list[str], *, limit: int = 5) -> dict:
-    """把本地刷取清单精确挂到会提到武器的响应上；失败不影响官方数据查询。"""
+def _farming_reference(service: Any, names: str | list[str], *, limit: int = 8) -> dict:
+    """把本地评级清单精确挂到会提到武器的响应上；失败不影响官方数据查询。"""
     if service is None:
         return {"available": False, "matched_count": 0, "results": [], "unmatched": []}
     try:

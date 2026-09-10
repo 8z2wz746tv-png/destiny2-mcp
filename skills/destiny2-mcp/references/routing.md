@@ -36,6 +36,11 @@ For “what does Perk X do”, use `perk_description`; do not infer an effect fr
 
 ## Farming-list attachments
 
-Weapon-bearing responses carry a `farming_list` field: an exact-name lookup into the local 刷取清单 (白弹/绿弹/威能紫枪 and 异域武器). Each row gives `tier` (or `scenario_tiers` such as `{"输出": "T0", "高难": "T0.5"}`, or a `role` label), `frame`, `element`, `perks`, `source`, and `note`, plus `source_ref` with the list name and update date.
+Weapon-bearing responses carry a `farming_list` field: an exact-name lookup into the local rated lists. Two families exist, and every row states which one it came from in `scale` — never compare across them.
 
-Use it when the user asks whether a weapon is worth keeping, farming, or using. Quote the tier together with its list name; these are community ratings, not official data. `unmatched` means the local lists have no such name — never report that as "this weapon is not worth farming". The list comes from local files and may be absent; check `available` before relying on it.
+- `scale="T"` — the curated 刷取清单 (白弹/绿弹/威能紫枪, 异域武器). This is the answer to "is it worth farming". `tier` is `T0`–`T4`, possibly with a qualifier such as `T0（旧）` for an older version of the weapon; the exotic list instead gives `scenario_tiers` such as `{"输出": "T0", "高难": "T0.5"}` or a `role` label such as `输出工具枪`, which is a role rather than a tier.
+- `scale="S-F"` — the 购物清单 (白弹/绿弹/威能/其他). An exhaustive tier list of every legendary weapon, graded `S`–`F` with a `rank` inside its ammo type. It is used only when the curated lists do not cover the weapon, and answers "how good is it", not "should I farm it".
+
+Rows also carry `frame`, `element`, `perks`, `source`, and `note`, plus `source_ref` with the list name and update date. `lists` reports which lists are installed, `truncated` says whether more rows exist, and `available=false` means no list data is installed at all.
+
+Quote the grade together with its list name and scale; these are community ratings, not official data. `unmatched` means the local lists have no such name — never report that as "this weapon is not worth farming".
