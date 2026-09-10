@@ -96,3 +96,14 @@ _COMMUNITY_ALIASES = _load_community_names()
 
 # Merge into ITEM_ALIASES
 ITEM_ALIASES.update(_COMMUNITY_ALIASES)
+
+
+# 职业名 → classType
+CHARACTER_CLASS_MAP: dict[str, int] = {
+    "titan": 0,
+    "hunter": 1,
+    "warlock": 2,
+    "泰坦": 0,
+    "猎人": 1,
+    "术士": 2,
+}
