@@ -18,6 +18,7 @@ from .logging_config import get_logger
 from .manifest_armor import ArmorCatalogMixin
 from .manifest_catalog import ItemCatalogMixin
 from .manifest_definitions import ItemDefinitionMixin
+from .manifest_plugs import PlugCatalogMixin
 from .manifest_data import (
     BUNGIE_BASE_URL as BUNGIE_BASE_URL,
     CHARACTER_CLASS_MAP as CHARACTER_CLASS_MAP,
@@ -131,7 +132,11 @@ def resolve_character_name(name: str) -> int:
 
 
 class ManifestManager(
-    SearchIndexMixin, ItemDefinitionMixin, ItemCatalogMixin, ArmorCatalogMixin
+    SearchIndexMixin,
+    ItemDefinitionMixin,
+    ItemCatalogMixin,
+    PlugCatalogMixin,
+    ArmorCatalogMixin,
 ):
     """Manages the Destiny manifest (SQLite) for item lookups.
 
@@ -216,81 +221,8 @@ class ManifestManager(
             self._zh_conn.row_factory = sqlite3.Row
             self._zh_conn.execute("PRAGMA journal_mode=WAL")
             self._build_name_index(self._zh_conn, language="zh-chs")
+
     # ── Public API ─────────────────────────────────────────────────
-    def get_plug_set_plugs(self, plug_set_hash: int) -> list[dict] | None:
-        """Get all plugs in a plug set (for weapon perk pools).
-
-        Returns a list of dicts with at least 'plugItemHash' and
-        'plugCategoryIdentifier' keys.
-        """
-        if plug_set_hash in self._plug_set_cache:
-            return self._plug_set_cache[plug_set_hash]
-
-        data = self._query_json("DestinyPlugSetDefinition", plug_set_hash)
-        if not data:
-            return None
-
-        raw_plugs = data.get("reusablePlugItems", [])
-        enriched: list[dict] = []
-        for p in raw_plugs:
-            ph = p.get("plugItemHash")
-            if not ph:
-                continue
-            item_def = self.get_item_definition(ph)
-            name = ""
-            cat_id = ""
-            if item_def:
-                name = (item_def.get("displayProperties") or {}).get("name", "")
-                cat_id = (item_def.get("plug") or {}).get("plugCategoryIdentifier", "")
-            enriched.append({
-                "plugItemHash": ph,
-                "name": name,
-                "plugCategoryIdentifier": cat_id,
-            })
-        self._plug_set_cache[plug_set_hash] = enriched
-        return enriched
-
-    def get_sandbox_perk_description(self, perk_hash: int) -> dict | None:
-        """Look up a sandbox perk's name and description.
-
-        Used for weapon perk effect text.
-        """
-        if perk_hash in self._sandbox_perk_cache:
-            return self._sandbox_perk_cache[perk_hash]
-
-        data = self._query_json("DestinySandboxPerkDefinition", perk_hash)
-        if not data:
-            return None
-
-        result = {
-            "name": data.get("displayProperties", {}).get("name", ""),
-            "description": data.get("displayProperties", {}).get("description", ""),
-        }
-        self._sandbox_perk_cache[perk_hash] = result
-        return result
-
-    def get_plug_category_identifier(self, plug_hash: int) -> str | None:
-        """Look up a plug's plugCategoryIdentifier from the manifest.
-
-        Used to categorize weapon sockets (barrel, magazine, perk, etc.).
-        """
-        if not self._conn:
-            return None
-
-        signed_hash = to_signed(plug_hash)
-        for h in (plug_hash, signed_hash):
-            cur = self._conn.execute(
-                "SELECT json FROM DestinyInventoryItemDefinition WHERE id = ?", (h,)
-            )
-            row = cur.fetchone()
-            if row:
-                try:
-                    data = json.loads(row["json"])
-                    return data.get("plug", {}).get("plugCategoryIdentifier")
-                except json.JSONDecodeError as e:
-                    logger.debug("JSON decode failed for plug hash=%s: %s", h, e)
-                    continue
-        return None
 
     @staticmethod
     def bucket_name(bucket_hash: int) -> str:
