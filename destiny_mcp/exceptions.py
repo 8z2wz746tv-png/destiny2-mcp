@@ -49,6 +49,20 @@ class ItemNotFoundError(DestinyMCPError):
         )
 
 
+class DefinitionNotFoundError(DestinyMCPError):
+    """A Manifest definition (artifact, fragment, set...) could not be found.
+
+    和 ItemNotFoundError 分开：那个说的是"账号里的实例可能被分解了"，
+    用在一个从没拥有过的定义名字上会误导模型去解释"你把它拆了"。
+    """
+
+    def __init__(self, identifier: str, detail: str = "") -> None:
+        self.identifier = identifier
+        super().__init__(
+            f"Manifest 里找不到 {identifier!r}。" + (f" {detail}" if detail else "")
+        )
+
+
 class TransferError(DestinyMCPError):
     """An item transfer or equip operation failed."""
 
@@ -62,6 +76,14 @@ class TransferError(DestinyMCPError):
 
 class ManifestError(DestinyMCPError):
     """Manifest is not loaded or not found."""
+
+
+class InvalidArgumentError(DestinyMCPError):
+    """A tool argument used a value outside the accepted vocabulary.
+
+    用于「封闭词表」的筛选项：合法取值是清楚的，传了别的值就该报错，而不是安静地
+    返回 0 条 —— 那种结果会被读成「游戏里没有这种东西」。
+    """
 
 
 class BuildValidationError(DestinyMCPError):

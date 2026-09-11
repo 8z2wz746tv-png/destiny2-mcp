@@ -21,7 +21,7 @@ from pathlib import Path
 import aiobungie
 
 from ..bungie_client import BungieClient
-from ..exceptions import DestinyMCPError
+from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..logging_config import get_logger
 from ..manifest import BUNGIE_BASE_URL, ManifestManager, class_type_name, resolve_character_name
 from ..models import (
@@ -105,10 +105,11 @@ class LoadoutService:
             else [(normalized, tables.get(normalized, ""))]
         )
         if not selected or not selected[0][1]:
-            return {
-                "success": False,
-                "message": "kind 只能是 all/name/icon/color（或 全部/名称/图标/颜色）。",
-            }
+            # 抛异常而不是返回 {"success": False}：后者会被包进 ok=true 的信封，
+            # 模型看到的是"成功"，只能从 message 里猜自己错了。
+            raise InvalidArgumentError(
+                "kind 只能是 all/name/icon/color（或 全部/名称/图标/颜色）。"
+            )
 
         max_per_kind = max(1, min(limit, 100))
         results: dict[str, list[dict]] = {}

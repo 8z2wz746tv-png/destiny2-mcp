@@ -16,11 +16,9 @@ ROOT = Path(__file__).parents[1]
 
 CEILINGS = {
     "destiny_mcp/manifest.py":           262,
-    # +9：8 个 assistant 各一行 @check_intent_parameters，1 行 import。
-    # +4：参数说明别名的 import（说明文本本身在 _param_docs.py）。
-    # +1：再加 7 个高危参数的说明别名，import 多一行。
-    # 三次都只加了「引用」，逻辑没落在这个模块里。
-    "destiny_mcp/tools/assistants.py": 1402,
+    # 参数说明改用 `from . import _param_docs as fields`，新增别名不再让 import 块
+    # 长胖；这一轮给全部参数补说明时反而比上次短了 5 行，所以上限跟着降。
+    "destiny_mcp/tools/assistants.py": 1397,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,

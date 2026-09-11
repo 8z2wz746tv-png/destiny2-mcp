@@ -10,7 +10,7 @@ data transformation for fragments and subclass options.
 
 from __future__ import annotations
 
-from ..exceptions import ItemNotFoundError, SubclassError
+from ..exceptions import DefinitionNotFoundError, SubclassError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, CHARACTER_CLASS_MAP
 
@@ -117,7 +117,7 @@ class FragmentService:
             if info:
                 return info
 
-        raise ItemNotFoundError(f"找不到碎片: {fragment_name}")
+        raise DefinitionNotFoundError(fragment_name, "没有匹配的碎片。")
 
     def list_subclass_options(
         self, class_name: str, element: str, component: str

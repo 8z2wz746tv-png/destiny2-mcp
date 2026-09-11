@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from destiny_mcp.exceptions import ItemNotFoundError, SubclassError
+from destiny_mcp.exceptions import DefinitionNotFoundError, ItemNotFoundError, SubclassError
 from destiny_mcp.services.fragment_service import FragmentService
 from destiny_mcp.services.set_bonus_service import SetBonusService
 
@@ -67,7 +67,7 @@ def test_subclass_options_reject_unknown_filters() -> None:
 def test_fragment_details_raises_when_nothing_matches() -> None:
     service = FragmentService(_EmptyManifest())
 
-    with pytest.raises(ItemNotFoundError, match="找不到碎片"):
+    with pytest.raises(DefinitionNotFoundError, match="没有匹配的碎片"):
         service.get_fragment_details("不存在的碎片")
 
 

@@ -7,6 +7,7 @@ business logic.
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
+from ..exceptions import DefinitionNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, resolve_character_name
 from ..player_resolver import PlayerResolver
@@ -39,10 +40,7 @@ class ArtifactService:
 
         artifact = self._manifest.get_artifact_by_name(artifact_name)
         if not artifact:
-            return {
-                "success": False,
-                "message": f"未找到名称包含 {artifact_name!r} 的赛季神器。",
-            }
+            raise DefinitionNotFoundError(artifact_name, "没有名称包含它的赛季神器。")
 
         current = self._manifest.get_current_artifact()
         return {
@@ -56,10 +54,7 @@ class ArtifactService:
         """Get details for a seasonal artifact mod by hash."""
         mod_info = self._manifest.get_artifact_mod_details(mod_hash)
         if not mod_info:
-            return {
-                "success": False,
-                "message": f"未找到 hash={mod_hash} 的神器模组。",
-            }
+            raise DefinitionNotFoundError(f"hash={mod_hash}", "没有这个神器模组。")
         return {
             "success": True,
             "artifact_mod": mod_info,

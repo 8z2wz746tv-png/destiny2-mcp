@@ -247,6 +247,7 @@
 | 用一个不存在的 intent | 任意工具 + 乱填 intent | 返回 `unsupported_intent` 并列出可用值，**不要静默降级成默认行为**。 |
 | 查子职业选项但不给元素／组件 | `subclass_assistant(intent="options")` | 返回 `ok=false` + `subclass_error`，消息里列出合法取值；**不能是 `ok=true` 里裹一段错误文字**，也不能当成「没有可选项」。 |
 | 查不存在的套装效果 | `build_assistant(intent="set_bonus", set_bonus_name=...)` | 返回 `ok=false` + `item_not_found_error`，不能包在成功信封里。 |
+| 用不认识的词筛护甲模组 | `build_assistant(intent="armor_mods", priority_stat="武器伤害")` | 返回 `ok=false` + `invalid_argument_error` 并列出词表；**不能安静返回 0 条**（那会被读成「没有这种模组」）。 |
 | 把实例 ID 传给 `inventory_assistant(intent="get")` | 拒绝，改走 `weapon_assistant(intent="compare")` 或 `inventory_assistant` 的写入 intent | 返回 `ignored_parameter`；**不进入服务层**，更不能返回整包清单冒充答案。 |
 | 把物品名传给 `inventory_assistant(intent="summary")` | 拒绝，改走 `intent="search"` | 同上：问的是某一件事，返回的不能是概况。 |
 | 把 `loadout_id` 传给 `loadout_assistant(intent="get")` | 拒绝 | 消息说明 `list`/`get` 返回全部配装、要自己挑，**不能把第一条当成用户说的那套**。 |

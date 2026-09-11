@@ -487,15 +487,6 @@ async def test_loadout_get_no_longer_swallows_loadout_id() -> None:
     assert "全部配装" in result["error"]["message"]
 
 
-# 模型只看得见 schema 的高危参数：这几个传错会拿到「答非所问但看起来正常」的答案。
-DESCRIBED_PARAMETERS = {
-    "item_name", "item_instance_id", "item_instance_ids", "item_type", "type_name",
-    "weapon_name", "loadout_id", "slot_number", "activity_id", "group_id",
-    "artifact_mod_hash", "canonical_build", "name_prefix",
-    "location", "character", "player_name",
-}
-
-
 def _description(annotation: object) -> str:
     for item in getattr(annotation, "__metadata__", ()):
         text = getattr(item, "description", None)
@@ -504,18 +495,20 @@ def _description(annotation: object) -> str:
     return ""
 
 
-def test_high_risk_parameters_are_described_in_the_schema() -> None:
-    """说明必须挂在每个使用点上：新加的同名参数不能再变成没说明的状态。
+def test_every_parameter_is_described_in_the_schema() -> None:
+    """8 个 assistant 的每个参数都要有说明 —— 模型只看得见 schema。
 
-    只查高危参数，不是全部 90 个：说明是建议，拦截才是保证，把每个参数的
-    说明都写成散文只会让文档更快腐烂。69 个历史工具里同名参数同样没有说明，
-    但它们只在 full/expert profile 下出现，属于另一件事。
+    曾经只有 16 个"高危"参数有说明，剩下 67 个（包括 `intent`）只能靠名字猜，
+    而且同一个 `intent` 在 weapon/build 有说明、在另外四个工具没有，属于直接的不一致。
+    `ctx` 是运行时注入的，不进 schema，所以不在检查范围。
     """
     missing = []
     for tool in ASSISTANT_NAMES:
         parameters = inspect.signature(TOOLS[tool], eval_str=True).parameters
         for name, parameter in parameters.items():
-            if name in DESCRIBED_PARAMETERS and not _description(parameter.annotation):
+            if name == "ctx":
+                continue
+            if not _description(parameter.annotation):
                 missing.append(f"{tool}.{name}")
 
     assert not missing, f"这些参数在 schema 里没有说明：{missing}"

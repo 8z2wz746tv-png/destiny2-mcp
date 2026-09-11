@@ -11,6 +11,9 @@ from __future__ import annotations
 import json
 import sqlite3
 
+import pytest
+
+from destiny_mcp.exceptions import InvalidArgumentError
 from destiny_mcp.manifest import ManifestManager
 
 ITEM_TABLE = "DestinyInventoryItemDefinition"
@@ -90,7 +93,6 @@ def test_stat_filter_matches_the_right_mods() -> None:
     manager = _manager()
 
     assert _names(manager.get_armor_mods(stat="weapons")) == {"武器模组"}
-    assert _names(manager.get_armor_mods(stat="weapons_target")) == set()  # 未收录的写法
     assert _names(manager.get_armor_mods(stat="health")) == {"小型生命值模组"}
     # "力量"在游戏里就是近战属性
     assert _names(manager.get_armor_mods(stat="力量")) == {"近战模组"}
@@ -107,10 +109,26 @@ def test_category_words_still_match_the_description() -> None:
     assert _names(manager.get_armor_mods(stat="recovery")) == {"某模组"}
 
 
-def test_unknown_stat_filter_returns_nothing_but_does_not_raise() -> None:
+def test_unknown_stat_filter_is_loud() -> None:
+    """不认识的筛选词要报错并列出词表。
+
+    安静返回 0 条会被读成"游戏里没有加这个属性的模组"，而真相是"这个词我不认识"。
+    """
     manager = _manager()
 
-    assert manager.get_armor_mods(stat="这不存在的属性") == []
+    with pytest.raises(InvalidArgumentError, match="不认识的属性筛选词"):
+        manager.get_armor_mods(stat="这不存在的属性")
+    with pytest.raises(InvalidArgumentError, match="不认识的属性筛选词"):
+        manager.get_armor_mods(stat="武器伤害")
+
+
+def test_unknown_slot_and_category_are_loud() -> None:
+    manager = _manager()
+
+    with pytest.raises(InvalidArgumentError, match="不支持的部位"):
+        manager.get_armor_mods(slot="不存在的部位")
+    with pytest.raises(InvalidArgumentError, match="不支持的模组类别"):
+        manager.get_armor_mods(category="不存在的类别")
 
 
 def test_slot_filter_accepts_chinese_slot_names() -> None:
@@ -128,7 +146,6 @@ def test_no_filter_returns_every_mod() -> None:
     assert _names(manager.get_armor_mods()) == {
         "武器模组", "小型生命值模组", "近战模组", "手雷模组", "头盔模组",
     }
-    assert manager.get_armor_mods(slot="不存在的部位") != []
 
 
 def test_missing_connection_is_empty_not_an_error() -> None:

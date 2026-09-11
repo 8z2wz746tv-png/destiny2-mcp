@@ -11,6 +11,7 @@ import sqlite3
 from typing import TYPE_CHECKING, Any
 
 from .logging_config import get_logger
+from .exceptions import InvalidArgumentError
 from .utils.hash_utils import to_signed
 
 if TYPE_CHECKING:
@@ -72,6 +73,8 @@ class ArmorCatalogMixin:
         "intellect": ("智慧",), "智慧": ("智慧",),
     }
 
+    _MOD_CATEGORIES = ("all", "general", "slot_specific", "artifice")
+
     # 部位关键词同样中英都认（中文是玩家实际会说的写法）
     _SLOT_ALIASES = {
         "helmet": "helmet", "头盔": "helmet",
@@ -111,6 +114,13 @@ class ArmorCatalogMixin:
         if not conn:
             return []
 
+        # 封闭词表：不认的值直接报错。以前不认的 category 会安静地当成 all、
+        # 不认的 slot 会被忽略，调用方拿到的是"全部模组"，看不出自己没有筛成。
+        if category not in self._MOD_CATEGORIES:
+            raise InvalidArgumentError(
+                f"不支持的模组类别: {category!r}，可用: {'/'.join(self._MOD_CATEGORIES)}"
+            )
+
         # Determine which plugCategoryHashes to include
         if category == "general":
             target_hashes = {2487827355}
@@ -130,6 +140,12 @@ class ArmorCatalogMixin:
             "class_item": 912441879,
         }
         slot_key = self._SLOT_ALIASES.get(slot.strip().lower(), slot.strip()) if slot else ""
+        if slot and slot_key not in slot_to_hash:
+            raise InvalidArgumentError(
+                f"不支持的部位: {slot!r}，可用: "
+                + "/".join(sorted(set(self._SLOT_ALIASES.values())))
+                + "（也认头盔/手套/胸甲/腿甲/职业物品）"
+            )
         if slot_key in slot_to_hash:
             target_hashes = {slot_to_hash[slot_key]}
             # Also include general mods (they go in any slot)
@@ -201,9 +217,20 @@ class ArmorCatalogMixin:
         # Filter by stat keyword if specified
         if stat:
             keywords = self._stat_keywords(stat)
-            results = [
+            filtered = [
                 mod for mod in results if self._mod_matches_keywords(mod, keywords)
             ]
+            # 一条都没匹配上、而且这个词也不在词表里 —— 说明是个不认识的筛选词。
+            # 直接报错并列出词表，别让调用方把 0 条读成"游戏里没有这种模组"。
+            if not filtered and stat.strip().lower() not in self._STAT_ALIASES:
+                english = sorted(
+                    key for key in self._STAT_ALIASES if key.isascii()
+                )
+                raise InvalidArgumentError(
+                    f"不认识的属性筛选词: {stat!r}，可用: {'/'.join(english)}"
+                    "，或中文名（武器/生命/职业/手雷/超能/近战/敏捷/韧性/恢复/纪律/智慧）"
+                )
+            results = filtered
 
         # Sort: general mods first, then by slot, then by energy cost
         results.sort(key=lambda x: (x["slot"] != "general", x["slot"], x["energy_cost"]))

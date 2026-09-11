@@ -23,11 +23,7 @@ from ._build_confirmation import (
 from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from ._param_contracts import check_intent_parameters
-from ._param_docs import (
-    ActivityId, ArtifactModHash, CanonicalBuild, Character, CharacterOptional, GroupId,
-    ItemInstanceId, ItemInstanceIds, ItemName, ItemType, LoadoutId, Location, NamePrefix,
-    PlayerName, SlotNumber, TypeName, WeaponName,
-)
+from . import _param_docs as fields
 from ._requests import (
     ActivityIntent, BuildIntent, InventoryIntent, LoadoutIntent, PlayerIntent,
     SubclassIntent, WeaponIntent, WorldIntent,
@@ -170,9 +166,9 @@ def _confirmation_required(intent: str, payload: dict[str, Any]) -> dict[str, An
 @handle_tool_error
 @check_intent_parameters
 async def player_assistant(
-    intent: PlayerIntent = "profile",
-    player_name: PlayerName = None,
-    name_prefix: NamePrefix = "",
+    intent: fields.PlayerIntentField = "profile",
+    player_name: fields.PlayerName = None,
+    name_prefix: fields.NamePrefix = "",
     ctx: Context = None,
 ) -> dict:
     """玩家/账号聚合入口：搜索玩家、模糊找人、读取角色档案。"""
@@ -205,26 +201,26 @@ async def player_assistant(
 @validate_request(InventoryRequest)
 @check_intent_parameters
 async def inventory_assistant(
-    intent: InventoryIntent = "summary",
-    player_name: PlayerName = None,
-    location: Location = "",
-    item_name: ItemName = "",
-    item_type: ItemType = "",
-    armor_slot: str = "",
-    rarity: str = "",
-    type_name: TypeName = "",
-    item_instance_id: ItemInstanceId = "",
-    item_instance_ids: ItemInstanceIds = None,
-    to_character: str = "",
-    from_character: str | None = None,
-    destination: str = "",
-    character: Character = "",
-    equip: bool = False,
-    locked: bool = True,
-    tracked: bool = True,
-    confirmed: bool = False,
-    limit: int = 10,
-    offset: int = 0,
+    intent: fields.InventoryIntentField = "summary",
+    player_name: fields.PlayerName = None,
+    location: fields.Location = "",
+    item_name: fields.ItemName = "",
+    item_type: fields.ItemType = "",
+    armor_slot: fields.ArmorSlot = "",
+    rarity: fields.Rarity = "",
+    type_name: fields.TypeName = "",
+    item_instance_id: fields.ItemInstanceId = "",
+    item_instance_ids: fields.ItemInstanceIds = None,
+    to_character: fields.ToCharacter = "",
+    from_character: fields.FromCharacter = None,
+    destination: fields.Destination = "",
+    character: fields.Character = "",
+    equip: fields.Equip = False,
+    locked: fields.Locked = True,
+    tracked: fields.Tracked = True,
+    confirmed: fields.Confirmed = False,
+    limit: fields.Limit = 10,
+    offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
     """背包/仓库聚合入口。
@@ -392,24 +388,24 @@ async def weapon_assistant(
         "catalog=从全量 Manifest 按武器类型和 Perk 查找，不限账号是否拥有；"
         "filter_rolls=只筛选账号持有副本；community=本地社区武器/Perk/DPS 资料搜索或详情。"
     ))] = "analyze",
-    player_name: PlayerName = None,
-    weapon_name: WeaponName = "",
+    player_name: fields.PlayerName = None,
+    weapon_name: fields.WeaponName = "",
     weapon_type: Annotated[
         str, Field(description="武器类型；filter_rolls 留空扫描全部持有武器。")
     ] = "",
     perk_name: Annotated[
         str, Field(description="单个 Perk 名称（中英文）；未传 required_perks 时作为必需 Perk。")
     ] = "",
-    item_instance_id: ItemInstanceId = "",
-    required_perks: list[str] | str | None = None,
-    any_perks: list[str] | str | None = None,
-    excluded_perks: list[str] | str | None = None,
-    location: Location = "",
-    include_inventory: bool = True,
-    limit: int = 50,
-    knowledge_id: str = "",
-    community_section: Literal["text", "tables", "links"] = "text",
-    offset: Annotated[int, Field(ge=0)] = 0,
+    item_instance_id: fields.ItemInstanceId = "",
+    required_perks: fields.RequiredPerks = None,
+    any_perks: fields.AnyPerks = None,
+    excluded_perks: fields.ExcludedPerks = None,
+    location: fields.Location = "",
+    include_inventory: fields.IncludeInventory = True,
+    limit: fields.Limit = 50,
+    knowledge_id: fields.KnowledgeId = "",
+    community_section: fields.CommunitySection = "text",
+    offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
     """武器聚合入口：分析、副本对比、perk 池、选取率和全量候选。
@@ -626,7 +622,7 @@ async def build_assistant(
         "*_target 都是硬约束；community=本地社区配装模板；无解时不得自动降低，"
         "必须先询问玩家。"
     ))] = "recommend",
-    player_name: PlayerName = None,
+    player_name: fields.PlayerName = None,
     character: Annotated[str, Field(description=(
         "目标职业：hunter/warlock/titan，或猎人/术士/泰坦。"
     ))] = "",
@@ -667,13 +663,13 @@ async def build_assistant(
     include_subclass_fragment: Annotated[bool, Field(description=(
         "是否计入当前子职业和碎片属性；重试和金装确认时必须原样保留。"
     ))] = False,
-    set_bonus_name: str | None = None,
-    set_bonus_count: int | None = None,
+    set_bonus_name: fields.SetBonusName = None,
+    set_bonus_count: fields.SetBonusCount = None,
     priority_stats: Annotated[list[str] | None, Field(description=(
         "所有硬目标达标后才按顺序最大化的属性。使用 "
         "weapons/health/class/grenade/melee/super；力量/strength 必须写为 melee。"
     ))] = None,
-    priority_stat: str | None = None,
+    priority_stat: fields.PriorityStat = None,
     replacement_slot: Annotated[str | None, Field(description=(
         "farm_target 时要替换并刷取的部位：helmet/gauntlets/chest/legs/class_item。"
         "不填时逐个尝试五个部位。"
@@ -688,17 +684,17 @@ async def build_assistant(
         "farm_target 最多反推的待刷护甲件数。默认 2：先完整查找单件，"
         "只有单件无解才返回两件方案。两件回退目前只支持 equipped 基线。"
     ))] = 2,
-    canonical_build: CanonicalBuild = None,
-    confirmed: bool = False,
+    canonical_build: fields.CanonicalBuild = None,
+    confirmed: fields.Confirmed = False,
     top_n: Annotated[int, Field(ge=1, le=20, description="返回的候选配装数量。")] = 5,
     community_build_id: Annotated[str, Field(description=(
         "community 搜索返回的配装 ID；指定后全库读取模板，不受搜索分页影响。不是可执行候选。"
     ))] = "",
-    scenario: str = "",
-    category: str = "",
-    query: str = "",
-    include_inventory: bool = True,
-    offset: Annotated[int, Field(ge=0)] = 0,
+    scenario: fields.Scenario = "",
+    category: fields.Category = "",
+    query: fields.Query = "",
+    include_inventory: fields.IncludeInventory = True,
+    offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
     """配装聚合入口：推荐、查候选、失败诊断、确认后装备。
@@ -1053,18 +1049,18 @@ async def loadout_assistant(
         "save=保存当前账号配装；equip_loadout=装备已存配装；"
         "社区配装不走此入口，使用 build_assistant(intent=community)。"
     ))] = "list",
-    player_name: PlayerName = None,
-    character: Character = "",
-    loadout_id: LoadoutId = "",
-    name: str = "",
-    notes: str = "",
-    slot_number: SlotNumber = 1,
-    name_hash: int | None = None,
-    icon_hash: int | None = None,
-    color_hash: int | None = None,
-    kind: str = "all",
-    query: str = "",
-    confirmed: bool = False,
+    player_name: fields.PlayerName = None,
+    character: fields.Character = "",
+    loadout_id: fields.LoadoutId = "",
+    name: fields.Name = "",
+    notes: fields.Notes = "",
+    slot_number: fields.SlotNumber = 1,
+    name_hash: fields.NameHash = None,
+    icon_hash: fields.IconHash = None,
+    color_hash: fields.ColorHash = None,
+    kind: fields.Kind = "all",
+    query: fields.Query = "",
+    confirmed: fields.Confirmed = False,
     ctx: Context = None,
 ) -> dict:
     """账号配装聚合入口：读取、保存、装备本地配装和 Bungie 官方槽位。
@@ -1150,21 +1146,21 @@ async def loadout_assistant(
 @validate_request(SubclassRequest)
 @check_intent_parameters
 async def subclass_assistant(
-    intent: SubclassIntent = "get",
-    player_name: PlayerName = None,
-    character: Character = "",
-    element: str = "",
-    component: str = "",
-    fragment_name: str = "",
-    artifact_name: str = "",
-    artifact_mod_hash: ArtifactModHash = 0,
-    changes: dict[str, str] | None = None,
-    query: str = "",
-    limit: int = 10,
-    knowledge_id: str = "",
-    community_section: Literal["text", "tables", "links"] = "text",
-    offset: Annotated[int, Field(ge=0)] = 0,
-    confirmed: bool = False,
+    intent: fields.SubclassIntentField = "get",
+    player_name: fields.PlayerName = None,
+    character: fields.Character = "",
+    element: fields.Element = "",
+    component: fields.Component = "",
+    fragment_name: fields.FragmentName = "",
+    artifact_name: fields.ArtifactName = "",
+    artifact_mod_hash: fields.ArtifactModHash = 0,
+    changes: fields.Changes = None,
+    query: fields.Query = "",
+    limit: fields.Limit = 10,
+    knowledge_id: fields.KnowledgeId = "",
+    community_section: fields.CommunitySection = "text",
+    offset: fields.Offset = 0,
+    confirmed: fields.Confirmed = False,
     ctx: Context = None,
 ) -> dict:
     """子职业/碎片/神器聚合入口：读取配置、查选项、确认后修改。
@@ -1244,18 +1240,18 @@ async def activity_assistant(
         "aggregate=活动累计排行；leaderboards=玩家排行榜；"
         "clan_leaderboards=公会排行榜。"
     ))] = "history",
-    player_name: PlayerName = None,
-    character: CharacterOptional = None,
-    mode: str | None = None,
-    activity_id: ActivityId = "",
-    group_id: GroupId = "",
-    statid: str | None = None,
-    maxtop: int = 10,
-    count: int = 20,
-    query: str = "",
-    knowledge_id: str = "",
-    community_section: Literal["text", "tables", "links"] = "text",
-    offset: Annotated[int, Field(ge=0)] = 0,
+    player_name: fields.PlayerName = None,
+    character: fields.CharacterOptional = None,
+    mode: fields.Mode = None,
+    activity_id: fields.ActivityId = "",
+    group_id: fields.GroupId = "",
+    statid: fields.StatId = None,
+    maxtop: fields.MaxTop = 10,
+    count: fields.Count = 20,
+    query: fields.Query = "",
+    knowledge_id: fields.KnowledgeId = "",
+    community_section: fields.CommunitySection = "text",
+    offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
     """活动/战绩聚合入口：历史、PGCR、生涯统计、武器使用、排行榜。
@@ -1313,21 +1309,21 @@ async def activity_assistant(
 @handle_tool_error
 @check_intent_parameters
 async def world_assistant(
-    intent: WorldIntent = "weekly",
-    player_name: PlayerName = None,
-    character: Character = "",
-    vendor_name: str = "",
-    query: str = "",
-    item_name: ItemName = "",
-    collectible_node_hash: int = 0,
-    include_invisible: bool = False,
-    limit: int = 12,
+    intent: fields.WorldIntentField = "weekly",
+    player_name: fields.PlayerName = None,
+    character: fields.Character = "",
+    vendor_name: fields.VendorName = "",
+    query: fields.Query = "",
+    item_name: fields.ItemName = "",
+    collectible_node_hash: fields.CollectibleNodeHash = 0,
+    include_invisible: fields.IncludeInvisible = False,
+    limit: fields.Limit = 12,
     community_category: Annotated[
         str, Field(description="社区资料分类：builds/weapons/armor/subclass/activities/mechanics/sources/other；留空为全部。")
     ] = "",
-    knowledge_id: str = "",
-    community_section: Literal["text", "tables", "links"] = "text",
-    offset: Annotated[int, Field(ge=0)] = 0,
+    knowledge_id: fields.KnowledgeId = "",
+    community_section: fields.CommunitySection = "text",
+    offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
     """世界/周常聚合入口：商人、周常、收藏品和社区机制资料。
