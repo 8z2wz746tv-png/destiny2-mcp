@@ -51,6 +51,8 @@ _RESPONSE = {
                            "saleStatus": 8},
                     "12": {"vendorItemIndex": 12, "itemHash": _PLACEHOLDER_ITEM, "costs": [], "failureIndexes": [],
                            "augments": 0, "saleStatus": 0},
+                    "13": {"vendorItemIndex": 13, "itemHash": 707, "costs": [], "failureIndexes": [0], "augments": 0,
+                           "saleStatus": 8},
                 }
             },
             str(_FOCUS): {
@@ -152,6 +154,7 @@ class _Manifest:
         704: "档案物品",
         705: "枪匠货",
         706: "仄的货",
+        707: "先锋行动",
         900: "Verified Barrel",
     }
 
@@ -276,8 +279,9 @@ async def test_named_vendor_returns_tabs_rank_and_buyability() -> None:
     assert len(result.vendors) == 1
     vendor = result.vendors[0]
     assert vendor.vendor_hash == _VANGUARD
-    assert vendor.total_items == 3
+    assert vendor.total_items == 3          # 13 号那条挂在装饰性 tab 下，不算商品
     assert vendor.purchasable_items == 2
+    assert vendor.hidden_items == 1
     assert vendor.truncated is False
     # 分类：等级奖励 / 子菜单 / 帮助按钮被丢掉
     assert [(category.index, category.kind) for category in vendor.categories] == [
@@ -450,3 +454,33 @@ async def test_blank_failure_string_falls_back_to_index_message() -> None:
     blocked = next(item for item in result.vendors[0].sale_items if item.name == "不可买的材料")
     assert blocked.can_be_sold is False
     assert blocked.failure_reasons == ["上游标记为不可购买（原因索引 [0]）"]
+
+
+@pytest.mark.asyncio
+async def test_sale_item_category_index_always_points_at_a_listed_category() -> None:
+    """sale_items[].category_index 不能指向一个没列出来的分类。"""
+    service, _ = _service()
+
+    result = await service.get_vendor_inventory("玩家#1234", "hunter", str(_VANGUARD))
+
+    vendor = result.vendors[0]
+    listed = {category.index for category in vendor.categories}
+    assert listed == {1, 2}
+    for item in vendor.sale_items:
+        assert item.category_index is None or item.category_index in listed
+    assert "先锋行动" not in {item.name for item in vendor.sale_items}
+
+
+@pytest.mark.asyncio
+async def test_uncapped_rank_reports_no_cap_instead_of_minus_one() -> None:
+    """上游用 -1 表示无上限，不能把它当数字吐给调用方。"""
+    response = deepcopy(_RESPONSE)
+    response["vendors"]["data"][str(_VANGUARD)]["progression"]["levelCap"] = -1
+    service = VendorService(_Bungie(response), _Manifest(), _Resolver())
+
+    result = await service.get_vendor_inventory("玩家#1234", "hunter", str(_VANGUARD))
+
+    rank = result.vendors[0].rank
+    assert rank is not None
+    assert rank.level_cap is None
+    assert rank.level == 11

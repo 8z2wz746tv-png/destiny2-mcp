@@ -163,6 +163,12 @@ def test_rank_reads_limits_and_names_the_reset_cycle() -> None:
     assert vm.build_rank(None) is None
 
 
+def test_uncapped_level_cap_is_none_not_minus_one() -> None:
+    assert vm.build_rank({"progressionHash": 1, "level": 50, "levelCap": -1}).level_cap is None
+    assert vm.build_rank({"progressionHash": 1, "level": 50, "levelCap": 0}).level_cap is None
+    assert vm.build_rank({"progressionHash": 1, "level": 11, "levelCap": 16}).level_cap == 16
+
+
 def test_daily_limits_are_labelled_daily() -> None:
     rank = vm.build_rank({"progressionHash": 1, "dailyLimit": 100})
 

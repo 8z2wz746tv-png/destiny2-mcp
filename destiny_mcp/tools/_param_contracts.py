@@ -550,6 +550,7 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
             '查收藏品状态用 intent="collectible_item"；查自己有没有这件东西用 '
             'inventory_assistant(intent="search")；intent="vendor" 返回整个货架，不按物品过滤。'
         ),
+        suggestion=("inventory_assistant", "search"),
     ),
     ("world_assistant", "vendor_name"): _contract(
         _only("vendor", "community"),

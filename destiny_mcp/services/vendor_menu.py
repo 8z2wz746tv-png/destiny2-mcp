@@ -233,6 +233,10 @@ def build_rank(
     progression_hash = int(progression.get("progressionHash") or 0)
     daily_limit = int(progression.get("dailyLimit") or 0)
     weekly_limit = int(progression.get("weeklyLimit") or 0)
+    # 上游对「没有上限」的声誉体系给 -1（实测：内欧姆那等级、王座世界等级等）；
+    # 原样吐出去会被消费方当成"上限 -1"，所以归一成 None = 无上限。
+    raw_cap = int(progression.get("levelCap") or 0)
+    level_cap = raw_cap if raw_cap > 0 else None
     if weekly_limit:
         reset_hint = "每周重置"
     elif daily_limit:
@@ -243,7 +247,7 @@ def build_rank(
         progression_hash=progression_hash,
         name=(progression_name(progression_hash) if progression_name else "") or "",
         level=int(progression.get("level") or 0),
-        level_cap=int(progression.get("levelCap") or 0),
+        level_cap=level_cap,
         progress=int(progression.get("currentProgress") or 0),
         progress_to_next_level=int(progression.get("progressToNextLevel") or 0),
         next_level_at=int(progression.get("nextLevelAt") or 0),

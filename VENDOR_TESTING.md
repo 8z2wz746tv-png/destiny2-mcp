@@ -42,9 +42,14 @@
 2. `mode="menu"` 时：**每件商品的列表是空的**（`vendors[].sale_items == []`），并且有 `question` 提示"要查哪个"。
 3. `returned_vendors == len(vendors)`，`returned_weapons` 同理（不能自相矛盾）。
 4. `truncated == (total > returned)`：说截断就必须真截断，真截断就必须说。
-5. 每件商品都有 `item_hash`（非 0）——它是串到武器详情的钥匙；`category_index` 必须能在同一个商人的 `categories[].index` 里找到。
+   - **响应级**（`data.vendors.truncated`）只在菜单态有意义（商人列表被 `limit` 裁过）；
+   - **商人级**（`vendors[].truncated`）只在详情态有意义（商品被裁过）；菜单态每个商人都写 `false`，
+     因为菜单本来就**不展开商品**（此时 `total_items > 0` 是正常的，不算违反）。
+5. 每件商品都有 `item_hash`（非 0）——它是串到武器详情的钥匙；`category_index` 要么指向
+   同一个商人 `categories[].index` 里**确实列出**的分类，要么为 `null`，**不允许指向被过滤掉的分类**。
 6. `can_be_sold=false` ⇒ `failure_reasons` **非空且不含空字符串**。
-7. `purchasable_items ≤ total_items`；`returned_vendors ≤ total_vendors`。
+7. `purchasable_items ≤ total_items`；`returned_vendors ≤ total_vendors`；`total_items + hidden_items`
+   = 上游真实行数（装饰性条目单独计数，不静默吞掉）。
 8. `categories[].kind="submenu"` ⇒ 一定有 `target_vendor_hash`；`target_available=false` 时必须有一条 `next_actions` 说明"本次没返回"。
 9. 不点名查商人 **不该** 逐个商人去拉 Perk socket（表现为慢+一堆 API 调用）。
 10. 任何"查不到"都必须是**说得清的空**：要么 `warnings` 给相近名字，要么明说"本周期不在/本次没返回"，**不允许**静默空数组。
@@ -90,7 +95,7 @@
 | D1 | 这个商人的货架分了哪几类？ | 每类的 `index`/`name`/`identifier`/`kind`/`item_count`；`kind` ∈ `sale`/`rewards`/`submenu` | 只给一个扁平商品列表 |
 | D2 | 「等级奖励」是什么？ | `kind="rewards"`、`identifier` 形如 `category.rank_rewards_seasonal`；说明它是**普通分类**，不是另一个商人 | 说"等级奖励是单独的模块/查不到" |
 | D3 | 「聚焦破译」点进去是什么？ | `kind="submenu"` + `target_vendor_hash`；工具给的是**下一步调用**，不是已合并的货架 | 声称这个分类不存在；或把两页货架混在一起 |
-| D4 | 帮助按钮（如「先锋行动」「枪匠」）算货架吗？ | 不算：装饰性 tab 不出现在 `categories` 里 | 把帮助按钮也列成一类商品 |
+| D4 | 帮助按钮（如「先锋行动」「枪匠」「霍桑」「仄」）算货架吗？ | 不算：装饰性 tab 不出现在 `categories` 里，挂在它下面的那条占位条目也**不进 `sale_items`、不计入 `total_items`**，只体现在 `hidden_items` 计数里 | 把帮助按钮列成一类商品；或商品里的 `category_index` 指向一个没列出来的分类 |
 | D5 | `target_available=false` 的子页面 | `next_actions` 里有一条明说"本次没有返回，暂时看不到它的货架" | 假装能查；或默默省略 |
 
 ### E. 能不能买 & 值不值得刷
@@ -117,7 +122,7 @@
 
 | # | 调用 | 期望输出 | 备注 |
 | --- | --- | --- | --- |
-| G1 | `world_assistant(intent="vendor", item_name="遗产")` | `ok=false` + `error.code="ignored_parameter"`，消息里列出真正认领 `item_name` 的 intent，并提示"vendor 返回整个货架，不按物品过滤" | 卖单件武器查询要用 `inventory_assistant(intent="search")` |
+| G1 | `world_assistant(intent="vendor", item_name="遗产")` | `ok=false` + `error.code="ignored_parameter"`，消息里列出真正认领 `item_name` 的 intent，提示"vendor 返回整个货架，不按物品过滤"，并给结构化 `next_actions`（改走 `inventory_assistant(intent="search")`） | 卖单件武器查询要用 `inventory_assistant(intent="search")`；所有 `ignored_parameter` 都应带 `next_actions`，只给文字不给调用算不合格 |
 | G2 | `world_assistant(intent="vendor", query="遗产")` | 同上（`query` 只给搜节点和社区） | 别把 query 当商品过滤 |
 | G3 | `world_assistant(intent="weekly", limit=3)` | 允许（`weekly` 认 `limit`） | 对照 G4 |
 | G4 | `world_assistant(intent="weekly_full", limit=3)` | `ok=false` + `ignored_parameter`（`weekly_full` 不读 limit） | 这是**故意**的，不是 bug |
@@ -146,7 +151,7 @@
 | --- | --- |
 | 商品名、价格、数量、`tier` | 字段名与 `mode`/`kind` 的取值 |
 | `total_items`、`purchasable_items`、菜单前几名 | `truncated == (total > returned)`、`returned == len(...)` |
-| `rank.level`、进度数字 | `rank` 里 `level ≤ level_cap`、有 `reset_hint` 或无（都合法） |
+| `rank.level`、进度数字、`level_cap` 的具体数值 | `level_cap` 要么是 `null`（= 无上限，上游发的是 -1），要么 `level ≤ level_cap` |
 | 商人是否在（仄只在周五 17:00–周二 17:00 UTC 在；聚焦页可能整周没货） | "不在/没返回"必须被明说 |
 | 哪个子页面本次有返回 | `kind="submenu"` 必须有 `target_vendor_hash` |
 | 具体商人 hash 是否出现（实测 229 个有货架的商人） | 别名/hash/片段三种写法都能定位到同一个 hash |
@@ -177,6 +182,9 @@
 | 仄（Xur）周三问不到 | 他只在周五 17:00 – 周二 17:00 UTC 在塔里，代码按时间判断后明说不在此周期 | 正常 |
 | `farming_list` 里 `matched_count=0` | 本地清单是**武器**清单，材料／货币／护甲不会命中 | 正常；`unmatched ≠ 不值得刷` |
 | 某件商品 `item_type` 是空串 | 该条目在上游没有类型（Bungie 枚举里那个成员就叫 `None`），显示空串而不是字符串 `"None"` | 已修 |
+| ~~`rank.level_cap=-1` 被当成上限~~ | 已修：上游对无上限的声誉体系（内欧姆那等级、王座世界等级、总合部、派克组、智能失效保险）发 -1，现在归一成 `null` | **已修** |
+| 「智能失效保险」的 `rank.name` 和商人同名，像是回退 | 不是回退：manifest 里那条声望定义的 `displayProperties.name` 本身就写作「智能失效保险」（已直接查定义核实） | 上游数据如此，不是缺陷 |
+| 装饰性条目混进 `sale_items`、`category_index` 越界 | 已修：装饰性 tab 下的条目不再算商品，改计入 `hidden_items` | **已修** |
 
 ---
 
@@ -189,3 +197,11 @@
 ```bash
 .venv/bin/python -m pytest tests/test_vendor_menu.py tests/test_vendor_inventory_modes.py -q
 ```
+
+几条"环境不具备、没法现场构造"的用例，自动化里已经有对应断言，不必等条件：
+
+| 现场难测的用例 | 自动化位置 |
+| --- | --- |
+| C6 商人本周期不在 | `test_vendor_inventory_modes.py::test_xur_absence_is_reported_instead_of_returning_nothing`（把可用性打桩成 false） |
+| E6 `farming_list.available=false` | `test_farming_list_lookup.py`（服务缺失 / 抛 `DestinyMCPError` 两条路径） |
+| F3 `limit` 超大值的夹取 | `test_vendor_menu.py::test_limit_clamping_uses_mode_defaults`（`clamp_limit(1000)` → 250 上限） |

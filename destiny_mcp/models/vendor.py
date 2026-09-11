@@ -48,7 +48,10 @@ class VendorRank(BaseModel):
     progression_hash: int = Field(description="DestinyProgressionDefinition hash")
     name: str = Field(default="", description="Reputation track name, e.g. 先锋")
     level: int = Field(default=0, description="Current rank level")
-    level_cap: int = Field(default=0, description="Maximum rank level")
+    level_cap: int | None = Field(
+        default=None,
+        description="Rank cap; None means the track has no cap (upstream sends -1)",
+    )
     progress: int = Field(default=0, description="Progress earned inside the current level")
     progress_to_next_level: int = Field(default=0, description="Progress still needed")
     next_level_at: int = Field(default=0, description="Progress value at which the next level ends")
@@ -94,6 +97,10 @@ class VendorInfo(BaseModel):
     total_items: int = Field(default=0, description="How many items this vendor really has")
     purchasable_items: int = Field(
         default=0, description="How many of them have no upstream purchase failure"
+    )
+    hidden_items: int = Field(
+        default=0,
+        description="Upstream rows excluded because their tab is decorative (help/button), not merchandise",
     )
     truncated: bool = Field(default=False, description="True when sale_items is shorter than total_items")
     sale_items: list[VendorSaleItem] = Field(default_factory=list)

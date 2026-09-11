@@ -601,12 +601,24 @@ class VendorService:
                 available_vendors=identity_by_hash,
                 vendor_label=label_for,
             )
+            # 装饰性 tab（帮助按钮/纯展示）不进 categories；挂在它们下面的条目也不是商品，
+            # 否则会出现 sale_items[].category_index 指向一个没列出来的分类。
+            listed_indexes = {category.index for category in categories}
+            decorative_indexes = {
+                int(entry["displayCategoryIndex"])
+                for entry in api_categories
+                if entry.get("itemIndexes") and entry.get("displayCategoryIndex") not in listed_indexes
+            }
 
             items: list[VendorSaleItem] = []
             total_items = 0
             purchasable_items = 0
+            hidden_items = 0
             for item_index_str, sale_item in sale_items_raw.items():
                 if not isinstance(sale_item, dict):
+                    continue
+                if index_to_category.get(int(item_index_str)) in decorative_indexes:
+                    hidden_items += 1
                     continue
                 total_items += 1
                 if not (sale_item.get("failureIndexes") or []):
@@ -631,6 +643,7 @@ class VendorService:
                 categories=categories,
                 total_items=total_items,
                 purchasable_items=purchasable_items,
+                hidden_items=hidden_items,
                 truncated=detail_mode and total_items > len(items),
                 sale_items=items,
             ))
