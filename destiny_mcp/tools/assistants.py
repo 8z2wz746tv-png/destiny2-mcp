@@ -1158,7 +1158,6 @@ async def subclass_assistant(
     fragment_name: str = "",
     artifact_name: str = "",
     artifact_mod_hash: ArtifactModHash = 0,
-    artifact_mod_name: str = "",
     changes: dict[str, str] | None = None,
     query: str = "",
     limit: int = 10,

@@ -184,7 +184,6 @@ Manifest 侧（**不代表拥有**）：
 | `any_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
 | `armor_slot` | `inventory_assistant`：`get`、`inventory`、`list` |
 | `artifact_mod_hash` | `subclass_assistant`：`artifact_mod`、`equip_artifact_mod` |
-| `artifact_mod_name` | `subclass_assistant`：没有任何 intent 读它 |
 | `artifact_name` | `subclass_assistant`：`artifact`、`community` |
 | `baseline` | `build_assistant`：`farm_target` |
 | `canonical_build` | `build_assistant`：`equip_build` |
@@ -280,6 +279,12 @@ Manifest 侧（**不代表拥有**）：
 ## 五、评级刻度：三种刻度不能混
 
 带武器或护甲的结果会附带 `farming_list`：按**精确名称**在本地清单里查的评级。每行都写明来自哪张清单、哪个 `scale`，跨刻度比较是错的。
+
+### Perk 上的 `god_roll_pve` / `god_roll_pvp`
+
+`perk_pool`、`analyze`、`compare` 返回的每个 Perk 都带这两个布尔标记，来源是本地 **DIM 社区愿单**：`true` 表示愿单给这把枪的推荐里包含这个 Perk。它和 `farming_list` 是两套数据，不要混着引用。
+
+愿单没装、没下载完，或者愿单里没有这把枪时，两个标记**全是 `false`** —— 那是「本地没收录」，不是「这些 Perk 都不好」。愿单在首次启动时自动下载；`weapon_assistant(intent="god_roll")` 给的是同一份数据的整理结果。
 
 - `scale="T"` —— 精选刷取清单（白弹／绿弹／威能紫枪、异域武器）。这才是「值不值得刷」的答案。`tier` 是 `T0`–`T4`，可能带限定语，例如 `T0（旧）` 表示旧版本；异域清单给的是 `scenario_tiers`，例如 `{"输出": "T0", "高难": "T0.5"}`，或者 `role` 这样的定位标签（如 `输出工具枪`）——`role` 是定位，不是档位。
 - `scale="S-F"` —— 购物清单（白弹／绿弹／威能／其他）。覆盖全部传说武器的梯队表，`S`–`F` 分级并在同弹种内带 `rank`。只在精选清单没覆盖时用，回答的是「它有多好」，不是「值不值得刷」。

@@ -54,6 +54,46 @@ class ArmorCatalogMixin:
         4244567218: "近战",
     }
 
+    # 筛模组用的属性关键词：工具面其它地方用的是英文键
+    # （weapons_target / priority_stats 的 weapons/health/class_stat/…），
+    # 而模组名称和描述是中文。两种都认 —— 只认中文时，传英文会安静地返回 0 条，
+    # 看起来像"游戏里没有这种模组"。
+    _STAT_ALIASES: dict[str, tuple[str, ...]] = {
+        "weapons": ("武器",), "weapon": ("武器",), "武器": ("武器",),
+        "health": ("生命",), "生命值": ("生命",), "生命": ("生命",),
+        "class_stat": ("职业",), "class": ("职业",), "职业": ("职业",),
+        "grenade": ("手雷",), "手雷": ("手雷",),
+        "super_stat": ("超能",), "super": ("超能",), "超能": ("超能",),
+        "melee": ("近战",), "strength": ("近战",), "力量": ("近战",), "近战": ("近战",),
+        "mobility": ("敏捷",), "敏捷": ("敏捷",),
+        "resilience": ("韧性",), "韧性": ("韧性",),
+        "recovery": ("恢复",), "恢复": ("恢复",),
+        "discipline": ("纪律",), "纪律": ("纪律",),
+        "intellect": ("智慧",), "智慧": ("智慧",),
+    }
+
+    # 部位关键词同样中英都认（中文是玩家实际会说的写法）
+    _SLOT_ALIASES = {
+        "helmet": "helmet", "头盔": "helmet",
+        "gauntlets": "gauntlets", "手套": "gauntlets", "护手": "gauntlets", "臂铠": "gauntlets",
+        "chest": "chest", "胸甲": "chest",
+        "legs": "legs", "腿甲": "legs", "腿部": "legs",
+        "class_item": "class_item", "职业物品": "class_item", "职业护甲": "class_item",
+    }
+
+    @classmethod
+    def _stat_keywords(cls, stat: str) -> tuple[str, ...]:
+        """把筛选关键词展开成所有要匹配的写法（英文键 → 中文，中文原样）。"""
+        cleaned = stat.strip()
+        return cls._STAT_ALIASES.get(cleaned.lower(), (cleaned,))
+
+    @staticmethod
+    def _mod_matches_keywords(mod: dict, keywords: tuple[str, ...]) -> bool:
+        haystacks = [str(key).lower() for key in mod.get("stat_bonus", {})]
+        haystacks.append(mod.get("description", "").lower())
+        haystacks.append(mod.get("name", "").lower())
+        return any(keyword in text for keyword in keywords for text in haystacks)
+
     def get_armor_mods(
         self, slot: str = "", category: str = "all", stat: str = ""
     ) -> list[dict]:
@@ -89,8 +129,9 @@ class ArmorCatalogMixin:
             "legs": 2111701510,
             "class_item": 912441879,
         }
-        if slot and slot in slot_to_hash:
-            target_hashes = {slot_to_hash[slot]}
+        slot_key = self._SLOT_ALIASES.get(slot.strip().lower(), slot.strip()) if slot else ""
+        if slot_key in slot_to_hash:
+            target_hashes = {slot_to_hash[slot_key]}
             # Also include general mods (they go in any slot)
             if category != "general":
                 target_hashes.add(2487827355)
@@ -159,23 +200,10 @@ class ArmorCatalogMixin:
 
         # Filter by stat keyword if specified
         if stat:
-            stat_lower = stat.lower()
-            filtered = []
-            for mod in results:
-                # Match stat_bonus keys (e.g., "恢复", "手雷")
-                stat_keys = [k.lower() for k in mod.get("stat_bonus", {}).keys()]
-                # Match description text
-                desc_lower = mod.get("description", "").lower()
-                # Match mod name
-                name_lower = mod.get("name", "").lower()
-
-                if (
-                    any(stat_lower in k for k in stat_keys)
-                    or stat_lower in desc_lower
-                    or stat_lower in name_lower
-                ):
-                    filtered.append(mod)
-            results = filtered
+            keywords = self._stat_keywords(stat)
+            results = [
+                mod for mod in results if self._mod_matches_keywords(mod, keywords)
+            ]
 
         # Sort: general mods first, then by slot, then by energy cost
         results.sort(key=lambda x: (x["slot"] != "general", x["slot"], x["energy_cost"]))

@@ -148,7 +148,7 @@ ArtifactModHash = Annotated[
     int,
     Field(description=(
         '神器模组的 hash，必须为正数。查模组详情用 intent="artifact_mod"，'
-        '装备模组用 intent="equip_artifact_mod"；artifact_mod_name 没有任何 intent 读。'
+        '装备模组用 intent="equip_artifact_mod"；没有按名字查模组的入口。'
     )),
 ]
 

@@ -456,14 +456,6 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint='查模组详情用 intent="artifact_mod"；装备模组用 intent="equip_artifact_mod"。',
         suggestion=("subclass_assistant", "artifact_mod"),
     ),
-    ("subclass_assistant", "artifact_mod_name"): _contract(
-        _only(),
-        hint=(
-            "这个参数目前没有任何 intent 读取，传了不会有任何效果；"
-            '查单个模组请用 artifact_mod_hash（intent="artifact_mod"）。'
-        ),
-        suggestion=("subclass_assistant", "artifact_mod"),
-    ),
     ("subclass_assistant", "changes"): _contract(
         _only("modify"), hint='改技能用 intent="modify"，改动放进 changes。',
         suggestion=("subclass_assistant", "modify"),

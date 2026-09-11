@@ -233,6 +233,7 @@
 | 看看班西现在卖什么，哪件值得留 | `vendor` | 每件带来源与评级；护甲类给 `scale="ordered"`（无档位，不编评级）。 |
 | 我缺的那件去哪刷 | `build_assistant(community)` 的 `sourcing` | 有来源给来源；`reason="no_adapter"` 时说明该类别未接入，**不是「没有来源」**。 |
 | 社区配装要的 Perk 和清单推荐的一样吗 | 不适用 | 必须**分开**说明：模板 `required_perks` 是「都要」，清单 `recommended_perks` 是「同栏任一」。 |
+| `<武器>` 的 Perk 里哪些是社区推荐的 | `perk_pool`／`analyze`，读每个 Perk 的 `god_roll_pve`／`god_roll_pvp` | 来自本地 DIM 愿望单；全为 `false` 时要说明「本地没收录」，**不能说「这些 Perk 都不好」**；它和 `farming_list` 是两套数据。 |
 
 ## 十三、错误与空状态
 
