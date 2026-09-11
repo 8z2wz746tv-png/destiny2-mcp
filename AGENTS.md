@@ -11,10 +11,12 @@ For any agent, not only Codex:
 
 ## Skill maintenance
 
-`skills/destiny2-mcp/` is the single source for the agent-facing guide; hosts only load a copy from their own skills directory.
+`skills/destiny2-mcp/` is the single source for the agent-facing guide. Nothing in it may assume one host: the same folder is loaded by hosts with a skills directory, and hosts without one get a pointer block plus the public URL advertised in the MCP handshake.
 
-- After editing anything under `skills/destiny2-mcp/`, run `scripts/install_skill.py` so the installed copy keeps up.
+- After editing anything under `skills/destiny2-mcp/`, run `scripts/install_skill.py` so the installed copies keep up; `--list` shows which hosts were detected, `--pointer` refreshes the instruction-file pointers.
+- Never write into a directory the host manages itself (for example Cursor's `skills-cursor`); use `--target` or `--pointer <file>` for unlisted hosts.
 - `tests/test_skill_contracts.py` checks `references/routing.md` against the code: intent coverage, parameter ownership, write intents, community categories. A red test there means the document is stale, not that the check is too strict.
+- `tests/test_skill_install.py` checks the delivery layer: pointer idempotence, mirror sync, and that `config.ROUTING_GUIDE_URL` matches the installer's URL.
 
 ## Setup-related tasks
 

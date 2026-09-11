@@ -29,6 +29,7 @@ from .config import (
     MCP_HOST,
     MCP_PORT,
     MCP_TRANSPORT,
+    ROUTING_GUIDE_URL,
     TOOL_PROFILE,
     resolve_resource_dir,
 )
@@ -417,7 +418,9 @@ def create_server(tool_profile: str | None = None) -> FastMCP:
             "Keep source URLs, dates, numerical conditions and uncertainty markers. "
             "Account loadouts expose a normalized build_template, but it is not an executable "
             "canonical_build. Unknown or unchecked requirements must not be reported as missing "
-            "or satisfied. Game writes require explicit user confirmation."
+            "or satisfied. Game writes require explicit user confirmation. "
+            "A parameter the chosen intent does not read is rejected with ignored_parameter; "
+            f"full tool/intent/parameter index: {ROUTING_GUIDE_URL}"
         ),
         json_response=True,
         lifespan=lifespan,

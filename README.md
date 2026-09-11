@@ -25,17 +25,26 @@ Destiny 2 装备管理 MCP Server — 通过 AI Agent 管理武器和装备。
 本项目提供两层 Agent 指引：
 
 - [`destiny2-mcp` 通用 Skill](skills/destiny2-mcp/SKILL.md)：工具路由、证据范围、Starside 配装和确认边界；任何能读取 Markdown 的 Agent 都可以使用。
-- [`destiny-mcp-setup` 安装 Skill](skills/destiny-mcp-setup/SKILL.md)：本地安装、OAuth、MCP 注册和故障排查；其中部分步骤是 Codex 专用的。
+- [`destiny-mcp-setup` 安装 Skill](skills/destiny-mcp-setup/SKILL.md)：本地安装、OAuth、MCP 注册和故障排查；注册部分与具体宿主相关，仓库里以 Codex 的命令为例。
 
-Skill 文件放在 GitHub 仓库中，不代表已经自动安装到某个平台的 Skill 目录。是否自动发现取决于 Agent 平台；如果平台不会自动发现，请按下面的提示让 Agent 直接读取这些 Markdown 文件。
+这份文档**不针对任何平台**，但不同宿主的加载能力不一样，所以按能力分三种落点 —— 不按品牌：
 
-Codex 这类宿主只自动加载 `~/.codex/skills/` 下的目录，所以仓库里这份文档要显式装一次（仓库始终是唯一源头，脚本只做镜像复制，不改宿主配置）：
+| 宿主能力 | 落点 | 怎么做 |
+| --- | --- | --- |
+| 有 skills 目录 | `~/.codex/skills/`、`~/.claude/skills/` 等 | 运行 `scripts/install_skill.py`（自动探测本机已存在的宿主） |
+| 只读全局指令文件 | `~/.codex/AGENTS.md`、`~/.claude/CLAUDE.md` 等 | 加 `--pointer`，写入一段指向文档的指针（幂等，重复跑不会堆积） |
+| 只连 MCP、不读文件 | MCP 握手 `instructions` 里的**线上地址** | 什么都不用做：能联网的客户端可以自己去读 |
 
 ```bash
-.venv/bin/python scripts/install_skill.py --dry-run          # 先看会改哪些文件
-.venv/bin/python scripts/install_skill.py                    # 装到 ~/.codex/skills/destiny2-mcp
-.venv/bin/python scripts/install_skill.py --target <目录>     # 其它宿主指到它自己的 skills 目录
+.venv/bin/python scripts/install_skill.py --list                  # 看本机探测到哪些宿主、会写到哪里
+.venv/bin/python scripts/install_skill.py --dry-run               # 先看会改哪些文件
+.venv/bin/python scripts/install_skill.py                         # 装到探测到的宿主 skills 目录
+.venv/bin/python scripts/install_skill.py --pointer               # 往全局指令文件写指针块
+.venv/bin/python scripts/install_skill.py --target <目录>          # 其它宿主的 skills 目录
+.venv/bin/python scripts/install_skill.py --pointer <文件>         # 其它宿主的规则文件（如 ~/AGENTS.md）
 ```
+
+仓库始终是唯一源头：脚本只做镜像复制和写入带标记的指针块，不改宿主配置，也不碰宿主自己管理的目录（例如 Cursor 的 `skills-cursor`）。**不装也能用**：MCP 握手的 `instructions` 和 8 个工具的 schema 每个客户端都会收到，线上还有这份完整文档。
 
 ### 使用任意 Agent 安装
 
@@ -341,7 +350,7 @@ PvP、强化和待验证数值保留为 `[pvp]`、`[enh]`、`[unsure]` 标记。
 .venv/bin/python scripts/verify_starside.py --inventory
 ```
 
-更多自然语言测试及验收标准见 [TESTING.md](TESTING.md)；覆盖全部 8 个工具与 108 个 intent 的完整语料见 [TESTING_CORPUS.md](TESTING_CORPUS.md)。代码更新后重启 Codex 或新开任务，
+更多自然语言测试及验收标准见 [TESTING.md](TESTING.md)；覆盖全部 8 个工具与 108 个 intent 的完整语料见 [TESTING_CORPUS.md](TESTING_CORPUS.md)。代码或文档更新后，重启你的 Agent 宿主或新开一个任务 ——
 避免继续使用旧服务进程。
 
 ## License

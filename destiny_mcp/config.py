@@ -92,6 +92,12 @@ MCP_PORT: int = int(os.getenv("MCP_PORT", "8000"))
 MCP_TRANSPORT: str = os.getenv("MCP_TRANSPORT", "stdio")
 TOOL_PROFILE: str = os.getenv("DESTINY_MCP_TOOL_PROFILE", "normal")
 
+# Public documentation address. The MCP handshake advertises it so that *any* client
+# can reach the full routing guide without a host-specific installation step.
+# scripts/install_skill.py must agree with this; tests/test_skill_install.py enforces it.
+REPO_URL: str = "https://github.com/8z2wz746tv-png/destiny2-mcp"
+ROUTING_GUIDE_URL: str = f"{REPO_URL}/blob/main/skills/destiny2-mcp/references/routing.md"
+
 # DIM wish list: an explicit path wins, otherwise the fallback order below decides.
 WISHLIST_PATH: Path | None = (
     Path(os.path.expanduser(value))

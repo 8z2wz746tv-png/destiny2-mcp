@@ -7,7 +7,7 @@ metadata:
 
 # Destiny 2 MCP
 
-This is a platform-neutral usage guide. An agent may read this file directly from GitHub; it does not require Codex-specific Skill installation.
+This is a platform-neutral usage guide. An agent may read this file directly from a local copy or from GitHub; it does not require any host-specific skill installation.
 
 ## First decision: what evidence does the user want?
 
@@ -38,4 +38,6 @@ Read only the relevant reference before a complex request:
 
 ## Installation handoff
 
-This file explains usage, not platform registration. Follow the repository's `README.md` and `skills/destiny-mcp-setup/SKILL.md` for installation and OAuth. If the host does not support Codex Skills, load this Markdown as project instructions and use its MCP configuration method.
+This file explains usage, not platform registration. Follow the repository's `README.md` and `skills/destiny-mcp-setup/SKILL.md` for installation and OAuth.
+
+Nothing here assumes a particular host: any agent that can read Markdown can use this file directly, from a local copy or from the repository. Hosts with a skills directory load the whole folder; hosts that only read an instruction file can be pointed at `references/routing.md`; hosts that only speak MCP already receive the essentials plus the online guide address in the server's handshake instructions.
