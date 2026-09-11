@@ -1,6 +1,8 @@
-# Codex 测试指南
+# 测试指南
 
 适用于当前工作区的本地单用户版本，默认 `normal` 模式。
+
+下文里的宿主命令以 Codex 为例，但**检查点与平台无关**：换任何能连 MCP 的宿主，验收标准都相同。
 
 **完整语料见 [`TESTING_CORPUS.md`](TESTING_CORPUS.md)**：按 8 个工具逐节列出可以直接发送的话、期望路由与验收点，含确认、证据边界、缺数据、社区资料等横切用例。机器可读子集在 [`tests/agent_behavior_cases.yaml`](tests/agent_behavior_cases.yaml)。本文下面的章节是其中较早、较窄的一部分。
 
@@ -10,7 +12,7 @@
 
 - 使用现有 Python 3.13 虚拟环境，执行 `pip install -e .` 更新安装。
 - `pip check` 通过；`pytest -q` 返回 `228 passed`。
-- 保留现有 Codex `destiny` 注册，命令指向本项目的 `.venv/bin/destiny-mcp`。
+- 保留宿主里现有的 `destiny` 注册，命令指向本项目的 `.venv/bin/destiny-mcp`。
 - 保留本地凭据和已有 OAuth 登录；真实账号档案读取通过。
 - 验证脚本返回 `BUNGIE_PROFILE_CHECK=ok`、`MCP_TOOL_COUNT=8`、`VERIFY_OK`。
 
@@ -21,7 +23,7 @@ Starside 本地资料层现已接入，测试方法见第 6 节。它支持资�
 
 ## 1. 在新任务中检查连接
 
-先重启 Codex，或新开一个任务。旧任务可能继续使用旧服务进程或旧工具列表。
+先重启你的 Agent 宿主，或新开一个任务。旧任务可能继续使用旧服务进程或旧工具列表。
 测试期间不要在多个任务、DIM 和游戏客户端中同时修改同一账号的装备。
 
 先发送：
@@ -131,7 +133,7 @@ cd "/Users/husky/项目/destiny2-mcp"
 .venv/bin/python -m pytest -q
 ```
 
-- 没有工具：先新开任务或重启 Codex，再跑验证脚本。
+- 没有工具：先新开任务或重启宿主，再跑验证脚本。
 - 验证脚本必须同时得到 `BUNGIE_PROFILE_CHECK=ok`、`MCP_TOOL_COUNT=8` 和 `VERIFY_OK`，仅注册成功不算通过。
 - 回调连接被拒绝：检查登录助手是否仍运行，不要不断刷新旧的带授权码 URL。
 - 账号读取失败：检查网络、Bungie 服务状态和本地登录；不要先反复卸载重装。
@@ -154,7 +156,7 @@ cd "/Users/husky/项目/destiny2-mcp"
 - 一套模板的库存读通不代表全部模板适合当前版本，也不代表所有模组、技能和神器已验证。
 - 官方槽位改为输出统一的 `build_template`；`slot_number` 和 `native_character_id` 仍用于 Bungie 原生槽位执行，模板本身不是 `canonical_build`。
 
-先重启 Codex 或新开任务，然后逐条发送：
+先重启宿主或新开任务，然后逐条发送：
 
 | 测试话术 | 验收点 |
 | --- | --- |
@@ -204,4 +206,4 @@ cd "/Users/husky/项目/destiny2-mcp"
 离线回归使用合成数据，覆盖归档缺失/损坏、分页、多个配装块、无损数值语义、严格名称匹配、
 未知 Perk、同部位套装计数和防止模板直接执行，不需要复制真实归档或暴露账号数据。
 
-Codex MCP 配置参考：[官方 MCP 文档](https://developers.openai.com/codex/mcp)。本项目的 Bungie 登录使用自己的 `destiny-mcp-oauth`，不是远程 MCP 的 `codex mcp login`。
+宿主注册参考（以 Codex 为例）：[官方 MCP 文档](https://developers.openai.com/codex/mcp)。本项目的 Bungie 登录使用自己的 `destiny-mcp-oauth`，不是远程 MCP 的 `codex mcp login`。
