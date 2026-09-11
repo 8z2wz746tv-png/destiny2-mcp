@@ -138,50 +138,21 @@ def test_routing_index_covers_every_declared_intent() -> None:
         )
 
 
-def test_routing_parameter_table_matches_the_guard() -> None:
-    """参数归属表里的每句断言都要在代码里成立。
+def test_routing_parameter_table_matches_the_generator() -> None:
+    """参数表是生成出来的：文档里那一块必须与 `render_parameter_table()` 逐字一致。
 
-    `除 A、B 外全部` 按补集校验：例外名单必须正好是代码里不认它的那些，
-    这样「除……外」就不能用来含糊地盖住一句错的断言。
+    表格有 90 行、每行都在声明「谁读这个参数」，手写必然腐烂。所以它由代码生成、
+    由这里比对；要改就改 `_param_contracts.py`，然后跑
+    `python -m destiny_mcp.tools._param_contracts --write-doc` 重新生成。
     """
-    declared = _declared()
-    rows = {
-        tokens[0]: row[1]
-        for row in _table_rows("## 三、参数")
-        if (tokens := _first_cell_tokens("|" + "|".join(row) + "|"))
-    }
+    text = _routing_text()
+    assert contracts.BLOCK_START in text, "routing.md 缺少参数表起始标记"
+    assert contracts.BLOCK_END in text, "routing.md 缺少参数表结束标记"
+    block = text.split(contracts.BLOCK_START, 1)[1].split(contracts.BLOCK_END, 1)[0].strip()
 
-    assert set(rows) == {parameter for _, parameter in contracts.PARAMETER_OWNERS}, (
-        "参数表与 PARAMETER_OWNERS 不是同一组参数"
-    )
-
-    claimed: set[tuple[str, str]] = set()
-    for parameter, raw in rows.items():
-        for segment in raw.split("；"):
-            tools_here = [name for name in TOOL_NAMES if f"`{name}`" in segment]
-            assert len(tools_here) == 1, f"{parameter} 的这一段没写清工具：{segment}"
-            tool = tools_here[0]
-            key = (tool, parameter)
-            assert key in contracts.PARAMETER_OWNERS, f"{tool} 没有登记 {parameter}"
-            claimed.add(key)
-            owners = contracts.PARAMETER_OWNERS[key].intents
-            tokens = [token for token in _cell_tokens(segment) if token != tool]
-            if "除" in segment and "外" in segment:
-                excluded = set(_cell_tokens(segment.split("除", 1)[1].split("外", 1)[0]))
-                actual = declared[tool] - owners
-                assert excluded == actual, (
-                    f"{parameter} 的例外名单 {sorted(excluded)} 与代码不符，"
-                    f"应当是 {sorted(actual)}"
-                )
-                continue
-            unknown = set(tokens) - declared[tool]
-            assert not unknown, f"{parameter} 提到了 {tool} 不存在的 intent：{sorted(unknown)}"
-            not_owners = set(tokens) - owners
-            assert not not_owners, f"{parameter} 说 {tool} 认 {sorted(not_owners)}，但代码里不认"
-
-    assert claimed == set(contracts.PARAMETER_OWNERS), (
-        "这些 (工具, 参数) 在文档里没有出现："
-        f"{sorted(set(contracts.PARAMETER_OWNERS) - claimed)}"
+    assert block == contracts.render_parameter_table(), (
+        "routing.md 里的参数表和 _param_contracts.PARAMETER_OWNERS 不一致；"
+        "运行 python -m destiny_mcp.tools._param_contracts --write-doc 重新生成"
     )
 
 

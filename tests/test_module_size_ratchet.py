@@ -18,8 +18,9 @@ CEILINGS = {
     "destiny_mcp/manifest.py":           262,
     # +9：8 个 assistant 各一行 @check_intent_parameters，1 行 import。
     # +4：参数说明别名的 import（说明文本本身在 _param_docs.py）。
-    # 两次都只加了「引用」，逻辑没落在这个模块里。
-    "destiny_mcp/tools/assistants.py": 1401,
+    # +1：再加 7 个高危参数的说明别名，import 多一行。
+    # 三次都只加了「引用」，逻辑没落在这个模块里。
+    "destiny_mcp/tools/assistants.py": 1402,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,

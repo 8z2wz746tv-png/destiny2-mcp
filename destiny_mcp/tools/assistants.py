@@ -24,8 +24,9 @@ from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from ._param_contracts import check_intent_parameters
 from ._param_docs import (
-    Character, CharacterOptional, ItemInstanceId, ItemInstanceIds,
-    ItemName, ItemType, Location, PlayerName, TypeName, WeaponName,
+    ActivityId, ArtifactModHash, CanonicalBuild, Character, CharacterOptional, GroupId,
+    ItemInstanceId, ItemInstanceIds, ItemName, ItemType, LoadoutId, Location, NamePrefix,
+    PlayerName, SlotNumber, TypeName, WeaponName,
 )
 from ._requests import (
     ActivityIntent, BuildIntent, InventoryIntent, LoadoutIntent, PlayerIntent,
@@ -171,7 +172,7 @@ def _confirmation_required(intent: str, payload: dict[str, Any]) -> dict[str, An
 async def player_assistant(
     intent: PlayerIntent = "profile",
     player_name: PlayerName = None,
-    name_prefix: str = "",
+    name_prefix: NamePrefix = "",
     ctx: Context = None,
 ) -> dict:
     """玩家/账号聚合入口：搜索玩家、模糊找人、读取角色档案。"""
@@ -687,7 +688,7 @@ async def build_assistant(
         "farm_target 最多反推的待刷护甲件数。默认 2：先完整查找单件，"
         "只有单件无解才返回两件方案。两件回退目前只支持 equipped 基线。"
     ))] = 2,
-    canonical_build: dict | None = None,
+    canonical_build: CanonicalBuild = None,
     confirmed: bool = False,
     top_n: Annotated[int, Field(ge=1, le=20, description="返回的候选配装数量。")] = 5,
     community_build_id: Annotated[str, Field(description=(
@@ -1054,10 +1055,10 @@ async def loadout_assistant(
     ))] = "list",
     player_name: PlayerName = None,
     character: Character = "",
-    loadout_id: str = "",
+    loadout_id: LoadoutId = "",
     name: str = "",
     notes: str = "",
-    slot_number: int = 1,
+    slot_number: SlotNumber = 1,
     name_hash: int | None = None,
     icon_hash: int | None = None,
     color_hash: int | None = None,
@@ -1156,7 +1157,7 @@ async def subclass_assistant(
     component: str = "",
     fragment_name: str = "",
     artifact_name: str = "",
-    artifact_mod_hash: int = 0,
+    artifact_mod_hash: ArtifactModHash = 0,
     artifact_mod_name: str = "",
     changes: dict[str, str] | None = None,
     query: str = "",
@@ -1247,8 +1248,8 @@ async def activity_assistant(
     player_name: PlayerName = None,
     character: CharacterOptional = None,
     mode: str | None = None,
-    activity_id: str = "",
-    group_id: str = "",
+    activity_id: ActivityId = "",
+    group_id: GroupId = "",
     statid: str | None = None,
     maxtop: int = 10,
     count: int = 20,

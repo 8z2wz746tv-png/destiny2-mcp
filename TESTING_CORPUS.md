@@ -120,7 +120,7 @@
 | --- | --- | --- |
 | 列出我的 `<职业>` 已有配装，不保存不覆盖 | `list` | 本地配装与 Bungie 官方槽位**来源分开**；每项含统一 `build_template`。 |
 | 看下 `<配装名>` 的具体内容 | `get` | 含武器、护甲、模组、碎片与来源。 |
-| 读一下官方配装槽 3 | `get` + 槽位 | 官方槽位保留 `slot_number` 等执行元数据；这些不是热度依据。 |
+| 读一下我所有的官方配装槽 | `get` + `character` | `list`/`get` 只按角色过滤，**返回全部**（含官方槽位）；`loadout_id`、`slot_number`、`kind`、`query` 在这两个 intent 上会被拒绝。官方槽位保留 `slot_number` 等执行元数据，这些不是热度依据。 |
 | 保存这套配装叫「测试配装」 | `save`，先确认 | 展示将写入的内容；确认后才落盘。 |
 | 删掉「测试配装」 | `delete`，先确认 | 展示要删除的目标；不误删其他配装。 |
 | 换上「测试配装」 | `equip_loadout` + `loadout_id`，先确认 | 需要本地或官方配装 ID；不按名字猜。 |
@@ -244,6 +244,11 @@
 | 改官方槽位到 21 号 | `update_official_identifiers` / `clear_official` | 槽位范围 1–20，越界应报错。 |
 | 装一个 hash 为负的神器模组 | `equip_artifact_mod` | 参数错误：hash 必须为正。 |
 | 用一个不存在的 intent | 任意工具 + 乱填 intent | 返回 `unsupported_intent` 并列出可用值，**不要静默降级成默认行为**。 |
+| 把实例 ID 传给 `inventory_assistant(intent="get")` | 拒绝，改走 `weapon_assistant(intent="compare")` 或 `inventory_assistant` 的写入 intent | 返回 `ignored_parameter`；**不进入服务层**，更不能返回整包清单冒充答案。 |
+| 把物品名传给 `inventory_assistant(intent="summary")` | 拒绝，改走 `intent="search"` | 同上：问的是某一件事，返回的不能是概况。 |
+| 把 `loadout_id` 传给 `loadout_assistant(intent="get")` | 拒绝 | 消息说明 `list`/`get` 返回全部配装、要自己挑，**不能把第一条当成用户说的那套**。 |
+| 把 `weapon_name` 传给 `weapon_assistant(intent="type")` | 拒绝，改传 `weapon_type` | 类型查询走 `weapon_type`；`weapon_name` 在 `type` 上无人认领。 |
+| 把属性目标传给 `build_assistant(intent="community")` | 拒绝，改走求解类 intent | 社区配装不吃 `*_target` 硬约束，混用会让人以为目标生效了。 |
 
 ## 十四、只跑一次就够的整链路
 

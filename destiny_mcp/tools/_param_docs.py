@@ -104,3 +104,59 @@ WeaponName = Annotated[
         "（它查 perk_name）外，武器意图都读它。"
     )),
 ]
+
+NamePrefix = Annotated[
+    str,
+    Field(description=(
+        '名字片段，模糊搜玩家用（intent="find"）。精确查人要用完整 BungieName 配 intent="search"。'
+    )),
+]
+
+LoadoutId = Annotated[
+    str,
+    Field(description=(
+        '已存配装的 ID。只有 intent="delete" 和 intent="equip_loadout" 读它；'
+        "list/get 会返回全部配装、不接受 ID，要哪一套请从结果里挑。"
+    )),
+]
+
+SlotNumber = Annotated[
+    int,
+    Field(ge=1, le=20, description=(
+        "Bungie 官方配装槽位号（1–20）。只有快照/改标识/清空三个写入 intent 读它；"
+        "list/get 返回全部槽位，不接受槽位号。"
+    )),
+]
+
+ActivityId = Annotated[
+    str,
+    Field(description=(
+        '活动实例 ID。只有 intent="pgcr" 读它（看单场结算）；'
+        '看最近几场用 intent="history"。'
+    )),
+]
+
+GroupId = Annotated[
+    str,
+    Field(description=(
+        '公会（clan）ID。只有 intent="clan_leaderboards" 读它，且必填；'
+        '个人排行榜用 intent="leaderboards"，不需要 group_id。'
+    )),
+]
+
+ArtifactModHash = Annotated[
+    int,
+    Field(description=(
+        '神器模组的 hash，必须为正数。查模组详情用 intent="artifact_mod"，'
+        '装备模组用 intent="equip_artifact_mod"；artifact_mod_name 没有任何 intent 读。'
+    )),
+]
+
+CanonicalBuild = Annotated[
+    dict | None,
+    Field(description=(
+        '服务端签发的完整配装候选（一次绑定、五个护甲部位齐全）。'
+        '只能在用户确认后原样回传给 intent="equip_build"；'
+        "禁止自己拼 hash、用 score，或把社区模板/build_template 当成它。"
+    )),
+]

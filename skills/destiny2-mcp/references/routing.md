@@ -120,7 +120,7 @@ Manifest 侧（**不代表拥有**）：
 | `update_official_identifiers` | 改官方槽位标识（写入） | `character`、`slot_number`、`name_hash`／`icon_hash`／`color_hash` 至少一个 |
 | `clear_official` | 清空官方槽位（写入） | `character`、`slot_number`（1–20） |
 
-`list` 和 `get` 只按 `character` 过滤，**返回全部配装**：`loadout_id`、`slot_number`、`kind`、`query` 在这两个 intent 上不参与筛选。要哪一套由你从结果里按名字或槽位号挑出来，不要假设第一条就是用户说的那套。
+`list` 和 `get` 只按 `character` 过滤，**返回全部配装**：`loadout_id`、`slot_number`、`kind`、`query` 在这两个 intent 上会被拒绝（返回 `ignored_parameter`）。要哪一套由你从结果里按名字或槽位号挑出来，不要假设第一条就是用户说的那套。
 
 官方槽位的名称、图标、颜色 hash 只是 Bungie 的展示元数据，**不是**配装内容，也不是热度依据。
 
@@ -169,20 +169,96 @@ Manifest 侧（**不代表拥有**）：
 
 ## 三、参数：传错会当场报错
 
-同一个工具只有一个宽签名，任何 `intent` 都能收到全部参数。凡是「回答问的是哪一件」的参数，只有下面这些 intent 认；别的 intent 传了会返回 `ignored_parameter`，消息里说明该换成哪个入口，`next_actions` 给出替代调用。
+同一个工具只有一个宽签名，任何 `intent` 都能收到全部参数。每个参数只有一部分 intent 真正读它，其余 intent 传了会**在调用服务层之前**返回 `ignored_parameter`，消息里列出认领者，能给出替代入口的还会带 `next_actions`。
 
-| 参数 | 谁认它 |
+这是**保证**，不是建议：`intent="get"` 配 `item_instance_id`、`intent="summary"` 配 `item_name`、`intent="get"` 配 `loadout_id` 都拿不到「看起来像答案」的结果，只会拿到一条要求改路由的错误。看到 `ignored_parameter` 不要重试同样的调用，按消息里的提示换 intent。
+
+判据是「行为上读没读」，不是「签名里有没有」：传了不改变任何结果的参数一律算没人认。等于签名默认值的值不算传（`confirmed=false`、`limit=10` 原样发过来不会被拒）。
+
+下面这张表由 `destiny_mcp/tools/_param_contracts.py` 生成，测试保证文档与代码逐字一致：
+
+<!-- 参数归属表开始：由 _param_contracts.render_parameter_table() 生成，不要手改 -->
+| 参数 | 谁读它 |
 | --- | --- |
-| `item_name` | `inventory_assistant`：`search`、`duplicates`、`move`；`world_assistant`：`community`、`collectible_item` |
-| `item_instance_id` | `inventory_assistant`：`move`、`transfer`、`equip`、`pull_postmaster`、`lock`、`track_quest`；`weapon_assistant`：`compare` |
-| `item_instance_ids` | `inventory_assistant`：`equip_many` |
-| `item_type` | `inventory_assistant`：`summary`、`get`、`type` |
-| `type_name` | `inventory_assistant`：`duplicates`、`type` |
-| `weapon_name` | `weapon_assistant`：除 `type`、`perk_description` 外全部武器 intent |
+| `activity_id` | `activity_assistant`：`pgcr` |
+| `any_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
+| `armor_slot` | `inventory_assistant`：`get`、`inventory`、`list` |
+| `artifact_mod_hash` | `subclass_assistant`：`artifact_mod`、`equip_artifact_mod` |
+| `artifact_mod_name` | `subclass_assistant`：没有任何 intent 读它 |
+| `artifact_name` | `subclass_assistant`：`artifact`、`community` |
+| `baseline` | `build_assistant`：`farm_target` |
+| `canonical_build` | `build_assistant`：`equip_build` |
+| `category` | `build_assistant`：`community`、`community_build`、`starside` |
+| `changes` | `subclass_assistant`：`modify` |
+| `character` | `activity_assistant`：除 `clan_leaderboards`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`set_bonus` 外全部；`inventory_assistant`：`equip`、`equip_items`、`equip_many`、`lock`、`pull_postmaster`、`quest_tracking`、`track_quest`；`loadout_assistant`：`clear_official`、`get`、`list`、`save`、`snapshot_official`、`update_official_identifiers`；`subclass_assistant`：`community`、`equip_artifact_mod`、`get`、`modify`、`options`、`subclass`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`vendor` |
+| `class_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `collectible_node_hash` | `world_assistant`：`collectible_node` |
+| `color_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
+| `community_category` | `world_assistant`：`community` |
+| `community_section` | `activity_assistant`：`community`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
+| `component` | `subclass_assistant`：`options` |
+| `confirmed_exotic_hash` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `count` | `activity_assistant`：`activity_aggregate`、`activity_stats`、`aggregate`、`community`、`history`、`weapon_history`、`weapon_leaderboard`、`weapon_usage`、`weapons` |
+| `destination` | `inventory_assistant`：`move` |
+| `element` | `subclass_assistant`：`community`、`fragments`、`options` |
+| `equip` | `inventory_assistant`：`move` |
+| `excluded_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
+| `exotic_confirmation_token` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `exotic_name` | `build_assistant`：`analyze`、`exotic_armor`、`farm_target`、`find`、`recommend` |
+| `fragment_name` | `subclass_assistant`：`community`、`fragment_details` |
+| `fragment_names` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `from_character` | `inventory_assistant`：`move`、`transfer` |
+| `grenade_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `group_id` | `activity_assistant`：`clan_leaderboards` |
+| `health_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `icon_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
+| `include_inventory` | `build_assistant`：`community`、`community_build`、`starside`；`weapon_assistant`：`analyze`、`filter_rolls` |
+| `include_invisible` | `world_assistant`：`collectible_node` |
+| `include_subclass_fragment` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `item_instance_id` | `inventory_assistant`：`equip`、`lock`、`move`、`pull_postmaster`、`quest_tracking`、`track_quest`、`transfer`；`weapon_assistant`：`compare`、`compare_duplicates` |
+| `item_instance_ids` | `inventory_assistant`：`equip_items`、`equip_many` |
+| `item_name` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`find_item`、`move`、`search`、`重复武器`；`world_assistant`：`collectible_item`、`community` |
+| `item_type` | `inventory_assistant`：`get`、`inventory`、`list`、`search_type`、`summarize`、`summary`、`type`、`概况` |
+| `kind` | `loadout_assistant`：`search_identifiers` |
+| `knowledge_id` | `activity_assistant`：`community`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
+| `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`summarize`、`summary`、`概况`、`重复武器`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`search_all`、`search_catalog`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`search_collectible_nodes`、`weekly` |
+| `loadout_id` | `loadout_assistant`：`delete`、`equip_loadout` |
+| `location` | `inventory_assistant`：`find_item`、`get`、`inventory`、`list`、`search`、`search_type`、`summarize`、`summary`、`type`、`概况`；`weapon_assistant`：`filter_rolls` |
+| `locked` | `inventory_assistant`：`lock` |
+| `max_replacements` | `build_assistant`：`farm_target` |
+| `maxtop` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
+| `melee_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `mode` | `activity_assistant`：`clan_leaderboards`、`community`、`history`、`leaderboard`、`leaderboards` |
+| `name` | `loadout_assistant`：`save` |
+| `name_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
+| `name_prefix` | `player_assistant`：`find`、`find_players`、`fuzzy` |
+| `notes` | `loadout_assistant`：`save` |
+| `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`重复武器`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
+| `perk_name` | `weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`perk_description`、`search_all`、`search_catalog` |
+| `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`filter_rolls`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`vendor` |
+| `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |
+| `priority_stats` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `query` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |
+| `rarity` | `inventory_assistant`：`get`、`inventory`、`list` |
+| `replacement_slot` | `build_assistant`：`farm_target` |
+| `required_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
+| `scenario` | `build_assistant`：`community`、`community_build`、`starside` |
+| `set_bonus_count` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `set_bonus_name` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend`、`set_bonus` |
+| `slot_number` | `loadout_assistant`：`clear_official`、`snapshot_official`、`update_official_identifiers` |
+| `statid` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
+| `super_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `to_character` | `inventory_assistant`：`transfer` |
+| `top_n` | `build_assistant`：`analyze`、`community`、`community_build`、`farm_target`、`find`、`recommend`、`starside` |
+| `tracked` | `inventory_assistant`：`quest_tracking`、`track_quest` |
+| `type_name` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`search_type`、`type`、`重复武器` |
+| `vendor_name` | `world_assistant`：`community`、`vendor` |
+| `weapon_name` | `weapon_assistant`：除 `perk_description`、`type` 外全部 |
+| `weapon_type` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog`、`type` |
+| `weapons_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+<!-- 参数归属表结束 -->
 
-这是**保证**，不是建议：`intent="get"` 配 `item_instance_id`、`intent="summary"` 配 `item_name` 都拿不到「看起来像答案」的结果，只会拿到一条要求改路由的错误。看到 `ignored_parameter` 不要重试同样的调用，按消息里的提示换 intent。
-
-`limit`、`offset`、`location`、`rarity` 这类范围与分页参数目前不拦：它们被忽略只是范围不对，不会把答案指到别的对象上。
+`confirmed` 是有意不登记的：它是写入确认门槛，读 intent 收到它被忽略不改变任何结果，而登记会误伤那些每次都把 `confirmed=true` 一起发过来的客户端。`community_build_id` 传给非 community intent 时，代码里已经有一段更贴切的 `community_template_not_executable` 说明。
 
 ## 四、社区资料：八个分类各装什么
 
