@@ -138,6 +138,8 @@ Manifest 侧（**不代表拥有**）：
 | `equip_artifact_mod` | 装神器模组（写入） | `character`、`artifact_mod_hash`（必须为正） |
 | `community` | 社区职业资料，**只在 `subclass` 分类里搜** | `query` 或 `fragment_name`／`element`、`knowledge_id`、`community_section`、`limit`、`offset` |
 
+`options` 必须同时给 `element` 和 `component`，`fragments` 必须给 `element`；缺了会返回 `subclass_error`，消息里列出合法取值（`void/solar/arc/stasis/strand/prism`、`super/melee/grenade/aspect/movement`，中文别名也认）。不要凭 0 条结果推断"没有可选项"。
+
 ### `activity_assistant` —— 战绩
 
 | intent | 做什么 | 关键参数 |

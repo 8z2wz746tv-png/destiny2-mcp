@@ -3,13 +3,16 @@
 Extracted from fragment_tools.py per Rule 1: tools should not contain
 business logic. This service encapsulates all manifest querying and
 data transformation for fragments and subclass options.
+
+参数不合法或查不到时**抛异常**，不返回 `{"error": ...}`：后者会被上层包进
+`ok=true` 的信封里，模型看到的是"成功"，于是把错误原文当结果念出来。
 """
 
 from __future__ import annotations
 
+from ..exceptions import ItemNotFoundError, SubclassError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, CHARACTER_CLASS_MAP
-from ..utils.hash_utils import to_signed
 
 logger = get_logger(__name__)
 
@@ -73,7 +76,9 @@ class FragmentService:
         """
         target_element = _ELEMENT_MAP.get(element.lower())
         if not target_element:
-            return {"error": f"不支持的元素: {element}，支持: void/solar/arc/stasis/strand/prism"}
+            raise SubclassError(
+                f"不支持的元素: {element}，支持: void/solar/arc/stasis/strand/prism"
+            )
 
         # Search for items whose plugCategoryIdentifier contains 'fragment' or 'trinket'
         all_candidates = []
@@ -101,7 +106,10 @@ class FragmentService:
             fragment_name: Fragment name (Chinese or English, fuzzy match).
 
         Returns:
-            Fragment info dict, or {"error": str} if not found.
+            Fragment info dict.
+
+        Raises:
+            ItemNotFoundError: 名字在 Manifest 里找不到对应碎片。
         """
         results = self._manifest.search(fragment_name, limit=10)
         for item in results:
@@ -109,7 +117,7 @@ class FragmentService:
             if info:
                 return info
 
-        return {"error": f"找不到碎片: {fragment_name}"}
+        raise ItemNotFoundError(f"找不到碎片: {fragment_name}")
 
     def list_subclass_options(
         self, class_name: str, element: str, component: str
@@ -133,11 +141,15 @@ class FragmentService:
         target_component = _COMPONENT_TYPE_MAP.get(component.lower())
 
         if target_class is None:
-            return {"error": f"不支持的职业: {class_name}，支持: hunter/warlock/titan"}
+            raise SubclassError(f"不支持的职业: {class_name}，支持: hunter/warlock/titan")
         if not target_element:
-            return {"error": f"不支持的元素: {element}，支持: void/solar/arc/stasis/strand/prism"}
+            raise SubclassError(
+                f"不支持的元素: {element}，支持: void/solar/arc/stasis/strand/prism"
+            )
         if not target_component:
-            return {"error": f"不支持的组件: {component}，支持: super/melee/grenade/aspect/movement"}
+            raise SubclassError(
+                f"不支持的组件: {component}，支持: super/melee/grenade/aspect/movement"
+            )
 
         if target_component == "grenades":
             target_cat = f"shared.{target_element}.grenades"

@@ -2,10 +2,14 @@
 
 Extracted from set_tools.py per Rule 1: tools should not contain
 business logic.
+
+查不到套装时**抛异常**，不返回 `{"error": ...}`：后者会被上层包进 `ok=true`
+的信封里，模型看到的是"成功"。
 """
 
 from __future__ import annotations
 
+from ..exceptions import ItemNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 
@@ -31,7 +35,7 @@ class SetBonusService:
 
         Returns:
             Set info dict with set_name, set_hash, armor_count, armor_pieces, perks.
-            Or {"error": str} if not found.
+            Armor set info dict.
         """
         all_sets = self._manifest.get_all_set_bonuses()
         matched_set = None
@@ -68,7 +72,7 @@ class SetBonusService:
                     break
 
         if not matched_set:
-            return {"error": f"找不到套装或护甲: {query}"}
+            raise ItemNotFoundError(f"找不到套装或护甲: {query}")
 
         set_hash, info = matched_set
 
