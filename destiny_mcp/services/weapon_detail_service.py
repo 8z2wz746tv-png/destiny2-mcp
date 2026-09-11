@@ -158,16 +158,18 @@ class WeaponDetailService:
         return WeaponStats(**kwargs)
 
     async def get_weapon_details_by_type(
-        self, player_name: str, type_name: str
+        self, player_name: str, type_name: str, limit: int | None = None
     ) -> WeaponDetailResponse:
         """Get comprehensive details for all weapons of a given type.
 
         Args:
             player_name: Bungie name.
             type_name: Weapon type display name; empty means all owned weapons.
+            limit: Max weapons returned; None or <= 0 returns everything.
 
         Returns:
-            WeaponDetailResponse with all matching weapons and their full details.
+            WeaponDetailResponse with matching weapons and their full details, plus
+            total/returned counts so a cut list is never mistaken for a short one.
         """
         logger.info("Getting weapon details: player=%s, type=%s", player_name, type_name)
 
@@ -324,12 +326,18 @@ class WeaponDetailService:
 
         details.sort(key=lambda d: (not d.is_equipped, -(d.power or 0), d.name))
 
+        total = len(details)
+        returned = details if not limit or limit <= 0 else details[:limit]
+
         logger.info(
-            "Weapon details for '%s': %d instance(s) found",
-            type_name, len(details),
+            "Weapon details for '%s': %d of %d instance(s) returned",
+            type_name, len(returned), total,
         )
 
         return WeaponDetailResponse(
             weapon_type_query=type_name,
-            weapons=details,
+            weapons=returned,
+            total_weapons=total,
+            returned_weapons=len(returned),
+            truncated=len(returned) < total,
         )

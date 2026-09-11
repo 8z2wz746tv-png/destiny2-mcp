@@ -16,8 +16,10 @@ logger = get_logger(__name__)
 BUNGIE_BASE_URL = "https://www.bungie.net"
 
 # Item type names
+# 0 是 Bungie 枚举里名为 None 的成员（商人占位条目、部分任务步），不是"缺数据"；
+# 输出空串而不是 "None"，否则 JSON 里看起来像个字符串化的 null。
 ITEM_TYPE_NAMES: dict[int, str] = {
-    0: "None",
+    0: "",
     1: "Currency",
     2: "Armor",
     3: "Weapon",

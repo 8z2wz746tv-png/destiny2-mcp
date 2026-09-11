@@ -18,8 +18,10 @@ CEILINGS = {
     "destiny_mcp/manifest.py":           262,
     # 参数说明改用 `from . import _param_docs as fields`，新增别名不再让 import 块
     # 长胖；给全部参数补说明时反而比上次短了 5 行。
-    # +2：写入失败时补 next_actions 的接线（提示文本本身在 _responses.py）。
-    "destiny_mcp/tools/assistants.py": 1399,
+    # +9：vendor 分支改走菜单/详情两种形态，并把 limit/next_actions/warnings 接出去；
+    # 分类、排名、截断规则在 services/vendor_menu.py，刷取清单挂载在 tools/_farming.py，
+    # 这次把后者整个搬出去，净减了约 46 行。
+    "destiny_mcp/tools/assistants.py": 1373,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,

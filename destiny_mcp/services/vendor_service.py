@@ -1,6 +1,16 @@
 """Vendor service — vendor inventory queries.
 
 References DIM's d2-vendors.ts and vendor-item.ts for implementation details.
+
+Two response shapes, decided by whether vendor_name resolves to one vendor:
+
+- menu:   one line per vendor (no items, no extra API calls), used when nothing was
+          named or the name matched several vendors
+- detail: one vendor's tabs, rank and shelf, with a per-vendor item cap and an
+          explicit truncated flag
+
+Sub-pages (Banshee's focusing screens, Eververse sub-shelves) are offered as
+next_actions instead of being silently merged into the main vendor's shelf.
 """
 
 from __future__ import annotations
@@ -20,6 +30,16 @@ from ..models import (
     VendorSaleItem,
 )
 from ..player_resolver import PlayerResolver
+from .vendor_menu import (
+    build_rank,
+    cap_warnings,
+    category_entries,
+    clamp_limit,
+    close_vendor_names,
+    match_vendors,
+    menu_sort_key,
+    vendor_identities,
+)
 
 if TYPE_CHECKING:
     from .perk_service import PerkService
@@ -101,6 +121,7 @@ SUB_VENDOR_IDENTIFIERS: dict[int, list[str]] = {
     672118013:  ["GUNSMITH"],                 # Banshee-44
     4230408743: ["LIGHT_AND_DARK", "FATE"],   # Monument to Lost Lights
     2190858386: ["TOWER_NINE"],               # Xur (仄)
+    3361454721: ["EVERVERSE"],                # Tess Everis' many sub-shelves
 }
 
 # Sub-vendor hash → Chinese display name
@@ -121,6 +142,9 @@ SUB_VENDOR_DISPLAY_NAMES: dict[int, str] = {
 
 # Xur availability: Friday 17:00 UTC — Tuesday 17:00 UTC
 _XUR_WEEKDAYS = {4, 5, 6, 0}  # Fri, Sat, Sun, Mon
+
+# How many sub-pages to offer as follow-up calls before it becomes a wall of text.
+_SUB_PAGE_HINTS = 5
 
 
 def _is_xur_available() -> bool:
@@ -149,8 +173,12 @@ def _vendor_failure_strings(
     if response_failure_strings:
         return response_failure_strings
 
-    # Legacy fallback for older tests/local fixtures that only include
-    # vendor-definition failureCategories.
+    # Vendor definitions carry a flat list; older fixtures only had
+    # failureCategories, so keep that path alive as a fallback.
+    flat = vendor_def.get("failureStrings")
+    if isinstance(flat, list) and flat:
+        return [str(entry) for entry in flat]
+
     fallback: list[str] = []
     for category in vendor_def.get("failureCategories", []):
         fallback.extend(category.get("failureStrings", []))
@@ -194,6 +222,116 @@ class VendorService:
             if isinstance(item, dict)
         )
 
+    def _vendor_labels(self) -> dict[int, str]:
+        """Chinese labels, so vendors the manifest leaves unnamed still have a name."""
+        labels = dict(VENDOR_DISPLAY_NAMES)
+        labels.update(SUB_VENDOR_DISPLAY_NAMES)
+        return labels
+
+    def _progression_name(self, progression_hash: int) -> str:
+        """Name of a reputation track, e.g. 先锋; empty when the manifest has no entry."""
+        if not progression_hash:
+            return ""
+        definition = self._manifest.get_definition(
+            "DestinyProgressionDefinition", progression_hash
+        )
+        if not isinstance(definition, dict):
+            return ""
+        return str((definition.get("displayProperties") or {}).get("name") or "")
+
+    def _submenu_targets(
+        self,
+        sale_items: dict,
+        api_categories: list,
+    ) -> dict[int, int]:
+        """Category index → vendor hash for tabs that open another vendor page.
+
+        A sub-page tab holds a single placeholder item whose definition points at the
+        vendor it opens (preview.previewVendorHash). Tabs whose placeholder points
+        nowhere (help tiles, pursuits) are not sub-pages.
+        """
+        targets: dict[int, int] = {}
+        for entry in api_categories or []:
+            index = entry.get("displayCategoryIndex")
+            item_indexes = entry.get("itemIndexes") or []
+            if not isinstance(index, int) or len(item_indexes) != 1:
+                continue
+            sale_item = sale_items.get(str(item_indexes[0])) or {}
+            item_hash = sale_item.get("itemHash")
+            if not item_hash:
+                continue
+            definition = self._manifest.get_definition(
+                "DestinyInventoryItemDefinition", item_hash
+            )
+            target = ((definition or {}).get("preview") or {}).get("previewVendorHash") or 0
+            if target and self._manifest.get_vendor_definition(int(target)):
+                targets[index] = int(target)
+        return targets
+
+    def _sub_vendor_hashes(
+        self,
+        main_hash: int,
+        vendors_data: dict,
+        grouped_hashes: set[int],
+    ) -> set[int]:
+        """Sibling vendor pages belonging to a main vendor (e.g. Banshee's focusing screens)."""
+        tag_keywords = SUB_VENDOR_TAGS.get(main_hash)
+        id_prefixes = SUB_VENDOR_IDENTIFIERS.get(main_hash)
+        if not tag_keywords and not id_prefixes:
+            return set()
+
+        matched: set[int] = set()
+        for vendor_hash_str in vendors_data:
+            vendor_hash = int(vendor_hash_str)
+            if vendor_hash in grouped_hashes:
+                continue  # grouped vendors are main vendors, not sub-pages
+            vendor_def = self._manifest.get_vendor_definition(vendor_hash)
+            if not vendor_def:
+                continue
+            if tag_keywords:
+                tags_text = " ".join(
+                    (
+                        (d.get("displayProperties") or {}).get("name", "")
+                        or d.get("identifier", "")
+                    )
+                    for d in vendor_def.get("displayCategories", [])
+                ).lower()
+                if any(keyword in tags_text for keyword in tag_keywords):
+                    matched.add(vendor_hash)
+                    continue
+            if id_prefixes:
+                vendor_id = (vendor_def.get("vendorIdentifier") or "").upper()
+                if any(vendor_id.startswith(prefix) for prefix in id_prefixes):
+                    matched.add(vendor_hash)
+        return matched
+
+    async def _ensure_vendor_components(
+        self,
+        mid: str,
+        mtype: int,
+        char_id: str,
+        vendor_hash: int,
+        existing: object,
+    ) -> tuple[object, list[str]]:
+        """Fetch the live socket payload for one vendor when it is missing."""
+        if _vendor_socket_data(existing):
+            return existing, []
+        try:
+            detail = await self._bungie.fetch_vendor_components(
+                mid, mtype, char_id, vendor_hash
+            )
+        except Exception as exc:
+            logger.warning(
+                "GetVendor components failed for vendor=%s: %s", vendor_hash, exc
+            )
+            return existing, [f"商人 {vendor_hash} 的实际 Perk 组件读取失败，已省略 Perk。"]
+        components = detail.get("itemComponents") if isinstance(detail, dict) else None
+        if _vendor_socket_data(components) is None:
+            return existing, [
+                f"商人 {vendor_hash} 未返回可核对的实际 socket，已省略 Perk。"
+            ]
+        return components, []
+
     async def _resolve_vendor_character(
         self,
         membership_id: str,
@@ -227,6 +365,79 @@ class VendorService:
         )
         return class_type_name(int(character_data.get("classType", -1))), character_id
 
+    def _build_sale_item(
+        self,
+        sale_item: dict,
+        item_index: int,
+        index_to_category: dict[int, int],
+        vendor_failure_strings: list[str],
+        vendor_item_components: object,
+        warnings: list[str],
+    ) -> VendorSaleItem:
+        """One shelf item, priced, gated honestly, and with live perks when available."""
+        vendor_item_index = sale_item.get("vendorItemIndex")
+        if not isinstance(vendor_item_index, int):
+            vendor_item_index = item_index
+        item_hash = sale_item.get("itemHash", 0)
+        item_info = self._manifest.get_item_info(item_hash) or {}
+        item_name = self._manifest.get_item_name(item_hash)
+
+        costs: list[VendorCost] = []
+        for cost in sale_item.get("costs", []) or []:
+            cost_hash = cost.get("itemHash", 0)
+            costs.append(VendorCost(
+                item_hash=cost_hash,
+                item_name=CURRENCY_NAMES.get(
+                    cost_hash, self._manifest.get_item_name(cost_hash)
+                ),
+                quantity=cost.get("quantity", 0),
+            ))
+
+        # failureIndexes point into the vendor's failureStrings; empty means buyable.
+        failure_indexes = sale_item.get("failureIndexes") or []
+        failures: list[str] = [
+            vendor_failure_strings[index]
+            for index in failure_indexes
+            if isinstance(index, int) and 0 <= index < len(vendor_failure_strings)
+        ]
+        if failure_indexes and not failures:
+            failures.append(f"上游标记为不可购买（原因索引 {list(failure_indexes)}）")
+
+        owned = bool(sale_item.get("augments", 0) & AUGMENTS_OWNED)
+
+        # Only live vendor socket data describes the actual sale roll.
+        perks: list[PerkInfo] | None = None
+        if item_info.get("itemType") == 3:  # Weapon
+            perks = self._extract_perks_from_vendor_components(
+                item_hash,
+                vendor_item_index,
+                vendor_item_components,
+            )
+            if perks is None:
+                warning = f"商品“{item_name}”未返回可核对的实际 socket，已省略 Perk。"
+                if warning not in warnings:
+                    warnings.append(warning)
+
+        # manifest already stores icon as full Bungie CDN URL
+        icon_url = item_info.get("icon", "")
+
+        return VendorSaleItem(
+            vendor_item_index=vendor_item_index,
+            item_hash=item_hash,
+            name=item_name,
+            item_type=item_info.get("itemTypeNameDisplay", "") or item_info.get("itemTypeName", ""),
+            tier={5: "传说", 6: "异域"}.get(item_info.get("tier", 0), ""),
+            icon=icon_url,
+            icon_url=icon_url,
+            costs=costs,
+            owned=owned,
+            can_be_sold=not failure_indexes,
+            failure_reasons=failures,
+            category_index=index_to_category.get(item_index),
+            sale_status=sale_item.get("saleStatus"),
+            perks=perks,
+        )
+
     async def get_vendor_inventory(
         self,
         player_name: str,
@@ -234,275 +445,246 @@ class VendorService:
         vendor_name: str = "",
         *,
         compact: bool = True,
+        limit: int | None = None,
     ) -> VendorInventoryResponse:
         """Get vendor inventory for a character.
 
         Args:
             player_name: Bungie name.
             character: Character name (vendor inventory varies by character).
-            vendor_name: Optional vendor filter (e.g. 'Xur', 'Banshee').
+            vendor_name: Vendor name, alias, identifier fragment, or hash. Empty lists
+                every vendor with something on the shelf (menu mode, no items).
+            compact: Strip fields that only matter for rendering.
+            limit: Max vendors in menu mode, max items per vendor in detail mode.
 
         Returns:
-            VendorInventoryResponse with vendor info and sale items.
+            VendorInventoryResponse; `mode` says which shape came back.
         """
         logger.info("get_vendor_inventory: player=%s char=%s vendor=%s",
                      player_name, character, vendor_name)
 
-        # Resolve player and character
         p = await self._resolver.resolve_player(player_name)
         mid = p["membership_id"]
         mtype = p["membership_type"]
         character, char_id = await self._resolve_vendor_character(mid, mtype, character)
 
-        # Determine which vendors to fetch
-        filter_hashes: list[int] | None = None
-        if vendor_name:
-            q = vendor_name.strip().lower()
-            for key, h in VENDOR_HASHES.items():
-                if q == key.lower():
-                    filter_hashes = [h]
-                    break
-            if filter_hashes is None:
-                logger.warning("Unknown vendor requested: %s", vendor_name)
+        raw = await self._bungie.fetch_vendors(mid, mtype, char_id)
+        vendors_data = raw.get("vendors", {}).get("data", {})
+        sales_data = raw.get("sales", {}).get("data", {})
+        categories_data = raw.get("categories", {}).get("data", {})
+        components_by_vendor = raw.get("itemComponents", {})
+        response_failure_strings = raw.get("failureStrings", [])
+
+        grouped_hashes: set[int] = set()
+        for group in raw.get("vendorGroups", {}).get("data", {}).get("groups", []):
+            for vendor_hash in group.get("vendorHashes", []) or []:
+                grouped_hashes.add(int(vendor_hash))
+
+        identities = vendor_identities(
+            vendors_data,
+            self._manifest.get_vendor_definition,
+            label_overrides=self._vendor_labels(),
+        )
+        identity_by_hash = {identity.vendor_hash: identity for identity in identities}
+
+        def label_for(vendor_hash: int) -> str:
+            identity = identity_by_hash.get(int(vendor_hash))
+            return identity.label if identity else f"#{vendor_hash}"
+
+        warnings: list[str] = []
+        next_actions: list[str] = []
+        question: str | None = None
+        mode = "menu"
+        selected = list(identities)
+
+        if vendor_name.strip():
+            match = match_vendors(vendor_name, identities, VENDOR_HASHES)
+            if match.how == "absent":
+                # Known vendor hash, just not in this character's payload today.
+                known = self._manifest.get_vendor_definition(match.hash_hint or 0) or {}
+                known_name = (known.get("displayProperties") or {}).get("name") or label_for(
+                    match.hash_hint or 0
+                )
+                warnings.append(
+                    f"商人“{known_name}”（hash={match.hash_hint}）这次没有返回，"
+                    "可能是本周期不在、或该角色看不到这页。"
+                )
                 return VendorInventoryResponse(
                     player_name=player_name,
                     character=class_type_name(resolve_character_name(character)),
-                    warnings=[f"未识别商人“{vendor_name}”，本次未查询任何商品。"],
+                    mode="menu",
+                    total_vendors=len(identities),
+                    question="要改看哪个商人？",
+                    next_actions=[
+                        f'world_assistant(intent="vendor", vendor_name="{identity.vendor_hash}")'
+                        f"  # {identity.label}"
+                        for identity in identities[:3]
+                    ],
+                    warnings=warnings,
                 )
+            if match.how == "none":
+                suggestions = close_vendor_names(vendor_name, identities)
+                if suggestions:
+                    warnings.append(
+                        f"未识别商人“{vendor_name}”；相近的名字：{'、'.join(suggestions)}。"
+                    )
+                    next_actions = [
+                        f'world_assistant(intent="vendor", vendor_name="{name}")'
+                        for name in suggestions[:3]
+                    ]
+                else:
+                    warnings.append(f"未识别商人“{vendor_name}”，也没有相近的名字。")
+                return VendorInventoryResponse(
+                    player_name=player_name,
+                    character=class_type_name(resolve_character_name(character)),
+                    mode="menu",
+                    total_vendors=len(identities),
+                    question=f"没找到商人“{vendor_name}”，要查哪一个？",
+                    next_actions=next_actions,
+                    warnings=warnings,
+                )
+            selected = list(match.identities)
+            if len(selected) == 1:
+                mode = "detail"
+            else:
+                question = f"“{vendor_name}”匹配到 {len(selected)} 个商人，要查哪一个？"
+                warnings.append(f"“{vendor_name}”匹配到 {len(selected)} 个商人，先列出候选。")
+                next_actions = [
+                    f'world_assistant(intent="vendor", vendor_name="{identity.vendor_hash}")'
+                    f"  # {identity.label}"
+                    for identity in selected[:5]
+                ]
+        else:
+            question = "要查看哪个商人？可以直接传商人名字或 hash。"
 
-        # Fetch vendors from API
-        raw = await self._bungie.fetch_vendors(mid, mtype, char_id)
-
-        # Parse response
-        vendors_data = raw.get("vendors", {}).get("data", {})
-        sales_data = raw.get("sales", {}).get("data", {})
-        item_components = raw.get("itemComponents", {})
-        response_failure_strings = raw.get("failureStrings", [])
-
+        detail_mode = mode == "detail"
+        item_limit = clamp_limit(limit, mode)
         results: list[VendorInfo] = []
-        warnings: list[str] = []
 
-        # Client-side filter: only process requested vendor(s)
-        allowed_hashes: set[int] = set(filter_hashes or [])
-
-        # If a single main vendor was requested, also include matching sub-vendors
-        if filter_hashes and len(filter_hashes) == 1:
-            main_hash = filter_hashes[0]
-            tag_keywords = SUB_VENDOR_TAGS.get(main_hash)
-            id_prefixes = SUB_VENDOR_IDENTIFIERS.get(main_hash)
-
-            if tag_keywords or id_prefixes:
-                # Collect all grouped vendor hashes to identify ungrouped ones
-                grouped_hashes: set[int] = set()
-                for g in raw.get("vendorGroups", {}).get("data", {}).get("groups", []):
-                    for h in g.get("vendorHashes", []):
-                        grouped_hashes.add(h)
-
-                # Scan ungrouped vendors for matching displayCategories tags or vendorIdentifier
-                for vh_str in vendors_data:
-                    vh = int(vh_str)
-                    if vh in grouped_hashes:
-                        continue  # Skip main vendors
-                    vdef = self._manifest.get_vendor_definition(vh)
-                    if not vdef:
-                        logger.debug("Sub-vendor %d: no definition, skipping", vh)
-                        continue
-
-                    matched = False
-
-                    # Match by displayCategories tags
-                    if tag_keywords:
-                        dc_list = vdef.get("displayCategories", [])
-                        tags_text = " ".join(
-                            (d.get("displayProperties", {}).get("name", "") or d.get("identifier", ""))
-                            for d in dc_list
-                        ).lower()
-                        if any(kw in tags_text for kw in tag_keywords):
-                            matched = True
-
-                    # Match by vendorIdentifier prefix
-                    if not matched and id_prefixes:
-                        vendor_id = (vdef.get("vendorIdentifier") or "").upper()
-                        if any(vendor_id.startswith(prefix) for prefix in id_prefixes):
-                            matched = True
-
-                    if matched:
-                        allowed_hashes.add(vh)
-                        logger.info("Sub-vendor matched: %s", vh)
-
-        if vendor_name:
-            for vendor_hash_str in vendors_data:
-                vendor_hash = int(vendor_hash_str)
-                if allowed_hashes and vendor_hash not in allowed_hashes:
-                    continue
-                vendor_sales = sales_data.get(vendor_hash_str, {}).get("saleItems", {})
-                if not self._sale_items_include_weapon(vendor_sales):
-                    continue
-                existing = (
-                    item_components.get(vendor_hash_str)
-                    if isinstance(item_components, dict)
-                    else None
-                )
-                if _vendor_socket_data(existing):
-                    continue
-                try:
-                    detail = await self._bungie.fetch_vendor_components(
-                        mid, mtype, char_id, vendor_hash
-                    )
-                except Exception as exc:
-                    logger.warning(
-                        "GetVendor components failed for vendor=%s: %s",
-                        vendor_hash,
-                        exc,
-                    )
-                    warnings.append(
-                        f"商人 {vendor_hash} 的实际 Perk 组件读取失败，已省略 Perk。"
-                    )
-                    continue
-                components = detail.get("itemComponents") if isinstance(detail, dict) else None
-                if _vendor_socket_data(components) is None:
-                    warnings.append(
-                        f"商人 {vendor_hash} 未返回可核对的实际 socket，已省略 Perk。"
-                    )
-                    continue
-                if not isinstance(item_components, dict):
-                    item_components = {}
-                item_components[vendor_hash_str] = components
-        elif any(
-            self._sale_items_include_weapon(sales.get("saleItems"))
-            for sales in sales_data.values()
-            if isinstance(sales, dict)
-        ):
-            warnings.append(
-                "未指定商人时不批量请求所有单商人详情；缺失的实际 Perk 已省略。"
-            )
-
-        for vendor_hash_str, vendor_data in vendors_data.items():
-            vendor_hash = int(vendor_hash_str)
-            if allowed_hashes and vendor_hash not in allowed_hashes:
-                continue
-
-            # Xur availability check
+        for identity in selected:
+            vendor_hash = identity.vendor_hash
             if vendor_hash == VENDOR_HASHES["Xur"] and not _is_xur_available():
+                warnings.append("仄（Xur）本周期不在，周五 17:00 UTC 后才回来；他的货架已跳过。")
                 continue
 
-            vendor_def = self._manifest.get_vendor_definition(vendor_hash)
-            if not vendor_def:
-                logger.debug("Vendor %d: no definition, skipping", vendor_hash)
+            vendor_data = vendors_data.get(str(vendor_hash)) or {}
+            vendor_def = self._manifest.get_vendor_definition(vendor_hash) or {}
+            sale_items_raw = (sales_data.get(str(vendor_hash)) or {}).get("saleItems") or {}
+            api_categories = (categories_data.get(str(vendor_hash)) or {}).get("categories") or []
+            if not sale_items_raw and not detail_mode:
                 continue
-            vendor_name_str = (vendor_def.get("displayProperties") or {}).get("name", "")
-            vendor_icon = (vendor_def.get("displayProperties") or {}).get("icon", "")
-            next_refresh = vendor_data.get("nextRefreshDate", "")
 
             vendor_failure_strings = _vendor_failure_strings(
-                response_failure_strings,
-                vendor_def,
+                response_failure_strings, vendor_def
             )
 
-            # Parse sale items
-            sale_items: list[VendorSaleItem] = []
-            vendor_sales = sales_data.get(vendor_hash_str, {})
-            categories = vendor_sales.get("saleItems", {})
-            vendor_item_components: object = {}
-            if isinstance(item_components, dict):
-                vendor_item_components = (
-                    item_components.get(vendor_hash_str)
-                    or item_components.get(vendor_hash)
-                    or {}
+            live_components = components_by_vendor.get(str(vendor_hash))
+            if detail_mode and self._sale_items_include_weapon(sale_items_raw):
+                live_components, component_warnings = await self._ensure_vendor_components(
+                    mid, mtype, char_id, vendor_hash, live_components
                 )
+                warnings.extend(component_warnings)
 
-            for item_index_str, sale_item in categories.items():
-                vendor_item_index = sale_item.get("vendorItemIndex")
-                if not isinstance(vendor_item_index, int):
-                    vendor_item_index = int(item_index_str)
-                item_hash = sale_item.get("itemHash", 0)
-                item_info = self._manifest.get_item_info(item_hash)
-                item_name = self._manifest.get_item_name(item_hash)
+            index_to_category: dict[int, int] = {}
+            for entry in api_categories:
+                category_index = entry.get("displayCategoryIndex")
+                for item_index in entry.get("itemIndexes") or []:
+                    index_to_category[int(item_index)] = category_index
 
-                # Costs
-                costs: list[VendorCost] = []
-                for cost in sale_item.get("costs", []):
-                    cost_hash = cost.get("itemHash", 0)
-                    cost_name = CURRENCY_NAMES.get(
-                        cost_hash,
-                        self._manifest.get_item_name(cost_hash),
-                    )
-                    costs.append(VendorCost(
-                        item_hash=cost_hash,
-                        item_name=cost_name,
-                        quantity=cost.get("quantity", 0),
+            categories = category_entries(
+                api_categories,
+                vendor_def.get("displayCategories"),
+                self._submenu_targets(sale_items_raw, api_categories),
+                available_vendors=identity_by_hash,
+                vendor_label=label_for,
+            )
+
+            items: list[VendorSaleItem] = []
+            total_items = 0
+            purchasable_items = 0
+            for item_index_str, sale_item in sale_items_raw.items():
+                if not isinstance(sale_item, dict):
+                    continue
+                total_items += 1
+                if not (sale_item.get("failureIndexes") or []):
+                    purchasable_items += 1
+                if detail_mode and len(items) < item_limit:
+                    items.append(self._build_sale_item(
+                        sale_item,
+                        int(item_index_str),
+                        index_to_category,
+                        vendor_failure_strings,
+                        live_components,
+                        warnings,
                     ))
 
-                # Failure reasons (failureIndexes point to response failureStrings)
-                failure_idxs = sale_item.get("failureIndexes", [])
-                failures: list[str] = []
-                for idx in failure_idxs:
-                    if idx < len(vendor_failure_strings):
-                        failures.append(vendor_failure_strings[idx])
+            results.append(VendorInfo(
+                vendor_hash=vendor_hash,
+                name=identity.label,
+                identifier=identity.identifier,
+                icon=(vendor_def.get("displayProperties") or {}).get("icon", ""),
+                next_refresh=vendor_data.get("nextRefreshDate", ""),
+                rank=build_rank(vendor_data.get("progression"), self._progression_name),
+                categories=categories,
+                total_items=total_items,
+                purchasable_items=purchasable_items,
+                truncated=detail_mode and total_items > len(items),
+                sale_items=items,
+            ))
 
-                # Owned state from augments
-                augments = sale_item.get("augments", 0)
-                owned = bool(augments & AUGMENTS_OWNED)
-
-                # Only live vendor socket data describes the actual sale roll.
-                perks: list[PerkInfo] | None = None
-                if item_info and item_info.get("itemType") == 3:  # Weapon
-                    perks = self._extract_perks_from_vendor_components(
-                        item_hash,
-                        vendor_item_index,
-                        vendor_item_components,
+        if detail_mode and results:
+            # Offer the sub-pages of this vendor instead of merging their shelves in.
+            sub_pages: dict[int, str] = {}
+            for category in results[0].categories:
+                if category.kind == "submenu" and category.target_vendor_hash:
+                    sub_pages[category.target_vendor_hash] = (
+                        f"{category.name} → {category.target_vendor_name or label_for(category.target_vendor_hash)}"
                     )
-                    if perks is None:
-                        warning = (
-                            f"商品“{item_name}”未返回可核对的实际 socket，已省略 Perk。"
-                        )
-                        if warning not in warnings:
-                            warnings.append(warning)
+            for sub_hash in sorted(
+                self._sub_vendor_hashes(results[0].vendor_hash, vendors_data, grouped_hashes)
+            ):
+                sub_pages.setdefault(sub_hash, label_for(sub_hash))
+            sub_pages.pop(results[0].vendor_hash, None)
+            for sub_hash, label in list(sub_pages.items())[:_SUB_PAGE_HINTS]:
+                if sub_hash in identity_by_hash:
+                    next_actions.append(
+                        f'world_assistant(intent="vendor", vendor_name="{sub_hash}")  # {label}'
+                    )
+                else:
+                    next_actions.append(f"子页面“{label}”本次没有返回，暂时看不到它的货架。")
 
-                tier_num = (item_info or {}).get("tier", 0)
-                tier = {5: "传说", 6: "异域"}.get(tier_num, "")
-
-                # manifest already stores icon as full Bungie CDN URL
-                icon_url = (item_info or {}).get("icon", "")
-
-                sale_items.append(VendorSaleItem(
-                    vendor_item_index=vendor_item_index,
-                    item_hash=item_hash,
-                    name=item_name,
-                    item_type=(item_info or {}).get("itemTypeNameDisplay", "") or (item_info or {}).get("itemTypeName", ""),
-                    tier=tier,
-                    icon=icon_url,
-                    icon_url=icon_url,
-                    costs=costs,
-                    owned=owned,
-                    can_be_sold=sale_item.get("apiPurchasable", True),
-                    failure_reasons=failures,
-                    perks=perks,
-                ))
-
-            if sale_items:
-                # Use Chinese display name if available, otherwise API name
-                display_name = (
-                    VENDOR_DISPLAY_NAMES.get(vendor_hash)
-                    or SUB_VENDOR_DISPLAY_NAMES.get(vendor_hash)
-                    or vendor_name_str
+        if mode == "menu":
+            results.sort(key=menu_sort_key)
+            returned = results[:item_limit]
+            truncated = len(results) > len(returned)
+            if not vendor_name.strip():
+                next_actions.extend(
+                    f'world_assistant(intent="vendor", vendor_name="{vendor.vendor_hash}")'
+                    f"  # {vendor.name}"
+                    for vendor in returned[:3]
                 )
-                results.append(VendorInfo(
-                    vendor_hash=vendor_hash,
-                    name=display_name,
-                    icon=vendor_icon,
-                    next_refresh=next_refresh,
-                    sale_items=sale_items,
-                ))
+                next_actions.append("要按名字找：vendor_name 传商人名字或名字片段即可。")
+        else:
+            returned = results
+            truncated = False
 
-        logger.info("get_vendor_inventory: %d vendors with items", len(results))
         response = VendorInventoryResponse(
             player_name=player_name,
-            character=class_type_name(
-                resolve_character_name(character)
-            ),
-            vendors=results,
-            warnings=warnings,
+            character=class_type_name(resolve_character_name(character)),
+            mode=mode,
+            vendors=returned,
+            total_vendors=len(results),
+            returned_vendors=len(returned),
+            truncated=truncated,
+            question=question,
+            next_actions=next_actions,
+            warnings=cap_warnings(warnings),
+        )
+        logger.info(
+            "get_vendor_inventory: mode=%s vendors=%d items=%d",
+            mode,
+            len(returned),
+            sum(len(vendor.sale_items) for vendor in returned),
         )
         return self._compact_response(response) if compact else response
 
@@ -574,19 +756,17 @@ class VendorService:
 
     @staticmethod
     def _compact_response(response: VendorInventoryResponse) -> VendorInventoryResponse:
-        """Compress response for LLM consumption — strip large/unnecessary fields."""
+        """Compress response for LLM consumption — strip large/unnecessary fields.
+
+        Item hashes, costs, purchase state and category indexes all stay: callers
+        chain them into other tools. Only rendering-only fields and perk text go.
+        """
         for vendor in response.vendors:
             vendor.icon = ""
             vendor.next_refresh = ""
             for item in vendor.sale_items:
                 item.icon = ""
                 item.vendor_item_index = 0
-                item.item_hash = 0
-                item.can_be_sold = True
-                # Compress costs to single line
-                if item.costs:
-                    parts = [f"{c.item_name}x{c.quantity}" for c in item.costs]
-                    item.costs = [VendorCost(item_hash=0, item_name=", ".join(parts), quantity=0)]
                 # Compress perks to names only, mark god rolls
                 if item.perks:
                     names = []

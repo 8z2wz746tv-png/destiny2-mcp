@@ -94,3 +94,6 @@ class WeaponDetailResponse(BaseModel):
 
     weapon_type_query: str = Field(description="What type was searched for")
     weapons: list[WeaponDetail] = Field(default_factory=list)
+    total_weapons: int = Field(default=0, description="How many weapons of this type the manifest knows")
+    returned_weapons: int = Field(default=0, description="How many are included in this response")
+    truncated: bool = Field(default=False, description="True when weapons were cut by limit")

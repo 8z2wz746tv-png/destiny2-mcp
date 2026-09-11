@@ -216,7 +216,11 @@ WorldIntentField = Annotated[
 
 Limit = Annotated[
     int,
-    Field(description="最多返回多少条。只限制返回条数，不限制扫描范围；不读它的 intent 传了会被拒绝。"),
+    Field(description=(
+        "最多返回多少条。只限制返回条数，不限制扫描范围，被截断时响应里会带 truncated/总数。"
+        "intent=\"vendor\" 时：不点名商人 = 最多列几个商人，点名 = 每个商人最多几件商品。"
+        "不读它的 intent 传了会被拒绝。"
+    )),
 ]
 
 Offset = Annotated[
@@ -417,7 +421,11 @@ Count = Annotated[
 
 VendorName = Annotated[
     str,
-    Field(description='商人名（如 班西-44）；留空表示所有商人。intent="vendor" 用它。'),
+    Field(description=(
+        '商人名、名字片段、别名或 hash（如 班西-44 / 萨瓦拉 / 672118013）。'
+        '留空 = 先列出有哪些商人（菜单，不含商品）；写一个名字 = 直接看那个商人的货架与分类；'
+        '名字匹配到多个时会返回候选列表而不是猜。intent="vendor" 用它。'
+    )),
 ]
 
 CollectibleNodeHash = Annotated[

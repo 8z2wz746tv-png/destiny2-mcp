@@ -161,13 +161,23 @@ Manifest 侧（**不代表拥有**）：
 | --- | --- | --- |
 | `weekly` | 本周活动概要 | `limit` |
 | `weekly_full` | 完整周常（比 `weekly` 更全） | — |
-| `vendor` | 商人**本次实际在卖**什么 | `character`、`vendor_name` |
+| `vendor` | 商人**本次实际在卖**什么（两种形态：先菜单、再详情） | `character`、`vendor_name`、`limit` |
 | `search_collectible_nodes` | 搜收藏品节点候选 | `query`、`limit` |
 | `collectible_node` | 某个节点的解锁状态 | `collectible_node_hash`、`character`、`include_invisible`、`limit` |
 | `collectible_item` | 某件物品的收藏品状态 | `item_name`、`character`、`limit` |
 | `community` | 社区机制／来源资料，**唯一能跨分类搜的入口** | `query`、`community_category`、`knowledge_id`、`community_section`、`limit`、`offset` |
 
-商人要报**本次售卖的具体 Perk**，不能拿这把枪的总 Perk 池代替。
+商人查询分两步，响应里的 `mode` 直接写明是哪一种：
+
+- **不点名（`mode="menu"`）**：给你有哪些商人 —— 名字、hash、等级、可买/总数、分类数，**不含商品**，用 `total_vendors`/`returned_vendors`/`truncated` 说明裁了多少。这一步不发多余的 API 请求，按名字挑一个再进详情即可。
+- **点名（`mode="detail"`）**：`vendor_name` 可以是名字、名字片段、别名或 hash；只返回这一个商人的分类、等级进度和商品，商品按 `limit` 截断并标 `truncated`。
+
+几件容易答错的事：
+
+- 分类 `categories[].kind`：`sale` 普通货架、`rewards` 等级奖励、`submenu` 是**子页面**（带 `target_vendor_hash`）。子页面要顺着 `next_actions` 再查一次，别把它的货架当成主商人的货。
+- 名字匹配到多个（例如好几个「传承装备」页）时返回的是**候选菜单**，要按 hash 再指定，不要替用户挑一个。
+- `can_be_sold=false` 一定配 `failure_reasons`；`owned` 只表示账号里已有。
+- 商人要报**本次售卖的具体 Perk**，不能拿这把枪的总 Perk 池代替。
 
 ## 三、参数：传错会当场报错
 
@@ -222,7 +232,7 @@ Manifest 侧（**不代表拥有**）：
 | `item_type` | `inventory_assistant`：`get`、`inventory`、`list`、`search_type`、`summarize`、`summary`、`type`、`概况` |
 | `kind` | `loadout_assistant`：`search_identifiers` |
 | `knowledge_id` | `activity_assistant`：`community`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
-| `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`summarize`、`summary`、`概况`、`重复武器`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`search_all`、`search_catalog`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`search_collectible_nodes`、`weekly` |
+| `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`summarize`、`summary`、`概况`、`重复武器`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`search_all`、`search_catalog`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`search_collectible_nodes`、`vendor`、`weekly` |
 | `loadout_id` | `loadout_assistant`：`delete`、`equip_loadout` |
 | `location` | `inventory_assistant`：`find_item`、`get`、`inventory`、`list`、`search`、`search_type`、`summarize`、`summary`、`type`、`概况`；`weapon_assistant`：`filter_rolls` |
 | `locked` | `inventory_assistant`：`lock` |

@@ -238,8 +238,8 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("weapon_assistant", "compare"),
     ),
     ("weapon_assistant", "limit"): _contract(
-        _only(*_W_ROLL_FILTERS, "community"),
-        hint="只有 catalog、filter_rolls 和 community 支持限量。",
+        _only(*_W_ROLL_FILTERS, "type", "community"),
+        hint="catalog、filter_rolls、type 和 community 支持限量；type 会另给 total_weapons/truncated。",
         suggestion=("weapon_assistant", "filter_rolls"),
     ),
     ("weapon_assistant", "knowledge_id"): _contract(
@@ -572,8 +572,8 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("world_assistant", "collectible_node"),
     ),
     ("world_assistant", "limit"): _contract(
-        _only("weekly", "search_collectible_nodes", "collectible_node", "collectible_item", "community"),
-        hint="完整周常（weekly_full）不读 limit。",
+        _only("weekly", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item", "community"),
+        hint="完整周常（weekly_full）不读 limit；vendor 用它限制商人数（菜单）或每个商人的商品数（详情）。",
     ),
     ("world_assistant", "community_category"): _contract(
         _only("community"), hint='只有 intent="community" 能跨分类搜索。',

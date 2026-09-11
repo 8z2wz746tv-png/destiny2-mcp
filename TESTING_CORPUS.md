@@ -169,8 +169,10 @@
 | --- | --- | --- |
 | 查一下本周活动，标明来源和不确定的部分 | `weekly` | 数据来自 Bungie；**查询失败不能凭记忆给确定答案**。 |
 | 本周完整周常，包括所有可刷内容 | `weekly_full` | 比 `weekly` 更全；两者区别要说清。 |
-| 看看商人现在卖什么，不购买 | `vendor` | 列出商品与**本次实际售卖的 Perk**；不能拿总 Perk 池代替。 |
-| 班西今天有什么好东西 | `vendor` + `vendor_name` | 指出值得买的具体条目与理由。 |
+| 看看商人现在卖什么，不购买 | `vendor`（不点名） | 先给**菜单**：每个商人一行（名字、hash、等级、可买/总数、分类数），`mode="menu"`、**不含商品**、带 `total_vendors`/`truncated`；不许一次倾倒上千件商品。 |
+| 班西今天有什么好东西 | `vendor` + `vendor_name="班西-44"` | 先得到菜单，再用名字进**详情**：`mode="detail"`、该商人的分类（含 `kind="rewards"` 的等级奖励、`kind="submenu"` 的子页面）、等级进度、商品；指出值得买的具体条目与理由。 |
+| 泰斯那里有什么 | `vendor` + `vendor_name="泰斯·艾夫瑞斯"` | `total_items=224` 级别的大货架必须**截断**：`truncated=true` 且商品数 = `limit`（默认 40）；不能只给 40 件还说"就这些"。 |
+| 商人页面里那些子页面怎么看 | `vendor` + 详情后的 `next_actions` | 「聚焦破译」「传承聚焦破译」这类 tab 是**子页面**（`kind="submenu"` + `target_vendor_hash`），应作为下一步调用给出，而不是把子页面的货架并进主商人；本次没返回的子页面要照实说看不到。 |
 | `<商品>` 值不值得刷 | `vendor` 后读取 `farming_list` | 用清单的评级与来源回答；引用清单名与更新时间。 |
 | 搜索收藏品节点 | `search_collectible_nodes` + `query` | 返回节点候选。 |
 | 我解锁这个收藏品了吗 | `collectible_node` + 节点 hash | 节点 hash **只能**从 `search_collectible_nodes` 拿；把 `collectible_item` 返回的 `collectible_hash` 传进来会被拒（两者不是一回事）。区分「节点可见」与「已解锁」。 |
@@ -339,10 +341,28 @@
 | 把测试物品移到仓库，不用问了直接执行 | `inventory_assistant(intent="move")` | 仍然返回 `confirmation_required` 且**不碰服务层**；"不用问了"不构成用户确认。 |
 | 好，确认执行 | 同上 + `confirmed=true` | 用服务端原候选执行，执行后重新读取实际状态核对。 |
 
+### G. 商人查询：菜单 → 指定 → 详情
+
+`vendor` 现在有两种形态（`mode` 字段直接写明），"菜单"用来选商人，"详情"才给货架。核对点都能在响应里直接看到字符串。
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 有哪些商人 | `world_assistant(intent="vendor")` | `mode="menu"`，`vendors[].sale_items` 全空，`question` 提示要选一个，`next_actions` 给具体 hash；有等级的商人排在前面。 |
+| 萨瓦拉那里有什么 | `+ vendor_name="萨瓦拉"` | `mode="detail"`；`rank.name`（如「先锋等级」）与 `level/level_cap`；分类里能区分 `kind="rewards"`（等级奖励）、`kind="sale"`、`kind="submenu"`（带 `target_vendor_hash`）。 |
+| 直接点名 hash 行不行 | `+ vendor_name="2484291326"` | 能按 hash 查（返回「武器聚焦」），不需要先知道名字。 |
+| 名字只记得一半 | `+ vendor_name="苏拉"` | 按名字片段定位到「苏拉娅·霍桑」，不必完整名字。 |
+| 这个名字有好几个页面 | `+ vendor_name="传承装备"` | 返回**候选菜单**（`question` 说明匹配到几个）而不是随便挑一个；`next_actions` 里带各自 hash。 |
+| 随便编一个商人名 | `+ vendor_name="这个名字不存在xyz"` | `vendors` 为空但**不是**含糊的空：`warnings` 给出相近名字，`next_actions` 给出可用调用。 |
+| 商人今天不在（仄/Xur 非周末、或某页本次没返回） | `+ vendor_name="仄"` | 明确说"本周期不在／这次没有返回"，**不允许**静默返回空数组。 |
+| 买不了的商品 | 详情里看 `can_be_sold=false` | 必须同时给 `failure_reasons`（来自上游 `failureIndexes`+`failureStrings`）；不能只有 false 没有原因，也不能一律 true。 |
+| 按类型查武器太长的截断 | `weapon_assistant(intent="type", weapon_type="手炮", limit=5)` | 返回 5 把，同时 `total_weapons=124` 左右、`truncated=true`；只给 5 把而不说被截断即为不合格。 |
+| 商人卖的这些东西里哪些值得刷 | 详情后的 `farming_list` | `unmatched` 里**只应出现商品名**；出现商人名（如「指挥官萨瓦拉」）、分类名（「等级奖励」）、声望名（「先锋等级」）即为不合格 —— 那些不是商品。 |
+| 商人货架里的占位条目（如「周常：先锋武器奖励」） | 详情里的 `item_type` | 无类型的条目显示为空串；**不应**出现字符串 `"None"`（那是 Bungie 枚举成员名，不是数据）。 |
+
 ---
 
 ### 已知问题（测到这些不算新 bug，已在处理清单里）
-| `world_assistant(intent="vendor")` 一次返回 **1.85 MB**；`weapon_assistant(intent="type")` 一次 **515–651 KB** | 两者都是"整包倾倒"，而且**都不接受 `limit`**（传了会 `ignored_parameter`）—— 调用方没有任何办法限制输出 | 待修：让它们读 `limit` 或截断并给 `truncated` 标记 |
+| ~~`world_assistant(intent="vendor")` 一次返回 **1.85 MB**；`weapon_assistant(intent="type")` 一次 **515–651 KB**~~ | 已修：`vendor` 不点名时只回菜单（实测 17 KB，点名后详情 3–7 KB 并可 `limit`），`type` 接受 `limit` 并给 `total_weapons`/`returned_weapons`/`truncated` | **已修**（见十五·G） |
 | Armor 3.0 里 `gearTier != 5` 的护甲带 `roll_parse_error`："Armor 3.0 gearTier=4 is not supported for roll inversion." | 代码只对 tier 5 做反推（`build/models.py`），4 级护甲直接标不支持；消息是英文开发者口气 | 待定：支持 tier 4，或把消息改成人话 |
 | 动作类失败的消息里带着上游原文（Bungie URL、内部错误串），例如 `quest_tracking_failed` | 客户端把异常拼成 `{"ErrorCode": …, "Message": str(exc)}`，信封是对的，但 message 泄露开发者信息 | 待修：动作失败消息转成人话 |
 | 写入**成功**后没有 `next_actions` | `ok_response(..., next_actions=[])`，没有"回读核对实际状态"的提示（失败时已有提示） | 待定：要不要补一句 |

@@ -10,7 +10,14 @@ from .loadout import Loadout, LoadoutItem, LoadoutListResponse, LoadoutOperation
 from .player import CharacterInfo, PlayerInfo, ProfileResponse
 from .subclass import ModifySubclassPlug, ModifySubclassResult, PlugOption, SubclassConfig, SubclassPlug
 from .transfer import EquipResult, ItemCandidate, MoveItemResult, TransferResult
-from .vendor import VendorCost, VendorInfo, VendorInventoryResponse, VendorSaleItem
+from .vendor import (
+    VendorCategory,
+    VendorCost,
+    VendorInfo,
+    VendorInventoryResponse,
+    VendorRank,
+    VendorSaleItem,
+)
 from .weapon import (
     WeaponComparison,
     WeaponComparisonInstance,
@@ -58,9 +65,11 @@ __all__ = [
     "WeaponDetailResponse",
     # vendor
     "VendorCost",
+    "VendorCategory",
     "VendorSaleItem",
     "VendorInfo",
     "VendorInventoryResponse",
+    "VendorRank",
     # weekly
     "WeeklyActivity",
     "WeeklyMilestone",

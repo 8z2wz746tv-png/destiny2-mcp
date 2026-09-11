@@ -107,6 +107,23 @@ async def test_named_type_is_not_capped_at_one_hundred_definitions(account):
     assert len(result.weapons) == 129
 
 
+async def test_type_query_limit_reports_total_and_truncation(account):
+    """按类型查可以限量：截断必须写明，别让 5 把看起来像全部。"""
+    result = await account.detail.get_weapon_details_by_type("test", "手炮", limit=5)
+
+    assert len(result.weapons) == 5
+    assert result.returned_weapons == 5
+    assert result.total_weapons == 129
+    assert result.truncated is True
+
+
+async def test_type_query_without_limit_returns_everything(account):
+    result = await account.detail.get_weapon_details_by_type("test", "手炮")
+
+    assert result.returned_weapons == result.total_weapons == 129
+    assert result.truncated is False
+
+
 @pytest.mark.parametrize("location, checked, matched", [
     ("vault", 127, 64), ("仓库", 127, 64), ("", 130, 65),
     ("all", 130, 65), ("猎人", 1, 1), ("warlock", 1, 0),
