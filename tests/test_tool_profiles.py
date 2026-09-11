@@ -23,7 +23,7 @@ ASSISTANT_TOOLS = {
 }
 
 
-def _registered_tools(profile: str | None = None) -> set[str]:
+def _registered_tools(profile: str | None = None, *, legacy: bool = False) -> set[str]:
     env = os.environ.copy()
     env.update({
         "BUNGIE_API_KEY": "dummy",
@@ -34,6 +34,11 @@ def _registered_tools(profile: str | None = None) -> set[str]:
         env.pop("DESTINY_MCP_TOOL_PROFILE", None)
     else:
         env["DESTINY_MCP_TOOL_PROFILE"] = profile
+    # 历史工具默认屏蔽，只有显式打开才会出现在工具面里
+    if legacy:
+        env["DESTINY_MCP_ENABLE_LEGACY_TOOLS"] = "1"
+    else:
+        env.pop("DESTINY_MCP_ENABLE_LEGACY_TOOLS", None)
 
     script = textwrap.dedent("""
         import json
@@ -60,8 +65,18 @@ def test_default_profile_exposes_assistant_tools_only() -> None:
     assert "transfer_item" not in tools
 
 
-def test_full_profile_keeps_legacy_tools_for_compatibility() -> None:
-    tools = _registered_tools("full")
+def test_legacy_tools_stay_hidden_in_every_profile_by_default() -> None:
+    """默认工具面只有 8 个聚合工具 —— 换 profile 也不行。"""
+    for profile in (None, "normal", "expert", "full"):
+        tools = _registered_tools(profile)
+
+        assert tools == ASSISTANT_TOOLS, profile
+        assert "raw_api_call" not in tools
+        assert "transfer_item" not in tools
+
+
+def test_full_profile_keeps_legacy_tools_when_explicitly_enabled() -> None:
+    tools = _registered_tools("full", legacy=True)
 
     assert ASSISTANT_TOOLS.issubset(tools)
     assert "raw_api_call" in tools
@@ -69,8 +84,8 @@ def test_full_profile_keeps_legacy_tools_for_compatibility() -> None:
     assert "compare_weapon_instances" in tools
 
 
-def test_expert_profile_adds_common_read_tools_without_raw_api() -> None:
-    tools = _registered_tools("expert")
+def test_expert_profile_adds_common_read_tools_when_explicitly_enabled() -> None:
+    tools = _registered_tools("expert", legacy=True)
 
     assert ASSISTANT_TOOLS.issubset(tools)
     assert "get_inventory" in tools

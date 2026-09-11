@@ -134,9 +134,9 @@ async def test_local_loadout_save_delete_refreshes_cached_list(tmp_path) -> None
 
 
 async def test_server_factories_do_not_leak_profiles_or_prompts() -> None:
-    full = server.create_server("full")
+    full = server.create_server("full", legacy_tools=True)
     normal = server.create_server("normal")
-    expert = server.create_server("expert")
+    expert = server.create_server("expert", legacy_tools=True)
     second_normal = server.create_server("normal")
     def names(instance):
         return {tool.name for tool in instance._tool_manager.list_tools()}

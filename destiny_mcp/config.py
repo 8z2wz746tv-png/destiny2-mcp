@@ -91,6 +91,11 @@ MCP_HOST: str = os.getenv("MCP_HOST", "127.0.0.1")
 MCP_PORT: int = int(os.getenv("MCP_PORT", "8000"))
 MCP_TRANSPORT: str = os.getenv("MCP_TRANSPORT", "stdio")
 TOOL_PROFILE: str = os.getenv("DESTINY_MCP_TOOL_PROFILE", "normal")
+# 历史工具（expert / full 里的那 69 个）默认不暴露：它们没有参数拦截、没有参数说明、
+# 返回契约也不统一，混在工具面里只会多出一堆能选错的东西。要用时显式打开。
+LEGACY_TOOLS_ENABLED: bool = os.getenv(
+    "DESTINY_MCP_ENABLE_LEGACY_TOOLS", ""
+).strip().lower() in {"1", "true", "yes", "on"}
 
 # Public documentation address. The MCP handshake advertises it so that *any* client
 # can reach the full routing guide without a host-specific installation step.

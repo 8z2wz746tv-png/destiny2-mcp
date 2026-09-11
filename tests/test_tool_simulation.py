@@ -151,7 +151,7 @@ class _Context:
 
 
 def _definitions() -> list:
-    server.create_server("full")
+    server.create_server("full", legacy_tools=True)
     return sorted(registry._definitions, key=lambda d: d.function.__name__)
 
 

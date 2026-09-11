@@ -92,13 +92,17 @@ cp .env.example .env
 DESTINY_MCP_TOOL_PROFILE=normal
 ```
 
-可选值：
+**历史工具默认屏蔽。** 那 69 个旧工具没有参数拦截、没有参数说明、返回契约也不统一，混在工具面里只会多出一堆能选错的东西，所以不论哪个 profile 都只暴露 8 个聚合工具。需要排查或兼容旧提示词时显式打开：
 
-| Profile | 用途 |
-|---|---|
-| `normal` | 推荐默认值，只暴露 8 个 assistant 聚合工具 |
-| `expert` | 聚合工具 + 常用查询类旧工具，用于排查查询问题 |
-| `full` | 聚合工具 + 全部历史工具，用于兼容旧提示词或开发调试 |
+```bash
+DESTINY_MCP_ENABLE_LEGACY_TOOLS=1   # 打开历史工具，配合下面的 profile 使用
+```
+
+| Profile | 默认（历史工具关闭） | 打开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 后 |
+|---|---|---|
+| `normal` | 8 个聚合工具（推荐） | 8 个聚合工具 |
+| `expert` | 8 个聚合工具 | 聚合工具 + 常用查询类旧工具，用于排查查询问题 |
+| `full` | 8 个聚合工具 | 聚合工具 + 全部历史工具，用于兼容旧提示词或开发调试 |
 
 ### 3. 准备可选数据（Manifest / DIM Wish List）
 
@@ -227,7 +231,7 @@ VERIFY_OK=Destiny MCP is ready
 写入完成、失败或取消后，依赖账号状态的缓存都会失效。不要同时启动多个实例操作同一
 Bungie 账号；跨进程互斥不在本项目的设计范围内。
 
-`normal` profile 对外保持 8 个聚合工具，内部按意图校验参数并委托领域服务；配装组合
+对外始终只暴露 8 个聚合工具（历史工具要显式打开），内部按意图校验参数并委托领域服务；配装组合
 计算在独立工作进程中运行，每个服务实例最多同时计算一个任务，默认 60 秒超时
 （包含排队时间）；超时或取消会终止该计算进程，不阻塞 MCP 请求循环。
 
@@ -244,7 +248,7 @@ destiny_mcp/
 ├── bungie_client.py   # Bungie API 客户端
 ├── manifest.py        # 游戏数据清单管理
 ├── models/            # Pydantic 数据模型
-├── tools/             # MCP 工具定义（默认 8 个 assistant，full 模式保留旧工具）
+├── tools/             # MCP 工具定义（默认 8 个 assistant；69 个历史工具需显式打开）
 ├── services/          # 业务逻辑层（25+ 个 service）
 ├── build/             # Armor 3.0 配装求解与合法刷取目标反推
 ├── utils/             # 工具函数

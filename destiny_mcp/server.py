@@ -7,6 +7,10 @@
 
 通过环境变量 DESTINY_MCP_TOOL_PROFILE 切换，默认 normal。
 
+**历史工具默认屏蔽**：不管哪个 profile，出厂都只暴露 8 个聚合工具；要 expert / full
+那部分旧工具，得同时设 DESTINY_MCP_ENABLE_LEGACY_TOOLS=1。原因是它们没有参数拦截、
+没有参数说明、返回契约三种混用 —— 放在默认工具面里只会让模型多一堆可以选错的东西。
+
 架构 (Rule 1): server.py 只做生命周期管理 + 工具注册。不含业务逻辑。
 工具定义在 tools/ 子模块中，每个领域一个文件。
 
@@ -26,6 +30,7 @@ from mcp.server.fastmcp import FastMCP
 from .audit import AuditLogger
 from .bungie_client import BungieClient
 from .config import (
+    LEGACY_TOOLS_ENABLED,
     MCP_HOST,
     MCP_PORT,
     MCP_TRANSPORT,
@@ -390,9 +395,23 @@ class AuditedMCP(FastMCP):
             raise
 
 
-def create_server(tool_profile: str | None = None) -> FastMCP:
-    """Create an independent server, including when modules are already imported."""
+def create_server(
+    tool_profile: str | None = None, legacy_tools: bool | None = None
+) -> FastMCP:
+    """Create an independent server, including when modules are already imported.
+
+    `legacy_tools` 默认跟随 `config.LEGACY_TOOLS_ENABLED`（出厂为关）。
+    历史工具没有参数拦截、没有参数说明、返回契约也不统一，所以默认不暴露；
+    需要排查或兼容旧提示词时，用 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 打开。
+    """
     profile = _tool_profile(tool_profile)
+    with_legacy = LEGACY_TOOLS_ENABLED if legacy_tools is None else legacy_tools
+    if not with_legacy and profile != "normal":
+        logger.warning(
+            "tool profile=%s 请求了历史工具，但 DESTINY_MCP_ENABLE_LEGACY_TOOLS 未打开；"
+            "本次只暴露 8 个聚合工具",
+            profile,
+        )
     readiness = {"ready": False}
 
     @asynccontextmanager
@@ -448,6 +467,8 @@ def create_server(tool_profile: str | None = None) -> FastMCP:
         "expert": _EXPERT_TOOL_MODULES,
         "full": _FULL_TOOL_MODULES,
     }[profile]
+    if not with_legacy:
+        modules = _NORMAL_TOOL_MODULES
     for module_name in modules:
         importlib.import_module(f"destiny_mcp.tools.{module_name}")
     tool_registry.register(server, set(modules))
