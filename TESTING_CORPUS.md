@@ -33,7 +33,7 @@
 | --- | --- | --- |
 | 看看我的背包和仓库概况，只读 | `summary` | 区分角色背包与仓库；给出数量概况。 |
 | 我仓库里有多少东西 | `summary` + `location="vault"` | 只统计仓库，不把角色背包算进去。 |
-| 只统计手炮 | `summary` + `item_type="手炮"` | 类型过滤生效；结果与不过滤时不同。 |
+| 只统计武器（不要护甲） | `summary` + `item_type="weapon"` | `summary` 的 `item_type` **只接受 weapon/armor/all**；传「手炮」会得到 `config_error`（这是实现限制，不是 Agent 的错）。要按具体武器类型看，用 `type` + `type_name`。 |
 | 列出我仓库里的物品 | `get` + `location="vault"` | 分页信息可见；不一次性倾倒全部。 |
 | 看看我装备着的护甲 | `get` + `armor_slot` | 部位过滤只作用于护甲。 |
 | 我有没有 `<物品名>` | `search` + `item_name` | 命中给实例 ID 与位置；未命中说「没找到」，不能反推「全账号没有」。 |
@@ -113,7 +113,7 @@
 | 有什么热门的猎人配装 | `community` + `character="hunter"` | 走**社区**模板；**不得用 `loadout_assistant`**。 |
 | 给我 5 套猎人社区方案，不读我的账号 | `community` + `include_inventory=false` | 不读取库存；返回带 `community_build_id`。 |
 | 就用第一套，看看我缺什么 | `community` + `community_build_id` + `include_inventory=true` | 需要**明确的 community_build_id**；不猜 ID。 |
-| 社区配装里缺的那件去哪刷 | 读取 `sourcing` | 有来源就给清单名与来源；**没有就说没有**，不能说「刷不到」。 |
+| 社区配装里缺的那件去哪刷 | `build_assistant(intent="community", community_build_id=…)` 返回里的 **`sourcing` 字段**（没有名为 sourcing 的 intent） | 有来源就给清单名与来源；**没有就说没有**，不能说「刷不到」。 |
 | 社区模板能直接一键装备吗 | 不适用 | 明确拒绝：`build_template`、`solver_handoff`、`farm_options` **都不是可执行方案**。 |
 
 ## 五、`loadout_assistant`
@@ -233,7 +233,7 @@
 | 牵引器火炮是什么评级 | 同上 | 它是 `role="输出工具枪"` 这个**定位**，不是 T0/T1 档位。 |
 | `<清单里没有的武器>` 值得刷吗 | 同上 | `unmatched` 命中时应说「本地清单里没有」，**不能说「不值得刷」**。 |
 | 看看班西现在卖什么，哪件值得留 | `vendor` | 每件带来源与评级；护甲类给 `scale="ordered"`（无档位，不编评级）。 |
-| 我缺的那件去哪刷 | `build_assistant(community)` 的 `sourcing` | 有来源给来源；`reason="no_adapter"` 时说明该类别未接入，**不是「没有来源」**。 |
+| 我缺的那件去哪刷 | `build_assistant(intent="community", community_build_id=…)` 返回里的 `sourcing` **字段** | 有来源给来源；`reason="no_adapter"` 时说明该类别未接入，**不是「没有来源」**。 |
 | 社区配装要的 Perk 和清单推荐的一样吗 | 不适用 | 必须**分开**说明：模板 `required_perks` 是「都要」，清单 `recommended_perks` 是「同栏任一」。 |
 | `<武器>` 的 Perk 里哪些是社区推荐的 | `perk_pool`／`analyze`，读每个 Perk 的 `god_roll_pve`／`god_roll_pvp` | 来自本地 DIM 愿望单；全为 `false` 时要说明「本地没收录」，**不能说「这些 Perk 都不好」**；它和 `farming_list` 是两套数据。 |
 
@@ -342,6 +342,12 @@
 ---
 
 ### 已知问题（测到这些不算新 bug，已在处理清单里）
+| `world_assistant(intent="vendor")` 一次返回 **1.85 MB**；`weapon_assistant(intent="type")` 一次 **515–651 KB** | 两者都是"整包倾倒"，而且**都不接受 `limit`**（传了会 `ignored_parameter`）—— 调用方没有任何办法限制输出 | 待修：让它们读 `limit` 或截断并给 `truncated` 标记 |
+| Armor 3.0 里 `gearTier != 5` 的护甲带 `roll_parse_error`："Armor 3.0 gearTier=4 is not supported for roll inversion." | 代码只对 tier 5 做反推（`build/models.py`），4 级护甲直接标不支持；消息是英文开发者口气 | 待定：支持 tier 4，或把消息改成人话 |
+| 动作类失败的消息里带着上游原文（Bungie URL、内部错误串），例如 `quest_tracking_failed` | 客户端把异常拼成 `{"ErrorCode": …, "Message": str(exc)}`，信封是对的，但 message 泄露开发者信息 | 待修：动作失败消息转成人话 |
+| 写入**成功**后没有 `next_actions` | `ok_response(..., next_actions=[])`，没有"回读核对实际状态"的提示（失败时已有提示） | 待定：要不要补一句 |
+
+
 
 下面几条是 2026-09-11 复现确认过的，写在这里免得下一轮重复当新缺陷上报：
 
