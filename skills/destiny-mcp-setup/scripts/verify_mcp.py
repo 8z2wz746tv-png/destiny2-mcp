@@ -158,6 +158,22 @@ async def _verify(root: Path, command: Path, timeout: float) -> None:
                         "Tool schema mismatch: " + ",".join(sorted(invalid_schema))
                     )
                 print("MCP_TOOL_SCHEMA=ok")
+                # 参数拦截自检：不需要账号，专门用来分辨「跑的是不是当前代码」。
+                # 旧构建会安静地忽略 item_name，这里就会拿到 ok=true。
+                guard_result = await session.call_tool(
+                    "inventory_assistant",
+                    {"intent": "summary", "item_name": "参数拦截自检"},
+                )
+                guard_error = _tool_payload(guard_result).get("error") or {}
+                guard_code = (
+                    guard_error.get("code") if isinstance(guard_error, dict) else None
+                )
+                if guard_code != "ignored_parameter":
+                    raise RuntimeError(
+                        "Parameter guard is missing: inventory_assistant(intent='summary', "
+                        "item_name=...) was accepted. The running server is probably a stale "
+                        "build - restart the host or open a new task."
+                    )
                 profile_result = await session.call_tool(
                     "player_assistant", {"intent": "profile"}
                 )
@@ -169,6 +185,7 @@ async def _verify(root: Path, command: Path, timeout: float) -> None:
                     code = error.get("code", "unknown") if isinstance(error, dict) else "unknown"
                     raise RuntimeError(f"Bungie profile check failed: {code}")
 
+    print("PARAMETER_GUARD=ok")
     print("BUNGIE_PROFILE_CHECK=ok")
     actual = {tool.name for tool in tools_result.tools}
     missing = sorted(EXPECTED_TOOLS - actual)

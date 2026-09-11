@@ -2,6 +2,10 @@
 
 Loads curated god roll recommendations from DIM community wish lists
 and provides scoring/lookup for weapon perk comparison.
+
+哈希约定：DIM 的 JSON 用无符号 32 位哈希做键，manifest 和库存返回的是有符号
+（`-2031504889` vs `2263462407`）。两边必须在同一个约定下比较，否则整张表都查不中
+—— 而查不中的表现是「全部 false」，不会报错。所以装载和查询都过一遍 `to_signed`。
 """
 
 from __future__ import annotations
@@ -10,6 +14,8 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from ..utils.hash_utils import to_signed
 
 logger = logging.getLogger(__name__)
 
@@ -80,13 +86,13 @@ class WishListService:
 
         rolls_data = data.get("rolls", {})
         for item_hash_str, rolls in rolls_data.items():
-            item_hash = int(item_hash_str)
+            item_hash = to_signed(int(item_hash_str))
             grp = GodRollPerks(item_hash=item_hash)
 
             for roll in rolls:
                 # Parse compact format: {"p": "hash1,hash2,...", "t": ["pve"], "s": "..."}
                 perks_str = roll.get("p", "")
-                perk_hashes = {int(h) for h in perks_str.split(",") if h.strip()}
+                perk_hashes = {to_signed(int(h)) for h in perks_str.split(",") if h.strip()}
                 tags = roll.get("t", [])
                 source = roll.get("s", "")
 
@@ -111,16 +117,17 @@ class WishListService:
 
     def has_data(self, item_hash: int) -> bool:
         """Check if we have wish list data for this weapon."""
-        return item_hash in self._weapons
+        return to_signed(item_hash) in self._weapons
 
     def is_god_roll_perk(self, item_hash: int, perk_hash: int) -> dict[str, bool]:
         """Check if a perk is in the god roll recommendations.
 
         Returns {"pve": bool, "pvp": bool}.
         """
-        grp = self._weapons.get(item_hash)
+        grp = self._weapons.get(to_signed(item_hash))
         if not grp:
             return {"pve": False, "pvp": False}
+        perk_hash = to_signed(perk_hash)
         return {
             "pve": perk_hash in grp.pve_perks,
             "pvp": perk_hash in grp.pvp_perks,
@@ -128,15 +135,15 @@ class WishListService:
 
     def get_god_roll_perks(self, item_hash: int) -> GodRollPerks | None:
         """Get all god roll perks for a weapon."""
-        return self._weapons.get(item_hash)
+        return self._weapons.get(to_signed(item_hash))
 
     def score_roll(self, item_hash: int, perk_hashes: list[int]) -> RollScore:
         """Score a set of perks against god roll recommendations."""
-        grp = self._weapons.get(item_hash)
+        grp = self._weapons.get(to_signed(item_hash))
         if not grp:
             return RollScore()
 
-        perk_set = set(perk_hashes)
+        perk_set = {to_signed(hash_) for hash_ in perk_hashes}
         return RollScore(
             pve_hits=len(perk_set & grp.pve_perks),
             pve_total=len(grp.pve_perks),
