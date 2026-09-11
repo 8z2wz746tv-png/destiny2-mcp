@@ -20,8 +20,8 @@
 | 我的角色档案，只读 | `profile` | 只读；不触发任何写入。 |
 | 查一下玩家 `<完整名>` 的档案 | `profile` + `player_name` | 用传入的名称，不套用默认玩家。 |
 | 搜一下叫 `<完整名>` 的玩家 | `search` | 返回 membership_id 与 membership_type，供后续查询复用。 |
-| 找找名字里有「husky」的玩家 | `find` + `name_prefix` | 模糊搜索；列出候选而不是随便挑一个。 |
-| 我名字记不全，帮我找找 | `find` | 名称不完整时应先模糊搜索，并提示需要 `#数字` 才能精确匹配。 |
+| 找找名字里有「husky」的玩家 | `find` + `name_prefix` | ⚠️ 上游的模糊搜索接口已失效（见文末已知问题）：现在**恒返回空**。验收点是 Agent **不要把空结果说成「没这个人」**，而要说明模糊找人不可用、请给完整 `名字#1234` 走 `search`。 |
+| 我名字记不全，帮我找找 | `find` → 不可用时说明并要完整名 | ⚠️ 同上游失败：应直接说明模糊搜索不可用，并提示需要 `名字#1234` 才能精确匹配。 |
 | 默认玩家是谁 | 不调用工具 | 说明来自 `DESTINY_DEFAULT_PLAYER`；未配置时说明会用当前 OAuth 账号。 |
 | 换个账号查 | 不适用 | 本项目是单用户本地版，应说明不支持多用户切换。 |
 
@@ -97,8 +97,8 @@
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
-| 用我的 `<职业>` 现有护甲找三套方案，生命至少 100、手雷至少 100，只列候选不装备 | `find` 或 `recommend` | 五个护甲部位齐全，含实际实例 ID 与最终六维。 |
-| 推荐一套 `<职业>` 护甲，武器 100、职业 100 | `recommend` | `*_target` 是**硬约束**；无解要说无解。 |
+| 用我的 `<职业>` 现有护甲找三套方案，生命至少 100、手雷至少 100，只列候选不装备 | `find` 或 `recommend` | 五个护甲部位齐全，含实际实例 ID 与最终六维。⏱️ 术士同样接近预算上限，见下条与文末已知问题。 |
+| 推荐一套 `<职业>` 护甲，武器 100、职业 100 | `recommend` | `*_target` 是**硬约束**；无解要说无解。⏱️ 实测耗时：泰坦 ~2s、猎人 ~5s、**术士 ~190s**（组合数是猎人的 39 倍）；超过预算会返回 `build_validation_error`，可用 `DESTINY_BUILD_TIMEOUT_SECONDS` 调。 |
 | 保留上面的目标，指定金装 `<异域护甲原名>` | 先返回候选 | **首次查询必须返回金装候选并等确认**；不得自行选定。 |
 | 就选第一个 | 带 `confirmed_exotic_hash` + `exotic_experience_token` 重试 | 必须原样回传候选里的值；职业、目标、优先级、碎片设置**不得在重试时丢失**。 |
 | 没有解的话别降条件，分析还差什么 | `analyze` | 明确说明无解；**不得擅自放宽硬目标**。 |
@@ -159,8 +159,8 @@
 | 我最常用哪把武器 | `weapon_history` | 按使用次数排行。 |
 | 我在熔炉里的表现怎么样 | `stats` 或 `leaderboards` | 明确区分生涯统计与排行榜。 |
 | 各类活动的累计统计 | `aggregate` | 按活动类型聚合。 |
-| 排行榜上我在什么位置 | `leaderboards` | 需要 `statid`；说明榜单范围。 |
-| 我们公会的排行榜 | `clan_leaderboards` + `group_id` | **必须提供 group_id**，否则参数错误。 |
+| 排行榜上我在什么位置 | `leaderboards` | ⚠️ 上游接口当前返回 `ErrorCode:3 UnhandledException`（见已知问题）：会得到 `ok=false`。验收点是 Agent 说明**这是上游问题、不是账号问题**，不要编排名。 |
+| 我们公会的排行榜 | `clan_leaderboards` + `group_id` | **必须提供 group_id**（数字公会 ID，不是公会名），否则 `invalid_argument_error`。 |
 | `<副本>` 的社区攻略 | `community` | 本地资料；外链只是引用，未抓正文。 |
 
 ## 八、`world_assistant` 🔐
@@ -173,7 +173,7 @@
 | 班西今天有什么好东西 | `vendor` + `vendor_name` | 指出值得买的具体条目与理由。 |
 | `<商品>` 值不值得刷 | `vendor` 后读取 `farming_list` | 用清单的评级与来源回答；引用清单名与更新时间。 |
 | 搜索收藏品节点 | `search_collectible_nodes` + `query` | 返回节点候选。 |
-| 我解锁这个收藏品了吗 | `collectible_node` + 节点 hash | 区分「节点可见」与「已解锁」。 |
+| 我解锁这个收藏品了吗 | `collectible_node` + 节点 hash | 节点 hash **只能**从 `search_collectible_nodes` 拿；把 `collectible_item` 返回的 `collectible_hash` 传进来会被拒（两者不是一回事）。区分「节点可见」与「已解锁」。 |
 | 查一下 `<物品>` 的收藏品状态 | `collectible_item` | 明确未解锁时不编造获取方式。 |
 | `<机制>` 在社区资料里怎么解释 | `community` | 走本地资料；保留 PvP／强化／待验证标记。 |
 | 跨分类搜社区资料：护甲 | `community` + `community_category="armor"` | 分类过滤生效；这是唯一能跨分类搜的入口。 |
