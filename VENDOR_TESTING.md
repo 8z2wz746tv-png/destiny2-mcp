@@ -53,6 +53,9 @@
 8. `categories[].kind="submenu"` ⇒ 一定有 `target_vendor_hash`；`target_available=false` 时必须有一条 `next_actions` 说明"本次没返回"。
 9. 不点名查商人 **不该** 逐个商人去拉 Perk socket（表现为慢+一堆 API 调用）。
 10. 任何"查不到"都必须是**说得清的空**：要么 `warnings` 给相近名字，要么明说"本周期不在/本次没返回"，**不允许**静默空数组。
+11. 详情被截断时，商品按**分类顺序**给出（同分类内按上游序号）：前缀覆盖的是靠前的分类，
+    不是上游字典顺序的随机切片。想知道"剩下的在哪"，看各分类的 `item_count` 即可
+    （`sum(item_count)` 等于 `total_items`；某个分类 `item_count=0` 就是今天那个 tab 没货）。
 
 ---
 
@@ -117,6 +120,9 @@
 | F2 | 商人详情最多给几件？（不给 limit） | 走默认 40 件（菜单默认 15 个商人） | 一次全给或只给 1 件 |
 | F3 | `limit=250` 这种超大值 | 被夹到上限（250），并照实标 `truncated` | 报错或无视上限 |
 | F4 | 按类型查武器：手炮，先给五把 | `weapon_assistant(intent="type", weapon_type="手炮", limit=5)` → 5 把 + `total_weapons=124` 左右 + `truncated=true` | 给 5 把却说这是全部 |
+| F5 | **`limit=12`**（曾经的坑） | 和别的数字一样生效：菜单 12 个商人、详情 12 件商品；对照 `11→11 / 12→12 / 13→13` 必须单调 | 12 被吞掉（详情变默认 40、菜单变默认 15）；三连测下来非单调 |
+| F6 | `limit=0` 或负数 | 等于"没指定"，按模式默认（菜单 15 / 详情 40），**不报错**；`limit=null`（不传）同理 | 报错；或返回 0 条 |
+| F7 | 截断时给的是哪几件？ | 按分类顺序的前 N 件：例如 `EVERVERSE_FOCUSED`（分类 0 有 1 件、分类 1–5 各 5 件）传 `limit=5` → 覆盖分类 0 和 1；**不应**出现"前 5 件只落在分类 0 和 2、其它分类像空的" | 按上游字典顺序乱切，让人误以为某些分类没货 |
 
 ### G. 参数守卫与错误路由
 
@@ -153,7 +159,7 @@
 | `total_items`、`purchasable_items`、菜单前几名 | `truncated == (total > returned)`、`returned == len(...)` |
 | `rank.level`、进度数字、`level_cap` 的具体数值 | `level_cap` 要么是 `null`（= 无上限，上游发的是 -1），要么 `level ≤ level_cap` |
 | 商人是否在（仄只在周五 17:00–周二 17:00 UTC 在；聚焦页可能整周没货） | "不在/没返回"必须被明说 |
-| 哪个子页面本次有返回 | `kind="submenu"` 必须有 `target_vendor_hash` |
+| 哪个子页面本次有返回 | `kind="submenu"` 必须有 `target_vendor_hash`；截断前缀按分类顺序取 |
 | 具体商人 hash 是否出现（实测 229 个有货架的商人） | 别名/hash/片段三种写法都能定位到同一个 hash |
 
 ---
@@ -169,6 +175,7 @@
 | 传承装备 | 名字有歧义 | 6 个同名页面 |
 | 全商人数 | 不点名 | `total_vendors=229`，菜单默认给 15 个，响应约 **17 KB**（修复前一次 1.85 MB） |
 | 详情响应大小 | 点名 | 约 **3–7 KB**；`type` + `limit=5` 约 22 KB（修复前 515–651 KB） |
+| 最大响应 | 泰斯 + `limit=250` | 224 件全量约 **178 KB / 5200 行**（`truncated=false`）；这是上限级场景，超过它说明 `limit` 没被夹住 |
 
 ---
 
@@ -185,6 +192,9 @@
 | ~~`rank.level_cap=-1` 被当成上限~~ | 已修：上游对无上限的声誉体系（内欧姆那等级、王座世界等级、总合部、派克组、智能失效保险）发 -1，现在归一成 `null` | **已修** |
 | 「智能失效保险」的 `rank.name` 和商人同名，像是回退 | 不是回退：manifest 里那条声望定义的 `displayProperties.name` 本身就写作「智能失效保险」（已直接查定义核实） | 上游数据如此，不是缺陷 |
 | 装饰性条目混进 `sale_items`、`category_index` 越界 | 已修：装饰性 tab 下的条目不再算商品，改计入 `hidden_items` | **已修** |
+| ~~显式 `limit=12` 被当成"没指定"~~ | 已修：`world_assistant.limit` 默认值改成 `null`（schema 里也是 `default: null`），11/12/13 现在都照常生效 | **已修** |
+| ~~`weekly_full` + `limit=12` 被静默放过~~ | 上一条的副作用：12 曾被当成"没传"，所以不读 `limit` 的 `weekly_full` 也就没报错。现在会正常返回 `ignored_parameter` | **已修** |
+| 聚焦类子页面"分类 26 个槽位、明细只有 5 件" | 不是丢数据：上游 `categories` 声明的是槽位，实际有货的行看 `total_items`/`sale_items`；`limit` 小的时候明细按分类顺序取前缀（见 F7） | 口径已写进断言 11 |
 
 ---
 

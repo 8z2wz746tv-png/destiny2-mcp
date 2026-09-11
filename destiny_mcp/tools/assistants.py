@@ -40,8 +40,7 @@ from ._responses import (
     ok_response,
 )
 
-# world_assistant 的 limit 默认值。等于它的调用视为「没指定」，
-# 由各 intent 自己决定默认条数（见 intent == "vendor"）。
+# world_assistant 里「没传 limit」时各 intent 用的条数（vendor 除外，它按菜单/详情取默认）。
 _WORLD_LIMIT_DEFAULT = 12
 
 
@@ -1283,7 +1282,7 @@ async def world_assistant(
     item_name: fields.ItemName = "",
     collectible_node_hash: fields.CollectibleNodeHash = 0,
     include_invisible: fields.IncludeInvisible = False,
-    limit: fields.Limit = _WORLD_LIMIT_DEFAULT,
+    limit: fields.OptionalLimit = None,
     community_category: Annotated[
         str, Field(description="社区资料分类：builds/weapons/armor/subclass/activities/mechanics/sources/other；留空为全部。")
     ] = "",
@@ -1300,6 +1299,12 @@ async def world_assistant(
     """
     svc = get_ctx(ctx)
     intent = cast(WorldIntent, (intent or "weekly").strip().lower())
+
+    # limit 的默认值必须是 None（= 没指定），不能用「等于默认值就当没传」那种写法：
+    # 那样显式传 12 会被静默吞掉（11 生效、12 变默认、13 又生效），宿主按 schema 默认值
+    # 自动填参时也分不清"传了 12"和"没传"。vendor 自己按菜单/详情分别取默认，留给它 None。
+    if limit is None and intent != "vendor":
+        limit = _WORLD_LIMIT_DEFAULT
 
     if intent == "community":
         result = _community_read(
@@ -1330,7 +1335,7 @@ async def world_assistant(
             resolved,
             character,
             vendor_name,
-            limit=None if limit == _WORLD_LIMIT_DEFAULT else limit,
+            limit=limit,
         )
         vendors = _dump(result)
         payload: dict[str, Any] = {"vendors": vendors}

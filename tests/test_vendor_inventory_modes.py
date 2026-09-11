@@ -10,8 +10,12 @@ vendorGroups），验证三件事：
 from __future__ import annotations
 
 from copy import deepcopy
+from types import SimpleNamespace
 
 import pytest
+
+from destiny_mcp.models import VendorInventoryResponse
+from destiny_mcp.tools.assistants import world_assistant
 
 from destiny_mcp.services import vendor_service as vendor_service_module
 from destiny_mcp.services.vendor_service import VendorService
@@ -155,6 +159,7 @@ class _Manifest:
         705: "枪匠货",
         706: "仄的货",
         707: "先锋行动",
+        708: "分类一末件",
         900: "Verified Barrel",
     }
 
@@ -504,3 +509,91 @@ async def test_malformed_category_entry_does_not_crash() -> None:
     assert [category.index for category in vendor.categories] == [1]
     assert vendor.categories[0].item_count == 3
     assert vendor.total_items >= 1
+
+
+class _StubVendorService:
+    """只记录收到的参数，用来验证工具层有没有把 limit 原样传下去。"""
+
+    def __init__(self) -> None:
+        self.calls: list[dict] = []
+
+    async def get_vendor_inventory(
+        self, player_name, character, vendor_name="", *, compact=True, limit=None
+    ):
+        self.calls.append({"vendor_name": vendor_name, "character": character, "limit": limit})
+        return VendorInventoryResponse(player_name=player_name, character="猎人", mode="menu")
+
+
+class _StubWeeklyService:
+    def __init__(self) -> None:
+        self.limits: list = []
+
+    async def summarize_weekly_reset(self, limit=None):
+        self.limits.append(limit)
+        return {"summary": "ok", "weekly": {}, "next_actions": [], "warnings": []}
+
+
+def _world_ctx(services: dict) -> SimpleNamespace:
+    return SimpleNamespace(
+        request_context=SimpleNamespace(lifespan_context=services)
+    )
+
+
+@pytest.mark.asyncio
+async def test_explicit_limit_twelve_reaches_the_service_untouched() -> None:
+    """12 曾经等于签名默认值、被当成"没传"而吞掉（11 生效、12 变默认、13 又生效）。"""
+    stub = _StubVendorService()
+
+    await world_assistant(
+        intent="vendor", player_name="Tester#1234", limit=12, ctx=_world_ctx({"vendor_svc": stub})
+    )
+
+    assert stub.calls[0]["limit"] == 12
+
+
+@pytest.mark.asyncio
+async def test_omitted_limit_still_reaches_vendor_as_unspecified() -> None:
+    """没传 limit 时 vendor 要拿到 None，才能按菜单/详情各取默认。"""
+    stub = _StubVendorService()
+
+    await world_assistant(
+        intent="vendor", player_name="Tester#1234", ctx=_world_ctx({"vendor_svc": stub})
+    )
+
+    assert stub.calls[0]["limit"] is None
+
+
+@pytest.mark.asyncio
+async def test_omitted_limit_gives_other_intents_the_shared_default() -> None:
+    """vendor 之外的 intent 仍然拿 12，行为没变。"""
+    weekly = _StubWeeklyService()
+
+    await world_assistant(
+        intent="weekly", ctx=_world_ctx({"weekly_analysis_svc": weekly})
+    )
+
+    assert weekly.limits == [12]
+
+
+@pytest.mark.asyncio
+async def test_truncated_detail_covers_the_first_tabs_not_a_random_slice() -> None:
+    """截断时给的是靠前分类的前 N 件，不能是上游字典顺序的随机前缀。"""
+    response = deepcopy(_RESPONSE)
+    response["categories"]["data"][str(_VANGUARD)]["categories"] = [
+        {"displayCategoryIndex": 1, "itemIndexes": [10, 11, 14]},
+        {"displayCategoryIndex": 2, "itemIndexes": [12]},
+    ]
+    # 上游把 14 排在最后，但它属于分类 1，按分类顺序应排在分类 2 的 12 之前
+    response["sales"]["data"][str(_VANGUARD)]["saleItems"]["14"] = {
+        "vendorItemIndex": 14, "itemHash": 708, "costs": [], "failureIndexes": [],
+        "augments": 0, "saleStatus": 0,
+    }
+    service = VendorService(_Bungie(response), _Manifest(), _Resolver())
+
+    result = await service.get_vendor_inventory("玩家#1234", "hunter", str(_VANGUARD), limit=3)
+
+    vendor = result.vendors[0]
+    assert [item.name for item in vendor.sale_items] == [
+        "Live Roll Weapon", "不可买的材料", "分类一末件",
+    ]
+    assert vendor.truncated is True

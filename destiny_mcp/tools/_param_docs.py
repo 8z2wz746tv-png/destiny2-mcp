@@ -214,14 +214,17 @@ WorldIntentField = Annotated[
 
 # ── 其余共享参数 ────────────────────────────────────────────────────────────
 
-Limit = Annotated[
-    int,
-    Field(description=(
-        "最多返回多少条。只限制返回条数，不限制扫描范围，被截断时响应里会带 truncated/总数。"
-        "intent=\"vendor\" 时：不点名商人 = 最多列几个商人，点名 = 每个商人最多几件商品。"
-        "不读它的 intent 传了会被拒绝。"
-    )),
-]
+_LIMIT_DESCRIPTION = (
+    "最多返回多少条。只限制返回条数，不限制扫描范围，被截断时响应里会带 truncated/总数。"
+    "intent=\"vendor\" 时：不点名商人 = 最多列几个商人（默认 15），点名 = 每个商人最多几件商品（默认 40）；"
+    "传 0 或负数等于没传。不读它的 intent 传了会被拒绝。"
+)
+
+Limit = Annotated[int, Field(description=_LIMIT_DESCRIPTION)]
+
+# 同一个参数在个别工具上「不传」本身有意义（vendor 要按菜单/详情分别取默认），
+# 这类工具用可空版本：schema 里默认值就是 null，显式传任何数字都算传了。
+OptionalLimit = Annotated[int | None, Field(description=_LIMIT_DESCRIPTION)]
 
 Offset = Annotated[
     int,

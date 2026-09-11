@@ -461,7 +461,9 @@ class VendorService:
             limit: Max vendors in menu mode, max items per vendor in detail mode.
 
         Returns:
-            VendorInventoryResponse; `mode` says which shape came back.
+            VendorInventoryResponse; `mode` says which shape came back. Items are
+            ordered by shelf tab, so a truncated detail always covers the first tabs
+            rather than an arbitrary slice of the upstream row order.
         """
         logger.info("get_vendor_inventory: player=%s char=%s vendor=%s",
                      player_name, character, vendor_name)
@@ -623,13 +625,25 @@ class VendorService:
             total_items = 0
             purchasable_items = 0
             hidden_items = 0
-            for item_index_str, sale_item in sale_items_raw.items():
-                if not isinstance(sale_item, dict):
-                    continue
+            ordered_indexes: list[int] = []
+            for item_index_str in sale_items_raw:
                 try:
-                    item_index = int(item_index_str)
+                    ordered_indexes.append(int(item_index_str))
                 except (TypeError, ValueError):
                     logger.debug("Skipping vendor row with non-numeric index %r", item_index_str)
+            # 截断时给出的是「靠前分类的前 N 件」，而不是上游字典顺序的随机前缀：
+            # 否则 limit 小的时候可能整类商品一件都没出现，看起来像那个分类是空的。
+            ordered_indexes.sort(
+                key=lambda item_index: (
+                    index_to_category.get(item_index) is None,
+                    index_to_category.get(item_index) or 0,
+                    item_index,
+                )
+            )
+
+            for item_index in ordered_indexes:
+                sale_item = sale_items_raw.get(str(item_index))
+                if not isinstance(sale_item, dict):
                     continue
                 if index_to_category.get(item_index) in decorative_indexes:
                     hidden_items += 1
