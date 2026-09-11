@@ -246,7 +246,7 @@
 | 批量装备给重复实例 ID | `equip_many` | 参数错误并指出重复。 |
 | 改官方槽位到 21 号 | `update_official_identifiers` / `clear_official` | 槽位范围 1–20，越界应报错。 |
 | 装一个 hash 为负的神器模组 | `equip_artifact_mod` | 参数错误：hash 必须为正。 |
-| 用一个不存在的 intent | 任意工具 + 乱填 intent | 返回 `unsupported_intent` 并列出可用值，**不要静默降级成默认行为**。 |
+| 用一个不存在的 intent | 任意工具 + 乱填 intent | 在 **schema 层**就被拒：客户端拿到 `isError` + pydantic 的 `literal_error`，消息里列出该工具允许的全部取值。**不要**期待 `unsupported_intent` 信封（那个分支只在参数过了 schema 校验、但代码没处理时才会走到，正常情况到不了）；底线是**不要静默降级成默认行为**。 |
 | 查子职业选项但不给元素／组件 | `subclass_assistant(intent="options")` | 返回 `ok=false` + `subclass_error`，消息里列出合法取值；**不能是 `ok=true` 里裹一段错误文字**，也不能当成「没有可选项」。 |
 | 查不存在的套装效果 | `build_assistant(intent="set_bonus", set_bonus_name=...)` | 返回 `ok=false` + `item_not_found_error`，不能包在成功信封里。 |
 | 用不认识的词筛护甲模组 | `build_assistant(intent="armor_mods", priority_stat="武器伤害")` | 返回 `ok=false` + `invalid_argument_error` 并列出词表；**不能安静返回 0 条**（那会被读成「没有这种模组」）。 |
@@ -340,6 +340,19 @@
 | 好，确认执行 | 同上 + `confirmed=true` | 用服务端原候选执行，执行后重新读取实际状态核对。 |
 
 ---
+
+### 已知问题（测到这些不算新 bug，已在处理清单里）
+
+下面几条是 2026-09-11 复现确认过的，写在这里免得下一轮重复当新缺陷上报：
+
+| 现象 | 真实原因（已核实） | 状态 |
+| --- | --- | --- |
+| `build_assistant` 的 `recommend` / `analyze` / `find` 对**术士**恒超时（62–67s，`build_validation_error`），猎人和泰坦正常（5–32s） | 求解器 60 秒预算对术士的搜索空间不够；和约束多少无关（`top_n=1`、不给属性目标也一样超时）。`farm_target` 走另一条求解路径，术士 5.5s 正常 | 待修：预算可配置/剪枝/部分结果 |
+| `player_assistant(intent="find")` 任何 `name_prefix` 都返回 `ok=true` + 空列表 | Bungie 的 `POST /User/SearchUsers/` 现在返回 **405**，代码把这类失败吞掉后返回空 —— 所以「没找到」和「搜索源不可用」分不出来 | 待修：换接口或明说不可用 |
+| `activity_assistant(intent="leaderboards")` 恒返回 `ok=false` + `a_p_i_error: 响应格式异常` | **上游失败**：Bungie 对账号榜单接口返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`。工具只是把上游失败说得太笼统 | 待修：消息带上游 ErrorCode/ErrorStatus |
+| `world_assistant(intent="collectible_node")` 传一个**正数但无效**的节点 hash → 原始 404 裸抛（无 `ok=false` 信封） | `collectible_item` 返回的 `collectible_hash` 与展示节点 hash **不是一回事**，传错就 404；`hash<=0` 已被拦，正数无效值还没拦 | 待修：包信封 + 说明两种 hash 的区别 |
+| `slot_number=21`、非法 intent、拼错的参数名 → 原始 pydantic 报错，没有 `ok=false` | schema 层校验发生在工具函数之前，属于**协议级**参数错误（不是业务失败） | 取舍中：保持协议级拒绝，或补一层信封包装 |
+| 写入失败（如 `move` 一个已装备物品）只有 Bungie 原文，没有 `next_actions` 指引 | `_action_response` 的失败分支只带 `candidates`，不给下一步建议 | 待修：补「先用 equip 换下再移」这类指引 |
 
 ## 机器可读子集
 
