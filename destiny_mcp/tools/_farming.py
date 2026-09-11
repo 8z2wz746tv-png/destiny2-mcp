@@ -58,16 +58,24 @@ def harvest_names(value: Any, *, limit: int = 8) -> list[str]:
 
 
 def sale_item_names(vendors: Any, *, limit: int = 8) -> list[str]:
-    """商人的货架商品名。
+    """商人的货架商品名，只读商品自己那层 `name`。
 
-    只取 `sale_items` 里的名字：`vendors[].name` 是商人名，`categories[].name` 是
-    分类名，`rank.name` 是声望名，它们都不是商品，混进来只会把 unmatched 塞满噪声。
+    刻意**不下钻**：商品条目里还嵌着 perks[].name（压缩后形如「狂暴 [PvP]」），
+    递归收集会把 Perk 名也送去查刷取清单；`vendors[].name`（商人名）、
+    `categories[].name`（分类名）、`rank.name`（声望名）同理都不是商品。
     """
-    shelf: list[dict] = []
-    if isinstance(vendors, dict):
-        for vendor in vendors.get("vendors", []) or []:
-            if isinstance(vendor, dict):
-                shelf.extend(
-                    item for item in (vendor.get("sale_items") or []) if isinstance(item, dict)
-                )
-    return harvest_names(shelf, limit=limit)
+    found: list[str] = []
+    if not isinstance(vendors, dict):
+        return found
+    for vendor in vendors.get("vendors", []) or []:
+        if not isinstance(vendor, dict):
+            continue
+        for item in vendor.get("sale_items") or []:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name") or "").strip()
+            if name and name not in found:
+                found.append(name)
+                if len(found) >= limit:
+                    return found
+    return found

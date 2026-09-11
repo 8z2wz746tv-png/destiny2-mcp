@@ -485,19 +485,24 @@ def test_harvest_names_skips_duplicates_and_stays_bounded() -> None:
     assert _harvest_names({"weapons": [{"item_hash": 1}, {"name": "  "}]}) == []
 
 
-def test_sale_item_names_ignores_vendor_and_category_names() -> None:
-    """商人名、分类名、等级名都不是商品，不该混进刷取清单查询。"""
+def test_sale_item_names_ignores_vendor_category_and_perk_names() -> None:
+    """商人名、分类名、等级名、商品里嵌的 Perk 名都不是商品，不该混进刷取清单查询。"""
     vendors = {
         "vendors": [
             {
                 "name": "指挥官萨瓦拉",
                 "rank": {"name": "先锋等级"},
                 "categories": [{"name": "等级奖励"}],
-                "sale_items": [{"name": "真相"}, {"name": "真相"}, {"name": "牵引器火炮"}],
+                "sale_items": [
+                    {"name": "真相", "perks": [{"name": "狂暴 [PvP]"}, {"name": "小口径枪膛 [PvP]"}]},
+                    {"name": "真相"},
+                    {"name": "牵引器火炮", "perks": [{"name": "移动目标 [PvP]"}]},
+                ],
             }
         ]
     }
 
     assert _sale_item_names(vendors) == ["真相", "牵引器火炮"]
+    assert _sale_item_names(vendors, limit=1) == ["真相"]
     assert _sale_item_names({"vendors": []}) == []
     assert _sale_item_names(None) == []

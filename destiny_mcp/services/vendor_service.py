@@ -394,12 +394,15 @@ class VendorService:
             ))
 
         # failureIndexes point into the vendor's failureStrings; empty means buyable.
+        # 上游有些槽位的文案本身就是空串（帮派按钮之类），过滤掉再判断，
+        # 否则会出现「不可买但原因是空字符串」这种等于没说的答案。
         failure_indexes = sale_item.get("failureIndexes") or []
         failures: list[str] = [
-            vendor_failure_strings[index]
+            str(vendor_failure_strings[index]).strip()
             for index in failure_indexes
             if isinstance(index, int) and 0 <= index < len(vendor_failure_strings)
         ]
+        failures = [text for text in failures if text]
         if failure_indexes and not failures:
             failures.append(f"上游标记为不可购买（原因索引 {list(failure_indexes)}）")
 

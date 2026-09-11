@@ -428,3 +428,25 @@ async def test_warning_list_is_capped() -> None:
     result = await service.get_vendor_inventory("玩家#1234", "hunter", str(_VANGUARD))
 
     assert len(result.warnings) <= 9
+
+
+@pytest.mark.asyncio
+async def test_blank_failure_string_falls_back_to_index_message() -> None:
+    """上游原因文案是空串时，不能回一个空字符串当"原因"。"""
+    response = deepcopy(_RESPONSE)
+    response["vendors"]["data"][str(_VANGUARD)]["progression"]  # keep shape explicit
+    manifest = _Manifest()
+
+    def blank_reason(vendor_hash: int) -> dict:
+        definition = _Manifest._vendor_def(manifest, vendor_hash)
+        definition["failureStrings"] = [""]
+        return definition
+
+    manifest.get_vendor_definition = blank_reason  # type: ignore[method-assign]
+    service = VendorService(_Bungie(response), manifest, _Resolver())
+
+    result = await service.get_vendor_inventory("玩家#1234", "hunter", str(_VANGUARD))
+
+    blocked = next(item for item in result.vendors[0].sale_items if item.name == "不可买的材料")
+    assert blocked.can_be_sold is False
+    assert blocked.failure_reasons == ["上游标记为不可购买（原因索引 [0]）"]
