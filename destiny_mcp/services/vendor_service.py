@@ -592,7 +592,14 @@ class VendorService:
             for entry in api_categories:
                 category_index = entry.get("displayCategoryIndex")
                 for item_index in entry.get("itemIndexes") or []:
-                    index_to_category[int(item_index)] = category_index
+                    # 上游偶尔有脏值（非数字、布尔）；这里认不出来就跳过，
+                    # 不能让一条脏分类把整个商人查询打崩。
+                    if isinstance(item_index, bool):
+                        continue
+                    if isinstance(item_index, int):
+                        index_to_category[item_index] = category_index
+                    elif isinstance(item_index, str) and item_index.isdigit():
+                        index_to_category[int(item_index)] = category_index
 
             categories = category_entries(
                 api_categories,
@@ -607,7 +614,9 @@ class VendorService:
             decorative_indexes = {
                 int(entry["displayCategoryIndex"])
                 for entry in api_categories
-                if entry.get("itemIndexes") and entry.get("displayCategoryIndex") not in listed_indexes
+                if isinstance(entry.get("displayCategoryIndex"), int)
+                and entry.get("itemIndexes")
+                and entry["displayCategoryIndex"] not in listed_indexes
             }
 
             items: list[VendorSaleItem] = []
@@ -617,7 +626,12 @@ class VendorService:
             for item_index_str, sale_item in sale_items_raw.items():
                 if not isinstance(sale_item, dict):
                     continue
-                if index_to_category.get(int(item_index_str)) in decorative_indexes:
+                try:
+                    item_index = int(item_index_str)
+                except (TypeError, ValueError):
+                    logger.debug("Skipping vendor row with non-numeric index %r", item_index_str)
+                    continue
+                if index_to_category.get(item_index) in decorative_indexes:
                     hidden_items += 1
                     continue
                 total_items += 1
@@ -626,7 +640,7 @@ class VendorService:
                 if detail_mode and len(items) < item_limit:
                     items.append(self._build_sale_item(
                         sale_item,
-                        int(item_index_str),
+                        item_index,
                         index_to_category,
                         vendor_failure_strings,
                         live_components,

@@ -193,17 +193,23 @@ def category_entries(
     available = {int(v) for v in (available_vendors or ())}
     label = vendor_label or (lambda _hash: "")
 
-    categories: list[VendorCategory] = []
+    # 同一个 index 可能在组件里出现多次（上游重复）；按 index 合并条目数，
+    # 否则会列出两条同号分类，前端按 index 归类时就会翻倍。
+    counts: dict[int, int] = {}
     for entry in api_categories or []:
         index = entry.get("displayCategoryIndex")
         item_indexes = entry.get("itemIndexes") or []
         if not isinstance(index, int) or not item_indexes:
             continue
+        counts[index] = counts.get(index, 0) + len(item_indexes)
+
+    categories: list[VendorCategory] = []
+    for index, item_count in counts.items():
         meta = display_by_index.get(index) or {}
         identifier = str(meta.get("identifier") or "")
         name = str((meta.get("displayProperties") or {}).get("name") or "")
         target = targets.get(index)
-        kind = classify_category(identifier, len(item_indexes), target)
+        kind = classify_category(identifier, item_count, target)
         if kind is None:
             continue
         category = VendorCategory(
@@ -211,7 +217,7 @@ def category_entries(
             name=name or identifier or f"分类{index}",
             identifier=identifier,
             kind=kind,
-            item_count=len(item_indexes),
+            item_count=item_count,
         )
         if kind == "submenu" and target:
             category.target_vendor_hash = int(target)

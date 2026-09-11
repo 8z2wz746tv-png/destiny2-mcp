@@ -484,3 +484,23 @@ async def test_uncapped_rank_reports_no_cap_instead_of_minus_one() -> None:
     assert rank is not None
     assert rank.level_cap is None
     assert rank.level == 11
+
+
+@pytest.mark.asyncio
+async def test_malformed_category_entry_does_not_crash() -> None:
+    """分类组件里缺 displayCategoryIndex / itemIndexes 不是数字时，不能直接把工具打崩。"""
+    response = deepcopy(_RESPONSE)
+    response["categories"]["data"][str(_VANGUARD)]["categories"] = [
+        {"displayCategoryIndex": None, "itemIndexes": [10]},
+        {"displayCategoryIndex": 1, "itemIndexes": ["x"]},
+        {"displayCategoryIndex": 1, "itemIndexes": [10, 11]},
+    ]
+    service = VendorService(_Bungie(response), _Manifest(), _Resolver())
+
+    result = await service.get_vendor_inventory("玩家#1234", "hunter", str(_VANGUARD))
+
+    vendor = result.vendors[0]
+    # 同一个 index 出现两次要合并成一条，不能列出两条同号分类
+    assert [category.index for category in vendor.categories] == [1]
+    assert vendor.categories[0].item_count == 3
+    assert vendor.total_items >= 1
