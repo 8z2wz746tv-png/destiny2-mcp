@@ -15,7 +15,12 @@ from pathlib import Path
 
 import pytest
 
-from destiny_mcp.exceptions import DefinitionNotFoundError, ItemNotFoundError, SubclassError
+from destiny_mcp.exceptions import (
+    DefinitionNotFoundError,
+    InvalidArgumentError,
+    ItemNotFoundError,
+    SubclassError,
+)
 from destiny_mcp.services.fragment_service import FragmentService
 from destiny_mcp.services.set_bonus_service import SetBonusService
 
@@ -76,3 +81,44 @@ def test_set_bonus_lookup_raises_when_nothing_matches() -> None:
 
     with pytest.raises(ItemNotFoundError, match="找不到套装或护甲"):
         service.lookup_armor_set("不存在的套装")
+
+
+class _Unused:
+    """给构造函数占位：这几个校验发生在碰任何依赖之前。"""
+
+    def __getattr__(self, name: str):
+        raise AssertionError(f"校验没挡住，居然用到了 {name}")
+
+
+async def test_activity_lookups_validate_ids_before_calling_bungie() -> None:
+    """缺 ID / 传了个名字，以前会拼出 .../PostGameCarnageReport// 打给 Bungie，
+    拿回 404 后以未捕获异常冒到客户端（没有 ok/error 信封）。"""
+    from destiny_mcp.services.activity_service import ActivityService
+
+    service = ActivityService(_Unused(), _Unused(), _Unused())
+
+    for bad in ("", "   ", "abc"):
+        with pytest.raises(InvalidArgumentError, match="activity_id"):
+            await service.get_pgcr(bad)
+        with pytest.raises(InvalidArgumentError, match="group_id"):
+            await service.get_clan_leaderboards(bad)
+
+
+async def test_collectible_status_validates_its_arguments() -> None:
+    from destiny_mcp.services.collection_service import CollectionService
+
+    service = CollectionService(_Unused(), _Unused(), _Unused())
+
+    with pytest.raises(InvalidArgumentError, match="collectible_node_hash"):
+        await service.get_collectible_node_status("玩家", 0)
+    with pytest.raises(InvalidArgumentError, match="item_name"):
+        await service.get_collectible_item_status("玩家", "  ")
+
+
+def test_loadout_identifier_search_rejects_an_unknown_kind() -> None:
+    from destiny_mcp.services.loadout_service import LoadoutService
+
+    service = LoadoutService(_Unused(), _Unused(), _Unused())
+
+    with pytest.raises(InvalidArgumentError, match="kind"):
+        service.search_official_loadout_identifiers(kind="不存在的种类")

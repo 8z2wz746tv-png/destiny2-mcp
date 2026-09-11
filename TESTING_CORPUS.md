@@ -7,6 +7,8 @@
 - 「期望路由」写的是**应该**出现的工具与 intent。工具返回 `unsupported_intent` 说明路由到了不存在的分支，是失败。
 - 需要真实账号、网络或 OAuth 的用例标了 🔐；离线只能跑前八节里不依赖账号的部分。
 - 光看工具名不够：写操作必须停下等确认，缺数据必须说缺数据，这两条在第九、十、十一节单独验。
+- **测之前先做两件事**：新开一个任务（或重启宿主），再跑 `scripts/verify_mcp.py` 看到 `PARAMETER_GUARD=ok` —— 那是「你连的是新代码」的证明。细节见第十五节。
+- 第十五节是**本轮修复的回归语料**：参数传错要报错、失败要走在失败信封里、词表不认要报错、愿单标记要真的亮、工具面只剩 8 个。
 
 ---
 
@@ -151,7 +153,7 @@
 | --- | --- | --- |
 | 看看我的 `<职业>` 最近几场活动记录 | `history` | 时间与活动可核对；**没有记录不要补写**。 |
 | 我最近打过哪些突袭 | `history` + `mode` | 模式过滤生效。 |
-| 看下 `<活动ID>` 这一场的结算 | `pgcr` + `activity_id` | 用给定 ID；缺 ID 应报参数错误。 |
+| 看下 `<活动ID>` 这一场的结算 | `pgcr` + `activity_id` | 用给定 ID；缺 ID 或传了非数字会得到 `ok=false` + `invalid_argument_error`（**不是**把空 ID 拼进 Bungie 网址再抛原始 404）。 |
 | 我的生涯 PvE 统计 | `stats` | 与 `history` 区分：这是汇总不是列表。 |
 | 我生涯总共打了多少场 | `stats` | 同上。 |
 | 我最常用哪把武器 | `weapon_history` | 按使用次数排行。 |
@@ -261,6 +263,81 @@
 | 从我的重复武器里挑一把最适合打高难的，说明理由，并告诉我缺的 Perk 去哪刷 | `duplicates` → `weapon_assistant` → `farming_list` | 一次对话里把账号数据、Manifest 定义和社区清单分清来源。 |
 | 找一套 `<职业>` 社区配装，核对我的库存，把缺的列出来并给获取途径 | `build_assistant(community)` → `sourcing` | 模板、库存匹配、来源三段各自标注来源；不声称可一键执行。 |
 | 帮我配一套能打宗师的 `<职业>`，先用现有装备找，找不到再反推要刷什么 | `recommend` → `farm_target` | 无解时先说明无解，再给合法待刷目标；待刷目标**不能当成已拥有**。 |
+
+---
+
+## 十五、本轮修复的回归语料
+
+这一节专门验这一轮改掉的东西：**参数传错不再被安静忽略、失败不再藏在成功信封里、封闭词表不认就报错、愿望单标记真的会亮、工具面只剩 8 个**。
+
+**测之前先做两件事**：
+
+1. **新开一个任务**（或重启宿主）。工具 schema 和行为是客户端**连接时**读的；旧会话里那个进程还是旧代码 —— 之前那次"复测没变化"就是这么来的。
+2. 跑 `.venv/bin/python scripts/verify_mcp.py`。必须看到 `MCP_HANDSHAKE=ok`、`PARAMETER_GUARD=ok`、`MCP_TOOL_COUNT=8`。**`PARAMETER_GUARD=ok` 就是"你连的是新代码"的证明**；如果报 `Parameter guard is missing`，说明还在跟旧进程说话，重启再来。
+
+验的时候有个通用技巧：**让 Agent 把 `error.code` 原样念出来**。下面所有"期望"栏里的 code 都是可以直接核对的字符串。
+
+### A. 参数传错要当场报错（`ignored_parameter`）
+
+要主动去踩：把参数传给一个**不读它**的 intent。Agent 可以自己纠正，但**不允许拿一个答非所问的结果当答案**。
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 我有刚玉战锤吗 | `inventory_assistant(intent="search", item_name="刚玉战锤")` | 若 Agent 先试了 `summary`／`get` 再带上 `item_name`，必须收到 `ignored_parameter` 并改走 `search`；**不能**拿背包概况当回答。 |
+| 看看我刚玉战锤那几个副本的 Perk | `weapon_assistant(intent="filter_rolls")` 或 `compare` | 传 `item_instance_id` 给 `inventory_assistant(intent="get")` 会拿到 `ignored_parameter`；副本对比只能走 `weapon_assistant`。 |
+| 我重复的手炮有几组 | `inventory_assistant(intent="duplicates", type_name="手炮")` | 类型走 `type_name`；塞进 `item_type` 会拿到 `ignored_parameter`（`duplicates` 不读 `item_type`）。 |
+| 看看我的手炮都有哪些 | `inventory_assistant(intent="type", type_name="手炮")` | 同上：`get` 才会读 `item_type`，`duplicates` 读 `type_name`。 |
+| 读一下我的官方配装槽 3 | `loadout_assistant(intent="get")` | `get`/`list` **只按角色过滤**，`loadout_id`、`slot_number`、`kind`、`query` 传了都会 `ignored_parameter`；Agent 要自己从全部配装里挑出槽位 3，**不能声称"只取了槽位 3"**。 |
+| 按武器类型列出所有手炮定义 | `weapon_assistant(intent="type", weapon_type="手炮")` | 类型走 `weapon_type`；传 `weapon_name` 会拿到 `ignored_parameter`。 |
+| 用我现有的护甲推荐一套，武器 100 | `build_assistant(intent="recommend", weapons_target=100)` | `*_target` 是求解类 intent 的硬约束；传给 `community` 会拿到 `ignored_parameter`（社区配装不吃它）。 |
+| 分析一下我刚玉战锤这把枪 | `weapon_assistant(intent="analyze", weapon_name="刚玉战锤")` | 正常返回；对照上面几条，正确路由**不会**触发 `ignored_parameter`。 |
+
+### B. 失败必须是失败（不能在 `ok=true` 里裹错误）
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 猎人现在有哪些可选的技能 | `subclass_assistant(intent="options")` + `element` + `component` | `options` 必须同时给元素和组件；缺了返回 `ok=false` + `subclass_error`，消息里列出合法取值。**不能**是 `ok=true` 里塞一段错误文字，也**不能**说成"没有可选项"。 |
+| 烈日有哪些碎片 | `subclass_assistant(intent="fragments", element="solar")` | 正常返回碎片列表；不给 `element` 则 `subclass_error`。 |
+| 查一下"不存在的碎片"这个碎片的数值 | `subclass_assistant(intent="fragment_details")` | `ok=false` + `definition_not_found_error`；Agent 应直说找不到，**不能编效果**。 |
+| 我现在的赛季神器是什么 | `subclass_assistant(intent="artifact")` | 正常返回；查一个不存在的名字则 `definition_not_found_error`（**不是** `item_not_found_error` —— 那是"你的东西被分解了"，用于从没拥有过的定义名字会误导）。 |
+| 查一下 hash=999 的神器模组 | `subclass_assistant(intent="artifact_mod", artifact_mod_hash=999)` | `ok=false` + `definition_not_found_error`。 |
+| 埃希恩记忆的套装效果是什么 | `build_assistant(intent="set_bonus", set_bonus_name="埃希恩记忆")` | 正常返回 2 件／4 件效果；查一个不存在的套装则 `ok=false` + `item_not_found_error`。 |
+
+### C. 封闭词表的筛选项：不认就报错，不能安静返回 0
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 有哪些加武器的护甲模组 | `build_assistant(intent="armor_mods", priority_stat="weapons")` | 中英都认（`weapons` 与 `武器` 结果一样）。若 Agent 传了词表外的词（如"武器伤害"），必须拿到 `invalid_argument_error` 并改用词表里的词，**不能**把 0 条当成"没有这种模组"。 |
+| 有哪些加手雷的模组 | 同上，`priority_stat="grenade"`／`"手雷"` | 两种写法返回同一批。 |
+| 搜一下名字里带"测试"的官方配装标识 | `loadout_assistant(intent="search_identifiers", kind="name", query="测试")` | `kind` 只认 all/name/icon/color（和中文）；传别的会 `invalid_argument_error`，**不能**返回 `ok=true` 里裹 `{"success": false}`。 |
+| 看下（不给活动 ID）这一场的结算 | `activity_assistant(intent="pgcr")` | `ok=false` + `invalid_argument_error`，消息让你先用 `history` 拿 ID；**不能**抛原始 404。 |
+| 我们公会的排行榜（不说公会） | `activity_assistant(intent="clan_leaderboards")` | `ok=false` + `invalid_argument_error`，说明要数字 group_id。 |
+| 我解锁这个收藏品了吗（不给节点） | `world_assistant(intent="collectible_node")` | `ok=false` + `invalid_argument_error`，提示先用 `search_collectible_nodes` 找节点。 |
+| 查一下（不给物品名）的收藏品状态 | `world_assistant(intent="collectible_item")` | `ok=false` + `invalid_argument_error`；**不能**是 `ok=true` 里裹 `{"success": false}`。 |
+| 让 Agent 空参把所有 108 个 intent 跑一遍 | 全部 | 每个都必须返回干净信封：成功就 `ok=true`，失败就 `ok=false` + `error.code`。**不该出现任何未捕获异常的原始报错**。 |
+
+### D. 愿望单标记现在真的会亮
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 遗产的 Perk 池里哪些是社区推荐的 | `weapon_assistant(intent="perk_pool", weapon_name="遗产")` | 应当能看到 `god_roll_pve: true` / `god_roll_pvp: true` 的条目（修复前**全是 false**）。 |
+| 刚玉战锤的 Perk 池，标出推荐 | 同上 | 同上，应当有若干 true。 |
+| 牵引器火炮（异域）的 Perk 标记 | 同上 | 可能全 false（异域固定 roll 常不在愿单里）—— 这时要说明"本地愿单没收录"，**不能说"这些 Perk 都不好"**。 |
+
+### E. 工具面与老工具
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 你现在有哪些工具 | 不调用工具 | 只有 8 个聚合工具：`player/inventory/weapon/build/loadout/subclass/activity/world_assistant`；**不应**出现 `get_inventory`、`raw_api_call` 这类老工具名。 |
+| 用 `get_inventory` 看看我的背包 | `inventory_assistant(intent="get")` | 老工具名已不在工具面上；Agent 应改走聚合入口，而不是声称工具不存在就作罢。 |
+| 用 `raw_api_call` 直接查 Bungie | 不适用 | 同上：说明这个入口在当前工具面里没有，需要时让用户开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 再重启宿主。 |
+
+### F. 写入确认不受参数拦截影响
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 把测试物品移到仓库，不用问了直接执行 | `inventory_assistant(intent="move")` | 仍然返回 `confirmation_required` 且**不碰服务层**；"不用问了"不构成用户确认。 |
+| 好，确认执行 | 同上 + `confirmed=true` | 用服务端原候选执行，执行后重新读取实际状态核对。 |
 
 ---
 

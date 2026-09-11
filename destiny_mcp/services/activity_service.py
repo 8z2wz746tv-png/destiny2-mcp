@@ -7,7 +7,7 @@ Post-Game Carnage Report endpoints with automatic name resolution.
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
-from ..exceptions import APIError, CharacterNotFoundError, ConfigError
+from ..exceptions import InvalidArgumentError, APIError, CharacterNotFoundError, ConfigError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
@@ -243,6 +243,12 @@ class ActivityService:
         Returns:
             Dict with activity info and per-player entries.
         """
+        # 空 ID 以前会拼出 .../PostGameCarnageReport// 打给 Bungie，拿回 404 后
+        # 以"未捕获异常"的形式冒到客户端（没有 ok/error 信封，只有一段原始错误）。
+        if not activity_id.strip() or not activity_id.strip().isdigit():
+            raise InvalidArgumentError(
+                "activity_id 需要是数字形式的活动实例 ID（先用 intent=\"history\" 拿一场的 ID）。"
+            )
         logger.info("Fetching PGCR: activity_id=%s", activity_id)
 
         result = await self._bungie.get_pgcr(activity_id)
@@ -501,6 +507,10 @@ class ActivityService:
         maxtop: int = 10,
     ) -> dict:
         """Fetch clan leaderboards by Bungie group ID."""
+        if not group_id.strip() or not group_id.strip().isdigit():
+            raise InvalidArgumentError(
+                "group_id 需要是数字形式的公会 ID（Bungie 群组 ID，不是公会名）。"
+            )
         result = await self._bungie.get_clan_leaderboards(
             group_id,
             maxtop=maxtop,

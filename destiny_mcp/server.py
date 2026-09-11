@@ -26,6 +26,8 @@ from contextlib import AsyncExitStack, asynccontextmanager
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.utilities.func_metadata import ArgModelBase
+from pydantic import ConfigDict
 
 from .audit import AuditLogger
 from .bungie_client import BungieClient
@@ -477,6 +479,12 @@ def create_server(
 
     return server
 
+
+# FastMCP 生成参数模型时用的是 pydantic 默认（extra="ignore"）：传一个不存在的参数名
+# 会被**静默丢掉**，工具照常执行。模型拼错一个词（item_instances_id、weapon、instance_id）
+# 就会拿到一个"没带筛选条件"的结果，而且看不出自己传错了。改成 forbid 让它当场报错，
+# 错误信息里会列出这个工具真正接收哪些参数。必须在注册工具之前打这个补丁。
+ArgModelBase.model_config = ConfigDict(arbitrary_types_allowed=True, extra="forbid")
 
 # Compatibility for existing imports and the installed CLI entry point.
 mcp = create_server()

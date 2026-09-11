@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
-from ..exceptions import APIError
+from ..exceptions import InvalidArgumentError, APIError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
@@ -77,7 +77,7 @@ class CollectionService:
     ) -> dict:
         """Search items by name and return collectible unlock states."""
         if not item_name.strip():
-            return {"success": False, "message": "必须提供 item_name。"}
+            raise InvalidArgumentError("查收藏品状态需要 item_name。")
 
         p = await self._resolver.resolve_player(player_name)
         mid = p["membership_id"]
@@ -185,6 +185,12 @@ class CollectionService:
         limit: int = 200,
     ) -> dict:
         """Return unlock status for collectibles directly under one presentation node."""
+        # 以前 hash=0 会直接打给 Bungie 拿 404，然后以未捕获异常冒到客户端。
+        if collectible_node_hash <= 0:
+            raise InvalidArgumentError(
+                "collectible_node_hash 需要是正的节点 hash"
+                '（先用 intent="search_collectible_nodes" 按名字找到节点）。'
+            )
         p = await self._resolver.resolve_player(player_name)
         mid = p["membership_id"]
         mtype = p["membership_type"]
