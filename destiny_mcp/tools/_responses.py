@@ -58,3 +58,28 @@ def confirmation_required_response(
         recoverable=True,
         candidates=[payload],
     )
+
+
+# 写入失败时，游戏给的原因往往配得上一句「那就这么做」。这里按原因的关键词补
+# next_actions —— 以前失败分支只有 candidates（多数是空的），调用方拿不到下一步，
+# 只能自己想到「先换下来再搬」。
+_WRITE_FAILURE_HINTS: tuple[tuple[tuple[str, ...], str], ...] = (
+    (
+        ("equipped item", "CannotPerformActionOnEquippedItem", "已装备"),
+        "目标正装备在身上：先用 intent=\"equip\" 把同槽位的另一件换上（或 equip 到别的角色），再对它执行 transfer/move。",
+    ),
+    (
+        ("not found in the character's inventory", "ItemNotFound"),
+        "先在账号里确认这件物品的实例 ID 与当前位置（inventory_assistant 的 search/get），再重试。",
+    ),
+    (
+        ("No space", "空间不足", "InventoryFull"),
+        "目标位置空间不足：先清出位置，或换一个目标角色/仓库。",
+    ),
+)
+
+
+def write_failure_hints(payload: dict[str, Any]) -> list[str]:
+    """从写入失败的 payload 里挑出可用的下一步建议（挑不到就返回空）。"""
+    haystack = f"{payload.get('code', '')} {payload.get('message', '')}"
+    return [hint for keywords, hint in _WRITE_FAILURE_HINTS if any(k in haystack for k in keywords)]

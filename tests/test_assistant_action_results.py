@@ -90,3 +90,36 @@ async def test_failed_move_preserves_disambiguation_candidates() -> None:
     assert not response["ok"]
     assert response["candidates"][0]["item_instance_id"] == "123"
     assert response["data"]["result"]["question"] == "Which instance?"
+
+
+@pytest.mark.asyncio
+async def test_equipped_item_failure_carries_a_next_step() -> None:
+    """「已装备的枪不能直接搬」是游戏规则，失败时要告诉调用方先怎么办。
+
+    以前失败分支只有 candidates（多数为空），Agent 只能自己想到
+    「先 equip 同槽位另一件，再 transfer」。
+    """
+    result = {
+        "success": False,
+        "code": "move_failed",
+        "message": "Cannot perform this action on an equipped item.",
+    }
+    ctx = SimpleNamespace(request_context=SimpleNamespace(lifespan_context={
+        "transfer_svc": SimpleNamespace(move_item=AsyncMock(return_value=result)),
+    }))
+
+    response = await inventory_assistant(
+        intent="move", item_name="Test", destination="vault", confirmed=True, ctx=ctx,
+    )
+
+    assert response["ok"] is False
+    assert response["error"]["code"] == "move_failed"
+    assert response["next_actions"], "失败时应当给出下一步，而不是只回一句游戏原文"
+    assert "equip" in response["next_actions"][0]
+
+
+def test_write_failure_hints_ignore_unrelated_failures() -> None:
+    from destiny_mcp.tools._responses import write_failure_hints
+
+    assert write_failure_hints({"code": "transfer_failed", "message": "网络超时"}) == []
+    assert write_failure_hints({"message": "Cannot perform this action on an equipped item."})

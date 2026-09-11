@@ -91,6 +91,12 @@ MCP_HOST: str = os.getenv("MCP_HOST", "127.0.0.1")
 MCP_PORT: int = int(os.getenv("MCP_PORT", "8000"))
 MCP_TRANSPORT: str = os.getenv("MCP_TRANSPORT", "stdio")
 TOOL_PROFILE: str = os.getenv("DESTINY_MCP_TOOL_PROFILE", "normal")
+
+# 配装求解的时间预算（秒）。排队等待不计入，只有真正在算的时间算。
+# 实测（2026-09-11，机器空闲时）：猎人 ~10s、泰坦 ~5–19s，**术士 >188s**（不给任何
+# 属性目标也一样），所以默认放到 300 秒让术士也能出结果。术士慢是求解器本身的
+# 成本问题（剪枝还没做），不是预算问题；机器负载高时会再慢几倍，必要时调这个值。
+BUILD_TIMEOUT_SECONDS: float = float(os.getenv("DESTINY_BUILD_TIMEOUT_SECONDS", "300"))
 # 历史工具（expert / full 里的那 69 个）默认不暴露：它们没有参数拦截、没有参数说明、
 # 返回契约也不统一，混在工具面里只会多出一堆能选错的东西。要用时显式打开。
 LEGACY_TOOLS_ENABLED: bool = os.getenv(

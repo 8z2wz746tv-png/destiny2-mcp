@@ -347,12 +347,12 @@
 
 | 现象 | 真实原因（已核实） | 状态 |
 | --- | --- | --- |
-| `build_assistant` 的 `recommend` / `analyze` / `find` 对**术士**恒超时（62–67s，`build_validation_error`），猎人和泰坦正常（5–32s） | 求解器 60 秒预算对术士的搜索空间不够；和约束多少无关（`top_n=1`、不给属性目标也一样超时）。`farm_target` 走另一条求解路径，术士 5.5s 正常 | 待修：预算可配置/剪枝/部分结果 |
+| 术士求解慢 | 已修一部分：**排队不再计入预算**，预算可配（`DESTINY_BUILD_TIMEOUT_SECONDS`，默认 300s），报错里说明预算与调法。空闲机器实测：猎人 ~10s、泰坦 ~5–19s、**术士 recommend 190s ✓ / find 187s ✓ / analyze >305s ✗**、farm_target 7.5s ✓ | recommend/find **已修**；`analyze` 对术士仍超预算，要剪枝或返回部分结果（未做） |
 | `player_assistant(intent="find")` 任何 `name_prefix` 都返回 `ok=true` + 空列表 | Bungie 的 `POST /User/SearchUsers/` 现在返回 **405**，代码把这类失败吞掉后返回空 —— 所以「没找到」和「搜索源不可用」分不出来 | 待修：换接口或明说不可用 |
 | `activity_assistant(intent="leaderboards")` 恒返回 `ok=false` + `a_p_i_error: 响应格式异常` | **上游失败**：Bungie 对账号榜单接口返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`。工具只是把上游失败说得太笼统 | 待修：消息带上游 ErrorCode/ErrorStatus |
-| `world_assistant(intent="collectible_node")` 传一个**正数但无效**的节点 hash → 原始 404 裸抛（无 `ok=false` 信封） | `collectible_item` 返回的 `collectible_hash` 与展示节点 hash **不是一回事**，传错就 404；`hash<=0` 已被拦，正数无效值还没拦 | 待修：包信封 + 说明两种 hash 的区别 |
+| ~~`collectible_node` 传正数但无效的 hash 裸抛 404~~ | 已修：现在回 `ok=false` + `invalid_argument_error`，消息说清「collectible_hash 不是节点号」；参数说明也标注了两者区别 | **已修** |
 | `slot_number=21`、非法 intent、拼错的参数名 → 原始 pydantic 报错，没有 `ok=false` | schema 层校验发生在工具函数之前，属于**协议级**参数错误（不是业务失败） | 取舍中：保持协议级拒绝，或补一层信封包装 |
-| 写入失败（如 `move` 一个已装备物品）只有 Bungie 原文，没有 `next_actions` 指引 | `_action_response` 的失败分支只带 `candidates`，不给下一步建议 | 待修：补「先用 equip 换下再移」这类指引 |
+| ~~写入失败没有下一步指引~~ | 已修：失败时按原因关键词补 `next_actions`（已装备 → 先 equip 换下；找不到物品 → 先核对实例；空间不足 → 先腾位置） | **已修** |
 
 ## 机器可读子集
 

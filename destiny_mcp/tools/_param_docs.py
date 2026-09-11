@@ -423,8 +423,9 @@ VendorName = Annotated[
 CollectibleNodeHash = Annotated[
     int,
     Field(description=(
-        '收藏品节点的 hash。先用 intent="search_collectible_nodes" 按名字找到节点，'
-        '再用 intent="collectible_node" 查它的解锁状态。'
+        "展示节点（文件夹）的 hash，必须先经 intent=\"search_collectible_nodes\" 拿到。"
+        "它不是 collectible_item 返回的 collectible_hash —— 后者是单个收藏品的号，"
+        '拿它来查节点会被拒绝。'
     )),
 ]
 

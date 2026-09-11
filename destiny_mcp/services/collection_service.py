@@ -204,13 +204,25 @@ class CollectionService:
                 raise APIError("读取收藏品", "账号下没有可用角色。")
             char_id = next(iter(chars))
 
-        result = await self._bungie.get_collectible_node_details(
-            mtype,
-            mid,
-            char_id,
-            collectible_node_hash,
-            components=[800],
-        )
+        try:
+            result = await self._bungie.get_collectible_node_details(
+                mtype,
+                mid,
+                char_id,
+                collectible_node_hash,
+                components=[800],
+            )
+        except Exception as exc:  # noqa: BLE001 - 只把「这个 hash 不是节点」翻译成人话
+            # 传一个正数但不是展示节点的 hash（最常见的是 collectible_item 返回的
+            # collectible_hash）时，Bungie 回 404，以前这段会以未捕获异常冒到客户端：
+            # 没有 ok/error 信封，调用方也没法知道该换成什么。
+            if "404" in str(exc) or "Notfound" in type(exc).__name__:
+                raise InvalidArgumentError(
+                    f"{collectible_node_hash} 不是展示节点 hash —— collectible_item 返回的 "
+                    "collectible_hash 是「收藏品」的号，不是「节点」的号。"
+                    '先用 intent="search_collectible_nodes" 按名字找到节点。'
+                ) from exc
+            raise
         if not isinstance(result, dict):
             raise APIError("读取收藏品", "响应格式异常。")
 

@@ -31,6 +31,7 @@ from ._requests import (
     InventoryRequest, LoadoutRequest, SubclassRequest, validate_request,
 )
 from ._responses import (
+    write_failure_hints,
     confirmation_required_response,
     error_response,
     ok_response,
@@ -55,6 +56,7 @@ def _action_response(intent: str, summary: str, result: Any) -> dict:
             payload.get("code") or f"{intent}_failed",
             payload.get("message") or f"{intent} 执行失败。",
             candidates=payload.get("candidates") or [],
+            next_actions=write_failure_hints(payload),
         )
         response["data"] = {"result": payload}
         return response
