@@ -358,6 +358,21 @@
 | 商人今天不在（仄/Xur 非周末、或某页本次没返回） | `+ vendor_name="仄"` | 明确说"本周期不在／这次没有返回"，**不允许**静默返回空数组。 |
 | 买不了的商品 | 详情里看 `can_be_sold=false` | 必须同时给 `failure_reasons`（来自上游 `failureIndexes`+`failureStrings`）；不能只有 false 没有原因，也不能一律 true。 |
 | 按类型查武器太长的截断 | `weapon_assistant(intent="type", weapon_type="手炮", limit=5)` | 返回 5 把，同时 `total_weapons=124` 左右、`truncated=true`；只给 5 把而不说被截断即为不合格。 |
+### H. 参数默认值不再是"黑洞"
+
+以前守卫判断"这次算不算传了这个参数"用的是"值 == 签名默认值"，于是**显式传默认值**会被当成没传、
+静默换成别的默认值（`limit=12` → 返回 40 件）。现在签名默认值统一是 `null`，真正的默认条数在工具内部补，
+任何具体值都算"传了"。
+
+| 说什么 / 调用 | 期望 | 不合格的表现 |
+| --- | --- | --- |
+| 给不读 `limit` 的 intent 传 `limit=10`（inventory 的读接口） | `ok=false` + `ignored_parameter` | `ok=true` 然后返回一大堆（默认值被吞） |
+| `loadout_assistant(intent="list", slot_number=1)` | `ignored_parameter`（list 不按槽位过滤） | 静默返回全部 60 套配装 |
+| `build_assistant(intent="armor_mods", top_n=5)` | `ignored_parameter` | 静默返回 300 个模组 |
+| `activity_assistant(intent="history", maxtop=10)` | `ignored_parameter` | 静默返回 20 场（`maxtop` 是榜单参数，条数要用 `count`） |
+| 宿主把 schema 默认值一起发来：`confirmed=false`、`offset=0`、`item_name=""` | **放行**（空值 = 没指定） | 误拒这些调用 |
+| 不传 `limit` 时各工具的默认条数 | inventory 10、weapon 50、subclass 10、activity `count` 20、world 菜单 15 / 详情 40 | 默认值不再是这些、或报错 |
+
 | 商人卖的这些东西里哪些值得刷 | 详情后的 `farming_list` | `unmatched` 里**只应出现商品名**；出现商人名（如「指挥官萨瓦拉」）、分类名（「等级奖励」）、声望名（「先锋等级」）即为不合格 —— 那些不是商品。 |
 | 商人货架里的占位条目（如「周常：先锋武器奖励」） | 详情里的 `item_type` | 无类型的条目显示为空串；**不应**出现字符串 `"None"`（那是 Bungie 枚举成员名，不是数据）。 |
 

@@ -23,7 +23,11 @@ CEILINGS = {
     # 把后者整个搬出去净减约 46 行。
     # +5：world_assistant 的 limit 默认值从 12 改成 None（显式传 12 曾被当成"没传"）
     # 并说明各 intent 的默认条数从哪来。
-    "destiny_mcp/tools/assistants.py": 1378,
+    # +24：同一条规则推广到全部 18 个"有含义的默认值"参数（limit/locked/tracked/
+    # slot_number/kind/baseline/top_n/count/maxtop/…），每个参数一行"None 就补默认值"。
+    # 判断点没有增加，只是把默认值从签名搬进函数体；规则与验收在
+    # tests/test_parameter_sentinels.py。
+    "destiny_mcp/tools/assistants.py": 1402,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,

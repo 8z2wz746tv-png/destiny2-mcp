@@ -132,8 +132,16 @@ def validate_request(model: type[IntentRequest]):
         async def wrapped(*args, **kwargs):
             arguments = parameters.bind(*args, **kwargs)
             arguments.apply_defaults()
-            values = dict(arguments.arguments)
-            values["intent"] = (values.get("intent") or parameters.parameters["intent"].default).strip().lower()
+            # None = 调用方没指定这个参数（签名默认值统一用 None 当哨兵）。
+            # 直接塞给模型会被"Input should be a valid integer"这类报错挡住，
+            # 所以这里丢掉 None，让模型用它自己的默认值；工具函数体随后再补默认值。
+            values = {
+                name: value
+                for name, value in arguments.arguments.items()
+                if value is not None
+            }
+            intent = values.get("intent") or parameters.parameters["intent"].default
+            values["intent"] = str(intent).strip().lower()
             try:
                 model.model_validate(values)
             except ValidationError as exc:

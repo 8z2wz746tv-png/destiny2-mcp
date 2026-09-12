@@ -11,6 +11,13 @@
 
 判据用「换个值，调用记录变不变」而不是「在参数里找哨兵值」：后者会被同名的
 布尔值、模型 dump 里的默认值误伤 —— 那些假阳性已经在这个文件的历史里出现过。
+
+另外还钉住一条**默认值规则**（文件末尾两节）：签名默认值只能是"空值"
+（None/""/0/False），有含义的默认值必须改成 None 哨兵、把默认值搬进函数体。
+原因是守卫判断"这次调用算不算传了这个参数"用的是「值 == 签名默认值」——
+默认值本身要是也是一个合法请求（limit 的 12、top_n 的 5、locked 的 true、
+slot_number 的 1），就没法区分"显式传了默认值"和"没传"，参数会被静默吞掉：
+历史上 `vendor` 的 limit=12 就是这样变成"返回默认 40 件"的。
 """
 
 from __future__ import annotations
@@ -271,6 +278,9 @@ def _probe(function: Any, parameter: str) -> tuple[Any, Any]:
     spec = inspect.signature(function, eval_str=True).parameters[parameter]
     base = _base_type(spec.annotation)
     if base is bool:
+        if spec.default is None:
+            # 哨兵默认值：True/False 两个真实布尔都算"传了"，才能看出有没有被读。
+            return True, False
         return (not spec.default), spec.default
     if base is int:
         first = _int_value(spec, 7)
@@ -512,3 +522,103 @@ def test_every_parameter_is_described_in_the_schema() -> None:
                 missing.append(f"{tool}.{name}")
 
     assert not missing, f"这些参数在 schema 里没有说明：{missing}"
+
+
+# ── 默认值哨兵规则 ────────────────────────────────────────────────────────────
+#
+# 每个"有含义的默认值"参数，它在函数体里补的默认值登记在这。表只用于测试取值，
+# 改大了也不会让断言失真（非 None 的任何值都必须算"传了"）。
+
+SENTINEL_BODY_DEFAULTS: dict[tuple[str, str], Any] = {
+    ("inventory_assistant", "limit"): 10,
+    ("inventory_assistant", "locked"): True,
+    ("inventory_assistant", "tracked"): True,
+    ("weapon_assistant", "limit"): 50,
+    ("weapon_assistant", "include_inventory"): True,
+    ("weapon_assistant", "community_section"): "text",
+    ("build_assistant", "baseline"): "equipped",
+    ("build_assistant", "max_replacements"): 2,
+    ("build_assistant", "top_n"): 5,
+    ("build_assistant", "include_inventory"): True,
+    ("loadout_assistant", "slot_number"): 1,
+    ("loadout_assistant", "kind"): "all",
+    ("subclass_assistant", "limit"): 10,
+    ("subclass_assistant", "community_section"): "text",
+    ("activity_assistant", "maxtop"): 10,
+    ("activity_assistant", "count"): 20,
+    ("activity_assistant", "community_section"): "text",
+    ("world_assistant", "limit"): 12,
+    ("world_assistant", "community_section"): "text",
+}
+
+
+def test_assistant_signature_defaults_are_sentinels() -> None:
+    """签名默认值只能是空值；有含义的默认值要走 None 哨兵 + 函数体补默认值。
+
+    反例（都曾经真实存在）：`limit=10`、`locked=True`、`slot_number=1`、
+    `kind="all"`、`top_n=5`、`baseline="equipped"`。
+    """
+    offenders = []
+    for tool in sorted(contracts.TOOL_INTENTS):
+        function = TOOLS[tool]
+        for name, parameter in inspect.signature(function, eval_str=True).parameters.items():
+            if name in {"ctx", "intent"} or parameter.default is inspect.Parameter.empty:
+                # intent 本身有默认值（"summary"/"analyze"…），但每个 intent 都认领它，
+                # 永远不可能"没人认"，不属于这条规则要管的范围。
+                continue
+            if parameter.default in (None, "", 0, False):
+                continue
+            offenders.append(f"{tool}.{name} 的默认值是 {parameter.default!r}")
+
+    assert not offenders, (
+        "这些参数的签名默认值是有含义的具体值，显式传它会被当成\"没传\"而静默吞掉。"
+        "请把签名默认值改成 None，把默认值搬进函数体（并在 "
+        "SENTINEL_BODY_DEFAULTS 里登记）：" + "；".join(offenders)
+    )
+
+
+@pytest.mark.parametrize(
+    "tool,parameter,value",
+    [(tool, parameter, value) for (tool, parameter), value in sorted(SENTINEL_BODY_DEFAULTS.items())],
+)
+async def test_explicit_body_default_counts_as_passed(
+    tool: str, parameter: str, value: Any
+) -> None:
+    """显式传"函数体里的默认值"也必须算传了 —— 不认领它的 intent 必须拒绝。
+
+    这一条就是 `limit=12` 那类静默黑洞的通用回归：修之前 12（=签名默认值）
+    会被当成没传，于是在不读 limit 的 intent 上一路 ok=true。
+    """
+    contract = contracts.PARAMETER_OWNERS[(tool, parameter)]
+    accepted = []
+    for intent in sorted(contracts.TOOL_INTENTS[tool] - contract.intents):
+        result, _calls = await _guarded(tool, intent, parameter, **{parameter: value})
+        if result.get("error", {}).get("code") != "ignored_parameter":
+            accepted.append(f"{intent} -> {result.get('error', {}).get('code') or '接受了'}")
+
+    assert not accepted, (
+        f"{tool} 的 {parameter} 显式传 {value!r}（函数体默认值）时，"
+        f"这些不认领它的 intent 没有拒绝：{accepted}"
+    )
+
+
+@pytest.mark.parametrize(
+    "tool,parameter,value",
+    [(tool, parameter, value) for (tool, parameter), value in sorted(SENTINEL_BODY_DEFAULTS.items())],
+)
+async def test_owner_intent_treats_omitted_and_explicit_default_alike(
+    tool: str, parameter: str, value: Any
+) -> None:
+    """认领它的 intent 上，"不传"和"显式传默认值"必须完全同效（默认值补得对不对）。"""
+    contract = contracts.PARAMETER_OWNERS[(tool, parameter)]
+    intent = sorted(contract.intents)[0]
+
+    _omitted_result, omitted_calls = await _guarded(tool, intent, parameter)
+    _explicit_result, explicit_calls = await _guarded(
+        tool, intent, parameter, **{parameter: value}
+    )
+
+    assert _trace(explicit_calls) == _trace(omitted_calls), (
+        f"{tool}({intent}) 不传 {parameter} 与显式传 {value!r} 的服务调用不一致：\n"
+        f"不传={_trace(omitted_calls)}\n显式={_trace(explicit_calls)}"
+    )

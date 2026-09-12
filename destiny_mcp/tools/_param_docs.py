@@ -131,7 +131,7 @@ LoadoutId = Annotated[
 ]
 
 SlotNumber = Annotated[
-    int,
+    int | None,
     Field(ge=1, le=20, description=(
         "Bungie 官方配装槽位号（1–20）。只有快照/改标识/清空三个写入 intent 读它；"
         "list/get 返回全部槽位，不接受槽位号。"
@@ -215,16 +215,14 @@ WorldIntentField = Annotated[
 # ── 其余共享参数 ────────────────────────────────────────────────────────────
 
 _LIMIT_DESCRIPTION = (
-    "最多返回多少条。只限制返回条数，不限制扫描范围，被截断时响应里会带 truncated/总数。"
-    "intent=\"vendor\" 时：不点名商人 = 最多列几个商人（默认 15），点名 = 每个商人最多几件商品（默认 40）；"
-    "传 0 或负数等于没传。不读它的 intent 传了会被拒绝。"
+    "最多返回多少条；null（或不传）= 没指定，按该 intent 的默认条数（列表类 10–50 条，"
+    "商人菜单 15 个、商人详情 40 件）。传 0 或负数等于没指定。只限制返回条数，不限制扫描范围；"
+    "被截断时响应里会带 truncated 与总数。不读它的 intent 传了会被拒绝。"
 )
 
-Limit = Annotated[int, Field(description=_LIMIT_DESCRIPTION)]
-
-# 同一个参数在个别工具上「不传」本身有意义（vendor 要按菜单/详情分别取默认），
-# 这类工具用可空版本：schema 里默认值就是 null，显式传任何数字都算传了。
-OptionalLimit = Annotated[int | None, Field(description=_LIMIT_DESCRIPTION)]
+# 默认值是 null 而不是某个数字：显式传 12 和"没传"必须分得开，
+# 否则 12 这种既是默认值又是合法请求的数字会被静默吞掉（详见 tests/test_parameter_sentinels.py）。
+Limit = Annotated[int | None, Field(description=_LIMIT_DESCRIPTION)]
 
 Offset = Annotated[
     int,
@@ -250,8 +248,8 @@ KnowledgeId = Annotated[
 ]
 
 CommunitySection = Annotated[
-    Literal["text", "tables", "links"],
-    Field(description="社区资料要读哪一部分：正文 text、表格 tables、外链 links。"),
+    Literal["text", "tables", "links"] | None,
+    Field(description="社区资料要读哪一部分：正文 text、表格 tables、外链 links；null=没指定（按 text 处理）。"),
 ]
 
 Scenario = Annotated[
@@ -265,10 +263,10 @@ Category = Annotated[
 ]
 
 IncludeInventory = Annotated[
-    bool,
+    bool | None,
     Field(description=(
         "要不要读账号库存。weapon 的 filter_rolls/analyze 用它在全量定义与账号扫描之间切换；"
-        "build 的 community 用它决定要不要把社区模板与你的库存比对。"
+        "build 的 community 用它决定要不要把社区模板与你的库存比对。null=没指定（按 true 处理）。"
     )),
 ]
 
@@ -303,13 +301,13 @@ Equip = Annotated[
 ]
 
 Locked = Annotated[
-    bool,
-    Field(description='锁或解锁：true=锁定，false=解锁。只有 intent="lock" 读它。'),
+    bool | None,
+    Field(description='锁或解锁：true=锁定，false=解锁；null=没指定（按 true 处理）。只有 intent="lock" 读它。'),
 ]
 
 Tracked = Annotated[
-    bool,
-    Field(description='追踪或取消：true=追踪，false=取消。只有 intent="track_quest" 读它。'),
+    bool | None,
+    Field(description='追踪或取消：true=追踪，false=取消；null=没指定（按 true 处理）。只有 intent="track_quest" 读它。'),
 ]
 
 RequiredPerks = Annotated[
@@ -363,8 +361,8 @@ ColorHash = Annotated[
 ]
 
 Kind = Annotated[
-    str,
-    Field(description='搜哪一类官方配装标识：all/name/icon/color（也认 全部/名称/图标/颜色）。只有 intent="search_identifiers" 读它。'),
+    str | None,
+    Field(description='搜哪一类官方配装标识：all/name/icon/color（也认 全部/名称/图标/颜色）；null=没指定（按 all 处理）。只有 intent="search_identifiers" 读它。'),
 ]
 
 Element = Annotated[
@@ -413,13 +411,13 @@ StatId = Annotated[
 ]
 
 MaxTop = Annotated[
-    int,
-    Field(description="榜单取前多少名。只有排行榜类 intent 读它。"),
+    int | None,
+    Field(description="榜单取前多少名；null=没指定（按 10 处理）。只有排行榜类 intent 读它。"),
 ]
 
 Count = Annotated[
-    int,
-    Field(description="要多少条记录。history、武器历史、聚合统计和社区资料读它；生涯统计不分条数。"),
+    int | None,
+    Field(description="要多少条记录；null=没指定（按 20 处理）。history、武器历史、聚合统计和社区资料读它；生涯统计不分条数。"),
 ]
 
 VendorName = Annotated[

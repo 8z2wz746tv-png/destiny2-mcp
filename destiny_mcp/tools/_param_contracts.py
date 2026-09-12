@@ -598,8 +598,13 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
 def _is_supplied(value: Any, default: Any = _MISSING) -> bool:
     """这个参数算不算「调用方真的传了」。
 
-    等于签名默认值的值不算传：客户端把默认值一起发过来（confirmed=false、
-    item_name=""、limit=10）不应该被拒。
+    空值（None/""/0/False）不算传：客户端把 schema 默认值一起发过来（confirmed=false、
+    item_name=""、offset=0）不应该被拒。
+
+    因此签名默认值只能是空值 —— 有含义的默认值（limit 的 12、locked 的 true、
+    slot_number 的 1）必须改成 None 哨兵、把默认值搬进函数体，否则显式传默认值
+    会被当成"没传"而静默吞掉。规则与回归见 tests/test_parameter_sentinels 一节
+    （在 tests/test_ignored_parameters.py 末尾）。
     """
     if default is not _MISSING and value == default:
         return False

@@ -185,7 +185,9 @@ Manifest 侧（**不代表拥有**）：
 
 这是**保证**，不是建议：`intent="get"` 配 `item_instance_id`、`intent="summary"` 配 `item_name`、`intent="get"` 配 `loadout_id` 都拿不到「看起来像答案」的结果，只会拿到一条要求改路由的错误。看到 `ignored_parameter` 不要重试同样的调用，按消息里的提示换 intent。
 
-判据是「行为上读没读」，不是「签名里有没有」：传了不改变任何结果的参数一律算没人认。等于签名默认值的值不算传（`confirmed=false`、`limit=10` 原样发过来不会被拒）。
+判据是「行为上读没读」，不是「签名里有没有」：传了不改变任何结果的参数一律算没人认。
+
+**有没有传**只按「是不是空值」判断：`null`／`""`／`0`／`false`（也就是签名默认值）算没传，宿主把 schema 默认值一起发过来（`confirmed=false`、`offset=0`）不会被拒；**任何具体值都算传了**，在不读它的 intent 上会拿到 `ignored_parameter`。所以 `limit=12`、`locked=true`、`slot_number=1` 这些既是默认值又是合法请求的值不会被静默吞掉 —— 签名默认值统一是 `null`，真正的默认条数在工具内部补。
 
 下面这张表由 `destiny_mcp/tools/_param_contracts.py` 生成，测试保证文档与代码逐字一致：
 

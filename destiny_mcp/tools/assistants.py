@@ -180,10 +180,10 @@ async def inventory_assistant(
     destination: fields.Destination = "",
     character: fields.Character = "",
     equip: fields.Equip = False,
-    locked: fields.Locked = True,
-    tracked: fields.Tracked = True,
+    locked: fields.Locked = None,
+    tracked: fields.Tracked = None,
     confirmed: fields.Confirmed = False,
-    limit: fields.Limit = 10,
+    limit: fields.Limit = None,
     offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
@@ -195,6 +195,10 @@ async def inventory_assistant(
     """
     svc = get_ctx(ctx)
     intent = cast(InventoryIntent, (intent or "summary").strip().lower())
+    # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
+    limit = 10 if limit is None else limit
+    locked = True if locked is None else locked
+    tracked = True if tracked is None else tracked
     resolved = resolve_player_name(player_name)
 
     if _requires_confirmation(intent) and not confirmed:
@@ -365,10 +369,10 @@ async def weapon_assistant(
     any_perks: fields.AnyPerks = None,
     excluded_perks: fields.ExcludedPerks = None,
     location: fields.Location = "",
-    include_inventory: fields.IncludeInventory = True,
-    limit: fields.Limit = 50,
+    include_inventory: fields.IncludeInventory = None,
+    limit: fields.Limit = None,
     knowledge_id: fields.KnowledgeId = "",
-    community_section: fields.CommunitySection = "text",
+    community_section: fields.CommunitySection = None,
     offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
@@ -384,6 +388,10 @@ async def weapon_assistant(
     """
     svc = get_ctx(ctx)
     intent = cast(WeaponIntent, (intent or "analyze").strip().lower())
+    # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
+    limit = 50 if limit is None else limit
+    include_inventory = True if include_inventory is None else include_inventory
+    community_section = community_section or "text"
     catalog_intents = {"catalog", "search_catalog", "all_weapons", "global", "search_all"}
     uses_catalog = intent in catalog_intents or (
         intent == "filter_rolls" and not include_inventory
@@ -639,26 +647,26 @@ async def build_assistant(
         "farm_target 时要替换并刷取的部位：helmet/gauntlets/chest/legs/class_item。"
         "不填时逐个尝试五个部位。"
     ))] = None,
-    baseline: Annotated[Literal["equipped", "inventory"], Field(
+    baseline: Annotated[Literal["equipped", "inventory"] | None, Field(
         description=(
             "farm_target 的四件护甲基线：equipped 固定当前穿着四件；"
             "inventory 从仓库选择更优四件。"
         ),
-    )] = "equipped",
-    max_replacements: Annotated[int, Field(ge=1, le=2, description=(
+    )] = None,
+    max_replacements: Annotated[int | None, Field(ge=1, le=2, description=(
         "farm_target 最多反推的待刷护甲件数。默认 2：先完整查找单件，"
         "只有单件无解才返回两件方案。两件回退目前只支持 equipped 基线。"
-    ))] = 2,
+    ))] = None,
     canonical_build: fields.CanonicalBuild = None,
     confirmed: fields.Confirmed = False,
-    top_n: Annotated[int, Field(ge=1, le=20, description="返回的候选配装数量。")] = 5,
+    top_n: Annotated[int | None, Field(ge=1, le=20, description="返回的候选配装数量；null=没指定（按 5 处理）。")] = None,
     community_build_id: Annotated[str, Field(description=(
         "community 搜索返回的配装 ID；指定后全库读取模板，不受搜索分页影响。不是可执行候选。"
     ))] = "",
     scenario: fields.Scenario = "",
     category: fields.Category = "",
     query: fields.Query = "",
-    include_inventory: fields.IncludeInventory = True,
+    include_inventory: fields.IncludeInventory = None,
     offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
@@ -674,6 +682,11 @@ async def build_assistant(
     """
     svc = get_ctx(ctx)
     intent = cast(BuildIntent, (intent or "recommend").strip().lower())
+    # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
+    baseline = baseline or "equipped"
+    max_replacements = 2 if max_replacements is None else max_replacements
+    top_n = 5 if top_n is None else top_n
+    include_inventory = True if include_inventory is None else include_inventory
     requested_player_name = player_name
     resolved = resolve_player_name(player_name)
 
@@ -1019,11 +1032,11 @@ async def loadout_assistant(
     loadout_id: fields.LoadoutId = "",
     name: fields.Name = "",
     notes: fields.Notes = "",
-    slot_number: fields.SlotNumber = 1,
+    slot_number: fields.SlotNumber = None,
     name_hash: fields.NameHash = None,
     icon_hash: fields.IconHash = None,
     color_hash: fields.ColorHash = None,
-    kind: fields.Kind = "all",
+    kind: fields.Kind = None,
     query: fields.Query = "",
     confirmed: fields.Confirmed = False,
     ctx: Context = None,
@@ -1038,6 +1051,9 @@ async def loadout_assistant(
     """
     svc = get_ctx(ctx)
     intent = cast(LoadoutIntent, (intent or "list").strip().lower())
+    # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
+    slot_number = 1 if slot_number is None else slot_number
+    kind = kind or "all"
     resolved = resolve_player_name(player_name)
 
     if _requires_confirmation(intent) and not confirmed:
@@ -1121,9 +1137,9 @@ async def subclass_assistant(
     artifact_mod_hash: fields.ArtifactModHash = 0,
     changes: fields.Changes = None,
     query: fields.Query = "",
-    limit: fields.Limit = 10,
+    limit: fields.Limit = None,
     knowledge_id: fields.KnowledgeId = "",
-    community_section: fields.CommunitySection = "text",
+    community_section: fields.CommunitySection = None,
     offset: fields.Offset = 0,
     confirmed: fields.Confirmed = False,
     ctx: Context = None,
@@ -1135,6 +1151,9 @@ async def subclass_assistant(
     """
     svc = get_ctx(ctx)
     intent = cast(SubclassIntent, (intent or "get").strip().lower())
+    # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
+    limit = 10 if limit is None else limit
+    community_section = community_section or "text"
     resolved = resolve_player_name(player_name)
 
     if intent == "community":
@@ -1211,11 +1230,11 @@ async def activity_assistant(
     activity_id: fields.ActivityId = "",
     group_id: fields.GroupId = "",
     statid: fields.StatId = None,
-    maxtop: fields.MaxTop = 10,
-    count: fields.Count = 20,
+    maxtop: fields.MaxTop = None,
+    count: fields.Count = None,
     query: fields.Query = "",
     knowledge_id: fields.KnowledgeId = "",
-    community_section: fields.CommunitySection = "text",
+    community_section: fields.CommunitySection = None,
     offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
@@ -1227,6 +1246,10 @@ async def activity_assistant(
     """
     svc = get_ctx(ctx)
     intent = cast(ActivityIntent, (intent or "history").strip().lower())
+    # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
+    maxtop = 10 if maxtop is None else maxtop
+    count = 20 if count is None else count
+    community_section = community_section or "text"
     resolved = resolve_player_name(player_name)
 
     if intent == "community":
@@ -1282,12 +1305,12 @@ async def world_assistant(
     item_name: fields.ItemName = "",
     collectible_node_hash: fields.CollectibleNodeHash = 0,
     include_invisible: fields.IncludeInvisible = False,
-    limit: fields.OptionalLimit = None,
+    limit: fields.Limit = None,
     community_category: Annotated[
         str, Field(description="社区资料分类：builds/weapons/armor/subclass/activities/mechanics/sources/other；留空为全部。")
     ] = "",
     knowledge_id: fields.KnowledgeId = "",
-    community_section: fields.CommunitySection = "text",
+    community_section: fields.CommunitySection = None,
     offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
@@ -1303,6 +1326,7 @@ async def world_assistant(
     # limit 的默认值必须是 None（= 没指定），不能用「等于默认值就当没传」那种写法：
     # 那样显式传 12 会被静默吞掉（11 生效、12 变默认、13 又生效），宿主按 schema 默认值
     # 自动填参时也分不清"传了 12"和"没传"。vendor 自己按菜单/详情分别取默认，留给它 None。
+    community_section = community_section or "text"
     if limit is None and intent != "vendor":
         limit = _WORLD_LIMIT_DEFAULT
 
