@@ -31,7 +31,6 @@
 | 看看我的角色概况，只读 | `profile` | 返回角色列表与光等；不编造未读到的字段，不触发任何写入。 |
 | 查一下玩家 `<完整名>` 的档案 | `profile` + `player_name` | 用传入的名称，不套用默认玩家。 |
 | 搜一下叫 `<完整名>` 的玩家 | `search` | 返回 membership_id 与 membership_type，供后续查询复用。 |
-| 找找名字里有「husky」的玩家 | `find` + `name_prefix` | ⚠️ 上游模糊搜索接口已失效（HTTP 405）。现在返回 `ok=false` + `a_p_i_error`，消息与 `next_actions` 都指向「给完整 `名字#1234` 走 `search`」；**不能把空结果说成「没这个人」**。真·空候选（上游正常但没匹配）才回 `ok=true` + warning。 |
 | 默认玩家是谁 | 不调用工具 | 说明来自 `DESTINY_DEFAULT_PLAYER`；未配置时说明会用当前 OAuth 账号。 |
 | 换个账号查 | 不适用 | 单用户本地版，应说明不支持多用户切换。 |
 
@@ -468,7 +467,7 @@ loadout_assistant  subclass_assistant  activity_assistant  world_assistant
 
 | 现象 | 真实原因（已核实） | 状态 |
 | --- | --- | --- |
-| `player_assistant(intent="find")` 任何 `name_prefix` 都返回 `ok=true` + 空列表 | Bungie 的 `POST /User/SearchUsers/` 现在返回 **405**，代码把失败吞掉后返回空 —— 「没找到」和「搜索源不可用」分不出来 | 待修：换接口或明说不可用 |
+| `player_assistant(intent="find")` 恒失败（`ok=false` + `a_p_i_error`） | Bungie 的 `POST /User/SearchUsers/` 返回 **405**；本地已不再吞掉失败，改成明说不可用并指向"用完整 `名字#1234` 走 `search`" | **先放放**：不再列入语料验收（换接口/替代数据源暂缓）；错误信封与消息由单测兜住 |
 | `activity_assistant(intent="leaderboards")` 恒返回 `ok=false` + `a_p_i_error` | **上游失败**：Bungie 对账号榜单返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`。SDK 把空响应拆成 `None`，码在这一层已经拿不到 | 消息已改成「上游接口问题、不是账号问题，不要凭记忆给排名」；要带具体上游码需要绕过 SDK 自己发请求（未做） |
 | 术士求解慢 | 排队已不计入预算、预算可配（`DESTINY_BUILD_TIMEOUT_SECONDS`，默认 300s）。空闲机器实测：猎人 ~10s、泰坦 ~5–19s、**术士 recommend 190s ✓ / find 187s ✓ / analyze >305s ✗**、farm_target 7.5s ✓ | recommend/find 已修；`analyze` 仍超预算 |
 | Armor 3.0 里 `gearTier != 5` 的护甲带 `roll_parse_error`（英文开发者口气） | 只对 tier 5 做反推（`build/models.py`），4 级护甲标不支持 | 待定：支持 tier 4 或改成人话 |
