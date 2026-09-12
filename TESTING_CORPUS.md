@@ -1,14 +1,25 @@
-# 测试语料
+# 测试语料与验收
 
-逐条发送下面的话，按「期望路由」和「验收点」核对 Agent 的行为。
+一份文件装完：可以直接发送的话、期望路由、验收点，加上跑之前要准备的环境。
 
 - 覆盖 `normal` profile 的 8 个聚合工具、108 个已声明 intent，以及确认、证据边界、缺数据、社区资料等横切规则。
 - `<...>` 是占位符：`<职业>` 换成账号里真实存在的猎人／术士／泰坦，`<完整名>` 换成带 `#数字` 的 Bungie 名称，`<武器>`、`<Perk>`、`<活动ID>` 换成前一步查询返回的真实值。
 - 「期望路由」写的是**应该**出现的工具与 intent。工具返回 `unsupported_intent` 说明路由到了不存在的分支，是失败。
-- 需要真实账号、网络或 OAuth 的用例标了 🔐；离线只能跑前八节里不依赖账号的部分。
-- 光看工具名不够：写操作必须停下等确认，缺数据必须说缺数据，这两条在第九、十、十一节单独验。
-- **测之前先做两件事**：新开一个任务（或重启宿主），再跑 `scripts/verify_mcp.py` 看到 `PARAMETER_GUARD=ok` —— 那是「你连的是新代码」的证明。细节见第十五节。
-- 第十五节是**本轮修复的回归语料**：参数传错要报错、失败要走在失败信封里、词表不认要报错、愿单标记要真的亮、工具面只剩 8 个。
+- 需要真实账号、网络或 OAuth 的用例标了 🔐。
+- 测之前先做两件事：**新开一个任务**（或重启宿主），再跑 `.venv/bin/python scripts/verify_mcp.py`，必须看到 `MCP_HANDSHAKE=ok`、`PARAMETER_GUARD=ok`、`MCP_TOOL_COUNT=8`。schema 和行为是客户端**连接时**读的，旧会话里跑的还是旧代码 —— **`PARAMETER_GUARD=ok` 就是「你连的是新代码」的证明**。
+
+核对时三个通用技巧，后面所有断言都能用它们验证，不用背细节：
+
+1. **让 Agent 把 `error.code` 和 `mode` 原样念出来** —— 这些是可以逐字核对的字符串。
+2. **看信封**：成功必须 `ok=true`，失败必须 `ok=false` + `error.code`；`ok=true` 里裹一段错误文字一律算不合格。
+3. **看总数与截断**：被裁过的列表要带 `truncated` 与总数，不能让人把「前 N 条」当成全部。
+
+字段级不变量（所有响应都该成立，任何一条不成立就是 bug，不必逐条测）：
+
+- 列表类：`returned == len(列表)`，`truncated == (total > returned)`。
+- 来源标注：Manifest 数据不得写成「你有／你没有」；账号数据不得写成「全游戏」；社区数据必须带来源与更新时间。
+- 未检查不等于没有：`coverage_complete=false`、`ownership_checked=false`、`unknown_count>0` 时不许下「没有」的结论。
+- 商人：`mode` 只能是 `menu`/`detail`；菜单态 `sale_items` 必须为空；商品的 `category_index` 要么指向已列出的分类、要么为 `null`；`can_be_sold=false` 必须带 `failure_reasons`。
 
 ---
 
@@ -16,14 +27,12 @@
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
-| 看看我的角色概况 | `profile` | 返回角色列表与光等；不编造未读到的字段。 |
-| 我的角色档案，只读 | `profile` | 只读；不触发任何写入。 |
+| 看看我的角色概况，只读 | `profile` | 返回角色列表与光等；不编造未读到的字段，不触发任何写入。 |
 | 查一下玩家 `<完整名>` 的档案 | `profile` + `player_name` | 用传入的名称，不套用默认玩家。 |
 | 搜一下叫 `<完整名>` 的玩家 | `search` | 返回 membership_id 与 membership_type，供后续查询复用。 |
-| 找找名字里有「husky」的玩家 | `find` + `name_prefix` | ⚠️ 上游的模糊搜索接口已失效（见文末已知问题）：现在**恒返回空**。验收点是 Agent **不要把空结果说成「没这个人」**，而要说明模糊找人不可用、请给完整 `名字#1234` 走 `search`。 |
-| 我名字记不全，帮我找找 | `find` → 不可用时说明并要完整名 | ⚠️ 同上游失败：应直接说明模糊搜索不可用，并提示需要 `名字#1234` 才能精确匹配。 |
+| 找找名字里有「husky」的玩家 | `find` + `name_prefix` | ⚠️ 上游模糊搜索接口已失效：现在**恒返回空**。验收点是说明「模糊找人不可用、请给完整 `名字#1234` 走 `search`」，**不能把空结果说成「没这个人」**。 |
 | 默认玩家是谁 | 不调用工具 | 说明来自 `DESTINY_DEFAULT_PLAYER`；未配置时说明会用当前 OAuth 账号。 |
-| 换个账号查 | 不适用 | 本项目是单用户本地版，应说明不支持多用户切换。 |
+| 换个账号查 | 不适用 | 单用户本地版，应说明不支持多用户切换。 |
 
 ## 二、`inventory_assistant`
 
@@ -33,29 +42,24 @@
 | --- | --- | --- |
 | 看看我的背包和仓库概况，只读 | `summary` | 区分角色背包与仓库；给出数量概况。 |
 | 我仓库里有多少东西 | `summary` + `location="vault"` | 只统计仓库，不把角色背包算进去。 |
-| 只统计武器（不要护甲） | `summary` + `item_type="weapon"` | `summary` 的 `item_type` **只接受 weapon/armor/all**；传「手炮」会得到 `config_error`（这是实现限制，不是 Agent 的错）。要按具体武器类型看，用 `type` + `type_name`。 |
-| 列出我仓库里的物品 | `get` + `location="vault"` | 分页信息可见；不一次性倾倒全部。 |
-| 看看我装备着的护甲 | `get` + `armor_slot` | 部位过滤只作用于护甲。 |
+| 只统计武器（不要护甲） | `summary` + `item_type="weapon"` | `summary` 的 `item_type` **只接受 weapon/armor/all**；传「手炮」得到 `config_error`（实现限制，不是 Agent 的错）。按具体类型看要用 `type` + `type_name`。 |
+| 列出我仓库里的物品 | `get` + `location="vault"` | 位置过滤生效；不一次性倾倒全部。 |
 | 我有没有 `<物品名>` | `search` + `item_name` | 命中给实例 ID 与位置；未命中说「没找到」，不能反推「全账号没有」。 |
 | 找几组我持有的重复武器，列出实例 ID 和位置，不要处理 | `duplicates` | 按精确 `item_hash` 分组；**同名不同版本不能当成完全相同物品**；不自动锁定或移动。 |
-| 我重复的手炮有几组 | `duplicates` + `type_name="手炮"` | 类型过滤；注意类型走 `type_name`，不要塞进 `item_type`。 |
-| 列出我所有的冲锋枪 | `type` + `type_name="微型冲锋枪"` | 按类型列举；不要用 `get` 的 `item_type`。 |
-| 我的背包里还有哪些类型的武器 | `type` | 按类型分组；分类来自 Manifest，不是猜的。 |
+| 我重复的手炮有几组 | `duplicates` + `type_name="手炮"` | 类型走 `type_name`，不要塞进 `item_type`。 |
+| 列出我所有的微型冲锋枪 | `type` + `type_name="微型冲锋枪"` | 按类型列举；不要用 `get` 的 `item_type`。 |
 
 ### 写入（必须等确认）
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | 把 `<物品名>` 移到仓库 | `move`，`confirmed=false` | **先展示目标与实例，等待确认**；未确认前游戏状态不变。 |
-| 把 `<物品名>` 移到 `<职业>` 并装上 | `move` + `equip=true` | 先展示将移动并装备的具体实例。目标为仓库时禁止 `equip`。 |
-| 把实例 `<实例ID>` 转移到 `<职业>` | `transfer` | 需要 `item_instance_id` 与 `to_character`；缺一即参数错误。 |
-| 把实例 `<实例ID>` 装备到 `<职业>` | `equip` | 同上。 |
+| 把 `<物品名>` 移到 `<职业>` 并装上 | `move` + `equip=true` | 先展示将移动并装备的具体实例；目标为仓库时禁止 `equip`。 |
+| 把实例 `<实例ID>` 转移到 `<职业>` 并装备 | `transfer` 或 `equip` | 需要 `item_instance_id` 与 `to_character`；缺一即参数错误。 |
 | 把这几件一起装上：`<实例ID列表>` | `equip_many` | 实例 ID 必须唯一；重复 ID 应判参数错误。 |
 | 把邮政官里的 `<物品名>` 取出来 | `pull_postmaster` | 需要实例 ID；取出后核对位置变化。 |
-| 锁定 `<物品名>` | `lock` + `locked=true` | 先展示目标；锁定状态改变后能从查询里看出来。 |
-| 解锁 `<物品名>` | `lock` + `locked=false` | 同上反向。 |
-| 把这个任务追踪起来 | `track_quest` | 需要实例 ID；追踪状态可从查询验证。 |
-| 取消追踪这个任务 | `quest_tracking` + `tracked=false` | 同上反向。 |
+| 锁定／解锁 `<物品名>` | `lock` + `locked=true`／`false` | 先展示目标；之后能从查询里看出状态变化。 |
+| 追踪／取消追踪这个任务 | `track_quest`／`quest_tracking` | 需要实例 ID；追踪状态可从查询验证。 |
 
 ## 三、`weapon_assistant`
 
@@ -64,12 +68,10 @@
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | 全游戏里哪些武器能滚出 `<Perk>` | `catalog` + `perk_name` | 明确标注**Manifest 候选**；`owned=false`／`ownership_checked=false` **不是**拥有结论。 |
-| 全游戏的手炮有哪些 | `catalog` + `weapon_type="手炮"` | 与账号无关；不读取库存。 |
-| 从全量目录找带某个 Perk 的手炮，不要判断我是否拥有 | `catalog` | 结果里不能出现「你有／你没有」这类措辞。 |
+| 全游戏的手炮有哪些 | `catalog` + `weapon_type="手炮"` | 与账号无关；不读取库存。结果里不能出现「你有／你没有」。 |
 | `<武器>` 的 Perk 池有哪些 | `perk_pool` | 列出**可能**滚到的 Perk；这不是账号当前副本。 |
-| `<武器>` 的定义和基础信息 | `info` | 来自 Manifest；未读账号时不谈持有。 |
-| `<武器>` 的基础属性数值 | `stats` | 只给定义数值；不叠加账号加成。 |
-| `<武器>` 的催化剂情况 | `catalyst` | 明确区分「游戏里有这个催化剂」与「我已解锁」。 |
+| `<武器>` 的定义和基础属性 | `info`／`stats` | 都来自 Manifest；只给定义数值，不叠加账号加成。 |
+| `<武器>` 的催化剂情况 | `catalyst` | 区分「游戏里有这个催化剂」与「我已解锁」。 |
 | 手炮这一类武器都有哪些 | `type` | 按类型列出定义。 |
 | `<Perk>` 是什么效果 | `perk_description` | 从 Manifest 取描述；**不得按名字推断效果**。 |
 
@@ -78,8 +80,7 @@
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | 我仓库里当前带 `<Perk>` 的武器 | `filter_rolls` + `include_inventory=true` | 只筛账号持有副本；给出实例 ID 与位置。 |
-| 对比我这几把 `<武器>` 的 Perk | `compare` + `weapon_name` | 每把建议对应**具体实例**，不能只给笼统结论。 |
-| 同一个武器我有好几把，帮我留一把 | `compare` | 给建议但不自动处理；说明依据是当前选中的 Perk。 |
+| 对比我这几把 `<武器>` 的 Perk，建议留哪把 | `compare` + `weapon_name` | 每把建议对应**具体实例**，不能只给笼统结论；只给建议不自动处理。 |
 | 分析一下 `<武器>` | `analyze` + `include_inventory` | 区分「定义」与「我持有的副本」两部分。 |
 | `<武器>` 大家一般选哪个 Perk | `popularity` | 标明数据来源与版本；**没有快照时明确说缺数据，不能编实时百分比**。 |
 | 给我 `<武器>` 的 god roll 建议 | `god_roll` | 来源于社区愿单；标明不是官方推荐。 |
@@ -97,14 +98,12 @@
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
-| 用我的 `<职业>` 现有护甲找三套方案，生命至少 100、手雷至少 100，只列候选不装备 | `find` 或 `recommend` | 五个护甲部位齐全，含实际实例 ID 与最终六维。⏱️ 术士同样接近预算上限，见下条与文末已知问题。 |
-| 推荐一套 `<职业>` 护甲，武器 100、职业 100 | `recommend` | `*_target` 是**硬约束**；无解要说无解。⏱️ 实测耗时：泰坦 ~2s、猎人 ~5s、**术士 ~190s**（组合数是猎人的 39 倍）；超过预算会返回 `build_validation_error`，可用 `DESTINY_BUILD_TIMEOUT_SECONDS` 调。 |
+| 用我的 `<职业>` 现有护甲找三套方案，生命至少 100、手雷至少 100，只列候选不装备 | `find` 或 `recommend` | 五个护甲部位齐全，含实际实例 ID 与最终六维。`*_target` 是**硬约束**，无解要说无解。⏱️ 实测耗时：泰坦 ~2s、猎人 ~5s、**术士 ~190s**（组合数是猎人 39 倍）；超预算返回 `build_validation_error`，可用 `DESTINY_BUILD_TIMEOUT_SECONDS` 调。 |
 | 保留上面的目标，指定金装 `<异域护甲原名>` | 先返回候选 | **首次查询必须返回金装候选并等确认**；不得自行选定。 |
-| 就选第一个 | 带 `confirmed_exotic_hash` + `exotic_experience_token` 重试 | 必须原样回传候选里的值；职业、目标、优先级、碎片设置**不得在重试时丢失**。 |
+| 就选第一个 | 带 `confirmed_exotic_hash` + `exotic_confirmation_token` 重试 | 必须原样回传候选里的值；职业、目标、优先级、碎片设置**不得在重试时丢失**。 |
 | 没有解的话别降条件，分析还差什么 | `analyze` | 明确说明无解；**不得擅自放宽硬目标**。 |
 | 不降目标，反推我该刷哪件护甲 | `farm_target` | 先查单件，单件无解再两件；待刷数值来自工具，**不能自己相减拼出来**。 |
-| 以我现在穿的四件为基线，最多替换两件 | `farm_target` + `baseline="equipped"` | 基线明确；`max_replacements` 生效。 |
-| 只看头盔这个部位 | `farm_target` + `replacement_slot="helmet"` | 只反推该部位。 |
+| 以我现在穿的四件为基线，最多替换两件，只看头盔 | `farm_target` + `baseline="equipped"` + `replacement_slot="helmet"` | 基线明确；`max_replacements` 与部位过滤都生效。 |
 | 这套方案穿上去 | `equip_build`，`confirmed=false` | **必须传回服务端签发的 `canonical_build`**；用 `score` 或自己拼 hash 应被拒绝。 |
 | 确认装备刚才那套 | `equip_build` + `confirmed=true` | 原样回传候选；**改过库存后旧候选应被拒绝并要求重新求解**。 |
 | 帮我看看有哪些护甲模组 | `armor_mods` | 模组名与数值来自 Manifest。 |
@@ -113,7 +112,7 @@
 | 有什么热门的猎人配装 | `community` + `character="hunter"` | 走**社区**模板；**不得用 `loadout_assistant`**。 |
 | 给我 5 套猎人社区方案，不读我的账号 | `community` + `include_inventory=false` | 不读取库存；返回带 `community_build_id`。 |
 | 就用第一套，看看我缺什么 | `community` + `community_build_id` + `include_inventory=true` | 需要**明确的 community_build_id**；不猜 ID。 |
-| 社区配装里缺的那件去哪刷 | `build_assistant(intent="community", community_build_id=…)` 返回里的 **`sourcing` 字段**（没有名为 sourcing 的 intent） | 有来源就给清单名与来源；**没有就说没有**，不能说「刷不到」。 |
+| 社区配装里缺的那件去哪刷 | `community` 返回里的 **`sourcing` 字段**（没有名为 sourcing 的 intent） | 有来源就给清单名与来源；**没有就说没有**，不能说「刷不到」。 |
 | 社区模板能直接一键装备吗 | 不适用 | 明确拒绝：`build_template`、`solver_handoff`、`farm_options` **都不是可执行方案**。 |
 
 ## 五、`loadout_assistant`
@@ -122,7 +121,7 @@
 | --- | --- | --- |
 | 列出我的 `<职业>` 已有配装，不保存不覆盖 | `list` | 本地配装与 Bungie 官方槽位**来源分开**；每项含统一 `build_template`。 |
 | 看下 `<配装名>` 的具体内容 | `get` | 含武器、护甲、模组、碎片与来源。 |
-| 读一下我所有的官方配装槽 | `get` + `character` | `list`/`get` 只按角色过滤，**返回全部**（含官方槽位）；`loadout_id`、`slot_number`、`kind`、`query` 在这两个 intent 上会被拒绝。官方槽位保留 `slot_number` 等执行元数据，这些不是热度依据。 |
+| 读一下我所有的官方配装槽 | `get` + `character` | `list`/`get` 只按角色过滤，**返回全部**（含官方槽位）；官方槽位的 `slot_number` 等只是执行元数据，不是热度依据。 |
 | 保存这套配装叫「测试配装」 | `save`，先确认 | 展示将写入的内容；确认后才落盘。 |
 | 删掉「测试配装」 | `delete`，先确认 | 展示要删除的目标；不误删其他配装。 |
 | 换上「测试配装」 | `equip_loadout` + `loadout_id`，先确认 | 需要本地或官方配装 ID；不按名字猜。 |
@@ -136,13 +135,11 @@
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
-| 看看我的 `<职业>` 当前技能、星相和碎片，不修改 | `get` | 与游戏内当前配置一致；只读。 |
-| 我的子职业现在装了什么 | `get` | 含超能、手雷、近战、职业技能、星相、碎片。 |
+| 看看我的 `<职业>` 当前超能、手雷、近战、星相和碎片，不修改 | `get` | 与游戏内当前配置一致；只读。 |
 | `<职业>` 有哪些超能可选 | `options` | 列出可选项；不代表账号已解锁。 |
 | 有哪些碎片可以选 | `fragments` | 列出碎片及效果。 |
 | `<碎片>` 的具体效果 | `fragment_details` | 从 Manifest 取数值与条件。 |
-| 我现在用的是哪个神器 | `artifact` | 返回神器与层级；来源是 Manifest。 |
-| 神器模组都有哪些 | `artifact_mod` | 分等级列出。 |
+| 我现在用的是哪个神器／神器模组都有哪些 | `artifact`／`artifact_mod` | 来源是 Manifest；模组分等级列出。 |
 | 把 `<职业>` 的超能改成 `<超能>` | `modify` + `changes`，**先确认** | 展示将变更的项；`changes` 必填。 |
 | 给我装上神器模组 `<模组>` | `equip_artifact_mod`，先确认 | `artifact_mod_hash` 必须为正；先展示目标。 |
 | `<碎片>` 在社区资料里怎么说 | `community` | 走本地 Starside 资料；标明不是官方数据。 |
@@ -153,36 +150,43 @@
 | --- | --- | --- |
 | 看看我的 `<职业>` 最近几场活动记录 | `history` | 时间与活动可核对；**没有记录不要补写**。 |
 | 我最近打过哪些突袭 | `history` + `mode` | 模式过滤生效。 |
-| 看下 `<活动ID>` 这一场的结算 | `pgcr` + `activity_id` | 用给定 ID；缺 ID 或传了非数字会得到 `ok=false` + `invalid_argument_error`（**不是**把空 ID 拼进 Bungie 网址再抛原始 404）。 |
-| 我的生涯 PvE 统计 | `stats` | 与 `history` 区分：这是汇总不是列表。 |
-| 我生涯总共打了多少场 | `stats` | 同上。 |
+| 看下 `<活动ID>` 这一场的结算 | `pgcr` + `activity_id` | 用给定 ID；缺 ID 或非数字得到 `ok=false` + `invalid_argument_error`（**不是**把空 ID 拼进 Bungie 网址再抛原始 404）。 |
+| 我的生涯 PvE 统计／总共打了多少场 | `stats` | 与 `history` 区分：这是汇总不是列表。 |
 | 我最常用哪把武器 | `weapon_history` | 按使用次数排行。 |
 | 我在熔炉里的表现怎么样 | `stats` 或 `leaderboards` | 明确区分生涯统计与排行榜。 |
 | 各类活动的累计统计 | `aggregate` | 按活动类型聚合。 |
-| 排行榜上我在什么位置 | `leaderboards` | ⚠️ 上游接口当前返回 `ErrorCode:3 UnhandledException`（见已知问题）：会得到 `ok=false`。验收点是 Agent 说明**这是上游问题、不是账号问题**，不要编排名。 |
+| 排行榜上我在什么位置 | `leaderboards` | ⚠️ 上游接口当前返回 `ErrorCode:3 UnhandledException`（见已知问题）：会得到 `ok=false`。验收点是说明**这是上游问题、不是账号问题**，不要编排名。 |
 | 我们公会的排行榜 | `clan_leaderboards` + `group_id` | **必须提供 group_id**（数字公会 ID，不是公会名），否则 `invalid_argument_error`。 |
 | `<副本>` 的社区攻略 | `community` | 本地资料；外链只是引用，未抓正文。 |
 
 ## 八、`world_assistant` 🔐
 
-> 商人这一块有更细的字段级测试集：见 **`VENDOR_TESTING.md`**（菜单/详情两种形态、分类与子页面、能不能买、截断与 limit、参数守卫反例）。
-
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | 查一下本周活动，标明来源和不确定的部分 | `weekly` | 数据来自 Bungie；**查询失败不能凭记忆给确定答案**。 |
-| 本周完整周常，包括所有可刷内容 | `weekly_full` | 比 `weekly` 更全；两者区别要说清。 |
-| 看看商人现在卖什么，不购买 | `vendor`（不点名） | 先给**菜单**：每个商人一行（名字、hash、等级、可买/总数、分类数），`mode="menu"`、**不含商品**、带 `total_vendors`/`truncated`；不许一次倾倒上千件商品。 |
-| 班西今天有什么好东西 | `vendor` + `vendor_name="班西-44"` | 先得到菜单，再用名字进**详情**：`mode="detail"`、该商人的分类（含 `kind="rewards"` 的等级奖励、`kind="submenu"` 的子页面）、等级进度、商品；指出值得买的具体条目与理由。 |
-| 泰斯那里有什么 | `vendor` + `vendor_name="泰斯·艾夫瑞斯"` | `total_items=224` 级别的大货架必须**截断**：`truncated=true` 且商品数 = `limit`（默认 40）；不能只给 40 件还说"就这些"。 |
-| 商人页面里那些子页面怎么看 | `vendor` + 详情后的 `next_actions` | 「聚焦破译」「传承聚焦破译」这类 tab 是**子页面**（`kind="submenu"` + `target_vendor_hash`），应作为下一步调用给出，而不是把子页面的货架并进主商人；本次没返回的子页面要照实说看不到。 |
-| `<商品>` 值不值得刷 | `vendor` 后读取 `farming_list` | 用清单的评级与来源回答；引用清单名与更新时间。 |
+| 本周完整周常，包括所有可刷内容 | `weekly_full` | 比 `weekly` 更全；两者区别要说清；它**不读** `limit`。 |
 | 搜索收藏品节点 | `search_collectible_nodes` + `query` | 返回节点候选。 |
-| 我解锁这个收藏品了吗 | `collectible_node` + 节点 hash | 节点 hash **只能**从 `search_collectible_nodes` 拿；把 `collectible_item` 返回的 `collectible_hash` 传进来会被拒（两者不是一回事）。区分「节点可见」与「已解锁」。 |
+| 我解锁这个收藏品了吗 | `collectible_node` + 节点 hash | 节点 hash **只能**从 `search_collectible_nodes` 拿；把 `collectible_item` 的 `collectible_hash` 传进来会被拒（两者不是一回事）。区分「节点可见」与「已解锁」。 |
 | 查一下 `<物品>` 的收藏品状态 | `collectible_item` | 明确未解锁时不编造获取方式。 |
 | `<机制>` 在社区资料里怎么解释 | `community` | 走本地资料；保留 PvP／强化／待验证标记。 |
 | 跨分类搜社区资料：护甲 | `community` + `community_category="armor"` | 分类过滤生效；这是唯一能跨分类搜的入口。 |
 
----
+### 商人：菜单 → 指定 → 详情
+
+`vendor` 有两种形态，响应里的 `mode` 直接写明：「菜单」用来选商人，「详情」才给货架。
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 有哪些商人 | `vendor`（不点名） | `mode="menu"`，`vendors[].sale_items` 全空，`total_vendors`/`truncated` 说明裁了多少，`question` 提示选一个，`next_actions` 给具体 hash；有等级的商人排前面。不许一次倾倒上千件商品。 |
+| 萨瓦拉那里有什么 | `+ vendor_name="萨瓦拉"` | `mode="detail"`；`rank.name`（如「先锋等级」）与 `level/level_cap`；分类能区分 `kind="rewards"`（等级奖励）、`sale`、`submenu`（带 `target_vendor_hash`）。 |
+| 名字只记得一半／直接给 hash | `+ vendor_name="苏拉"`／`"2484291326"` | 名字片段能定位；hash 能直接查（返回「武器聚焦」）。 |
+| 这个名字有好几个页面 | `+ vendor_name="传承装备"` | 返回**候选菜单**（`question` 说明匹配到几个）+ 各自 hash，**不许自己挑一个**。 |
+| 随便编一个商人名 | `+ vendor_name="这个名字不存在xyz"` | `vendors` 为空但**不是**含糊的空：`warnings` 给相近名字，`next_actions` 给可用调用。 |
+| 商人今天不在（仄/Xur 非周末、或某页本次没返回） | `+ vendor_name="仄"` | 明确说「本周期不在／这次没有返回」，**不允许**静默返回空数组。 |
+| 这里面哪些能买／为什么买不了 | 详情里的 `can_be_sold` + `failure_reasons` | 不可买必须带原因（如「需要等级4」）；不能一律 `true`，也不能只有 `false` 没有原因。 |
+| 泰斯那里有什么 | `+ vendor_name="泰斯·艾夫瑞斯"` | 大货架必须**截断**：`truncated=true` 且商品数 = `limit`（默认 40）；不能只给 40 件还说「就这些」。 |
+| 子页面（聚焦破译等）怎么看 | 详情后的 `next_actions` | 子页面作为**下一步调用**给出，不并入主商人货架；本次没返回的要照实说看不到。 |
+| 商人卖的这些哪些值得刷 | 详情后的 `farming_list` | `unmatched` 里**只应出现商品名**；出现商人名、分类名、声望名、Perk 名即为不合格（那些不是商品）。 |
 
 ## 九、横切：写入确认
 
@@ -196,18 +200,13 @@
 | 好，确认执行 | `confirmed=true` | 用服务端原候选执行；完成后**重新读取实际状态核对**。 |
 | 我改了一件护甲，再执行刚才那套 | `equip_build` + 旧候选 | 快照不匹配时应**拒绝**并要求重新求解，不能自动换一套。 |
 
-## 十、横切：证据边界
-
-这三句话是同一个问题的三种问法，答案必须来自不同数据源。
+## 十、横切：证据边界与不可信资料
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | 我有没有 `<Perk>` 的武器 | `filter_rolls` | 账号数据；未完整扫描时不能说「没有」。 |
 | 游戏里有没有 `<Perk>` 的武器 | `catalog` | Manifest 数据；**不能推断我是否拥有**。 |
 | 大家怎么评价 `<Perk>` | `community` | 社区资料；标明本地快照、非官方、有更新时间。 |
-
-| 说什么 | 期望路由 | 验收点 |
-| --- | --- | --- |
 | 社区配装里那把枪我有吗 | `community` + `include_inventory=true` | 需要具体 ID 后才读账号；结果区分已持有／Perk 命中／缺少／未验证。 |
 | 社区模板和我的库存对照一下，能直接穿吗 | 不适用 | 返回 `execution_eligible=false`；说明模板不是可执行方案。 |
 | 这个社区数值适用于当前版本吗 | 不适用 | 只能说「是本地快照、页面更新于 X」，**不能保证适用于当前版本**。 |
@@ -220,45 +219,68 @@
 | 查一个不存在的玩家 `<乱码#0000>` | `search` | 明确说找不到；不编造档案。 |
 | 查一个不存在的武器 | `analyze` | 明确说 Manifest 里没有；不凭记忆描述。 |
 | 我的背包里有没有 `<冷门武器>` | `filter_rolls` | 检查 `coverage_complete`；不完整时说明「无法判断 N 把」。 |
-| 商人现在卖什么（断网时）🔐 | `vendor` | 报查询失败；**不能给缓存或记忆里的答案**。 |
-| 本周周常是什么（断网时）🔐 | `weekly` | 同上。 |
-| 这个收藏品怎么获得 | `collectible_item` | 未解锁时给获取途径；若数据里没有就说没有。 |
+| 商人现在卖什么／本周周常是什么（断网时）🔐 | `vendor`／`weekly` | 报查询失败；**不能给缓存或记忆里的答案**。 |
+| 这个收藏品怎么获得 | `collectible_item` | 未解锁时给获取途径；数据里没有就说没有。 |
 | 本地社区资料没装时问 `<机制>` | `community` | 返回 `available=false` 并说明未安装，**不能说「资料里没有」**。 |
 
-## 十二、本次新增能力：刷取清单与来源
+## 十二、参数、错误与信封
 
-这些是这几轮加的能力，单独验一遍。
+### A. 传错参数要当场报错（`ignored_parameter`）
 
-| 说什么 | 期望路由 | 验收点 |
-| --- | --- | --- |
-| `<武器>` 值得刷吗 | `analyze` 等带 `farming_list` | 命中刷取清单时给 `tier`、`source`、清单名与更新时间（`scale="T"`）。 |
-| 迎驾这把枪怎么样 | 同上 | 不在精选清单但在购物清单 → 给 `scale="S-F"` 的梯队评级与名次，并区分两种刻度。 |
-| 真相在输出和高难里分别什么水平 | 同上 | 给 `scenario_tiers`（`{"输出": "T0", "高难": "T0.5"}`），**不能压成一个档位**。 |
-| 牵引器火炮是什么评级 | 同上 | 它是 `role="输出工具枪"` 这个**定位**，不是 T0/T1 档位。 |
-| `<清单里没有的武器>` 值得刷吗 | 同上 | `unmatched` 命中时应说「本地清单里没有」，**不能说「不值得刷」**。 |
-| 看看班西现在卖什么，哪件值得留 | `vendor` | 每件带来源与评级；护甲类给 `scale="ordered"`（无档位，不编评级）。 |
-| 我缺的那件去哪刷 | `build_assistant(intent="community", community_build_id=…)` 返回里的 `sourcing` **字段** | 有来源给来源；`reason="no_adapter"` 时说明该类别未接入，**不是「没有来源」**。 |
-| 社区配装要的 Perk 和清单推荐的一样吗 | 不适用 | 必须**分开**说明：模板 `required_perks` 是「都要」，清单 `recommended_perks` 是「同栏任一」。 |
-| `<武器>` 的 Perk 里哪些是社区推荐的 | `perk_pool`／`analyze`，读每个 Perk 的 `god_roll_pve`／`god_roll_pvp` | 来自本地 DIM 愿望单；全为 `false` 时要说明「本地没收录」，**不能说「这些 Perk 都不好」**；它和 `farming_list` 是两套数据。 |
-
-## 十三、错误与空状态
+主动去踩：把参数传给一个**不读它**的 intent。Agent 可以自己纠正，但**不允许拿一个答非所问的结果当答案**。
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
-| 移动物品但不给目标 | `move` 缺 `destination` | 参数错误，**不进入服务层**。 |
-| 装备一个不存在的位置 | `move` + `destination="仓库"` + `equip=true` | 明确拒绝：不能装备到仓库。 |
-| 批量装备给重复实例 ID | `equip_many` | 参数错误并指出重复。 |
-| 改官方槽位到 21 号 | `update_official_identifiers` / `clear_official` | 槽位范围 1–20，越界应报错。 |
-| 装一个 hash 为负的神器模组 | `equip_artifact_mod` | 参数错误：hash 必须为正。 |
-| 用一个不存在的 intent | 任意工具 + 乱填 intent | 在 **schema 层**就被拒：客户端拿到 `isError` + pydantic 的 `literal_error`，消息里列出该工具允许的全部取值。**不要**期待 `unsupported_intent` 信封（那个分支只在参数过了 schema 校验、但代码没处理时才会走到，正常情况到不了）；底线是**不要静默降级成默认行为**。 |
-| 查子职业选项但不给元素／组件 | `subclass_assistant(intent="options")` | 返回 `ok=false` + `subclass_error`，消息里列出合法取值；**不能是 `ok=true` 里裹一段错误文字**，也不能当成「没有可选项」。 |
-| 查不存在的套装效果 | `build_assistant(intent="set_bonus", set_bonus_name=...)` | 返回 `ok=false` + `item_not_found_error`，不能包在成功信封里。 |
-| 用不认识的词筛护甲模组 | `build_assistant(intent="armor_mods", priority_stat="武器伤害")` | 返回 `ok=false` + `invalid_argument_error` 并列出词表；**不能安静返回 0 条**（那会被读成「没有这种模组」）。 |
-| 把实例 ID 传给 `inventory_assistant(intent="get")` | 拒绝，改走 `weapon_assistant(intent="compare")` 或 `inventory_assistant` 的写入 intent | 返回 `ignored_parameter`；**不进入服务层**，更不能返回整包清单冒充答案。 |
-| 把物品名传给 `inventory_assistant(intent="summary")` | 拒绝，改走 `intent="search"` | 同上：问的是某一件事，返回的不能是概况。 |
-| 把 `loadout_id` 传给 `loadout_assistant(intent="get")` | 拒绝 | 消息说明 `list`/`get` 返回全部配装、要自己挑，**不能把第一条当成用户说的那套**。 |
-| 把 `weapon_name` 传给 `weapon_assistant(intent="type")` | 拒绝，改传 `weapon_type` | 类型查询走 `weapon_type`；`weapon_name` 在 `type` 上无人认领。 |
-| 把属性目标传给 `build_assistant(intent="community")` | 拒绝，改走求解类 intent | 社区配装不吃 `*_target` 硬约束，混用会让人以为目标生效了。 |
+| 我有刚玉战锤吗 | `inventory_assistant(intent="search", item_name="刚玉战锤")` | 若先试了 `summary`／`get` 再带 `item_name`，必须收到 `ignored_parameter` 并改走 `search`；**不能**拿背包概况当回答。 |
+| 看看我刚玉战锤那几个副本的 Perk | `weapon_assistant(intent="filter_rolls")` 或 `compare` | 把 `item_instance_id` 传给 `inventory_assistant(intent="get")` 会拿到 `ignored_parameter`；副本对比只能走 `weapon_assistant`。 |
+| 我重复的手炮有几组 | `inventory_assistant(intent="duplicates", type_name="手炮")` | 类型走 `type_name`；塞进 `item_type` 会拿到 `ignored_parameter`。 |
+| 读一下我的官方配装槽 3 | `loadout_assistant(intent="get")` | `get`/`list` **只按角色过滤**，`loadout_id`、`slot_number`、`kind`、`query` 传了都会 `ignored_parameter`；Agent 要自己从全部配装里挑出槽位 3，**不能声称「只取了槽位 3」**。 |
+| 按武器类型列出所有手炮定义 | `weapon_assistant(intent="type", weapon_type="手炮")` | 类型走 `weapon_type`；传 `weapon_name` 会拿到 `ignored_parameter`。 |
+| 用我现有的护甲推荐一套，武器 100 | `build_assistant(intent="recommend", weapons_target=100)` | `*_target` 是求解类 intent 的硬约束；传给 `community` 会拿到 `ignored_parameter`。 |
+| 分析一下我刚玉战锤这把枪 | `weapon_assistant(intent="analyze", weapon_name="刚玉战锤")` | 正常返回；对照上面几条，正确路由**不会**触发 `ignored_parameter`。 |
+
+**参数默认值不再是「黑洞」**：签名默认值统一是 `null`，任何**具体值**都算「传了」，所以下面这些以前会被静默吞掉的调用现在必须报错：
+
+| 调用 | 期望 | 不合格的表现 |
+| --- | --- | --- |
+| 给不读 `limit` 的 intent 传 `limit=10`（inventory 读接口） | `ignored_parameter` | `ok=true` 然后返回一大堆 |
+| `loadout_assistant(intent="list", slot_number=1)` | `ignored_parameter` | 静默返回全部 60 套配装 |
+| `build_assistant(intent="armor_mods", top_n=5)` | `ignored_parameter` | 静默返回 300 个模组 |
+| `activity_assistant(intent="history", maxtop=10)` | `ignored_parameter` | 静默返回 20 场（条数该用 `count`） |
+| 宿主把 schema 默认值一起发来：`confirmed=false`、`offset=0`、`item_name=""` | **放行**（空值 = 没指定） | 误拒这些调用 |
+| 不传 `limit` 时的默认条数 | inventory 10、weapon 50、subclass 10、activity `count` 20、world 菜单 15 / 详情 40 | 默认值不是这些、或报错 |
+
+### B. 失败必须是失败（不能在 `ok=true` 里裹错误）
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 猎人现在有哪些可选的技能 | `subclass_assistant(intent="options")` + `element` + `component` | 缺参数返回 `ok=false` + `subclass_error`，消息里列出合法取值；**不能**是 `ok=true` 里塞错误文字，也不能说成「没有可选项」。 |
+| 查一下「不存在的碎片」的数值 | `subclass_assistant(intent="fragment_details")` | `ok=false` + `definition_not_found_error`；直说找不到，**不能编效果**。 |
+| 查一个不存在的赛季神器名 | `subclass_assistant(intent="artifact")` | `definition_not_found_error`（**不是** `item_not_found_error` —— 后者是「你的东西被分解了」，用在从没拥有过的定义上会误导）。 |
+| 查一下 hash=999 的神器模组 | `subclass_assistant(intent="artifact_mod", artifact_mod_hash=999)` | `ok=false` + `definition_not_found_error`。 |
+| 查一个不存在的套装效果 | `build_assistant(intent="set_bonus", set_bonus_name=…)` | `ok=false` + `item_not_found_error`；不能包在成功信封里。 |
+
+### C. 封闭词表与协议级拒绝
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 有哪些加武器的护甲模组 | `build_assistant(intent="armor_mods", priority_stat="weapons")` | 中英都认（`weapons` 与 `武器` 同结果）。传词表外的词（如「武器伤害」）必须拿到 `invalid_argument_error` 并列出词表，**不能把 0 条当成「没有这种模组」**。 |
+| 搜名字里带「测试」的官方配装标识 | `loadout_assistant(intent="search_identifiers", kind="name", query="测试")` | `kind` 只认 all/name/icon/color（含中文）；传别的会 `invalid_argument_error`，**不能返回 `ok=true` 里裹 `{"success": false}`**。 |
+| 看下（不给活动 ID）这一场的结算 | `activity_assistant(intent="pgcr")` | `ok=false` + `invalid_argument_error`，消息让先用 `history` 拿 ID；**不能**抛原始 404。 |
+| 我们公会的排行榜（不说公会） | `activity_assistant(intent="clan_leaderboards")` | `ok=false` + `invalid_argument_error`，说明要数字 group_id。 |
+| 我解锁这个收藏品了吗（不给节点） | `world_assistant(intent="collectible_node")` | `ok=false` + `invalid_argument_error`，提示先用 `search_collectible_nodes` 找节点。 |
+| 改官方槽位到 21 号／装 hash 为负的神器模组／移动物品不给目标 | 对应写入 intent | 越界与非法的参数一律 `ok=false` + 参数错误，**不进入服务层**。 |
+| 用一个不存在的 intent | 任意工具 + 乱填 intent | 在 **schema 层**就被拒：客户端拿到 `isError` + pydantic 的 `literal_error`，消息里列出该工具允许的全部取值。**不要**期待 `unsupported_intent` 信封（那个分支正常情况到不了）；底线是**不要静默降级成默认行为**。 |
+| 让 Agent 空参把所有 intent 跑一遍 | 全部 | 每个都必须返回干净信封：成功 `ok=true`，失败 `ok=false` + `error.code`，**不该出现任何未捕获异常的原始报错**。 |
+
+## 十三、本轮修复的回归点
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 遗产／刚玉战锤的 Perk 池里哪些是社区推荐的 | `weapon_assistant(intent="perk_pool", weapon_name=…)` | 应能看到 `god_roll_pve: true` / `god_roll_pvp: true` 的条目（修复前**全是 false**）。异域可能全 false —— 这时要说明「本地愿单没收录」，**不能说「这些 Perk 都不好」**。 |
+| 你现在有哪些工具 | 不调用工具 | 只有 8 个聚合工具；**不应**出现 `get_inventory`、`raw_api_call` 这类老工具名。 |
+| 用 `get_inventory` 看看我的背包 | `inventory_assistant(intent="get")` | 老工具名已不在工具面上；应改走聚合入口，而不是声称工具不存在就作罢。想用老工具要开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 并重启宿主。 |
+| 列一个不存在的商人／查不存在的节点 hash | `vendor`／`collectible_node` | `ok=false` + `invalid_argument_error`，消息说清「这个 hash 不是那种东西」，**不是**裸抛 404。 |
 
 ## 十四、只跑一次就够的整链路
 
@@ -270,132 +292,90 @@
 
 ---
 
-## 十五、本轮修复的回归语料
+## 十五、环境与流程
 
-这一节专门验这一轮改掉的东西：**参数传错不再被安静忽略、失败不再藏在成功信封里、封闭词表不认就报错、愿望单标记真的会亮、工具面只剩 8 个**。
+### 连接与基线
 
-**测之前先做两件事**：
+先重启宿主或新开任务，然后发送：
 
-1. **新开一个任务**（或重启宿主）。工具 schema 和行为是客户端**连接时**读的；旧会话里那个进程还是旧代码 —— 之前那次"复测没变化"就是这么来的。
-2. 跑 `.venv/bin/python scripts/verify_mcp.py`。必须看到 `MCP_HANDSHAKE=ok`、`PARAMETER_GUARD=ok`、`MCP_TOOL_COUNT=8`。**`PARAMETER_GUARD=ok` 就是"你连的是新代码"的证明**；如果报 `Parameter guard is missing`，说明还在跟旧进程说话，重启再来。
+> 接下来测试 Destiny MCP。先只做查询，不移动、装备、锁定、保存或删除任何东西。请实际调用工具，不用记忆补数据；失败时告诉我工具名和错误原因，不展示任何密钥或令牌。先看看我的账号角色信息。
 
-验的时候有个通用技巧：**让 Agent 把 `error.code` 原样念出来**。下面所有"期望"栏里的 code 都是可以直接核对的字符串。
+预期：调用 `player_assistant(intent="profile")`，返回当前授权账号的角色；无需再次提供 API Key 或 client secret。默认应发现这 8 个工具，不要把宿主自身的工具算进去：
 
-### A. 参数传错要当场报错（`ignored_parameter`）
+```text
+player_assistant  inventory_assistant  weapon_assistant  build_assistant
+loadout_assistant  subclass_assistant  activity_assistant  world_assistant
+```
 
-要主动去踩：把参数传给一个**不读它**的 intent。Agent 可以自己纠正，但**不允许拿一个答非所问的结果当答案**。
+安装复查命令：
 
-| 说什么 | 期望路由 | 验收点 |
-| --- | --- | --- |
-| 我有刚玉战锤吗 | `inventory_assistant(intent="search", item_name="刚玉战锤")` | 若 Agent 先试了 `summary`／`get` 再带上 `item_name`，必须收到 `ignored_parameter` 并改走 `search`；**不能**拿背包概况当回答。 |
-| 看看我刚玉战锤那几个副本的 Perk | `weapon_assistant(intent="filter_rolls")` 或 `compare` | 传 `item_instance_id` 给 `inventory_assistant(intent="get")` 会拿到 `ignored_parameter`；副本对比只能走 `weapon_assistant`。 |
-| 我重复的手炮有几组 | `inventory_assistant(intent="duplicates", type_name="手炮")` | 类型走 `type_name`；塞进 `item_type` 会拿到 `ignored_parameter`（`duplicates` 不读 `item_type`）。 |
-| 看看我的手炮都有哪些 | `inventory_assistant(intent="type", type_name="手炮")` | 同上：`get` 才会读 `item_type`，`duplicates` 读 `type_name`。 |
-| 读一下我的官方配装槽 3 | `loadout_assistant(intent="get")` | `get`/`list` **只按角色过滤**，`loadout_id`、`slot_number`、`kind`、`query` 传了都会 `ignored_parameter`；Agent 要自己从全部配装里挑出槽位 3，**不能声称"只取了槽位 3"**。 |
-| 按武器类型列出所有手炮定义 | `weapon_assistant(intent="type", weapon_type="手炮")` | 类型走 `weapon_type`；传 `weapon_name` 会拿到 `ignored_parameter`。 |
-| 用我现有的护甲推荐一套，武器 100 | `build_assistant(intent="recommend", weapons_target=100)` | `*_target` 是求解类 intent 的硬约束；传给 `community` 会拿到 `ignored_parameter`（社区配装不吃它）。 |
-| 分析一下我刚玉战锤这把枪 | `weapon_assistant(intent="analyze", weapon_name="刚玉战锤")` | 正常返回；对照上面几条，正确路由**不会**触发 `ignored_parameter`。 |
+```bash
+.venv/bin/python -m pip check
+.venv/bin/python skills/destiny-mcp-setup/scripts/verify_mcp.py   # 或 scripts/verify_mcp.py
+.venv/bin/python -m pytest -q
+```
 
-### B. 失败必须是失败（不能在 `ok=true` 里裹错误）
+- 没有工具：先新开任务或重启宿主，再跑验证脚本。
+- 验证脚本必须同时得到 `BUNGIE_PROFILE_CHECK=ok`、`MCP_TOOL_COUNT=8`、`VERIFY_OK`；仅注册成功不算通过。
+- 账号读取失败：先查网络与 Bungie 服务状态和本地登录，不要反复卸载重装。
+- 配装求解超时：如实记录耗时；不要通过擅自降目标掩盖失败。
+- 写入失败：停止后续操作，重新读取实际状态；不要假设没有变更，也不要自动循环重试。
 
-| 说什么 | 期望路由 | 验收点 |
-| --- | --- | --- |
-| 猎人现在有哪些可选的技能 | `subclass_assistant(intent="options")` + `element` + `component` | `options` 必须同时给元素和组件；缺了返回 `ok=false` + `subclass_error`，消息里列出合法取值。**不能**是 `ok=true` 里塞一段错误文字，也**不能**说成"没有可选项"。 |
-| 烈日有哪些碎片 | `subclass_assistant(intent="fragments", element="solar")` | 正常返回碎片列表；不给 `element` 则 `subclass_error`。 |
-| 查一下"不存在的碎片"这个碎片的数值 | `subclass_assistant(intent="fragment_details")` | `ok=false` + `definition_not_found_error`；Agent 应直说找不到，**不能编效果**。 |
-| 我现在的赛季神器是什么 | `subclass_assistant(intent="artifact")` | 正常返回；查一个不存在的名字则 `definition_not_found_error`（**不是** `item_not_found_error` —— 那是"你的东西被分解了"，用于从没拥有过的定义名字会误导）。 |
-| 查一下 hash=999 的神器模组 | `subclass_assistant(intent="artifact_mod", artifact_mod_hash=999)` | `ok=false` + `definition_not_found_error`。 |
-| 埃希恩记忆的套装效果是什么 | `build_assistant(intent="set_bonus", set_bonus_name="埃希恩记忆")` | 正常返回 2 件／4 件效果；查一个不存在的套装则 `ok=false` + `item_not_found_error`。 |
+反馈问题时记录：测试话术、目标职业、工具名与 intent、脱敏错误码、预期结果、实际结果，以及游戏状态有无变化。不要附 `.env`、`tokens.json` 或未检查的完整日志。
 
-### C. 封闭词表的筛选项：不认就报错，不能安静返回 0
+### 写入测试的操作要点（可选执行）
 
-| 说什么 | 期望路由 | 验收点 |
-| --- | --- | --- |
-| 有哪些加武器的护甲模组 | `build_assistant(intent="armor_mods", priority_stat="weapons")` | 中英都认（`weapons` 与 `武器` 结果一样）。若 Agent 传了词表外的词（如"武器伤害"），必须拿到 `invalid_argument_error` 并改用词表里的词，**不能**把 0 条当成"没有这种模组"。 |
-| 有哪些加手雷的模组 | 同上，`priority_stat="grenade"`／`"手雷"` | 两种写法返回同一批。 |
-| 搜一下名字里带"测试"的官方配装标识 | `loadout_assistant(intent="search_identifiers", kind="name", query="测试")` | `kind` 只认 all/name/icon/color（和中文）；传别的会 `invalid_argument_error`，**不能**返回 `ok=true` 里裹 `{"success": false}`。 |
-| 看下（不给活动 ID）这一场的结算 | `activity_assistant(intent="pgcr")` | `ok=false` + `invalid_argument_error`，消息让你先用 `history` 拿 ID；**不能**抛原始 404。 |
-| 我们公会的排行榜（不说公会） | `activity_assistant(intent="clan_leaderboards")` | `ok=false` + `invalid_argument_error`，说明要数字 group_id。 |
-| 我解锁这个收藏品了吗（不给节点） | `world_assistant(intent="collectible_node")` | `ok=false` + `invalid_argument_error`，提示先用 `search_collectible_nodes` 找节点。 |
-| 查一下（不给物品名）的收藏品状态 | `world_assistant(intent="collectible_item")` | `ok=false` + `invalid_argument_error`；**不能**是 `ok=true` 里裹 `{"success": false}`。 |
-| 让 Agent 空参把所有 108 个 intent 跑一遍 | 全部 | 每个都必须返回干净信封：成功就 `ok=true`，失败就 `ok=false` + `error.code`。**不该出现任何未捕获异常的原始报错**。 |
+实际装备前让角色停在轨道等允许换装的状态，保留原装备与技能配置的截图，并停止其他工具的装备操作。核对清单后再单独发一条明确批准（例如「确认把刚才展示的候选 1 装备到我的 `<职业>`，不要更换候选」）。执行后逐项核对五件护甲、模组、相关技能与六维；失败时要求说明哪些步骤完成、哪些失败、恢复结果如何。
 
-### D. 愿望单标记现在真的会亮
+当前精确执行以**五件护甲为核心**，可附带受支持的子职业配置，不等于任意网站配装的全套武器与神器导入。Bungie 多步写入不是数据库事务，不能保证任何网络故障下都完整回滚。
 
-| 说什么 | 期望路由 | 验收点 |
-| --- | --- | --- |
-| 遗产的 Perk 池里哪些是社区推荐的 | `weapon_assistant(intent="perk_pool", weapon_name="遗产")` | 应当能看到 `god_roll_pve: true` / `god_roll_pvp: true` 的条目（修复前**全是 false**）。 |
-| 刚玉战锤的 Perk 池，标出推荐 | 同上 | 同上，应当有若干 true。 |
-| 牵引器火炮（异域）的 Perk 标记 | 同上 | 可能全 false（异域固定 roll 常不在愿单里）—— 这时要说明"本地愿单没收录"，**不能说"这些 Perk 都不好"**。 |
+### 重新登录（仅在需要时）
 
-### E. 工具面与老工具
+先关闭正在使用 Destiny MCP 的任务，再在本地终端运行：
 
-| 说什么 | 期望路由 | 验收点 |
-| --- | --- | --- |
-| 你现在有哪些工具 | 不调用工具 | 只有 8 个聚合工具：`player/inventory/weapon/build/loadout/subclass/activity/world_assistant`；**不应**出现 `get_inventory`、`raw_api_call` 这类老工具名。 |
-| 用 `get_inventory` 看看我的背包 | `inventory_assistant(intent="get")` | 老工具名已不在工具面上；Agent 应改走聚合入口，而不是声称工具不存在就作罢。 |
-| 用 `raw_api_call` 直接查 Bungie | 不适用 | 同上：说明这个入口在当前工具面里没有，需要时让用户开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 再重启宿主。 |
+```bash
+.venv/bin/destiny-mcp-oauth --no-open --timeout 900
+```
 
-### F. 写入确认不受参数拦截影响
+回调必须是 `https://localhost:8765/callback`，不能改成数字 IP。仅在确认地址是本机 localhost 且登录助手仍在运行时，处理本地自签名证书提示。重新登录会替换本地令牌，**不要**先删 `.env` 或令牌文件；曾公开过的凭据建议在 Bungie 后台轮换。不要把回调 URL 或凭据粘到聊天里。
 
-| 说什么 | 期望路由 | 验收点 |
-| --- | --- | --- |
-| 把测试物品移到仓库，不用问了直接执行 | `inventory_assistant(intent="move")` | 仍然返回 `confirmation_required` 且**不碰服务层**；"不用问了"不构成用户确认。 |
-| 好，确认执行 | 同上 + `confirmed=true` | 用服务端原候选执行，执行后重新读取实际状态核对。 |
+### 本地社区资料（Starside）数据包
 
-### G. 商人查询：菜单 → 指定 → 详情
+| 测试话术 | 验收点 |
+| --- | --- |
+| 用本地资料解释辉耀炽热的效果，区分强化效果并附来源和更新日期。 | 引用标记不丢失；来源为作者 Markdown。 |
+| 用本地资料查傍晚 SI4，列出三号位、四号位推荐 Perk 和获取地点。 | 两列 Perk 不串列；结果来源为 `author_markdown`。 |
+| 查圣贤保护者的 2 件和 4 件效果。 | 走 `world_assistant(intent="community", community_category="armor")`；能下钻正文并保留作者文档更新时间。 |
+| 查被腐化的卡丽生命值，并说明来源边界。 | 表格返回 `299440` 和上游链接，但仍标记为社区实测而非 Bungie 实时数据。 |
+| 找 5 套猎人社区配装，只看模板，不读取我的账号。 | 显示总命中数与下一页位置，不把 5 当全量。 |
+| 再看下一页，保留相同筛选条件。 | 原样使用 `next_offset`，ID 不重复、不漏页。 |
+| 读取某套的完整模板，检查我的库存，不装备。 | 用返回的 `community_build_id`；区分已持有、缺少、未解析、未验证。 |
+| 查本地输出表，保留表头、条件、PvP 和待验证数值。 | 先搜 `DPS`，再用 `knowledge_id` + `community_section="tables"` 读取；零散摘要不能当完整排名。 |
 
-`vendor` 现在有两种形态（`mode` 字段直接写明），"菜单"用来选商人，"详情"才给货架。核对点都能在响应里直接看到字符串。
+正文单次最多 6000 字符，表格与外链单次最多 20 行/条；存在 `next_offset` 表示还没读完。表格/外链是所属整页范围，不一定只对应搜索命中的那一项（响应的 `detail_scope` 会说明）。`source.inline_semantics_preserved=false` 的普通索引摘要不保留全部内联语义，比较数值应优先读 `description` 条目或带标记的表格详情。
 
-| 说什么 | 期望路由 | 验收点 |
-| --- | --- | --- |
-| 有哪些商人 | `world_assistant(intent="vendor")` | `mode="menu"`，`vendors[].sale_items` 全空，`question` 提示要选一个，`next_actions` 给具体 hash；有等级的商人排在前面。 |
-| 萨瓦拉那里有什么 | `+ vendor_name="萨瓦拉"` | `mode="detail"`；`rank.name`（如「先锋等级」）与 `level/level_cap`；分类里能区分 `kind="rewards"`（等级奖励）、`kind="sale"`、`kind="submenu"`（带 `target_vendor_hash`）。 |
-| 直接点名 hash 行不行 | `+ vendor_name="2484291326"` | 能按 hash 查（返回「武器聚焦」），不需要先知道名字。 |
-| 名字只记得一半 | `+ vendor_name="苏拉"` | 按名字片段定位到「苏拉娅·霍桑」，不必完整名字。 |
-| 这个名字有好几个页面 | `+ vendor_name="传承装备"` | 返回**候选菜单**（`question` 说明匹配到几个）而不是随便挑一个；`next_actions` 里带各自 hash。 |
-| 随便编一个商人名 | `+ vendor_name="这个名字不存在xyz"` | `vendors` 为空但**不是**含糊的空：`warnings` 给出相近名字，`next_actions` 给出可用调用。 |
-| 商人今天不在（仄/Xur 非周末、或某页本次没返回） | `+ vendor_name="仄"` | 明确说"本周期不在／这次没有返回"，**不允许**静默返回空数组。 |
-| 买不了的商品 | 详情里看 `can_be_sold=false` | 必须同时给 `failure_reasons`（来自上游 `failureIndexes`+`failureStrings`）；不能只有 false 没有原因，也不能一律 true。 |
-| 按类型查武器太长的截断 | `weapon_assistant(intent="type", weapon_type="手炮", limit=5)` | 返回 5 把，同时 `total_weapons=124` 左右、`truncated=true`；只给 5 把而不说被截断即为不合格。 |
-### H. 参数默认值不再是"黑洞"
+```bash
+.venv/bin/python -m pytest -q tests/test_starside_markdown.py tests/test_starside_integration.py
+.venv/bin/python scripts/verify_starside.py            # 加 --inventory 可核对库存
+```
 
-以前守卫判断"这次算不算传了这个参数"用的是"值 == 签名默认值"，于是**显式传默认值**会被当成没传、
-静默换成别的默认值（`limit=12` → 返回 40 件）。现在签名默认值统一是 `null`，真正的默认条数在工具内部补，
-任何具体值都算"传了"。
-
-| 说什么 / 调用 | 期望 | 不合格的表现 |
-| --- | --- | --- |
-| 给不读 `limit` 的 intent 传 `limit=10`（inventory 的读接口） | `ok=false` + `ignored_parameter` | `ok=true` 然后返回一大堆（默认值被吞） |
-| `loadout_assistant(intent="list", slot_number=1)` | `ignored_parameter`（list 不按槽位过滤） | 静默返回全部 60 套配装 |
-| `build_assistant(intent="armor_mods", top_n=5)` | `ignored_parameter` | 静默返回 300 个模组 |
-| `activity_assistant(intent="history", maxtop=10)` | `ignored_parameter` | 静默返回 20 场（`maxtop` 是榜单参数，条数要用 `count`） |
-| 宿主把 schema 默认值一起发来：`confirmed=false`、`offset=0`、`item_name=""` | **放行**（空值 = 没指定） | 误拒这些调用 |
-| 不传 `limit` 时各工具的默认条数 | inventory 10、weapon 50、subclass 10、activity `count` 20、world 菜单 15 / 详情 40 | 默认值不再是这些、或报错 |
-
-| 商人卖的这些东西里哪些值得刷 | 详情后的 `farming_list` | `unmatched` 里**只应出现商品名**；出现商人名（如「指挥官萨瓦拉」）、分类名（「等级奖励」）、声望名（「先锋等级」）即为不合格 —— 那些不是商品。 |
-| 商人货架里的占位条目（如「周常：先锋武器奖励」） | 详情里的 `item_type` | 无类型的条目显示为空串；**不应**出现字符串 `"None"`（那是 Bungie 枚举成员名，不是数据）。 |
+新克隆默认只有随附 Markdown，因此 `STARSIDE_AUTHOR_DOCUMENT_COUNT=22` 与 `STARSIDE_BUILD_ARCHIVE=not_installed` 同时出现是正常结果。
 
 ---
 
-### 已知问题（测到这些不算新 bug，已在处理清单里）
-| ~~`world_assistant(intent="vendor")` 一次返回 **1.85 MB**；`weapon_assistant(intent="type")` 一次 **515–651 KB**~~ | 已修：`vendor` 不点名时只回菜单（实测 17 KB，点名后详情 3–7 KB 并可 `limit`），`type` 接受 `limit` 并给 `total_weapons`/`returned_weapons`/`truncated` | **已修**（见十五·G） |
-| Armor 3.0 里 `gearTier != 5` 的护甲带 `roll_parse_error`："Armor 3.0 gearTier=4 is not supported for roll inversion." | 代码只对 tier 5 做反推（`build/models.py`），4 级护甲直接标不支持；消息是英文开发者口气 | 待定：支持 tier 4，或把消息改成人话 |
-| 动作类失败的消息里带着上游原文（Bungie URL、内部错误串），例如 `quest_tracking_failed` | 客户端把异常拼成 `{"ErrorCode": …, "Message": str(exc)}`，信封是对的，但 message 泄露开发者信息 | 待修：动作失败消息转成人话 |
-| 写入**成功**后没有 `next_actions` | `ok_response(..., next_actions=[])`，没有"回读核对实际状态"的提示（失败时已有提示） | 待定：要不要补一句 |
-
-
-
-下面几条是 2026-09-11 复现确认过的，写在这里免得下一轮重复当新缺陷上报：
+## 已知问题（测到这些不算新 bug）
 
 | 现象 | 真实原因（已核实） | 状态 |
 | --- | --- | --- |
-| 术士求解慢 | 已修一部分：**排队不再计入预算**，预算可配（`DESTINY_BUILD_TIMEOUT_SECONDS`，默认 300s），报错里说明预算与调法。空闲机器实测：猎人 ~10s、泰坦 ~5–19s、**术士 recommend 190s ✓ / find 187s ✓ / analyze >305s ✗**、farm_target 7.5s ✓ | recommend/find **已修**；`analyze` 对术士仍超预算，要剪枝或返回部分结果（未做） |
-| `player_assistant(intent="find")` 任何 `name_prefix` 都返回 `ok=true` + 空列表 | Bungie 的 `POST /User/SearchUsers/` 现在返回 **405**，代码把这类失败吞掉后返回空 —— 所以「没找到」和「搜索源不可用」分不出来 | 待修：换接口或明说不可用 |
-| `activity_assistant(intent="leaderboards")` 恒返回 `ok=false` + `a_p_i_error: 响应格式异常` | **上游失败**：Bungie 对账号榜单接口返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`。工具只是把上游失败说得太笼统 | 待修：消息带上游 ErrorCode/ErrorStatus |
-| ~~`collectible_node` 传正数但无效的 hash 裸抛 404~~ | 已修：现在回 `ok=false` + `invalid_argument_error`，消息说清「collectible_hash 不是节点号」；参数说明也标注了两者区别 | **已修** |
-| `slot_number=21`、非法 intent、拼错的参数名 → 原始 pydantic 报错，没有 `ok=false` | schema 层校验发生在工具函数之前，属于**协议级**参数错误（不是业务失败） | 取舍中：保持协议级拒绝，或补一层信封包装 |
-| ~~写入失败没有下一步指引~~ | 已修：失败时按原因关键词补 `next_actions`（已装备 → 先 equip 换下；找不到物品 → 先核对实例；空间不足 → 先腾位置） | **已修** |
+| `player_assistant(intent="find")` 任何 `name_prefix` 都返回 `ok=true` + 空列表 | Bungie 的 `POST /User/SearchUsers/` 现在返回 **405**，代码把失败吞掉后返回空 —— 「没找到」和「搜索源不可用」分不出来 | 待修：换接口或明说不可用 |
+| `activity_assistant(intent="leaderboards")` 恒返回 `ok=false` + `a_p_i_error: 响应格式异常` | **上游失败**：Bungie 对账号榜单返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`；工具只是说得太笼统 | 待修：消息带上游 ErrorCode |
+| 术士求解慢 | 排队已不计入预算、预算可配（`DESTINY_BUILD_TIMEOUT_SECONDS`，默认 300s）。空闲机器实测：猎人 ~10s、泰坦 ~5–19s、**术士 recommend 190s ✓ / find 187s ✓ / analyze >305s ✗**、farm_target 7.5s ✓ | recommend/find 已修；`analyze` 仍超预算 |
+| Armor 3.0 里 `gearTier != 5` 的护甲带 `roll_parse_error`（英文开发者口气） | 只对 tier 5 做反推（`build/models.py`），4 级护甲标不支持 | 待定：支持 tier 4 或改成人话 |
+| 动作类失败的消息里带着上游原文（Bungie URL、内部错误串），如 `quest_tracking_failed` | 信封是对的，但 message 泄露开发者信息 | 待修：转成人话 |
+| 写入**成功**后没有 `next_actions` | 失败时已有提示，成功时没有「回读核对实际状态」 | 待定 |
+| `slot_number=21`、非法 intent、拼错的参数名 → 原始 pydantic 报错，没有 `ok=false` | schema 层校验发生在工具函数之前，属于**协议级**参数错误（不是业务失败） | 取舍中：保持协议级拒绝，或补一层信封 |
+
+以下已修项都有回归断言（第十二、十三章），**不必再当新缺陷上报**：`vendor`/`type` 的整包倾倒与 `limit` 缺失、`limit=12` 被当成没传、装饰性条目混进商品、`rank.level_cap=-1`、`ignored_parameter` 缺 `next_actions`、愿望单标记全 false、`collectible_node` 无效 hash 裸抛 404、写入失败无下一步指引、无类型条目的 `item_type` 显示字符串 `"None"`。
 
 ## 机器可读子集
 
