@@ -12,38 +12,12 @@ from ..exceptions import ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..manifest_names import names_for
-from . import weapon_profile
-from ..models import PerkInfo, WeaponPerkPool, WeaponPerkSlot
+from . import weapon_payload, weapon_profile
+from ..models import PerkInfo
 from .wishlist_service import WishListService
 from .weapon_popularity_service import WeaponPopularityService
 
 logger = get_logger(__name__)
-
-# Socket category hashes
-_CAT_WEAPON_PERKS = 4241085061   # WEAPON PERKS (barrels, magazines, perks)
-
-# Plug categories to include in perk pool output
-_PERK_CATEGORIES = {
-    "barrels", "barrel", "sights", "scopes", "magazines", "magazine",
-    "batteries", "grips", "stocks", "perks", "frames",
-}
-
-
-def _categorize_slot(plug_category: str) -> str:
-    """Map a plugCategoryIdentifier to a human-readable slot name."""
-    cat = plug_category.lower().split(".")[-1] if plug_category else ""
-    if cat in ("barrels", "barrel"):
-        return "barrel"
-    if cat in ("sights", "scopes"):
-        return "sight"
-    if cat in ("magazines", "magazine", "batteries"):
-        return "magazine"
-    if cat in ("grips", "stocks"):
-        return "grip"
-    if cat in ("frames",):
-        return "intrinsic"
-    return "perk"
-
 
 class PerkService:
     """Manifest-only weapon perk pool queries."""
@@ -72,122 +46,47 @@ class PerkService:
         perk.god_roll_pve = god_roll["pve"]
         perk.god_roll_pvp = god_roll["pvp"]
 
-    async def get_weapon_perks(self, weapon_name: str) -> WeaponPerkPool:
-        """Get the full perk pool for a weapon by name.
+    def god_roll_lookup(self, item_hash: int):
+        """给 `weapon_payload` 用的愿单查询：定义 → (pve, pvp)。没有愿单就返回 None。"""
+        if not self._wishlist:
+            return None
 
-        Looks up the weapon definition in the manifest and extracts all
-        possible perks from randomizedPlugSetHash / reusablePlugSetHash.
+        def lookup(plug_hash: int) -> tuple[bool, bool]:
+            verdict = self._wishlist.is_god_roll_perk(item_hash, plug_hash)
+            return bool(verdict.get("pve")), bool(verdict.get("pvp"))
 
-        Args:
-            weapon_name: Partial or full weapon name (Chinese or English).
+        return lookup
 
-        Returns:
-            WeaponPerkPool with perks grouped by slot.
+    async def get_weapon_perks(self, weapon_name: str) -> dict:
+        """武器 perk 池：`{weapon, sockets}`（与 info/analyze 同一形状）。
+
+        插槽不再只挑 WEAPON PERKS 两类，也不再把 `slot_name` 写成英文：
+        所有插槽都在 `sockets` 里（含大师杰作/模组/纪念物），`kind` 是稳定枚举。
 
         Raises:
             ManifestError: If no weapon matches the name.
         """
         logger.info("Looking up perk pool for: %s", weapon_name)
-
-        # Step 1: Search manifest for weapon
-        results = self._manifest.search(weapon_name, limit=10)
-        weapon = None
-        for r in results:
-            if r["itemType"] == 3:  # Weapon
-                weapon = r
-                break
-        if not weapon:
-            # 名字在 Manifest 里找不到武器 —— 这是 manifest_error，不是
-            # item_not_found_error（后者表示"账号里的东西没了"，用在这里会误导）。
-            raise ManifestError(f"找不到武器: {weapon_name}")
-
-        item_hash = weapon["itemHash"]
-        weapon_display_name = weapon["name"]
-
-        # Step 2: Get full weapon definition
-        definition = self._manifest.get_item_definition(item_hash)
-        if not definition:
-            raise ManifestError(f"找不到武器定义: {weapon_name}")
-
-        weapon_type = definition.get("itemTypeDisplayName", "")
-
-        # Step 3: Extract socket entries
-        socket_entries = (
-            definition.get("sockets", {}).get("socketEntries", [])
+        item_hash, definition = weapon_profile.find_weapon(self._manifest, weapon_name)
+        names = names_for(self._manifest)
+        sockets = weapon_payload.socket_list(
+            self._manifest,
+            definition,
+            names=names,
+            god_roll_lookup=self.god_roll_lookup(item_hash),
         )
-        socket_categories = (
-            definition.get("sockets", {}).get("socketCategories", [])
-        )
-
-        # Find which socket indexes belong to WEAPON PERKS category
-        perk_socket_indexes: set[int] = set()
-        for cat in socket_categories:
-            if cat.get("socketCategoryHash") == _CAT_WEAPON_PERKS:
-                perk_socket_indexes.update(cat.get("socketIndexes", []))
-
-        # Step 4: Extract perk pool from each relevant socket
-        slots: list[WeaponPerkSlot] = []
-        for idx in sorted(perk_socket_indexes):
-            if idx >= len(socket_entries):
-                continue
-            socket = socket_entries[idx]
-
-            plug_set_hash = socket.get("randomizedPlugSetHash") or socket.get("reusablePlugSetHash")
-            if not plug_set_hash:
-                continue
-
-            plug_items = self._manifest.get_plug_set_plugs(plug_set_hash)
-            if not plug_items:
-                continue
-
-            # Sub-group plugs by their plugCategoryIdentifier
-            grouped: dict[str, list[PerkInfo]] = {}
-            seen_hashes: set[int] = set()
-            for plug in plug_items:
-                ph = plug["plugItemHash"]
-                if ph in seen_hashes:
-                    continue
-                seen_hashes.add(ph)
-
-                cat_id = plug.get("plugCategoryIdentifier", "")
-                slot_label = _categorize_slot(cat_id)
-
-                desc = ""
-                sandbox_info = self._manifest.get_sandbox_perk_description(ph)
-                if sandbox_info:
-                    desc = sandbox_info.get("description", "")
-                if not desc:
-                    item_description = self._manifest.get_item_description(ph)
-                    if isinstance(item_description, str):
-                        desc = item_description
-
-                perk = PerkInfo(
-                    plug_hash=ph,
-                    name=plug["name"],
-                    description=desc,
-                    plug_category=cat_id,
-                    icon_url=_item_icon_url(self._manifest, ph),
-                )
-                self.annotate_god_roll(item_hash, ph, perk)
-                grouped.setdefault(slot_label, []).append(perk)
-
-            for slot_label, perks in grouped.items():
-                slots.append(WeaponPerkSlot(slot_name=slot_label, plugs=perks))
-
         logger.info(
-            "Perk pool for '%s': %d slot(s), %d total perks",
-            weapon_display_name,
-            len(slots),
-            sum(len(s.plugs) for s in slots),
+            "Perk pool for '%s': %d socket(s), %d option(s)",
+            definition.get("displayProperties", {}).get("name", weapon_name),
+            len(sockets),
+            sum(socket.get("option_count", 0) for socket in sockets),
         )
-
-        return WeaponPerkPool(
-            weapon_name=weapon_display_name,
-            weapon_type=weapon_type,
-            item_hash=item_hash,
-            icon_url=str(weapon.get("icon") or ""),
-            slots=slots,
-        )
+        return {
+            "weapon": weapon_payload.weapon_block(
+                self._manifest, definition, sockets=sockets, names=names
+            ),
+            "sockets": sockets,
+        }
 
     async def get_god_roll(self, weapon_name: str) -> dict:
         """社区推荐 roll，返回**结构化**结果（以前是一段文字）。
@@ -222,7 +121,7 @@ class PerkService:
         names = names_for(self._manifest)
 
         base: dict[str, Any] = {
-            "weapon": display_name,
+            "weapon_name": display_name,
             "kind": "none",
             "source": "dim_wishlist",
             "pve": [],

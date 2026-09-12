@@ -10,14 +10,9 @@ from ..exceptions import AuthenticationError, ConfigError
 from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager, class_type_name
-from ..models import (
-    WeaponDetail,
-    WeaponDetailResponse,
-    WeaponSocketInfo,
-    WeaponStats,
-)
+from ..models import WeaponDetail, WeaponDetailResponse
+from . import weapon_payload, weapon_profile
 from ..manifest_names import names_for
-from . import weapon_profile
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
 from .profile_cache import ProfileCache
@@ -38,119 +33,15 @@ class WeaponDetailService:
         manifest: ManifestManager,
         resolver: PlayerResolver,
         profile_cache: ProfileCache | None = None,
+        lookup_factory=None,
     ) -> None:
         self._manifest = manifest
         self._resolver = resolver
         # 武器详情要组件 310（这一个副本能换什么），真机实测整个 profile 从 3.3 MB 涨到 10.2 MB。
         # 不接缓存就等于每次 type 查询都重新拉一遍；接上共享缓存后由 TTL 与后台刷新兜住。
         self._profile_cache = profile_cache
-
-    @staticmethod
-    def _cat_to_label(cat: str, trait_counter: dict) -> str:
-        """Map a plugCategoryIdentifier to a display label."""
-        c = cat.lower()
-        if "intrinsic" in c:
-            return "框架"
-        if "barrel" in c:
-            return "枪管"
-        if "scope" in c:
-            return "瞄具"
-        if "magazine" in c or "battery" in c or "batteries" in c:
-            return "弹匣"
-        if "stock" in c:
-            return "枪托"
-        if "frame" in c:
-            trait_counter["count"] += 1
-            return f"特性{trait_counter['count']}"
-        if "shader" in c:
-            return "着色器"
-        if "mod" in c:
-            return "模组"
-        if "masterwork" in c and "tracker" in c:
-            return "追踪器"
-        if "masterwork" in c:
-            return "大师杰作"
-        if "kill_vfx" in c:
-            return "战斗特效"
-        if "skin" in c or "tiering" in c:
-            return "纪念物"
-        if "catalyst" in c:
-            return "催化"
-        return ""
-
-    def _categorize_socket(
-        self, socket_index: int, plug_hash: int,
-        weapon_def: dict,
-        trait_counter: dict,
-    ) -> WeaponSocketInfo | None:
-        """Categorize a socket by its plug's plugCategoryIdentifier."""
-        if not plug_hash:
-            return None
-
-        socket_entries = (weapon_def or {}).get("sockets", {}).get("socketEntries", [])
-        label = ""
-        if socket_index < len(socket_entries):
-            entry = socket_entries[socket_index]
-            plug_set_hash = entry.get("randomizedPlugSetHash") or entry.get("reusablePlugSetHash")
-            if plug_set_hash:
-                plug_set_plugs = self._manifest.get_plug_set_plugs(plug_set_hash)
-                if plug_set_plugs:
-                    first_cat = plug_set_plugs[0].get("plugCategoryIdentifier", "")
-                    label = self._cat_to_label(first_cat, trait_counter)
-            elif entry.get("singleInitialItemHash"):
-                init_cat = self._manifest.get_plug_category_identifier(entry["singleInitialItemHash"]) or ""
-                label = self._cat_to_label(init_cat, trait_counter)
-
-        info = self._manifest.get_item_info(plug_hash)
-        if not info or not info.get("name"):
-            plug_def = self._manifest.get_item_definition(plug_hash)
-            # Bungie uses named categories with intentionally unnamed placeholder plugs.
-            if isinstance(plug_def, dict) and not (plug_def.get("displayProperties") or {}).get("name"):
-                return None
-        name = info.get("name", f"#{plug_hash}") if info else f"#{plug_hash}"
-        cat_id = self._manifest.get_plug_category_identifier(plug_hash) or ""
-        # Unknown categories still carry real instance plugs and must be searchable.
-        if not label:
-            label = self._cat_to_label(cat_id, trait_counter) or f"插槽{socket_index + 1}"
-
-        desc = ""
-        sandbox = self._manifest.get_sandbox_perk_description(plug_hash)
-        if sandbox:
-            desc = sandbox.get("description", "")
-        if not desc:
-            item_description = self._manifest.get_item_description(plug_hash)
-            if isinstance(item_description, str):
-                desc = item_description
-
-        return WeaponSocketInfo(
-            slot_label=label,
-            plug_name=name,
-            plug_hash=plug_hash,
-            plug_category=cat_id,
-            description=desc,
-            icon_url=str(info.get("icon") or "") if info else "",
-        )
-
-    def _build_weapon_stats(self, instance_stats: dict) -> WeaponStats:
-        """Build WeaponStats from API stats data."""
-        kwargs = {}
-        stat_field_map = {
-            "4284893193": "rpm",
-            "4043523819": "damage",
-            "1240592695": "range",
-            "155624089": "stability",
-            "943549884": "handling",
-            "4188031367": "reload_speed",
-            "1345609583": "aim_assist",
-            "3555269338": "zoom",
-            "2714457168": "airborne_effectiveness",
-            "2715839340": "recoil_direction",
-            "3871231066": "magazine",
-        }
-        for stat_hash_str, field_name in stat_field_map.items():
-            stat_entry = instance_stats.get(stat_hash_str, {})
-            kwargs[field_name] = stat_entry.get("value", 0)
-        return WeaponStats(**kwargs)
+        # 愿单标注（god_roll_pve/pvp）：由 perk 服务提供，这里不直接依赖它
+        self._lookup_factory = lookup_factory
 
     async def get_weapon_details_by_type(
         self, player_name: str, type_name: str, limit: int | None = None
@@ -261,71 +152,62 @@ class WeaponDetailService:
                 add_weapon(raw, loc_name, True)
 
         # Step 5: Build detailed weapon info
+        names = names_for(self._manifest)
+        # 同一个定义会被多个副本复用：能滚几栏的计数按 item_hash 缓存一次
+        summary_cache: dict[int, dict] = {}
         details: list[WeaponDetail] = []
         for wi in weapon_instances:
             inst_id = wi["instance_id"]
             item_hash = wi["item_hash"]
 
             inst_info = instances_data.get(inst_id, {})
-            power = inst_info.get("primaryStat", {}).get("value")
-            damage_type_hash = inst_info.get("damageTypeHash", 0)
-            damage_type = names_for(self._manifest).damage_type(damage_type_hash)
-
-            w_info = hash_to_info.get(item_hash, {})
-            weapon_name = w_info.get("name", self._manifest.get_item_name(item_hash))
-            # manifest already stores icon as full Bungie CDN URL
-            icon_url = w_info.get("icon", "")
-            weapon_type = w_info.get("itemTypeNameDisplay", type_name)
-            tier_num = w_info.get("tier", 0)
-            tier = weapon_profile.rarity_of(tier_num)
-
             weapon_def = self._manifest.get_item_definition(item_hash)
-            ammo_type_val = 0
-            if weapon_def:
-                ammo_type_val = weapon_def.get("equippingBlock", {}).get("ammoType", 0)
-            ammo_type = names_for(self._manifest).ammo_type(ammo_type_val)
 
-            socket_list = sockets_data.get(inst_id, {}).get("sockets", [])
-            sockets: list[WeaponSocketInfo] = []
-            perks_complete = bool(socket_list)
-            trait_counter = {"count": 0}
-            for idx, socket in enumerate(socket_list):
-                plug_hash = socket.get("plugHash", 0)
-                if plug_hash:
-                    info = self._manifest.get_item_info(plug_hash)
-                    if not info and not isinstance(self._manifest.get_item_definition(plug_hash), dict):
-                        perks_complete = False
-                si = self._categorize_socket(
-                    idx, plug_hash, weapon_def, trait_counter
+            raw_sockets = sockets_data.get(inst_id, {}).get("sockets", [])
+            plug_hashes = [int(socket.get("plugHash") or 0) for socket in raw_sockets]
+            perks_complete = bool(raw_sockets)
+            for plug_hash in plug_hashes:
+                if plug_hash and not self._manifest.get_item_info(plug_hash) and not isinstance(
+                    self._manifest.get_item_definition(plug_hash), dict
+                ):
+                    perks_complete = False
+
+            if item_hash not in summary_cache:
+                summary_cache[item_hash] = weapon_profile.roll_summary_from_columns(
+                    weapon_profile.socket_columns(self._manifest, weapon_def)
                 )
-                if si:
-                    sockets.append(si)
-
-            inst_stats_raw = stats_data.get(inst_id, {})
-            inst_stats = inst_stats_raw.get("stats", {})
-            weapon_stats = self._build_weapon_stats(inst_stats)
-
-            if weapon_stats.magazine == 0 and weapon_def:
-                manifest_stats = weapon_def.get("stats", {}).get("stats", {})
-                mag_entry = manifest_stats.get("3871231066") or manifest_stats.get(str(3871231066))
-                if mag_entry:
-                    weapon_stats.magazine = mag_entry.get("value", 0)
-
-            # 副本级：T 级/等级/品质（组件 300）、上锁/追踪（item.state）、能换成什么（组件 310）
-            instance = weapon_profile.instance_fields(inst_info)
-            state_flags = weapon_profile.item_state_flags(wi.get("state"))
-            options = weapon_profile.instance_options(
+            # 列表类只放"这一件能换什么"（组件 310）+ 现在装的；完整池是单把武器的问题
+            # （`info`/`perk_pool`）。实测把整张池子塞进列表：5 把武器 597 KB。
+            sockets = weapon_payload.column_list(
+                self._manifest, weapon_def, equipped=plug_hashes
+            )
+            options = weapon_payload.socket_list(
                 self._manifest,
                 weapon_def,
-                reusable_data.get(inst_id),
-                equipped=[int(s.get("plugHash") or 0) for s in socket_list],
+                scope="instance",
+                reusable=reusable_data.get(inst_id),
+                equipped=plug_hashes,
+                names=names,
             )
 
+            inst_stats = (stats_data.get(inst_id, {}) or {}).get("stats", {})
+            stats = weapon_payload.stat_list(self._manifest, weapon_def, inst_stats)
+            weapon = weapon_payload.weapon_block(
+                self._manifest,
+                weapon_def,
+                roll_summary=summary_cache[item_hash],
+                instance=inst_info,
+                names=names,
+            )
+
+            instance_meta = weapon_profile.instance_fields(inst_info)
+            state_flags = weapon_profile.item_state_flags(wi.get("state"))
+
             notes: list[str] = []
-            if instance["missing"]:
+            if instance_meta["missing"]:
                 notes.append(
                     "该副本缺少实例信息（组件 300 未返回）："
-                    + "、".join(instance["missing"])
+                    + "、".join(instance_meta["missing"])
                     + " 为 null"
                 )
             if state_flags["locked"] is None:
@@ -333,34 +215,34 @@ class WeaponDetailService:
             if not options:
                 notes.append(
                     "该副本没有可更换部件数据（组件 310 未返回）：options 为空，"
-                    "只能看当前已装的 sockets"
+                    "只能看 sockets 里已装的内容"
                 )
 
+            weapon["instance"] = {
+                "instance_id": inst_id,
+                "location": wi["location"],
+                "power": inst_info.get("primaryStat", {}).get("value"),
+                "is_equipped": wi["is_equipped"],
+                "locked": state_flags["locked"],
+                "tracked": state_flags["tracked"],
+            }
+
             details.append(WeaponDetail(
-                instance_id=inst_id,
-                item_hash=item_hash,
-                name=weapon_name,
-                weapon_type=weapon_type,
-                tier=tier,
-                damage_type=damage_type,
-                ammo_type=ammo_type,
-                power=power,
-                location=wi["location"],
-                is_equipped=wi["is_equipped"],
+                weapon=weapon,
                 sockets=sockets,
-                perks_complete=perks_complete and bool(sockets),
-                stats=weapon_stats,
-                icon_url=icon_url,
-                gear_tier=instance["gear_tier"],
-                item_level=instance["item_level"],
-                quality=instance["quality"],
-                locked=state_flags["locked"],
-                tracked=state_flags["tracked"],
                 options=options,
+                stats=stats,
+                perks_complete=perks_complete and bool(raw_sockets),
                 notes=notes,
             ))
 
-        details.sort(key=lambda d: (not d.is_equipped, -(d.power or 0), d.name))
+        details.sort(
+            key=lambda d: (
+                not d.weapon.get("instance", {}).get("is_equipped", False),
+                -int(d.weapon.get("instance", {}).get("power") or 0),
+                str(d.weapon.get("name") or ""),
+            )
+        )
 
         total = len(details)
         returned = details if not limit or limit <= 0 else details[:limit]

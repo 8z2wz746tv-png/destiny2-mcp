@@ -31,8 +31,9 @@ CEILINGS = {
     # loadout 列表补 total/returned 以便自证全量。
     # +16：库存类型查询补 total/returned（自证全量）；community 指定 build id 时
     # 用新 payload 收掉搜索分页结构（不改服务返回的字典，避免改到调用方对象）。
-    # +7：god_roll 结构化后，分支按 kind 给三种人话摘要 + 把 note 放进 warnings。
-    "destiny_mcp/tools/assistants.py": 1431,
+    # P4：武器分支搬去 tools/_weapon_branches.py，只剩认参数与分发 —— 上限跟着收紧
+    # （收紧后旧上限就不再是"可以慢慢长回去"的许可）。
+    "destiny_mcp/tools/assistants.py": 1352,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,
@@ -40,6 +41,10 @@ CEILINGS = {
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     "destiny_mcp/services/loadout_equipment_service.py": 795,
     "destiny_mcp/services/starside_service.py": 769,
+    # P4 新增：武器分支载荷与形状工厂。定在上限处是为了让"再加一个 intent"
+    # 必须先回答"是搬出去还是抬上限"，而不是悄悄长胖。
+    "destiny_mcp/tools/_weapon_branches.py": 347,
+    "destiny_mcp/services/weapon_payload.py": 349,
 }
 
 

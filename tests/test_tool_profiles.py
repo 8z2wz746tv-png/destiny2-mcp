@@ -97,28 +97,30 @@ def test_expert_profile_adds_common_read_tools_when_explicitly_enabled() -> None
 def test_weapon_roll_filter_matches_explicit_perk_terms() -> None:
     service = WeaponRollFilterService()
 
+    def _detail(instance_id: str, perks: list[str]) -> dict:
+        # P4 形状：身份块在 weapon 里，当前装的 plug 挂在 sockets[].equipped
+        return {
+            "weapon": {
+                "name": "午夜政变",
+                "instance": {
+                    "instance_id": instance_id,
+                    "location": "vault",
+                    "power": 540,
+                    "is_equipped": False,
+                    "locked": False,
+                },
+            },
+            "sockets": [
+                {"equipped": {"plug_hash": index + 1, "name": name}}
+                for index, name in enumerate(perks)
+            ],
+            "perks_complete": True,
+        }
+
     result = service.filter_rolls(
         [
-            {
-                "name": "午夜政变",
-                "instance_id": "1",
-                "location": "vault",
-                "power": 540,
-                "sockets": [
-                    {"plug_name": "快速命中"},
-                    {"plug_name": "动能震颤"},
-                ],
-            },
-            {
-                "name": "午夜政变",
-                "instance_id": "2",
-                "location": "vault",
-                "power": 540,
-                "sockets": [
-                    {"plug_name": "移动目标"},
-                    {"plug_name": "强力首发"},
-                ],
-            },
+            _detail("1", ["快速命中", "动能震颤"]),
+            _detail("2", ["移动目标", "强力首发"]),
         ],
         weapon_name="午夜",
         location="vault",

@@ -20,7 +20,6 @@ from .vendor import (
 )
 from .weapon import (
     WeaponComparison,
-    WeaponComparisonInstance,
     WeaponDetail,
     WeaponDetailResponse,
     WeaponPerkPool,
@@ -57,7 +56,6 @@ __all__ = [
     # weapon
     "WeaponPerkSlot",
     "WeaponPerkPool",
-    "WeaponComparisonInstance",
     "WeaponComparison",
     "WeaponStats",
     "WeaponSocketInfo",

@@ -8,7 +8,6 @@ os.environ.setdefault("BUNGIE_CLIENT_SECRET", "dummy")
 
 from destiny_mcp.services.perk_service import PerkService
 from destiny_mcp.services.manifest_query_service import ManifestQueryService
-from destiny_mcp.services.weapon_detail_service import WeaponDetailService
 
 
 class _PopularityStub:
@@ -29,7 +28,13 @@ class _ManifestStub:
 
     def get_item_definition(self, item_hash: int) -> dict:
         return {
+            "hash": 100,
+            "itemType": 3,
             "itemTypeDisplayName": "手炮",
+            "displayProperties": {
+                "name": "测试武器",
+                "icon": "/weapon.png",
+            },
             "sockets": {
                 "socketCategories": [
                     {"socketCategoryHash": 4241085061, "socketIndexes": [0]}
@@ -69,32 +74,28 @@ async def test_perk_pool_includes_weapon_and_perk_icons_with_description_fallbac
 
     result = await service.get_weapon_perks("测试")
 
-    assert result.icon_url == "https://www.bungie.net/weapon.png"
-    assert len(result.slots) == 1
-    perk = result.slots[0].plugs[0]
-    assert perk.icon_url == "https://www.bungie.net/perk.png"
-    assert perk.description == "Manifest 物品描述"
+    # P4 形状：`{weapon, sockets}`，perk 就是 socket 里的 option
+    assert result["weapon"]["icon_url"] == "https://www.bungie.net/weapon.png"
+    assert len(result["sockets"]) == 1
+    perk = result["sockets"][0]["options"][0]
+    assert perk["icon_url"] == "https://www.bungie.net/perk.png"
+    assert perk["description"] == "Manifest 物品描述"
 
 
-def test_current_weapon_socket_includes_icon_and_description_fallback() -> None:
+def test_socket_option_includes_icon_and_description_fallback() -> None:
+    """P4：取当前插槽的那套私有方法已删，行为由 weapon_payload 的插槽工厂承担。"""
+    from destiny_mcp.services import weapon_payload
+
     manifest = _ManifestStub()
-    service = object.__new__(WeaponDetailService)
-    service._manifest = manifest  # type: ignore[attr-defined]
+    definition = manifest.get_item_definition(100)
 
-    socket = service._categorize_socket(
-        0,
-        300,
-        {
-            "sockets": {
-                "socketEntries": [{"randomizedPlugSetHash": 200}],
-            }
-        },
-        {"count": 0},
-    )
+    sockets = weapon_payload.socket_list(manifest, definition)  # type: ignore[arg-type]
 
-    assert socket is not None
-    assert socket.icon_url == "https://www.bungie.net/perk.png"
-    assert socket.description == "Manifest 物品描述"
+    assert len(sockets) == 1
+    option = sockets[0]["options"][0]
+    assert option["icon_url"] == "https://www.bungie.net/perk.png"
+    assert option["description"] == "Manifest 物品描述"
+    assert sockets[0]["equipped"] is None  # 没传实例数据就不假装装了什么
 
 
 def test_intrinsic_perk_includes_absolute_icon_url() -> None:

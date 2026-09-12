@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, Validation
 
 from ..exceptions import WeaponPopularityDataError
 from ..manifest import ManifestManager
+from . import weapon_payload, weapon_profile
 from ..utils.hash_utils import to_unsigned
 
 _RESOURCE_PACKAGE = "destiny_mcp"
@@ -313,19 +314,29 @@ class WeaponPopularityService:
             )
         return matches[0]
 
-    @staticmethod
-    def _weapon_identity(recorded: _WeaponSnapshot, hit: dict) -> dict:
-        return {
-            "name": str(hit.get("name") or recorded.name),
-            "name_en": str(hit.get("nameEn") or ""),
-            "item_hash": to_unsigned(int(hit["itemHash"])),
-            "icon_url": str(hit.get("icon") or ""),
-            "weapon_type": recorded.weapon_type,
+    def _weapon_identity(self, recorded: _WeaponSnapshot, hit: dict) -> dict:
+        """身份块走统一工厂（稀有度/框架/射速这些以前在选取率里是缺的）。"""
+        definition = None
+        getter = getattr(self._manifest, "get_item_definition", None)
+        if callable(getter):
+            definition = getter(int(hit["itemHash"]))
+        block = weapon_payload.lean_identity(
+            self._manifest,
+            definition,
+            roll_kind=weapon_profile.roll_kind(definition),
+            fallback_name=str(hit.get("name") or recorded.name),
+        )
+        # item_hash 以命中记录为准（定义里缺 hash 时不能变成 0），沿用快照的无符号约定
+        block["item_hash"] = to_unsigned(int(hit["itemHash"]))
+        block.update({
             "version_label": recorded.version_label,
             "status": recorded.status,
             "release_label": recorded.release_label,
             "episode": recorded.episode,
-        }
+        })
+        if not block.get("weapon_type"):
+            block["weapon_type"] = recorded.weapon_type
+        return block
 
     def _socket_items(self, definition: dict) -> list[dict]:
         resolved: dict[int, dict] = {}

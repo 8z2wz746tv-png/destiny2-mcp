@@ -65,6 +65,9 @@ async def test_weapon_analysis_does_not_report_zero_when_inventory_lookup_fails(
         async def get_god_roll(self, weapon_name: str) -> str:
             return ""
 
+        def god_roll_lookup(self, item_hash: int):
+            return None
+
     class Compare:
         async def compare_weapon_instances(self, player_name: str, weapon_name: str):
             raise APIError("读取武器副本", "暂时不可用")
@@ -72,7 +75,13 @@ async def test_weapon_analysis_does_not_report_zero_when_inventory_lookup_fails(
     service = WeaponAnalysisService(
         Perks(),  # type: ignore[arg-type]
         Compare(),  # type: ignore[arg-type]
-        SimpleNamespace(get_weapon_full_info=lambda name: {"name": name}),
+        SimpleNamespace(
+            get_weapon_full_info=lambda name, **_kw: {
+                "weapon": {"name": name, "roll_summary": {}},
+                "sockets": [],
+                "stats": [],
+            }
+        ),
     )
 
     result = await service.analyze_weapon(

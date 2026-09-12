@@ -95,6 +95,38 @@
 | 我账号里有没有 `<Perk>` | `filter_rolls` 并检查 `coverage_complete` | **`coverage_complete=false` 时，0 命中不能说成「你没有」**；要报 `unknown_count`。 |
 | 我持有的这把 `<武器>` 能不能换成 `<Perk>` | `analyze`／`compare` | 「当前 Perk 不匹配」≠「这枪没这个 Perk」；可切换但未选中的插槽没被检查。 |
 
+### P4 键映射表（old → new，形状统一后）
+
+十处形状收敛成一套：**`weapon`（身份块）+ `sockets`（插槽）+ `stats`（属性）**，
+所有武器 intent 共用；`data.weapon_schema_version` 写在响应顶层（当前 `1`）。
+
+| 旧键（P0 基线） | 新键 | 说明 |
+| --- | --- | --- |
+| `weapon.nameEn` / `weaponType` / `tier` / `ammoType` / `damageType` | `weapon.name_en` / `weapon_type` / `rarity` + `rarity_tier` / `ammo_type` / `damage_type` | snake_case；稀有度补 `rarity_tier`（5 传说 / 6 异域） |
+| `weapon.stats.{属性名: 值}` | `stats[] = {stat_hash, name, value, display, is_primary, display_as_numeric}` | 顺序与"是否按数字展示"来自 `DestinyStatGroupDefinition`；`is_primary` = `primaryBaseStatHash` |
+| `weapon.intrinsicPerks[]` | `weapon.intrinsic` + `sockets[kind="intrinsic"]` | 固有特性只留一处 |
+| （无） | `weapon.frame` / `rpm` / `roll_kind` / `has_enhanced` / `is_craftable` / `trait_ids` / `watermark` | P1/P2 新增 |
+| `perk_pool.{weapon_name, weapon_type, item_hash, icon_url}` | `weapon.*` | perk 池并入统一身份块 |
+| `perk_pool.slots[].slot_name`（英文） | `sockets[].slot` + `sockets[].kind` | 中文标签 + 稳定枚举；同名栏位编号（特性1/特性2） |
+| `perk_pool.slots[].plugs[] = {plug_hash, name, plug_category, description, icon_url, god_roll_*}` | `sockets[].options[] = {plug_hash, name, plug_category, description, icon_url, can_roll, enhanced, enhanced_plug_hash, stat_effects, god_roll_pve, god_roll_pvp}` | 选项自带"能不能滚到"（退役 perk `can_roll=false`）与强化配对 |
+| `inventory.weapon_name` | `comparison.weapon`（身份块，含 `owned`） | analyze 的 `inventory` 与 compare 同形状 |
+| `inventory|comparison.instances[].{instance_id, location, power, perks[], god_roll_score, icon_url}` | `instances[].{weapon.instance.{instance_id, location, power, locked, gear_tier, item_level}, sockets, options, stats}` | 副本字段进 `weapon.instance`；已装 plug 在 `sockets[].equipped`；可换项在 `options[]` |
+| `matched[].{nameEn, tier, damage_type, ammo_type}` | `matched[].{name_en, rarity, rarity_tier}` | 列表行 = 精简身份块（字段写死，见 `weapon_payload.LEAN_IDENTITY_KEYS`）；伤害/弹药类型要看 `info`/`analyze` |
+| `weapon_assistant(intent="stats").{name, nameEn, weaponType, stats{}, icon_url}` | `{weapon, stats[]}` | 与其他 intent 同一身份块 |
+| `weapon_assistant(intent="type").{weapon_type_query, total_weapons, returned_weapons, weapons[]}` | `.weapons = {query, total, returned, truncated, items[]}` | 列表类统一 `total/returned/truncated` |
+| `type.weapons[].{instance_id, name, tier, power, location, is_equipped, sockets[].{slot_label, plug_name, plug_hash, plug_category, description, icon_url}, stats{11 个固定字段}}` | `items[].{weapon, sockets, options, stats, perks_complete, notes}` | 身份块在 `weapon`；`sockets` 是**列计数 + equipped**（不展开池子）；`options` 是这一件能换的（310） |
+| `god_roll.weapon`（字符串） | `god_roll.weapon_name` + 顶层 `weapon` 身份块 | 判定与身份分开 |
+| `catalyst.weapon` / `weaponEn`（字符串） | `catalyst.weapon`（精简身份块）/ `catalyst.weapon.name_en` | 与其它 intent 一致 |
+| `perk.nameEn` / `flavorText` | `perk.name_en` / `flavor_text`（补 `item_hash`/`plug_category`） | |
+| `inventory_assistant(intent="type").result.{total_items, returned_items, items[]}` | `.result.{total, returned, truncated, items[], weapon_count}` | 武器行 = 精简身份块 + 位置/光等；**不读 305/310**（与 `weapon.type` 的分工见计划 §3.2） |
+
+`sockets[]` 的两个 `scope`：
+
+- `scope="definition"`：定义级。单把武器（`info`/`perk_pool`/`analyze`）展开完整池子（`options_available=true`）；
+  列表类用 `column_list()` 只给列计数（`options_available=false`，`option_count` 才是数量）。
+- `scope="instance"`：实例级（组件 310）。这是"这一件能换的"。
+- `equipped`：不管哪个 scope，都表示**这一件现在装的**（来自组件 305）；没实例数据时为 `null`。
+
 ## 四、`build_assistant`
 
 | 说什么 | 期望路由 | 验收点 |

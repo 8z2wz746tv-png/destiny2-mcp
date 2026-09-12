@@ -22,6 +22,8 @@ from ._build_confirmation import (
 )
 from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
+from . import _weapon_branches as weapon_branches
+from ._enrichment import community_enrichment, community_read
 from ._farming import farming_reference as _farming_reference
 from ._farming import harvest_names as _harvest_names
 from ._farming import sale_item_names as _sale_item_names
@@ -69,39 +71,9 @@ def _action_response(intent: str, summary: str, result: Any) -> dict:
     return ok_response(summary, {"result": payload})
 
 
-def _community_read(
-    service: Any,
-    *,
-    query: str = "",
-    category: str = "",
-    knowledge_id: str = "",
-    section: str = "text",
-    limit: int = 10,
-    offset: int = 0,
-) -> dict:
-    if knowledge_id:
-        return service.get_knowledge(
-            knowledge_id, section=section, limit=limit, offset=offset
-        )
-    return service.search_knowledge(
-        query, category=category, limit=limit, offset=offset
-    )
-
-
-def _community_enrichment(service: Any, query: str, category: str) -> dict:
-    """Community data must never make an official-data query fail."""
-    if service is None or not query.strip():
-        return {"archive_available": False, "matched_count": 0, "results": []}
-    try:
-        return service.search_knowledge(query, category=category, limit=3)
-    except DestinyMCPError as exc:
-        return {
-            "archive_available": False,
-            "matched_count": 0,
-            "results": [],
-            "error": str(exc),
-            "coverage_scope": "community_enrichment_unavailable",
-        }
+# 社区富集与读取实现在 _enrichment（武器分支已搬到 _weapon_branches，避免反向依赖）
+_community_read = community_read
+_community_enrichment = community_enrichment
 
 
 def _perk_filter_terms(required_perks: list[str] | str | None, perk_name: str) -> list[str] | str | None:
@@ -285,14 +257,10 @@ async def inventory_assistant(
             type_name or item_type,
             location,
         )
-        payload = _dump(result)
-        items = payload.get("items") or []
-        # 这个查询没有 limit（按类型列全量），所以两者相等；给出来是为了让
-        # "我是不是只看到了一部分"可以自证，而不是靠调用方数数。
-        payload["total_items"] = len(items)
-        payload["returned_items"] = len(items)
-        payload["truncated"] = False
-        return ok_response("已按类型搜索物品。", {"result": payload})
+        # 武器走精简身份块（列表类边界：不请求 305/310，所以没有 perk 与可换部件）
+        return weapon_branches.inventory_type_payload(
+            svc, result, type_name or item_type, location
+        )
 
     if intent == "move":
         result = await svc["transfer_svc"].move_item(
@@ -428,84 +396,43 @@ async def weapon_assistant(
             )
         except DestinyMCPError as exc:
             return error_response("weapon_catalog_lookup_failed", str(exc))
-        return ok_response(
-            f"全量武器定义检查 {filtered['checked_count']} 把，命中 {filtered['matched_count']} 把。",
-            filtered,
-            warnings=["这些是 Manifest 全量候选，未读取账号持有情况。"],
+        return weapon_branches.catalog_payload(
+            svc, filtered, include_inventory=False, intent=intent
         )
 
     if intent == "analyze":
         if not weapon_name.strip():
-            return error_response("missing_weapon_name", "分析武器需要提供 weapon_name。")
+            return weapon_branches.missing_weapon_name("analyze")
         result = await svc["weapon_analysis_svc"].analyze_weapon(
             weapon_name,
             player_name=resolved if include_inventory else None,
             include_inventory=include_inventory,
         )
-        return ok_response(result["summary"], {
-            "weapon": result["weapon"],
-            "perk_pool": result["perk_pool"],
-            "god_roll": result["god_roll"],
-            "inventory": result["inventory"],
-            "inventory_status": result["inventory_status"],
-            "community_references": _community_enrichment(
-                svc.get("starside_svc"), weapon_name, "weapons"
-            ),
-            "farming_list": _farming_reference(svc.get("starside_svc"), weapon_name),
-        }, next_actions=result["next_actions"], warnings=result["warnings"])
+        return weapon_branches.analyze_payload(svc, result, weapon_name)
 
     if intent in {"compare", "compare_duplicates"}:
         result = await svc["weapon_compare_svc"].compare_weapon_instances(
             resolved, weapon_name, item_instance_id or None
         )
-        return ok_response("已对比同名武器副本。", {
-            "comparison": _dump(result),
-            "farming_list": _farming_reference(svc.get("starside_svc"), weapon_name),
-        })
+        return weapon_branches.compare_payload(svc, result, weapon_name)
 
     if intent in {"perk_pool", "perks"}:
-        result = await svc["perk_svc"].get_weapon_perks(weapon_name)
-        return ok_response("已读取 perk 池。", {
-            "perk_pool": _dump(result),
-            "community_references": _community_enrichment(
-                svc.get("starside_svc"), weapon_name, "weapons"
-            ),
-            "farming_list": _farming_reference(svc.get("starside_svc"), weapon_name),
-        })
+        return await weapon_branches.perk_pool_payload(svc, weapon_name)
 
     if intent == "god_roll":
         result = await svc["perk_svc"].get_god_roll(weapon_name)
-        if result.get("kind") == "fixed":
-            summary = f"「{result.get('weapon')}」是固定 perk 武器，没有可推荐的随机 roll。"
-        elif result.get("kind") == "recommended":
-            summary = f"已读取「{result.get('weapon')}」的社区推荐 roll。"
-        else:
-            summary = f"「{result.get('weapon')}」本地没有可用的推荐 roll 数据。"
-        warnings = [result["note"]] if result.get("note") else []
-        return ok_response(summary, {"god_roll": result}, warnings=warnings)
+        return weapon_branches.god_roll_payload(svc, result, weapon_name)
 
     if intent in {"popularity", "selection_rates", "perk_selection", "selection", "usage_rates"}:
         if not weapon_name.strip():
-            return error_response("missing_weapon_name", "查询选取率需要提供 weapon_name。")
+            return weapon_branches.missing_weapon_name("查询选取率")
         # 先确认这把武器在 Manifest 里存在，否则「打错名字」会被答成「暂无录入快照」。
         svc["manifest_query_svc"].get_weapon_stats(weapon_name)
         try:
             result = svc["perk_svc"].get_weapon_popularity(weapon_name)
         except DestinyMCPError as exc:
             return error_response("popularity_lookup_failed", str(exc))
-        if result is None:
-            return ok_response(
-                f"「{weapon_name}」暂无录入的选取率快照。",
-                {"popularity": None},
-                warnings=["未录入不代表 0%，不应据此推断 Perk 热度。"],
-            )
-        payload = dict(result)
-        warnings = payload.pop("warnings", [])
-        return ok_response(
-            f"已读取「{result['weapon']['name']}」已录入的选取率快照。",
-            {"popularity": payload},
-            warnings=warnings,
-        )
+        return weapon_branches.popularity_payload(svc, result, weapon_name)
 
     if intent == "type":
         result = await svc["weapon_detail_svc"].get_weapon_details_by_type(
@@ -513,13 +440,7 @@ async def weapon_assistant(
             weapon_type,
             limit=limit,
         )
-        weapons = _dump(result)
-        return ok_response("已按武器类型读取详情。", {
-            "weapons": weapons,
-            "farming_list": _farming_reference(
-                svc.get("starside_svc"), _harvest_names(weapons)
-            ),
-        })
+        return weapon_branches.type_payload(svc, result, weapon_type)
 
     if intent == "filter_rolls":
         if not include_inventory:
@@ -532,21 +453,15 @@ async def weapon_assistant(
                 excluded_perks=excluded_perks,
                 limit=limit,
             )
-            return ok_response(
-                f"全量武器定义检查 {filtered['checked_count']} 把，命中 {filtered['matched_count']} 把。",
-                filtered | {
-                    "farming_list": _farming_reference(
-                        svc.get("starside_svc"), _harvest_names(filtered)
-                    )
-                },
-                warnings=["include_inventory=false：这些是 Manifest 全量候选，未读取账号持有情况。"],
+            return weapon_branches.catalog_payload(
+                svc, filtered, include_inventory=False, intent=intent
             )
-        result = await svc["weapon_detail_svc"].get_weapon_details_by_type(
+        detail = await svc["weapon_detail_svc"].get_weapon_details_by_type(
             resolved,
             weapon_type,
         )
         filtered = svc["weapon_roll_filter_svc"].filter_rolls(
-            _dump(result).get("weapons", []),
+            [weapon.model_dump(mode="json") for weapon in detail.weapons],
             weapon_name=weapon_name,
             location=location,
             required_perks=_perk_filter_terms(required_perks, perk_name),
@@ -555,49 +470,21 @@ async def weapon_assistant(
             limit=limit,
         )
         filtered["filters"]["weapon_type"] = weapon_type
-        warnings = []
-        if not filtered["coverage_complete"]:
-            warnings.append(
-                f"有 {filtered['unknown_count']} 把武器缺少完整的当前 Perk 数据；"
-                "结果不完整，不能据此断言没有符合条件的武器。"
-            )
-        return ok_response(
-            f"范围内 {filtered['scoped_count']} 把武器，已检查 {filtered['checked_count']} 把，"
-            f"当前插槽命中 {filtered['matched_count']} 把，无法判断 {filtered['unknown_count']} 把。",
-            filtered | {
-                "farming_list": _farming_reference(
-                    svc.get("starside_svc"), _harvest_names(filtered)
-                )
-            },
-            warnings=warnings,
+        return weapon_branches.catalog_payload(
+            svc, filtered, include_inventory=True, intent=intent
         )
 
     if intent == "info":
-        return ok_response("已读取武器信息。", {
-            "weapon": svc["manifest_query_svc"].get_weapon_full_info(weapon_name),
-            "community_references": _community_enrichment(
-                svc.get("starside_svc"), weapon_name, "weapons"
-            ),
-            "farming_list": _farming_reference(svc.get("starside_svc"), weapon_name),
-        })
+        return weapon_branches.info_payload(svc, weapon_name)
 
     if intent == "stats":
-        return ok_response("已读取武器属性。", {
-            "stats": svc["manifest_query_svc"].get_weapon_stats(weapon_name)
-        })
+        return weapon_branches.stats_payload(svc, weapon_name)
 
     if intent == "perk_description":
-        return ok_response("已读取 perk 描述。", {
-            "perk": svc["manifest_query_svc"].get_perk_description(perk_name),
-            "community_references": _community_enrichment(
-                svc.get("starside_svc"), perk_name, "weapons"
-            ),
-        })
+        return weapon_branches.perk_description_payload(svc, perk_name)
 
     if intent == "catalyst":
-        return ok_response("已读取催化剂信息。", {
-            "catalyst": svc["manifest_query_svc"].get_catalyst_details(weapon_name)
-        })
+        return weapon_branches.catalyst_payload(svc, weapon_name)
 
     return error_response("unsupported_intent", f"weapon_assistant 不支持 intent={intent!r}。")
 

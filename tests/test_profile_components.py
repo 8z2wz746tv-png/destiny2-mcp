@@ -83,7 +83,8 @@ def _source(module) -> str:
     ("module", "named_set", "count"),
     [
         (transfer_service, "INVENTORY", 1),
-        (weapon_compare_service, "INVENTORY_SOCKETS", 2),
+        # P4：对比也要 310（"这一件能换什么"），所以从 INVENTORY_SOCKETS 升到 WEAPON_DETAIL
+        (weapon_compare_service, "WEAPON_DETAIL", 2),
         (weapon_detail_service, "WEAPON_DETAIL", 2),
         (artifact_service, "ARTIFACT", 1),
         (loadout_service, "LOADOUT_SLOTS", 1),

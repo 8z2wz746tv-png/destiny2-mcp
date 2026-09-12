@@ -65,13 +65,14 @@ def test_instance_fields_are_null_with_a_reason_when_unread(instance) -> None:
     assert fields["missing"] == ["gear_tier", "item_level", "quality"]
 
 
-def test_weapon_detail_defaults_are_null_not_false() -> None:
-    detail = WeaponDetail(instance_id="1", item_hash=2, name="测试")
+def test_weapon_detail_defaults_are_empty_not_fabricated() -> None:
+    """P4 形状：身份块在 `weapon` 里，副本字段为 null 而不是 False。"""
+    detail = WeaponDetail()
 
-    assert detail.gear_tier is None
-    assert detail.locked is None
-    assert detail.tracked is None
+    assert detail.weapon == {}
+    assert detail.sockets == []
     assert detail.options == []
+    assert detail.stats == []
     assert detail.notes == []
 
 
@@ -140,7 +141,8 @@ def test_instance_options_keep_only_insertable_plugs(stub) -> None:
     socket = options[0]
     assert socket["scope"] == "instance"
     assert socket["kind"] == "trait"
-    assert socket["slot"] == "特性"
+    # 同名栏位统一编号：这把替身有两个特性栏，所以是「特性1」
+    assert socket["slot"] == "特性1"
     assert socket["option_count"] == 2
     assert [option["name"] for option in socket["options"]] == ["狂暴", "高强度弹药"]
 
@@ -278,43 +280,47 @@ def account():
 
 async def test_detail_carries_instance_fields_and_options(account):
     result = await account.service.get_weapon_details_by_type("test", "")
-    weapon = result.weapons[0]
+    detail = result.weapons[0]
+    weapon = detail.weapon
 
-    assert (weapon.gear_tier, weapon.item_level, weapon.quality) == (4, 12, 3)
-    assert weapon.locked is True
-    assert weapon.tracked is False
-    assert [option["slot"] for option in weapon.options] == ["特性"]
-    assert weapon.options[0]["scope"] == "instance"
-    assert weapon.options[0]["equipped_plug_hash"] == 300
-    assert weapon.options[0]["equipped_name"] == "狂暴"
-    assert weapon.notes == []
+    assert (weapon["gear_tier"], weapon["item_level"], weapon["quality"]) == (4, 12, 3)
+    assert weapon["instance"]["locked"] is True
+    assert weapon["instance"]["tracked"] is False
+    assert weapon["instance"]["location"] == "仓库"
+    assert [option["slot"] for option in detail.options] == ["特性"]
+    assert detail.options[0]["scope"] == "instance"
+    assert detail.options[0]["equipped"] == {"plug_hash": 300, "name": "狂暴"}
+    assert [socket["slot"] for socket in detail.sockets] == ["特性"]
+    assert detail.sockets[0]["equipped"] == {"plug_hash": 300, "name": "狂暴"}
+    assert [stat["name"] for stat in detail.stats] == []
+    assert detail.notes == []
 
 
 async def test_missing_component_310_is_explained_not_silent(account):
     del account.profile["itemComponents"]["reusablePlugs"]
 
-    weapon = (await account.service.get_weapon_details_by_type("test", "")).weapons[0]
+    detail = (await account.service.get_weapon_details_by_type("test", "")).weapons[0]
 
-    assert weapon.options == []
-    assert any("310" in note for note in weapon.notes)
+    assert detail.options == []
+    assert any("310" in note for note in detail.notes)
 
 
 async def test_missing_component_300_is_null_with_a_reason(account):
     account.profile["itemComponents"]["instances"]["data"] = {}
 
-    weapon = (await account.service.get_weapon_details_by_type("test", "")).weapons[0]
+    detail = (await account.service.get_weapon_details_by_type("test", "")).weapons[0]
 
-    assert weapon.gear_tier is None
-    assert weapon.item_level is None
-    assert weapon.quality is None
-    assert any("300" in note for note in weapon.notes)
+    assert detail.weapon["gear_tier"] is None
+    assert detail.weapon["item_level"] is None
+    assert detail.weapon["quality"] is None
+    assert any("300" in note for note in detail.notes)
 
 
 async def test_missing_state_field_is_null_with_a_reason(account):
     del account.profile["profileInventory"]["data"]["items"][0]["state"]
 
-    weapon = (await account.service.get_weapon_details_by_type("test", "")).weapons[0]
+    detail = (await account.service.get_weapon_details_by_type("test", "")).weapons[0]
 
-    assert weapon.locked is None
-    assert weapon.tracked is None
-    assert any("state" in note for note in weapon.notes)
+    assert detail.weapon["instance"]["locked"] is None
+    assert detail.weapon["instance"]["tracked"] is None
+    assert any("state" in note for note in detail.notes)

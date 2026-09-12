@@ -202,8 +202,11 @@ async def test_inventory_type_reports_total_and_returned() -> None:
 
     payload = result["data"]["result"]
     assert result["ok"] is True
-    assert payload["total_items"] == payload["returned_items"] == len(payload["items"]) == 7
+    assert payload["total"] == payload["returned"] == len(payload["items"]) == 7
     assert payload["truncated"] is False
+    # P4 边界：按类型列持有物品时不读 305/310，所以没有 perk 与可换部件
+    assert all("sockets" not in item and "options" not in item for item in payload["items"])
+    assert result["data"]["weapon_schema_version"] >= 1
 
 
 class _StarsideStub:

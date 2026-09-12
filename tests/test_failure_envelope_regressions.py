@@ -144,6 +144,22 @@ class _CompareManifest:
     def search(self, query: str, *, limit: int = 20) -> list[dict]:
         return [{"itemHash": 100, "name": "测试武器", "itemType": 3, "icon": "/w.png"}]
 
+    def get_item_definition(self, item_hash: int) -> dict:
+        return {
+            "hash": 100,
+            "itemType": 3,
+            "itemTypeDisplayName": "手炮",
+            "displayProperties": {"name": "测试武器", "icon": "/w.png"},
+            "inventory": {"tierType": 5},
+            "sockets": {"socketEntries": [{"randomizedPlugSetHash": 700}]},
+        }
+
+    def get_plug_set_plugs(self, plug_set_hash: int) -> list[dict]:
+        return [
+            {"plugItemHash": 6001, "name": "Perk A", "plugCategoryIdentifier": "frames"},
+            {"plugItemHash": 6002, "name": "Perk B", "plugCategoryIdentifier": "frames"},
+        ]
+
 
 class _CompareResolver:
     async def resolve_player(self, player_name: str) -> dict:
@@ -182,6 +198,9 @@ class _CompareResolver:
 class _NoAnnotations:
     def annotate_god_roll(self, item_hash: int, plug_hash: int, perk: object) -> None:
         pass
+
+    def god_roll_lookup(self, item_hash: int):
+        return None
 
 
 async def test_compare_difference_names_the_instance_not_the_location() -> None:
@@ -262,6 +281,9 @@ def test_weapon_stats_resolves_the_weapon_not_the_same_named_item() -> None:
     service = object.__new__(ManifestQueryService)
     service._manifest = _AmbiguousManifest()  # type: ignore[attr-defined]
 
-    stats = service.get_weapon_stats("遗产")
+    result = service.get_weapon_stats("遗产")
 
-    assert stats["weaponType"] == "霰弹枪"
+    # P4 形状：`{weapon, stats}`；重点是"按名字搜到的是武器，而不是同名的其它条目"
+    assert result["weapon"]["weapon_type"] == "霰弹枪"
+    # 901 = 武器那条；900 是同名的非武器条目
+    assert result["weapon"]["item_hash"] == 901

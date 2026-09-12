@@ -15,7 +15,7 @@ from ..exceptions import ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..manifest_names import names_for
-from . import weapon_profile
+from . import weapon_payload, weapon_profile
 
 logger = get_logger(__name__)
 
@@ -181,95 +181,62 @@ class ManifestQueryService:
 
     # ── Weapon Info ──────────────────────────────────────────────────
 
-    def get_weapon_full_info(self, weapon_name: str) -> dict:
-        """Get complete weapon info: stats, intrinsics, catalysts.
+    def get_weapon_full_info(
+        self,
+        weapon_name: str,
+        *,
+        lookup_factory=None,
+        instance_stats: dict | None = None,
+    ) -> dict:
+        """完整武器模板：`{weapon, sockets, stats}`（info / analyze 共用）。
 
+        形状一律由 `weapon_payload` 造；这里只负责找定义、带愿单标注、异域补催化剂。
+        `lookup_factory(item_hash)` 返回 `plug_hash -> (pve, pvp)`，由愿单服务提供
+        （这里不直接依赖它，避免服务之间互相认识）。
         Raises ManifestError if not found or not a weapon.
         """
-        results = self._manifest.search(weapon_name, limit=5)
-        weapon_def = None
-        weapon_zh_name = ""
-
-        for item in results:
-            if item.get("itemType") == 3:
-                weapon_zh_name = item.get("name", "")
-                weapon_def = self._manifest.get_item_definition(item["itemHash"])
-                break
-
-        if not weapon_def:
-            raise ManifestError(f"找不到武器: {weapon_name}")
-
-        display = weapon_def.get("displayProperties") or {}
-        inventory = weapon_def.get("inventory") or {}
-        equipping = weapon_def.get("equippingBlock") or {}
-
-        damage_type = weapon_def.get("defaultDamageType", 0)
-        ammo_type = equipping.get("ammoType", 0)
-        tier_type = inventory.get("tierType", 0)
-
-        icon = display.get("icon") or ""
-        icon_url = f"https://www.bungie.net{icon}" if icon else ""
-        weapon_en_name = self._get_en_name(weapon_def.get("hash", 0))
-
-        info = {
-            "name": weapon_zh_name or display.get("name", ""),
-            "nameEn": weapon_en_name,
-            "weaponType": weapon_def.get("itemTypeDisplayName", ""),
-            "tier": weapon_profile.rarity_of(tier_type),
-            "damageType": names_for(self._manifest).damage_type(damage_type),
-            "ammoType": names_for(self._manifest).ammo_type(ammo_type),
-            "description": display.get("description", "") or weapon_def.get("flavorText", ""),
-            "intrinsicPerks": self._extract_intrinsic_perks(weapon_def),
-            "stats": self._extract_weapon_stats(weapon_def),
-            "icon_url": icon_url,
+        item_hash, weapon_def = self._find_weapon_definition(weapon_name)
+        names = names_for(self._manifest)
+        sockets = weapon_payload.socket_list(
+            self._manifest,
+            weapon_def,
+            names=names,
+            god_roll_lookup=lookup_factory(item_hash) if lookup_factory else None,
+        )
+        template: dict = {
+            "weapon": weapon_payload.weapon_block(
+                self._manifest, weapon_def, sockets=sockets, names=names
+            ),
+            "sockets": sockets,
+            "stats": weapon_payload.stat_list(
+                self._manifest, weapon_def, instance_stats, names=names
+            ),
         }
+        if (weapon_def.get("inventory") or {}).get("tierType") == 6:
+            template["weapon"]["catalysts"] = self._find_catalysts(weapon_def)
+        return template
 
-        if tier_type == 6:
-            info["catalysts"] = self._find_catalysts(weapon_def)
-
-        return info
+    def _find_weapon_definition(self, weapon_name: str) -> tuple[int, dict]:
+        """按名字找武器定义（实现在 weapon_profile.find_weapon，多处共用）。"""
+        return weapon_profile.find_weapon(self._manifest, weapon_name)
 
     def get_weapon_stats(self, weapon_name: str) -> dict:
-        """Get weapon investment stats. Raises ManifestError if not found or not weapon.
+        """武器属性：`{weapon, stats}`（同一个模板的身份块 + 属性列表）。
 
-        用与 analyze/info 相同的方式解析名字：按名字搜索后取第一条**武器**。
-        不能按精确名取定义 —— 存在与武器同名的非武器条目（例如「遗产」），
-        精确名会拿到那一条，然后误报「不是武器」。
+        属性顺序与"是否按数字展示"来自 `DestinyStatGroupDefinition`，名字查
+        `DestinyStatDefinition`；值取显示值（不是 `investmentStats`，否则遗产的
+        每分钟发射数会从 65 变成 30）。
         """
-        definition = None
-        for item in self._manifest.search(weapon_name, limit=5):
-            if item.get("itemType") == 3:
-                definition = self._manifest.get_item_definition(item["itemHash"])
-                break
-        if not definition:
-            raise ManifestError(f"找不到武器: {weapon_name}")
-        if definition.get("itemType") != 3:
-            raise ManifestError(f"{weapon_name} 不是武器")
-
-        display = definition.get("displayProperties", {})
-        icon = display.get("icon") or ""
-        icon_url = f"https://www.bungie.net{icon}" if icon else ""
-        en_name = self._get_en_name(definition.get("hash", 0))
-
-        stats = {}
-        for s in definition.get("investmentStats", []):
-            stat_hash = s.get("statTypeHash", 0)
-            value = s.get("value", 0)
-            stat_def = (
-                self._manifest.get_localized_definition("DestinyStatDefinition", stat_hash)
-                or self._manifest.get_definition("DestinyStatDefinition", stat_hash)
-            )
-            if stat_def:
-                stat_name = (stat_def.get("displayProperties") or {}).get("name", "")
-                if stat_name and value != 0:
-                    stats[stat_name] = value
-
+        _item_hash, definition = self._find_weapon_definition(weapon_name)
+        names = names_for(self._manifest)
         return {
-            "name": display.get("name", ""),
-            "nameEn": en_name,
-            "weaponType": definition.get("itemTypeDisplayName", ""),
-            "stats": stats,
-            "icon_url": icon_url,
+            "weapon": weapon_payload.lean_identity(
+                self._manifest,
+                definition,
+                names=names,
+                roll_kind=weapon_profile.roll_kind(definition),
+            ),
+            "stats": weapon_payload.stat_list(self._manifest, definition, names=names),
         }
 
     # ── Catalyst ─────────────────────────────────────────────────────
@@ -279,26 +246,15 @@ class ManifestQueryService:
 
         Raises ManifestError if weapon not found or no catalyst exists.
         """
-        weapon_results = self._manifest.search(weapon_name, limit=5)
-        weapon_def = None
-        weapon_zh_name = ""
-        weapon_en_name = ""
-
-        for item in weapon_results:
-            if item.get("itemType") == 3:
-                weapon_zh_name = item.get("name", "")
-                weapon_def = self._manifest.get_item_definition(item["itemHash"])
-                if weapon_def:
-                    weapon_en_name = self._get_en_name(weapon_def.get("hash", 0))
-                break
-
-        if not weapon_def:
-            raise ManifestError(f"找不到武器: {weapon_name}")
+        _item_hash, weapon_def = self._find_weapon_definition(weapon_name)
 
         tier = (weapon_def.get("inventory") or {}).get("tierType", 0)
+        identity = weapon_payload.lean_identity(
+            self._manifest, weapon_def, names=names_for(self._manifest)
+        )
+        weapon_zh_name = identity["name"] or weapon_name
         base = {
-            "weapon": weapon_zh_name or weapon_name,
-            "weaponEn": weapon_en_name,
+            "weapon": identity,
             "is_exotic": tier == 6,
             "count": 0,
             "catalysts": [],
@@ -309,7 +265,7 @@ class ManifestQueryService:
         if tier != 6:
             return {
                 **base,
-                "note": f"「{base['weapon']}」不是异域武器；只有异域武器才有催化剂。",
+                "note": f"「{weapon_zh_name}」不是异域武器；只有异域武器才有催化剂。",
             }
 
         result_catalysts = []
@@ -354,9 +310,14 @@ class ManifestQueryService:
 
         return {
             "name": display.get("name", ""),
-            "nameEn": en_name,
+            "name_en": en_name,
+            "item_hash": definition.get("hash", 0),
             "description": display.get("description", ""),
-            "flavorText": definition.get("flavorText", ""),
+            "flavor_text": definition.get("flavorText", ""),
+            "plug_category": self._manifest.get_plug_category_identifier(
+                definition.get("hash", 0)
+            )
+            or "",
             "icon_url": icon_url,
         }
 
@@ -396,26 +357,6 @@ class ManifestQueryService:
                                 "icon_url": _absolute_icon_url(plug_display.get("icon")),
                             })
         return intrinsic_perks
-
-    def _extract_weapon_stats(self, definition: dict) -> dict:
-        """Extract weapon investment stats."""
-        stats = {}
-        # 属性名走统一名称表；取值优先"显示值"（Bungie 已把框架加成算进去），
-        # 回退投资值 —— 遗产的每分钟发射数就是 65 而不是投资值 30。
-        names = names_for(self._manifest)
-        seen: set[int] = set()
-        for s in definition.get("investmentStats", []):
-            stat_hash = s.get("statTypeHash", 0)
-            if stat_hash in seen:
-                continue
-            seen.add(stat_hash)
-            value = weapon_profile.stat_value(definition, stat_hash)
-            if value is None:
-                value = s.get("value", 0)
-            stat_name = names.stat(stat_hash)
-            if stat_name and value:
-                stats[stat_name] = value
-        return stats
 
     def _find_catalysts(self, weapon_def: dict) -> list[dict]:
         """Find catalyst plugs for an exotic weapon."""

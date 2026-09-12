@@ -73,16 +73,27 @@ def test_allowlist_entries_explain_where_the_field_went() -> None:
 
 
 def test_diff_gate_detects_a_removed_field(diff_module, tmp_path: Path) -> None:
-    """把闸门自己测一遍：删掉一个字段必须被抓到、且退出码非 0。"""
+    """把闸门自己测一遍：删掉一个字段必须被抓到、且退出码非 0。
+
+    做法是**先注入一个探针字段**再删掉它 —— 不能直接删基线里的字段：
+    P4 之后基线里几乎每个字段都已登记为"有意消失"，删它们闸门本来就该放行，
+    于是这条自测会变成"测过期的东西"（这正是这轮踩到的坑）。
+    """
+    before = tmp_path / "before"
+    after = tmp_path / "after"
+    before.mkdir()
+    after.mkdir()
     for source in BASELINE.glob("*.json"):
-        (tmp_path / source.name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+        text = source.read_text(encoding="utf-8")
+        (after / source.name).write_text(text, encoding="utf-8")
+        payload = json.loads(text)
+        if source.name == "stats_legendary.json":
+            payload["data"]["stats"]["__probe__"] = "闸门探针"
+        (before / source.name).write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8"
+        )
 
-    victim = tmp_path / "stats_legendary.json"
-    payload = json.loads(victim.read_text(encoding="utf-8"))
-    del payload["data"]["stats"]["stats"]["变焦"]
-    victim.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+    report, ok = diff_module.diff(before, after, ALLOWLIST)
 
-    report, ok = diff_module.diff(BASELINE, tmp_path, ALLOWLIST)
-
-    assert not ok, "删字段必须让闸门失败"
-    assert "data.stats.stats.变焦" in report
+    assert not ok, "删掉未登记的字段必须让闸门失败"
+    assert "data.stats.__probe__" in report

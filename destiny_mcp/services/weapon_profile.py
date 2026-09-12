@@ -92,6 +92,24 @@ SLOT_LABELS: dict[str, str] = {
 }
 
 
+def find_weapon(manifest: "ManifestManager", weapon_name: str) -> tuple[int, dict]:
+    """按名字找武器定义：返回 (item_hash, definition)。
+
+    只取 `itemType == 3` 的条目 —— 存在与武器同名的非武器条目（例如「遗产」），
+    按精确名取会拿到那一条，然后误报「不是武器」。
+    """
+    from ..exceptions import ManifestError
+
+    for item in manifest.search(weapon_name, limit=5):
+        item_hash = item.get("itemHash") or item.get("hash") or 0
+        if item.get("itemType") != 3:
+            continue
+        definition = manifest.get_item_definition(item_hash)
+        if definition:
+            return int(item_hash), definition
+    raise ManifestError(f"找不到武器: {weapon_name}")
+
+
 def rarity_of(tier: Any) -> str:
     """稀有度中文名；未知档位照实说，不猜。"""
     if isinstance(tier, int) and tier in RARITY:
@@ -429,6 +447,13 @@ def _plug_option(
             description = str(sandbox.get("description") or "")
         if not description:
             description = str(info.get("description") or "")
+        if not description:
+            # 中文 Manifest 里 perk 的描述常常只落在物品定义的 displayProperties.description
+            fallback = getattr(manifest, "get_item_description", None)
+            if callable(fallback):
+                item_description = fallback(plug_hash)
+                if isinstance(item_description, str):
+                    description = item_description
         option["description"] = description
     effects = _stat_effects(manifest, names, plug_hash)
     if effects:
@@ -440,6 +465,82 @@ def _plug_option(
     icon = str(info.get("icon") or "")
     option["icon_url"] = icon
     return option
+
+
+def socket_columns(
+    manifest: "ManifestManager",
+    definition: Mapping[str, Any] | None,
+) -> list[dict]:
+    """只**数**每个插槽有几个可选项，不构造选项字典（所有栏，不只 roll 栏）。
+
+    列表类（按类型列武器）只需要"有哪些栏、每栏几个、现在装的什么"，把整张池子
+    塞进去会让响应从几十 KB 涨到几百 KB（实测 5 把武器 597 KB）。所以这里做轻量计数，
+    完整池子由单把武器的 `info`/`perk_pool` 给。
+    """
+    columns: list[dict] = []
+    used: dict[str, int] = {}
+    for index, entry in enumerate(socket_entries(definition)):
+        plug_set_hash = entry.get("randomizedPlugSetHash") or entry.get("reusablePlugSetHash")
+        single_hash = entry.get("singleInitialItemHash") or 0
+        if not plug_set_hash and not single_hash:
+            continue
+        if plug_set_hash:
+            raw_plugs = manifest.get_plug_set_plugs(plug_set_hash) or []
+        else:
+            raw_plugs = [{"plugItemHash": single_hash}]
+        kind = ""
+        names: list[str] = []
+        seen: set[int] = set()
+        for raw in raw_plugs:
+            plug_hash = int(raw.get("plugItemHash") or 0)
+            if not plug_hash or plug_hash in seen:
+                continue
+            seen.add(plug_hash)
+            category = str(raw.get("plugCategoryIdentifier") or "") or (
+                manifest.get_plug_category_identifier(plug_hash) or ""
+            )
+            if not kind:
+                kind = slot_kind(category)
+            name = str(raw.get("name") or "")
+            if not name:
+                name = str((manifest.get_item_info(plug_hash) or {}).get("name") or "")
+            if name:
+                names.append(name)
+        if not kind or not names:
+            continue
+        base = slot_label(kind)
+        used[base] = used.get(base, 0) + 1
+        columns.append({
+            "slot": base,
+            "kind": kind,
+            "socket_index": index,
+            "option_count": len(names),
+        })
+    for column in columns:
+        if used.get(column["slot"], 0) > 1:
+            same = [c for c in columns if c["slot"] == column["slot"]]
+            column["slot"] = f"{column['slot']}{same.index(column) + 1}"
+    return columns
+
+
+def roll_summary_from_columns(columns: list[dict]) -> dict[str, Any]:
+    """与 `roll_summary` 同一结构，但输入是轻量计数。"""
+    random_columns = [
+        column["slot"]
+        for column in columns
+        if column["kind"] in {"barrel", "magazine", "trait", "scope", "grip"}
+        and column["option_count"] > 1
+    ]
+    return {
+        "roll_kind": "random" if random_columns else "fixed",
+        "random_columns": random_columns,
+        "option_counts": {
+            column["slot"]: column["option_count"]
+            for column in columns
+            if column["slot"] in random_columns
+        },
+        "scope": "definition",
+    }
 
 
 def socket_options(
@@ -500,13 +601,9 @@ def socket_options(
             continue
 
         kind = slot_kind(str(options[0].get("plug_category") or ""))
-        label = slot_label(kind)
-        used_labels[label] = used_labels.get(label, 0) + 1
-        if used_labels[label] > 1:
-            label = f"{label}{used_labels[label]}"
 
         socket: dict[str, Any] = {
-            "slot": label,
+            "slot": "",
             "kind": kind,
             "scope": "definition",
             "socket_index": index,
@@ -520,7 +617,29 @@ def socket_options(
             socket["options"] = options[:NON_DETAIL_OPTION_SAMPLE]
             socket["options_truncated"] = True
         sockets.append(socket)
+        used_labels[slot_label(kind)] = used_labels.get(slot_label(kind), 0) + 1
+
+    # 同名栏位统一编号：有两栏「特性」就叫「特性1」「特性2」（只编重复的，不编唯一的）
+    for socket in sockets:
+        base = slot_label(str(socket.get("kind") or ""))
+        if used_labels.get(base, 0) > 1:
+            socket["slot"] = f"{base}{_ordinal_of(sockets, socket)}"
+        else:
+            socket["slot"] = base
     return sockets
+
+
+def _ordinal_of(sockets: list[dict], target: dict) -> int:
+    """同一 kind 里这是第几栏（从 1 开始）—— 用于「特性1/特性2」。"""
+    base = slot_label(str(target.get("kind") or ""))
+    order = 0
+    for socket in sockets:
+        if slot_label(str(socket.get("kind") or "")) != base:
+            continue
+        order += 1
+        if socket is target:
+            return order
+    return order
 
 
 # 物品 state 位（组件 102/201/205 的 item.state）。来源：Bungie 官方 OpenAPI 生成的

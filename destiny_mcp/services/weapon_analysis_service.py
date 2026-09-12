@@ -6,7 +6,7 @@ from typing import Literal
 
 from ..exceptions import ConfigError, DestinyMCPError, ItemNotFoundError
 from ..logging_config import get_logger
-from ..models import WeaponComparison, WeaponPerkPool
+from ..models import WeaponComparison
 from .manifest_query_service import ManifestQueryService
 from .perk_service import PerkService
 from .weapon_compare_service import WeaponCompareService
@@ -51,13 +51,15 @@ class WeaponAnalysisService:
             player_name or "<none>",
         )
 
-        weapon_info = self._manifest_query_svc.get_weapon_full_info(weapon_query)
-        resolved_weapon_name = weapon_info.get("name") or weapon_query
+        template = self._manifest_query_svc.get_weapon_full_info(
+            weapon_query, lookup_factory=self._perk_svc.god_roll_lookup
+        )
+        resolved_weapon_name = template["weapon"].get("name") or weapon_query
 
         warnings: list[str] = []
         next_actions: list[dict[str, str]] = []
 
-        perk_pool = await self._load_perk_pool(weapon_query, warnings)
+        sockets = await self._load_sockets(weapon_query, warnings)
         god_roll = await self._load_god_roll(weapon_query, warnings)
         inventory, inventory_status = await self._load_inventory_comparison(
             resolved_weapon_name,
@@ -67,11 +69,15 @@ class WeaponAnalysisService:
             next_actions,
         )
 
-        slot_count = len(perk_pool.slots) if perk_pool else 0
+        random_columns = (template["weapon"].get("roll_summary") or {}).get("random_columns") or []
         instance_count = len(inventory.instances) if inventory else 0
         summary_parts = [
             f"已分析「{resolved_weapon_name}」",
-            f"{slot_count} 个 perk 栏位",
+            (
+                f"{len(random_columns)} 个可滚栏位（{'、'.join(random_columns)}）"
+                if random_columns
+                else "固定 roll，没有可滚栏位"
+            ),
         ]
         if include_inventory:
             summary_parts.append(
@@ -82,8 +88,10 @@ class WeaponAnalysisService:
 
         return {
             "summary": "，".join(summary_parts) + "。",
-            "weapon": weapon_info,
-            "perk_pool": _dump_model(perk_pool),
+            # 与 info/perk_pool 同一形状：weapon 是身份块，sockets 是唯一池子来源
+            "weapon": template["weapon"],
+            "sockets": sockets if sockets is not None else template["sockets"],
+            "stats": template["stats"],
             "god_roll": god_roll,
             "inventory": _dump_model(inventory),
             "inventory_status": inventory_status,
@@ -91,17 +99,19 @@ class WeaponAnalysisService:
             "next_actions": next_actions,
         }
 
-    async def _load_perk_pool(
+    async def _load_sockets(
         self,
         weapon_name: str,
         warnings: list[str],
-    ) -> WeaponPerkPool | None:
+    ) -> list[dict] | None:
+        """插槽池来自 perk 服务（带愿单标注）；失败就退回模板里那份不带标注的。"""
         try:
-            return await self._perk_svc.get_weapon_perks(weapon_name)
+            pool = await self._perk_svc.get_weapon_perks(weapon_name)
         except DestinyMCPError as exc:
             logger.warning("Weapon perk pool lookup failed for '%s': %s", weapon_name, exc)
             warnings.append(f"perk 池查询失败：{exc}")
             return None
+        return pool.get("sockets") if isinstance(pool, dict) else None
 
     async def _load_god_roll(
         self,

@@ -334,7 +334,13 @@ async def match_inventory(
                 {"scope": "weapon_sockets", "error_type": type(exc).__name__}
             )
     details_by_instance = (
-        {item.instance_id: item for item in details.weapons} if details else {}
+        {
+            item.weapon["instance"]["instance_id"]: item
+            for item in details.weapons
+            if isinstance(item.weapon.get("instance"), dict)
+        }
+        if details
+        else {}
     )
     snapshot = None
     if (
@@ -382,31 +388,28 @@ async def match_inventory(
                 perks = row["required_perks"]
                 if perks:
                     detail = details_by_instance.get(item.item_instance_id)
+                    identity = detail.weapon if detail else {}
                     instance["socket_status"] = (
                         "complete"
                         if detail
                         and detail.perks_complete
-                        and to_unsigned(detail.item_hash) == to_unsigned(item.item_hash)
+                        and to_unsigned(identity.get("item_hash", 0))
+                        == to_unsigned(item.item_hash)
                         else "unknown"
                     )
-                    instance["current_perks"] = (
-                        [
-                            socket.plug_name
-                            for socket in detail.sockets
-                            if socket.plug_name
-                        ]
-                        if detail
-                        else []
-                    )
-                    current_hashes = (
-                        {
-                            to_unsigned(socket.plug_hash)
-                            for socket in detail.sockets
-                            if socket.plug_hash
-                        }
-                        if detail
-                        else set()
-                    )
+                    # P4 形状：当前装的 plug 挂在定义级 sockets 的 equipped 上
+                    equipped = [
+                        socket["equipped"]
+                        for socket in (detail.sockets if detail else [])
+                        if isinstance(socket.get("equipped"), dict)
+                        and socket["equipped"].get("plug_hash")
+                    ]
+                    instance["current_perks"] = [
+                        str(plug.get("name") or "") for plug in equipped if plug.get("name")
+                    ]
+                    current_hashes = {
+                        to_unsigned(plug["plug_hash"]) for plug in equipped
+                    }
                     perk_resolved = all(
                         perk["status"] == "resolved" for perk in row["perk_resolutions"]
                     )

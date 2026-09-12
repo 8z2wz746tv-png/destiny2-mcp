@@ -24,23 +24,17 @@ class WeaponPerkPool(BaseModel):
     slots: list[WeaponPerkSlot] = Field(default_factory=list, description="Perk pool grouped by slot")
 
 
-class WeaponComparisonInstance(BaseModel):
-    """A single weapon instance with its current perks."""
-
-    instance_id: str = Field(description="Item instance ID")
-    location: str = Field(description="Where this weapon is (vault/hunter/warlock/titan)")
-    power: int | None = Field(default=None, description="Power level")
-    perks: list[PerkInfo] = Field(default_factory=list, description="Current perks on this instance")
-    god_roll_score: str = Field(default="", description="God roll score (e.g. 'PvE 3/5 | PvP 1/4')")
-    icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
-
-
 class WeaponComparison(BaseModel):
-    """compare_weapon_instances tool response."""
+    """compare_weapon_instances 的产出：同一把武器的多个副本。
 
-    weapon_name: str = Field(description="Weapon name")
-    instances: list[WeaponComparisonInstance] = Field(default_factory=list)
-    differences: list[dict] = Field(default_factory=list, description="Perk differences between instances")
+    每个副本是 `{weapon（身份块 + instance）, sockets（定义级池 + equipped 现在装的）,
+    options（实例级 310：这一件能换的）, stats}`；`weapon.owned` 给副本摘要，
+    便于"哪一件更好"一眼看完。没有 310 时 `options` 为空，但 `equipped` 仍在。
+    """
+
+    weapon: dict = Field(default_factory=dict, description="身份块（含 owned 摘要）")
+    instances: list[dict] = Field(default_factory=list, description="每个副本一份完整模板")
+    differences: list[dict] = Field(default_factory=list, description="副本之间的已装 perk 差异")
 
 
 class WeaponStats(BaseModel):
@@ -71,36 +65,28 @@ class WeaponSocketInfo(BaseModel):
 
 
 class WeaponDetail(BaseModel):
-    """Comprehensive weapon instance info."""
+    """一把武器的完整模板：身份块 + 定义级插槽池 + 这一件的可换项 + 属性。
 
-    instance_id: str = Field(description="Item instance ID")
-    item_hash: int = Field(description="Weapon definition hash")
-    name: str = Field(description="Weapon name")
-    weapon_type: str = Field(default="", description="Weapon type display name (e.g. 微型冲锋枪)")
-    tier: str = Field(default="", description="Tier: 传说/异域")
-    damage_type: str = Field(default="", description="伤害类型: 动能/烈日/电弧/虚空/冰影/编织")
-    ammo_type: str = Field(default="", description="弹药类型: 白弹/绿弹/紫弹")
-    power: int | None = Field(default=None, description="Power/light level")
-    location: str = Field(default="", description="Where the weapon is")
-    is_equipped: bool = Field(default=False)
-    sockets: list[WeaponSocketInfo] = Field(default_factory=list, description="All sockets, categorized")
-    perks_complete: bool = Field(default=False, description="All current socket plugs were resolved")
-    stats: WeaponStats = Field(default_factory=WeaponStats, description="Weapon stat values")
-    icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
-    # ── 副本级（组件 300/310）：账号数据，Manifest 里没有；没读到就是 None ──
-    gear_tier: int | None = Field(
-        default=None, description="护甲 3.0 的 T1–T5 等级（0 = 旧装备）；没读到为 null"
+    形状与 `info`/`analyze`/`perk_pool` 一致（都由 `services.weapon_payload` 造），
+    区别只在于这里一定绑定了一个**副本**：`sockets[].equipped` 是它现在装的，
+    `options` 是它（组件 310）能换的。
+    """
+
+    weapon: dict = Field(
+        default_factory=dict, description="身份块（含 roll_summary、gear_tier/item_level/quality）"
     )
-    item_level: int | None = Field(default=None, description="Bungie 给的 itemLevel；没读到为 null")
-    quality: int | None = Field(default=None, description="Bungie 给的 quality；没读到为 null")
-    locked: bool | None = Field(default=None, description="是否已上锁；没读到为 null")
-    tracked: bool | None = Field(default=None, description="是否已追踪；没读到为 null")
+    sockets: list[dict] = Field(
+        default_factory=list,
+        description="定义级：所有插槽与完整池，每栏带 equipped（这一件现在装的）",
+    )
     options: list[dict] = Field(
         default_factory=list,
-        description="副本级可选部件（组件 310）：这一件能换成什么，按 socket_index 与 sockets 对齐",
+        description="实例级（组件 310）：这一件能换成什么，按 socket_index 与 sockets 对齐",
     )
+    stats: list[dict] = Field(default_factory=list, description="属性列表（实例值优先）")
+    perks_complete: bool = Field(default=False, description="所有当前插槽的 plug 都解析出来了")
     notes: list[str] = Field(
-        default_factory=list, description="这把武器的数据说明（哪些账号字段没读到、为什么为空）"
+        default_factory=list, description="数据说明（哪些账号字段没读到、为什么为空）"
     )
 
 

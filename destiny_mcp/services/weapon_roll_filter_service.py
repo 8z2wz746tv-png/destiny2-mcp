@@ -13,8 +13,8 @@ from ..manifest import class_type_name, resolve_character_name
 
 if TYPE_CHECKING:
     from ..manifest import ManifestManager
-from ..manifest_names import names_for
-from . import weapon_profile
+from . import weapon_payload, weapon_profile
+from .weapon_payload import LEAN_IDENTITY_KEYS
 
 class WeaponRollFilterService:
     """Filter weapon instances by explicit name, location, and perk terms."""
@@ -55,9 +55,11 @@ class WeaponRollFilterService:
         )
 
         for weapon in weapons:
-            if name_key and name_key not in str(weapon.get("name", "")).lower():
+            identity = weapon.get("weapon") or {}
+            instance = identity.get("instance") or {}
+            if name_key and name_key not in str(identity.get("name", "")).lower():
                 continue
-            weapon_location = str(weapon.get("location", "")).lower()
+            weapon_location = str(instance.get("location", "")).lower()
             if weapon_location == "仓库":
                 weapon_location = "vault"
             if location_key and location_key != weapon_location:
@@ -71,7 +73,7 @@ class WeaponRollFilterService:
                 continue
             perk_keys = [name.lower() for name in perk_names]
             if needs_english_names and self._manifest is not None:
-                for socket in weapon.get("sockets", []) or []:
+                for socket in self._equipped_plugs(weapon):
                     plug_hash = socket.get("plug_hash")
                     if plug_hash:
                         if plug_hash not in english_perks:
@@ -142,6 +144,9 @@ class WeaponRollFilterService:
         matched: list[dict[str, Any]] = []
 
         for candidate in candidates:
+            definition = self._manifest.get_item_definition(int(candidate.get("itemHash", 0)))
+            if not isinstance(definition, dict):
+                continue
             perk_details = self._catalog_perk_details(candidate)
             perk_names = [str(perk["name"]) for perk in perk_details if perk.get("name")]
             perk_keys = [name.casefold() for name in perk_names]
@@ -166,9 +171,10 @@ class WeaponRollFilterService:
                 perk for perk in perk_details if perk.get("name") in matched_perks
             ]
             matched.append(self._compact_catalog_weapon(
-                candidate,
+                definition,
                 matched_perks,
                 matched_perk_details,
+                fallback_name=str(candidate.get("name") or ""),
             ))
 
         result_limit = max(1, min(limit, 200))
@@ -193,106 +199,46 @@ class WeaponRollFilterService:
         }
 
     def _catalog_perk_details(self, weapon: dict[str, Any]) -> list[dict[str, Any]]:
-        """Extract possible plugs and localized Manifest details."""
+        """池子里的每个 plug（走 weapon_payload，与 sockets/options 同一套解析）。
+
+        旧实现自己遍历 socketEntries、自己读描述 —— 于是目录里的 perk 与
+        `perk_pool` 里的 perk 是两套字段。现在两边同源。
+        """
         if self._manifest is None:
             return []
-
         definition = self._manifest.get_item_definition(int(weapon.get("itemHash", 0)))
         if not isinstance(definition, dict):
             return []
 
-        entries = (definition.get("sockets") or {}).get("socketEntries", [])
         details: list[dict[str, Any]] = []
-        seen_hashes: set[int] = set()
-        for entry in entries:
-            if not isinstance(entry, dict):
-                continue
-            for key in ("randomizedPlugSetHash", "reusablePlugSetHash"):
-                plug_set_hash = entry.get(key)
-                if not plug_set_hash:
-                    continue
-                for plug in self._manifest.get_plug_set_plugs(int(plug_set_hash)) or []:
-                    plug_hash = int(plug.get("plugItemHash", 0))
-                    if not plug_hash or plug_hash in seen_hashes:
-                        continue
-                    name = str(plug.get("name") or "")
-                    if not name:
-                        info = self._manifest.get_item_info(plug_hash)
-                        name = str(info.get("name") or "") if isinstance(info, dict) else ""
-                    if name:
-                        details.append(self._build_catalog_perk_detail(
-                            plug_hash,
-                            name,
-                            str(plug.get("plugCategoryIdentifier") or ""),
-                        ))
-                    seen_hashes.add(plug_hash)
-
-            initial_hash = entry.get("singleInitialItemHash")
-            if initial_hash:
-                plug_hash = int(initial_hash)
-                if plug_hash in seen_hashes:
-                    continue
-                info = self._manifest.get_item_info(plug_hash)
-                name = str(info.get("name") or "") if isinstance(info, dict) else ""
-                if name:
-                    details.append(self._build_catalog_perk_detail(plug_hash, name, ""))
-                seen_hashes.add(plug_hash)
+        for socket in weapon_payload.socket_list(self._manifest, definition):
+            for option in socket.get("options") or []:
+                details.append(option | {"slot": socket.get("slot", ""), "kind": socket.get("kind", "")})
         return details
-
-    def _build_catalog_perk_detail(
-        self,
-        plug_hash: int,
-        name: str,
-        plug_category: str,
-    ) -> dict[str, Any]:
-        if self._manifest is None:
-            return {
-                "name": name,
-                "plug_hash": plug_hash,
-                "plug_category": plug_category,
-                "description": "",
-                "icon_url": "",
-            }
-        info = self._manifest.get_item_info(plug_hash)
-        sandbox = self._manifest.get_sandbox_perk_description(plug_hash)
-        description = str(sandbox.get("description") or "") if isinstance(sandbox, dict) else ""
-        if not description:
-            item_description = self._manifest.get_item_description(plug_hash)
-            if isinstance(item_description, str):
-                description = item_description
-        if not plug_category:
-            category = self._manifest.get_plug_category_identifier(plug_hash)
-            plug_category = category if isinstance(category, str) else ""
-        return {
-            "name": name,
-            "plug_hash": plug_hash,
-            "plug_category": plug_category,
-            "description": description,
-            "icon_url": str(info.get("icon") or "") if isinstance(info, dict) else "",
-        }
 
     def _compact_catalog_weapon(
         self,
-        weapon: dict[str, Any],
+        definition: dict[str, Any],
         matched_perks: list[str],
         matched_perk_details: list[dict[str, Any]],
+        *,
+        fallback_name: str = "",
     ) -> dict[str, Any]:
-        tier = int(weapon.get("tier") or 0)
-        return {
-            "name": weapon.get("name", ""),
-            "nameEn": weapon.get("nameEn", ""),
-            "item_hash": weapon.get("itemHash", 0),
-            "weapon_type": weapon.get("itemTypeNameDisplay", ""),
-            "tier": weapon_profile.rarity_of(tier),
-            "damage_type": names_for(self._manifest).damage_type(weapon.get("damageType")),
-            "ammo_type": names_for(self._manifest).ammo_type(weapon.get("ammoType")),
+        """目录命中行：精简身份块 + 命中 perk（不读账号，所以 owned 明说是猜的）。"""
+        row = weapon_payload.lean_identity(
+            self._manifest,
+            definition,
+            roll_kind=weapon_profile.roll_kind(definition),
+            fallback_name=fallback_name,
+        )
+        row.update({
             "matched_perks": matched_perks,
             "matched_perk_details": matched_perk_details,
-            "icon_url": weapon.get("icon", ""),
             "owned": False,
             "ownership_checked": False,
             "source": "manifest_catalog",
-        }
+        })
+        return row
 
     @staticmethod
     def _split_terms(values: list[str] | str | None) -> list[str]:
@@ -303,24 +249,34 @@ class WeaponRollFilterService:
         return [str(part).strip().lower() for part in values if str(part).strip()]
 
     @staticmethod
-    def _perk_names(weapon: dict[str, Any]) -> list[str]:
-        sockets = weapon.get("sockets", []) or []
+    def _equipped_plugs(weapon: dict[str, Any]) -> list[dict[str, Any]]:
+        """这一件**当前装着**的 plug（P4 形状：定义级 sockets 上的 `equipped`）。"""
         return [
-            str(socket.get("plug_name", ""))
-            for socket in sockets
-            if socket.get("plug_name")
+            socket["equipped"]
+            for socket in weapon.get("sockets") or []
+            if isinstance(socket.get("equipped"), dict) and socket["equipped"].get("plug_hash")
+        ]
+
+    @classmethod
+    def _perk_names(cls, weapon: dict[str, Any]) -> list[str]:
+        return [
+            str(plug.get("name") or "")
+            for plug in cls._equipped_plugs(weapon)
+            if plug.get("name")
         ]
 
     @staticmethod
     def _compact_weapon(weapon: dict[str, Any], perk_names: list[str]) -> dict[str, Any]:
-        return {
-            "name": weapon.get("name", ""),
-            "instance_id": weapon.get("instance_id", ""),
-            "item_hash": weapon.get("item_hash", 0),
-            "weapon_type": weapon.get("weapon_type", ""),
-            "location": weapon.get("location", ""),
-            "power": weapon.get("power"),
-            "is_equipped": weapon.get("is_equipped", False),
+        """列表行：精简身份块 + 副本位置/光等 + 当前 perk。"""
+        identity = weapon.get("weapon") or {}
+        instance = identity.get("instance") or {}
+        row = {key: identity.get(key) for key in LEAN_IDENTITY_KEYS}
+        row.update({
+            "instance_id": instance.get("instance_id", ""),
+            "location": instance.get("location", ""),
+            "power": instance.get("power"),
+            "is_equipped": instance.get("is_equipped", False),
+            "locked": instance.get("locked"),
             "perks": perk_names,
-            "icon_url": weapon.get("icon_url", ""),
-        }
+        })
+        return row

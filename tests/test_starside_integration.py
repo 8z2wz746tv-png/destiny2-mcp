@@ -14,6 +14,8 @@ import pytest
 from destiny_mcp.exceptions import ConfigError
 from destiny_mcp.services.starside_builds import parse_build
 from destiny_mcp.services.starside_matching import match_inventory, validate_build
+
+
 from destiny_mcp.services.starside_service import StarsideService
 from destiny_mcp.tools.assistants import build_assistant
 from destiny_mcp.tools.assistants import (
@@ -22,6 +24,21 @@ from destiny_mcp.tools.assistants import (
     activity_assistant,
     world_assistant,
 )
+
+
+def _weapon_detail(
+    instance_id: str,
+    item_hash: int,
+    installed: list[tuple[int, str]],
+    *,
+    complete: bool = True,
+):
+    """P4 形状的武器副本替身：身份块在 `weapon`，当前装的 plug 在 `sockets[].equipped`。"""
+    return SimpleNamespace(
+        weapon={"item_hash": item_hash, "instance": {"instance_id": instance_id}},
+        perks_complete=complete,
+        sockets=[{"equipped": {"plug_hash": h, "name": n}} for h, n in installed],
+    )
 
 
 def _write(path: Path, value) -> None:
@@ -338,14 +355,7 @@ async def test_inventory_matching_distinguishes_missing_unknown_and_current_roll
         get_armor_snapshot=AsyncMock(side_effect=ConfigError("partial")),
     )
     weapon_details = SimpleNamespace(
-        weapons=[
-            SimpleNamespace(
-                instance_id="w1",
-                item_hash=2**32 - 1,
-                perks_complete=True,
-                sockets=[SimpleNamespace(plug_name="测试 Perk", plug_hash=9)],
-            )
-        ]
+        weapons=[_weapon_detail("w1", 2**32 - 1, [(9, "测试 Perk")])]
     )
     detail_service = SimpleNamespace(
         get_weapon_details_by_type=AsyncMock(return_value=weapon_details)
@@ -664,14 +674,7 @@ async def test_current_roll_is_distinct_from_selectable_perks(
         ]
     )
     details = SimpleNamespace(
-        weapons=[
-            SimpleNamespace(
-                instance_id="1",
-                item_hash=2**32 - 1,
-                perks_complete=complete,
-                sockets=[SimpleNamespace(plug_name="Test Perk", plug_hash=perk_hash)],
-            )
-        ]
+        weapons=[_weapon_detail("1", 2**32 - 1, [(perk_hash, "Test Perk")], complete=complete)]
     )
     result = await match_inventory(
         _Manifest(),

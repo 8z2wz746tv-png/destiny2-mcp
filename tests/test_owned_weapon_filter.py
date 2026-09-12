@@ -95,11 +95,15 @@ def account():
 async def test_empty_type_scans_all_owned_weapons_with_actual_sockets(account):
     result = await account.detail.get_weapon_details_by_type("test", "")
     assert len(result.weapons) == 130
-    assert {w.location.lower() for w in result.weapons} == {"仓库", "titan", "hunter", "warlock"}
-    assert next(w for w in result.weapons if w.instance_id == "130").is_equipped
-    weapon = next(w for w in result.weapons if w.instance_id == "1")
+    locations = {w.weapon["instance"]["location"].lower() for w in result.weapons}
+    assert locations == {"仓库", "titan", "hunter", "warlock"}
+    assert next(w for w in result.weapons if w.weapon["instance"]["instance_id"] == "130").weapon[
+        "instance"
+    ]["is_equipped"]
+    weapon = next(w for w in result.weapons if w.weapon["instance"]["instance_id"] == "1")
     assert weapon.perks_complete
-    assert [s.plug_name for s in weapon.sockets] == ["辉耀炽热"]
+    installed = [s["equipped"]["name"] for s in weapon.sockets if s.get("equipped")]
+    assert installed == ["辉耀炽热"]
 
 
 async def test_named_type_is_not_capped_at_one_hundred_definitions(account):

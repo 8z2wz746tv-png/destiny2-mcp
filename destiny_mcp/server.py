@@ -103,7 +103,9 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
         subclass_svc = SubclassService(bungie, manifest, resolver)
         perk_svc = PerkService(manifest, wishlist_svc)
         weapon_compare_svc = WeaponCompareService(manifest, resolver, perk_svc, wishlist_svc, profile_cache)
-        weapon_detail_svc = WeaponDetailService(manifest, resolver, profile_cache)
+        weapon_detail_svc = WeaponDetailService(
+            manifest, resolver, profile_cache, lookup_factory=perk_svc.god_roll_lookup
+        )
         weapon_roll_filter_svc = WeaponRollFilterService(manifest)
         manifest_query_svc = ManifestQueryService(manifest)
         weapon_analysis_svc = WeaponAnalysisService(

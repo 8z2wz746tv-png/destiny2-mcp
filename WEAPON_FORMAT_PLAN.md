@@ -312,9 +312,26 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
   未知槽位下标、裁断、以及服务层"组件缺了要说清楚"；真机四档 T 各一例核对通过；
   基线 diff 无「无理由消失」。
 
-### P4 · 十处形状收敛
-- 改 6 个服务 + 工具分支 + `inventory.type` 边界；`stats` 改动态属性；交付 `old → new` 键映射表（写进 `TESTING_CORPUS.md` 武器章节附录）。
-- 验收：`tests/test_weapon_keys_snapshot.py` 通过；真机四把武器 × 全部 intent 形状一致；内部消费者测试（starside 匹配、vendor 愿单标记）仍绿。
+### P4 · 十处形状收敛 ✅ 已完成
+- 新增 `services/weapon_payload.py`：**唯一**造形状的地方（`weapon` / `sockets` / `stats`），
+  `WEAPON_SCHEMA_VERSION` 随响应顶层输出。十处形状全部改成调它：
+  `manifest_query_service`（info/stats/catalyst/perk_description）、`perk_service`（perk_pool/god_roll）、
+  `weapon_analysis_service`、`weapon_detail_service`、`weapon_compare_service`、
+  `weapon_roll_filter_service`（目录 + 持有两条路径）、`weapon_popularity_service`、`inventory.type` 边界。
+- 工具层：武器分支搬到 `tools/_weapon_branches.py`（`assistants.py` 只认参数与分发，上限从 1431 收到 1352）；
+  社区富集搬到 `tools/_enrichment.py`。
+- `stats` 改数据驱动：顺序与"是否按数字展示"来自 `DestinyStatGroupDefinition`，名字查 `DestinyStatDefinition`，
+  `is_primary` 取 `primaryBaseStatHash`（遗产 12 项，含以前硬编码表里没有的后坐方向/弹药生成）。
+- 键映射表（old → new）写进 `TESTING_CORPUS.md` 武器章节附录；119 处消失字段逐条登记进基线 allowlist。
+- **对计划表的一处修正（有实测依据）**：原表写 `type` = "完整武器模板（定义级 sockets + 实例级 options）"，
+  实测 5 把武器 **597 KB**（每把约 120 KB，50 把就是 6 MB）。列表要回答的是"我这把能换什么"，
+  完整池子是单把武器的问题，故改成：`type`/`compare` 用 `column_list()`（列计数 + `equipped`）
+  + 实例级 `options`（310）；`info`/`perk_pool`/`analyze` 才展开完整池（`options_available=true`）。
+  同一次实测还发现 compare 给每个副本各带一份完整池子（analyze 356 KB），改成列计数后总基线
+  1484 KB → 832 KB。`sockets[].options_available` 就是"这次是没展开、不是没有"的标记。
+- 验收：`tests/test_weapon_keys_snapshot.py`（23 条，走工具层逐 intent 钉键集合，并覆盖 perk_pool 的 await 回归）；
+  真机四把武器 × 11 个 intent 形状一致（`weapon` 20 键、`sockets` 8 键、`stats` 6 键）；消费者（starside 匹配、
+  filter_rolls、vendor 愿单标注）测试仍绿；基线 diff 无「无理由消失」。
 
 ### P5 · 本地数据 + 语义 + 文档
 - 三个兄弟字段收进模板；`options[].recommended`；覆盖表实现 + 契约测试；固定/随机分支；语料与 skill 武器章节重写。
