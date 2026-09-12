@@ -29,7 +29,9 @@ CEILINGS = {
     # tests/test_parameter_sentinels.py。
     # +6：popularity 组先确认武器存在（避免"打错名字"被答成"暂无快照"），
     # loadout 列表补 total/returned 以便自证全量。
-    "destiny_mcp/tools/assistants.py": 1408,
+    # +16：库存类型查询补 total/returned（自证全量）；community 指定 build id 时
+    # 用新 payload 收掉搜索分页结构（不改服务返回的字典，避免改到调用方对象）。
+    "destiny_mcp/tools/assistants.py": 1424,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,

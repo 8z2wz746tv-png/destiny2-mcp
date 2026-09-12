@@ -316,29 +316,36 @@ class ManifestQueryService:
         if not weapon_def:
             raise ManifestError(f"找不到武器: {weapon_name}")
 
-        catalysts = self._find_catalysts(weapon_def)
+        tier = (weapon_def.get("inventory") or {}).get("tierType", 0)
+        base = {
+            "weapon": weapon_zh_name or weapon_name,
+            "weaponEn": weapon_en_name,
+            "is_exotic": tier == 6,
+            "count": 0,
+            "catalysts": [],
+            # 本地不读账号记录组件，所以不猜"解锁没有"；要说清是没查，不是没解锁。
+            "unlock_state": "not_checked",
+        }
 
-        if not catalysts:
-            raise ManifestError(f"找不到 {weapon_name} 的催化剂（该武器可能没有催化剂）")
-
-        if len(catalysts) > 1:
-            result_catalysts = []
-            for cat in catalysts:
-                cat_info = self._get_catalyst_effect_info(cat["itemHash"])
-                if cat_info:
-                    result_catalysts.append(cat_info)
+        if tier != 6:
             return {
-                "weapon": weapon_zh_name or weapon_name,
-                "weaponEn": weapon_en_name,
-                "count": len(result_catalysts),
-                "catalysts": result_catalysts,
+                **base,
+                "note": f"「{base['weapon']}」不是异域武器；只有异域武器才有催化剂。",
             }
 
-        # Single catalyst
-        cat_info = self._get_catalyst_effect_info(catalysts[0]["itemHash"])
-        if not cat_info:
-            raise ManifestError(f"找不到催化剂定义：{weapon_name}")
-        return cat_info
+        result_catalysts = []
+        for cat in self._find_catalysts(weapon_def):
+            cat_info = self._get_catalyst_effect_info(cat["itemHash"])
+            if cat_info:
+                result_catalysts.append(cat_info)
+
+        if not result_catalysts:
+            return {
+                **base,
+                "note": f"本地 Manifest 里没有「{base['weapon']}」的催化剂定义（它可能确实没有催化剂）。",
+            }
+
+        return {**base, "count": len(result_catalysts), "catalysts": result_catalysts}
 
     # ── Perk Description ─────────────────────────────────────────────
 
@@ -479,6 +486,11 @@ class ManifestQueryService:
                     if pd:
                         pn = (pd.get("displayProperties") or {}).get("name", "")
                         pc = (pd.get("plug") or {}).get("plugCategoryIdentifier", "")
+                        # 通用锻造/大师杰作属性池（v400.plugs.weapons.masterworks.stat.*）
+                        # 是每条武器都有的"1阶：稳定性…"，不是催化剂；传说武器会因此
+                        # 吐出上百条噪声，看起来像它有 140 个催化剂。
+                        if "masterworks.stat." in pc.lower():
+                            continue
                         if pn and "empty" not in pc.lower():
                             catalysts.append({"itemHash": ph, "name": pn})
         return catalysts

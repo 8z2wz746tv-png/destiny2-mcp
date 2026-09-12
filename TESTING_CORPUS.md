@@ -11,7 +11,8 @@
 核对时三个通用技巧，后面所有断言都能用它们验证，不用背细节：
 
 1. **让 Agent 把 `error.code` 和 `mode` 原样念出来** —— 这些是可以逐字核对的字符串。
-2. **看信封**：成功必须 `ok=true`，失败必须 `ok=false` + `error.code`；`ok=true` 里裹一段错误文字一律算不合格。
+2. **看信封**：**进入工具函数之后**的失败必须 `ok=false` + `error.code`；`ok=true` 里裹一段错误文字一律算不合格。
+   唯一的例外是 schema 层拒绝（拼错参数名、intent 不在枚举里、类型不对）—— 它发生在函数之前，客户端拿到的是协议级 `isError` + pydantic 文本，没有 `error.code`（见第十二章 C 的分层表）。
 3. **看总数与截断**：被裁过的列表要带 `truncated` 与总数，不能让人把「前 N 条」当成全部。
 
 字段级不变量（所有响应都该成立，任何一条不成立就是 bug，不必逐条测）：
@@ -47,7 +48,7 @@
 | 我有没有 `<物品名>` | `search` + `item_name` | 命中给实例 ID 与位置；未命中说「没找到」，不能反推「全账号没有」。 |
 | 找几组我持有的重复武器，列出实例 ID 和位置，不要处理 | `duplicates` | 按精确 `item_hash` 分组；**同名不同版本不能当成完全相同物品**；不自动锁定或移动。 |
 | 我重复的手炮有几组 | `duplicates` + `type_name="手炮"` | 类型走 `type_name`，不要塞进 `item_type`。 |
-| 列出我所有的微型冲锋枪 | `type` + `type_name="微型冲锋枪"` | 按类型列举；不要用 `get` 的 `item_type`。 |
+| 列出我所有的微型冲锋枪 | `type` + `type_name="微型冲锋枪"` | 按类型列举；不要用 `get` 的 `item_type`。返回里要有 `total_items`/`returned_items`/`truncated`，让「是不是全量」可以自证。 |
 
 ### 写入（必须等确认）
 
@@ -67,11 +68,11 @@
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
-| 全游戏里哪些武器能滚出 `<Perk>` | `catalog` + `perk_name` | 明确标注**Manifest 候选**；`owned=false`／`ownership_checked=false` **不是**拥有结论。 |
+| 全游戏里哪些武器能滚出 `<Perk>` | `catalog` + `perk_name` | 明确标注**Manifest 候选**；`owned=false`／`ownership_checked=false` **不是**拥有结论；命中被裁过时必须给 `matched_count`／`returned_count`／`truncated=true`，**不能**只给 50 条就说「全游戏只有这些」。 |
 | 全游戏的手炮有哪些 | `catalog` + `weapon_type="手炮"` | 与账号无关；不读取库存。结果里不能出现「你有／你没有」。 |
 | `<武器>` 的 Perk 池有哪些 | `perk_pool` | 列出**可能**滚到的 Perk；这不是账号当前副本。 |
 | `<武器>` 的定义和基础属性 | `info`／`stats` | 都来自 Manifest；只给定义数值，不叠加账号加成。 |
-| `<武器>` 的催化剂情况 | `catalyst` | 区分「游戏里有这个催化剂」与「我已解锁」。 |
+| `<武器>` 的催化剂情况 | `catalyst` | 返回结构固定：`weapon`/`is_exotic`/`count`/`catalysts`/`unlock_state`/`note`。**传说武器必须回 `count=0` + 「只有异域才有催化剂」**，不能吐上百条「N阶：稳定性」这类通用锻造词条；`unlock_state` 目前恒为 `not_checked`（本地不读账号记录组件），**不许把「没查」说成「没解锁」**。 |
 | 手炮这一类武器都有哪些 | `type` | 按类型列出定义。 |
 | `<Perk>` 是什么效果 | `perk_description` | 从 Manifest 取描述；**不得按名字推断效果**。 |
 
@@ -83,7 +84,7 @@
 | 对比我这几把 `<武器>` 的 Perk，建议留哪把 | `compare` + `weapon_name`（`item_instance_id` 是**可选**的定位，不能只给实例 ID —— 缺 `weapon_name` 会得到 `config_error`「请提供 weapon_name」） | 每把建议对应**具体实例**；差异项用 `present_in_instance`/`absent_in_instance` 指到副本，**不能只写位置**（两把都在仓库时 `present_in=仓库 / absent_in=仓库` 等于没说）。 |
 | 分析一下 `<武器>` | `analyze` + `include_inventory` | 区分「定义」与「我持有的副本」两部分。 |
 | `<武器>` 大家一般选哪个 Perk | `popularity` | 标明数据来源与版本；**没有快照时明确说缺数据，不能编实时百分比**。 |
-| 给我 `<武器>` 的 god roll 建议 | `god_roll` | 来源于社区愿单；标明不是官方推荐。 |
+| 给我 `<武器>` 的 god roll 建议 | `god_roll` | 来源于社区愿单；标明不是官方推荐。三种情况必须分清：① 愿单里有完整条目 → 列出 Perk；② 有记录但解析不出 Perk → 明说「本地这条数据不完整」；③ 本地没收录 → 明说「暂无社区推荐」。**不允许**只回一个标题的空壳。 |
 
 ### 关键区分（必须答对）
 
@@ -111,7 +112,7 @@
 | `<套装名>` 的套装效果是什么 | `set_bonus` | 2 件／4 件效果分开说明。 |
 | 有什么热门的猎人配装 | `community` + `character="hunter"` | 走**社区**模板；**不得用 `loadout_assistant`**。 |
 | 给我 5 套猎人社区方案，不读我的账号 | `community` + `include_inventory=false` | 不读取库存；返回带 `community_build_id`。 |
-| 就用第一套，看看我缺什么 | `community` + `community_build_id` + `include_inventory=true` | 需要**明确的 community_build_id**；不猜 ID。 |
+| 就用第一套，看看我缺什么 | `community` + `community_build_id` + `include_inventory=true` | 需要**明确的 community_build_id**；不猜 ID。指定后响应里**不应再带** `results`/`next_offset` 这类搜索分页结构（否则 5 套完整模板会把响应撑到上百 KB，还会让人以为「还有更多套要读」），保留 `selected_build` + `matched_count` 即可。 |
 | 社区配装里缺的那件去哪刷 | `community` 返回里的 **`sourcing` 字段**（没有名为 sourcing 的 intent） | 有来源就给清单名与来源；**没有就说没有**，不能说「刷不到」。 |
 | 社区模板能直接一键装备吗 | 不适用 | 明确拒绝：`build_template`、`solver_handoff`、`farm_options` **都不是可执行方案**。 |
 
@@ -298,6 +299,10 @@
 | 查一把不存在的武器的社区 roll／选取率／Perk 池／属性 | `weapon_assistant(intent="god_roll"／"popularity"／"perk_pool"／"stats")` | 都必须是 `ok=false` + `manifest_error`（修复前 god_roll／popularity 是 `ok=true` + 一段文字，perk_pool 用的是 `item_not_found_error`）。 |
 | 对比两把都在仓库的同名武器 | `weapon_assistant(intent="compare", weapon_name=…)` | 差异项必须给 `present_in_instance`/`absent_in_instance`（修复前两条都写 `仓库`，无法判断是哪一把）。 |
 | 列出我的配装 | `loadout_assistant(intent="list")` | 返回里应有 `total_loadouts` 与 `returned_loadouts`（修复前没有，无法自证全量）。 |
+| 全游戏能滚出「萤火虫」的武器 | `weapon_assistant(intent="catalog", required_perks="萤火虫")` | `matched_count` > `returned_count` 时必须 `truncated=true`（修复前给 50 条却不说被裁过）。 |
+| 查「泰拉巴」的社区 roll | `weapon_assistant(intent="god_roll", weapon_name="泰拉巴")` | 愿单有记录但解析不出 Perk 时，必须明说「本地这条数据不完整」（修复前只回一个标题）。 |
+| 查「遗产」的催化剂 | `weapon_assistant(intent="catalyst", weapon_name="遗产")` | 传说武器 `count=0` + 说明「只有异域才有催化剂」（修复前吐 140 条通用锻造词条）；异域如「牵引器火炮」应给 1 条专属催化剂 + `unlock_state="not_checked"`。 |
+| 查不存在的套装效果 | `build_assistant(intent="set_bonus", set_bonus_name="不存在的套装xyz")` | `ok=false` + `definition_not_found_error`，消息干净（修复前是 `item_not_found_error` + 嵌套引号 + 「可能已被分解或移走」的账号物品话术）。 |
 | 查「遗产」的基础属性 | `weapon_assistant(intent="stats", weapon_name="遗产")` | 必须返回这把霰弹枪的属性（修复前会误报「遗产 不是武器」—— 精确名查到了同名的非武器条目）。同名歧义应按「搜索后取第一条武器」解析。 |
 
 ## 十四、只跑一次就够的整链路
@@ -386,12 +391,12 @@ loadout_assistant  subclass_assistant  activity_assistant  world_assistant
 | 现象 | 真实原因（已核实） | 状态 |
 | --- | --- | --- |
 | `player_assistant(intent="find")` 任何 `name_prefix` 都返回 `ok=true` + 空列表 | Bungie 的 `POST /User/SearchUsers/` 现在返回 **405**，代码把失败吞掉后返回空 —— 「没找到」和「搜索源不可用」分不出来 | 待修：换接口或明说不可用 |
-| `activity_assistant(intent="leaderboards")` 恒返回 `ok=false` + `a_p_i_error: 响应格式异常` | **上游失败**：Bungie 对账号榜单返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`；工具只是说得太笼统 | 待修：消息带上游 ErrorCode |
+| `activity_assistant(intent="leaderboards")` 恒返回 `ok=false` + `a_p_i_error` | **上游失败**：Bungie 对账号榜单返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`。SDK 把空响应拆成 `None`，码在这一层已经拿不到 | 消息已改成「上游接口问题、不是账号问题，不要凭记忆给排名」；要带具体上游码需要绕过 SDK 自己发请求（未做） |
 | 术士求解慢 | 排队已不计入预算、预算可配（`DESTINY_BUILD_TIMEOUT_SECONDS`，默认 300s）。空闲机器实测：猎人 ~10s、泰坦 ~5–19s、**术士 recommend 190s ✓ / find 187s ✓ / analyze >305s ✗**、farm_target 7.5s ✓ | recommend/find 已修；`analyze` 仍超预算 |
 | Armor 3.0 里 `gearTier != 5` 的护甲带 `roll_parse_error`（英文开发者口气） | 只对 tier 5 做反推（`build/models.py`），4 级护甲标不支持 | 待定：支持 tier 4 或改成人话 |
 | 动作类失败的消息里带着上游原文（Bungie URL、内部错误串），如 `quest_tracking_failed` | 信封是对的，但 message 泄露开发者信息 | 待修：转成人话 |
 | 写入**成功**后没有 `next_actions` | 失败时已有提示，成功时没有「回读核对实际状态」 | 待定 |
-| `slot_number=21`、非法 intent、拼错的参数名 → 原始 pydantic 报错，没有 `ok=false` | schema 层校验发生在工具函数之前，属于**协议级**参数错误（不是业务失败） | 取舍中：保持协议级拒绝，或补一层信封 |
+| `slot_number=21`、非法 intent、拼错的参数名 → 原始 pydantic 报错，没有 `ok=false` | schema 层校验发生在工具函数之前，属于**协议级**参数错误（不是业务失败） | 保持协议级拒绝（语料第十二章 C 已明确分层）；若要统一信封，需给 8 个助手都加多余参数兜底，代价是 schema 变成 `additionalProperties: true` |
 
 以下已修项都有回归断言（第十二、十三章），**不必再当新缺陷上报**：`vendor`/`type` 的整包倾倒与 `limit` 缺失、`limit=12` 被当成没传、装饰性条目混进商品、`rank.level_cap=-1`、`ignored_parameter` 缺 `next_actions`、愿望单标记全 false、`collectible_node` 无效 hash 裸抛 404、写入失败无下一步指引、无类型条目的 `item_type` 显示字符串 `"None"`。
 

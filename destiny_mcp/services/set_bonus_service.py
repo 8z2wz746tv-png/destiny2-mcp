@@ -9,7 +9,7 @@ business logic.
 
 from __future__ import annotations
 
-from ..exceptions import ItemNotFoundError
+from ..exceptions import DefinitionNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 
@@ -72,7 +72,11 @@ class SetBonusService:
                     break
 
         if not matched_set:
-            raise ItemNotFoundError(f"找不到套装或护甲: {query}")
+            # 这是 Manifest 定义查询，不是"你账号里的东西没了"：
+            # 以前抛 ItemNotFoundError，外层又拼一句「它可能已被分解或移走」，
+            # 对从没拥有过这个套装的用户是误导。
+            # 消息只给"是什么没找到"，模板由异常类补（避免套两层引号）。
+            raise DefinitionNotFoundError(query, "（查的是套装效果。）")
 
         set_hash, info = matched_set
 

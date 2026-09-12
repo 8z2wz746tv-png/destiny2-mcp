@@ -59,7 +59,7 @@ class DefinitionNotFoundError(DestinyMCPError):
     def __init__(self, identifier: str, detail: str = "") -> None:
         self.identifier = identifier
         super().__init__(
-            f"Manifest 里找不到 {identifier!r}。" + (f" {detail}" if detail else "")
+            f"Manifest 里找不到「{identifier}」。" + (detail if detail else "")
         )
 
 

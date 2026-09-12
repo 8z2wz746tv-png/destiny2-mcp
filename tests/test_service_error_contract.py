@@ -18,7 +18,6 @@ import pytest
 from destiny_mcp.exceptions import (
     DefinitionNotFoundError,
     InvalidArgumentError,
-    ItemNotFoundError,
     SubclassError,
 )
 from destiny_mcp.services.fragment_service import FragmentService
@@ -77,9 +76,11 @@ def test_fragment_details_raises_when_nothing_matches() -> None:
 
 
 def test_set_bonus_lookup_raises_when_nothing_matches() -> None:
+    """套装是 Manifest 定义查询：查不到用 definition_not_found_error，
+    不能套用"你账号里的东西被分解了"那套话术。"""
     service = SetBonusService(_EmptyManifest())
 
-    with pytest.raises(ItemNotFoundError, match="找不到套装或护甲"):
+    with pytest.raises(DefinitionNotFoundError, match="不存在的套装"):
         service.lookup_armor_set("不存在的套装")
 
 

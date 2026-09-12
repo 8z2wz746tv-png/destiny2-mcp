@@ -170,12 +170,17 @@ class WeaponRollFilterService:
             ))
 
         result_limit = max(1, min(limit, 200))
+        returned = matched[:result_limit]
         return {
             "scope": "manifest_catalog",
             "scope_label": "全量武器定义候选（未读取账号持有情况）",
             "checked_count": len(candidates),
             "matched_count": len(matched),
-            "matched": matched[:result_limit],
+            "returned_count": len(returned),
+            # matched 是裁过的，matched_count 才是真实命中数：不标出来，
+            # 调用方会把列表长度当成"全游戏只有这么多把"。
+            "truncated": len(matched) > len(returned),
+            "matched": returned,
             "filters": {
                 "weapon_name": weapon_name,
                 "weapon_type": weapon_type,

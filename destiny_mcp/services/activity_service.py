@@ -63,7 +63,15 @@ MODE_NAMES: dict[int, str] = {
 def _unwrap_bungie_response(result: dict, operation: str) -> dict:
     error_code = result.get("ErrorCode")
     if error_code is not None and error_code != 1:
-        raise APIError(operation, result.get("Message", ""))
+        # 把上游的码和状态一起带出来：只说"失败"的话，调用方分不清是
+        # 上游接口问题、限流，还是自己的参数问题。
+        status = str(result.get("ErrorStatus") or "").strip()
+        detail = str(result.get("Message") or "").strip()
+        parts = [f"上游 ErrorCode={error_code}"]
+        if status:
+            parts.append(f"ErrorStatus={status}")
+        message = " ".join(parts) + (f"：{detail}" if detail else "")
+        raise APIError(operation, message)
     return result.get("Response", result)
 
 
@@ -489,7 +497,13 @@ class ActivityService:
                 statid=statid,
             )
         if not isinstance(result, dict):
-            raise APIError("查询排行榜", "响应格式异常")
+            # Bungie 对账号榜单接口会返回 HTTP 200 + ErrorCode:3 UnhandledException +
+            # Response:null，SDK 把空响应拆成了 None，码在这一层已经拿不到。
+            raise APIError(
+                "查询排行榜",
+                "Bungie 返回了空响应。这是上游接口的问题，不是你的账号问题；"
+                "不要凭记忆给排名，稍后重试或改用生涯统计。",
+            )
         response = _unwrap_bungie_response(result, "查询排行榜")
         return {
             "success": True,

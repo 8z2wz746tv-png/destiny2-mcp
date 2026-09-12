@@ -233,6 +233,15 @@ class PerkService:
         lines.append(f"来源: {sources}")
         lines.append("")
 
+        if not pve_names and not pvp_names:
+            # 愿单里"有这条记录"但解析不出任何 Perk：以前只回一个标题，
+            # 看起来像"这把枪没有推荐"。要明说是本地条目解析不出内容。
+            return (
+                f"「{display_name}」在本地愿单里有记录（来源: {sources}），"
+                "但这条记录解析不出 PvE/PvP 推荐 Perk。这不代表它没有推荐，"
+                "只是本地这条数据不完整。"
+            )
+
         if pve_names:
             lines.append(f"【PvE】推荐 perk ({len(pve_names)} 个):")
             for name in pve_names:

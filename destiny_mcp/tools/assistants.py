@@ -285,7 +285,14 @@ async def inventory_assistant(
             type_name or item_type,
             location,
         )
-        return ok_response("已按类型搜索物品。", {"result": _dump(result)})
+        payload = _dump(result)
+        items = payload.get("items") or []
+        # 这个查询没有 limit（按类型列全量），所以两者相等；给出来是为了让
+        # "我是不是只看到了一部分"可以自证，而不是靠调用方数数。
+        payload["total_items"] = len(items)
+        payload["returned_items"] = len(items)
+        payload["truncated"] = False
+        return ok_response("已按类型搜索物品。", {"result": payload})
 
     if intent == "move":
         result = await svc["transfer_svc"].move_item(
@@ -719,7 +726,17 @@ async def build_assistant(
                     "warnings": ["账号数据不可用；不能根据该错误判断缺少任何装备。"],
                 }
         if selected:
-            result["selected_build"] = selected
+            # 已经定位到具体某一套，搜索分页结构就是噪声：results 里那 5 套完整模板
+            # 会把响应撑到上百 KB，next_offset 还会让人以为"还有更多套要读"。
+            # 新建一个 payload 而不是改服务返回的字典 —— 就地删键会改到调用方的对象。
+            payload = {
+                key: value
+                for key, value in result.items()
+                if key not in {"results", "next_offset", "offset", "returned_count", "limit"}
+            }
+            payload["selected_build"] = selected
+        else:
+            payload = result
         warnings = [
             "Starside 内容是社区资料，不代表 Bungie 官方推荐；装备前必须继续通过库存、实例和用户确认校验。"
         ]
@@ -733,7 +750,7 @@ async def build_assistant(
             warnings.append("搜索到多套配装；指定 community_build_id 后才会读取账号库存进行匹配。")
         return ok_response(
             f"已读取社区配装：{selected['title']}。" if selected else f"Starside 找到 {result['matched_count']} 套配装。",
-            result,
+            payload,
             warnings=warnings,
         )
     if community_build_id:
