@@ -70,10 +70,10 @@
 | --- | --- | --- |
 | 全游戏里哪些武器能滚出 `<Perk>` | `catalog` + `perk_name` | 明确标注**Manifest 候选**；`owned=false`／`ownership_checked=false` **不是**拥有结论；命中被裁过时必须给 `matched_count`／`returned_count`／`truncated=true`，**不能**只给 50 条就说「全游戏只有这些」。 |
 | 全游戏的手炮有哪些 | `catalog` + `weapon_type="手炮"` | 与账号无关；不读取库存。结果里不能出现「你有／你没有」。 |
-| `<武器>` 的 Perk 池有哪些 | `perk_pool` | 列出**可能**滚到的 Perk；这不是账号当前副本。 |
-| `<武器>` 的定义和基础属性 | `info`／`stats` | 都来自 Manifest；只给定义数值，不叠加账号加成。 |
+| `<武器>` 的 Perk 池有哪些 | `perk_pool` | 列出**可能**滚到的 Perk（`sockets[]`，`scope=definition`）；这不是账号当前副本。每个选项的 `recommended` 已汇总愿单/选取率/清单/社区，引用时要带上 `weapon.sources` 里的来源与更新时间。 |
+| `<武器>` 的定义和基础属性 | `info`／`stats` | 都来自 Manifest；只给定义数值（`stats[]` 按 Bungie 属性组顺序），不叠加账号加成。`info` 带清单块（`weapon.farming` + `cross_check`），**`popularity` 在 info 里是 available=false 的"这个 intent 不查"**，要选取率用 `popularity`。 |
 | `<武器>` 的催化剂情况 | `catalyst` | 返回结构固定：`weapon`/`is_exotic`/`count`/`catalysts`/`unlock_state`/`note`。**传说武器必须回 `count=0` + 「只有异域才有催化剂」**，不能吐上百条「N阶：稳定性」这类通用锻造词条；`unlock_state` 目前恒为 `not_checked`（本地不读账号记录组件），**不许把「没查」说成「没解锁」**。 |
-| 手炮这一类武器都有哪些 | `type` | 按类型列出定义。 |
+| 手炮这一类武器都有哪些 | `type` | 按类型列出**我持有的**武器：每件 `{weapon, sockets, options, stats}`；`sockets` 是列计数（`options_available=false`，别读成"没有可选项"），`options` 才是这一件能换的（组件 310）。列表类不逐个读本地资料（`popularity`/`community` 明说没查）。 |
 | `<Perk>` 是什么效果 | `perk_description` | 从 Manifest 取描述；**不得按名字推断效果**。 |
 
 ### 账号侧（当前副本）
@@ -93,7 +93,21 @@
 | 我有没有能滚出 `<Perk>` 的武器 | `filter_rolls`，**不是** `catalog` | 用 `catalog` 回答「我有没有」是错的。 |
 | 这游戏一共有多少把能滚出 `<Perk>` 的枪 | `catalog`，**不是** `filter_rolls` | 用账号扫描回答全游戏问题是错的。 |
 | 我账号里有没有 `<Perk>` | `filter_rolls` 并检查 `coverage_complete` | **`coverage_complete=false` 时，0 命中不能说成「你没有」**；要报 `unknown_count`。 |
-| 我持有的这把 `<武器>` 能不能换成 `<Perk>` | `analyze`／`compare` | 「当前 Perk 不匹配」≠「这枪没这个 Perk」；可切换但未选中的插槽没被检查。 |
+| 我持有的这把 `<武器>` 能不能换成 `<Perk>` | `analyze`／`compare` | 看两处：`sockets[].equipped` 是现在装的，`sockets[].options`／`options[]`（`scope=instance`，组件 310）才是这一件能换的。定义池里有、实例选项里没有 = "这枪能滚到、你这把不行"。组件 310 缺失时 `options` 为空并带 `notes`，**不能**读成"换不了"。 |
+
+### 本地资料（P5 起）
+
+- 三处本地来源合并进 `weapon`：`farming`（清单评级 + `recommended_perks` + 与 Manifest 的
+  `cross_check`）、`popularity`（选取率摘要）、`community`（社区资料条目），
+  并在 `weapon.sources[]` 里逐条给出来源、更新时间与 `trust`。
+- 每个插槽选项上的 `recommended` 是四路结论的就地汇总：
+  `wishlist`（愿单 PvE/PvP）、`popularity`（`selection_rate` + `rank` + `column`）、
+  `farming`（清单栏位 + `must_farm`）、`community`（`knowledge_id`，按名字子串匹配，只是线索）。
+- **口径**：本地资料是参考（`trust=untrusted_reference`），不是官方事实；
+  `popularity.available=false` 是"本地没这把的快照"，不是 0%；
+  `farming.matched=false` 是"清单没收录"，不是不值得刷；
+  社区条目按名字子串匹配，可能只是同名提及。
+- **失败也不能弄坏主结果**：任何一路读失败只是缺一块 + `warnings`，官方数据照常返回。
 
 ### P4 键映射表（old → new，形状统一后）
 

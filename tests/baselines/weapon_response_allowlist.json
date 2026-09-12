@@ -1,5 +1,5 @@
 {
-  "_note": "允许消失的字段登记在这里：键是归一化路径（list 索引写成 []），值写明去向。没登记的消失会让 scripts/diff_weapon_baseline.py 退出码非 0。P4 把十处形状收敛成 weapon/sockets/stats，旧键去向见 TESTING_CORPUS.md 的键映射表。规矩：只登记**真的消失了**的路径 —— 登记项不许与当前基线里的现存字段重叠（tests/test_weapon_baseline.py 会检查），否则等于用宽前缀把新字段也一起放过。",
+  "_note": "允许消失的字段登记在这里：键是路径（list 索引写成 []），值写明去向。三种键都认：`用例::路径`（只在某个 intent 消失 —— 整块搬家时用，避免全局登记把别的用例一起放过）、`路径`（所有用例都该消失）、`用例::块根`（子树登记，字段整块改名时用，别抄几百个叶子）。没登记的消失会让 scripts/diff_weapon_baseline.py 退出码非 0。P4 把十处形状收敛成 weapon/sockets/stats、P5 把本地资料收进模板，旧键去向见 TESTING_CORPUS.md 的键映射表。",
   "removed": {
     "data.god_roll": "P2：god_roll 从一段文字改成结构化 {kind, source, pve[], pvp[], fixed_perks[], note}；文字内容进 note 与 pve/pvp 列表（analyze 里的同一字段同步改）。",
     "data.catalyst.weapon": "P4：catalyst.weapon 从字符串改成精简身份块（含 rarity/frame/rpm）",
@@ -120,6 +120,24 @@
     "data.weapons.weapons[].stats.stability": "P4：type 的每件武器改 {weapon,sockets,options,stats,perks_complete,notes}；身份块在 weapon 内，位置/光等在 weapon.instance，定义池改成列计数（完整池用 info/perk_pool）",
     "data.weapons.weapons[].stats.zoom": "P4：type 的每件武器改 {weapon,sockets,options,stats,perks_complete,notes}；身份块在 weapon 内，位置/光等在 weapon.instance，定义池改成列计数（完整池用 info/perk_pool）",
     "data.weapons.weapons[].tier": "P4：type 的每件武器改 {weapon,sockets,options,stats,perks_complete,notes}；身份块在 weapon 内，位置/光等在 weapon.instance，定义池改成列计数（完整池用 info/perk_pool）",
-    "data.weapons.weapons[].weapon_type": "P4：type 的每件武器改 {weapon,sockets,options,stats,perks_complete,notes}；身份块在 weapon 内，位置/光等在 weapon.instance，定义池改成列计数（完整池用 info/perk_pool）"
+    "data.weapons.weapons[].weapon_type": "P4：type 的每件武器改 {weapon,sockets,options,stats,perks_complete,notes}；身份块在 weapon 内，位置/光等在 weapon.instance，定义池改成列计数（完整池用 info/perk_pool）",
+    "analyze_exotic::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "analyze_exotic::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "analyze_legendary::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "analyze_legendary::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "info_common::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "info_common::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "info_exotic::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "info_exotic::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "info_legendary::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "info_legendary::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "info_rare::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "info_rare::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "perk_pool_craftable::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "perk_pool_craftable::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "perk_pool_exotic::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "perk_pool_exotic::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "perk_pool_legendary::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "perk_pool_legendary::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。"
   }
 }

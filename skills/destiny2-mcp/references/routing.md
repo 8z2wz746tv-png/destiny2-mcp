@@ -20,6 +20,8 @@
 ### 最容易走错的四个岔路
 
 1. 「我有没有带某 Perk 的枪」→ `weapon_assistant(intent="filter_rolls")`；「游戏里一共有多少把能滚出这个 Perk」→ `weapon_assistant(intent="catalog")`。两个方向反了就是错答案。
+2. 「我这把能不能换成某 Perk」看 `sockets` 两处：`sockets[].equipped` 是**现在装的**，`options[]`（`scope=instance`，来自组件 310）才是**这一件能换的**；定义级池子里有、但实例选项里没有的，就是"这枪能滚到、但你这把不行"。
+3. `sockets[].options_available=false` 表示这次没展开池子（列表类为了体积），`option_count` 仍是数字；不能读成"没有可选项"。
 2. 「社区配装／热门配装」→ `build_assistant(intent="community")`，**不是** `loadout_assistant`（那是我自己存过的配装）。
 3. 「这把枪可能滚到什么」→ `perk_pool`；「我这把现在是什么」→ `filter_rolls`／`analyze`／`compare`。定义和实物不能混。
 4. 「这个 Perk 什么效果」→ `perk_description`，**不得按名字推断效果**。
@@ -62,27 +64,46 @@
 
 ### `weapon_assistant` —— 武器
 
+**形状统一（P4 起）**：所有武器 intent 的载荷都是 `weapon`（身份块）+ `sockets`（插槽）+
+`stats`（属性列表），顶层带 `data.weapon_schema_version`（当前 1）。每个插槽选项上的
+`recommended` 已经把愿单／选取率／刷取清单／社区四路结论汇总好，不用按名字跨字段拼。
+
+每个 `sockets[]` 条目（用列表写，避免被上面的 intent 表格解析器当入口）：
+
+- `slot` / `kind`：中文栏名（重复的会编号成 特性1/特性2）／稳定枚举
+  `intrinsic`/`barrel`/`magazine`/`trait`/`mod`/`masterwork`/`memento`/`tracker`/`shader`/`ornament`/`catalyst`/`other`。
+- `scope`：`definition`（定义级池子）或 `instance`（这一件能换的，来自组件 310）。
+- `option_count`：这栏有几个可选项（**权威数字**）。
+- `options_available`：`false` = 这次**没展开**池子（列表类为了体积），不是"没有可选项"。
+- `equipped`：这一件**现在装的**（组件 305）；没实例数据时为 `null`。
+- `options[]`：可选项，含 `plug_hash`/`name`/`can_roll`（退役 perk 为 false）/`enhanced`/
+  `enhanced_plug_hash`/`stat_effects`/`recommended`。
+
+`weapon` 身份块里的本地资料：`farming`（清单评级 + `recommended_perks` + `cross_check`）、
+`popularity`（选取率摘要，`available=false` 表示本地没这把的快照）、`community`（社区资料）、
+`sources`（每条结论的来源／更新时间／`trust`）。**本地资料是参考，不是官方事实。**
+
 Manifest 侧（**不代表拥有**）：
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
 | `catalog`（`search_catalog`、`all_weapons`、`global`、`search_all`） | 全量定义里按类型／Perk 找枪 | `weapon_name`、`weapon_type`、`required_perks`、`perk_name`、`limit` |
-| `perk_pool`（`perks`） | 这把枪**可能**滚到哪些 Perk | `weapon_name` |
-| `info` | 武器完整定义 | `weapon_name` |
-| `stats` | 基础属性数值 | `weapon_name` |
-| `catalyst` | 催化剂情况 | `weapon_name` |
-| `perk_description` | 单个 Perk 的效果 | `perk_name` |
-| `type` | 按武器类型列定义 | `weapon_type` |
-| `god_roll` | 社区愿单里的推荐 roll | `weapon_name` |
+| `perk_pool`（`perks`） | 这把枪**可能**滚到哪些 Perk（定义级 `sockets`，四路本地资料齐全） | `weapon_name` |
+| `info` | 武器完整定义（定义级 `sockets` + `stats` + 清单块） | `weapon_name` |
+| `stats` | 基础属性数值（`{weapon, stats[]}`，顺序按 Bungie 的属性组） | `weapon_name` |
+| `catalyst` | 催化剂情况（`weapon` 为身份块 + `unlock_state=not_checked`） | `weapon_name` |
+| `perk_description` | 单个 Perk 的效果（`{perk, community_references}`） | `perk_name` |
+| `type` | 按武器类型列**我持有的**武器（`weapons.items[]`：身份块 + 列计数 `sockets` + 实例 `options`） | `weapon_type`、`limit` |
+| `god_roll` | 社区愿单里的推荐 roll（`{weapon, sockets, god_roll}`；固定武器给固定内容） | `weapon_name` |
 
 账号侧（当前副本）：
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
-| `filter_rolls` | 在账号持有副本里筛 Perk | `weapon_name`、`weapon_type`、`required_perks`、`perk_name`、`any_perks`、`excluded_perks`、`include_inventory`、`limit` |
-| `analyze` | 定义＋我持有的副本 | `weapon_name`、`include_inventory` |
-| `compare`（`compare_duplicates`） | 对比同名副本，给留哪把的建议 | `weapon_name`、`item_instance_id` |
-| `popularity`（`selection_rates`、`perk_selection`、`selection`、`usage_rates`） | Perk 选取率快照 | `weapon_name` |
+| `filter_rolls` | 在账号持有副本里筛 Perk（行是精简身份块 + `perks` 当前插槽） | `weapon_name`、`weapon_type`、`required_perks`、`perk_name`、`any_perks`、`excluded_perks`、`include_inventory`、`limit` |
+| `analyze` | 定义＋我持有的副本（`weapon`/`sockets`/`stats`/`god_roll`/`inventory`） | `weapon_name`、`include_inventory` |
+| `compare`（`compare_duplicates`） | 对比同名副本，给留哪把的建议（每个副本 = `{weapon, sockets, options, stats}`） | `weapon_name`、`item_instance_id` |
+| `popularity`（`selection_rates`、`perk_selection`、`selection`、`usage_rates`） | Perk 选取率快照（快照当时的数据，与当前 Manifest 数值分开标注） | `weapon_name` |
 
 社区：
 

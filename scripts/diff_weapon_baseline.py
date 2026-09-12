@@ -83,6 +83,26 @@ def _suggest_renames(removed: list[str], added: list[str]) -> list[tuple[str, st
     return suggestions
 
 
+def _allowed_reason(allowed: dict[str, str], case_id: str, path: str) -> str | None:
+    """查这条消失是否已登记。
+
+    三种键都认，按精度从高到低：
+    1. `用例::路径` —— 只在某个 intent 发生的整块搬家；
+    2. `路径` —— 全局（所有用例都该消失）；
+    3. `用例::块根` / `块根` —— 子树登记：整块字段改名时登记根一次，
+       不用把几百个叶子逐条抄进来（登记太吵就会有人随便写个宽前缀糊弄）。
+    """
+    scoped = f"{case_id}::{path}"
+    for key in (scoped, path):
+        if key in allowed:
+            return allowed[key]
+    for prefix, reason in allowed.items():
+        for candidate in (scoped, path):
+            if candidate.startswith(prefix + ".") or candidate.startswith(prefix + "[]"):
+                return reason
+    return None
+
+
 def diff(before_dir: Path, after_dir: Path, allowlist_path: Path) -> tuple[str, bool]:
     before = _load_cases(before_dir)
     after = _load_cases(after_dir)
@@ -144,7 +164,7 @@ def diff(before_dir: Path, after_dir: Path, allowlist_path: Path) -> tuple[str, 
         if changed:
             lines.append(f"- 值变化 {len(changed)} 个（非易变字段）：" + "、".join(f"`{p}`" for p in changed[:8]) + ("…" if len(changed) > 8 else ""))
         for path in removed:
-            reason = allowed_removed.get(path)
+            reason = _allowed_reason(allowed_removed, case_id, path)
             if reason:
                 lines.append(f"- 消失（已登记）：`{path}` → {reason}")
             else:

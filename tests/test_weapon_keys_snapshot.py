@@ -184,6 +184,8 @@ WEAPON_BLOCK_KEYS = sorted([
     "icon_url", "intrinsic", "is_craftable", "item_hash", "name", "name_en", "rarity",
     "rarity_tier", "rpm", "roll_kind", "roll_summary", "trait_ids", "watermark",
     "weapon_type",
+    # P5：本地资料收进模板（列表类是精简版，但键一样）
+    "farming", "popularity", "community", "sources",
 ])
 
 SOCKET_KEYS = sorted([
@@ -209,20 +211,20 @@ async def _call(services: dict[str, Any], **kwargs) -> dict:
     ("intent", "kwargs", "expected_keys"),
     [
         ("info", {"weapon_name": "测试武器"},
-         ["community_references", "farming_list", "sockets", "stats", "weapon", "weapon_schema_version"]),
+         ["sockets", "stats", "weapon", "weapon_schema_version"]),
         ("stats", {"weapon_name": "测试武器"},
          ["stats", "weapon", "weapon_schema_version"]),
         ("perk_pool", {"weapon_name": "测试武器"},
-         ["community_references", "farming_list", "sockets", "weapon", "weapon_schema_version"]),
+         ["sockets", "weapon", "weapon_schema_version"]),
         ("god_roll", {"weapon_name": "测试武器"},
-         ["farming_list", "god_roll", "weapon", "weapon_schema_version"]),
+         ["god_roll", "sockets", "weapon", "weapon_schema_version"]),
         ("popularity", {"weapon_name": "测试武器"},
-         ["popularity", "weapon_schema_version"]),
+         ["popularity", "weapon", "weapon_schema_version"]),
         ("catalyst", {"weapon_name": "测试武器"},
          ["catalyst", "weapon_schema_version"]),
         ("analyze", {"weapon_name": "测试武器", "include_inventory": False},
-         ["community_references", "farming_list", "god_roll", "inventory", "inventory_status",
-          "sockets", "stats", "weapon", "weapon_schema_version"]),
+         ["god_roll", "inventory", "inventory_status", "sockets", "stats", "weapon",
+          "weapon_schema_version"]),
         ("compare", {"weapon_name": "测试武器"},
          ["comparison", "farming_list", "weapon_schema_version"]),
         ("type", {"weapon_type": "手炮"},

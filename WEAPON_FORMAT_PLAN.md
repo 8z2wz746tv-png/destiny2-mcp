@@ -333,9 +333,28 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
   真机四把武器 × 11 个 intent 形状一致（`weapon` 20 键、`sockets` 8 键、`stats` 6 键）；消费者（starside 匹配、
   filter_rolls、vendor 愿单标注）测试仍绿；基线 diff 无「无理由消失」。
 
-### P5 · 本地数据 + 语义 + 文档
-- 三个兄弟字段收进模板；`options[].recommended`；覆盖表实现 + 契约测试；固定/随机分支；语料与 skill 武器章节重写。
-- 验收：覆盖表逐 intent 逐块核对；`baseline diff` 报告无"无理由消失"；语料武器行逐条实跑。
+### P5 · 本地数据 + 语义 + 文档 ✅ 已完成
+- 新增 `services/weapon_local_data.py`：愿单／选取率／刷取清单／社区四路读进来（全部 fail-soft，
+  坏数据只缺一块 + warning），汇总成：
+  - `weapon.farming`（评级 + `recommended_perks` + **与 Manifest 的 `cross_check`**：
+    清单写的框架/伤害类型对不对得上、必刷特性现在还滚不滚得到）；
+  - `weapon.popularity`（选取率摘要：每栏前 5 + 热门组合 + 来源）；
+  - `weapon.community`（社区条目）；`weapon.sources[]`（来源/更新时间/`trust` 一张表）；
+  - 每个插槽选项的 `recommended`：`wishlist` / `popularity{selection_rate,rank,column}` /
+    `farming{columns,must_farm}` / `community{knowledge_id}` 就地汇总。
+- 三个兄弟字段（`farming_list` / `community_references` / 散在各处的愿单标注）收进模板；
+  列表类（type/catalog/filter_rolls）保留覆盖整张列表的顶层 `farming_list`，逐件只给清单摘要，
+  且 `popularity`/`community` 明说"这个 intent 不查"（键不少、语义不糊）。
+- **覆盖表落地**：`weapon_local_data.attach(include_popularity=…, include_community=…)` 逐 intent 控制，
+  `tests/test_weapon_local_data.py` 逐 intent 核对（info/god_roll 不带选取率、popularity 不带社区）。
+- 固定/随机分支（计划 §3.5）：`god_roll` 固定武器给固有+固定特性（P2 已做）、
+  `popularity` 固定武器加"选取率不反映哪套 roll 更值得刷"、`perk_pool` 加"仅部件可选"、
+  `filter_rolls` 命中固定武器时加"没有 roll 可变"。
+- 文档：`TESTING_CORPUS.md` 武器章节补本地资料口径与形状说明；`skills/.../routing.md`
+  武器章节重写（新增 `sockets` 字段语义与"能不能换成某 Perk 看哪两处"），并跑 `install_skill.py` 同步。
+- 验收：`tests/test_weapon_local_data.py`（12 条）+ 键集合快照仍绿；真机 `perk_pool` 遗产实测
+  清单 T1/来源/`cross_check` 齐全、24 个选项带 `recommended`；基线 diff 无「无理由消失」
+  （闸门新增"按用例 + 子树"登记，避免整块搬家逼出几百条叶子登记）。
 
 ### P6 · 瘦身与缓存
 - 定义级不带 description；perk 池/配对表进程内缓存；体积对比记录。
