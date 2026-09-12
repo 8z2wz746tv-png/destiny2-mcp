@@ -73,6 +73,44 @@ Manifest 全量 2208 把武器：普通 18、罕见 37、稀有 94、传说 1913
 
 ---
 
+### 1.4 对照 DIM 的做法（已读源码）与我们缺的东西
+
+DIM（`src/app/inventory/store/sockets.ts`、`src/app/utils/perk-utils.ts`）的模型：
+
+```ts
+DimSocket { plug, reusablePlugs: DimPlugSet, ... }
+DimPlugSet { plugs, plugHashesThatCanRoll, plugHashesThatCannotRoll, craftingData, ... }
+DimPlug    { plugDef, cannotCurrentlyRoll, enabled, ... }
+// 强化 perk：data/d2/trait-to-enhanced-trait.json（基础 hash → 强化 hash）+ 反转映射
+isEnhancedPerkHash(h) / unenhancedVersion(h) / enhancedVersion(h)
+```
+
+四条可以直接照搬：
+
+1. **一个 socket = 已装 plug + 这一件副本能换的 plug 集合**。DIM 读的是 `itemComponents.reusablePlugs.data[instanceId].plugs`（组件 **310**）—— **我们现在根本没请求 310**，所以只能拿定义级的池冒充"可能 perk"。
+2. **`currentlyCanRoll`**：plug set 条目自带的"这个 perk 现在还能不能滚出"。我们现在把退役 perk 也当"可能 perk"列出来，直接影响"值不值得刷"的判断。
+3. **强化 perk 是独立条目**，靠生成的配对表转换；实测我们 Manifest 里的判据是 **同 plug 类别 + 同名字 + `inventory.tierType` 2（基础）/ 3（强化）**，共 **272 组**配对，强化版描述都是"持续时间延长／效果增强／数量增多"。
+4. **框架从固有 perk 取**；异域没有定义框架的固有 perk（社区与 DIM issue #4056 都确认），只能退回 RPM —— 与我们 2.2 定的规则一致。
+
+### 1.5 定义级 vs 实例级（关键：现在混在一起了）
+
+| 层级 | 数据来源 | 例子 |
+| --- | --- | --- |
+| **定义级** | Manifest `socketEntries` + `DestinyPlugSetDefinition` | 遗产的特性栏定义池 **19 个** perk；哪些退役（`currentlyCanRoll=false`）；强化配对 |
+| **实例级** | 账号组件 305（已装）+ **310（能换）** + 300（`gearTier`） | 这一件 T5 遗产的特性栏**实际只有 3 个**；已装的是哪个 |
+
+实测 `gearTier → 特性栏可滚数量`（账号里 1425 件有 reusablePlugs 的武器）：
+
+| gearTier | 实例数 | 最常见的「随机栏可选数」组合 | 结论 |
+| --- | --- | --- | --- |
+| T5 | 343 | (3,3,2,2) × 274 | **两个特性栏各 3 个** |
+| T4 | 17 | (2,2,2,2) × 10 | 各 2 个 |
+| T3 | 10 | (2,2,2,2) × 6 | 各 2 个 |
+| T2 | 8 | (1,1,1,1) × 5 | 各 1 个 |
+| T0（老武器，无级） | 521 | (2,2,1,1) × 215、(1,1,1,1) × 123 | 无统一规律，**必须按实例报** |
+
+同一把武器确实会以不同 T 级存在（742 个武器 hash 里有 **28 个**同时有多个 T 级的副本），所以"这把枪能滚几个"不能只看定义。
+
 ## 2. 设计
 
 ### 2.1 两个共用块
@@ -95,6 +133,7 @@ Manifest 全量 2208 把武器：普通 18、罕见 37、稀有 94、传说 1913
   "is_craftable": false,       // 有 type 30 配方
   "roll_kind": "random",       // random | fixed
   "socket_kinds": {"fixed": 1, "option": 11, "random": 4},
+  "gear_tier": 5,              // T 级：只在实例上（300 组件）；未读账号时 null 并说明
   "description": "…",
   "icon_url": "…",
   "owned": {"status": "checked", "count": 2,
@@ -109,8 +148,10 @@ Manifest 全量 2208 把武器：普通 18、罕见 37、稀有 94、传说 1913
 "perks": {
   "source": "manifest+wishlist",      // manifest | manifest+wishlist
   "slots": [
-    {"slot": "枪管", "kind": "random",  "plugs": [{"plug_hash": 1, "name": "箭头制退器",
-        "description": "…", "god_roll_pve": false, "god_roll_pvp": true, "icon_url": "…"}]},
+    {"slot": "枪管", "kind": "random", "option_count": 3, "plugs": [
+        {"plug_hash": 1, "name": "箭头制退器", "description": "…",
+         "enhanced": false, "enhanced_plug_hash": 0, "can_roll": true,
+         "god_roll_pve": false, "god_roll_pvp": true, "icon_url": "…"}]},
     {"slot": "框架", "kind": "fixed",   "plugs": [{...}]},
     {"slot": "特性1", "kind": "option", "plugs": [{...}]}
   ]
@@ -118,6 +159,8 @@ Manifest 全量 2208 把武器：普通 18、罕见 37、稀有 94、传说 1913
 ```
 
 - `kind`：`fixed` = socket 只有 `singleInitialItemHash`；`option` = `reusablePlugSetHash`（固定但可换）；`random` = `randomizedPlugSetHash`。
+- `plugs` 的口径由 `perks.scope` 标明：`"definition"`（Manifest 完整池，含退役条目与强化配对）或 `"instance"`（这一件副本在组件 310 里能换的，`option_count` 就是 T 级决定的那个数）。
+- `can_roll` 来自 plug set 条目的 `currentlyCanRoll`；`enhanced` / `enhanced_plug_hash` 来自 tierType 2/3 配对表。
 - `slot` 统一用中文标签（和实例侧一致），英文原类别放 `plug_category` 字段备查。
 
 ### 2.2 稀有度、框架与 roll_kind 规则（单一实现）
@@ -189,13 +232,16 @@ def is_craftable(manifest, item_hash) -> bool                       # find_items
 - 验收：单测覆盖 6 把真实形态（泰拉巴/枯骨鳞片/遗产/牵引器火炮/刚愎自用/Ψ卷云II 的结构样本）+ 稀有度 5 档 + 未知 tier 兜底 + **框架三种情形**（传说有框架 / 异域只有专属特性 → frame=null 但 intrinsic 有值 / 老武器的非框架固有 → frame=null）。
 - 文件：新增 1 个模块 + 1 个测试文件。
 
-### P2 · perk 块（保留 socket 种类）
-- `perk_service.get_weapon_perks` 改为按 socket 逐条产出 `{slot, kind, plugs}`，槽位中文标签与实例侧统一；`plug_category` 字段保留英文类别。
+### P2 · perk 块（保留 socket 种类 + 强化配对 + 能否滚出）
+- `perk_service.get_weapon_perks` 改为按 socket 逐条产出 `{slot, kind, option_count, plugs}`，槽位中文标签与实例侧统一；`plug_category` 保留英文类别。
+- 新增 `weapon_profile.enhanced_pairs(manifest)`：按「同 plug 类别 + 同名字 + tierType 2/3」生成配对表（实测 272 组），供 `enhanced`/`enhanced_plug_hash` 使用；生成结果可缓存。
+- plug 条目带 `can_roll`（plug set 的 `currentlyCanRoll`），退役 perk 不再冒充"可能滚到"。
 - `god_roll` 从字符串改成结构化结果（`get_god_roll` 返回 dict）。
-- 验收：单测断言 `kind` 分布与真实数据一致（遗产 4 个 random、泰拉巴 0 个）；`analyze`/`perk_pool`/`god_roll` 三个入口都拿到同一个 perk 块。
+- 验收：单测断言 `kind` 分布（遗产 4 个 random、泰拉巴 0 个）、强化配对数量与抽查 3 组文案、`can_roll=false` 的条目被标出；`analyze`/`perk_pool`/`god_roll` 三个入口拿到同一个 perk 块。
 
-### P3 · 接入身份块（10 处形状收敛到 2 个块）
-- 改：`manifest_query_service`（info/stats/catalyst 的键名 snake_case）、`weapon_detail_service`、`weapon_roll_filter_service`（catalog/filter 两处条目）、`weapon_compare_service`、`weapon_popularity_service`（身份块复用）、`inventory_service` 的 type 查询（补精简身份块）、工具层 `assistants.py` 的武器分支。
+### P3 · 接入身份块 + 补实例级数据（10 处形状收敛到 2 个块）
+- **`weapon_detail_service` 的组件请求加 310（ItemReusablePlugs）**，并把 305（已装）+ 310（能换）+ 300（`gearTier`）合成实例级 perk 信息；没有实例数据时退回定义级并标明 `scope`。
+- 改：`manifest_query_service`（info/stats/catalyst 键名 snake_case + `frame`/`intrinsic`/`rpm`）、`weapon_detail_service`、`weapon_roll_filter_service`（catalog/filter 两处条目）、`weapon_compare_service`、`weapon_popularity_service`（复用身份块）、`inventory_service` 的 type 查询（补精简身份块）、工具层 `assistants.py` 的武器分支。
 - 验收：工具级测试逐 intent 断言 `data.weapon`/`data.perks` 的键集合；live 冒烟四把武器 × 全部 intent 的形状一致。
 
 ### P4 · 语义分支（固定 vs 随机）
@@ -229,6 +275,10 @@ def is_craftable(manifest, item_hash) -> bool                       # find_items
 - [ ] 稀有度表只有一份，蓝/绿/白不再显示空字符串
 - [ ] 身份块带 `frame`/`intrinsic`/`rpm`：遗产 `frame="精确重击框架"`；泰拉巴 `frame=null` + `intrinsic="贪食野兽"`（话术用"异域专属特性"）；刚愎自用 `frame="攻击型框架"`
 - [ ] 列表类（catalog/type/filter_rolls）每项都能看到 `frame`（用户最常按框架找枪）
+- [ ] 单武器详情能区分**定义级**与**实例级**：定义级给完整池（遗产特性栏 19 个 + 退役标记 + 强化配对），实例级给这一件的 T 级与实际可换选项（T5 遗产特性栏 3 个）
+- [ ] `gear_tier` 正确：T5/T4/T3/T2 各一例；老武器（T0）为 0/null 并说明"无 T 级"
+- [ ] 强化 perk 成对出现：同一 perk 的 `enhanced=false/true` 两条，且 `enhanced_plug_hash` 指向对方
+- [ ] `can_roll=false` 的退役 perk 被标出，不影响"能不能滚到"的结论
 - [ ] 同一把武器在 info/stats/perk_pool/analyze 里拿到**同一个** `weapon` 块（哈希、稀有度、roll_kind 一致）
 - [ ] `perks.slots[].kind` 与真实 socket 结构一致；`roll_kind` 由它推出
 - [ ] 泰拉巴：`roll_kind=fixed`，god_roll 给固定 perk + 说明；popularity 说明无意义
