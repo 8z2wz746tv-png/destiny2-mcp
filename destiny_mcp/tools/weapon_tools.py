@@ -168,7 +168,7 @@ async def search_weapons_by_type(
 async def get_god_roll(
     weapon_name: str = "",
     ctx: Context = None,
-) -> str:
+) -> dict:
     """查询武器的社区推荐 god roll（来自 DIM wish list）。
 
     何时使用：用户问"千语的 god roll 是什么"、"这把枪怎么留"时。

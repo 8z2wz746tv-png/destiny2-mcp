@@ -60,5 +60,5 @@ class WeaponService:
     ) -> WeaponDetailResponse:
         return await self._detail_svc.get_weapon_details_by_type(player_name, type_name)
 
-    async def get_god_roll(self, weapon_name: str) -> str:
+    async def get_god_roll(self, weapon_name: str) -> dict:
         return await self._perk_svc.get_god_roll(weapon_name)

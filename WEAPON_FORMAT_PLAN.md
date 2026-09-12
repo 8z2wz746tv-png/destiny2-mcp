@@ -35,7 +35,7 @@
 | `inventory.recipeItemHash` | 没用（原来用 type 30 猜，漏 203 把传说） | 可锻造（实测 219 把） |
 | 固有槽（`SOCKET_CAT_INTRINSIC`） | 只在 `intrinsicPerks` 里混着 | `frame`/`intrinsic`/`rpm` |
 | plug set `currentlyCanRoll` | 没用 | 退役 perk 不该冒充"能滚到" |
-| 强化配对（同名同类 + tierType 2/3） | 没用 | **272 组** |
+| 强化配对（同名同类 + tierType 2/3 + 描述不同） | 没用 | **228 组 / 216 个 perk 名**（另 56 组跳过并写明理由） |
 | `plug.investmentStats` | 没用 | perk 数值效果（箭头制退器 后坐+30/操控+10） |
 | `breakerType` | 没用 | 破盾类型（干扰/眩晕/贯穿护盾） |
 | `traitIds` | 没用 | 武器族 + 版本 |
@@ -171,7 +171,7 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
 | 属性名与顺序 | 硬编码 10 项 | `DestinyStatGroupDefinition` + `DestinyStatDefinition` |
 | 槽位标签 | 中英两套 | `weapon_profile.slot_kind()` |
 | 组件列表 | 17 处 | `profile_components.py` |
-| 强化配对 | 无 | 生成物 + 生成脚本 + 校验测试 |
+| 强化配对 | 无 | `data/weapon_enhanced_pairs.json` + `scripts/generate_weapon_metadata.py` + 新鲜度测试 |
 
 ### 3.4 本地数据挂载 + 覆盖表
 
@@ -263,9 +263,21 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
 - 稀有度、`frame_of`/`intrinsic_of`/`rpm_of`、`roll_kind`、`socket_kinds`、`is_craftable`、`breaker_type`、`trait_ids`、`slot_kind`、身份块构造；名称表（伤害/弹药/破盾/属性）查 DB + 缓存；`manifest/fingerprint.json` 写入与比对。
 - 验收：`tests/test_weapon_profile.py` 覆盖 6 把真实形态 + 框架三情形 + 稀有度 5 档（含 Ψ卷云II=稀有、刚愎自用=普通）+ 破盾 3 档 + 可锻造（遗产 true / 泰拉巴 false）+ 指纹不一致时告警文案可见。
 
-### P2 · sockets（定义级）+ 强化 + can_roll + stat_effects
-- 遍历**所有**插槽，按 plug 类别归 `kind`；保留 `randomized/reusable/single` 三态；生成强化配对表 + 落盘 + 校验测试；`can_roll` 来自 `currentlyCanRoll`；`stat_effects` 来自 plug `investmentStats`；`god_roll` 结构化。
-- 验收：`tests/test_weapon_socket_contract.py` 断言遗产 4 个随机栏、泰拉巴 0 个；配对表 272 组（抽查 3 组）；退役 perk 被标；大师杰作/模组/纪念物出现在 `sockets` 里。
+### P2 · sockets（定义级）+ 强化 + can_roll + stat_effects ✅ 已完成
+- 遍历**所有**插槽，按 plug 类别归 `kind`；保留 `randomized/reusable/single` 三态。
+- 强化配对走生成物：规则是「同 plug 类别 + 同名字 + 强化版唯一 + 描述不同」。
+  严格一对一虽然能凑 254 组，但其中 49 组描述完全相同（是同名的另一份副本，属误配），
+  所以改成现在的规则：**228 组 / 216 个 perk 名**，另外 56 组跳过并把理由写进生成物。
+- `can_roll` 来自 plug set 的 `currentlyCanRoll`（退役 perk 不再冒充"能滚到"）。
+- `stat_effects` 来自 plug 的 `investmentStats`（箭头制退器：后坐 +30、操控 +10）。
+- **选项分级**：roll 相关栏位（框架/枪管/弹匣/特性/瞄具/握把）给全量；装饰类只给
+  `option_count` + 3 个样本 + `options_truncated`（实测遗产着色器 694 项、大师杰作 167 项，
+  全量展开会把响应撑到上百 KB）。遗产 sockets 实测 45 KB（P6 再砍描述）。
+- `god_roll` 结构化：`{weapon, kind: fixed|recommended|none, source, source_detail, pve[], pvp[], fixed_perks[], note}`。
+- 验收（`tests/test_weapon_sockets.py` 13 条 + `tests/test_weapon_metadata_freshness.py` 5 条）：
+  合成替身覆盖三态与退役/强化/效果；真实数据断言遗产覆盖大师杰作/模组/纪念物/追踪器、
+  装饰类被裁、箭头制退器效果、强化配对可用；生成物与当前 Manifest 重跑逐条一致。
+- 基线 diff：唯一"消失"是 `data.god_roll`（字符串 → 结构），已按规矩登记 allowlist 与理由。
 
 ### P3 · 组件与实例级
 - `profile_components.py` 收拢；加 310/302/308；实例级 `gear_tier`/`item_level`/`quality`/`locked`/`tracked`/`options`。

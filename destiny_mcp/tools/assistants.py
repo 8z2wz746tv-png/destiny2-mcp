@@ -475,7 +475,14 @@ async def weapon_assistant(
 
     if intent == "god_roll":
         result = await svc["perk_svc"].get_god_roll(weapon_name)
-        return ok_response("已读取社区推荐 roll。", {"god_roll": result})
+        if result.get("kind") == "fixed":
+            summary = f"「{result.get('weapon')}」是固定 perk 武器，没有可推荐的随机 roll。"
+        elif result.get("kind") == "recommended":
+            summary = f"已读取「{result.get('weapon')}」的社区推荐 roll。"
+        else:
+            summary = f"「{result.get('weapon')}」本地没有可用的推荐 roll 数据。"
+        warnings = [result["note"]] if result.get("note") else []
+        return ok_response(summary, {"god_roll": result}, warnings=warnings)
 
     if intent in {"popularity", "selection_rates", "perk_selection", "selection", "usage_rates"}:
         if not weapon_name.strip():

@@ -62,7 +62,8 @@ class ManifestNames:
         """属性中文名；Manifest 里没有名字时返回空串（调用方应跳过该属性）。"""
         if stat_hash in self._stat_names:
             return self._stat_names[stat_hash]
-        definition = self._manifest.get_definition("DestinyStatDefinition", stat_hash)
+        getter = getattr(self._manifest, "get_definition", None)
+        definition = getter("DestinyStatDefinition", stat_hash) if callable(getter) else None
         name = ""
         if isinstance(definition, dict):
             name = str((definition.get("displayProperties") or {}).get("name") or "")

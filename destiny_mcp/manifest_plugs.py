@@ -23,7 +23,11 @@ class PlugCatalogMixin:
         """Get all plugs in a plug set (for weapon perk pools).
 
         Returns a list of dicts with at least 'plugItemHash' and
-        'plugCategoryIdentifier' keys.
+        'plugCategoryIdentifier' keys. 另外带上 plug set 自带的两个标记：
+
+        - `currentlyCanRoll`：这个 perk 现在还能不能滚出来（退役 perk 为 False）；
+          以前被丢掉，导致退役 perk 也被当成"可能滚到"。
+        - `craftingRequirements`：锻造解锁/材料需求（可锻造武器用）。
         """
         if plug_set_hash in self._plug_set_cache:
             return self._plug_set_cache[plug_set_hash]
@@ -48,6 +52,8 @@ class PlugCatalogMixin:
                 "plugItemHash": ph,
                 "name": name,
                 "plugCategoryIdentifier": cat_id,
+                "currentlyCanRoll": p.get("currentlyCanRoll", True),
+                "craftingRequirements": p.get("craftingRequirements"),
             })
         self._plug_set_cache[plug_set_hash] = enriched
         return enriched

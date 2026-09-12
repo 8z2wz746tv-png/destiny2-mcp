@@ -31,7 +31,8 @@ CEILINGS = {
     # loadout 列表补 total/returned 以便自证全量。
     # +16：库存类型查询补 total/returned（自证全量）；community 指定 build id 时
     # 用新 payload 收掉搜索分页结构（不改服务返回的字典，避免改到调用方对象）。
-    "destiny_mcp/tools/assistants.py": 1424,
+    # +7：god_roll 结构化后，分支按 kind 给三种人话摘要 + 把 note 放进 warnings。
+    "destiny_mcp/tools/assistants.py": 1431,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,

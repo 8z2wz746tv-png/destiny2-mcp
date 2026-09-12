@@ -107,13 +107,13 @@ class WeaponAnalysisService:
         self,
         weapon_name: str,
         warnings: list[str],
-    ) -> str:
+    ) -> dict:
         try:
             return await self._perk_svc.get_god_roll(weapon_name)
         except DestinyMCPError as exc:
             logger.warning("God roll lookup failed for '%s': %s", weapon_name, exc)
             warnings.append(f"god roll 查询失败：{exc}")
-            return ""
+            return {}
 
     async def _load_inventory_comparison(
         self,

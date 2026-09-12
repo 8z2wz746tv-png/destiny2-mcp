@@ -1,4 +1,6 @@
 {
   "_note": "允许消失的字段登记在这里：键是归一化路径（list 索引写成 []），值写明去向。没登记的消失会让 scripts/diff_weapon_baseline.py 退出码非 0。",
-  "removed": {}
+  "removed": {
+    "data.god_roll": "P2：god_roll 从一段文字改成结构化 {kind, source, pve[], pvp[], fixed_perks[], note}；文字内容进 note 与 pve/pvp 列表（analyze 里的同一字段同步改）。"
+  }
 }

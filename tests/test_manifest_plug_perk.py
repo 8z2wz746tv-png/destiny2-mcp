@@ -67,8 +67,20 @@ def test_plug_set_enriches_each_plug_from_its_item_definition() -> None:
     plugs = manager.get_plug_set_plugs(1)
 
     assert plugs == [
-        {"plugItemHash": 10, "name": "枪管 A", "plugCategoryIdentifier": "barrels"},
-        {"plugItemHash": 11, "name": "弹匣 B", "plugCategoryIdentifier": "magazines"},
+        {
+            "plugItemHash": 10,
+            "name": "枪管 A",
+            "plugCategoryIdentifier": "barrels",
+            "currentlyCanRoll": True,
+            "craftingRequirements": None,
+        },
+        {
+            "plugItemHash": 11,
+            "name": "弹匣 B",
+            "plugCategoryIdentifier": "magazines",
+            "currentlyCanRoll": True,
+            "craftingRequirements": None,
+        },
     ]
 
 
@@ -88,7 +100,13 @@ def test_plug_set_keeps_a_plug_whose_definition_is_missing() -> None:
     manager._conn = _connection({PLUG_SET_TABLE: [(1, _plugin_set([10]))]})
 
     assert manager.get_plug_set_plugs(1) == [
-        {"plugItemHash": 10, "name": "", "plugCategoryIdentifier": ""}
+        {
+            "plugItemHash": 10,
+            "name": "",
+            "plugCategoryIdentifier": "",
+            "currentlyCanRoll": True,
+            "craftingRequirements": None,
+        }
     ]
 
 

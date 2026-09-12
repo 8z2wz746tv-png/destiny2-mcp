@@ -25,11 +25,42 @@ from destiny_mcp.tools.assistants import loadout_assistant, weapon_assistant
 
 
 class _ManifestWithWeapon:
+    """随机 roll 武器（有随机池）—— 这样才会去查愿单，而不是走"固定 perk"分支。"""
+
     def search(self, query: str, *, limit: int = 20) -> list[dict]:
         return [{"itemHash": 100, "name": "测试武器", "itemType": 3}]
 
     def get_item_definition(self, item_hash: int) -> dict:
-        return {"displayProperties": {"name": "测试武器"}}
+        return {
+            "hash": item_hash,
+            "displayProperties": {"name": "测试武器"},
+            "inventory": {"tierType": 5},
+            "sockets": {
+                "socketCategories": [
+                    {"socketCategoryHash": 4241085061, "socketIndexes": [0]},
+                ],
+                "socketEntries": [{"randomizedPlugSetHash": 200}],
+            },
+        }
+
+    def get_plug_set_plugs(self, plug_set_hash: int) -> list[dict]:
+        return [
+            {
+                "plugItemHash": 300,
+                "name": "测试 Perk",
+                "plugCategoryIdentifier": "frames",
+                "currentlyCanRoll": True,
+            }
+        ]
+
+    def get_item_info(self, plug_hash: int) -> dict:
+        return {"name": "测试 Perk", "icon": ""}
+
+    def get_plug_category_identifier(self, plug_hash: int) -> str:
+        return "frames"
+
+    def get_sandbox_perk_description(self, plug_hash: int) -> None:
+        return None
 
 
 class _ManifestWithoutWeapon:
@@ -60,9 +91,11 @@ async def test_god_roll_without_wishlist_data_is_still_a_success() -> None:
         _ManifestWithWeapon(), popularity=None, wishlist=_NoWishlist()
     )
 
-    text = await service.get_god_roll("测试武器")
+    result = await service.get_god_roll("测试武器")
 
-    assert "暂无社区推荐" in text
+    assert result["kind"] == "none"
+    assert "没收录" in result["note"]
+    assert result["pve"] == [] and result["pvp"] == []
 
 
 # ── 2. popularity：打错名字必须是失败 ──────────────────────────────────────

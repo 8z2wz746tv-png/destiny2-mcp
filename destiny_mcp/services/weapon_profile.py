@@ -16,7 +16,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Mapping
+import json
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Callable, Mapping
 
 from ..manifest_names import RPM_STAT_HASH
 
@@ -24,6 +26,11 @@ if TYPE_CHECKING:  # pragma: no cover
     from .manifest import ManifestManager
 
 RARITY: dict[int, str] = {6: "异域", 5: "传说", 4: "稀有", 3: "罕见", 2: "普通"}
+
+# 生成物：基础 perk ↔ 强化 perk。由 scripts/generate_weapon_metadata.py 产出，
+# 里面记着生成时的 Manifest 指纹（见 manifest_fingerprint）。
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+ENHANCED_PAIRS_PATH = _REPO_ROOT / "data" / "weapon_enhanced_pairs.json"
 
 # 插槽类别：固有特性（框架）与武器特性（枪管/弹匣/特性）
 SOCKET_CATEGORY_INTRINSIC = 3956125808
@@ -55,6 +62,12 @@ _SLOT_KINDS: tuple[tuple[str, str], ...] = (
     ("skin", "ornament"),
     ("catalyst", "catalyst"),
 )
+
+# roll 相关栏位给全量选项；其余（着色器/装饰/追踪器/大师杰作…）只给计数 + 少量样本。
+# 实测：遗产的着色器插槽有 694 个选项、大师杰作 167 个 —— 全量展开会把响应撑到上百 KB。
+ROLL_KINDS: frozenset[str] = frozenset({"intrinsic", "barrel", "magazine", "trait", "scope", "grip"})
+FULL_OPTION_KINDS: frozenset[str] = ROLL_KINDS | {"mod", "catalyst"}
+NON_DETAIL_OPTION_SAMPLE = 3
 
 SLOT_LABELS: dict[str, str] = {
     "intrinsic": "框架",
@@ -284,3 +297,265 @@ def _english_name(manifest: "ManifestManager", definition: Mapping[str, Any]) ->
         except Exception:  # noqa: BLE001 - 英文名缺失不该影响画像
             return ""
     return ""
+
+
+# ── 强化 perk 配对（生成物）──────────────────────────────────────────────
+
+
+class EnhancedPairs:
+    """基础 perk hash → 强化 perk hash 的查表。
+
+    数据来自生成物，Manifest 里没有这个关系；`enhanced_plug_hash` 的语义是
+    "这个 perk 的强化版 hash"（本身就是强化版时指向自己，没有强化版时为 0）。
+    """
+
+    def __init__(self, pairs: Mapping[str, Mapping[str, Any]] | None = None) -> None:
+        self._pairs = dict(pairs or {})
+        self._reverse: dict[int, int] = {}
+        for key, entry in self._pairs.items():
+            try:
+                base = int(key)
+                enhanced = int(entry.get("enhanced") or 0)
+            except (TypeError, ValueError):
+                continue
+            if enhanced:
+                self._reverse.setdefault(enhanced, base)
+
+    @property
+    def size(self) -> int:
+        return len(self._pairs)
+
+    def enhanced_of(self, plug_hash: int) -> int:
+        """该 perk 的强化版 hash；没有就 0。本身就是强化版时返回自己。"""
+        entry = self._pairs.get(str(plug_hash))
+        if entry:
+            return int(entry.get("enhanced") or 0)
+        if plug_hash in self._reverse:
+            return int(plug_hash)
+        return 0
+
+    def base_of(self, plug_hash: int) -> int:
+        """强化版 perk 对应的基础版 hash；不是强化版就返回 0。"""
+        return int(self._reverse.get(int(plug_hash), 0))
+
+    def is_enhanced(self, plug_hash: int) -> bool:
+        return int(plug_hash) in self._reverse
+
+
+_PAIRS_CACHE: dict[str, tuple[float, EnhancedPairs]] = {}
+
+
+def load_enhanced_pairs(path: Path | None = None) -> EnhancedPairs:
+    """读生成物（按文件 mtime 缓存）。文件缺失时返回空表，不抛异常。"""
+    target = Path(path) if path is not None else ENHANCED_PAIRS_PATH
+    try:
+        mtime = target.stat().st_mtime
+    except OSError:
+        return EnhancedPairs()
+    cached = _PAIRS_CACHE.get(str(target))
+    if cached and cached[0] == mtime:
+        return cached[1]
+    try:
+        document = json.loads(target.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return EnhancedPairs()
+    pairs = EnhancedPairs(document.get("pairs") or {})
+    _PAIRS_CACHE[str(target)] = (mtime, pairs)
+    return pairs
+
+
+# ── 定义级插槽 ───────────────────────────────────────────────────────────
+
+
+def _plug_definition(manifest: "ManifestManager", plug_hash: int) -> dict:
+    getter = getattr(manifest, "get_item_definition", None)
+    if not callable(getter):
+        return {}
+    return getter(plug_hash) or {}
+
+
+def _stat_effects(manifest: "ManifestManager", names: Any, plug_hash: int) -> list[dict]:
+    """plug 自带的效果：`investmentStats` 是增量（例如箭头制退器 后坐+30、操控+10）。"""
+    definition = _plug_definition(manifest, plug_hash)
+    effects: list[dict] = []
+    for entry in definition.get("investmentStats") or []:
+        if not isinstance(entry, dict):
+            continue
+        value = entry.get("value")
+        if not value:
+            continue
+        effect = {
+            "stat": names.stat(entry.get("statTypeHash", 0)) or f"#{entry.get('statTypeHash', 0)}",
+            "value": value,
+        }
+        if entry.get("isConditionallyActive"):
+            effect["conditional"] = True
+        effects.append(effect)
+    return effects
+
+
+def _plug_option(
+    manifest: "ManifestManager",
+    *,
+    plug_hash: int,
+    name: str = "",
+    category: str = "",
+    can_roll: bool = True,
+    names: Any,
+    pairs: EnhancedPairs,
+    include_descriptions: bool,
+    god_roll_lookup: Callable[[int], tuple[bool, bool]] | None,
+) -> dict:
+    info = manifest.get_item_info(plug_hash) or {}
+    option_name = str(name or info.get("name") or "").strip()
+    plug_category = str(category or manifest.get_plug_category_identifier(plug_hash) or "")
+    option: dict[str, Any] = {
+        "plug_hash": int(plug_hash),
+        "name": option_name,
+        "plug_category": plug_category,
+        "can_roll": bool(can_roll),
+        "enhanced": pairs.is_enhanced(plug_hash),
+        "enhanced_plug_hash": pairs.enhanced_of(plug_hash),
+    }
+    if include_descriptions:
+        description = ""
+        sandbox = manifest.get_sandbox_perk_description(plug_hash)
+        if isinstance(sandbox, dict):
+            description = str(sandbox.get("description") or "")
+        if not description:
+            description = str(info.get("description") or "")
+        option["description"] = description
+    effects = _stat_effects(manifest, names, plug_hash)
+    if effects:
+        option["stat_effects"] = effects
+    if god_roll_lookup is not None:
+        pve, pvp = god_roll_lookup(plug_hash)
+        option["god_roll_pve"] = bool(pve)
+        option["god_roll_pvp"] = bool(pvp)
+    icon = str(info.get("icon") or "")
+    option["icon_url"] = icon
+    return option
+
+
+def socket_options(
+    manifest: "ManifestManager",
+    definition: Mapping[str, Any] | None,
+    *,
+    names: Any = None,
+    pairs: EnhancedPairs | None = None,
+    include_descriptions: bool = True,
+    god_roll_lookup: Callable[[int], tuple[bool, bool]] | None = None,
+) -> list[dict]:
+    """**全部**插槽（定义级）：框架/枪管/弹匣/特性/模组/大师杰作/纪念物/追踪器/装饰…
+
+    以前只取两类插槽类别 + 一张 plug 类别白名单，于是大师杰作、模组、纪念物全丢了；
+    这里改成遍历所有 socket entry，按 plug 类别归 kind，认不出来归 `other`（不丢）。
+    """
+    if names is None:
+        from ..manifest_names import names_for
+
+        names = names_for(manifest)
+    pairs = pairs if pairs is not None else load_enhanced_pairs()
+
+    sockets: list[dict] = []
+    used_labels: dict[str, int] = {}
+    for index, entry in enumerate(socket_entries(definition)):
+        plug_set_hash = entry.get("randomizedPlugSetHash") or entry.get("reusablePlugSetHash")
+        single_hash = entry.get("singleInitialItemHash") or 0
+        if not plug_set_hash and not single_hash:
+            continue  # 这个插槽没有任何来源，跳过
+
+        if plug_set_hash:
+            raw_plugs = manifest.get_plug_set_plugs(plug_set_hash) or []
+        else:
+            raw_plugs = [{"plugItemHash": single_hash}]
+
+        options: list[dict] = []
+        seen: set[int] = set()
+        for raw in raw_plugs:
+            plug_hash = int(raw.get("plugItemHash") or 0)
+            if not plug_hash or plug_hash in seen:
+                continue
+            seen.add(plug_hash)
+            option = _plug_option(
+                manifest,
+                plug_hash=plug_hash,
+                name=str(raw.get("name") or ""),
+                category=str(raw.get("plugCategoryIdentifier") or ""),
+                can_roll=bool(raw.get("currentlyCanRoll", True)),
+                names=names,
+                pairs=pairs,
+                include_descriptions=include_descriptions,
+                god_roll_lookup=god_roll_lookup,
+            )
+            if not option["name"]:
+                continue  # 无名字的占位 plug（Bungie 用它占位），不是可选内容
+            options.append(option)
+        if not options:
+            continue
+
+        kind = slot_kind(str(options[0].get("plug_category") or ""))
+        label = slot_label(kind)
+        used_labels[label] = used_labels.get(label, 0) + 1
+        if used_labels[label] > 1:
+            label = f"{label}{used_labels[label]}"
+
+        socket: dict[str, Any] = {
+            "slot": label,
+            "kind": kind,
+            "scope": "definition",
+            "socket_index": index,
+            "option_count": len(options),
+        }
+        if kind in FULL_OPTION_KINDS or len(options) <= NON_DETAIL_OPTION_SAMPLE:
+            socket["options"] = options
+        else:
+            # 装饰/大师杰作这类插槽动辄上百个选项（着色器 694、大师杰作 167），
+            # 全量展开没有意义；给计数 + 少量样本，并明说被裁过。
+            socket["options"] = options[:NON_DETAIL_OPTION_SAMPLE]
+            socket["options_truncated"] = True
+        sockets.append(socket)
+    return sockets
+
+
+def roll_summary(sockets: list[dict], *, scope: str = "definition") -> dict:
+    """回答"能不能滚、有几栏"：随机栏清单 + 每栏可选数。"""
+    random_columns = [
+        socket["slot"] for socket in sockets if socket.get("kind") in {"barrel", "magazine", "trait", "scope", "grip"}
+        and socket.get("option_count", 0) > 1
+    ]
+    return {
+        "roll_kind": "random" if any(socket.get("kind") == "trait" and socket.get("option_count", 0) > 1 for socket in sockets) else "fixed",
+        "random_columns": random_columns,
+        "option_counts": {
+            socket["slot"]: socket["option_count"]
+            for socket in sockets
+            if socket.get("slot") in random_columns
+        },
+        "scope": scope,
+    }
+
+
+def has_enhanced(sockets: list[dict]) -> bool:
+    """这把武器的池子里有没有带强化版的 perk。"""
+    return any(
+        option.get("enhanced_plug_hash")
+        for socket in sockets
+        for option in socket.get("options") or []
+    )
+
+
+def fixed_roll_perks(sockets: list[dict]) -> list[dict]:
+    """固定 roll 武器的"真正固定"内容：固有特性 + 只有一个选项的特性栏。
+
+    固定武器（多数异域、蓝绿白）问"推荐 roll"是无意义的，该回答它到底装了什么；
+    但**不能把可选的枪管/弹匣也算进去**，那些是可换部件。
+    """
+    perks: list[dict] = []
+    for socket in sockets:
+        if socket.get("kind") == "intrinsic":
+            perks.extend(socket.get("options") or [])
+            continue
+        if socket.get("kind") == "trait" and socket.get("option_count", 0) == 1:
+            perks.extend(socket.get("options") or [])
+    return perks

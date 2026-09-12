@@ -6,9 +6,13 @@ Extracted from weapon_service.py during refactoring.
 
 from __future__ import annotations
 
+from typing import Any
+
 from ..exceptions import ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
+from ..manifest_names import names_for
+from . import weapon_profile
 from ..models import PerkInfo, WeaponPerkPool, WeaponPerkSlot
 from .wishlist_service import WishListService
 from .weapon_popularity_service import WeaponPopularityService
@@ -185,14 +189,20 @@ class PerkService:
             slots=slots,
         )
 
-    async def get_god_roll(self, weapon_name: str) -> str:
-        """Get god roll recommendation for a weapon from DIM wish list.
+    async def get_god_roll(self, weapon_name: str) -> dict:
+        """社区推荐 roll，返回**结构化**结果（以前是一段文字）。
+
+        `kind` 三态，三种情况必须分得清：
+        - `fixed`：固定 roll 武器（多数异域、蓝绿白），没有"推荐 roll"这回事，
+          列出它真正固定的内容（固有特性 + 只有一个选项的特性栏）；
+        - `recommended`：随机 roll 武器且本地愿单有可解析条目；
+        - `none`：随机 roll 武器但本地愿单没收录／条目解析不出内容（`note` 说明是哪一种）。
 
         Args:
             weapon_name: Weapon name to look up.
 
-        Returns:
-            Formatted string with PvE/PvP god roll perks, or "暂无推荐".
+        Raises:
+            ManifestError: 武器在 Manifest 里不存在（与 analyze/info/catalyst 一致）。
         """
         results = self._manifest.search(weapon_name, limit=10)
         weapon = None
@@ -203,57 +213,75 @@ class PerkService:
 
         if not weapon:
             # 「武器不存在」和「武器存在但本地愿单没收录」是两件事：
-            # 前者走错误信封（与 analyze/info/catalyst 一致），后者才是成功的说明文字。
-            # 以前两者都当成功返回，用户分不清是打错名字还是真没数据。
+            # 前者走错误信封（与 analyze/info/catalyst 一致），后者才是成功的说明。
             raise ManifestError(f"找不到武器: {weapon_name}")
 
         item_hash = weapon["itemHash"]
         display_name = weapon["name"]
+        definition = self._manifest.get_item_definition(item_hash) or {}
+        names = names_for(self._manifest)
+
+        base: dict[str, Any] = {
+            "weapon": display_name,
+            "kind": "none",
+            "source": "dim_wishlist",
+            "pve": [],
+            "pvp": [],
+        }
+
+        def _perks(perk_hashes: set[int]) -> list[dict]:
+            entries = []
+            for perk_hash in sorted(perk_hashes):
+                info = self._manifest.get_item_info(perk_hash) or {}
+                entries.append({
+                    "plug_hash": int(perk_hash),
+                    "name": str(info.get("name") or f"#{perk_hash}"),
+                })
+            return entries
+
+        if weapon_profile.roll_kind(definition) == "fixed":
+            sockets = weapon_profile.socket_options(
+                self._manifest, definition, names=names
+            )
+            return base | {
+                "kind": "fixed",
+                "source": "manifest",
+                "fixed_perks": [
+                    {"plug_hash": perk["plug_hash"], "name": perk["name"]}
+                    for perk in weapon_profile.fixed_roll_perks(sockets)
+                ],
+                "note": (
+                    "固定 roll 武器：没有可推荐的随机 roll，"
+                    "上面列的是它固定的固有特性与特性栏内容。"
+                ),
+            }
 
         if not self._wishlist or not self._wishlist.has_data(item_hash):
-            return f"「{display_name}」暂无社区推荐 god roll 数据。"
+            return base | {
+                "note": "本地愿单没有收录这把武器；没收录不等于不值得留。",
+            }
 
         grp = self._wishlist.get_god_roll_perks(item_hash)
         if not grp:
-            return f"「{display_name}」暂无社区推荐 god roll 数据。"
+            return base | {"note": "本地愿单里这条记录解析不出内容。"}
 
-        def _perk_names(perk_hashes: set[int]) -> list[str]:
-            names = []
-            for h in perk_hashes:
-                info = self._manifest.get_item_info(h)
-                name = info.get("name", f"#{h}") if info else f"#{h}"
-                names.append(name)
-            return sorted(names)
-
-        pve_names = _perk_names(grp.pve_perks)
-        pvp_names = _perk_names(grp.pvp_perks)
-        sources = ", ".join(grp.sources[:5]) if grp.sources else "未知"
-
-        lines = [f"=== {display_name} God Roll 推荐 ==="]
-        lines.append(f"来源: {sources}")
-        lines.append("")
-
-        if not pve_names and not pvp_names:
-            # 愿单里"有这条记录"但解析不出任何 Perk：以前只回一个标题，
-            # 看起来像"这把枪没有推荐"。要明说是本地条目解析不出内容。
-            return (
-                f"「{display_name}」在本地愿单里有记录（来源: {sources}），"
-                "但这条记录解析不出 PvE/PvP 推荐 Perk。这不代表它没有推荐，"
-                "只是本地这条数据不完整。"
-            )
-
-        if pve_names:
-            lines.append(f"【PvE】推荐 perk ({len(pve_names)} 个):")
-            for name in pve_names:
-                lines.append(f"  • {name}")
-            lines.append("")
-
-        if pvp_names:
-            lines.append(f"【PvP】推荐 perk ({len(pvp_names)} 个):")
-            for name in pvp_names:
-                lines.append(f"  • {name}")
-
-        return "\n".join(lines)
+        pve = _perks(grp.pve_perks)
+        pvp = _perks(grp.pvp_perks)
+        sources = ", ".join(grp.sources[:5]) if grp.sources else ""
+        if not pve and not pvp:
+            return base | {
+                "source_detail": sources,
+                "note": (
+                    "本地愿单里有这条记录，但解析不出 PvE/PvP 推荐 Perk；"
+                    "不代表这把枪没有推荐，只是本地这条数据不完整。"
+                ),
+            }
+        return base | {
+            "kind": "recommended",
+            "source_detail": sources,
+            "pve": pve,
+            "pvp": pvp,
+        }
 
 
 def _item_icon_url(manifest: ManifestManager, item_hash: int) -> str:

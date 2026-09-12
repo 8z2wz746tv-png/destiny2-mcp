@@ -72,11 +72,42 @@ def test_catalog_without_truncation_says_so_too() -> None:
 
 
 class _WeaponManifest:
+    """随机 roll 武器（有随机池）：god_roll 才会走愿单分支。"""
+
     def search(self, query: str, *, limit: int = 20) -> list[dict]:
         return [{"itemHash": 100, "name": "测试武器", "itemType": 3}]
 
     def get_item_definition(self, item_hash: int) -> dict:
-        return {"displayProperties": {"name": "测试武器"}}
+        return {
+            "hash": item_hash,
+            "displayProperties": {"name": "测试武器"},
+            "inventory": {"tierType": 5},
+            "sockets": {
+                "socketCategories": [
+                    {"socketCategoryHash": 4241085061, "socketIndexes": [0]},
+                ],
+                "socketEntries": [{"randomizedPlugSetHash": 200}],
+            },
+        }
+
+    def get_plug_set_plugs(self, plug_set_hash: int) -> list[dict]:
+        return [
+            {
+                "plugItemHash": 300,
+                "name": "测试 Perk",
+                "plugCategoryIdentifier": "frames",
+                "currentlyCanRoll": True,
+            }
+        ]
+
+    def get_item_info(self, plug_hash: int) -> dict:
+        return {"name": "测试 Perk", "icon": ""}
+
+    def get_plug_category_identifier(self, plug_hash: int) -> str:
+        return "frames"
+
+    def get_sandbox_perk_description(self, plug_hash: int) -> None:
+        return None
 
 
 class _EmptyPerks:
@@ -98,10 +129,11 @@ async def test_god_roll_with_unparsable_entry_explains_instead_of_empty_shell() 
         _WeaponManifest(), popularity=None, wishlist=_WishlistWithEmptyEntry()
     )
 
-    text = await service.get_god_roll("测试武器")
+    result = await service.get_god_roll("测试武器")
 
-    assert "解析不出" in text
-    assert "某个愿单.txt" in text, "要带上来源，方便判断是哪条数据不完整"
+    assert result["kind"] == "none"
+    assert "解析不出" in result["note"]
+    assert result["source_detail"] == "某个愿单.txt", "要带上来源，方便判断是哪条数据不完整"
 
 
 # ── 3. catalyst：只有异域才有，且不能吐通用锻造词条 ─────────────────────────

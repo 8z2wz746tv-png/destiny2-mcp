@@ -1,0 +1,1681 @@
+{
+ "generated_from": "manifest/destiny_manifest_zh.sqlite3",
+ "generator": "scripts/generate_weapon_metadata.py",
+ "manifest_fingerprint": {
+  "computed_at": "2026-09-12T03:40:15+00:00",
+  "files": {
+   "destiny_manifest.sqlite3": {
+    "mtime": 1783841185.147,
+    "sha256": "1ed24e67daf27176f37d09c8904d817643e373c15f9b52c15e055932217e7255",
+    "size": 359257088
+   },
+   "destiny_manifest_zh.sqlite3": {
+    "mtime": 1783843554.343,
+    "sha256": "dd90cec95d3bf951d50e7b297e11fafdb8604c64261fd61c250cdade3ee39863",
+    "size": 358504448
+   }
+  },
+  "reused_hashes": false,
+  "schema_version": 1
+ },
+ "pair_count": 228,
+ "pairs": {
+  "1015611457": {
+   "base_description": "完成击杀后填装可提高武器伤害力。",
+   "category": "frames",
+   "enhanced": 2923251173,
+   "enhanced_description": "消灭目标后填装可提高武器伤害力，持续时间延长。",
+   "name": "杀戮弹匣"
+  },
+  "1017229899": {
+   "base_description": "造成溅射伤害会赋予手雷属性加成。",
+   "category": "frames",
+   "enhanced": 3696140595,
+   "enhanced_description": "造成溅射伤害会赋予更多的手雷属性加成。",
+   "name": "爆破分配器"
+  },
+  "1048183818": {
+   "base_description": "此武器可调整其伤害输出和效率来对抗与其伤害类型不匹配的能量护盾。",
+   "category": "frames",
+   "enhanced": 3431277734,
+   "enhanced_description": "此武器可调整其伤害输出以更有效地对抗与其伤害类型不匹配的能量护盾。伤害提升量提高。",
+   "name": "适配弹药"
+  },
+  "1089671869": {
+   "base_description": "造成独特的元素伤害会为此武器提供叠加的伤害加成。对于动能武器，此加成会提升。",
+   "category": "frames",
+   "enhanced": 496047945,
+   "enhanced_description": "造成独特的元素伤害会为此武器提供叠加的伤害加成，效果持续时间延长。对于动能武器，此加成会提升。",
+   "name": "元素磨砺"
+  },
+  "1115162408": {
+   "base_description": "接收或释放电光充能会从备弹中填装弹匣的一部分。",
+   "category": "frames",
+   "enhanced": 511499160,
+   "enhanced_description": "接收或释放电光充能会从备弹中填装弹匣的一部分，填装量更多。",
+   "name": "涓流充能"
+  },
+  "1119449540": {
+   "base_description": "对一个目标造成元素减益会在较短时间内提升此武器的填装速度、瞄准辅助和瞄准时的移动速度。",
+   "category": "frames",
+   "enhanced": 561986700,
+   "enhanced_description": "对一个目标造成元素减益可提升此武器的填装速度、瞄准辅助和瞄准时的移动速度，持续时间延长。",
+   "name": "顺畅换弹"
+  },
+  "1126264488": {
+   "base_description": "散射所有弹丸造成伤害时会提升填装速度、操控性和稳定性。",
+   "category": "frames",
+   "enhanced": 2476672792,
+   "enhanced_description": "散射几乎所有弹丸造成伤害时会提升填装速度、操控性和稳定性。",
+   "name": "威胁移除器"
+  },
+  "1134488199": {
+   "base_description": "瞄准此武器一小段时间而不射击，你将能够削弱下一个目标。计时器在射击或停止瞄准后重置。",
+   "category": "frames",
+   "enhanced": 2904194311,
+   "enhanced_description": "在更短的时间内瞄准此武器而不射击，你将能够削弱下一个目标。计时器在射击或停止瞄准后重置。",
+   "name": "枯萎凝视"
+  },
+  "113508675": {
+   "base_description": "多次同时造成最后一击会积累可叠加的伤害增益。计时器在下次武器射击时开始；造成最后一击会延长此计时器。",
+   "category": "frames",
+   "enhanced": 177189259,
+   "enhanced_description": "多次同时造成最后一击会积累可叠加的伤害增益。持续时间更长的计时器在下次武器射击时开始；造成最后一击会延长此计时器。",
+   "name": "收割者贡品"
+  },
+  "11551321": {
+   "base_description": "以牺牲填装速度为代价，大幅提升武器的稳定性。",
+   "category": "frames",
+   "enhanced": 3097973565,
+   "enhanced_description": "以牺牲较少量填装速度为代价，大幅提升武器的稳定性。",
+   "name": "钢铁握把"
+  },
+  "11612903": {
+   "base_description": "使用手雷或此武器获得最后一击可提高此武器的伤害和操控性。",
+   "category": "frames",
+   "enhanced": 2422968039,
+   "enhanced_description": "使用手雷或此武器获得最后一击可提高此武器的伤害和操控性，持续时间延长。",
+   "name": "肾上腺素成瘾"
+  },
+  "1168162263": {
+   "base_description": "精准击杀可大幅缩短填装时间。",
+   "category": "frames",
+   "enhanced": 1347741687,
+   "enhanced_description": "精准最后一击可大幅缩短填装时间，持续时间延长。",
+   "name": "不法之徒"
+  },
+  "1194056669": {
+   "base_description": "弹匣中的弹药减少时，射程、精度和操控性随之提高。",
+   "category": "frames",
+   "enhanced": 3955464425,
+   "enhanced_description": "弹匣中的弹药减少时，射程、精度和操控性随之进一步提高。",
+   "name": "打烊时间"
+  },
+  "1195158366": {
+   "base_description": "精准最后一击会赋予该武器可叠加的射程奖励。非精准最后一击将移除叠加射程奖励，但会在所有叠加射程被消除后奖励额外精准度和稳定性。",
+   "category": "frames",
+   "enhanced": 838873202,
+   "enhanced_description": "最后一击可为此武器提供稳定性、射程及精度的叠加加成。精准最后一击可提供更多层数。\n效果持续时间延长。",
+   "name": "周而复始"
+  },
+  "1202584452": {
+   "base_description": "快速元素最后一击和对受元素减益影响的目标造成最后一击，会定期准备一枚制导微型导弹，在此武器下次造成最后一击后从目标位置发射。可准备多枚导弹。",
+   "category": "frames",
+   "enhanced": 2138673996,
+   "enhanced_description": "快速元素最后一击和对受元素减益影响的目标造成最后一击，会定期准备一枚制导微型导弹，在此武器下次造成最后一击后从目标位置发射。可准备更多枚导弹。",
+   "name": "辅助炸药"
+  },
+  "1226351311": {
+   "base_description": "拾取弹药会从备弹中填装此武器，并在一段时间内提升其伤害和填装速度。\n\n拾取重型弹药提供的时间更长。",
+   "category": "frames",
+   "enhanced": 3251326479,
+   "enhanced_description": "拾取弹药会从备弹中填装此武器，并在更长时间内提升其伤害和填装速度。\n\n拾取重型弹药提供的时间更长。",
+   "name": "全明星"
+  },
+  "124408337": {
+   "base_description": "精准最后一击会在目标附近生成一块冰影水晶。",
+   "category": "frames",
+   "enhanced": 1171887445,
+   "enhanced_description": "精准最后一击会在目标附近生成一块大型冰影水晶。",
+   "name": "墓碑"
+  },
+  "1264398905": {
+   "base_description": "提高武器操控性和装填速度。当你作为你的火力战队最后一名存活的队员时获得以下效果：\n·增强目标锁定\n·增强操控性和装填速度\n·减少收到伤害时的屏幕抖动",
+   "category": "frames",
+   "enhanced": 1489035549,
+   "enhanced_description": "大幅提高武器操控性和装填速度。当你作为火力战队最后一名存活的成员时获得以下效果：\n• 提高目标捕获能力\n• 提高操控性和填装速度\n• 减少受到伤害时的抖动",
+   "name": "迅捷"
+  },
+  "1275731761": {
+   "base_description": "引爆火箭时会释放出集束炸弹。",
+   "category": "frames",
+   "enhanced": 2091001077,
+   "enhanced_description": "引爆火箭时会释放出集束炸弹。扩大爆炸范围。",
+   "name": "集束炸弹"
+  },
+  "1354429876": {
+   "base_description": "快速精准命中目标会向弹匣里返还两枚弹药。",
+   "category": "frames",
+   "enhanced": 848860060,
+   "enhanced_description": "快速精准命中目标会向弹匣里返还两枚弹药。增加精准命中之间的时间间隔。",
+   "name": "事不过四"
+  },
+  "1359896290": {
+   "base_description": "持续按住扳机可提升命中率和稳定性。",
+   "category": "frames",
+   "enhanced": 3060983774,
+   "enhanced_description": "持续按住扳机可快速提升精度和稳定性。",
+   "name": "动态减摆"
+  },
+  "1365187766": {
+   "base_description": "瞄准可提升身体射击伤害，减少目标捕获能力。",
+   "category": "frames",
+   "enhanced": 4200236906,
+   "enhanced_description": "瞄准可提升身体射击伤害，但会小幅减少目标捕获能力。",
+   "name": "直击要害"
+  },
+  "1421772400": {
+   "base_description": "增加弹药生成。在空中时，精度与填装速度提升，但目标捕获能力降低。",
+   "category": "frames",
+   "enhanced": 3291427296,
+   "enhanced_description": "大幅增加弹药生成。在空中时，精度与填装速度进一步提升，但目标捕获能力降低。",
+   "name": "空中扳机"
+  },
+  "1427256713": {
+   "base_description": "电池满能时，下一次冲击将造成额外伤害并使敌人在死亡时爆炸。",
+   "category": "frames",
+   "enhanced": 254337357,
+   "enhanced_description": "电池充满时，你的下一次点射获得提升，造成额外伤害并使目标在被击败时爆炸。",
+   "name": "洪涝"
+  },
+  "1428297954": {
+   "base_description": "此武器可在持用者保持移动时获得稳定性、操控性和填装速度加成。",
+   "category": "frames",
+   "enhanced": 2014892510,
+   "enhanced_description": "此武器可在持用者保持移动时获得短时间的稳定性、操控性和填装速度加成。",
+   "name": "永动不歇"
+  },
+  "1439600632": {
+   "base_description": "可提升弹药和备弹，但会减少伤害、爆炸范围和填装速度。",
+   "category": "frames",
+   "enhanced": 2282937672,
+   "enhanced_description": "可提升弹药和备弹，但会减少伤害。爆炸范围和填装速度将轻微降低。",
+   "name": "双脚架"
+  },
+  "1451849462": {
+   "base_description": "使用此武器造成最后一击会在短时间内降低其弹道分布。",
+   "category": "frames",
+   "enhanced": 4175584682,
+   "enhanced_description": "使用此武器造成最后一击可大幅降低其弹道分布，持续时间延长。",
+   "name": "枪管收缩装置"
+  },
+  "1464081238": {
+   "base_description": "精准最后一击会使附近目标变得虚弱。",
+   "category": "frames",
+   "enhanced": 2813913866,
+   "enhanced_description": "精准最后一击会使附近目标变得虚弱。减少启动冷却时间。",
+   "name": "瓦解"
+  },
+  "1511100135": {
+   "base_description": "处于增幅状态时，弹药会逐渐从备弹转移到弹匣中。\n\n拥有速度加成时，弹药回复更快并会过量填充弹匣。",
+   "category": "frames",
+   "enhanced": 65604327,
+   "enhanced_description": "处于增幅状态时，弹药会逐渐从备弹转移到弹匣中。\n\n拥有速度加成时，弹药回复更快并会过量填充弹匣。提升弹匣容量。",
+   "name": "超充弹匣"
+  },
+  "1517798362": {
+   "base_description": "此武器的动能弹药更容易令战斗人员眩晕，对低生命值目标的目标捕获能力和伤害更高。",
+   "category": "frames",
+   "enhanced": 1011551830,
+   "enhanced_description": "此武器的动能弹药更容易令战斗人员眩晕，对更大范围内的低生命值目标的目标捕获能力和伤害更高。",
+   "name": "阻止力"
+  },
+  "1523832109": {
+   "base_description": "此武器会缓慢填装子弹，直至两倍弹匣容量。",
+   "category": "frames",
+   "enhanced": 461595545,
+   "enhanced_description": "此武器会填装子弹直至两倍弹匣容量，此填装的速度有所提升。",
+   "name": "重建"
+  },
+  "1528281896": {
+   "base_description": "精准击杀可大幅缩短填装时间。",
+   "category": "frames",
+   "enhanced": 1347741687,
+   "enhanced_description": "精准最后一击可大幅缩短填装时间，持续时间延长。",
+   "name": "不法之徒"
+  },
+  "1546142478": {
+   "base_description": "与此武器相克的元素最后一击会在短时间内提升伤害。暗影最后一击强化电弧、烈日和虚空武器。光能最后一击强化冰影、缚丝和动能武器。",
+   "category": "frames",
+   "enhanced": 983853954,
+   "enhanced_description": "与此武器相克的元素最后一击会在更长的时间内提升伤害。暗影最后一击强化电弧、烈日和虚空武器。光能最后一击强化冰影、缚丝和动能武器。",
+   "name": "二元轨道"
+  },
+  "1546637391": {
+   "base_description": "对首领、载具和激活超能的守护者造成更多伤害。",
+   "category": "frames",
+   "enhanced": 3418165135,
+   "enhanced_description": "对首领、载具和激活超能的守护者造成更多伤害。提升稳定性。刀剑拥有更高的防御抗性。",
+   "name": "斩首武器"
+  },
+  "1556840489": {
+   "base_description": "捡取重型弹药会为此武器提供弹药。",
+   "category": "frames",
+   "enhanced": 3442762221,
+   "enhanced_description": "拾取重型弹药会为此武器提供更多弹药。",
+   "name": "金中藏弹"
+  },
+  "1570042021": {
+   "base_description": "使用此武器完成最后一击可提高精度和稳定性，同时改善垂直后坐力。",
+   "category": "frames",
+   "enhanced": 2748258257,
+   "enhanced_description": "使用此武器完成最后一击可提高精度和稳定性，同时改善垂直后坐力，持续时间延长。",
+   "name": "热力四射"
+  },
+  "1570399071": {
+   "base_description": "拾取能量球后，此武器造成的下一次最后一击将提供额外特殊弹药量表进度。",
+   "category": "frames",
+   "enhanced": 1661646271,
+   "enhanced_description": "拾取能量球后，此武器造成的下一次最后一击将提供额外特殊弹药量表进度。提升可叠加次数上限。",
+   "name": "光中藏弹"
+  },
+  "1583705720": {
+   "base_description": "命中三个不同目标可在一定时间内提高武器操控性、稳定性、填装和射程。",
+   "category": "frames",
+   "enhanced": 1409206216,
+   "enhanced_description": "命中三个不同目标可提高武器操控性、稳定性、填装和射程，持续时间延长。",
+   "name": "全面提升"
+  },
+  "1600092898": {
+   "base_description": "切换至此武器后短时间内充能时间缩短，操控速度提高。",
+   "category": "frames",
+   "enhanced": 828056542,
+   "enhanced_description": "切换至此武器后短时间内充能时间缩短，操控速度提高，持续时间延长。",
+   "name": "B计划"
+  },
+  "1631667848": {
+   "base_description": "近战最后一击或使用充能近战造成伤害会从储存弹药中填装此武器的弹匣。",
+   "category": "frames",
+   "enhanced": 402033656,
+   "enhanced_description": "近战最后一击或使用充能近战造成伤害会从储存弹药中填装此武器的弹匣。提升操控性。",
+   "name": "盗墓者"
+  },
+  "1645158859": {
+   "base_description": "弹匣中的弹药减少时，稳定性和精度随之提高。",
+   "category": "frames",
+   "enhanced": 3755250867,
+   "enhanced_description": "弹匣中的弹药减少时，稳定性和精度随之大幅提高。",
+   "name": "越战越勇"
+  },
+  "1683379515": {
+   "base_description": "使用武器破坏敌人的护盾，使他们在一小段时间内对动能伤害的承受力更低。",
+   "category": "frames",
+   "enhanced": 2216471363,
+   "enhanced_description": "使用武器破坏战斗人员的护盾，使他们对动能伤害的承受力更低，持续时间延长。",
+   "name": "瓦解破裂"
+  },
+  "1685431615": {
+   "base_description": "切换至这把刀剑之后立即进行快速攻击可造成额外伤害。",
+   "category": "frames",
+   "enhanced": 3406782879,
+   "enhanced_description": "切换至这把刀剑之后立即进行快速攻击可造成额外伤害，持续时间延长。",
+   "name": "居合连斩"
+  },
+  "1749209109": {
+   "base_description": "[轻攻击]  ：短时间内进行三次轻攻击可提供刀剑的弹药。",
+   "category": "frames",
+   "enhanced": 4085959009,
+   "enhanced_description": "[轻攻击]  ：短时间内进行三次轻攻击可提供刀剑的弹药，持续时间延长。",
+   "name": "无情打击"
+  },
+  "1754714824": {
+   "base_description": "冲刺一小段时间后滑行期间可获得额外伤害和充能速度加成。",
+   "category": "frames",
+   "enhanced": 834262328,
+   "enhanced_description": "冲刺后滑行期间可获得额外伤害和充能速度加成，持续时间延长。",
+   "name": "快速启动"
+  },
+  "1771339417": {
+   "base_description": "在两个或更多盟友身边时，武器造成的精准伤害增加。",
+   "category": "frames",
+   "enhanced": 395388285,
+   "enhanced_description": "在两个或更多盟友身边时，武器造成的精准伤害增加。提高操控性。",
+   "name": "火线"
+  },
+  "1782407750": {
+   "base_description": "偃月射弹最后一击会增加偃月近战伤害。偃月射弹或近战伤害会延长效果持续时间。",
+   "category": "frames",
+   "enhanced": 2241043034,
+   "enhanced_description": "偃月射弹最后一击会增加偃月近战伤害，且持续时间更长。偃月射弹或近战伤害会延长效果持续时间。",
+   "name": "紧逼近战"
+  },
+  "1799762209": {
+   "base_description": "缩短被战斗人员包围时的充能时间或蓄力时间。",
+   "category": "frames",
+   "enhanced": 1008128453,
+   "enhanced_description": "缩短被战斗人员包围时的充能时间或拉弓时间。提高稳定性。",
+   "name": "逼入绝境"
+  },
+  "1820235745": {
+   "base_description": "消灭目标会使弹药从储存弹药中转移并填装部分弹匣。",
+   "category": "frames",
+   "enhanced": 4245865861,
+   "enhanced_description": "消灭目标会用储存弹药填装部分弹匣，弹药数量提高。",
+   "name": "维持生计"
+  },
+  "1821614984": {
+   "base_description": "大幅增加操控性，大幅降低目标捕获能力。",
+   "category": "frames",
+   "enhanced": 1942880504,
+   "enhanced_description": "大幅增加操控性，降低目标捕获能力。",
+   "name": "平顺拔枪"
+  },
+  "1866048759": {
+   "base_description": "提高腰际射击时的命中率、稳定性和精准命中能力。",
+   "category": "frames",
+   "enhanced": 3118144663,
+   "enhanced_description": "大幅提高腰际射击时的精度、稳定性和精准命中能力。",
+   "name": "腰射握把"
+  },
+  "1870851715": {
+   "base_description": "对拥有覆盖护盾的目标造成额外伤害。对战斗人员的护盾造成少量额外伤害。",
+   "category": "frames",
+   "enhanced": 183938251,
+   "enhanced_description": "对拥有覆盖护盾的目标造成更多额外伤害。对战斗人员的护盾造成少量额外伤害。",
+   "name": "覆盖护盾克星"
+  },
+  "1888882410": {
+   "base_description": "收集一个元素拾取物或摧毁缠结会赋予此武器一段叠加期，期间命中时生成近战能量。投掷缠结会延长持续时间。\n\n元素拾取物包括焰灵、虚空裂口、离子轨迹、冰影碎片和缚丝缠结。",
+   "category": "frames",
+   "enhanced": 3684445958,
+   "enhanced_description": "收集一个元素拾取物或摧毁缠结会赋予此武器一段叠加期，期间命中时生成更多的近战能量。投掷缠结会延长持续时间。\n\n元素拾取物包括焰灵、虚空裂口、离子轨迹、冰影碎片和缚丝缠结。",
+   "name": "集体拳击"
+  },
+  "1890422124": {
+   "base_description": "初次扣动扳机时可在短时间内提高稳定性和精度。",
+   "category": "frames",
+   "enhanced": 1523649716,
+   "enhanced_description": "初次扣动扳机时可在短时间内大幅提高稳定性和精度，持续时间延长。",
+   "name": "扳机轻语"
+  },
+  "1918398421": {
+   "base_description": "当你拥有织造铠甲、冰霜护甲或虚空覆盖护盾时，获得瞄准辅助、稳定性和抖动抗性。",
+   "category": "frames",
+   "enhanced": 3422375969,
+   "enhanced_description": "当你拥有织造铠甲、冰霜护甲或虚空覆盖护盾时，在更长的时间内获得瞄准辅助、稳定性和抖动抗性。",
+   "name": "爆破之构"
+  },
+  "1941225610": {
+   "base_description": "蜻蜓会根据先前造成的精准射击次数造成额外伤害。",
+   "category": "frames",
+   "enhanced": 4196156997,
+   "enhanced_description": "精准最后一击会产生元素伤害爆炸，该爆炸会根据先前造成的精准命中次数造成额外伤害。",
+   "name": "巨脉蜻蜓"
+  },
+  "1954620775": {
+   "base_description": "弹药可粘附在目标上，并在短暂延迟后爆炸。",
+   "category": "frames",
+   "enhanced": 1562897767,
+   "enhanced_description": "射弹可粘附在目标上，并在短暂延迟后爆炸。提高稳定性。",
+   "name": "延时载荷"
+  },
+  "1955165503": {
+   "base_description": "使用此武器摧毁冰影水晶或击败被冻结的目标可获得冰霜护甲。",
+   "category": "frames",
+   "enhanced": 2617553311,
+   "enhanced_description": "使用此武器摧毁冰影水晶或击败被冻结的目标可获得更多的冰霜护甲。",
+   "name": "霜华窃取者"
+  },
+  "1966281507": {
+   "base_description": "阻挡伤害可从储备弹药中部分填装此武器。",
+   "category": "frames",
+   "enhanced": 1592669035,
+   "enhanced_description": "阻挡伤害可从储备弹药中部分填装此武器。减少启动延迟。",
+   "name": "补足神盾"
+  },
+  "2010801679": {
+   "base_description": "根据填装之前完成的快速击杀数可过量填充弹匣。",
+   "category": "frames",
+   "enhanced": 3797647183,
+   "enhanced_description": "根据填装之前完成的最后一击数可过量填充弹匣, 提高填装速度。",
+   "name": "刺客野心"
+  },
+  "201365942": {
+   "base_description": "每次精准射击命中后蓄力时间缩短。",
+   "category": "frames",
+   "enhanced": 3523746922,
+   "enhanced_description": "每次精准射击命中后蓄力时间大幅缩短，持续时间延长。",
+   "name": "弓手节奏"
+  },
+  "2030760728": {
+   "base_description": "在受到伤害时进行防护可产生职业技能能量。",
+   "category": "frames",
+   "enhanced": 2856365672,
+   "enhanced_description": "在受到伤害时进行防御可生成职业技能能量，生成速度提高。",
+   "name": "能量转换"
+  },
+  "2039302152": {
+   "base_description": "滑行可装填武器的一部分弹药，并暂时性地大幅提高武器操控性和稳定性。",
+   "category": "frames",
+   "enhanced": 2396422520,
+   "enhanced_description": "滑行可填装武器的一部分弹匣，并暂时性地大幅提高武器操控性和稳定性。",
+   "name": "滑行健射"
+  },
+  "2048641572": {
+   "base_description": "击败一个目标会产生虚空爆发；用此爆发击中其他目标会使其不稳定，并在短时间内为你提供不稳定弹药。",
+   "category": "frames",
+   "enhanced": 1926441324,
+   "enhanced_description": "击败一个目标会产生虚空爆发；用此爆发击中其他目标会使其不稳定，并为你提供不稳定弹药，持续时间延长。",
+   "name": "失衡弹药"
+  },
+  "2054520291": {
+   "base_description": "在精准最后一击后填装，会使后续的精准命中从备弹中补充一发子弹。",
+   "category": "frames",
+   "enhanced": 4170193963,
+   "enhanced_description": "在精准最后一击后填装，会使后续的精准命中从备弹中补充一发子弹，持续时间延长。",
+   "name": "幸运的一击"
+  },
+  "2077819806": {
+   "base_description": "切换到此武器后立即提高刀剑前冲距离。",
+   "category": "frames",
+   "enhanced": 1618208178,
+   "enhanced_description": "切换到此武器后立即大幅提高刀剑前冲距离。",
+   "name": "急切刀锋"
+  },
+  "2109543898": {
+   "base_description": "武器最后一击会造成额外伤害。近战和手雷最后一击会造成更多额外伤害，而且可叠加。",
+   "category": "frames",
+   "enhanced": 2799030358,
+   "enhanced_description": "武器最后一击会造成额外伤害，持续时间延长。近战和手雷最后一击会造成更多额外伤害，而且可叠加。",
+   "name": "铤而走险"
+  },
+  "2172504645": {
+   "base_description": "在此武器收起时使用武器或技能完成最后一击可在短时间内提高其操控性、稳定性和填装速度。",
+   "category": "frames",
+   "enhanced": 1172098417,
+   "enhanced_description": "在此武器收起时使用武器或技能完成最后一击可提高其操控性、稳定性和填装速度，持续时间延长。",
+   "name": "花招戏法"
+  },
+  "2173046394": {
+   "base_description": "击败目标后填装此武器会短时间过充武器，下次命中时震颤敌人。",
+   "category": "frames",
+   "enhanced": 1720528630,
+   "enhanced_description": "击败目标后填装此武器会短时间过充武器且持续时间延长，下次命中时震颤敌人。",
+   "name": "伏特子弹"
+  },
+  "2209918983": {
+   "base_description": "使用此武器打破正在使用超能的战斗人员或守护者的护盾将获得覆盖护盾。",
+   "category": "frames",
+   "enhanced": 2000295559,
+   "enhanced_description": "使用此武器打破正在使用超能的战斗人员或守护者的护盾将获得覆盖护盾，持续时间延长。",
+   "name": "还治彼身"
+  },
+  "2213355989": {
+   "base_description": "弹匣中最后的几发弹药可造成更高伤害。",
+   "category": "frames",
+   "enhanced": 2002547233,
+   "enhanced_description": "弹匣中最后的几发弹药可造成更高伤害。弹匣中更高伤害的弹药增多。",
+   "name": "高强度型弹药储备"
+  },
+  "2224838837": {
+   "base_description": "使用护盾阻挡伤害可在短时间内提高射弹伤害。",
+   "category": "frames",
+   "enhanced": 3102670337,
+   "enhanced_description": "使用护盾阻挡伤害可在短时间内提高射弹伤害，持续时间延长。",
+   "name": "势不可挡"
+  },
+  "2244851822": {
+   "base_description": "举起防御阻挡伤害后会释放出一道使目标迷失方向的短程冲击波。",
+   "category": "frames",
+   "enhanced": 2860991074,
+   "enhanced_description": "举起防御阻挡伤害后会释放出一道使目标迷失方向的短程冲击波，效果持续时间更长。",
+   "name": "闪电反击"
+  },
+  "2272927194": {
+   "base_description": "参加战斗一定时间后会增加空中效率并减少后仰，效果持续到你离开战斗。",
+   "category": "frames",
+   "enhanced": 711628886,
+   "enhanced_description": "参加战斗一定时间后会增加空中精度并减少后仰，效果持续到你离开战斗一段时间后。",
+   "name": "完美浮空"
+  },
+  "2284787283": {
+   "base_description": "装填此武器将随机从备弹中多填装弹药。",
+   "category": "frames",
+   "enhanced": 3563868667,
+   "enhanced_description": "填装此武器将随机从储存弹药中填装更多弹药。",
+   "name": "小丑皇弹药筒"
+  },
+  "2289534249": {
+   "base_description": "击败目标后填装此武器，会使下次命中发射一枚引爆造成迷失效果的动能射弹。",
+   "category": "frames",
+   "enhanced": 3914874605,
+   "enhanced_description": "击败目标后填装此武器，会使下次命中发射一枚引爆造成更持久迷失效果的动能射弹。",
+   "name": "迷惑爆发"
+  },
+  "2298656195": {
+   "base_description": "快速治疗盟友可提升此武器在一段时间内的伤害。",
+   "category": "frames",
+   "enhanced": 674546187,
+   "enhanced_description": "快速治疗盟友可提升此武器在一段时间内的伤害，持续时间延长。",
+   "name": "生命轮回"
+  },
+  "2305480722": {
+   "base_description": "在最后一击后填装会获得一段时间的伤害提升。填装前额外造成最后一击会进一步延长伤害提升持续时间。",
+   "category": "frames",
+   "enhanced": 2260261934,
+   "enhanced_description": "在最后一击后填装会获得更长时间的伤害提升。填装前额外造成最后一击会进一步延长伤害提升持续时间。",
+   "name": "超级杀戮弹匣"
+  },
+  "2319119708": {
+   "base_description": "使用此武器造成最后一击会提供可叠加的额外伤害。从高处攻击目标可立即获得最大层数。",
+   "category": "frames",
+   "enhanced": 2140591236,
+   "enhanced_description": "使用此武器造成最后一击会提供可叠加的额外伤害。从高处攻击目标可立即获得最大层数。提升填装速度。",
+   "name": "高地"
+  },
+  "2360347339": {
+   "base_description": "最后一击会在短时间内增加所有来源的弹药量表进度。",
+   "category": "frames",
+   "enhanced": 4096144819,
+   "enhanced_description": "最后一击会在稍微延长的时间内增加所有来源的弹药量表进度。",
+   "name": "即兴弹药"
+  },
+  "2360754333": {
+   "base_description": "在进行一次成功的近战打击后，在一小段时间内——或直到发射完三枚子弹前——武器的伤害、操控性和填装速度会提高。",
+   "category": "frames",
+   "enhanced": 2459015849,
+   "enhanced_description": "在进行一次成功的近战打击后，在一小段时间内——或直到发射完三枚子弹前——提高武器的伤害、操控性和填装速度。",
+   "name": "战嚎炮管"
+  },
+  "2387244414": {
+   "base_description": "使用此武器造成伤害可逐渐减少后坐力和抖动。",
+   "category": "frames",
+   "enhanced": 1748774930,
+   "enhanced_description": "使用此武器造成伤害可逐渐减少后坐力和抖动。提高基础稳定性。",
+   "name": "禅意时刻"
+  },
+  "2396489472": {
+   "base_description": "此武器的每次最后一击都会造成一次元素伤害爆炸。",
+   "category": "frames",
+   "enhanced": 598607952,
+   "enhanced_description": "此武器的每次最后一击都会造成一次更强的元素伤害爆炸。",
+   "name": "连锁反应"
+  },
+  "2416023159": {
+   "base_description": "最后一击可在短时间内增加腰射的武器射程、稳定性和精度。",
+   "category": "frames",
+   "enhanced": 3050799639,
+   "enhanced_description": "最后一击可在更长时间内增加腰射的武器射程、稳定性和精度。",
+   "name": "即时打击"
+  },
+  "243981275": {
+   "base_description": "造成持续伤害会生成一个能量球。",
+   "category": "frames",
+   "enhanced": 984655331,
+   "enhanced_description": "造成持续伤害会生成一个略有提升的能量球。",
+   "name": "羸弱能量球"
+  },
+  "2450788523": {
+   "base_description": "最后一击可在短时间内提升敏捷、武器射程和操控性。",
+   "category": "frames",
+   "enhanced": 4207509907,
+   "enhanced_description": "最后一击可提升敏捷、武器射程和操控性，持续时间延长。",
+   "name": "杀人风"
+  },
+  "2451262963": {
+   "base_description": "此武器可获得射程加成，直至你的护盾被摧毁。在你的护盾重新充满能量后，该加成将重新生效。",
+   "category": "frames",
+   "enhanced": 1609056795,
+   "enhanced_description": "此武器可获得射程加成，直至你的护盾被摧毁。在你的护盾重新充满能量后，该加成将更快地重新生效。",
+   "name": "脆弱专注"
+  },
+  "2458213969": {
+   "base_description": "填装的弹药会根据先前完成快速最后一击次数造成额外伤害。",
+   "category": "frames",
+   "enhanced": 2570477205,
+   "enhanced_description": "填装的弹药会根据先前完成快速最后一击次数造成额外伤害，持续时间延长。",
+   "name": "多杀弹匣"
+  },
+  "2458610193": {
+   "base_description": "当你拥有增幅、焕光，或吞食效果时，此武器获得填装速度、操控性与瞄准速度。",
+   "category": "frames",
+   "enhanced": 2133978453,
+   "enhanced_description": "当你拥有增幅、焕光，或吞食效果时，此武器获得更多的填装速度、操控性与瞄准速度。",
+   "name": "光能之触"
+  },
+  "247725512": {
+   "base_description": "快速精准命中目标会暂时提高稳定性和填装速度。",
+   "category": "frames",
+   "enhanced": 2938480696,
+   "enhanced_description": "快速精准命中目标会暂时大幅提高稳定性和填装速度。",
+   "name": "快速命中"
+  },
+  "2551157718": {
+   "base_description": "未射击下瞄准一小段时间可提高在射击或退出瞄准后重置的射程和精准伤害。",
+   "category": "frames",
+   "enhanced": 23371658,
+   "enhanced_description": "在更短的一小段时间内瞄准此武器而不射击可提高射程和精准伤害，射击或退出瞄准后重置。",
+   "name": "盒式呼吸法"
+  },
+  "25606670": {
+   "base_description": "一次填装一发额外子弹。",
+   "category": "frames",
+   "enhanced": 3143051906,
+   "enhanced_description": "一次填装两发额外子弹。",
+   "name": "双重装填"
+  },
+  "2578928832": {
+   "base_description": "射空此武器的弹匣时，会根据命中次数从储存弹药中填装。",
+   "category": "frames",
+   "enhanced": 1563455254,
+   "enhanced_description": "射空此武器的弹匣时，会根据命中次数更有效地从储存弹药中填装。",
+   "name": "回转弹药"
+  },
+  "2578928835": {
+   "base_description": "快速精准命中目标会暂时提高稳定性和填装速度。",
+   "category": "frames",
+   "enhanced": 2938480696,
+   "enhanced_description": "快速精准命中目标会暂时大幅提高稳定性和填装速度。",
+   "name": "快速命中"
+  },
+  "2579169598": {
+   "base_description": "略微提升瞄准辅助、瞄准速度和空中效率。附近没有盟友时这些效果将提升。",
+   "category": "frames",
+   "enhanced": 2073244114,
+   "enhanced_description": "提升瞄准辅助、瞄准速度和空中效率。附近没有盟友时这些效果将提升。",
+   "name": "孤狼"
+  },
+  "2586829431": {
+   "base_description": "最后一击会储存多股能量，使你切换和收举此武器的速度增加。",
+   "category": "frames",
+   "enhanced": 2217963031,
+   "enhanced_description": "最后一击会储存多股能量，使你切换和收举此武器的速度大幅增加。",
+   "name": "射击切换"
+  },
+  "2590710093": {
+   "base_description": "每隔一次的赋能刀剑击杀都可提供刀剑弹药。",
+   "category": "frames",
+   "enhanced": 4183521337,
+   "enhanced_description": "每隔一次的赋能刀剑最后一击都可提供刀剑弹药，并有几率提供额外弹药。",
+   "name": "无倦利刃"
+  },
+  "2594592626": {
+   "base_description": "在连射中，每一次射击命中都会在短时间内提高此武器的伤害并减少充能时间。",
+   "category": "frames",
+   "enhanced": 2037312142,
+   "enhanced_description": "在连射中，每一次射击命中都会提高此武器的伤害并减少充能时间，持续时间延长。",
+   "name": "受控连射"
+  },
+  "2621346526": {
+   "base_description": "友军在附近时，提高操控性和填装速度。",
+   "category": "frames",
+   "enhanced": 2495011826,
+   "enhanced_description": "友军在附近时，大幅提高操控性和填装速度。",
+   "name": "大合奏"
+  },
+  "2652708987": {
+   "base_description": "每次最后一击都能提高充能/拉弓速度。",
+   "category": "frames",
+   "enhanced": 617966211,
+   "enhanced_description": "每次最后一击都能提高充能/拉弓速度，持续时间延长。",
+   "name": "小试牛刀"
+  },
+  "2679249093": {
+   "base_description": "一发弹药的所有弹片均命中同一敌人可在短时间内提高近战伤害。",
+   "category": "frames",
+   "enhanced": 788178929,
+   "enhanced_description": "一发弹药的几乎所有弹片均命中同一目标可在短时间内提高近战伤害。",
+   "name": "雪上加霜"
+  },
+  "2720533289": {
+   "base_description": "填装前精准最后一击的次数会影响射程和伤害增加的子弹总数。激活宏伟之嚎时，精准最后一击会延长额外子弹效果。",
+   "category": "frames",
+   "enhanced": 3042219245,
+   "enhanced_description": "填装前精准最后一击的次数会影响射程和伤害增加的子弹总数。激活宏伟之嚎时，精准最后一击会延长额外子弹效果。提升填装速度。",
+   "name": "宏伟之嚎"
+  },
+  "2726471870": {
+   "base_description": "使用此武器击杀战斗人员会产生少量超能能量。",
+   "category": "frames",
+   "enhanced": 1172413778,
+   "enhanced_description": "使用此武器消灭战斗人员会产生少量超能能量，能量数量提高。",
+   "name": "敲打"
+  },
+  "2779035018": {
+   "base_description": "此武器的每个快速击杀将在短时间内累积增加装填速度。",
+   "category": "frames",
+   "enhanced": 1171147302,
+   "enhanced_description": "此武器的每个快速最后一击将在短时间内累积大幅增加填装速度。",
+   "name": "喂食狂热"
+  },
+  "2782457288": {
+   "base_description": "完成击杀可提高此武器的伤害，效果持续至切换或填装武器。",
+   "category": "frames",
+   "enhanced": 2896748467,
+   "enhanced_description": "完成最后一击可提高此武器的伤害，效果持续至切换或填装武器。提高弹匣容量。",
+   "name": "击杀记录"
+  },
+  "280464955": {
+   "base_description": "蹲伏射击时可提高精度、稳定性和操控性。",
+   "category": "frames",
+   "enhanced": 3920370755,
+   "enhanced_description": "蹲伏射击时可大幅提高精度、稳定性和操控性。",
+   "name": "稳若磐石"
+  },
+  "2846385770": {
+   "base_description": "使用这款武器瞄准可提高有效射程和变焦倍率。提高使用火箭发射器、榴弹发射器、弓箭瞄准时的射弹速度。",
+   "category": "frames",
+   "enhanced": 509594246,
+   "enhanced_description": "使用此武器瞄准可提高有效射程和变焦倍率，并改善操控性。提高使用火箭发射器、榴弹发射器、弓箭瞄准时的射弹速度。",
+   "name": "测距仪"
+  },
+  "2848615171": {
+   "base_description": "精准击杀可产生元素伤害爆炸。",
+   "category": "frames",
+   "enhanced": 169755979,
+   "enhanced_description": "精准最后一击可产生元素伤害爆炸。提高填装速度。",
+   "name": "蜻蜓"
+  },
+  "2859149211": {
+   "base_description": "使用此武器造成最后一击可为射弹提供追踪能力并提升填装速度。造成更多伤害可延长持续时间。",
+   "category": "frames",
+   "enhanced": 1135494563,
+   "enhanced_description": "使用此武器造成最后一击可为射弹提供追踪能力并增加填装速度，效果持续时间延长。造成更多伤害可延长持续时间。",
+   "name": "信标弹药"
+  },
+  "2866798147": {
+   "base_description": "使用这款武器瞄准可在短时间内减少抖动。",
+   "category": "frames",
+   "enhanced": 3974407819,
+   "enhanced_description": "使用此武器进行极短时间的瞄准可减少抖动。",
+   "name": "心无旁骛"
+  },
+  "2869569095": {
+   "base_description": "增加弹药储备量。蹲伏时填装、收举和准备速度提高。",
+   "category": "frames",
+   "enhanced": 2308090567,
+   "enhanced_description": "大幅提升弹药生成。蹲伏时提升填装、收举和准备速度。",
+   "name": "沙场备战"
+  },
+  "2888557110": {
+   "base_description": "随着射弹在爆炸前飞得越远，造成的爆炸伤害就越高。",
+   "category": "frames",
+   "enhanced": 1905598698,
+   "enhanced_description": "随着射弹在爆炸前飞得越远，造成的爆炸伤害就越高。扩大爆炸范围。",
+   "name": "掌控全场"
+  },
+  "2890807135": {
+   "base_description": "造成持续伤害会灼烧目标。对被灼烧的目标造成伤害会施加灼烧效果。",
+   "category": "frames",
+   "enhanced": 3581929919,
+   "enhanced_description": "造成持续伤害会更快地灼烧目标。对被灼烧的目标造成伤害会施加灼烧效果。",
+   "name": "燃烧野心"
+  },
+  "2896038713": {
+   "base_description": "弹匣内的部分弹药造成精准伤害后可赋予此武器额外伤害。在填装或是收起武器时重置命中数量。",
+   "category": "frames",
+   "enhanced": 2402480669,
+   "enhanced_description": "弹匣内的部分弹药造成精准伤害后可赋予此武器一段更长时间的额外伤害。在填装或是收起武器时重置命中数量。",
+   "name": "聚焦狂怒"
+  },
+  "2922950962": {
+   "base_description": "快速最后一击会在目标附近生成一块冰影水晶。",
+   "category": "frames",
+   "enhanced": 2078520142,
+   "enhanced_description": "快速最后一击会在目标附近生成一块更大的冰影水晶。",
+   "name": "结晶残花"
+  },
+  "2946784966": {
+   "base_description": "消灭目标后填装可在短时间内大幅改善目标捕获能力和瞄准速度。",
+   "category": "frames",
+   "enhanced": 987673306,
+   "enhanced_description": "消灭目标后填装可大幅改善目标捕获能力和瞄准速度，持续时间延长。",
+   "name": "狭窄视野"
+  },
+  "2978966579": {
+   "base_description": "使用前半弹匣弹药直接命中可造成减速附近目标的爆炸。",
+   "category": "frames",
+   "enhanced": 344235611,
+   "enhanced_description": "弹匣的大多数弹药直接命中可造成减速附近目标的爆炸。",
+   "name": "冰冷弹匣"
+  },
+  "2980589453": {
+   "base_description": "快速治疗盟友可为你提供固有特性元素增益。",
+   "category": "frames",
+   "enhanced": 4063561849,
+   "enhanced_description": "快速治疗盟友可为你提供固有特性元素增益。该增益对你和盟友都更为强效。",
+   "name": "医治"
+  },
+  "3016987351": {
+   "base_description": "在防御后立刻格挡攻击将会在短时间内增加伤害。",
+   "category": "frames",
+   "enhanced": 1145640183,
+   "enhanced_description": "在防御后立刻格挡攻击可增加伤害，持续时间延长。",
+   "name": "强力反击"
+  },
+  "3017780555": {
+   "base_description": "最后一击后短时间内填装，可为自身和附近盟友提供治愈。",
+   "category": "frames",
+   "enhanced": 4223976499,
+   "enhanced_description": "最后一击后填装，可为自身和附近盟友提供治愈。你有额外的时间来进行填装。",
+   "name": "治疗弹匣"
+  },
+  "3018146897": {
+   "base_description": "重复偏离目标可在短时间内提高此武器的稳定性。此增益效果在命中目标后会持续较短时间。",
+   "category": "frames",
+   "enhanced": 4100396181,
+   "enhanced_description": "重复偏离目标可在短时间内提高此武器的稳定性。此增益效果在命中目标后会持续较长时间。",
+   "name": "无形之手"
+  },
+  "3038247973": {
+   "base_description": "弹药在命中时爆炸，产生范围效果。",
+   "category": "frames",
+   "enhanced": 64866129,
+   "enhanced_description": "射弹命中后产生范围效果爆炸。提高填装速度。",
+   "name": "高爆载荷"
+  },
+  "3047969693": {
+   "base_description": "造成精准最后一击或快速击败目标后进行填装可提升你的射速。",
+   "category": "frames",
+   "enhanced": 624891305,
+   "enhanced_description": "造成精准最后一击或快速击败目标后进行填装可提升你的射速，持续时间延长。",
+   "name": "亡命之徒"
+  },
+  "307683764": {
+   "base_description": "在低热量状态下，此武器的射程、操控性与精度提升。",
+   "category": "frames",
+   "enhanced": 1341464476,
+   "enhanced_description": "在低热量状态下，此武器的射程、操控性与精度提升得略微更高。",
+   "name": "精细调整"
+  },
+  "3078487919": {
+   "base_description": "在短时间内使用所有已装备的武器造成伤害可为此武器提供伤害加成。",
+   "category": "frames",
+   "enhanced": 3744057135,
+   "enhanced_description": "在短时间内使用所有已装备的武器造成伤害可为此武器提供伤害加成，持续时间延长。",
+   "name": "诱导推销"
+  },
+  "3081867624": {
+   "base_description": "使用任意武器完成击杀将在短时间内提高此武器的伤害。",
+   "category": "frames",
+   "enhanced": 2963273944,
+   "enhanced_description": "使用任意武器造成最后一击会提高此武器的伤害，效果持续时间延长。",
+   "name": "武器大师"
+  },
+  "3096702027": {
+   "base_description": "使用武器打破战斗护盾可从储备弹药中转移弹药至弹匣。若能量武器与战斗护盾伤害类型吻合，击中目标时可重生弹药。",
+   "category": "frames",
+   "enhanced": 1658784563,
+   "enhanced_description": "使用武器打破战斗护盾可从储备弹药中转移弹药至弹匣。若能量武器与战斗护盾伤害类型吻合，击中目标时可重生弹药。还可提升武器操控性。",
+   "name": "创世"
+  },
+  "3108830275": {
+   "base_description": "快速消灭目标可触发生命值恢复。守护者和高阶战斗人员视为不止一个击杀。",
+   "category": "frames",
+   "enhanced": 855168139,
+   "enhanced_description": "快速消灭目标可触发更多的生命值回复。守护者和强力战斗人员视为不止一个目标。",
+   "name": "不屈"
+  },
+  "3124871000": {
+   "base_description": "精准击杀可大幅缩短填装时间。",
+   "category": "frames",
+   "enhanced": 1347741687,
+   "enhanced_description": "精准最后一击可大幅缩短填装时间，持续时间延长。",
+   "name": "不法之徒"
+  },
+  "31345821": {
+   "base_description": "使用此武器造成最后一击可提供额外伤害。击败更强力的目标可提高此加成的强度和持续时间。",
+   "category": "frames",
+   "enhanced": 639190697,
+   "enhanced_description": "使用此武器造成最后一击可提供额外伤害，且持续时间延长。击败更强力的目标可提高此加成的强度和持续时间。",
+   "name": "邪剑守则"
+  },
+  "3161816588": {
+   "base_description": "滑行可装填武器的一部分弹药，并暂时性地大幅提高武器射程和稳定性。",
+   "category": "frames",
+   "enhanced": 191144788,
+   "enhanced_description": "滑行可填装武器的一部分弹匣，并暂时性地大幅提高武器射程和稳定性。",
+   "name": "滑行射击"
+  },
+  "3182497402": {
+   "base_description": "收集虚空裂口会使最后一击提供虚空覆盖护盾。",
+   "category": "frames",
+   "enhanced": 1767911158,
+   "enhanced_description": "收集虚空裂口会使最后一击提供更高数值的虚空覆盖护盾。",
+   "name": "维度偏移"
+  },
+  "3194351027": {
+   "base_description": "拾取能量球会增加下一枚射弹的爆炸范围和伤害。",
+   "category": "frames",
+   "enhanced": 2275087323,
+   "enhanced_description": "拾取能量球会增加下一枚射弹的爆炸范围和伤害。提升层数限制。",
+   "name": "爆炸光能"
+  },
+  "3201496230": {
+   "base_description": "对普通敌人造成伤害会提升对高阶敌人的伤害。",
+   "category": "frames",
+   "enhanced": 1545231802,
+   "enhanced_description": "对普通战斗人员造成伤害会提升对高阶敌人的伤害。强力射击会消耗更少层数。",
+   "name": "转向"
+  },
+  "3215448563": {
+   "base_description": "与此武器匹配能量类型的最后一击会在短时间内提升伤害。光能最后一击可提升电弧、烈日和虚空武器。暗影最后一击可提升冰影和缚丝武器。",
+   "category": "frames",
+   "enhanced": 3299896859,
+   "enhanced_description": "与此武器匹配能量类型的最后一击会提升伤害，持续时间延长。光能最后一击可提升电弧、烈日和虚空武器。暗影最后一击可提升冰影和缚丝武器。",
+   "name": "超因果亲和"
+  },
+  "3218042543": {
+   "base_description": "最后一击会提供电光充能。\n处于增幅状态时，最后一击会提供额外的电光充能。",
+   "category": "frames",
+   "enhanced": 2633604463,
+   "enhanced_description": "最后一击会提供电光充能。\n处于增幅状态时，最后一击会提供额外的电光充能。\n没有电光充能时，获得的电光充能层数提升。",
+   "name": "风暴涌动"
+  },
+  "3252937884": {
+   "base_description": "拾取弹药会装填一枚可粘附于各种表面的高爆弹药，命中后不久引爆并施加疲惫。",
+   "category": "frames",
+   "enhanced": 122204356,
+   "enhanced_description": "拾取弹药会装填一枚可粘附于各种表面的高爆弹药，命中后不久引发更强力的爆炸并施加疲惫。",
+   "name": "粘附弹药"
+  },
+  "3300816228": {
+   "base_description": "武器收回枪套一小段时间后会自动填装弹药。",
+   "category": "frames",
+   "enhanced": 3528046508,
+   "enhanced_description": "武器收回枪套一小段时间后会自动填装弹药，持续时间延长。",
+   "name": "自动填装枪套"
+  },
+  "3324494224": {
+   "base_description": "收集一个元素拾取物或摧毁缠结会赋予此武器一段叠加期，期间提升伤害。投掷缠结会延长持续时间。\n\n元素拾取物包括焰灵、虚空裂口、离子轨迹、冰影碎片和缚丝缠结。",
+   "category": "frames",
+   "enhanced": 2562668800,
+   "enhanced_description": "收集一个元素拾取物或摧毁缠结会赋予此武器一段叠加期，期间进一步提升伤害。投掷缠结会延长持续时间。\n\n元素拾取物包括焰灵、虚空裂口、离子轨迹、冰影碎片和缚丝缠结。",
+   "name": "集体行动"
+  },
+  "3350417888": {
+   "base_description": "最后一击后进行填装时可以为收起的武器也进行填装",
+   "category": "frames",
+   "enhanced": 1537607344,
+   "enhanced_description": "最后一击后短时间内进行填装时可以为收起的武器也进行填装。",
+   "name": "交感军火库"
+  },
+  "3365897133": {
+   "base_description": "箭矢在短暂延迟后爆炸。",
+   "category": "frames",
+   "enhanced": 1551736345,
+   "enhanced_description": "箭矢在短暂延迟后爆炸。提高精度。",
+   "name": "爆炸箭头"
+  },
+  "3400784728": {
+   "base_description": "快速精准命中目标会向弹匣里填装一枚弹药。",
+   "category": "frames",
+   "enhanced": 573122728,
+   "enhanced_description": "精准命中目标会向弹匣里填装一枚弹药。",
+   "name": "精准连击"
+  },
+  "3414324643": {
+   "base_description": "腰射精准命中会在短时间内给予极大的拉弓速度加成。",
+   "category": "frames",
+   "enhanced": 2662236651,
+   "enhanced_description": "腰射精准命中会提供大量拉弓速度加成，效果持续时间延长。更多精准命中可延长持续时间。",
+   "name": "弓手的智谋"
+  },
+  "3418782618": {
+   "base_description": "射空此武器的弹匣时，会根据命中次数从储存弹药中填装。",
+   "category": "frames",
+   "enhanced": 1563455254,
+   "enhanced_description": "射空此武器的弹匣时，会根据命中次数更有效地从储存弹药中填装。",
+   "name": "回转弹药"
+  },
+  "3425386926": {
+   "base_description": "完成击杀可暂时性地提高武器伤害力。可叠加3次。",
+   "category": "frames",
+   "enhanced": 288411554,
+   "enhanced_description": "完成最后一击可提高武器伤害力，持续时间延长。可叠加3次。",
+   "name": "狂暴"
+  },
+  "3436462433": {
+   "base_description": "每个完全充能的技能都会提升操控性、填装速度和稳定性。",
+   "category": "frames",
+   "enhanced": 2658083589,
+   "enhanced_description": "每个完全充能的技能都会大幅提升操控性、填装速度和稳定性。",
+   "name": "充盈"
+  },
+  "3511092054": {
+   "base_description": "根据当前装备的超能增加属性。\n•  加快填装速度。\n•  增加操控性。\n•  增加稳定性。\n•  适度地控制后坐力，并提高瞄准时的移动速度。\n•  提升空中效率。",
+   "category": "frames",
+   "enhanced": 711234314,
+   "enhanced_description": "根据当前装备的超能显著增加属性。\n•  加快填装速度。\n•  增加操控性。\n•  增加稳定性。\n•  适度地控制后坐力，并提高瞄准时的移动速度。\n•  提升空中效率。",
+   "name": "元素电容"
+  },
+  "3513791699": {
+   "base_description": "子弹未命中时有几率直接向弹匣返还弹药。",
+   "category": "frames",
+   "enhanced": 162561147,
+   "enhanced_description": "子弹未命中时有更高几率直接向弹匣返还弹药。",
+   "name": "重新调度"
+  },
+  "3523296417": {
+   "base_description": "击杀将生成手雷能量。使用手雷技能将从弹药储备中转移弹药对此武器进行填装。",
+   "category": "frames",
+   "enhanced": 1906147653,
+   "enhanced_description": "最后一击将生成更多手雷能量。使用手雷技能将用储存弹药填装此武器。",
+   "name": "爆破专家"
+  },
+  "3526486541": {
+   "base_description": "使用护盾阻挡伤害可提高举盾时的移动速度。",
+   "category": "frames",
+   "enhanced": 1738338041,
+   "enhanced_description": "使用护盾阻挡伤害可在更长时间内提高举盾时的移动速度。",
+   "name": "庸人自扰"
+  },
+  "354401740": {
+   "base_description": "刀剑最后一击可大幅提高移动速度和伤害。",
+   "category": "frames",
+   "enhanced": 3678483220,
+   "enhanced_description": "刀剑最后一击可大幅提高移动速度和伤害，持续时间延长。",
+   "name": "刺客剑刃"
+  },
+  "3551326236": {
+   "base_description": "完成击杀可暂时性地提高武器伤害力。可叠加3次。",
+   "category": "frames",
+   "enhanced": 288411554,
+   "enhanced_description": "完成最后一击可提高武器伤害力，持续时间延长。可叠加3次。",
+   "name": "狂暴"
+  },
+  "3592538738": {
+   "base_description": "使用此武器造成击杀会产生技能能量。此能量会平分至你未充能完毕的技能。",
+   "category": "frames",
+   "enhanced": 2675361166,
+   "enhanced_description": "使用此武器造成最后一击会产生技能能量，能量数量提高。此能量会平分至你未充能完毕的技能。",
+   "name": "泉源"
+  },
+  "3619207468": {
+   "base_description": "若附近无目标，提升填装、射程和精度。",
+   "category": "frames",
+   "enhanced": 3198323828,
+   "enhanced_description": "若附近无目标，大幅提升填装、射程和精度。",
+   "name": "切勿靠近"
+  },
+  "3640170453": {
+   "base_description": "长时间处于战斗状态会使此武器获得额外伤害。更长时间的战斗状态会使此武器获得更大的额外伤害，并周期性治疗使用者。",
+   "category": "frames",
+   "enhanced": 1817983009,
+   "enhanced_description": "长时间处于战斗状态会使此武器获得额外伤害，激活速度更快。战斗状态的时间稍有缩短，会使此武器获得更大的额外伤害，并周期性治疗使用者。",
+   "name": "混沌重塑"
+  },
+  "3643424744": {
+   "base_description": "拾取特殊或重型弹药可自动填装武器至超出正常弹药储存量。",
+   "category": "frames",
+   "enhanced": 2682205016,
+   "enhanced_description": "拾取特殊或重型弹药可填装武器至超出正常弹药储存量，储存量进一步提高。",
+   "name": "丰盈满溢"
+  },
+  "3650930298": {
+   "base_description": "充能刀剑命中可让目标减速。",
+   "category": "frames",
+   "enhanced": 405677814,
+   "enhanced_description": "充能刀剑命中可让目标减速，提高弹药容量。",
+   "name": "冷冻钢铁"
+  },
+  "365154968": {
+   "base_description": "随着此武器准星在目标上停留的时间增加伤害。",
+   "category": "frames",
+   "enhanced": 2939589096,
+   "enhanced_description": "随着此武器准星在目标上停留的时间增加更多伤害。",
+   "name": "目标锁定"
+  },
+  "3673922083": {
+   "base_description": "在击败目标后，此武器的射速、充能速度、换持速度都会减慢，但是会在短时间内造成额外伤害。",
+   "category": "frames",
+   "enhanced": 2889515627,
+   "enhanced_description": "在击败目标后，此武器的射速、充能速度、拉弓速度都会减慢，但是会造成额外伤害，持续时间延长。",
+   "name": "柔缓"
+  },
+  "3700496672": {
+   "base_description": "射击能量球会立即将其拾起。射击弹药盒会立即将其拾取，并自动从储存弹药中填充所有已装备武器的弹药。",
+   "category": "frames",
+   "enhanced": 2840833776,
+   "enhanced_description": "射击能量球会立即将其拾起。射击弹药盒会立即将其拾取，并自动从储存弹药中填充所有已装备武器的弹药。提高射程。",
+   "name": "边打边劫"
+  },
+  "3705817207": {
+   "base_description": "刀剑最后一击可提高充能速度和防御，效果持续至收起此武器。",
+   "category": "frames",
+   "enhanced": 1646437399,
+   "enhanced_description": "刀剑最后一击可大幅提高充能速度和防御，效果持续至收起此武器。",
+   "name": "决斗者之境"
+  },
+  "3713215006": {
+   "base_description": "击败目标后填装，会提供能量给当前充能最低的技能。",
+   "category": "frames",
+   "enhanced": 3555252274,
+   "enhanced_description": "击败目标后填装，会提供更多能量给当前充能最低的技能。",
+   "name": "已回收能量"
+  },
+  "3722653512": {
+   "base_description": "最后一击可为空中效率提供叠加加成。在空中时最后一击可提供更多层数。",
+   "category": "frames",
+   "enhanced": 2898218424,
+   "enhanced_description": "最后一击可为空中效率提供更多叠加加成。在空中时最后一击可提供更多层数。",
+   "name": "空中袭击"
+  },
+  "3731491409": {
+   "base_description": "最后一击会根据武器伤害类型的分类赋予属性加成。光能元素赋予稳定性和操控性。暗影元素赋予射程和瞄准辅助。处于超凡状态时，这件武器同时获得两类加成。",
+   "category": "frames",
+   "enhanced": 680897173,
+   "enhanced_description": "最后一击会根据武器伤害类型的分类赋予属性加成。光能元素赋予更多的稳定性和操控性。暗影元素赋予更多的射程和瞄准辅助。处于超凡状态时，这件武器同时获得两类加成。",
+   "name": "超凡时刻"
+  },
+  "3751912585": {
+   "base_description": "使用其他武器造成最后一击或持续精准命中，会在短时间内增加此武器的射速。",
+   "category": "frames",
+   "enhanced": 331667533,
+   "enhanced_description": "使用其他武器造成最后一击或持续精准命中，会在更长时间内增加此武器的射速。",
+   "name": "级联点"
+  },
+  "3764420437": {
+   "base_description": "此武器会根据目标身上被施加的每个元素减益效果造成更多伤害。",
+   "category": "frames",
+   "enhanced": 3192447905,
+   "enhanced_description": "此武器会根据目标身上被施加的每个元素减益效果造成更多伤害。伤害加成提升。",
+   "name": "聚合充能"
+  },
+  "3773585912": {
+   "base_description": "使用此武器造成近战最后一击可为其提供额外能量，并在格挡时提供更高的移动速度。",
+   "category": "frames",
+   "enhanced": 2817677128,
+   "enhanced_description": "使用此武器造成近战最后一击可为其进一步提供额外能量，并在格挡时提供更高的移动速度。",
+   "name": "近战动量"
+  },
+  "3800201097": {
+   "base_description": "保持不动举起护盾时造成远程伤害可提供更多的武器能量。",
+   "category": "frames",
+   "enhanced": 3674673997,
+   "enhanced_description": "保持不动举起护盾时造成远程伤害可提供大幅增加的武器能量。",
+   "name": "不动如山"
+  },
+  "3824105627": {
+   "base_description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+   "category": "frames",
+   "enhanced": 1183436451,
+   "enhanced_description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+   "name": "萤火虫"
+  },
+  "3828510309": {
+   "base_description": "造成伤害可提升填装速度与操控性。",
+   "category": "frames",
+   "enhanced": 1771736209,
+   "enhanced_description": "造成伤害可大幅提升填装速度与操控性。",
+   "name": "启迪行动"
+  },
+  "3865257976": {
+   "base_description": "精准击杀可产生元素伤害爆炸。",
+   "category": "frames",
+   "enhanced": 169755979,
+   "enhanced_description": "精准最后一击可产生元素伤害爆炸。提高填装速度。",
+   "name": "蜻蜓"
+  },
+  "3891536761": {
+   "base_description": "对目标造成持续的动能伤害会发射出一道冲击波，对任何附近的目标造成伤害。",
+   "category": "frames",
+   "enhanced": 1549370717,
+   "enhanced_description": "对目标造成持续的动能伤害会发射出一道冲击波，对任何附近的目标造成伤害。特性启动速度更快。",
+   "name": "动能震颤"
+  },
+  "3913600130": {
+   "base_description": "快速刀剑打击将在短时间内增加此武器的伤害。防御将中断此效果。",
+   "category": "frames",
+   "enhanced": 147913470,
+   "enhanced_description": "快速刀剑打击将增加此武器的伤害，持续时间延长。防御将中断此效果。",
+   "name": "旋风利刃"
+  },
+  "3927722942": {
+   "base_description": "火箭会在碰撞时粘附，延迟一定时间后引爆。爆炸范围扩大且伤害提高。",
+   "category": "frames",
+   "enhanced": 1167468626,
+   "enhanced_description": "火箭会在碰撞时粘附，延迟一定时间后引爆。爆炸范围大幅扩大且伤害提高。",
+   "name": "持久印象"
+  },
+  "3932949589": {
+   "base_description": "收集元素拾取物、能量球，或是摧毁缠结会降低热量。\n\n元素拾取物包括焰灵、虚空裂口、离子轨迹、冰影碎片和缚丝缠结。",
+   "category": "frames",
+   "enhanced": 2039482529,
+   "enhanced_description": "收集元素拾取物、能量球，或是摧毁缠结会降低略多的热量。\n\n元素拾取物包括焰灵、虚空裂口、离子轨迹、冰影碎片和缚丝缠结。",
+   "name": "冷却饰物"
+  },
+  "3938834702": {
+   "base_description": "装备此武器时，受到伤害可提升操控性与瞄准辅助，直到武器被收起。\n\n受到更多伤害可提升此效果。",
+   "category": "frames",
+   "enhanced": 3416609154,
+   "enhanced_description": "装备此武器时，受到伤害可大幅提升操控性与瞄准辅助，直到武器被收起。\n\n受到更多伤害可提升此效果。",
+   "name": "痛苦之道"
+  },
+  "3966416502": {
+   "base_description": "使用此武器造成重复伤害会施加震颤。\n\n增幅状态下震颤施加速度更快。",
+   "category": "frames",
+   "enhanced": 717070634,
+   "enhanced_description": "使用此武器造成重复伤害会以更快的速度施加震颤。\n\n增幅状态下震颤施加速度更快。",
+   "name": "震颤反馈"
+  },
+  "3977735242": {
+   "base_description": "为火箭添加追踪能力。瞄准时锁定目标。",
+   "category": "frames",
+   "enhanced": 406461158,
+   "enhanced_description": "为火箭添加追踪能力。瞄准时锁定目标。扩大爆炸范围。",
+   "name": "追踪模块"
+  },
+  "3978468247": {
+   "base_description": "使用其他武器造成最后一击，可在短时间内提升此武器的瞄准速度、精度和空中效率。失调协议效果激活时，最后一击会返还弹药。",
+   "category": "frames",
+   "enhanced": 906981559,
+   "enhanced_description": "使用其他武器造成最后一击，可提升此武器的瞄准速度、精度和空中效率，且持续时间延长。失调协议效果激活时，最后一击会返还弹药。",
+   "name": "失调协议"
+  },
+  "3987942396": {
+   "base_description": "在此武器准备就绪前，使用其他两件武器造成伤害可从弹药储备中填装弹药。",
+   "category": "frames",
+   "enhanced": 2817499044,
+   "enhanced_description": "在此武器准备就绪前，使用其他两件武器造成伤害可从弹药储备中填装弹药。提升弹药生成。",
+   "name": "嫉妒军械库"
+  },
+  "3993379141": {
+   "base_description": "造成持续伤害可提供对载具和构造体的额外伤害，并从备弹中填充弹药。主弹药伤害或对构造体的伤害可提供额外进度。\n\n构造体包括屏障、炮台、冰影水晶以及其他在战场上生成的物体。",
+   "category": "frames",
+   "enhanced": 1164602481,
+   "enhanced_description": "造成持续伤害可提供对载具和构造体的额外伤害，效果持续时间延长，并从备弹中填充弹药。主弹药伤害或对构造体的伤害可提供额外进度。\n\n构造体包括屏障、炮台、冰影水晶以及其他在战场上生成的物体。",
+   "name": "解构"
+  },
+  "4019266109": {
+   "base_description": "收集一个元素拾取物或摧毁缠结会赋予此武器一段叠加期，期间命中时生成手雷能量。投掷缠结会延长持续时间。\n\n元素拾取物包括焰灵、虚空裂口、离子轨迹、冰影碎片和缚丝缠结。",
+   "category": "frames",
+   "enhanced": 2613226185,
+   "enhanced_description": "收集一个元素拾取物或摧毁缠结会赋予此武器一段叠加期，期间命中时生成更多手雷能量。投掷缠结会延长持续时间。\n\n元素拾取物包括焰灵、虚空裂口、离子轨迹、冰影碎片和缚丝缠结。",
+   "name": "集体爆破"
+  },
+  "4042220767": {
+   "base_description": "回收弩弹会提升填装速度和操控性。",
+   "category": "frames",
+   "enhanced": 883665727,
+   "enhanced_description": "回收弩弹会在更长的时间内提升填装速度和操控性。",
+   "name": "弩弹拾荒者"
+  },
+  "4049631843": {
+   "base_description": "命中三个不同目标可在一定时间内提高伤害。",
+   "category": "frames",
+   "enhanced": 859780267,
+   "enhanced_description": "命中三个不同目标可提高伤害，持续时间延长。",
+   "name": "我为人人"
+  },
+  "4071163871": {
+   "base_description": "当敌人接近时，填装速度、稳定性和操控性均会提高。",
+   "category": "frames",
+   "enhanced": 494941759,
+   "enhanced_description": "附近有目标时，填装速度、稳定性和操控性均会大幅提高。",
+   "name": "威胁探测"
+  },
+  "4082225868": {
+   "base_description": "使用近战和此武器获得击杀可提高此武器造成的伤害。",
+   "category": "frames",
+   "enhanced": 1161469972,
+   "enhanced_description": "近战最后一击和使用此武器消灭目标可提高此武器造成的伤害，持续时间更长。",
+   "name": "斗剑士"
+  },
+  "4104185692": {
+   "base_description": "长时间处于战斗状态会提升此武器的伤害、操控性和填装速度，持续直到脱离战斗。",
+   "category": "frames",
+   "enhanced": 3007133316,
+   "enhanced_description": "长时间处于战斗状态会提升此武器的伤害、操控性和填装速度，持续直到脱离战斗，持续时间延长。",
+   "name": "狂乱"
+  },
+  "4132187021": {
+   "base_description": "短时间内进行三次轻攻击可提供特殊弹药。",
+   "category": "frames",
+   "enhanced": 2581144697,
+   "enhanced_description": "时间窗口延长的短时间内进行三次轻攻击可提供特殊弹药。",
+   "name": "尖锐收割"
+  },
+  "4152709778": {
+   "base_description": "以牺牲武器射程为代价，大幅提升武器的目标获取能力。",
+   "category": "frames",
+   "enhanced": 3609952942,
+   "enhanced_description": "以牺牲较少量武器射程为代价，大幅提升武器的目标捕获能力。",
+   "name": "钢铁凝视"
+  },
+  "4190679284": {
+   "base_description": "当目标在附近时，最后一击会赋予近战属性加成。",
+   "category": "frames",
+   "enhanced": 820036316,
+   "enhanced_description": "当目标在附近时，最后一击会赋予更多的近战属性加成。",
+   "name": "近接能量"
+  },
+  "4198902903": {
+   "base_description": "造成持续伤害会在目标周围引发爆炸。",
+   "category": "frames",
+   "enhanced": 222783511,
+   "enhanced_description": "造成持续伤害会在目标周围引发爆炸。触发速度更快。",
+   "name": "引爆光束"
+  },
+  "4252909580": {
+   "base_description": "提高弹匣容量。如果你是火力战队中唯一生还的成员，每次最后一击都会为你回满弹匣。",
+   "category": "frames",
+   "enhanced": 706172244,
+   "enhanced_description": "大幅提高弹匣容量。如果你是火力战队中唯一生还的成员，每次最后一击都会为你填充弹匣。",
+   "name": "无尽悲痛"
+  },
+  "4274614370": {
+   "base_description": "防御时受到伤害会暂时增加刀剑前冲距离。",
+   "category": "frames",
+   "enhanced": 4274613598,
+   "enhanced_description": "前冲距离时受到伤害会暂时增加刀剑前冲距离，持续时间更长。",
+   "name": "无畏充能"
+  },
+  "4293542123": {
+   "base_description": "消灭一个目标会向附近目标蔓延灼烧效果。\n更强大的战斗人员和敌方守护者会在更大的范围内造成灼烧效果。",
+   "category": "frames",
+   "enhanced": 2675184851,
+   "enhanced_description": "消灭一个目标会向附近目标蔓延持续时间更长的灼烧效果。\n更强大的战斗人员和敌方守护者会在更大的范围内造成灼烧效果。",
+   "name": "辉耀炽热"
+  },
+  "438098033": {
+   "base_description": "使用其他武器达成最后一击将在短时间内提高此武器的伤害和性能。",
+   "category": "frames",
+   "enhanced": 2748801589,
+   "enhanced_description": "使用其他武器达成最后一击将提高此武器的伤害和性能，持续时间延长。",
+   "name": "和谐"
+  },
+  "454085387": {
+   "base_description": "使用近战技能对附近战斗人员造成伤害可大幅提高操控性和伤害。持续短暂时间后，或下次射击后过期。",
+   "category": "frames",
+   "enhanced": 2529412083,
+   "enhanced_description": "使用近战技能对附近战斗人员造成伤害可大幅提高操控性和伤害。持续短暂时间后或下次射击后过期，持续时间延长。",
+   "name": "钝器处决弹药"
+  },
+  "469285294": {
+   "base_description": "元素最后一击会提升此武器的下一击伤害。",
+   "category": "frames",
+   "enhanced": 3335686050,
+   "enhanced_description": "元素最后一击会提升此武器的下一击伤害。伤害提升速度加快。",
+   "name": "重组"
+  },
+  "47981717": {
+   "base_description": "第一发弹药的精度和射程提高。",
+   "category": "frames",
+   "enhanced": 1370847713,
+   "enhanced_description": "第一发弹药的精度和射程大幅提高。",
+   "name": "强力首发"
+  },
+  "509074078": {
+   "base_description": "击杀可在短时间内为所有武器提供更高的操控性。",
+   "category": "frames",
+   "enhanced": 843318450,
+   "enhanced_description": "击杀可为所有武器提供更高的操控性，持续时间延长。",
+   "name": "稳健之手"
+  },
+  "555281244": {
+   "base_description": "造成持续伤害会提升精准伤害。",
+   "category": "frames",
+   "enhanced": 332733060,
+   "enhanced_description": "造成精准伤害会大幅提升精准伤害。",
+   "name": "精准工具"
+  },
+  "557221067": {
+   "base_description": "完成击杀可提高此武器的伤害，效果持续至切换或填装武器。",
+   "category": "frames",
+   "enhanced": 2896748467,
+   "enhanced_description": "完成最后一击可提高此武器的伤害，效果持续至切换或填装武器。提高弹匣容量。",
+   "name": "击杀记录"
+  },
+  "563069569": {
+   "base_description": "使用此武器造成最后一击会在短时间内提升爆炸的范围。",
+   "category": "frames",
+   "enhanced": 2167611941,
+   "enhanced_description": "使用此武器造成最后一击会提升爆炸的范围，持续时间延长。",
+   "name": "混响"
+  },
+  "588594999": {
+   "base_description": "移动时瞄准会提高移动速度和目标获取速度。",
+   "category": "frames",
+   "enhanced": 2717805783,
+   "enhanced_description": "移动时瞄准会提高移动速度和目标捕获能力。",
+   "name": "移动目标"
+  },
+  "591790007": {
+   "base_description": "以牺牲武器稳定性为代价，大幅提升武器的射程。",
+   "category": "frames",
+   "enhanced": 3315935575,
+   "enhanced_description": "以牺牲较少武器稳定性为代价，大幅提升武器的射程。",
+   "name": "钢铁之触"
+  },
+  "654512643": {
+   "base_description": "在最后一击或进入增幅状态后填装，会获得一段时间的伤害提升。最多叠加5层。",
+   "category": "frames",
+   "enhanced": 4065965131,
+   "enhanced_description": "在最后一击或进入增幅状态后填装，会获得更长时间的伤害提升。最多叠加5层。",
+   "name": "换挡"
+  },
+  "657025441": {
+   "base_description": "精准最后一击会产生元素伤害爆炸，该爆炸会根据先前造成的快速精准命中次数造成额外伤害。",
+   "category": "frames",
+   "enhanced": 4196156997,
+   "enhanced_description": "精准最后一击会产生元素伤害爆炸，该爆炸会根据先前造成的精准命中次数造成额外伤害。",
+   "name": "巨脉蜻蜓"
+  },
+  "671806388": {
+   "base_description": "接近满弹匣时赋予更快的填装速度。",
+   "category": "frames",
+   "enhanced": 595108252,
+   "enhanced_description": "接近满弹匣时赋予大幅提高的填装速度。",
+   "name": "强制填装"
+  },
+  "684456054": {
+   "base_description": "在冲刺后或处于增幅状态时暂时提高填装速度和操控性。此效果在你处于增幅状态时会得到提升。",
+   "category": "frames",
+   "enhanced": 2785334058,
+   "enhanced_description": "在冲刺后或处于增幅状态时暂时提高填装速度和操控性；填装速度和操控性的提升将持续更长时间。此效果在你处于增幅状态时会得到显著提升。",
+   "name": "涡流电流"
+  },
+  "691659142": {
+   "base_description": "使用此武器造成最后一击会产生近战能量。\n造成近战伤害会在短时间内提升此武器的操控性。",
+   "category": "frames",
+   "enhanced": 536173722,
+   "enhanced_description": "使用此武器造成最后一击会产生更多近战能量。\n造成近战伤害会在短时间内提升这把武器的操控性。",
+   "name": "拳击手"
+  },
+  "692399809": {
+   "base_description": "此武器的治疗射弹击中盟友时，你也会获得少量治疗。",
+   "category": "frames",
+   "enhanced": 4070834277,
+   "enhanced_description": "此武器的治疗射弹击中盟友时，你也会获得更多治疗。",
+   "name": "互惠"
+  },
+  "699525795": {
+   "base_description": "你的生命值越低，这款武器的精度和操控性就越好。",
+   "category": "frames",
+   "enhanced": 3719974635,
+   "enhanced_description": "你的生命值越低，此武器的精度和操控性提升越大。",
+   "name": "风暴之眼"
+  },
+  "706527188": {
+   "base_description": "难以置信武器的拔出速度有多快。",
+   "category": "frames",
+   "enhanced": 1961144892,
+   "enhanced_description": "此武器的拉弓速度快得难以置信。提高填装速度。",
+   "name": "光速拔枪"
+  },
+  "744594675": {
+   "base_description": "投掷手雷或使用充能近战击中目标可提供武器稳定性、操控性和射程叠加加成。\n\n使用超能可提供最大叠加次数。",
+   "category": "frames",
+   "enhanced": 2139363611,
+   "enhanced_description": "投掷手雷或使用充能近战击中目标可提供更多的武器稳定性、操控性和射程叠加加成。\n\n使用超能可提供最大叠加次数。",
+   "name": "全面发展"
+  },
+  "776531651": {
+   "base_description": "消灭虚空减益目标可提供覆盖护盾。",
+   "category": "frames",
+   "enhanced": 2541826827,
+   "enhanced_description": "消灭虚空减益目标可提供覆盖护盾，持续时间延长。",
+   "name": "冲击支撑"
+  },
+  "777589556": {
+   "base_description": "使用这款武器瞄准可在短时间内减少抖动。",
+   "category": "frames",
+   "enhanced": 3974407819,
+   "enhanced_description": "使用此武器进行极短时间的瞄准可减少抖动。",
+   "name": "心无旁骛"
+  },
+  "777589557": {
+   "base_description": "造成伤害可提升填装速度与操控性。",
+   "category": "frames",
+   "enhanced": 1771736209,
+   "enhanced_description": "造成伤害可大幅提升填装速度与操控性。",
+   "name": "启迪行动"
+  },
+  "777589559": {
+   "base_description": "增加弹药储备量。蹲伏时填装、收举和准备速度提高。",
+   "category": "frames",
+   "enhanced": 2308090567,
+   "enhanced_description": "大幅提升弹药生成。蹲伏时提升填装、收举和准备速度。",
+   "name": "沙场备战"
+  },
+  "831391274": {
+   "base_description": "精准最后一击或使用此武器快速击败目标，会在目标的位置生成一个线虫。",
+   "category": "frames",
+   "enhanced": 102912326,
+   "enhanced_description": "精准最后一击或使用此武器快速击败目标，会在目标的位置生成一个线虫。有几率生成更多线虫。",
+   "name": "幼雏"
+  },
+  "880644845": {
+   "base_description": "使用此武器造成最后一击会产生职业技能能量。使用你的职业技能会在短时间内提升此武器的稳定性。",
+   "category": "frames",
+   "enhanced": 3120212825,
+   "enhanced_description": "使用此武器造成最后一击会产生更多的职业技能能量。使用你的职业技能会在短时间内提升此武器的稳定性。",
+   "name": "战略家"
+  },
+  "908147344": {
+   "base_description": "提升充能时间和填装速度，同时防止蹲伏射击时产生雷达信号。",
+   "category": "frames",
+   "enhanced": 1663363584,
+   "enhanced_description": "提升充能时间和填装速度；蹲伏时射击不产生雷达信号。提高稳定性和填装速度。",
+   "name": "潜匿弓箭"
+  },
+  "923806249": {
+   "base_description": "施放你的职业技能会让此武器在短时间内命中时割裂目标，直至达到最大目标数量。",
+   "category": "frames",
+   "enhanced": 3422796781,
+   "enhanced_description": "施放你的职业技能会让此武器在短时间内命中时割裂目标，直至达到最大目标数量。效果持续时间延长。",
+   "name": "切割"
+  },
+  "939227542": {
+   "base_description": "当启用私人助手时，此武器拥有更好的目标捕获能力，显著造成更高的精准伤害。",
+   "category": "frames",
+   "enhanced": 2939589096,
+   "enhanced_description": "随着此武器准星在目标上停留的时间增加更多伤害。",
+   "name": "目标锁定"
+  },
+  "951095735": {
+   "base_description": "大幅提高弹头速度，提升填装速度。",
+   "category": "frames",
+   "enhanced": 3878366039,
+   "enhanced_description": "大幅提高射弹速度，大幅提升填装速度。",
+   "name": "脉冲增幅器"
+  },
+  "95528736": {
+   "base_description": "使用此武器完成最后一击可提高其射速。",
+   "category": "frames",
+   "enhanced": 956288240,
+   "enhanced_description": "使用此武器完成最后一击可提高其射速，持续时间延长。",
+   "name": "猛攻"
+  },
+  "957782887": {
+   "base_description": "提高瞄准速度。",
+   "category": "frames",
+   "enhanced": 4116820839,
+   "enhanced_description": "提高瞄准速度。提高稳定性。",
+   "name": "速射瞄准"
+  },
+  "960810156": {
+   "base_description": "当被战斗人员包围时，此武器的爆炸范围会增大。启用时，此武器对持有者造成的伤害会大幅降低。",
+   "category": "frames",
+   "enhanced": 1077019636,
+   "enhanced_description": "当被战斗人员包围时，此武器的爆炸范围会增大。启用时，此武器对持有者造成的伤害会大幅降低。\n基础爆炸范围增大。",
+   "name": "危险区域"
+  },
+  "960997401": {
+   "base_description": "精准最后一击会使附近目标变得割裂。",
+   "category": "frames",
+   "enhanced": 3244229373,
+   "enhanced_description": "精准最后一击会使附近目标变得割裂。减少启动冷却时间。",
+   "name": "撕裂"
+  },
+  "968510818": {
+   "base_description": "拿出此武器前使用其他武器击败目标，可从储备弹药中转移弹药至弹匣。此效果可基于击败目标的数量溢出弹匣。",
+   "category": "frames",
+   "enhanced": 424370782,
+   "enhanced_description": "拿出此武器前使用其他武器击败目标，可从储备弹药中转移额外弹药至弹匣。此效果可基于击败目标的数量溢出弹匣。",
+   "name": "嫉妒刺客"
+  }
+ },
+ "perk_count": 216,
+ "rules": "同 plugCategoryIdentifier + 同显示名；强化版(inventory.tierType=3)唯一且描述与基础版不同；基础版可有多个副本，都指向同一强化 hash；强化版不唯一或描述相同的跳过，不猜。",
+ "schema_version": 1,
+ "skipped": [
+  "光能炮台(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "光膛枪(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "光面握把(grips)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "全口径枪膛(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "全自动击发系统(frames)：强化版有 2 条，配不出唯一的一条",
+  "六翼天使弹药(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "切换弹匣(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "加大弹匣(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "加速散热器(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "加速线圈(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "加长枪管(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "合金弹匣(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "复合枪托(stocks)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "多边形膛线(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "大口径弹药(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "小口径枪膛(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "广口弹匣(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "弹头保险丝(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "弹跳型弹药(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "强化散热器(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "强化电池(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "战斗握把(grips)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "战术弹匣(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "战术散热器(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "战术炮台(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "手托枪托(stocks)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "枪管套筒(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "枪膛修正钮(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "槽化枪管(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "死亡寻觅者(frames)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "液态线圈(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "渗透(frames)：强化版有 3 条，配不出唯一的一条",
+  "热能雾化(frames)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "电离散热器(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "短枪机枪托(stocks)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "离子中继器(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "离子电池(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "稳固弹药(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "穿甲弹(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "突击弹匣(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "箭头制退器(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "精确弹药(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "糙面握把(grips)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "聚合物握把(grips)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "脉搏监控(frames)：强化版有 2 条，配不出唯一的一条",
+  "膛线枪管(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "蝴蝶(frames)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "螺旋膛线(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "超频散热器(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "轻型散热器(batteries)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "轻质弹匣(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "适配枪托(stocks)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "重型握把(grips)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "锻造膛线(barrels)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "附加弹匣(magazines)：基础与强化描述完全相同，疑似同名的另一份副本",
+  "高密度收束器(barrels)：基础与强化描述完全相同，疑似同名的另一份副本"
+ ]
+}
