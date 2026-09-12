@@ -64,6 +64,26 @@
 
 ### `weapon_assistant` —— 武器
 
+**「T 几」有三个不同含义，别答错**（用户问「这把武器是 T 几」时最容易踩）：
+
+- **武器/护甲分级 `gear_tier`（0–5）** —— 游戏里装备图标上那个 T 级，也是**用户问的那个**。
+  它**只存在于副本上**（组件 300 的 `gearTier`），定义里没有：`info`／`perk_pool`／`god_roll`／
+  `popularity` 拿不到它（连键都没有），必须读账号：
+  `weapon_assistant(intent="analyze")` → `inventory.instances[].weapon.gear_tier`；
+  `weapon_assistant(intent="type")` → `weapons.items[].weapon.gear_tier`；
+  `weapon_assistant(intent="compare")` → `comparison.instances[].weapon.gear_tier`。
+  **`0` 表示"不在分级体系内"（旧装备/不属于分级的武器），不是 T0。**
+  同一把枪的不同副本可以是不同 T 级（实测「遗产」两件：一件 0、一件 5），
+  所以答案必须**逐副本**给（"你仓库里两件：一件无分级、一件 T5"），不能只报一个数字。
+  T 级还决定每栏能换几个 perk（T5→3、T4/T3→2、T2→1），答错会连带答错"能换几个"。
+- **稀有度 `rarity` / `rarity_tier`（2–6）** —— 普通/罕见/稀有/传说/异域。定义级就有，
+  所有武器 intent 都给。**这不是 T 级**：传说武器的 `rarity_tier` 是 5，跟"T5"完全无关。
+- **`farming.tier`（社区刷取评级）** —— 本地刷取清单的 T0–T4，或购物清单的 S–F 字母
+  （`type` 里可能是 `A` 这类字母）。它回答"值不值得刷"，同样不是装备分级。
+
+口径：用户问 T 级 → 先看有没有账号数据能给 `gear_tier`；没有账号数据就明说
+"分级是每件副本的属性，要读你的账号（analyze/type）才能答"，**不要拿稀有度或清单评级顶替**。
+
 **形状统一（P4 起）**：所有武器 intent 的载荷都是 `weapon`（身份块）+ `sockets`（插槽）+
 `stats`（属性列表），顶层带 `data.weapon_schema_version`（当前 1）。每个插槽选项上的
 `recommended` 已经把愿单／选取率／刷取清单／社区四路结论汇总好，不用按名字跨字段拼。
@@ -259,7 +279,7 @@ Manifest 侧（**不代表拥有**）：
 | `item_type` | `inventory_assistant`：`get`、`inventory`、`list`、`search_type`、`summarize`、`summary`、`type`、`概况` |
 | `kind` | `loadout_assistant`：`search_identifiers` |
 | `knowledge_id` | `activity_assistant`：`community`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
-| `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`summarize`、`summary`、`概况`、`重复武器`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`search_all`、`search_catalog`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`search_collectible_nodes`、`vendor`、`weekly` |
+| `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`summarize`、`summary`、`概况`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`search_all`、`search_catalog`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`search_collectible_nodes`、`vendor`、`weekly` |
 | `loadout_id` | `loadout_assistant`：`delete`、`equip_loadout` |
 | `location` | `inventory_assistant`：`find_item`、`get`、`inventory`、`list`、`search`、`search_type`、`summarize`、`summary`、`type`、`概况`；`weapon_assistant`：`filter_rolls` |
 | `locked` | `inventory_assistant`：`lock` |
@@ -271,7 +291,7 @@ Manifest 侧（**不代表拥有**）：
 | `name_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
 | `name_prefix` | `player_assistant`：`find`、`find_players`、`fuzzy` |
 | `notes` | `loadout_assistant`：`save` |
-| `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`重复武器`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
+| `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
 | `perk_name` | `weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`perk_description`、`search_all`、`search_catalog` |
 | `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`filter_rolls`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`vendor` |
 | `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |

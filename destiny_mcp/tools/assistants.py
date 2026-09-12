@@ -44,6 +44,9 @@ from ._responses import (
 
 # world_assistant 里「没传 limit」时各 intent 用的条数（vendor 除外，它按菜单/详情取默认）。
 _WORLD_LIMIT_DEFAULT = 12
+_INVENTORY_DEFAULT_LIMIT = 100
+_INVENTORY_PAGE_INTENTS = {"get", "inventory", "list"}
+_LOADOUT_DEFAULT_LIMIT = 5
 
 
 def _dump(value: Any) -> Any:
@@ -126,7 +129,29 @@ async def player_assistant(
     if intent in {"find", "find_players", "fuzzy"}:
         if not name_prefix:
             return error_response("missing_name_prefix", "必须提供 name_prefix。")
-        result = await player_svc.find_players(name_prefix)
+        try:
+            result = await player_svc.find_players(name_prefix)
+        except DestinyMCPError as exc:
+            # 上游模糊搜索不可用时必须显式失败 + 给出下一步，**不能**回空列表 ——
+            # 那会被读成「没这个人」（语料第二章：不能把没查到说成不存在）。
+            return error_response(
+                "a_p_i_error",
+                str(exc),
+                next_actions=[{
+                    "label": "改用完整 Bungie 名（名字#1234）精确查找",
+                    "tool": "player_assistant",
+                    "arguments": {"intent": "search"},
+                }],
+            )
+        if not result:
+            return ok_response(
+                f"模糊搜索没有返回候选（前缀：{name_prefix}）。",
+                {"players": []},
+                warnings=[
+                    "空候选只说明这次没匹配到；若要确认某人是否存在，"
+                    "请用完整 Bungie 名（名字#1234）走 intent=\"search\"。"
+                ],
+            )
         return ok_response("已模糊搜索玩家。", {"players": result})
 
     return error_response("unsupported_intent", f"player_assistant 不支持 intent={intent!r}。")
@@ -168,7 +193,10 @@ async def inventory_assistant(
     svc = get_ctx(ctx)
     intent = cast(InventoryIntent, (intent or "summary").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
-    limit = 10 if limit is None else limit
+    # 列清单（get/list）给 100 件的默认上限：它以前一次倒出整个仓库（1260 件 ≈ 511 KB），
+    # 现在按上限返回并带 total/truncated/next_offset，想全看就翻页。
+    if limit is None:
+        limit = _INVENTORY_DEFAULT_LIMIT if intent in _INVENTORY_PAGE_INTENTS else 10
     locked = True if locked is None else locked
     tracked = True if tracked is None else tracked
     resolved = resolve_player_name(player_name)
@@ -225,20 +253,37 @@ async def inventory_assistant(
         )
 
     if intent in {"get", "inventory", "list"}:
+        # 传 0/负数 = 没指定 → 回到默认上限（项目统一约定），要更多用 offset 翻页。
+        page_limit = limit if limit and limit > 0 else _INVENTORY_DEFAULT_LIMIT
         result = await svc["inventory_svc"].get_inventory(
             resolved,
             location,
             item_type=item_type or None,
             armor_slot=armor_slot or None,
             rarity=rarity or None,
+            limit=page_limit,
+            offset=offset,
         )
         inventory = _dump(result)
-        return ok_response("已读取背包。", {
-            "inventory": inventory,
-            "farming_list": _farming_reference(
-                svc.get("starside_svc"), _harvest_names(inventory)
-            ),
-        })
+        warnings = []
+        if inventory.get("truncated"):
+            warnings.append(
+                f"只返回了 {inventory['returned_items']} / {inventory['total_items']} 件"
+                f"（按 limit={page_limit} 截断）；继续读传 offset={inventory['next_offset']}，"
+                "或先用 location/item_type/rarity 缩小范围。"
+            )
+        return ok_response(
+            "已读取背包"
+            + (f"（{inventory['returned_items']}/{inventory['total_items']} 件）"
+               if inventory.get("truncated") else "。"),
+            {
+                "inventory": inventory,
+                "farming_list": _farming_reference(
+                    svc.get("starside_svc"), _harvest_names(inventory)
+                ),
+            },
+            warnings=warnings,
+        )
 
     if intent in {"search", "find_item"}:
         result = await svc["inventory_svc"].search_items(resolved, item_name, location)
@@ -952,6 +997,8 @@ async def loadout_assistant(
     kind: fields.Kind = None,
     query: fields.Query = "",
     confirmed: fields.Confirmed = False,
+    limit: fields.Limit = None,
+    offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
     """账号配装聚合入口：读取、保存、装备本地配装和 Bungie 官方槽位。
@@ -978,16 +1025,33 @@ async def loadout_assistant(
         })
 
     if intent in {"list", "get"}:
-        result = await svc["loadout_svc"].get_loadouts(resolved, character or None)
+        # 每套配装带完整 build_template（约 11 KB），整套账号 20 套 ≈ 227 KB：
+        # 默认只给 5 套（切片在服务层做，工具层只负责把"被截断"讲清楚）。
+        page_limit = limit if limit and limit > 0 else _LOADOUT_DEFAULT_LIMIT
+        _ = page_limit
+        result = await svc["loadout_svc"].get_loadouts(
+            resolved, character or None, page_limit, offset
+        )
         payload = _dump(result)
+        cut = bool(payload.get("truncated"))
+        warnings = []
+        if cut:
+            warnings.append(
+                f"只返回了 {payload['returned_loadouts']} / {payload['total_loadouts']} 套"
+                f"（按 limit={page_limit} 截断）；继续读传 offset={payload['next_offset']}，"
+                "或用 character 收窄。"
+            )
         return ok_response(
-            "已读取玩家已存配装（统一模板格式）。",
+            "已读取玩家已存配装（统一模板格式）"
+            + (f"，{payload['returned_loadouts']}/{payload['total_loadouts']} 套。" if cut else "。"),
             {
                 "player_name": payload["player_name"],
                 "loadouts": payload["loadouts"],
-                # 列表类响应都要能自证是否全量（配装没有 limit，所以两者相等）
-                "total_loadouts": len(payload["loadouts"]),
-                "returned_loadouts": len(payload["loadouts"]),
+                # 列表类响应都要能自证是否全量
+                "total_loadouts": payload["total_loadouts"],
+                "returned_loadouts": payload["returned_loadouts"],
+                "truncated": cut,
+                "next_offset": payload["next_offset"],
                 "scope": payload["scope"],
                 "loadout_format": payload["loadout_format"],
                 "community_route": {
@@ -998,7 +1062,7 @@ async def loadout_assistant(
                     },
                 },
             },
-            warnings=[
+            warnings=warnings + [
                 "这里仅包含玩家本地配装和 Bungie 官方槽位，不代表社区热门或推荐排序。",
             ],
         )

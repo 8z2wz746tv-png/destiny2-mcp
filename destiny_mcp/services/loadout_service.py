@@ -577,7 +577,11 @@ class LoadoutService:
     # ── Public API ──────────────────────────────────────────────────
 
     async def get_loadouts(
-        self, player_name: str, character: str | None = None,
+        self,
+        player_name: str,
+        character: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
     ) -> LoadoutListResponse:
         """List saved account loadouts in the normalized build-template format.
 
@@ -598,7 +602,23 @@ class LoadoutService:
             }.get(resolve_character_name(character), character.lower())
             all_loadouts = [lo for lo in all_loadouts if lo.character == char_lower]
 
-        return LoadoutListResponse(player_name=player_name, loadouts=all_loadouts)
+        # 每套配装带完整 build_template（约 11 KB）：20 套 ≈ 227 KB，一次全给会把
+        # 调用方上下文打满。这里按 limit/offset 切片，并把"是否被截断"写进响应。
+        total = len(all_loadouts)
+        start = max(0, offset)
+        if limit is not None and limit > 0:
+            window = all_loadouts[start : start + limit]
+        else:
+            window = all_loadouts[start:]
+        truncated = start + len(window) < total
+        return LoadoutListResponse(
+            player_name=player_name,
+            loadouts=window,
+            total_loadouts=total,
+            returned_loadouts=len(window),
+            truncated=truncated,
+            next_offset=(start + len(window)) if truncated else None,
+        )
 
     async def save_loadout(
         self, player_name: str, name: str, character: str, notes: str = "",

@@ -11,7 +11,7 @@ import time
 import aiobungie
 
 from ..bungie_client import BungieClient
-from ..exceptions import PlayerNotFoundError
+from ..exceptions import APIError, PlayerNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..models import CharacterInfo, PlayerInfo, ProfileResponse
@@ -70,12 +70,26 @@ class PlayerService:
         try:
             result = await self._bungie.search_users(name_prefix)
         except aiobungie.HTTPError as e:
+            # 以前这里 `return []`：上游 405 被当成"没有这个人"，Agent 于是回答
+            # "没找到叫 X 的玩家" —— 语料明令禁止把没查到说成不存在。现在显式失败。
             logger.error("User search failed: %s", e)
-            return []
+            status = int(getattr(getattr(e, "http_status", 0), "value", getattr(e, "http_status", 0)) or 0)
+            raise APIError(
+                "模糊搜索玩家",
+                f"Bungie 的 User/SearchUsers 接口不可用（HTTP {status or '未知状态'}）。"
+                "模糊找人现在用不了；请让用户给出完整 Bungie 名（形如 名字#1234）"
+                "再用 intent=\"search\" 精确查找。",
+            ) from e
 
         if not isinstance(result, dict) or result.get("ErrorCode", 0) != 1:
             logger.warning("User search API error: %s", result)
-            return []
+            raise APIError(
+                "模糊搜索玩家",
+                "Bungie 返回了错误响应（"
+                + str(result.get("Message") if isinstance(result, dict) else type(result).__name__)
+                + "）。模糊找人现在用不了；请让用户给出完整 Bungie 名（形如 名字#1234）"
+                "再用 intent=\"search\" 精确查找。",
+            )
 
         users = result.get("Response", [])
         if not users:

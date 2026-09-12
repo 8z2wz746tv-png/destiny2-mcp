@@ -120,6 +120,25 @@ class APIError(DestinyMCPError):
         )
 
 
+class UpstreamNotFoundError(DestinyMCPError):
+    """Bungie 说「没有这个对象」（HTTP 404）：ID 打错/过期，不是服务故障。
+
+    单独一个类是为了让调用方能程序化区分两种情况 ——
+    以前 404 会以原始异常冒到 MCP 客户端（没有 `ok`/`error.code` 信封），
+    调用方只能看到一句英文 `Notfound: (http_status: 404, ...)`，
+    既分不清「这个活动/公会不存在」和「MCP 服务坏了」，也会被当故障反复重试。
+    """
+
+    def __init__(self, operation: str, detail: str = "") -> None:
+        self.operation = operation
+        parts = [f"{operation}：Bungie 没有找到这个对象（HTTP 404）。"]
+        if detail:
+            parts.append(detail if detail.endswith(("。", ".", "）")) else f"{detail}。")
+        # 这句话必须**始终**在：否则调用方容易把它当临时故障反复重试。
+        parts.append("这是「查不到」而不是服务故障：请确认 ID 是否正确或已过期，不要当故障重试。")
+        super().__init__("".join(parts))
+
+
 class BungieServiceUnavailableError(APIError):
     """Bungie.net is temporarily unavailable or under maintenance."""
 

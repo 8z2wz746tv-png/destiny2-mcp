@@ -183,14 +183,17 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("inventory_assistant", "track_quest"),
     ),
     ("inventory_assistant", "limit"): _contract(
-        _only(*_INV_SUMMARY, *_INV_DUPLICATES),
-        hint='要数量概况用 intent="summary"；列清单( get/list )不支持限量,会返回全部。',
+        _only(*_INV_SUMMARY, *_INV_DUPLICATES, *_INV_GET),
+        hint=(
+            'list（get/inventory）默认 100 件、可传 limit 调整；要数量概况用 intent="summary"。'
+            '被截断时响应带 total_items/returned_items/truncated/next_offset。'
+        ),
         suggestion=("inventory_assistant", "summary"),
     ),
     ("inventory_assistant", "offset"): _contract(
-        _only(*_INV_DUPLICATES),
-        hint='只有 intent="duplicates" 支持翻页；列清单( get/list )不支持。',
-        suggestion=("inventory_assistant", "duplicates"),
+        _only(*_INV_DUPLICATES, *_INV_GET),
+        hint='list 与 duplicates 都支持翻页：用响应里的 next_offset 继续读。',
+        suggestion=("inventory_assistant", "get"),
     ),
     # ══ weapon_assistant ═══════════════════════════════════════════════════
     ("weapon_assistant", "player_name"): _contract(
@@ -371,6 +374,19 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
             "snapshot_official", "update_official_identifiers", "clear_official",
         ),
         hint="删配装、装备配装、搜官方槽位标识不需要玩家名（前者按 ID，后者是本地搜索）。",
+    ),
+    ("loadout_assistant", "limit"): _contract(
+        _only("list", "get"),
+        hint=(
+            "配装（list/get）默认 5 套、可用 limit 调整；被截断时响应带 "
+            "total_loadouts/returned_loadouts/truncated/next_offset。"
+        ),
+        suggestion=("loadout_assistant", "list"),
+    ),
+    ("loadout_assistant", "offset"): _contract(
+        _only("list", "get"),
+        hint="配装翻页：用响应里的 next_offset 继续读。",
+        suggestion=("loadout_assistant", "list"),
     ),
     ("loadout_assistant", "character"): _contract(
         _only(

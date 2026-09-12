@@ -31,7 +31,7 @@
 | 看看我的角色概况，只读 | `profile` | 返回角色列表与光等；不编造未读到的字段，不触发任何写入。 |
 | 查一下玩家 `<完整名>` 的档案 | `profile` + `player_name` | 用传入的名称，不套用默认玩家。 |
 | 搜一下叫 `<完整名>` 的玩家 | `search` | 返回 membership_id 与 membership_type，供后续查询复用。 |
-| 找找名字里有「husky」的玩家 | `find` + `name_prefix` | ⚠️ 上游模糊搜索接口已失效：现在**恒返回空**。验收点是说明「模糊找人不可用、请给完整 `名字#1234` 走 `search`」，**不能把空结果说成「没这个人」**。 |
+| 找找名字里有「husky」的玩家 | `find` + `name_prefix` | ⚠️ 上游模糊搜索接口已失效（HTTP 405）。现在返回 `ok=false` + `a_p_i_error`，消息与 `next_actions` 都指向「给完整 `名字#1234` 走 `search`」；**不能把空结果说成「没这个人」**。真·空候选（上游正常但没匹配）才回 `ok=true` + warning。 |
 | 默认玩家是谁 | 不调用工具 | 说明来自 `DESTINY_DEFAULT_PLAYER`；未配置时说明会用当前 OAuth 账号。 |
 | 换个账号查 | 不适用 | 单用户本地版，应说明不支持多用户切换。 |
 
@@ -44,7 +44,7 @@
 | 看看我的背包和仓库概况，只读 | `summary` | 区分角色背包与仓库；给出数量概况。 |
 | 我仓库里有多少东西 | `summary` + `location="vault"` | 只统计仓库，不把角色背包算进去。 |
 | 只统计武器（不要护甲） | `summary` + `item_type="weapon"` | `summary` 的 `item_type` **只接受 weapon/armor/all**；传「手炮」得到 `config_error`（实现限制，不是 Agent 的错）。按具体类型看要用 `type` + `type_name`。 |
-| 列出我仓库里的物品 | `get` + `location="vault"` | 位置过滤生效；不一次性倾倒全部。 |
+| 列出我仓库里的物品 | `get` + `location="vault"` | 位置过滤生效；**默认最多 100 件**（`limit` 可调、`offset` 翻页），响应带 `total_items`／`returned_items`／`truncated`／`next_offset`，被截断时给 warning。不许一次倒出全部（实测 1260 件 ≈ 511 KB ≈ 13–15 万 tokens，足以打满上下文）。 |
 | 我有没有 `<物品名>` | `search` + `item_name` | 命中给实例 ID 与位置；未命中说「没找到」，不能反推「全账号没有」。 |
 | 找几组我持有的重复武器，列出实例 ID 和位置，不要处理 | `duplicates` | 按精确 `item_hash` 分组；**同名不同版本不能当成完全相同物品**；不自动锁定或移动。 |
 | 我重复的手炮有几组 | `duplicates` + `type_name="手炮"` | 类型走 `type_name`，不要塞进 `item_type`。 |
@@ -75,6 +75,7 @@
 | `<武器>` 的催化剂情况 | `catalyst` | 返回结构固定：`weapon`/`is_exotic`/`count`/`catalysts`/`unlock_state`/`note`。**传说武器必须回 `count=0` + 「只有异域才有催化剂」**，不能吐上百条「N阶：稳定性」这类通用锻造词条；`unlock_state` 目前恒为 `not_checked`（本地不读账号记录组件），**不许把「没查」说成「没解锁」**。 |
 | 手炮这一类武器都有哪些 | `type` | 按类型列出**我持有的**武器：每件 `{weapon, sockets, options, stats}`；`sockets` 是列计数（`options_available=false`，别读成"没有可选项"），`options` 才是这一件能换的（组件 310）。列表类不逐个读本地资料（`popularity`/`community` 明说没查）。 |
 | `<Perk>` 是什么效果 | `perk_description` | 从 Manifest 取描述；**不得按名字推断效果**。 |
+| 这把 `<武器>` 是 T 几 | 先看有没有账号数据：`analyze`／`type`／`compare` 的 `weapon.gear_tier`；只有定义数据时明说"分级是副本属性" | **三个 T 不能混**：`gear_tier`（0–5，装备分级，用户问的就是这个）／`rarity_tier`（2–6，稀有度）／`farming.tier`（社区评级 T0–T4 或 S–F 字母）。只能答 `gear_tier`；`0` 是"无分级"，不是 T0。同一把枪不同副本可以不同 T 级（实测「遗产」一件 0、一件 5），必须**逐副本**回答；拿「传说」或清单 T1 顶替即为不合格。`info`/`perk_pool`/`god_roll` 里**没有**这个字段。 |
 
 ### 账号侧（当前副本）
 
@@ -213,7 +214,8 @@
 | --- | --- | --- |
 | 看看我的 `<职业>` 最近几场活动记录 | `history` | 时间与活动可核对；**没有记录不要补写**。 |
 | 我最近打过哪些突袭 | `history` + `mode` | 模式过滤生效。 |
-| 看下 `<活动ID>` 这一场的结算 | `pgcr` + `activity_id` | 用给定 ID；缺 ID 或非数字得到 `ok=false` + `invalid_argument_error`（**不是**把空 ID 拼进 Bungie 网址再抛原始 404）。 |
+| 看下 `<活动ID>` 这一场的结算 | `pgcr` + `activity_id` | 用给定 ID；缺 ID 或非数字得到 `ok=false` + `invalid_argument_error`（**不是**把空 ID 拼进 Bungie 网址再抛原始 404）。**数字但不存在**的活动 ID 必须给 `upstream_not_found_error` 信封（以前是裸抛 `Notfound: http_status 404 …`，没有 `ok`/`code`）。 |
+| 我们公会 `<group_id>` 的排行榜 | `clan_leaderboards` + 数字 group_id | 缺 group_id → `invalid_argument_error`；**数字但不存在**的公会 ID → `upstream_not_found_error`（同样是信封，不是裸 404）。 |
 | 我的生涯 PvE 统计／总共打了多少场 | `stats` | 与 `history` 区分：这是汇总不是列表。 |
 | 我最常用哪把武器 | `weapon_history` | 按使用次数排行。 |
 | 我在熔炉里的表现怎么样 | `stats` 或 `leaderboards` | 明确区分生涯统计与排行榜。 |
@@ -336,6 +338,8 @@
 | 服务层实体参数 | `pgcr` 缺活动 ID、`clan_leaderboards` 缺 group_id、`collectible_node` 传收藏品号 | `invalid_argument_error` | 参数语义不对，服务层拒绝 |
 | Manifest 找不到东西 | 不存在的武器/物品/套装/赛季神器 | `manifest_error`（`artifact` 等定义类用 `definition_not_found_error`） | 名字或 hash 在本地 Manifest 里没有 |
 | 账号里找不到 | 分解掉的物品、不存在的副本 | `item_not_found_error` | 曾经拥有或以为拥有，实际不在账号里 |
+| 上游说「没这个对象」 | `pgcr` 传数字但不存在的活动 ID、`clan_leaderboards` 传不存在的 group_id | `upstream_not_found_error` | ID 打错/过期 —— **改 ID**，不是重试 |
+| 上游其它 HTTP 错误 | 4xx（非 404）／无法归类的上游响应 | `a_p_i_error` | 上游问题；消息里带 HTTP 状态与 Bungie 原文 |
 
 ### D. 封闭词表与协议级拒绝
 
@@ -360,7 +364,7 @@
 | 查不存在的收藏品节点 hash | `world_assistant(intent="collectible_node")` | `ok=false` + `invalid_argument_error`，消息说清「收藏品号 ≠ 节点号」，**不是**裸抛 404。（不存在的商人名走第八章：返回空菜单 + 相近名建议，**不是**错误信封） |
 | 查一把不存在的武器的社区 roll／选取率／Perk 池／属性 | `weapon_assistant(intent="god_roll"／"popularity"／"perk_pool"／"stats")` | 都必须是 `ok=false` + `manifest_error`（修复前 god_roll／popularity 是 `ok=true` + 一段文字，perk_pool 用的是 `item_not_found_error`）。 |
 | 对比两把都在仓库的同名武器 | `weapon_assistant(intent="compare", weapon_name=…)` | 差异项必须给 `present_in_instance`/`absent_in_instance`（修复前两条都写 `仓库`，无法判断是哪一把）。 |
-| 列出我的配装 | `loadout_assistant(intent="list")` | 返回里应有 `total_loadouts` 与 `returned_loadouts`（修复前没有，无法自证全量）。 |
+| 列出我的配装 | `loadout_assistant(intent="list")` | 返回 `total_loadouts`／`returned_loadouts`／`truncated`／`next_offset`；**默认最多 5 套**（每套带完整 `build_template` ≈ 11 KB，20 套 ≈ 227 KB），要更多用 `limit`/`offset`。 |
 | 全游戏能滚出「萤火虫」的武器 | `weapon_assistant(intent="catalog", required_perks="萤火虫")` | `matched_count` > `returned_count` 时必须 `truncated=true`（修复前给 50 条却不说被裁过）。 |
 | 查「泰拉巴」的社区 roll | `weapon_assistant(intent="god_roll", weapon_name="泰拉巴")` | 愿单有记录但解析不出 Perk 时，必须明说「本地这条数据不完整」（修复前只回一个标题）。 |
 | 查「遗产」的催化剂 | `weapon_assistant(intent="catalyst", weapon_name="遗产")` | 传说武器 `count=0` + 说明「只有异域才有催化剂」（修复前吐 140 条通用锻造词条）；异域如「牵引器火炮」应给 1 条专属催化剂 + `unlock_state="not_checked"`。异域但确实没有催化剂时（泰拉巴／弑后者），`count=0` 的 note 里必须写**武器名**，不能打印身份块字典（P4 回归过一次，已加断言）。 |

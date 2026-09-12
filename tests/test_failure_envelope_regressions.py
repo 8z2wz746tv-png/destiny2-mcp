@@ -222,12 +222,22 @@ async def test_compare_difference_names_the_instance_not_the_location() -> None:
 
 
 class _LoadoutStub:
-    async def get_loadouts(self, player_name: str, character: str | None) -> dict:
+    async def get_loadouts(
+        self, player_name: str, character: str | None, limit: int | None = None, offset: int = 0
+    ) -> dict:
+        """P4/D4 起服务层负责切片，所以替身也要照实按 limit/offset 返回计数。"""
+        all_loadouts = [{"id": "local:1"}, {"id": "local:2"}]
+        window = all_loadouts[offset : offset + limit] if limit else all_loadouts[offset:]
+        truncated = offset + len(window) < len(all_loadouts)
         return {
             "player_name": player_name,
-            "loadouts": [{"id": "local:1"}, {"id": "local:2"}],
+            "loadouts": window,
             "scope": "account_saved",
             "loadout_format": "build_template",
+            "total_loadouts": len(all_loadouts),
+            "returned_loadouts": len(window),
+            "truncated": truncated,
+            "next_offset": (offset + len(window)) if truncated else None,
         }
 
 

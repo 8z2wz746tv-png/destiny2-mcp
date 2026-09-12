@@ -33,9 +33,11 @@ CEILINGS = {
     # 用新 payload 收掉搜索分页结构（不改服务返回的字典，避免改到调用方对象）。
     # P4：武器分支搬去 tools/_weapon_branches.py，只剩认参数与分发 —— 上限跟着收紧
     # （收紧后旧上限就不再是"可以慢慢长回去"的许可）。
-    "destiny_mcp/tools/assistants.py": 1352,
+    # +27（P4→D4）：inventory get / loadout get+list 的默认上限与截断话术。
+    "destiny_mcp/tools/assistants.py": 1383,
     "destiny_mcp/build/farm_target.py": 1296,
-    "destiny_mcp/bungie_client.py": 1219,
+    # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
+    "destiny_mcp/bungie_client.py": 1263,
     "destiny_mcp/services/build_service.py": 1114,
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
