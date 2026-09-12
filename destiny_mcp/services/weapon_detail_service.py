@@ -188,6 +188,10 @@ class WeaponDetailService:
                 reusable=reusable_data.get(inst_id),
                 equipped=plug_hashes,
                 names=names,
+                # 列表类只给"能换成什么"的名字与结论；描述与图标在单把武器的
+                # info/analyze/compare 里给（实测每件武器因此省下约 10 KB）
+                include_descriptions=False,
+                include_icons=False,
             )
 
             inst_stats = (stats_data.get(inst_id, {}) or {}).get("stats", {})

@@ -68,6 +68,10 @@
 `stats`（属性列表），顶层带 `data.weapon_schema_version`（当前 1）。每个插槽选项上的
 `recommended` 已经把愿单／选取率／刷取清单／社区四路结论汇总好，不用按名字跨字段拼。
 
+体积口径（P6 起）：**定义级池子不带 `description`/`icon_url`**（要看效果用 `perk_description`，
+要图看实例级）；非 roll 栏（模组/大师杰作/纪念物/着色器）只给 `option_count` + 最多 3 个样本，
+超过时带 `options_truncated=true`。
+
 每个 `sockets[]` 条目（用列表写，避免被上面的 intent 表格解析器当入口）：
 
 - `slot` / `kind`：中文栏名（重复的会编号成 特性1/特性2）／稳定枚举

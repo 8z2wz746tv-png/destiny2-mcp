@@ -193,10 +193,10 @@ SOCKET_KEYS = sorted([
     "socket_index",
 ])
 
-OPTION_KEYS = sorted([
-    "can_roll", "description", "enhanced", "enhanced_plug_hash", "icon_url", "name",
-    "plug_category", "plug_hash",
-])
+# 选项的必备键（两种 scope 一致）；`description`/`icon_url` 只在实例级出现，
+# `stat_effects`/`recommended`/`plug_category` 按需出现 —— 定义级池子的体积口径见 P6。
+OPTION_KEYS = sorted(["can_roll", "enhanced_plug_hash", "name", "plug_hash"])
+DEFINITION_ONLY_ABSENT = ("description", "icon_url")
 
 STAT_KEYS = sorted(["display", "display_as_numeric", "is_primary", "name", "stat_hash", "value"])
 
@@ -275,7 +275,9 @@ async def test_socket_and_option_keys(services, intent) -> None:
         # 单把武器才展开池子；列表类用 column_list（options_available=false）
         assert socket["options_available"] is True
         for option in socket["options"]:
-            assert sorted(option.keys()) == OPTION_KEYS, option
+            assert set(OPTION_KEYS).issubset(option.keys()), option
+            for absent in DEFINITION_ONLY_ABSENT:
+                assert absent not in option, (socket["slot"], option["name"])
 
 
 async def test_stats_keys_and_primary_flag(services) -> None:

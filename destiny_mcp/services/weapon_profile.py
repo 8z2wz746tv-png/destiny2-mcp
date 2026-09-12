@@ -66,7 +66,9 @@ _SLOT_KINDS: tuple[tuple[str, str], ...] = (
 # roll 相关栏位给全量选项；其余（着色器/装饰/追踪器/大师杰作…）只给计数 + 少量样本。
 # 实测：遗产的着色器插槽有 694 个选项、大师杰作 167 个 —— 全量展开会把响应撑到上百 KB。
 ROLL_KINDS: frozenset[str] = frozenset({"intrinsic", "barrel", "magazine", "trait", "scope", "grip"})
-FULL_OPTION_KINDS: frozenset[str] = ROLL_KINDS | {"mod", "catalyst"}
+# 只有 roll 相关栏位给全量。模组以前也在里面，实测一件武器 54 个模组选项 = 19.6 KB
+# （perk_pool 里最大的一块），而"能滚到什么"跟模组无关 —— 模组改为计数 + 3 个样本。
+FULL_OPTION_KINDS: frozenset[str] = ROLL_KINDS | {"catalyst"}
 NON_DETAIL_OPTION_SAMPLE = 3
 
 # 实例级（副本级）只对 roll 栏给全量：模组/大师杰作/纪念物这些"每个副本都差不多"的栏，
@@ -427,7 +429,8 @@ def _plug_option(
     names: Any,
     pairs: EnhancedPairs,
     include_descriptions: bool,
-    god_roll_lookup: Callable[[int], tuple[bool, bool]] | None,
+    include_icons: bool = True,
+    god_roll_lookup: Callable[[int], tuple[bool, bool]] | None = None,
 ) -> dict:
     info = manifest.get_item_info(plug_hash) or {}
     option_name = str(name or info.get("name") or "").strip()
@@ -437,7 +440,8 @@ def _plug_option(
         "name": option_name,
         "plug_category": plug_category,
         "can_roll": bool(can_roll),
-        "enhanced": pairs.is_enhanced(plug_hash),
+        # `enhanced` 布尔与 `enhanced_plug_hash` 表达同一件事（自己就是强化版时后者指向自己），
+        # 保留一个即可；`recommended.wishlist` 也取代了原来的扁平 god_roll_pve/pvp。
         "enhanced_plug_hash": pairs.enhanced_of(plug_hash),
     }
     if include_descriptions:
@@ -460,10 +464,10 @@ def _plug_option(
         option["stat_effects"] = effects
     if god_roll_lookup is not None:
         pve, pvp = god_roll_lookup(plug_hash)
-        option["god_roll_pve"] = bool(pve)
-        option["god_roll_pvp"] = bool(pvp)
-    icon = str(info.get("icon") or "")
-    option["icon_url"] = icon
+        if pve or pvp:
+            option["recommended"] = {"wishlist": {"pve": bool(pve), "pvp": bool(pvp)}}
+    if include_icons:
+        option["icon_url"] = str(info.get("icon") or "")
     return option
 
 
@@ -550,6 +554,7 @@ def socket_options(
     names: Any = None,
     pairs: EnhancedPairs | None = None,
     include_descriptions: bool = True,
+    include_icons: bool = True,
     god_roll_lookup: Callable[[int], tuple[bool, bool]] | None = None,
 ) -> list[dict]:
     """**全部**插槽（定义级）：框架/枪管/弹匣/特性/模组/大师杰作/纪念物/追踪器/装饰…
@@ -592,6 +597,7 @@ def socket_options(
                 names=names,
                 pairs=pairs,
                 include_descriptions=include_descriptions,
+                include_icons=include_icons,
                 god_roll_lookup=god_roll_lookup,
             )
             if not option["name"]:
@@ -601,6 +607,11 @@ def socket_options(
             continue
 
         kind = slot_kind(str(options[0].get("plug_category") or ""))
+        # 同一栏里类别一致时，逐选项重复 plug_category 纯属浪费（实测 2.7 KB/把）；
+        # 只在这个选项的类别与栏位主类别不同时才保留。
+        for option in options:
+            if option.get("plug_category") == options[0].get("plug_category"):
+                option.pop("plug_category", None)
 
         socket: dict[str, Any] = {
             "slot": "",
@@ -711,6 +722,7 @@ def instance_options(
     names: Any = None,
     pairs: EnhancedPairs | None = None,
     include_descriptions: bool = True,
+    include_icons: bool = True,
     god_roll_lookup: Callable[[int], tuple[bool, bool]] | None = None,
 ) -> list[dict]:
     """**这一件副本**能换成什么（组件 310 itemReusablePlugs）。
@@ -770,6 +782,7 @@ def instance_options(
                 names=names,
                 pairs=pairs,
                 include_descriptions=include_descriptions,
+                include_icons=include_icons,
                 god_roll_lookup=god_roll_lookup,
             )
             if not option["name"]:
@@ -777,7 +790,12 @@ def instance_options(
             built.append(option)
         if not built:
             continue
-        kind = str(socket.get("kind") or slot_kind(str(built[0].get("plug_category") or "")))
+        primary_category = str(built[0].get("plug_category") or "")
+        kind = str(socket.get("kind") or slot_kind(primary_category))
+        # 与定义级同一口径：同一栏里类别一致时不逐选项重复 plug_category
+        for option in built:
+            if option.get("plug_category") == primary_category:
+                option.pop("plug_category", None)
         socket.update(
             {
                 "slot": socket.get("slot") or slot_label(kind),

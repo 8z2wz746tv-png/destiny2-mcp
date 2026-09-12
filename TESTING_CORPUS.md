@@ -109,6 +109,18 @@
   社区条目按名字子串匹配，可能只是同名提及。
 - **失败也不能弄坏主结果**：任何一路读失败只是缺一块 + `warnings`，官方数据照常返回。
 
+### 选项的体积口径（P6 起）
+
+| 位置 | 带什么 | 不带什么 |
+| --- | --- | --- |
+| 定义级 `sockets[].options`（`info`/`perk_pool`/`analyze`/`god_roll`） | `plug_hash`/`name`/`can_roll`/`enhanced_plug_hash`，按需带 `stat_effects`/`recommended`/`plug_category` | **`description`、`icon_url`**（实测占 17 KB/把）。要看效果用 `perk_description`，要图用实例级 |
+| 实例级 `options[]`（`type`/`compare`） | 名字与结论（列表类）；`compare` 与单把武器给全 | 列表类不带描述与图标（每件省约 10 KB） |
+| 非 roll 栏（模组/大师杰作/纪念物/着色器…） | `option_count` + 最多 3 个样本 + `options_truncated=true` | 全量展开（模组一件 54 项 = 19.6 KB） |
+| `weapon.community` | 最多 3 条社区条目（含 snippet） | 全量社区命中 |
+
+`perk_pool` 的体积现状：紧凑 JSON 约 25 KB（P0 为 44.5 KB，同一口径 45.4 KB），
+其中 79 个可滚选项 14 KB、采样非 roll 栏 3.7 KB、`weapon` 块 5.6 KB。
+
 ### P4 键映射表（old → new，形状统一后）
 
 十处形状收敛成一套：**`weapon`（身份块）+ `sockets`（插槽）+ `stats`（属性）**，

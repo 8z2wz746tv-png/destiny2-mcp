@@ -210,8 +210,12 @@ class WeaponRollFilterService:
         if not isinstance(definition, dict):
             return []
 
+        # 只把**命中**的 perk 明细带回响应，所以这里要带描述与图标；
+        # 池子整体（perk_pool/info）默认不带，见 weapon_payload 的体积口径。
         details: list[dict[str, Any]] = []
-        for socket in weapon_payload.socket_list(self._manifest, definition):
+        for socket in weapon_payload.socket_list(
+            self._manifest, definition, include_descriptions=True, include_icons=True
+        ):
             for option in socket.get("options") or []:
                 details.append(option | {"slot": socket.get("slot", ""), "kind": socket.get("kind", "")})
         return details

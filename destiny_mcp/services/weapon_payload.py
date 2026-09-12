@@ -199,10 +199,22 @@ def socket_list(
     equipped: list[int] | None = None,
     names: Any = None,
     pairs: weapon_profile.EnhancedPairs | None = None,
-    include_descriptions: bool = True,
+    include_descriptions: bool | None = None,
+    include_icons: bool | None = None,
     god_roll_lookup: Callable[[int], tuple[bool, bool]] | None = None,
 ) -> list[dict[str, Any]]:
-    """`sockets` 块。`scope="definition"` = 完整池；`scope="instance"` = 这一件能换的（组件 310）。"""
+    """`sockets` 块。`scope="definition"` = 完整池；`scope="instance"` = 这一件能换的（组件 310）。
+
+    体积口径（P6 实测）：
+    - 定义级池子默认**不带** `description`/`icon_url` —— 池子回答"能滚到什么"，
+      名字 + hash + 能不能滚 + 强化版 + 本地结论就够；要看效果用 `perk_description`，
+      要图用 `info`。实测这两项曾占 17 KB/把（图标 13.2 + 描述 4.0）。
+    - 实例级（组件 310，通常每栏 1–3 个）给全，因为那才是"这一件能换的"。
+    """
+    if include_descriptions is None:
+        include_descriptions = scope == "instance"
+    if include_icons is None:
+        include_icons = scope == "instance"
     if scope == "instance":
         raw = weapon_profile.instance_options(
             manifest,
@@ -212,6 +224,7 @@ def socket_list(
             names=names,
             pairs=pairs,
             include_descriptions=include_descriptions,
+            include_icons=include_icons,
             god_roll_lookup=god_roll_lookup,
         )
         return [
@@ -224,6 +237,7 @@ def socket_list(
         names=names,
         pairs=pairs,
         include_descriptions=include_descriptions,
+        include_icons=include_icons,
         god_roll_lookup=god_roll_lookup,
     )
     expanded = [

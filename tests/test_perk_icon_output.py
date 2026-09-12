@@ -78,18 +78,23 @@ async def test_perk_pool_includes_weapon_and_perk_icons_with_description_fallbac
     assert result["weapon"]["icon_url"] == "https://www.bungie.net/weapon.png"
     assert len(result["sockets"]) == 1
     perk = result["sockets"][0]["options"][0]
-    assert perk["icon_url"] == "https://www.bungie.net/perk.png"
-    assert perk["description"] == "Manifest 物品描述"
+    # P6 体积口径：定义级池子不带描述与图标（要看效果用 perk_description，
+    # 要图用实例级 options）——这里反向确认没带。
+    assert "icon_url" not in perk
+    assert "description" not in perk
 
 
-def test_socket_option_includes_icon_and_description_fallback() -> None:
-    """P4：取当前插槽的那套私有方法已删，行为由 weapon_payload 的插槽工厂承担。"""
+def test_instance_option_includes_icon_and_description_fallback() -> None:
+    """实例级（这一件能换的）必须带图标与描述，且三级回退仍在。"""
     from destiny_mcp.services import weapon_payload
 
     manifest = _ManifestStub()
     definition = manifest.get_item_definition(100)
+    reusable = {"plugs": {"0": [{"plugItemHash": 300, "canInsert": True}]}}
 
-    sockets = weapon_payload.socket_list(manifest, definition)  # type: ignore[arg-type]
+    sockets = weapon_payload.socket_list(
+        manifest, definition, scope="instance", reusable=reusable  # type: ignore[arg-type]
+    )
 
     assert len(sockets) == 1
     option = sockets[0]["options"][0]
