@@ -48,7 +48,7 @@
 | 我有没有 `<物品名>` | `search` + `item_name` | 命中给实例 ID 与位置；未命中说「没找到」，不能反推「全账号没有」。 |
 | 找几组我持有的重复武器，列出实例 ID 和位置，不要处理 | `duplicates` | 按精确 `item_hash` 分组；**同名不同版本不能当成完全相同物品**；不自动锁定或移动。 |
 | 我重复的手炮有几组 | `duplicates` + `type_name="手炮"` | 类型走 `type_name`，不要塞进 `item_type`。 |
-| 列出我所有的微型冲锋枪 | `type` + `type_name="微型冲锋枪"` | 按类型列举；不要用 `get` 的 `item_type`。返回里要有 `total_items`/`returned_items`/`truncated`，让「是不是全量」可以自证。 |
+| 列出我所有的微型冲锋枪 | `type` + `type_name="微型冲锋枪"` | 按类型列举；不要用 `get` 的 `item_type`。返回里要有 `total`/`returned`/`truncated`（P4 前的 `total_items`/`returned_items` 已改名）与 `weapon_count`，让「是不是全量」可以自证。武器行是精简身份块 + 位置/光等（**不读 305/310，所以没有 perk 与可换项**）；要看「能换成什么」用 `weapon_assistant(intent="type")`。 |
 
 ### 写入（必须等确认）
 
@@ -354,7 +354,7 @@
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
-| 遗产／刚玉战锤的 Perk 池里哪些是社区推荐的 | `weapon_assistant(intent="perk_pool", weapon_name=…)` | 应能看到 `god_roll_pve: true` / `god_roll_pvp: true` 的条目（修复前**全是 false**）。异域可能全 false —— 这时要说明「本地愿单没收录」，**不能说「这些 Perk 都不好」**。 |
+| 遗产／刚玉战锤的 Perk 池里哪些是社区推荐的 | `weapon_assistant(intent="perk_pool", weapon_name=…)` | 应能看到选项上带 `recommended.wishlist = {pve: true, pvp: true}`（P6 前是扁平的 `god_roll_pve/pvp`；修复前**全是 false**）。异域可能没有这一项 —— 这时要说明「本地愿单没收录」，**不能说「这些 Perk 都不好」**。 |
 | 你现在有哪些工具 | 不调用工具 | 只有 8 个聚合工具；**不应**出现 `get_inventory`、`raw_api_call` 这类老工具名。 |
 | 用 `get_inventory` 看看我的背包 | `inventory_assistant(intent="get")` | 老工具名已不在工具面上；应改走聚合入口，而不是声称工具不存在就作罢。想用老工具要开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 并重启宿主。 |
 | 查不存在的收藏品节点 hash | `world_assistant(intent="collectible_node")` | `ok=false` + `invalid_argument_error`，消息说清「收藏品号 ≠ 节点号」，**不是**裸抛 404。（不存在的商人名走第八章：返回空菜单 + 相近名建议，**不是**错误信封） |
@@ -363,7 +363,7 @@
 | 列出我的配装 | `loadout_assistant(intent="list")` | 返回里应有 `total_loadouts` 与 `returned_loadouts`（修复前没有，无法自证全量）。 |
 | 全游戏能滚出「萤火虫」的武器 | `weapon_assistant(intent="catalog", required_perks="萤火虫")` | `matched_count` > `returned_count` 时必须 `truncated=true`（修复前给 50 条却不说被裁过）。 |
 | 查「泰拉巴」的社区 roll | `weapon_assistant(intent="god_roll", weapon_name="泰拉巴")` | 愿单有记录但解析不出 Perk 时，必须明说「本地这条数据不完整」（修复前只回一个标题）。 |
-| 查「遗产」的催化剂 | `weapon_assistant(intent="catalyst", weapon_name="遗产")` | 传说武器 `count=0` + 说明「只有异域才有催化剂」（修复前吐 140 条通用锻造词条）；异域如「牵引器火炮」应给 1 条专属催化剂 + `unlock_state="not_checked"`。 |
+| 查「遗产」的催化剂 | `weapon_assistant(intent="catalyst", weapon_name="遗产")` | 传说武器 `count=0` + 说明「只有异域才有催化剂」（修复前吐 140 条通用锻造词条）；异域如「牵引器火炮」应给 1 条专属催化剂 + `unlock_state="not_checked"`。异域但确实没有催化剂时（泰拉巴／弑后者），`count=0` 的 note 里必须写**武器名**，不能打印身份块字典（P4 回归过一次，已加断言）。 |
 | 查不存在的套装效果 | `build_assistant(intent="set_bonus", set_bonus_name="不存在的套装xyz")` | `ok=false` + `definition_not_found_error`，消息干净（修复前是 `item_not_found_error` + 嵌套引号 + 「可能已被分解或移走」的账号物品话术）。 |
 | 查「遗产」的基础属性 | `weapon_assistant(intent="stats", weapon_name="遗产")` | 必须返回这把霰弹枪的属性（修复前会误报「遗产 不是武器」—— 精确名查到了同名的非武器条目）。同名歧义应按「搜索后取第一条武器」解析。 |
 
