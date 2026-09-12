@@ -47,6 +47,7 @@ _WORLD_LIMIT_DEFAULT = 12
 _INVENTORY_DEFAULT_LIMIT = 100
 _INVENTORY_PAGE_INTENTS = {"get", "inventory", "list"}
 _LOADOUT_DEFAULT_LIMIT = 5
+_WEAPON_TYPE_DEFAULT_LIMIT = 20
 
 
 def _dump(value: Any) -> Any:
@@ -143,16 +144,28 @@ async def player_assistant(
                     "arguments": {"intent": "search"},
                 }],
             )
-        if not result:
+        players = result.get("players") or []
+        has_more = bool(result.get("has_more"))
+        if not players:
             return ok_response(
                 f"模糊搜索没有返回候选（前缀：{name_prefix}）。",
-                {"players": []},
+                {"players": [], "page": result.get("page", 0), "has_more": has_more},
                 warnings=[
                     "空候选只说明这次没匹配到；若要确认某人是否存在，"
                     "请用完整 Bungie 名（名字#1234）走 intent=\"search\"。"
                 ],
             )
-        return ok_response("已模糊搜索玩家。", {"players": result})
+        warnings = []
+        if has_more:
+            warnings.append(
+                "上游还有下一页候选；这里只列了最高置信度的若干条。"
+                "拿到完整名（名字#1234）后用 intent=\"search\" 精确定位。"
+            )
+        return ok_response(
+            f"已模糊搜索玩家：找到 {len(players)} 个候选。",
+            {"players": players, "page": result.get("page", 0), "has_more": has_more},
+            warnings=warnings,
+        )
 
     return error_response("unsupported_intent", f"player_assistant 不支持 intent={intent!r}。")
 
@@ -409,7 +422,10 @@ async def weapon_assistant(
     svc = get_ctx(ctx)
     intent = cast(WeaponIntent, (intent or "analyze").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
-    limit = 50 if limit is None else limit
+    # 按类型列武器默认 20 件：每件带完整模板（真机约 9.7 KB 紧凑 JSON），50 件 ≈ 452 KB
+    # ≈ 13 万 tokens，一次就能把调用方上下文吃掉大半；目录/筛选仍是 50（行很轻）。
+    if limit is None:
+        limit = _WEAPON_TYPE_DEFAULT_LIMIT if intent == "type" else 50
     include_inventory = True if include_inventory is None else include_inventory
     community_section = community_section or "text"
     catalog_intents = {"catalog", "search_catalog", "all_weapons", "global", "search_all"}

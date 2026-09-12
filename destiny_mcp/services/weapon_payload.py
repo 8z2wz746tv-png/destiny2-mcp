@@ -358,6 +358,8 @@ def owned_instance(
         "is_equipped": is_equipped,
         "locked": locked,
     }
+    if fields.get("legacy_tier"):
+        entry["gear_tier_note"] = "这件不在分级体系内（组件里的 gearTier=0），不是 T0"
     if option_counts:
         entry["option_counts"] = dict(option_counts)
     return entry

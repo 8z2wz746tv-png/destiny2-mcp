@@ -7,6 +7,7 @@ cannot be met. It also suggests farming activities for each stat.
 
 from __future__ import annotations
 
+from .. import config
 from ..logging_config import get_logger
 from .models import (
     STAT_NAMES,
@@ -28,6 +29,35 @@ _STAT_ADVICE: dict[str, str] = {
 }
 
 
+def estimate_combinations(
+    snapshot: InventorySnapshot,
+    constraints: BuildConstraints,
+) -> tuple[int, list[int]]:
+    """估算这次分析要枚举多少种组合，返回 (组合数, 各部位件数)。
+
+    纯计数、不枚举：五个部位件数相乘，指定金装时该部位只算金装那几件
+    （所以"指定金装"是最有效的收窄手段）。
+    """
+    slots = [
+        snapshot.helmets,
+        snapshot.gauntlets,
+        snapshot.chests,
+        snapshot.legs,
+        snapshot.class_items,
+    ]
+    counts: list[int] = []
+    for pieces in slots:
+        if constraints.exotic_hashes:
+            exotic = [p for p in pieces if p.item_hash in constraints.exotic_hashes]
+            counts.append(len(exotic) if exotic else len(pieces))
+            continue
+        counts.append(len(pieces))
+    total = 1
+    for count in counts:
+        total *= max(1, count)
+    return total, counts
+
+
 def analyze(
     snapshot: InventorySnapshot,
     constraints: BuildConstraints,
@@ -41,6 +71,29 @@ def analyze(
     Returns:
         BuildAnalysis with failure reason and farming suggestions.
     """
+    total, counts = estimate_combinations(snapshot, constraints)
+    limit = config.BUILD_MAX_COMBINATIONS
+    if limit > 0 and total > limit:
+        # 提前失败：精确上限要对每个属性各跑一次求解器，规模一大必然跑满预算，
+        # 让用户干等 5 分钟才拿到"缩小请求"是浪费。这里直接给可操作建议，
+        # 并**不**编一个 max_possible（没算就是没算）。
+        logger.info(
+            "Analyzer: combination estimate %s exceeds limit %s; returning early", total, limit
+        )
+        return BuildAnalysis(
+            reason=(
+                f"这次分析的组合规模太大（各部位 {counts[0]}/{counts[1]}/{counts[2]}/"
+                f"{counts[3]}/{counts[4]} 件，预估约 {total:,} 种组合，超过上限 {limit:,}），"
+                "没有做精确的属性上限推算。可以这样收窄：①指定一件金装（该部位直接锁成它，"
+                "收窄最明显）；②减少属性目标，或只留最在意的一两项；③只想补某一个部位，"
+                "用 intent=\"farm_target\" 反推那一件；④确实要跑精确分析，"
+                "把 DESTINY_BUILD_MAX_COMBINATIONS 设为 0 或调高上限后重试。"
+            ),
+            max_possible={},
+            precision="not_computed",
+            suggested_farm=[],
+        )
+
     max_possible = _max_possible_stats(snapshot, constraints)
 
     # Check each target

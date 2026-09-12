@@ -440,22 +440,26 @@ class InventorySnapshot(BaseModel):
             base_roll_stats = ArmorStats()
             masterwork_level = gear_tier or 0
             if armor_system == "armor_3":
+                # 这些是**给人看**的话（会进分析结果），所以写中文、说清"能不能反推"，
+                # 不要留英文开发者口气（语料「已知问题」表里登记过这条）。
                 if gear_tier is None:
-                    roll_parse_error = "Armor 3.0 gearTier is missing or outside 1-5."
+                    roll_parse_error = (
+                        "这件护甲没有可用的分级信息（T 级缺失或不在 1–5 内），无法反推词条。"
+                    )
                 elif gear_tier != 5:
                     roll_parse_error = (
-                        f"Armor 3.0 gearTier={gear_tier} is not supported for roll inversion."
+                        f"目前只对 T5 护甲做词条反推；这件是 T{gear_tier}。"
                     )
                 elif not sockets_data:
-                    roll_parse_error = "Armor 3.0 socket data is unavailable."
+                    roll_parse_error = "这件护甲缺少插槽数据，无法反推词条。"
                 elif len(archetype_hashes) != 1:
-                    roll_parse_error = "Armor 3.0 archetype socket is missing or ambiguous."
+                    roll_parse_error = "这件护甲的词条原型插槽缺失或无法确定，无法反推。"
                 else:
                     archetype_hash = archetype_hashes[0]
                     roll = _matching_armor3_roll(base_stats_dict, gear_tier, archetype_hash, tuning_hash)
                     if roll is None:
                         roll_parse_error = (
-                            "Armor 3.0 stats do not match a legal Tier-5 archetype roll."
+                            "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。"
                         )
                     else:
                         template, _ = roll
@@ -791,6 +795,14 @@ class BuildAnalysis(BaseModel):
     max_possible: dict[str, int] = Field(
         default_factory=dict,
         description="Max achievable stats given current inventory",
+    )
+    precision: Literal["exact", "not_computed"] = Field(
+        default="exact",
+        description=(
+            "exact = max_possible 是精确推算（每个属性各跑一次求解器）；"
+            "not_computed = 组合规模超限，**没有**推算上限（此时 max_possible 为空，"
+            "不能读成上限为零），reason 里给了收窄建议。"
+        ),
     )
     suggested_farm: list[str] = Field(
         default_factory=list,

@@ -1231,26 +1231,30 @@ class BungieClient:
         logger.debug("GetClanLeaderboards returned")
         return result
 
-    async def search_users(self, display_name_prefix: str) -> dict:
-        """Search for Bungie users by display name prefix.
+    async def search_users(self, display_name_prefix: str, page: int = 0) -> dict:
+        """Search for Bungie users by global display-name prefix.
 
-        Bungie API: POST /User/SearchUsers/
+        Bungie API: ``POST /User/Search/GlobalName/{page}/``（官方推荐；
+        `User/SearchUsers/` 已经废弃，调用它只会拿到 405 HTML 错误页）。
         No OAuth required — uses API key only.
 
         Args:
             display_name_prefix: Partial display name to search for.
+            page: Zero-based page of results.
 
         Returns:
-            Raw Bungie API response dict.
+            未拆信封的载荷：``{searchResults: [...], page, hasMore}``；
+            每个结果的显示名是 ``bungieGlobalDisplayName`` + ``bungieGlobalDisplayNameCode``，
+            账号标识在 ``destinyMemberships[]`` 里。
         """
-        logger.debug("API call: SearchUsers(prefix=%s)", display_name_prefix)
+        logger.debug("API call: SearchGlobalName(prefix=%s, page=%s)", display_name_prefix, page)
         try:
             result = await self.rest.static_request(
                 "POST",
-                "User/SearchUsers/",
+                f"User/Search/GlobalName/{max(0, page)}/",
                 json={"displayNamePrefix": display_name_prefix},
             )
         except aiobungie.HTTPError as exc:
             _raise_bungie_error(exc, "搜索 Bungie 用户")
-        logger.debug("SearchUsers returned")
+        logger.debug("SearchGlobalName returned")
         return result

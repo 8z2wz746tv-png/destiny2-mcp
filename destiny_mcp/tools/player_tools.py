@@ -56,7 +56,8 @@ async def find_players(
         find_players(name="OneTop")
     """
     svc = get_ctx(ctx)
-    results = await svc['player_svc'].find_players(name)
+    payload = await svc['player_svc'].find_players(name)
+    results = payload.get("players") or []
 
     if not results:
         return f"未找到名称包含 '{name}' 的玩家。"

@@ -208,6 +208,11 @@ class WeaponDetailService:
             state_flags = weapon_profile.item_state_flags(wi.get("state"))
 
             notes: list[str] = []
+            if instance_meta.get("legacy_tier"):
+                notes.append(
+                    "这件装备没有分级（组件里的 gearTier=0，旧装备或不属于分级体系），"
+                    "不是 T0；gear_tier 输出 null。"
+                )
             if instance_meta["missing"]:
                 notes.append(
                     "该副本缺少实例信息（组件 300 未返回）："
