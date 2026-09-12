@@ -324,19 +324,25 @@ class WeaponCompareService:
             for other in comparison_instances[1:]:
                 ref_perks = {p.plug_hash: p.name for p in ref.perks}
                 other_perks = {p.plug_hash: p.name for p in other.perks}
+                # 必须定位到具体副本：两把都在仓库时，写 location 会得到
+                # "present_in=仓库 / absent_in=仓库"，结论不可用。
                 for ph, name in ref_perks.items():
                     if ph not in other_perks:
                         differences.append({
                             "perk_name": name,
-                            "present_in": ref.location,
-                            "absent_in": other.location,
+                            "present_in_instance": ref.instance_id,
+                            "present_in_location": ref.location,
+                            "absent_in_instance": other.instance_id,
+                            "absent_in_location": other.location,
                         })
                 for ph, name in other_perks.items():
                     if ph not in ref_perks:
                         differences.append({
                             "perk_name": name,
-                            "present_in": other.location,
-                            "absent_in": ref.location,
+                            "present_in_instance": other.instance_id,
+                            "present_in_location": other.location,
+                            "absent_in_instance": ref.instance_id,
+                            "absent_in_location": ref.location,
                         })
 
         logger.info(

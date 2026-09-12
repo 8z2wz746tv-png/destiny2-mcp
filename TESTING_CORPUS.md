@@ -16,7 +16,7 @@
 
 字段级不变量（所有响应都该成立，任何一条不成立就是 bug，不必逐条测）：
 
-- 列表类：`returned == len(列表)`，`truncated == (total > returned)`。
+- 列表类：`returned == len(列表)`，`truncated == (total > returned)`；没有 `limit` 的列表（如配装）也要给 `total_loadouts`/`returned_loadouts`，让「是否全量」可以自证。
 - 来源标注：Manifest 数据不得写成「你有／你没有」；账号数据不得写成「全游戏」；社区数据必须带来源与更新时间。
 - 未检查不等于没有：`coverage_complete=false`、`ownership_checked=false`、`unknown_count>0` 时不许下「没有」的结论。
 - 商人：`mode` 只能是 `menu`/`detail`；菜单态 `sale_items` 必须为空；商品的 `category_index` 要么指向已列出的分类、要么为 `null`；`can_be_sold=false` 必须带 `failure_reasons`。
@@ -80,7 +80,7 @@
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | 我仓库里当前带 `<Perk>` 的武器 | `filter_rolls` + `include_inventory=true` | 只筛账号持有副本；给出实例 ID 与位置。 |
-| 对比我这几把 `<武器>` 的 Perk，建议留哪把 | `compare` + `weapon_name` | 每把建议对应**具体实例**，不能只给笼统结论；只给建议不自动处理。 |
+| 对比我这几把 `<武器>` 的 Perk，建议留哪把 | `compare` + `weapon_name`（`item_instance_id` 是**可选**的定位，不能只给实例 ID —— 缺 `weapon_name` 会得到 `config_error`「请提供 weapon_name」） | 每把建议对应**具体实例**；差异项用 `present_in_instance`/`absent_in_instance` 指到副本，**不能只写位置**（两把都在仓库时 `present_in=仓库 / absent_in=仓库` 等于没说）。 |
 | 分析一下 `<武器>` | `analyze` + `include_inventory` | 区分「定义」与「我持有的副本」两部分。 |
 | `<武器>` 大家一般选哪个 Perk | `popularity` | 标明数据来源与版本；**没有快照时明确说缺数据，不能编实时百分比**。 |
 | 给我 `<武器>` 的 god roll 建议 | `god_roll` | 来源于社区愿单；标明不是官方推荐。 |
@@ -259,8 +259,22 @@
 | 查一个不存在的赛季神器名 | `subclass_assistant(intent="artifact")` | `definition_not_found_error`（**不是** `item_not_found_error` —— 后者是「你的东西被分解了」，用在从没拥有过的定义上会误导）。 |
 | 查一下 hash=999 的神器模组 | `subclass_assistant(intent="artifact_mod", artifact_mod_hash=999)` | `ok=false` + `definition_not_found_error`。 |
 | 查一个不存在的套装效果 | `build_assistant(intent="set_bonus", set_bonus_name=…)` | `ok=false` + `item_not_found_error`；不能包在成功信封里。 |
+| 查一把不存在的武器的社区推荐 roll | `weapon_assistant(intent="god_roll", weapon_name="不存在的武器xyz")` | `ok=false` + `manifest_error`；**不能**是 `ok=true` 里带一段「未找到武器」的文字。武器存在但本地愿单没收录时才是成功 + 说明。 |
+| 查一把不存在的武器的选取率 | `weapon_assistant(intent="popularity"／"selection_rates"／"perk_selection")` | 同上 `manifest_error`；**不能**答成「暂无录入的选取率快照」（那会让用户分不清打错名字还是真没数据）。 |
 
-### C. 封闭词表与协议级拒绝
+### C. 错误码分层（按语料核对 code 前先看这张表）
+
+同一个「你参数不对」会出现在不同层，码不同、责任方也不同；按错层核对会产生假失败。
+
+| 层 | 例子 | 码 | 谁的问题 |
+| --- | --- | --- | --- |
+| schema 层（进不了工具函数） | 拼错参数名、intent 不在枚举里、类型不对 | 协议级 `isError` + pydantic 文本（`literal_error`、`extra_forbidden`） | 调用方写法错，不是业务失败 |
+| 工具层前置校验 | `move` 缺 `destination`、`equip_artifact_mod` hash 为负、`modify` 缺 `changes`、`equip_many` 实例重复 | `invalid_arguments` | 调用方漏参数/越界，**不进服务层** |
+| 服务层实体参数 | `pgcr` 缺活动 ID、`clan_leaderboards` 缺 group_id、`collectible_node` 传收藏品号 | `invalid_argument_error` | 参数语义不对，服务层拒绝 |
+| Manifest 找不到东西 | 不存在的武器/物品/套装/赛季神器 | `manifest_error`（`artifact` 等定义类用 `definition_not_found_error`） | 名字或 hash 在本地 Manifest 里没有 |
+| 账号里找不到 | 分解掉的物品、不存在的副本 | `item_not_found_error` | 曾经拥有或以为拥有，实际不在账号里 |
+
+### D. 封闭词表与协议级拒绝
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
@@ -280,7 +294,11 @@
 | 遗产／刚玉战锤的 Perk 池里哪些是社区推荐的 | `weapon_assistant(intent="perk_pool", weapon_name=…)` | 应能看到 `god_roll_pve: true` / `god_roll_pvp: true` 的条目（修复前**全是 false**）。异域可能全 false —— 这时要说明「本地愿单没收录」，**不能说「这些 Perk 都不好」**。 |
 | 你现在有哪些工具 | 不调用工具 | 只有 8 个聚合工具；**不应**出现 `get_inventory`、`raw_api_call` 这类老工具名。 |
 | 用 `get_inventory` 看看我的背包 | `inventory_assistant(intent="get")` | 老工具名已不在工具面上；应改走聚合入口，而不是声称工具不存在就作罢。想用老工具要开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 并重启宿主。 |
-| 列一个不存在的商人／查不存在的节点 hash | `vendor`／`collectible_node` | `ok=false` + `invalid_argument_error`，消息说清「这个 hash 不是那种东西」，**不是**裸抛 404。 |
+| 查不存在的收藏品节点 hash | `world_assistant(intent="collectible_node")` | `ok=false` + `invalid_argument_error`，消息说清「收藏品号 ≠ 节点号」，**不是**裸抛 404。（不存在的商人名走第八章：返回空菜单 + 相近名建议，**不是**错误信封） |
+| 查一把不存在的武器的社区 roll／选取率 | `weapon_assistant(intent="god_roll"／"popularity")` | 都必须是 `ok=false` + `manifest_error`（修复前是 `ok=true` + 一段「未找到武器」或「暂无录入快照」的文字）。 |
+| 对比两把都在仓库的同名武器 | `weapon_assistant(intent="compare", weapon_name=…)` | 差异项必须给 `present_in_instance`/`absent_in_instance`（修复前两条都写 `仓库`，无法判断是哪一把）。 |
+| 列出我的配装 | `loadout_assistant(intent="list")` | 返回里应有 `total_loadouts` 与 `returned_loadouts`（修复前没有，无法自证全量）。 |
+| 查「遗产」的基础属性 | `weapon_assistant(intent="stats", weapon_name="遗产")` | 必须返回这把霰弹枪的属性（修复前会误报「遗产 不是武器」—— 精确名查到了同名的非武器条目）。同名歧义应按「搜索后取第一条武器」解析。 |
 
 ## 十四、只跑一次就够的整链路
 

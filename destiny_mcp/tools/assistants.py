@@ -473,6 +473,8 @@ async def weapon_assistant(
     if intent in {"popularity", "selection_rates", "perk_selection", "selection", "usage_rates"}:
         if not weapon_name.strip():
             return error_response("missing_weapon_name", "查询选取率需要提供 weapon_name。")
+        # 先确认这把武器在 Manifest 里存在，否则「打错名字」会被答成「暂无录入快照」。
+        svc["manifest_query_svc"].get_weapon_stats(weapon_name)
         try:
             result = svc["perk_svc"].get_weapon_popularity(weapon_name)
         except DestinyMCPError as exc:
@@ -1072,6 +1074,9 @@ async def loadout_assistant(
             {
                 "player_name": payload["player_name"],
                 "loadouts": payload["loadouts"],
+                # 列表类响应都要能自证是否全量（配装没有 limit，所以两者相等）
+                "total_loadouts": len(payload["loadouts"]),
+                "returned_loadouts": len(payload["loadouts"]),
                 "scope": payload["scope"],
                 "loadout_format": payload["loadout_format"],
                 "community_route": {

@@ -251,10 +251,19 @@ class ManifestQueryService:
         return info
 
     def get_weapon_stats(self, weapon_name: str) -> dict:
-        """Get weapon investment stats. Raises ManifestError if not found or not weapon."""
-        definition = self._manifest.get_item_definition_by_name(weapon_name)
+        """Get weapon investment stats. Raises ManifestError if not found or not weapon.
+
+        用与 analyze/info 相同的方式解析名字：按名字搜索后取第一条**武器**。
+        不能按精确名取定义 —— 存在与武器同名的非武器条目（例如「遗产」），
+        精确名会拿到那一条，然后误报「不是武器」。
+        """
+        definition = None
+        for item in self._manifest.search(weapon_name, limit=5):
+            if item.get("itemType") == 3:
+                definition = self._manifest.get_item_definition(item["itemHash"])
+                break
         if not definition:
-            raise ManifestError(f"找不到物品：{weapon_name}")
+            raise ManifestError(f"找不到武器: {weapon_name}")
         if definition.get("itemType") != 3:
             raise ManifestError(f"{weapon_name} 不是武器")
 

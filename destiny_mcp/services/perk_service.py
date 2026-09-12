@@ -6,7 +6,7 @@ Extracted from weapon_service.py during refactoring.
 
 from __future__ import annotations
 
-from ..exceptions import ItemNotFoundError
+from ..exceptions import ItemNotFoundError, ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..models import PerkInfo, WeaponPerkPool, WeaponPerkSlot
@@ -206,7 +206,10 @@ class PerkService:
                 break
 
         if not weapon:
-            return f"未找到武器 '{weapon_name}'。"
+            # 「武器不存在」和「武器存在但本地愿单没收录」是两件事：
+            # 前者走错误信封（与 analyze/info/catalyst 一致），后者才是成功的说明文字。
+            # 以前两者都当成功返回，用户分不清是打错名字还是真没数据。
+            raise ManifestError(f"找不到武器: {weapon_name}")
 
         item_hash = weapon["itemHash"]
         display_name = weapon["name"]

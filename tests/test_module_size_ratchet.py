@@ -27,7 +27,9 @@ CEILINGS = {
     # slot_number/kind/baseline/top_n/count/maxtop/…），每个参数一行"None 就补默认值"。
     # 判断点没有增加，只是把默认值从签名搬进函数体；规则与验收在
     # tests/test_parameter_sentinels.py。
-    "destiny_mcp/tools/assistants.py": 1402,
+    # +6：popularity 组先确认武器存在（避免"打错名字"被答成"暂无快照"），
+    # loadout 列表补 total/returned 以便自证全量。
+    "destiny_mcp/tools/assistants.py": 1408,
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,
