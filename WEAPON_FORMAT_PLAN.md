@@ -241,7 +241,45 @@ perks:    sockets 里 roll 相关栏位（intrinsic/barrel/magazine/trait）的�
 
 ---
 
+### 3.6 体验保障与迁移（"问什么答什么"不能变）
+
+两层要分开说：
+
+- **人话层**（Agent 转述给用户的那段）：`ok_response` 的 `summary`、`warnings`、`next_actions` 措辞**只增不减**——这是体验的主体，重构不动它；
+- **结构层**（Agent 读的 JSON 键名）：**会变**，这正是重构的目的。Agent 每次调用都重新读响应，不依赖上一次的键名。
+
+#### P0（新增，改动之前先做）：录基线
+
+1. 用固定问法跑一遍（语料里的武器问题 + 社区配装库存匹配 + 商人商品），完整响应落盘到 `tests/baselines/weapon_responses/`。
+2. 重构后再跑一遍，生成 diff 报告：**新增 / 重命名 / 消失 / 语义变化**四类。
+3. **硬门槛：任何"消失的字段"必须逐个给出理由**（内容进了新结构，或确认是废弃项）；没有理由的消失不允许合并。
+
+#### 内部消费者清单（同批改，且必须有测试）
+
+| 消费者 | 依赖什么 | 不处理的后果 |
+| --- | --- | --- |
+| `starside_matching.match_build_inventory` | `WeaponDetail.perks_complete`、`sockets[].plug_name`、`InventoryItem.item_instance_id/name` | 社区配装"看看我缺什么"会坏 —— 保留这些字段或同批改 + 测试 |
+| `vendor_service`（商人商品） | `PerkService.annotate_god_roll(item_hash, plug_hash, perk)` | 商人商品的愿单标记会丢 —— 保持该 API 签名与语义 |
+| `assistants.py` 武器分支 | 全部服务 | 同批改 |
+| `weapon_tools.py` 遗留工具 | 同一批服务 | 跟着变（默认屏蔽），语料注明 |
+| `build_assistant` 求解/farm_target | **不读**武器 perk（已核实） | 无影响 |
+
+#### Agent 不会"看不懂"的前提
+
+1. 响应自描述：`kind`/`scope`/`roll_kind`/`schema_version` 都在响应里；
+2. skill `routing.md` 武器章节与代码**同批更新**——旧文档会让 Agent 按已删字段名去找值，这是最现实的翻车点；
+3. 语料武器章节同批重写，供你上线前逐条实跑。
+
+#### 明确不保证
+
+- 写在**别处**的旧字段名会失效：自定义 prompt、第三方前端、外部脚本里如果写死了 `weapon.nameEn`、`god_roll`（字符串）、`perk_pool.slots[].slot_name` 这类，需要一起改（本仓库内已确认没有这类外部消费方）；
+- 切换后必须**新开任务**：工具 schema 与 docstring 是宿主连接时读的。
+
 ## 4. 分阶段任务
+
+### P0 · 录基线（改动前）
+- 固定问法跑一遍并落盘 `tests/baselines/weapon_responses/*.json`；写一个 `scripts/diff_weapon_baseline.py` 生成四类差异报告。
+- 验收：基线文件入库；diff 脚本能在"未改动"状态下报告"零差异"。
 
 ### P1 · `weapon_profile.py` + 名称表（纯函数，可单测）
 - 稀有度、`frame_of`/`intrinsic_of`/`rpm_of`、`roll_kind`、`socket_kinds`、`is_craftable`、`breaker_type`、`trait_ids`、`slot_kind`、身份块构造函数。
@@ -306,4 +344,7 @@ perks:    sockets 里 roll 相关栏位（intrinsic/barrel/magazine/trait）的�
 - [ ] 遗产的 `farming.list="刷取清单-绿弹紫枪"`、`tier="T1"`、`source="深岩墓室"`、`recommended_perks` 与清单一致
 - [ ] 清单 `frame`/`rpm` 与 Manifest 推出值不一致时输出 `cross_check` 说明（遗产清单写 65）
 - [ ] 响应体积：`perk_pool` 从 32 KB 降到 10 KB 量级（若做 P6）
+- [ ] baseline diff 报告里**没有"无理由消失"的字段**（P0 的硬门槛）
+- [ ] 人话层不变：同一批问法的 `summary`/`warnings`/`next_actions` 与基线一致（只允许增补）
+- [ ] 内部消费者回归：社区配装库存匹配（starside）与商人商品愿单标记的测试仍绿
 - [ ] `pytest` 全绿、`PARAMETER_GUARD=ok`、8 个工具、语料武器行逐条实跑
