@@ -1,8 +1,9 @@
 """Per-intent validation behind the stable aggregate tool signatures."""
 
+from collections.abc import Mapping
 from functools import wraps
 from inspect import signature
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, ClassVar, Literal, Self
 
 from pydantic import BaseModel, Field, StringConstraints, ValidationError, model_validator
 
@@ -48,11 +49,32 @@ WRITE_INTENTS: frozenset[str] = frozenset(
 class IntentRequest(BaseModel):
     intent: str
 
+    # 参数名 → 给调用方看的中文说明（缺参时直接说清"要补什么"）
+    FIELD_HINTS: ClassVar[dict[str, str]] = {
+        "item_name": "物品名",
+        "item_instance_id": "物品实例 ID（instance_id）",
+        "item_instance_ids": "物品实例 ID 列表",
+        "destination": "目标位置（vault/仓库，或角色名）",
+        "to_character": "目标角色",
+        "character": "角色（hunter/warlock/titan 或中文职业名）",
+        "name": "配装名",
+        "changes": "要改的内容",
+        "element": "元素（void/solar/arc/stasis/strand/prism，或中文名）",
+        "component": "组件（super/grenade/melee/class/aspects/fragments）",
+        "group_id": "公会 ID（数字）",
+        "node_hash": "节点号（不是收藏品号）",
+    }
+
     def require(self, *fields: str) -> None:
+        missing = []
         for field in fields:
             value = getattr(self, field)
             if not value or (isinstance(value, str) and not value.strip()):
-                raise ValueError(f"intent={self.intent} requires {field}.")
+                missing.append(self.FIELD_HINTS.get(field, field))
+        if missing:
+            raise ValueError(
+                f"intent={self.intent} 需要 {'、'.join(missing)}；请补上后重试。"
+            )
 
 
 class InventoryRequest(IntentRequest):
@@ -69,7 +91,7 @@ class InventoryRequest(IntentRequest):
         if self.intent == "move":
             self.require("item_name", "destination")
             if self.equip and self.destination.strip().lower() in {"vault", "仓库"}:
-                raise ValueError("Cannot equip an item in the vault.")
+                raise ValueError("仓库里的东西不能直接装备：先移到角色身上（destination 用角色名）再装备。")
         elif self.intent == "transfer":
             self.require("item_instance_id", "to_character")
         elif self.intent == "equip":
@@ -78,7 +100,7 @@ class InventoryRequest(IntentRequest):
             self.require("item_instance_ids", "character")
             instance_ids = self.item_instance_ids or []
             if len(set(instance_ids)) != len(instance_ids):
-                raise ValueError("item_instance_ids must be unique.")
+                raise ValueError("item_instance_ids 里有重复的实例 ID；同一件只能出现一次。")
         elif self.intent in {"pull_postmaster", "lock", "track_quest", "quest_tracking"}:
             self.require("item_instance_id")
         return self
@@ -120,7 +142,7 @@ class SubclassRequest(IntentRequest):
         elif self.intent == "equip_artifact_mod":
             self.require("character")
             if self.artifact_mod_hash <= 0:
-                raise ValueError("artifact_mod_hash must be positive.")
+                raise ValueError("artifact_mod_hash 必须是正整数。")
         return self
 
 
@@ -145,10 +167,37 @@ def validate_request(model: type[IntentRequest]):
             try:
                 model.model_validate(values)
             except ValidationError as exc:
-                messages = "; ".join(error["msg"] for error in exc.errors(include_input=False))
+                messages = "; ".join(
+                    _readable_validation_message(error)
+                    for error in exc.errors(include_input=False)
+                )
                 return error_response("invalid_arguments", messages)
             return await function(*args, **kwargs)
 
         return wrapped
 
     return decorator
+
+
+# pydantic 给自定义校验失败的 msg 会自带框架前缀（"Value error, "/"Assertion failed, "），
+# 那是开发者信息，不该进给调用方看的话术（语料第十二章 D 同源问题）。
+_PYDANTIC_PREFIXES = ("Value error, ", "Assertion failed, ", "Assertion failed: ")
+
+
+def _readable_validation_message(error: Mapping[str, Any]) -> str:
+    """把一条 pydantic 校验错误转成人能读的话。
+
+    优先取 `ctx["error"]` 里我们抛出的原始异常文本（最干净），
+    取不到再退回 msg 并剥掉框架前缀。
+    """
+    ctx = error.get("ctx") or {}
+    original = ctx.get("error")
+    if isinstance(original, BaseException):
+        text = str(original).strip()
+        if text:
+            return text
+    message = str(error.get("msg") or "").strip()
+    for prefix in _PYDANTIC_PREFIXES:
+        if message.startswith(prefix):
+            return message[len(prefix):].strip()
+    return message
