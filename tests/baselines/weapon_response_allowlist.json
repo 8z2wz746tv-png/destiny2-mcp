@@ -1,0 +1,4 @@
+{
+  "_note": "允许消失的字段登记在这里：键是归一化路径（list 索引写成 []），值写明去向。没登记的消失会让 scripts/diff_weapon_baseline.py 退出码非 0。",
+  "removed": {}
+}

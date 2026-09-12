@@ -1,0 +1,112 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "catalog",
+      "limit": 5,
+      "weapon_type": "手炮"
+    },
+    "elapsed_ms": 2314,
+    "is_error": false,
+    "payload_chars": 2952,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "checked_count": 228,
+    "filters": {
+      "any_perks": [],
+      "excluded_perks": [],
+      "required_perks": [],
+      "weapon_name": "",
+      "weapon_type": "手炮"
+    },
+    "matched": [
+      {
+        "ammo_type": "主要",
+        "damage_type": "虚空",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/39441735ec0f1e7f7760775f6ee4bd24.jpg",
+        "item_hash": 253843484,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "叛贼",
+        "nameEn": "Turncoat",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "电弧",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ac56ad66eb1ebb8a371f9d3d3c768c5a.jpg",
+        "item_hash": 648595258,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "引力子尖刺",
+        "nameEn": "Graviton Spike",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/65735eb5048ba941145e35224014e479.jpg",
+        "item_hash": -782952492,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "流明",
+        "nameEn": "Lumina",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5564a17ddf52e36f56e7256ad9946a17.jpg",
+        "item_hash": 204878059,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "渎职",
+        "nameEn": "Malfeasance",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f45a7d8e52bf0d88bbd43d4354878313.jpg",
+        "item_hash": -1387837739,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "烈日弹丸",
+        "nameEn": "Sunshot",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "手炮"
+      }
+    ],
+    "matched_count": 228,
+    "returned_count": 5,
+    "scope": "manifest_catalog",
+    "scope_label": "全量武器定义候选（未读取账号持有情况）",
+    "truncated": true
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "全量武器定义检查 228 把，命中 228 把。",
+  "warnings": [
+    "这些是 Manifest 全量候选，未读取账号持有情况。"
+  ]
+}

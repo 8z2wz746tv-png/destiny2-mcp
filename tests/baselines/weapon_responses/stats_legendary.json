@@ -1,0 +1,39 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "stats",
+      "weapon_name": "遗产"
+    },
+    "elapsed_ms": 4,
+    "is_error": false,
+    "payload_chars": 580,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "stats": {
+      "icon_url": "https://www.bungie.net/common/destiny2_content/icons/07619f9f7115a2295c080f08179deb98.jpg",
+      "name": "遗产",
+      "nameEn": "Heritage",
+      "stats": {
+        "伤害": 70,
+        "变焦": 12,
+        "后坐方向": 60,
+        "填装速度": 45,
+        "射程": 68,
+        "弹匣": 60,
+        "弹药生成": 49,
+        "操控性": 70,
+        "每分钟发射数": 30,
+        "稳定性": 43,
+        "空中效率": 5,
+        "辅助瞄准": 68
+      },
+      "weaponType": "霰弹枪"
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已读取武器属性。",
+  "warnings": []
+}

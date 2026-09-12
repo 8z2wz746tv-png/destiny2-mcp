@@ -1,0 +1,212 @@
+{
+  "cases": [
+    {
+      "case": "catalog_perk",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 21843,
+      "payload_chars": 56330
+    },
+    {
+      "case": "catalog_type",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 2314,
+      "payload_chars": 2952
+    },
+    {
+      "case": "type_list",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 4610,
+      "payload_chars": 31789
+    },
+    {
+      "case": "filter_rolls_owned",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 2052,
+      "payload_chars": 2779
+    },
+    {
+      "case": "filter_rolls_catalog",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 1682,
+      "payload_chars": 6400
+    },
+    {
+      "case": "inventory_type",
+      "tool": "inventory_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 2870,
+      "payload_chars": 70764
+    },
+    {
+      "case": "info_legendary",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 11,
+      "payload_chars": 7892
+    },
+    {
+      "case": "info_exotic",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 265,
+      "payload_chars": 8447
+    },
+    {
+      "case": "info_rare",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 11,
+      "payload_chars": 2585
+    },
+    {
+      "case": "info_common",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 10,
+      "payload_chars": 2611
+    },
+    {
+      "case": "stats_legendary",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 4,
+      "payload_chars": 580
+    },
+    {
+      "case": "perk_pool_legendary",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 20,
+      "payload_chars": 45580
+    },
+    {
+      "case": "perk_pool_exotic",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 12,
+      "payload_chars": 10700
+    },
+    {
+      "case": "perk_pool_craftable",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 14,
+      "payload_chars": 18375
+    },
+    {
+      "case": "analyze_legendary",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 3599,
+      "payload_chars": 56661
+    },
+    {
+      "case": "analyze_exotic",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 705,
+      "payload_chars": 14607
+    },
+    {
+      "case": "god_roll_legendary",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 7,
+      "payload_chars": 895
+    },
+    {
+      "case": "god_roll_exotic",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 6,
+      "payload_chars": 251
+    },
+    {
+      "case": "catalyst_legendary",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 7,
+      "payload_chars": 339
+    },
+    {
+      "case": "catalyst_exotic",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 553,
+      "payload_chars": 748
+    },
+    {
+      "case": "popularity",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 4,
+      "payload_chars": 183
+    },
+    {
+      "case": "compare",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 447,
+      "payload_chars": 7458
+    },
+    {
+      "case": "perk_description",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 18,
+      "payload_chars": 5880
+    },
+    {
+      "case": "weapon_community",
+      "tool": "weapon_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 13,
+      "payload_chars": 31783
+    },
+    {
+      "case": "community_builds",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 4,
+      "payload_chars": 7510
+    },
+    {
+      "case": "vendor_banshee",
+      "tool": "world_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 2972,
+      "payload_chars": 6589
+    }
+  ]
+}

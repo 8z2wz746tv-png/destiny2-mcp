@@ -1,0 +1,41 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "catalyst",
+      "weapon_name": "牵引器火炮"
+    },
+    "elapsed_ms": 553,
+    "is_error": false,
+    "payload_chars": 748,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "catalyst": {
+      "catalysts": [
+        {
+          "description": "此武器升级为大师杰作后将获得强化能力，如提高的属性和/或额外的特性。",
+          "effects": [
+            {
+              "description": "增加弹药储备量。",
+              "name": "财力雄厚"
+            }
+          ],
+          "flavorText": "",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/1bd8b5b8a2287f37ba549f09f46bd905.jpg",
+          "name": "牵引器火炮催化",
+          "nameEn": "Tractor Cannon Catalyst"
+        }
+      ],
+      "count": 1,
+      "is_exotic": true,
+      "unlock_state": "not_checked",
+      "weapon": "牵引器火炮",
+      "weaponEn": "Tractor Cannon"
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已读取催化剂信息。",
+  "warnings": []
+}

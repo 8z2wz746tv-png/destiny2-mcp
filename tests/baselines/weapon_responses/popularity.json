@@ -1,0 +1,22 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "popularity",
+      "weapon_name": "遗产"
+    },
+    "elapsed_ms": 4,
+    "is_error": false,
+    "payload_chars": 183,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "popularity": null
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "「遗产」暂无录入的选取率快照。",
+  "warnings": [
+    "未录入不代表 0%，不应据此推断 Perk 热度。"
+  ]
+}

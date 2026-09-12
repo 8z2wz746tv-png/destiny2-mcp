@@ -1,0 +1,218 @@
+{
+  "_case": {
+    "arguments": {
+      "include_inventory": false,
+      "intent": "filter_rolls",
+      "limit": 5,
+      "weapon_type": "微型冲锋枪"
+    },
+    "elapsed_ms": 1682,
+    "is_error": false,
+    "payload_chars": 6400,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "checked_count": 160,
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 5,
+      "results": [
+        {
+          "list": "刷取清单-异域武器",
+          "name": "墓园双星",
+          "note": "荒疫追踪弹可以轻松融化大片初级首领可惜弹药生成只有 32",
+          "scale": "T",
+          "scenario_tiers": {
+            "清怪": "T1.5"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          }
+        },
+        {
+          "list": "刷取清单-异域武器",
+          "name": "枯骨鳞片",
+          "note": "清怪效率勉强，毒爆范围有点小，毒伤只能打动红血，可和毒手联动",
+          "scale": "T",
+          "scenario_tiers": {
+            "清怪": "T2"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          }
+        },
+        {
+          "list": "刷取清单-异域武器",
+          "name": "泰拉巴",
+          "note": "适合搭配女王香炉的发热寒颤与火种扳机、精密射线快速进入野兽模式，获得火伤抗性。本身 100 弹药生成，非常不错的清怪枪",
+          "scale": "T",
+          "scenario_tiers": {
+            "清怪": "T1"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          }
+        },
+        {
+          "list": "刷取清单-异域武器",
+          "name": "蝎狮",
+          "note": "本身伤害一般，但能让任何伤害在滞空时触发蝎狮的虚空覆盖护盾，比较合适的有黎明副歌火术",
+          "role": "特殊用途",
+          "scale": "T",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          }
+        },
+        {
+          "list": "刷取清单-异域武器",
+          "name": "赴险者",
+          "note": "唯一有连锁反应的白弹，只建议在战斗人员是电弧伤害时触发电弧导体使用",
+          "scale": "T",
+          "scenario_tiers": {
+            "清怪": "T1"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          }
+        }
+      ],
+      "returned_count": 5,
+      "truncated": false,
+      "unmatched": [],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    },
+    "filters": {
+      "any_perks": [],
+      "excluded_perks": [],
+      "required_perks": [],
+      "weapon_name": "",
+      "weapon_type": "微型冲锋枪"
+    },
+    "matched": [
+      {
+        "ammo_type": "主要",
+        "damage_type": "棱镜",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/938bc6eb5c5c772e2f3d066380179d36.jpg",
+        "item_hash": 1481594633,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "墓园双星",
+        "nameEn": "Barrow-Dyad",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "微型冲锋枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2752ee2761149f004df20e78749c1bab.jpg",
+        "item_hash": 46524085,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "枯骨鳞片",
+        "nameEn": "Osteo Striga",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "微型冲锋枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/88ea7e35e14f29c4cda6588cb258333b.jpg",
+        "item_hash": -1184268484,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "泰拉巴",
+        "nameEn": "Tarrabah",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "微型冲锋枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "虚空",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b52c06c2497831876503dbbe795b1e59.jpg",
+        "item_hash": 219145368,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "蝎狮",
+        "nameEn": "The Manticore",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "微型冲锋枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "电弧",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0b7fa10956ee9f16899ce1838c3c0e31.jpg",
+        "item_hash": -1205549507,
+        "matched_perk_details": [],
+        "matched_perks": [],
+        "name": "赴险者",
+        "nameEn": "Riskrunner",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "微型冲锋枪"
+      }
+    ],
+    "matched_count": 160,
+    "returned_count": 5,
+    "scope": "manifest_catalog",
+    "scope_label": "全量武器定义候选（未读取账号持有情况）",
+    "truncated": true
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "全量武器定义检查 160 把，命中 160 把。",
+  "warnings": [
+    "include_inventory=false：这些是 Manifest 全量候选，未读取账号持有情况。"
+  ]
+}

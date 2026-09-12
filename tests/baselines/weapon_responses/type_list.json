@@ -1,0 +1,800 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "type",
+      "limit": 5,
+      "weapon_type": "手炮"
+    },
+    "elapsed_ms": 4610,
+    "is_error": false,
+    "payload_chars": 31789,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 3,
+      "results": [
+        {
+          "element": "冰影",
+          "frame": "散射",
+          "list": "购物清单-白弹",
+          "name": "三冠得主",
+          "note": "对于以水晶为基础的配装来说很不错 框架优秀 起源+结晶残花 搭配很好",
+          "perks": {
+            "三号位": [
+              "结晶残花"
+            ],
+            "四号位": [
+              "混沌重塑",
+              "战嚎炮管"
+            ]
+          },
+          "rank": "19",
+          "scale": "S-F",
+          "source": "忠诚纪念碑",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "A"
+        },
+        {
+          "element": "烈日",
+          "frame": "精密",
+          "list": "购物清单-白弹",
+          "name": "信任",
+          "note": "有双溅射 Perk 和不错框架 但 Perk 多样性少 起源也差",
+          "perks": {
+            "三号位": [
+              "萤火虫"
+            ],
+            "四号位": [
+              "辉耀炽热",
+              "高爆载荷"
+            ]
+          },
+          "rank": "20",
+          "scale": "S-F",
+          "source": "智谋",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "A"
+        },
+        {
+          "element": "动能",
+          "frame": "攻击型",
+          "list": "购物清单-白弹",
+          "name": "克瑞米尔之匕",
+          "note": "起源不错 + 框架最差 溅射 Perk 尚可",
+          "perks": {
+            "三号位": [
+              "萤火虫"
+            ],
+            "四号位": [
+              "高爆载荷"
+            ]
+          },
+          "rank": "47",
+          "scale": "S-F",
+          "source": "铁旗",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "C"
+        }
+      ],
+      "returned_count": 3,
+      "truncated": false,
+      "unmatched": [],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    },
+    "weapons": {
+      "returned_weapons": 5,
+      "total_weapons": 124,
+      "truncated": true,
+      "weapon_type_query": "手炮",
+      "weapons": [
+        {
+          "ammo_type": "白弹",
+          "damage_type": "冰影",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/95f79ae16f450a7d3fe0af1f49f5768f.jpg",
+          "instance_id": "6917530183210837452",
+          "is_equipped": false,
+          "item_hash": 2908653246,
+          "location": "仓库",
+          "name": "三冠得主",
+          "perks_complete": true,
+          "power": 550,
+          "sockets": [
+            {
+              "description": "发射短射程的散弹。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b473eb1143bf843be894a88bedee0550.png",
+              "plug_category": "intrinsics",
+              "plug_hash": 2427219599,
+              "plug_name": "散射",
+              "slot_label": "框架"
+            },
+            {
+              "description": "均衡型霰弹枪枪管。\n  •  提高稳定性\n  •  提高操控速度",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d9e5e8fa07a84c29252b78b0e7b3106d.png",
+              "plug_category": "barrels",
+              "plug_hash": 2371713880,
+              "plug_name": "枪管套筒",
+              "slot_label": "枪管"
+            },
+            {
+              "description": "对多种战术进行提高。\n  •  略微提高稳定性\n  •  提高填装速度\n  •  略微增大弹匣容量",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f0e309a267b25279a871d182f8910bcc.png",
+              "plug_category": "magazines",
+              "plug_hash": 1783397184,
+              "plug_name": "战术弹匣",
+              "slot_label": "弹匣"
+            },
+            {
+              "description": "近战最后一击或使用充能近战造成伤害会从储存弹药中填装此武器的弹匣。提升操控性。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/043d100167af67d6041719044a033221.png",
+              "plug_category": "frames",
+              "plug_hash": 402033656,
+              "plug_name": "盗墓者",
+              "slot_label": "特性1"
+            },
+            {
+              "description": "一发弹药的几乎所有弹片均命中同一目标可在短时间内提高近战伤害。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/013a56db7dc9c3f89012a381f601a4ff.png",
+              "plug_category": "frames",
+              "plug_hash": 788178929,
+              "plug_name": "雪上加霜",
+              "slot_label": "特性2"
+            },
+            {
+              "description": "使用此着色器更改装备配色。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/6622aa22307b3ef8db4cea8a9c54c92b.jpg",
+              "plug_category": "shader",
+              "plug_hash": 211863483,
+              "plug_name": "大奖赢家",
+              "slot_label": "着色器"
+            },
+            {
+              "description": "",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b8f6e3e41a381e4b27f2d50d6f3a9de0.png",
+              "plug_category": "v400.weapon.mod_guns",
+              "plug_hash": 1772241052,
+              "plug_name": "战术",
+              "slot_label": "模组"
+            },
+            {
+              "description": "最高属性。\n\n为此武器应用等同于武器阶级的额外属性。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/a9f6aee3209300eded5032e7528f80d1.jpg",
+              "plug_category": "v400.plugs.weapons.masterworks.stat.stability",
+              "plug_hash": 3513245618,
+              "plug_name": "大师杰作：稳定性",
+              "slot_label": "大师杰作"
+            },
+            {
+              "description": "使用此武器完成最后一击可获得更多职业技能能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ea99a5550787bc2196c717e98baff076.png",
+              "plug_category": "origins",
+              "plug_hash": 2523469161,
+              "plug_name": "优秀竞争者",
+              "slot_label": "插槽9"
+            },
+            {
+              "description": "记录使用武器消灭的敌人数量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fa9b8e2b358de10643b14a058094f4b.png",
+              "plug_category": "v400.plugs.weapons.masterworks.trackers",
+              "plug_hash": 2302094943,
+              "plug_name": "击杀记录器",
+              "slot_label": "追踪器"
+            },
+            {
+              "description": "将武器重置为默认外观。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3bb544f2136894a13a73875639f376d5.png",
+              "plug_category": "weapon_tiering_tier5_skins",
+              "plug_hash": 3854296178,
+              "plug_name": "默认皮肤",
+              "slot_label": "纪念物"
+            },
+            {
+              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/1f455d55b85156ae92c1219252fea12a.png",
+              "plug_category": "weapon_tiering_kill_vfx",
+              "plug_hash": 165824714,
+              "plug_name": "淘气光束",
+              "slot_label": "战斗特效"
+            },
+            {
+              "description": "此武器的特性可通过更高的装备阶级等级强化。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
+              "plug_category": "weapon_tiering.plugs.mods.enhancers",
+              "plug_hash": 780815822,
+              "plug_name": "空的装备阶级升级",
+              "slot_label": "模组"
+            }
+          ],
+          "stats": {
+            "aim_assist": 61,
+            "airborne_effectiveness": 22,
+            "damage": 96,
+            "handling": 55,
+            "magazine": 8,
+            "range": 33,
+            "recoil_direction": 82,
+            "reload_speed": 47,
+            "rpm": 100,
+            "stability": 51,
+            "zoom": 12
+          },
+          "tier": "传说",
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "烈日",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+          "instance_id": "6917530193975673732",
+          "is_equipped": false,
+          "item_hash": 810474118,
+          "location": "仓库",
+          "name": "信任",
+          "perks_complete": true,
+          "power": 550,
+          "sockets": [
+            {
+              "description": "此武器的后坐力模式可预测地偏向垂直方向。可进行拥有高精度的快速射击。装备此武器时，瞄准时的移动速度更快。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e9dd736124e8ef94048901a279a5bb18.png",
+              "plug_category": "intrinsics",
+              "plug_hash": 1322370662,
+              "plug_name": "精密框架",
+              "slot_label": "框架"
+            },
+            {
+              "description": "轻微弯曲型枪管。\n  •  大幅增强对后坐力的控制\n  •  提高操控速度",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8f7fb54687aa52a9c2595d90ce9c9417.png",
+              "plug_category": "barrels",
+              "plug_hash": 3048246338,
+              "plug_name": "箭头制退器",
+              "slot_label": "枪管"
+            },
+            {
+              "description": "弹匣容量提高。\n  •  增大弹匣容量",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d9f468cce26fe35d9db413e2f8451127.png",
+              "plug_category": "magazines",
+              "plug_hash": 1065371964,
+              "plug_name": "附加弹匣",
+              "slot_label": "弹匣"
+            },
+            {
+              "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+              "plug_category": "frames",
+              "plug_hash": 1183436451,
+              "plug_name": "萤火虫",
+              "slot_label": "特性1"
+            },
+            {
+              "description": "精准最后一击可产生元素伤害爆炸。提高填装速度。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c87b03bb6d56b393f8582e128b337332.png",
+              "plug_category": "frames",
+              "plug_hash": 169755979,
+              "plug_name": "蜻蜓",
+              "slot_label": "特性2"
+            },
+            {
+              "description": "将装备恢复为默认颜色。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/96831e244728f0350340bb7d5d05b463.png",
+              "plug_category": "shader",
+              "plug_hash": 4248210736,
+              "plug_name": "默认着色器",
+              "slot_label": "着色器"
+            },
+            {
+              "description": "当前未选择模组。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/431cc8304da4f5eb44c5c10a5c1866ce.jpg",
+              "plug_category": "v400.weapon.mod_empty",
+              "plug_hash": 2323986101,
+              "plug_name": "空模组插槽",
+              "slot_label": "模组"
+            },
+            {
+              "description": "属性略微提高。提高武器阶层，将其铸造为大师杰作物品。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e3a74e6dd4c520ea17eb1fdaf2128213.jpg",
+              "plug_category": "v400.plugs.weapons.masterworks.stat.reload",
+              "plug_hash": 4283235141,
+              "plug_name": "3阶：填装速度",
+              "slot_label": "大师杰作"
+            },
+            {
+              "description": "击败目标可在更长时间内获得边打边跑层数。短暂冲刺消耗一层效果并从储备弹药中部分填装此武器的弹匣。如为弓箭，则在更长时间内提升拉弓速度。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5011e479f02ede344fb16099cfecd800.png",
+              "plug_category": "origins",
+              "plug_hash": 859855990,
+              "plug_name": "边打边跑",
+              "slot_label": "插槽9"
+            },
+            {
+              "description": "记录使用武器消灭的敌人数量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fa9b8e2b358de10643b14a058094f4b.png",
+              "plug_category": "v400.plugs.weapons.masterworks.trackers",
+              "plug_hash": 905869860,
+              "plug_name": "击杀记录器",
+              "slot_label": "追踪器"
+            },
+            {
+              "description": "装备此武器皮肤以改变信任的外观。当你解锁一个皮肤后，你帐号中的所有角色都将解锁获得的皮肤。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cf0a81fe5497f59c6ed6747f844a595e.jpg",
+              "plug_category": "v400_activities_gambit_hand_cannon0_skins",
+              "plug_hash": 2319265678,
+              "plug_name": "怀疑",
+              "slot_label": "纪念物"
+            },
+            {
+              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8c28abb43d902b731365e1045f467a95.png",
+              "plug_category": "weapon_tiering_kill_vfx",
+              "plug_hash": 1335132356,
+              "plug_name": "凯旋脉动",
+              "slot_label": "战斗特效"
+            },
+            {
+              "description": "此武器的特性可通过更高的装备阶级等级强化。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
+              "plug_category": "weapon_tiering.plugs.mods.enhancers",
+              "plug_hash": 780815822,
+              "plug_name": "空的装备阶级升级",
+              "slot_label": "模组"
+            }
+          ],
+          "stats": {
+            "aim_assist": 78,
+            "airborne_effectiveness": 35,
+            "damage": 78,
+            "handling": 47,
+            "magazine": 15,
+            "range": 37,
+            "recoil_direction": 100,
+            "reload_speed": 55,
+            "rpm": 180,
+            "stability": 56,
+            "zoom": 14
+          },
+          "tier": "传说",
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "烈日",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+          "instance_id": "6917530193973399564",
+          "is_equipped": false,
+          "item_hash": 810474118,
+          "location": "仓库",
+          "name": "信任",
+          "perks_complete": true,
+          "power": 550,
+          "sockets": [
+            {
+              "description": "此武器的后坐力模式可预测地偏向垂直方向。可进行拥有高精度的快速射击。装备此武器时，瞄准时的移动速度更快。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e9dd736124e8ef94048901a279a5bb18.png",
+              "plug_category": "intrinsics",
+              "plug_hash": 1322370662,
+              "plug_name": "精密框架",
+              "slot_label": "框架"
+            },
+            {
+              "description": "经优化减少后坐力的枪管。\n  •  提高稳定性",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7d7aaccee29cf450d4057a9de871cdc8.png",
+              "plug_category": "barrels",
+              "plug_hash": 3966296580,
+              "plug_name": "多边形膛线",
+              "slot_label": "枪管"
+            },
+            {
+              "description": "经优化提高对后坐力控制的弹匣。\n  •  大幅提高稳定性\n  •  略微缩短射程\n  • 增加空中效率",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/6c6e1cc341487a8afd0b0c714a229255.png",
+              "plug_category": "magazines",
+              "plug_hash": 1002206008,
+              "plug_name": "稳固弹药",
+              "slot_label": "弹匣"
+            },
+            {
+              "description": "快速精准命中目标会暂时大幅提高稳定性和填装速度。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/de22847fa94634a487758041887bcdaa.png",
+              "plug_category": "frames",
+              "plug_hash": 2938480696,
+              "plug_name": "快速命中",
+              "slot_label": "特性1"
+            },
+            {
+              "description": "消灭一个目标会向附近目标蔓延持续时间更长的灼烧效果。\n更强大的战斗人员和敌方守护者会在更大的范围内造成灼烧效果。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/22ed4a2cd5a0eb129a14ce77db49373f.png",
+              "plug_category": "frames",
+              "plug_hash": 2675184851,
+              "plug_name": "辉耀炽热",
+              "slot_label": "特性2"
+            },
+            {
+              "description": "将装备恢复为默认颜色。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/96831e244728f0350340bb7d5d05b463.png",
+              "plug_category": "shader",
+              "plug_hash": 4248210736,
+              "plug_name": "默认着色器",
+              "slot_label": "着色器"
+            },
+            {
+              "description": "当前未选择模组。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/431cc8304da4f5eb44c5c10a5c1866ce.jpg",
+              "plug_category": "v400.weapon.mod_empty",
+              "plug_hash": 2323986101,
+              "plug_name": "空模组插槽",
+              "slot_label": "模组"
+            },
+            {
+              "description": "属性略微提高。提高武器阶层，将其铸造为大师杰作物品。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d2e1ab2542f585d025fb4cc1a3885164.jpg",
+              "plug_category": "v400.plugs.weapons.masterworks.stat.handling",
+              "plug_hash": 518224745,
+              "plug_name": "3阶：操控性",
+              "slot_label": "大师杰作"
+            },
+            {
+              "description": "击败目标可在更长时间内获得边打边跑层数。短暂冲刺消耗一层效果并从储备弹药中部分填装此武器的弹匣。如为弓箭，则在更长时间内提升拉弓速度。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5011e479f02ede344fb16099cfecd800.png",
+              "plug_category": "origins",
+              "plug_hash": 859855990,
+              "plug_name": "边打边跑",
+              "slot_label": "插槽9"
+            },
+            {
+              "description": "记录使用武器消灭的敌人数量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fa9b8e2b358de10643b14a058094f4b.png",
+              "plug_category": "v400.plugs.weapons.masterworks.trackers",
+              "plug_hash": 905869860,
+              "plug_name": "击杀记录器",
+              "slot_label": "追踪器"
+            },
+            {
+              "description": "将武器重置为默认外观。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3bb544f2136894a13a73875639f376d5.png",
+              "plug_category": "weapon_tiering_tier5_skins",
+              "plug_hash": 3854296178,
+              "plug_name": "默认皮肤",
+              "slot_label": "纪念物"
+            },
+            {
+              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8c28abb43d902b731365e1045f467a95.png",
+              "plug_category": "weapon_tiering_kill_vfx",
+              "plug_hash": 1335132356,
+              "plug_name": "凯旋脉动",
+              "slot_label": "战斗特效"
+            },
+            {
+              "description": "此武器的特性可通过更高的装备阶级等级强化。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
+              "plug_category": "weapon_tiering.plugs.mods.enhancers",
+              "plug_hash": 780815822,
+              "plug_name": "空的装备阶级升级",
+              "slot_label": "模组"
+            }
+          ],
+          "stats": {
+            "aim_assist": 78,
+            "airborne_effectiveness": 42,
+            "damage": 78,
+            "handling": 38,
+            "magazine": 12,
+            "range": 33,
+            "recoil_direction": 96,
+            "reload_speed": 50,
+            "rpm": 180,
+            "stability": 84,
+            "zoom": 14
+          },
+          "tier": "传说",
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "烈日",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+          "instance_id": "6917530193978049636",
+          "is_equipped": false,
+          "item_hash": 810474118,
+          "location": "Hunter",
+          "name": "信任",
+          "perks_complete": true,
+          "power": 550,
+          "sockets": [
+            {
+              "description": "此武器的后坐力模式可预测地偏向垂直方向。可进行拥有高精度的快速射击。装备此武器时，瞄准时的移动速度更快。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e9dd736124e8ef94048901a279a5bb18.png",
+              "plug_category": "intrinsics",
+              "plug_hash": 1322370662,
+              "plug_name": "精密框架",
+              "slot_label": "框架"
+            },
+            {
+              "description": "极轻型枪管。\n  •  大幅提高操控速度\n  •  略微提高稳定性",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/260eba9dd149dbb94b1306c9ed4dd8db.png",
+              "plug_category": "barrels",
+              "plug_hash": 1124871858,
+              "plug_name": "槽化枪管",
+              "slot_label": "枪管"
+            },
+            {
+              "description": "经优化提高填装速度。\n  •  略微提高稳定性\n  •  大幅提高填装速度",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f95e67e4ff37466505d66d3fa1030782.png",
+              "plug_category": "magazines",
+              "plug_hash": 1709045111,
+              "plug_name": "广口弹匣",
+              "slot_label": "弹匣"
+            },
+            {
+              "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+              "plug_category": "frames",
+              "plug_hash": 1183436451,
+              "plug_name": "萤火虫",
+              "slot_label": "特性1"
+            },
+            {
+              "description": "消灭一个目标会向附近目标蔓延持续时间更长的灼烧效果。\n更强大的战斗人员和敌方守护者会在更大的范围内造成灼烧效果。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/22ed4a2cd5a0eb129a14ce77db49373f.png",
+              "plug_category": "frames",
+              "plug_hash": 2675184851,
+              "plug_name": "辉耀炽热",
+              "slot_label": "特性2"
+            },
+            {
+              "description": "使用此着色器更改装备配色。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/033984aaa9fbce32a4d7ad4d771ee21d.jpg",
+              "plug_category": "shader",
+              "plug_hash": 3812602472,
+              "plug_name": "冷热交替",
+              "slot_label": "着色器"
+            },
+            {
+              "description": "小幅提升弹药生成速度。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/26614af76b46d7a5f178eeaeedc79c36.png",
+              "plug_category": "v400.weapon.mod_guns",
+              "plug_hash": 325500297,
+              "plug_name": "丰足弹药",
+              "slot_label": "模组"
+            },
+            {
+              "description": "最高属性。\n\n为此武器应用等同于武器阶级的额外属性。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2ed55f129d92647218ccb05f31e31cc8.jpg",
+              "plug_category": "v400.plugs.weapons.masterworks.stat.range",
+              "plug_hash": 622249644,
+              "plug_name": "大师杰作：射程",
+              "slot_label": "大师杰作"
+            },
+            {
+              "description": "击败目标可在更长时间内获得边打边跑层数。短暂冲刺消耗一层效果并从储备弹药中部分填装此武器的弹匣。如为弓箭，则在更长时间内提升拉弓速度。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5011e479f02ede344fb16099cfecd800.png",
+              "plug_category": "origins",
+              "plug_hash": 859855990,
+              "plug_name": "边打边跑",
+              "slot_label": "插槽9"
+            },
+            {
+              "description": "记录使用武器消灭的敌人数量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fa9b8e2b358de10643b14a058094f4b.png",
+              "plug_category": "v400.plugs.weapons.masterworks.trackers",
+              "plug_hash": 905869860,
+              "plug_name": "击杀记录器",
+              "slot_label": "追踪器"
+            },
+            {
+              "description": "装备此武器皮肤以改变信任的外观。当你解锁一个皮肤后，你帐号中的所有角色都将解锁获得的皮肤。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cf0a81fe5497f59c6ed6747f844a595e.jpg",
+              "plug_category": "v400_activities_gambit_hand_cannon0_skins",
+              "plug_hash": 2319265678,
+              "plug_name": "怀疑",
+              "slot_label": "纪念物"
+            },
+            {
+              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8c28abb43d902b731365e1045f467a95.png",
+              "plug_category": "weapon_tiering_kill_vfx",
+              "plug_hash": 1335132356,
+              "plug_name": "凯旋脉动",
+              "slot_label": "战斗特效"
+            },
+            {
+              "description": "此武器的特性可通过更高的装备阶级等级强化。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
+              "plug_category": "weapon_tiering.plugs.mods.enhancers",
+              "plug_hash": 780815822,
+              "plug_name": "空的装备阶级升级",
+              "slot_label": "模组"
+            }
+          ],
+          "stats": {
+            "aim_assist": 78,
+            "airborne_effectiveness": 35,
+            "damage": 78,
+            "handling": 51,
+            "magazine": 12,
+            "range": 47,
+            "recoil_direction": 96,
+            "reload_speed": 66,
+            "rpm": 180,
+            "stability": 68,
+            "zoom": 14
+          },
+          "tier": "传说",
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "动能",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/063b3d4db62ef73dff4297c33ea1ec88.jpg",
+          "instance_id": "6917530195652349780",
+          "is_equipped": false,
+          "item_hash": 1617917863,
+          "location": "仓库",
+          "name": "克瑞米尔之匕",
+          "perks_complete": true,
+          "power": 550,
+          "sockets": [
+            {
+              "description": "高伤害，高后坐力。为远程射击进行优化。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/64209c4fd20513b33109c374179d0958.png",
+              "plug_category": "intrinsics",
+              "plug_hash": 2757685314,
+              "plug_name": "攻击型框架",
+              "slot_label": "框架"
+            },
+            {
+              "description": "极轻型枪管。\n  •  大幅提高操控速度\n  •  略微提高稳定性",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/260eba9dd149dbb94b1306c9ed4dd8db.png",
+              "plug_category": "barrels",
+              "plug_hash": 1124871858,
+              "plug_name": "槽化枪管",
+              "slot_label": "枪管"
+            },
+            {
+              "description": "射程提高。\n  •  增加射程",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d85024478504205359c7fb52dbc4f6b6.png",
+              "plug_category": "magazines",
+              "plug_hash": 3267421167,
+              "plug_name": "精确弹药",
+              "slot_label": "弹匣"
+            },
+            {
+              "description": "提升瞄准辅助、瞄准速度和空中效率。附近没有盟友时这些效果将提升。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4c244b847778a484726543e5c35935ef.png",
+              "plug_category": "frames",
+              "plug_hash": 2073244114,
+              "plug_name": "孤狼",
+              "slot_label": "特性1"
+            },
+            {
+              "description": "造成精准伤害会大幅提升精准伤害。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e6a4ebc1a8a73e4c7fcfc21c69000ce2.png",
+              "plug_category": "frames",
+              "plug_hash": 332733060,
+              "plug_name": "精准工具",
+              "slot_label": "特性2"
+            },
+            {
+              "description": "使用此着色器更改装备配色。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/de8240e503da2b7bea9ecc6674f99fe8.jpg",
+              "plug_category": "shader",
+              "plug_hash": 1364828722,
+              "plug_name": "星晶体",
+              "slot_label": "着色器"
+            },
+            {
+              "description": "",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/9ddce607dd85d55bef0631473cfbf939.png",
+              "plug_category": "v400.weapon.mod_damage",
+              "plug_hash": 2057879635,
+              "plug_name": "强化稳定性",
+              "slot_label": "模组"
+            },
+            {
+              "description": "最高属性。\n\n为此武器应用等同于武器阶级的额外属性。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2ed55f129d92647218ccb05f31e31cc8.jpg",
+              "plug_category": "v400.plugs.weapons.masterworks.stat.range",
+              "plug_hash": 622249644,
+              "plug_name": "大师杰作：射程",
+              "slot_label": "大师杰作"
+            },
+            {
+              "description": "生命值低下时，使用此武器造成最后一击可提供强化雷达，将你从敌方守护者雷达上移除，并减少战斗人员对你的攻击性，效果持续时间更长。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/451e0f091bd3e7245a82e4efc01ad8c3.png",
+              "plug_category": "origins",
+              "plug_hash": 1831023215,
+              "plug_name": "藏匿之狼",
+              "slot_label": "插槽9"
+            },
+            {
+              "description": "记录使用武器击败熔炉竞技场对手的数量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b444ae01d264d6242d7a114fc6f23b9b.png",
+              "plug_category": "v400.plugs.weapons.masterworks.trackers",
+              "plug_hash": 38912240,
+              "plug_name": "熔炉竞技场击杀记录器",
+              "slot_label": "追踪器"
+            },
+            {
+              "description": "将武器重置为默认外观。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3bb544f2136894a13a73875639f376d5.png",
+              "plug_category": "weapon_tiering_tier5_skins",
+              "plug_hash": 3854296178,
+              "plug_name": "默认皮肤",
+              "slot_label": "纪念物"
+            },
+            {
+              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8c28abb43d902b731365e1045f467a95.png",
+              "plug_category": "weapon_tiering_kill_vfx",
+              "plug_hash": 1335132356,
+              "plug_name": "凯旋脉动",
+              "slot_label": "战斗特效"
+            },
+            {
+              "description": "此武器的特性可通过更高的装备阶级等级强化。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
+              "plug_category": "weapon_tiering.plugs.mods.enhancers",
+              "plug_hash": 780815822,
+              "plug_name": "空的装备阶级升级",
+              "slot_label": "模组"
+            }
+          ],
+          "stats": {
+            "aim_assist": 67,
+            "airborne_effectiveness": 21,
+            "damage": 92,
+            "handling": 47,
+            "magazine": 8,
+            "range": 82,
+            "recoil_direction": 98,
+            "reload_speed": 24,
+            "rpm": 120,
+            "stability": 47,
+            "zoom": 14
+          },
+          "tier": "传说",
+          "weapon_type": "手炮"
+        }
+      ]
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已按武器类型读取详情。",
+  "warnings": []
+}

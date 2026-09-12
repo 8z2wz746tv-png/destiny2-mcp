@@ -1,0 +1,123 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "filter_rolls",
+      "weapon_name": "刚玉战锤"
+    },
+    "elapsed_ms": 2052,
+    "is_error": false,
+    "payload_chars": 2779,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "checked_count": 1,
+    "coverage_complete": true,
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 1,
+      "results": [
+        {
+          "element": "缚丝",
+          "frame": "适配",
+          "list": "购物清单-白弹",
+          "name": "刚玉战锤",
+          "note": "以缚丝手炮来说双溅射 Perk 不错 框架优秀 还有 边打边劫+高爆",
+          "perks": {
+            "三号位": [
+              "萤火虫",
+              "边打边劫",
+              "切割"
+            ],
+            "四号位": [
+              "撕裂",
+              "高爆载荷"
+            ]
+          },
+          "rank": "10",
+          "scale": "S-F",
+          "source": "试炼",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "A"
+        }
+      ],
+      "returned_count": 1,
+      "truncated": false,
+      "unmatched": [],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    },
+    "filters": {
+      "any_perks": [],
+      "excluded_perks": [],
+      "location": "",
+      "required_perks": [],
+      "weapon_name": "刚玉战锤",
+      "weapon_type": ""
+    },
+    "matched": [
+      {
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/86e4372fd618aabc649d851a5ba5dfcb.jpg",
+        "instance_id": "6917530197987359694",
+        "is_equipped": false,
+        "item_hash": 2263462407,
+        "location": "仓库",
+        "name": "刚玉战锤",
+        "perks": [
+          "适配框架",
+          "小口径枪膛",
+          "精确弹药",
+          "滑行射击",
+          "精准工具",
+          "伽拉忒亚不灭",
+          "弹道",
+          "大师杰作：稳定性",
+          "轻捷脚步",
+          "击杀记录器",
+          "恶名刚玉战锤",
+          "默认战斗特效",
+          "5阶升级"
+        ],
+        "power": 300,
+        "reason": "命中筛选条件",
+        "weapon_type": "手炮"
+      }
+    ],
+    "matched_count": 1,
+    "not_matched": [],
+    "perk_scope": "current_sockets",
+    "returned_count": 1,
+    "scope": "owned_inventory",
+    "scope_label": "账号持有武器实例",
+    "scoped_count": 1,
+    "truncated": false,
+    "unknown": [],
+    "unknown_count": 0
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "范围内 1 把武器，已检查 1 把，当前插槽命中 1 把，无法判断 0 把。",
+  "warnings": []
+}

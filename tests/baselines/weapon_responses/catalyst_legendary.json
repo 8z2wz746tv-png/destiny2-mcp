@@ -1,0 +1,28 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "catalyst",
+      "weapon_name": "遗产"
+    },
+    "elapsed_ms": 7,
+    "is_error": false,
+    "payload_chars": 339,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "catalyst": {
+      "catalysts": [],
+      "count": 0,
+      "is_exotic": false,
+      "note": "「遗产」不是异域武器；只有异域武器才有催化剂。",
+      "unlock_state": "not_checked",
+      "weapon": "遗产",
+      "weaponEn": "Heritage"
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已读取催化剂信息。",
+  "warnings": []
+}

@@ -1,0 +1,1596 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "catalog",
+      "perk_name": "萤火虫"
+    },
+    "elapsed_ms": 21843,
+    "is_error": false,
+    "payload_chars": 56330,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "checked_count": 2208,
+    "filters": {
+      "any_perks": [],
+      "excluded_perks": [],
+      "required_perks": [
+        "萤火虫"
+      ],
+      "weapon_name": "",
+      "weapon_type": ""
+    },
+    "matched": [
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f513e68c68d76392cffd52d94cc1410a.jpg",
+        "item_hash": -450272986,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "玉兔",
+        "nameEn": "The Jade Rabbit",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "斥候步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cdfbfd3f098329a367294f191070f8c4.jpg",
+        "item_hash": 347366834,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/27f84cef4d4ab2aa73fa5692792831e2.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1561789734
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "黑桃A",
+        "nameEn": "Ace of Spades",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "异域",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "棱镜",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ca90cc7a696ecfec9d4dc9b19e0743a5.jpg",
+        "item_hash": -310190974,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "不胜即亡",
+        "nameEn": "All or Nothing",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "棱镜",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ca90cc7a696ecfec9d4dc9b19e0743a5.jpg",
+        "item_hash": 2023002233,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "不胜即亡",
+        "nameEn": "All or Nothing",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      },
+      {
+        "ammo_type": "特殊",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0d2362114689cf93a8cb8b9c0eac5097.jpg",
+        "item_hash": -1066870577,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "亚斯明的抗争",
+        "nameEn": "Defiance of Yasmin",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "狙击步枪"
+      },
+      {
+        "ammo_type": "特殊",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b82e8de6477f03b716e90d5be299f70b.jpg",
+        "item_hash": -791947678,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "亚斯明的抗争（痛苦）",
+        "nameEn": "Defiance of Yasmin (Harrowed)",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "狙击步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/03de9a5e297c2a9521e9ef360066417a.jpg",
+        "item_hash": 859869931,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "作废",
+        "nameEn": "Nullify",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5811f7bd2abb7a2c553361e582d1bd3f.jpg",
+        "item_hash": 892183998,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "作废（专家）",
+        "nameEn": "Nullify (Adept)",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+        "item_hash": 810474118,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "信任",
+        "nameEn": "Trust",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b70bbed7f611b521a85a931985186ee3.jpg",
+        "item_hash": -17419209,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "信使",
+        "nameEn": "The Messenger",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/063b3d4db62ef73dff4297c33ea1ec88.jpg",
+        "item_hash": 1617917863,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "克瑞米尔之匕",
+        "nameEn": "Crimil's Dagger",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/88fbb9eaf27d7811bfaf030e55988eba.jpg",
+        "item_hash": -319851810,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "兰迪飞刃",
+        "nameEn": "Randy's Throwing Knife",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "斥候步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/88fbb9eaf27d7811bfaf030e55988eba.jpg",
+        "item_hash": -118142951,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "兰迪飞刃",
+        "nameEn": "Randy's Throwing Knife",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "斥候步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "虚空",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d439b1b560e696b8214362b12364da6d.jpg",
+        "item_hash": 1937552980,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "切尔奇斯的末日",
+        "nameEn": "Doom of Chelchis",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "斥候步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "虚空",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2d98a8b5e97febf8744ad3df1d94d051.jpg",
+        "item_hash": 1184692845,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "切尔奇斯的末日（痛苦）",
+        "nameEn": "Doom of Chelchis (Harrowed)",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "斥候步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "棱镜",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/86e4372fd618aabc649d851a5ba5dfcb.jpg",
+        "item_hash": -2031504889,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "刚玉战锤",
+        "nameEn": "Corundum Hammer",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3d73e49c38342933346e3a431680e25a.jpg",
+        "item_hash": -1795246469,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "午夜政变",
+        "nameEn": "Midnight Coup",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/a16c0c62d2153cb59ca7dd5565d66d6a.jpg",
+        "item_hash": -1531123398,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "午夜政变",
+        "nameEn": "Midnight Coup",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/a16c0c62d2153cb59ca7dd5565d66d6a.jpg",
+        "item_hash": 2033531689,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "午夜政变",
+        "nameEn": "Midnight Coup",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7741689cbc1102aa9fc742b33a106f19.jpg",
+        "item_hash": -2123488531,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "命运终结者",
+        "nameEn": "Fatebringer",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7741689cbc1102aa9fc742b33a106f19.jpg",
+        "item_hash": -110799086,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "命运终结者",
+        "nameEn": "Fatebringer",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0e281ebb76f5e5ba169bd44c036fcf39.jpg",
+        "item_hash": -75141113,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "命运终结者（失时）",
+        "nameEn": "Fatebringer (Timelost)",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0e281ebb76f5e5ba169bd44c036fcf39.jpg",
+        "item_hash": 1216319404,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "命运终结者（失时）",
+        "nameEn": "Fatebringer (Timelost)",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/fe5f0360bc8bea0d5d341a223c9b1b41.jpg",
+        "item_hash": -968831875,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "嗡鸣铁锭",
+        "nameEn": "The Ringing Nail",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "自动步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3726a4ad9cfc3c9b637341758e030830.jpg",
+        "item_hash": -88417202,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "嗡鸣铁锭",
+        "nameEn": "The Ringing Nail",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "自动步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/a89d50bc5df2f7da55acd9129e61c858.jpg",
+        "item_hash": -656243979,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "噤声",
+        "nameEn": "Hush",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "战斗弓箭"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fa6f8078f2dd6afa358a6f90791f948.jpg",
+        "item_hash": -170604956,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "圣爱",
+        "nameEn": "Agape",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/9bcfb80b10ec5d29b131e745c7bd5442.jpg",
+        "item_hash": 471764396,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "城主IV",
+        "nameEn": "Pre Astyanax IV",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "战斗弓箭"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "编织",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/1a65db38cd29ed8a340a802642f7e641.jpg",
+        "item_hash": 810474119,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "备用口粮",
+        "nameEn": "Spare Rations",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3a90382c1d58974a51ebe02515fd7fa1.jpg",
+        "item_hash": -674690257,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "奇特魅力",
+        "nameEn": "Peculiar Charm",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "微型冲锋枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "编织",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0bcc2c506d613a6f5db10ddca0d0b1af.jpg",
+        "item_hash": -178448714,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "庄严追忆",
+        "nameEn": "Solemn Remembrance",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "威能",
+        "damage_type": "编织",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7e045bc7b88d478a54913ddc6bd7f373.jpg",
+        "item_hash": 1321506184,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "库里姆的终界",
+        "nameEn": "Qullim's Terminus",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "机枪"
+      },
+      {
+        "ammo_type": "威能",
+        "damage_type": "编织",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c449217d255f5b210037d069bde484b2.jpg",
+        "item_hash": -1046538207,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "库里姆的终界（痛苦）",
+        "nameEn": "Qullim's Terminus (Harrowed)",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "机枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "虚空",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e0799b8dec061ac16a8dc6c347bc45b4.jpg",
+        "item_hash": 1969802090,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "征兆",
+        "nameEn": "Premonition",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "编织",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/03bda9652787e5b8dc553b9559fe1e4f.jpg",
+        "item_hash": 1094998581,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "恶意尖牙",
+        "nameEn": "The Spiteful Fang",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "战斗弓箭"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "编织",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7826e7d9d238988ffa1c4a008ec0b04c.jpg",
+        "item_hash": 1704597062,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "恶意尖牙",
+        "nameEn": "The Spiteful Fang",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "战斗弓箭"
+      },
+      {
+        "ammo_type": "威能",
+        "damage_type": "虚空",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/38b4251825652c4f5464aa3ac2139d1b.jpg",
+        "item_hash": -640222998,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "惩戒措施",
+        "nameEn": "Corrective Measure",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "机枪"
+      },
+      {
+        "ammo_type": "威能",
+        "damage_type": "虚空",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/38b4251825652c4f5464aa3ac2139d1b.jpg",
+        "item_hash": 471518543,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "惩戒措施",
+        "nameEn": "Corrective Measure",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "机枪"
+      },
+      {
+        "ammo_type": "威能",
+        "damage_type": "虚空",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/afc4bf7003651980fac94464f807f964.jpg",
+        "item_hash": -1960486833,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "惩戒措施（失时）",
+        "nameEn": "Corrective Measure (Timelost)",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "机枪"
+      },
+      {
+        "ammo_type": "威能",
+        "damage_type": "虚空",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/afc4bf7003651980fac94464f807f964.jpg",
+        "item_hash": -498456862,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "惩戒措施（失时）",
+        "nameEn": "Corrective Measure (Timelost)",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "机枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8eaa5e9bf94cb5f21bd924fac66d331e.jpg",
+        "item_hash": -1228021441,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "扎乌利的克星",
+        "nameEn": "Zaouli's Bane",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d11aa112b88dc2cbf48706fdad606710.jpg",
+        "item_hash": -647625556,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "扎乌利的克星",
+        "nameEn": "Zaouli's Bane",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d11aa112b88dc2cbf48706fdad606710.jpg",
+        "item_hash": 431721920,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "扎乌利的克星",
+        "nameEn": "Zaouli's Bane",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "烈日",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/22009ab433d96fee661b6be12cc734b2.jpg",
+        "item_hash": 291092617,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "扎乌利的克星（痛苦）",
+        "nameEn": "Zaouli's Bane (Harrowed)",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "编织",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/768fabb5ad0ab70dadc1a6baf87f1a55.jpg",
+        "item_hash": -1148309908,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "改装B-7手枪",
+        "nameEn": "Modified B-7 Pistol",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "编织",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/768fabb5ad0ab70dadc1a6baf87f1a55.jpg",
+        "item_hash": 1872906663,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "改装B-7手枪",
+        "nameEn": "Modified B-7 Pistol",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "手炮"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/76f2275fd658bb22dc03eba01c11327a.jpg",
+        "item_hash": -2095412772,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "故人往事",
+        "nameEn": "Bygones",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "动能",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/76f2275fd658bb22dc03eba01c11327a.jpg",
+        "item_hash": 767170345,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "故人往事",
+        "nameEn": "Bygones",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "棱镜",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/1075e2db6a02be3910e7c00a993d7117.jpg",
+        "item_hash": -1463707653,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "无情",
+        "nameEn": "Relentless",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      },
+      {
+        "ammo_type": "主要",
+        "damage_type": "棱镜",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/856f688ebe0b462a58e17a58e3db0229.jpg",
+        "item_hash": -613686388,
+        "matched_perk_details": [
+          {
+            "description": "完成精准击杀可以提高填装速度并使目标爆炸，对附近的敌人造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 3824105627
+          },
+          {
+            "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
+            "name": "萤火虫",
+            "plug_category": "frames",
+            "plug_hash": 1183436451
+          }
+        ],
+        "matched_perks": [
+          "萤火虫"
+        ],
+        "name": "无情",
+        "nameEn": "Relentless",
+        "owned": false,
+        "ownership_checked": false,
+        "source": "manifest_catalog",
+        "tier": "传说",
+        "weapon_type": "脉冲步枪"
+      }
+    ],
+    "matched_count": 100,
+    "returned_count": 50,
+    "scope": "manifest_catalog",
+    "scope_label": "全量武器定义候选（未读取账号持有情况）",
+    "truncated": true
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "全量武器定义检查 2208 把，命中 100 把。",
+  "warnings": [
+    "这些是 Manifest 全量候选，未读取账号持有情况。"
+  ]
+}

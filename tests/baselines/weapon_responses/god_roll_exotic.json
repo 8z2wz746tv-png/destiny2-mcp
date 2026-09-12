@@ -1,0 +1,20 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "god_roll",
+      "weapon_name": "泰拉巴"
+    },
+    "elapsed_ms": 6,
+    "is_error": false,
+    "payload_chars": 251,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "god_roll": "「泰拉巴」在本地愿单里有记录（来源: Mercules904/mercules_crown_of_sorrow.txt），但这条记录解析不出 PvE/PvP 推荐 Perk。这不代表它没有推荐，只是本地这条数据不完整。"
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已读取社区推荐 roll。",
+  "warnings": []
+}

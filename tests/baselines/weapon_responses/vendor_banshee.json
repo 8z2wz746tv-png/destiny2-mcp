@@ -1,0 +1,228 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "vendor",
+      "limit": 5,
+      "vendor_name": "班西-44"
+    },
+    "elapsed_ms": 2972,
+    "is_error": false,
+    "payload_chars": 6589,
+    "tool": "world_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 0,
+      "results": [],
+      "returned_count": 0,
+      "truncated": false,
+      "unmatched": [
+        "强化核心",
+        "增强棱镜",
+        "上维合金"
+      ],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    },
+    "vendors": {
+      "character": "Warlock",
+      "mode": "detail",
+      "next_actions": [
+        "子页面“传承聚焦破译 → #908529654”本次没有返回，暂时看不到它的货架。",
+        "world_assistant(intent=\"vendor\", vendor_name=\"2484291326\")  # 聚焦破译 → 武器聚焦"
+      ],
+      "player_name": "__destiny_current_oauth_player__",
+      "question": null,
+      "returned_vendors": 1,
+      "total_vendors": 1,
+      "truncated": false,
+      "vendors": [
+        {
+          "categories": [
+            {
+              "identifier": "category.rank_rewards_seasonal",
+              "index": 1,
+              "item_count": 6,
+              "kind": "rewards",
+              "name": "等级奖励",
+              "target_available": false,
+              "target_vendor_hash": null,
+              "target_vendor_name": ""
+            },
+            {
+              "identifier": "category_class_misc",
+              "index": 7,
+              "item_count": 1,
+              "kind": "sale",
+              "name": "杂项",
+              "target_available": false,
+              "target_vendor_hash": null,
+              "target_vendor_name": ""
+            },
+            {
+              "identifier": "category.vendor_engram_purchase.legacy_name",
+              "index": 8,
+              "item_count": 1,
+              "kind": "submenu",
+              "name": "传承聚焦破译",
+              "target_available": false,
+              "target_vendor_hash": 908529654,
+              "target_vendor_name": "#908529654"
+            },
+            {
+              "identifier": "category.vendor_engram_purchase",
+              "index": 9,
+              "item_count": 1,
+              "kind": "submenu",
+              "name": "聚焦破译",
+              "target_available": true,
+              "target_vendor_hash": 2484291326,
+              "target_vendor_name": "武器聚焦"
+            }
+          ],
+          "hidden_items": 1,
+          "icon": "",
+          "identifier": "GUNSMITH",
+          "name": "班西-44",
+          "next_refresh": "",
+          "purchasable_items": 3,
+          "rank": {
+            "daily_limit": 0,
+            "daily_progress": 0,
+            "level": 2,
+            "level_cap": 16,
+            "name": "枪匠等级",
+            "next_level_at": 125,
+            "progress": 220,
+            "progress_to_next_level": 95,
+            "progression_hash": 1471185389,
+            "reset_hint": "",
+            "weekly_limit": 0,
+            "weekly_progress": 0
+          },
+          "sale_items": [
+            {
+              "can_be_sold": false,
+              "category_index": 1,
+              "costs": [],
+              "failure_reasons": [
+                "需要等级4"
+              ],
+              "icon": "",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0a4eb695ed55b4e720ddc401460cc0f9.jpg",
+              "item_hash": 3853748946,
+              "item_type": "材料",
+              "name": "强化核心",
+              "owned": false,
+              "perks": null,
+              "sale_status": 8,
+              "tier": "传说",
+              "vendor_item_index": 0
+            },
+            {
+              "can_be_sold": false,
+              "category_index": 1,
+              "costs": [],
+              "failure_reasons": [
+                "需要等级7"
+              ],
+              "icon": "",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0a4eb695ed55b4e720ddc401460cc0f9.jpg",
+              "item_hash": 3853748946,
+              "item_type": "材料",
+              "name": "强化核心",
+              "owned": false,
+              "perks": null,
+              "sale_status": 8,
+              "tier": "传说",
+              "vendor_item_index": 0
+            },
+            {
+              "can_be_sold": false,
+              "category_index": 1,
+              "costs": [],
+              "failure_reasons": [
+                "需要等级10"
+              ],
+              "icon": "",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/dea2a35badf7466d4c2c2697ce6e8d87.jpg",
+              "item_hash": 4257549984,
+              "item_type": "材料",
+              "name": "增强棱镜",
+              "owned": false,
+              "perks": null,
+              "sale_status": 8,
+              "tier": "传说",
+              "vendor_item_index": 0
+            },
+            {
+              "can_be_sold": false,
+              "category_index": 1,
+              "costs": [],
+              "failure_reasons": [
+                "需要等级13"
+              ],
+              "icon": "",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/dea2a35badf7466d4c2c2697ce6e8d87.jpg",
+              "item_hash": 4257549984,
+              "item_type": "材料",
+              "name": "增强棱镜",
+              "owned": false,
+              "perks": null,
+              "sale_status": 8,
+              "tier": "传说",
+              "vendor_item_index": 0
+            },
+            {
+              "can_be_sold": false,
+              "category_index": 1,
+              "costs": [],
+              "failure_reasons": [
+                "需要等级16"
+              ],
+              "icon": "",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b4d6dbc8eda17711bfb8fedb6e48cc80.jpg",
+              "item_hash": 353704689,
+              "item_type": "材料",
+              "name": "上维合金",
+              "owned": false,
+              "perks": null,
+              "sale_status": 9,
+              "tier": "异域",
+              "vendor_item_index": 0
+            }
+          ],
+          "total_items": 9,
+          "truncated": true,
+          "vendor_hash": 672118013
+        }
+      ],
+      "warnings": []
+    }
+  },
+  "next_actions": [
+    "子页面“传承聚焦破译 → #908529654”本次没有返回，暂时看不到它的货架。",
+    "world_assistant(intent=\"vendor\", vendor_name=\"2484291326\")  # 聚焦破译 → 武器聚焦"
+  ],
+  "ok": true,
+  "summary": "已读取商人库存。",
+  "warnings": []
+}

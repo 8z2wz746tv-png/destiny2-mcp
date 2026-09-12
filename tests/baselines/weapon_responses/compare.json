@@ -1,0 +1,212 @@
+{
+  "_case": {
+    "arguments": {
+      "intent": "compare",
+      "weapon_name": "挽歌"
+    },
+    "elapsed_ms": 447,
+    "is_error": false,
+    "payload_chars": 7458,
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "comparison": {
+      "differences": [
+        {
+          "absent_in_instance": "6917529229627545524",
+          "absent_in_location": "仓库",
+          "perk_name": "空催化插槽",
+          "present_in_instance": "6917529210691585418",
+          "present_in_location": "仓库"
+        },
+        {
+          "absent_in_instance": "6917529210691585418",
+          "absent_in_location": "仓库",
+          "perk_name": "挽歌催化",
+          "present_in_instance": "6917529229627545524",
+          "present_in_location": "仓库"
+        }
+      ],
+      "instances": [
+        {
+          "god_roll_score": "",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6844ca3eb572c546e97a340c24531d5.jpg",
+          "instance_id": "6917529210691585418",
+          "location": "仓库",
+          "perks": [
+            {
+              "description": "[格挡]  ：长按以旋转剑刃。\n• 伤害提升，同时为所有攻击附加 护盾穿透效果。\n• 旋转攻击造成伤害时会叠加层数。\n• 额外层数会提高重攻击的伤害和伤害抗性。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3a2fe8c1bd3fa1219922bf180b8e96e8.png",
+              "name": "女妖之嚎",
+              "plug_category": "intrinsics",
+              "plug_hash": 2179914730
+            },
+            {
+              "description": "伤害提高，剑刃弹药容量降低。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d9a508b43ae6935d68fc5030c90b5b4a.png",
+              "name": "锯齿刀锋",
+              "plug_category": "blades",
+              "plug_hash": 3666208348
+            },
+            {
+              "description": "刀剑格挡拥有高持久和低抗性。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f41732ca49953994397e5ab50fdc3a2e.png",
+              "name": "耐力刀剑格",
+              "plug_category": "guards",
+              "plug_hash": 599007201
+            },
+            {
+              "description": "每隔一次的赋能刀剑击杀都可提供刀剑弹药。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d597ced6ce0812d168ce86b31eaaeb03.png",
+              "name": "无倦利刃",
+              "plug_category": "frames",
+              "plug_hash": 2590710093
+            },
+            {
+              "description": "对战斗人员造成伤害可以治疗武器的使用者。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/19a92359d87ad5585413ea3f6a953931.png",
+              "name": "急速消耗",
+              "plug_category": "frames",
+              "plug_hash": 290014589
+            },
+            {
+              "description": "可以将异域催化插入此插槽。\n\n查看成就中的异域催化部分，了解在哪里可以获得催化。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/62890cb9e33bbed6a3587a1064dc860e.png",
+              "name": "空催化插槽",
+              "plug_category": "v400.empty.exotic.masterwork",
+              "plug_hash": 1498917124
+            }
+          ],
+          "power": 10
+        },
+        {
+          "god_roll_score": "",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6844ca3eb572c546e97a340c24531d5.jpg",
+          "instance_id": "6917529229627545524",
+          "location": "仓库",
+          "perks": [
+            {
+              "description": "[格挡]  ：长按以旋转剑刃。\n• 伤害提升，同时为所有攻击附加 护盾穿透效果。\n• 旋转攻击造成伤害时会叠加层数。\n• 额外层数会提高重攻击的伤害和伤害抗性。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3a2fe8c1bd3fa1219922bf180b8e96e8.png",
+              "name": "女妖之嚎",
+              "plug_category": "intrinsics",
+              "plug_hash": 2179914730
+            },
+            {
+              "description": "伤害提高，剑刃弹药容量降低。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d9a508b43ae6935d68fc5030c90b5b4a.png",
+              "name": "锯齿刀锋",
+              "plug_category": "blades",
+              "plug_hash": 3666208348
+            },
+            {
+              "description": "刀剑格挡拥有高持久和低抗性。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f41732ca49953994397e5ab50fdc3a2e.png",
+              "name": "耐力刀剑格",
+              "plug_category": "guards",
+              "plug_hash": 599007201
+            },
+            {
+              "description": "每隔一次的赋能刀剑击杀都可提供刀剑弹药。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d597ced6ce0812d168ce86b31eaaeb03.png",
+              "name": "无倦利刃",
+              "plug_category": "frames",
+              "plug_hash": 2590710093
+            },
+            {
+              "description": "对战斗人员造成伤害可以治疗武器的使用者。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/19a92359d87ad5585413ea3f6a953931.png",
+              "name": "急速消耗",
+              "plug_category": "frames",
+              "plug_hash": 290014589
+            },
+            {
+              "description": "将此武器升级为大师杰作。升级后，武器将获得强化能力，如提高的属性和/或额外的特性。\n\n使用此武器消灭目标以解锁这项升级。",
+              "god_roll_pve": false,
+              "god_roll_pvp": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e1b22c5abde048b49abcb61e307c3dc4.jpg",
+              "name": "挽歌催化",
+              "plug_category": "v500.new.sword0.masterwork",
+              "plug_hash": 1218164788
+            }
+          ],
+          "power": 482
+        }
+      ],
+      "weapon_name": "挽歌"
+    },
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 1,
+      "results": [
+        {
+          "dps": "4646",
+          "list": "刷取清单-异域武器",
+          "name": "挽歌",
+          "note": "本身伤害还不错，但被狼毒压了一头，可搭配黎明副歌输出手法：格挡三轻一重+一普通轻击加密数据盘银白利刃，剑刃风暴 吸血提供部分生存能力，反屏障",
+          "scale": "T",
+          "scenario_tiers": {
+            "输出": "T2",
+            "高难": "T2"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          },
+          "total_damage": "176080"
+        }
+      ],
+      "returned_count": 1,
+      "truncated": false,
+      "unmatched": [],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已对比同名武器副本。",
+  "warnings": []
+}
