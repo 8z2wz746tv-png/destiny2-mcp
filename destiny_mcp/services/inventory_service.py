@@ -85,6 +85,8 @@ class InventoryService:
         item_type: str | None = None,
         armor_slot: str | None = None,
         rarity: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
     ) -> InventoryResponse:
         """Get inventory for a specific character or the vault.
 
@@ -94,6 +96,8 @@ class InventoryService:
             item_type: Filter by type — 'weapon'/'armor'/'all'. None = all.
             armor_slot: Filter by armor slot — 'helmet'/'gauntlets'/'chest'/'legs'/'class_item'/'all'. None = all.
             rarity: Filter by rarity — 'exotic'/'legendary'/'rare'/'all'. None = all.
+            limit: 最多返回多少件；None 或 <=0 = 不限（调用方负责给默认上限）。
+            offset: 从第几件开始（配合 next_offset 翻页）。
 
         Raises:
             PlayerNotFoundError: If the player name cannot be resolved.
@@ -113,7 +117,23 @@ class InventoryService:
         # Apply filters
         items = self._filter_items(items, item_type, armor_slot, rarity)
 
-        return InventoryResponse(location=loc_name, items=items)
+        # 截断与自证：以前一次能把整个仓库倒出来（真机 1260 件 ≈ 511 KB / 13–15 万 tokens），
+        # 而响应里没有总数也没有 truncated，调用方既没法少要一点、也察觉不到自己只看到一部分。
+        total = len(items)
+        start = max(0, offset)
+        if limit is not None and limit > 0:
+            window = items[start : start + limit]
+        else:
+            window = items[start:]
+        truncated = start + len(window) < total
+        return InventoryResponse(
+            location=loc_name,
+            items=window,
+            total_items=total,
+            returned_items=len(window),
+            truncated=truncated,
+            next_offset=(start + len(window)) if truncated else None,
+        )
 
     def _filter_items(
         self,

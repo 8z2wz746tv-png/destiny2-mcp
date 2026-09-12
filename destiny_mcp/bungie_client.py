@@ -10,13 +10,20 @@ import time
 import zipfile
 from collections.abc import Mapping
 from pathlib import Path
+from typing import NoReturn
 
 import httpx
 
 import aiobungie
 
 from . import config
-from .exceptions import APIError, AuthenticationError, BungieServiceUnavailableError, ManifestError
+from .exceptions import (
+    APIError,
+    AuthenticationError,
+    BungieServiceUnavailableError,
+    ManifestError,
+    UpstreamNotFoundError,
+)
 from .logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -56,9 +63,53 @@ def _is_bungie_service_unavailable(exc: aiobungie.HTTPError) -> bool:
 
 
 def _raise_bungie_unavailable(exc: aiobungie.HTTPError, operation: str) -> None:
+    """只在「Bungie 暂时不可用」时抛；其余情况返回，交给调用方决定（例如回退到基础组件）。"""
     if _is_bungie_service_unavailable(exc):
         logger.warning("Bungie unavailable during %s: %s", operation, exc)
         raise BungieServiceUnavailableError(operation) from exc
+
+
+def _raise_bungie_error(exc: aiobungie.HTTPError, operation: str) -> NoReturn:
+    """把上游 HTTP 错误**统一**翻译成领域错误 —— 绝不让裸异常冒到 MCP 客户端。
+
+    以前只有 503 会被翻译，其它 4xx 直接 `raise`：客户端拿到的是
+    `Error executing tool …: Notfound: (http_status: 404, error_status: DestinyPGCRNotFound…)`，
+    没有 `ok`/`error.code`，因此分不清「这个 ID 查不到」和「服务坏了」（真机复现：
+    `pgcr` 传一个数字但不存在的活动 ID；`clan_leaderboards` 传不存在的 group_id）。
+
+    404 单独映射为 `UpstreamNotFoundError`（码 `upstream_not_found_error`），
+    其余状态码归 `APIError`（码 `a_p_i_error`）并在消息里带上 HTTP 状态与 Bungie 原文。
+    """
+    _raise_bungie_unavailable(exc, operation)
+    status = _http_status_of(exc)
+    error_code = _http_error_code(exc)
+    error_status = str(getattr(exc, "error_status", "") or "")
+    message = str(getattr(exc, "message", "") or exc).strip()
+    if status == 404:
+        logger.warning("Upstream 404 during %s: %s", operation, exc)
+        detail = f"Bungie 原文：{message}" if message else ""
+        if error_status:
+            detail = f"{detail}（{error_status}）" if detail else f"（{error_status}）"
+        raise UpstreamNotFoundError(operation, detail) from exc
+    logger.warning("Upstream HTTP %s (code=%s) during %s: %s", status, error_code, operation, exc)
+    raise APIError(
+        operation,
+        f"Bungie 返回 HTTP {status or '未知状态'}"
+        + (f"（{error_status}，code={error_code}）" if error_status or error_code else "")
+        + (f"：{message}" if message else "。")
+        + "这不是你的账号问题；若是临时故障可稍后重试，若是参数问题请检查 ID。",
+    ) from exc
+
+
+def _http_status_of(exc: aiobungie.HTTPError) -> int:
+    """真正的 HTTP 状态码。
+
+    不能拿 `error_code` 顶替：Bungie 的 `error_code` 是**业务错误码**
+    （例如 1653 = DestinyPGCRNotFound），`aiobungie.error.NotFound` 的 error_code
+    是 1653 而 http_status 才是 404 —— 按 error_code 判断会把 404 漏掉。
+    """
+    status = getattr(exc, "http_status", 0)
+    return int(getattr(status, "value", status) or 0)
 
 
 def _http_error_code(exc: aiobungie.HTTPError) -> int:
@@ -254,8 +305,7 @@ class BungieClient:
                 },
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "搜索 Bungie 玩家")
-            raise
+            _raise_bungie_error(exc, "搜索 Bungie 玩家")
         # static_request unwraps the Response envelope, result is already a list
         players = result if isinstance(result, list) else result.get("Response", [])
         logger.debug("SearchDestinyPlayer returned %d result(s)", len(players))
@@ -279,8 +329,7 @@ class BungieClient:
                 auth=await self.get_access_token(),
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取当前 Bungie 账号")
-            raise
+            _raise_bungie_error(exc, "读取当前 Bungie 账号")
         response = result.get("Response", result) if isinstance(result, dict) else {}
         memberships = response.get("destinyMemberships", [])
         if not memberships:
@@ -321,8 +370,7 @@ class BungieClient:
                 auth=token,
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取 Destiny 档案")
-            raise
+            _raise_bungie_error(exc, "读取 Destiny 档案")
         logger.debug("GetProfile returned (chars=%s)",
                      result.get("characters", {}).get("data", {}).keys())
         return result
@@ -762,7 +810,7 @@ class BungieClient:
         except aiobungie.HTTPError as exc:
             _raise_bungie_unavailable(exc, "读取商人库存")
             if not _is_insufficient_privileges(exc):
-                raise
+                _raise_bungie_error(exc, "读取商人库存")
             logger.warning(
                 "GetVendors full components rejected for mid=%s char=%s; falling back to %s",
                 membership_id,
@@ -783,7 +831,7 @@ class BungieClient:
                         "当前 Bungie OAuth token 缺少商人库存权限 "
                         "ReadDestinyVendorsAndAdvisors，请重新完成 Bungie 授权。"
                     ) from fallback_exc
-                raise
+                _raise_bungie_error(fallback_exc, "读取商人基础库存")
         logger.debug("GetVendors returned")
         if not isinstance(result, Mapping):
             logger.error("GetVendors returned unexpected payload type: %s", type(result).__name__)
@@ -845,8 +893,7 @@ class BungieClient:
         try:
             result = await self.rest.fetch_public_milestones()
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取本周重置")
-            raise
+            _raise_bungie_error(exc, "读取本周重置")
         logger.debug("GetPublicMilestones returned")
         return result
 
@@ -954,8 +1001,7 @@ class BungieClient:
                 params=params,
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取活动历史")
-            raise
+            _raise_bungie_error(exc, "读取活动历史")
         logger.debug("GetActivityHistory returned")
         return result
 
@@ -978,8 +1024,7 @@ class BungieClient:
                 f"Destiny2/Stats/PostGameCarnageReport/{activity_id}/",
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取活动结算报告")
-            raise
+            _raise_bungie_error(exc, "读取活动结算报告")
         logger.debug("GetPGCR returned")
         return result
 
@@ -1009,8 +1054,7 @@ class BungieClient:
                 f"Destiny2/{membership_type}/Account/{membership_id}/Character/{character_id}/Stats/",
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取历史统计")
-            raise
+            _raise_bungie_error(exc, "读取历史统计")
         logger.debug("GetHistoricalStats returned")
         return result
 
@@ -1038,8 +1082,7 @@ class BungieClient:
                 params=params,
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取收藏品节点")
-            raise
+            _raise_bungie_error(exc, "读取收藏品节点")
         logger.debug("GetCollectibleNodeDetails returned")
         return result
 
@@ -1061,8 +1104,7 @@ class BungieClient:
                 f"Destiny2/{membership_type}/Account/{membership_id}/Character/{character_id}/Stats/UniqueWeapons/",
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取武器使用历史")
-            raise
+            _raise_bungie_error(exc, "读取武器使用历史")
         logger.debug("GetUniqueWeaponHistory returned")
         return result
 
@@ -1084,8 +1126,7 @@ class BungieClient:
                 f"Destiny2/{membership_type}/Account/{membership_id}/Character/{character_id}/Stats/AggregateActivityStats/",
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取活动聚合统计")
-            raise
+            _raise_bungie_error(exc, "读取活动聚合统计")
         logger.debug("GetDestinyAggregateActivityStats returned")
         return result
 
@@ -1117,8 +1158,7 @@ class BungieClient:
                 params=params,
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取排行榜")
-            raise
+            _raise_bungie_error(exc, "读取排行榜")
         logger.debug("GetLeaderboards returned")
         return result
 
@@ -1156,8 +1196,7 @@ class BungieClient:
                 params=params,
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取角色排行榜")
-            raise
+            _raise_bungie_error(exc, "读取角色排行榜")
         logger.debug("GetLeaderboardsForCharacter returned")
         return result
 
@@ -1188,8 +1227,7 @@ class BungieClient:
                 params=params,
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "读取公会排行榜")
-            raise
+            _raise_bungie_error(exc, "读取公会排行榜")
         logger.debug("GetClanLeaderboards returned")
         return result
 
@@ -1213,7 +1251,6 @@ class BungieClient:
                 json={"displayNamePrefix": display_name_prefix},
             )
         except aiobungie.HTTPError as exc:
-            _raise_bungie_unavailable(exc, "搜索 Bungie 用户")
-            raise
+            _raise_bungie_error(exc, "搜索 Bungie 用户")
         logger.debug("SearchUsers returned")
         return result

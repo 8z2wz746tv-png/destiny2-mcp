@@ -27,10 +27,16 @@ class InventoryItem(BaseModel):
 
 
 class InventoryResponse(BaseModel):
-    """get_inventory tool response."""
+    """get_inventory tool response（列表类：必须能自证是否被截断）。"""
 
     location: str = Field(description="Queried location")
     items: list[InventoryItem] = Field(default_factory=list)
+    total_items: int = Field(default=0, description="过滤后一共有多少件")
+    returned_items: int = Field(default=0, description="本次返回多少件")
+    truncated: bool = Field(default=False, description="True = 被 limit 截断，不是全部")
+    next_offset: int | None = Field(
+        default=None, description="还有下一页时传回它的 offset；None = 已到末尾"
+    )
 
 
 class SearchItemsResponse(BaseModel):

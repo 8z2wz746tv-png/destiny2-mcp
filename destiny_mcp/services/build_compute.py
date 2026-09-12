@@ -5,6 +5,7 @@ from typing import Callable, TypeVar
 
 import anyio
 from anyio import to_process
+from anyio._core._exceptions import BrokenWorkerProcess
 
 from .. import config
 from ..exceptions import BuildValidationError
@@ -42,4 +43,14 @@ class BuildCompute:
                     f"Build computation exceeded the {self._timeout_seconds:.0f}s budget; "
                     "narrow the request (fewer stat targets or a specific replacement slot) "
                     "or raise DESTINY_BUILD_TIMEOUT_SECONDS."
+                ) from exc
+            except BrokenWorkerProcess as exc:
+                # worker 起不来时以前是裸抛：客户端只看到 anyio 的原始异常，看不出原因。
+                # 最常见的原因就是启动方式 —— anyio 的 worker 会按路径重跑父进程主模块，
+                # 而 `python -m destiny_mcp.server` 的主模块含相对导入，重跑会 ImportError。
+                raise BuildValidationError(
+                    "配装求值的 worker 进程启动失败，本次没有计算。"
+                    "如果你是用 `python -m destiny_mcp.server` 启动服务的，请改用"
+                    "`python -m destiny_mcp` 或控制台脚本 `destiny-mcp`（前者同样支持 -m）。"
+                    "若仍失败，请把这条消息连同启动命令一起反馈。"
                 ) from exc

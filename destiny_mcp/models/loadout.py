@@ -113,6 +113,12 @@ class LoadoutListResponse(BaseModel):
         description="Common format used by each loadout's build_template",
     )
     loadouts: list[Loadout] = Field(default_factory=list)
+    total_loadouts: int = Field(default=0, description="过滤后一共有多少套")
+    returned_loadouts: int = Field(default=0, description="本次返回多少套")
+    truncated: bool = Field(default=False, description="True = 被 limit 截断，不是全部")
+    next_offset: int | None = Field(
+        default=None, description="还有下一页时传回它的 offset；None = 已到末尾"
+    )
 
 
 class LoadoutOperationResult(BaseModel):
