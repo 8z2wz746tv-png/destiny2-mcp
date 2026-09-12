@@ -678,21 +678,30 @@ def item_state_flags(state: Any) -> dict[str, bool | None]:
 def instance_fields(instance: Mapping[str, Any] | None) -> dict[str, Any]:
     """组件 300（itemInstances）里的副本级字段 + 缺失清单。
 
-    `gear_tier` 是《护甲 3.0》的 T1–T5（0 = 旧装备），`item_level`/`quality` 由 Bungie 给。
-    这些字段**只在账号数据里**，Manifest 里查不到；没取到就留 None，并说明缺了什么，
+    `gear_tier` 是装备分级 T1–T5；组件里的 **0 表示"不在分级体系内"**（旧装备，或本来就
+    不属于分级的武器），不是 T0 —— 所以统一输出 `null`，并在 `legacy_tier` 里标出来，
+    由展示层补一句说明。`item_level`/`quality` 由 Bungie 给。
+    这些字段**只在账号数据里**，Manifest 里查不到；没取到就留 None 并记进 `missing`，
     避免调用方把"没读到"当成"没有"。
     """
     data: Mapping[str, Any] = instance if isinstance(instance, Mapping) else {}
     fields: dict[str, Any] = {}
     missing: list[str] = []
+    legacy_tier = False
     for key, source in (("gear_tier", "gearTier"), ("item_level", "itemLevel"), ("quality", "quality")):
         value = data.get(source)
+        if key == "gear_tier" and value == 0:
+            # 0 = 无分级：给 null（不是 0），并标记出来让上层写说明
+            fields[key] = None
+            legacy_tier = True
+            continue
         if isinstance(value, int) and not isinstance(value, bool):
             fields[key] = value
         else:
             fields[key] = None
             missing.append(key)
     fields["missing"] = missing
+    fields["legacy_tier"] = legacy_tier
     return fields
 
 

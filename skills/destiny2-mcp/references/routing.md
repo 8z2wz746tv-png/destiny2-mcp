@@ -36,7 +36,7 @@
 | --- | --- | --- |
 | `profile`（`get_profile`、`角色`、`档案`） | 我的角色列表、光等、基本档案 | `player_name` |
 | `search`（`search_player`） | 精确搜玩家，拿 `membership_id` 供后续复用 | `player_name` |
-| `find`（`find_players`、`fuzzy`） | 名字前缀模糊找人 —— ⚠️ **上游接口当前不可用**（返回 `a_p_i_error`）；请让用户给完整 `名字#1234` 走 `search`，别把它当"查无此人" | `name_prefix` |
+| `find`（`find_players`、`fuzzy`） | 名字记不全时按前缀模糊找人，返回按置信度排序的候选（`display_name` 形如 `Husky#210`、`confidence`、`has_more`）；拿到完整名后用 `search` 精确定位。**空候选不等于"没这个人"** | `name_prefix` |
 
 ### `inventory_assistant` —— 背包与仓库
 
@@ -72,7 +72,8 @@
   `weapon_assistant(intent="analyze")` → `inventory.instances[].weapon.gear_tier`；
   `weapon_assistant(intent="type")` → `weapons.items[].weapon.gear_tier`；
   `weapon_assistant(intent="compare")` → `comparison.instances[].weapon.gear_tier`。
-  **`0` 表示"不在分级体系内"（旧装备/不属于分级的武器），不是 T0。**
+  **`null` 表示"不在分级体系内"**（组件里是 `gearTier=0`，旧装备或不属于分级的武器），
+  **不是 T0**；响应里会附一句说明。
   同一把枪的不同副本可以是不同 T 级（实测「遗产」两件：一件 0、一件 5），
   所以答案必须**逐副本**给（"你仓库里两件：一件无分级、一件 T5"），不能只报一个数字。
   T 级还决定每栏能换几个 perk（T5→3、T4/T3→2、T2→1），答错会连带答错"能换几个"。

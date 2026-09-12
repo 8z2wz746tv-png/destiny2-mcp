@@ -31,6 +31,7 @@
 | 看看我的角色概况，只读 | `profile` | 返回角色列表与光等；不编造未读到的字段，不触发任何写入。 |
 | 查一下玩家 `<完整名>` 的档案 | `profile` + `player_name` | 用传入的名称，不套用默认玩家。 |
 | 搜一下叫 `<完整名>` 的玩家 | `search` | 返回 membership_id 与 membership_type，供后续查询复用。 |
+| 找找名字里有「husky」的玩家 | `find` + `name_prefix` | 返回按置信度排序的候选：`display_name`（形如 `Husky#210`，可直接拿去做 `search`）、`confidence`、`playtime_hours`、`last_played`、`membership_id`/`membership_type`；另有 `has_more`，为真时带 warning 说明上游还有下一页。**空候选不能说成「没这个人」**；上游失败必须给 `ok=false` + `a_p_i_error` 信封（不能静默返回空列表）。端点用官方现行的 `POST /User/Search/GlobalName/{page}/`，不是已废弃的 `User/SearchUsers/`（那个只会 405）。 |
 | 默认玩家是谁 | 不调用工具 | 说明来自 `DESTINY_DEFAULT_PLAYER`；未配置时说明会用当前 OAuth 账号。 |
 | 换个账号查 | 不适用 | 单用户本地版，应说明不支持多用户切换。 |
 
@@ -72,9 +73,9 @@
 | `<武器>` 的 Perk 池有哪些 | `perk_pool` | 列出**可能**滚到的 Perk（`sockets[]`，`scope=definition`）；这不是账号当前副本。每个选项的 `recommended` 已汇总愿单/选取率/清单/社区，引用时要带上 `weapon.sources` 里的来源与更新时间。 |
 | `<武器>` 的定义和基础属性 | `info`／`stats` | 都来自 Manifest；只给定义数值（`stats[]` 按 Bungie 属性组顺序），不叠加账号加成。`info` 带清单块（`weapon.farming` + `cross_check`），**`popularity` 在 info 里是 available=false 的"这个 intent 不查"**，要选取率用 `popularity`。 |
 | `<武器>` 的催化剂情况 | `catalyst` | 返回结构固定：`weapon`/`is_exotic`/`count`/`catalysts`/`unlock_state`/`note`。**传说武器必须回 `count=0` + 「只有异域才有催化剂」**，不能吐上百条「N阶：稳定性」这类通用锻造词条；`unlock_state` 目前恒为 `not_checked`（本地不读账号记录组件），**不许把「没查」说成「没解锁」**。 |
-| 手炮这一类武器都有哪些 | `type` | 按类型列出**我持有的**武器：每件 `{weapon, sockets, options, stats}`；`sockets` 是列计数（`options_available=false`，别读成"没有可选项"），`options` 才是这一件能换的（组件 310）。列表类不逐个读本地资料（`popularity`/`community` 明说没查）。 |
+| 手炮这一类武器都有哪些 | `type` | 按类型列出**我持有的**武器：每件 `{weapon, sockets, options, stats}`；`sockets` 是列计数（`options_available=false`，别读成"没有可选项"），`options` 才是这一件能换的（组件 310）。**默认最多 20 件**（每件带完整模板 ≈ 9.7 KB；50 件 ≈ 452 KB ≈ 13 万 tokens），响应带 `total/returned/truncated` 与截断警告，要更多调 `limit` 或按类型收窄。列表类不逐个读本地资料（`popularity`/`community` 明说没查）。 |
 | `<Perk>` 是什么效果 | `perk_description` | 从 Manifest 取描述；**不得按名字推断效果**。 |
-| 这把 `<武器>` 是 T 几 | 先看有没有账号数据：`analyze`／`type`／`compare` 的 `weapon.gear_tier`；只有定义数据时明说"分级是副本属性" | **三个 T 不能混**：`gear_tier`（0–5，装备分级，用户问的就是这个）／`rarity_tier`（2–6，稀有度）／`farming.tier`（社区评级 T0–T4 或 S–F 字母）。只能答 `gear_tier`；`0` 是"无分级"，不是 T0。同一把枪不同副本可以不同 T 级（实测「遗产」一件 0、一件 5），必须**逐副本**回答；拿「传说」或清单 T1 顶替即为不合格。`info`/`perk_pool`/`god_roll` 里**没有**这个字段。 |
+| 这把 `<武器>` 是 T 几 | 先看有没有账号数据：`analyze`／`type`／`compare` 的 `weapon.gear_tier`；只有定义数据时明说"分级是副本属性" | **三个 T 不能混**：`gear_tier`（0–5，装备分级，用户问的就是这个）／`rarity_tier`（2–6，稀有度）／`farming.tier`（社区评级 T0–T4 或 S–F 字母）。只能答 `gear_tier`；**`null` 是"无分级"（组件里是 `gearTier=0`），不是 T0** —— 这时响应里还会带一句说明。同一把枪不同副本可以不同 T 级（实测「遗产」一件 0、一件 5），必须**逐副本**回答；拿「传说」或清单 T1 顶替即为不合格。`info`/`perk_pool`/`god_roll` 里**没有**这个字段。 |
 
 ### 账号侧（当前副本）
 
@@ -162,6 +163,7 @@
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | 用我的 `<职业>` 现有护甲找三套方案，生命至少 100、手雷至少 100，只列候选不装备 | `find` 或 `recommend` | 五个护甲部位齐全，含实际实例 ID 与最终六维。`*_target` 是**硬约束**，无解要说无解。⏱️ 实测耗时：泰坦 ~2s、猎人 ~5s、**术士 ~190s**（组合数是猎人 39 倍）；超预算返回 `build_validation_error`，可用 `DESTINY_BUILD_TIMEOUT_SECONDS` 调。 |
+| 帮我分析一下为什么配不出 `<职业>` 的这套 | `build_assistant(intent="analyze")` | 组合规模在阈值内时给**精确**属性上限（`max_possible` + `precision="exact"`，泰坦 ~15s）。**超规模时立刻返回**（术士真机 4.5s，而以前要干等 300s 才报错）：`precision="not_computed"`、`max_possible={}`（**不是"上限为零"**）、`reason` 里给出组合数估算与收窄手段（指定金装／减少目标／改用 `farm_target`／调 `DESTINY_BUILD_MAX_COMBINATIONS`）。 |
 | 保留上面的目标，指定金装 `<异域护甲原名>` | 先返回候选 | **首次查询必须返回金装候选并等确认**；不得自行选定。 |
 | 就选第一个 | 带 `confirmed_exotic_hash` + `exotic_confirmation_token` 重试 | 必须原样回传候选里的值；职业、目标、优先级、碎片设置**不得在重试时丢失**。 |
 | 没有解的话别降条件，分析还差什么 | `analyze` | 明确说明无解；**不得擅自放宽硬目标**。 |
@@ -467,10 +469,10 @@ loadout_assistant  subclass_assistant  activity_assistant  world_assistant
 
 | 现象 | 真实原因（已核实） | 状态 |
 | --- | --- | --- |
-| `player_assistant(intent="find")` 恒失败（`ok=false` + `a_p_i_error`） | Bungie 的 `POST /User/SearchUsers/` 返回 **405**；本地已不再吞掉失败，改成明说不可用并指向"用完整 `名字#1234` 走 `search`" | **先放放**：不再列入语料验收（换接口/替代数据源暂缓）；错误信封与消息由单测兜住 |
+| （已修）`player_assistant(intent="find")` 曾恒失败 | 根因是本地在调 Bungie **已废弃**的 `POST /User/SearchUsers/`（405），不是上游失效；已改用官方现行的 `POST /User/Search/GlobalName/{page}/` 并适配新响应形状（`bungieGlobalDisplayName(+code)` / `destinyMemberships[]`） | 已修复（真机：`find("husky")` 返回 10 个候选 + `has_more`） |
 | `activity_assistant(intent="leaderboards")` 恒返回 `ok=false` + `a_p_i_error` | **上游失败**：Bungie 对账号榜单返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`。SDK 把空响应拆成 `None`，码在这一层已经拿不到 | 消息已改成「上游接口问题、不是账号问题，不要凭记忆给排名」；要带具体上游码需要绕过 SDK 自己发请求（未做） |
-| 术士求解慢 | 排队已不计入预算、预算可配（`DESTINY_BUILD_TIMEOUT_SECONDS`，默认 300s）。空闲机器实测：猎人 ~10s、泰坦 ~5–19s、**术士 recommend 190s ✓ / find 187s ✓ / analyze >305s ✗**、farm_target 7.5s ✓ | recommend/find 已修；`analyze` 仍超预算 |
-| Armor 3.0 里 `gearTier != 5` 的护甲带 `roll_parse_error`（英文开发者口气） | 只对 tier 5 做反推（`build/models.py`），4 级护甲标不支持 | 待定：支持 tier 4 或改成人话 |
+| 术士求解慢 | 排队已不计入预算、预算可配（`DESTINY_BUILD_TIMEOUT_SECONDS`，默认 300s）。空闲机器实测：猎人 ~10s、泰坦 ~5–19s、**术士 recommend 190s ✓ / find 187s ✓**、farm_target 7.5s ✓ | `analyze` 已加组合规模闸（真机：术士组合 2.43 亿 → 4.5s 返回可操作建议；泰坦 388 万仍做精确分析）。阈值 `DESTINY_BUILD_MAX_COMBINATIONS`（默认 2000 万，0=关闭） |
+| ~~Armor 3.0 里 `gearTier != 5` 的护甲带 `roll_parse_error`（英文开发者口气）~~ | 只对 tier 5 做反推（`build/models.py`） | **已改人话**：「目前只对 T5 护甲做词条反推；这件是 T{n}」等（4 条消息全部中文化） |
 | 动作类失败的消息里带着上游原文（Bungie URL、内部错误串），如 `quest_tracking_failed` | 信封是对的，但 message 泄露开发者信息 | 待修：转成人话 |
 | 写入**成功**后没有 `next_actions` | 失败时已有提示，成功时没有「回读核对实际状态」 | 待定 |
 | `slot_number=21`、非法 intent、拼错的参数名 → 原始 pydantic 报错，没有 `ok=false` | schema 层校验发生在工具函数之前，属于**协议级**参数错误（不是业务失败） | 保持协议级拒绝（语料第十二章 C 已明确分层）；若要统一信封，需给 8 个助手都加多余参数兜底，代价是 schema 变成 `additionalProperties: true` |

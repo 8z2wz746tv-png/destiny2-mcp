@@ -324,3 +324,28 @@ async def test_missing_state_field_is_null_with_a_reason(account):
     assert detail.weapon["instance"]["locked"] is None
     assert detail.weapon["instance"]["tracked"] is None
     assert any("state" in note for note in detail.notes)
+
+def test_gear_tier_zero_means_no_tier_not_t0() -> None:
+    """组件里的 gearTier=0 是"不在分级体系内"（旧装备），输出 null + 标记，不是 T0。"""
+    fields = wp.instance_fields({"gearTier": 0, "itemLevel": 1, "quality": 0})
+
+    assert fields["gear_tier"] is None
+    assert fields["legacy_tier"] is True
+    assert fields["item_level"] == 1
+    assert "gear_tier" not in fields["missing"], "0 是读到了但没分级，不是没读到"
+
+
+def test_gear_tier_present_is_untouched() -> None:
+    fields = wp.instance_fields({"gearTier": 5, "itemLevel": 55, "quality": 0})
+
+    assert fields["gear_tier"] == 5
+    assert fields["legacy_tier"] is False
+
+
+async def test_detail_explains_legacy_tier_in_notes(account) -> None:
+    account.profile["itemComponents"]["instances"]["data"]["inst-1"]["gearTier"] = 0
+
+    detail = (await account.service.get_weapon_details_by_type("test", "")).weapons[0]
+
+    assert detail.weapon["gear_tier"] is None
+    assert any("不是 T0" in note for note in detail.notes), detail.notes

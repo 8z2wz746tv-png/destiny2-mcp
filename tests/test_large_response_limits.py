@@ -15,6 +15,7 @@ total/truncated —— 调用方既没法少要一点、也察觉不到自己只
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import Any
 from unittest.mock import AsyncMock
 
 import pytest
@@ -136,3 +137,105 @@ async def test_zero_or_negative_limit_falls_back_to_the_default(intent) -> None:
         intent=intent, limit=0, ctx=_ctx(inventory_svc=inventory, starside_svc=None)
     )
     assert response["data"]["inventory"]["returned_items"] == INVENTORY_DEFAULT
+
+
+# ── analyze 的组合规模闸（D5）：超规模提前失败，不让人干等 5 分钟 ──────────
+
+
+def _snapshot(per_slot: int, *, exotic_hash: int | None = None, exotic_slot: str = "helmet"):
+    """金装只可能在某一个部位上（真实数据就是这样），所以只有该部位会被锁成 1 件。"""
+    from destiny_mcp.build.models import Armor, InventorySnapshot
+
+    def pieces(prefix: str) -> list[Any]:
+        out = []
+        for index in range(per_slot):
+            is_exotic = exotic_hash is not None and index == 0 and prefix == exotic_slot
+            out.append(Armor(
+                item_instance_id=f"{prefix}-{index}",
+                item_hash=(exotic_hash if is_exotic else abs(hash((prefix, index))) % 10**8),
+                name=f"{prefix}{index}",
+                slot=prefix,
+                is_exotic=is_exotic,
+                stats={"weapons": 10, "health": 10, "class_stat": 10,
+                       "grenade": 10, "melee": 10, "super_stat": 10},
+                energy_capacity=10,
+            ))
+        return out
+
+    return InventorySnapshot(
+        helmets=pieces("helmet"), gauntlets=pieces("gauntlets"), chests=pieces("chest"),
+        legs=pieces("legs"), class_items=pieces("class_item"),
+    )
+
+
+def _constraints(*, exotic_hash: int | None = None):
+    from destiny_mcp.build.models import BuildConstraints
+
+    return BuildConstraints(
+        exotic_hash=exotic_hash,
+        exotic_hashes={exotic_hash} if exotic_hash else set(),
+        weapons_min=0,
+    )
+
+
+def test_combination_estimate_counts_every_slot(monkeypatch) -> None:
+    from destiny_mcp.build import analyzer
+
+    total, counts = analyzer.estimate_combinations(_snapshot(3), _constraints())
+
+    assert counts == [3, 3, 3, 3, 3]
+    assert total == 3**5
+
+
+def test_combination_estimate_narrows_when_an_exotic_is_pinned() -> None:
+    """指定金装会把该部位锁成金装那几件 —— 这是最有效的收窄手段，要让 Agent 说得出。"""
+    from destiny_mcp.build import analyzer
+
+    total, counts = analyzer.estimate_combinations(
+        _snapshot(4, exotic_hash=424242), _constraints(exotic_hash=424242)
+    )
+
+    assert counts == [1, 4, 4, 4, 4]
+    assert total == 4**4
+
+
+def test_analyze_returns_early_with_actionable_reason_when_too_large(monkeypatch) -> None:
+    from destiny_mcp.build import analyzer
+
+    monkeypatch.setattr(analyzer.config, "BUILD_MAX_COMBINATIONS", 1000, raising=False)
+    called = {"max_possible": False}
+    monkeypatch.setattr(
+        analyzer, "_max_possible_stats",
+        lambda *a, **k: called.__setitem__("max_possible", True) or {},  # type: ignore[func-returns-value]
+    )
+
+    result = analyzer.analyze(_snapshot(5), _constraints())  # 5^5 = 3125 > 1000
+
+    assert called["max_possible"] is False, "超规模时不该再去跑 6 次求解器"
+    assert result.max_possible == {}, "没算就是没算，不能编一个上限值"
+    assert "组合规模太大" in result.reason
+    assert "指定一件金装" in result.reason
+    assert "DESTINY_BUILD_MAX_COMBINATIONS" in result.reason
+
+
+def test_analyze_still_computes_when_within_budget(monkeypatch) -> None:
+    from destiny_mcp.build import analyzer
+
+    monkeypatch.setattr(analyzer.config, "BUILD_MAX_COMBINATIONS", 10**6, raising=False)
+    monkeypatch.setattr(
+        analyzer, "_max_possible_stats",
+        lambda snapshot, constraints: {"health": 123},
+    )
+
+    result = analyzer.analyze(_snapshot(2), _constraints())  # 2^5 = 32 < 1e6
+
+    assert result.max_possible == {"health": 123}
+
+
+def test_zero_threshold_disables_the_gate(monkeypatch) -> None:
+    from destiny_mcp.build import analyzer
+
+    monkeypatch.setattr(analyzer.config, "BUILD_MAX_COMBINATIONS", 0, raising=False)
+    monkeypatch.setattr(analyzer, "_max_possible_stats", lambda snapshot, constraints: {"health": 1})
+
+    assert analyzer.analyze(_snapshot(6), _constraints()).max_possible == {"health": 1}

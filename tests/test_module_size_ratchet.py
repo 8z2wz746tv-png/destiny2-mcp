@@ -33,8 +33,8 @@ CEILINGS = {
     # 用新 payload 收掉搜索分页结构（不改服务返回的字典，避免改到调用方对象）。
     # P4：武器分支搬去 tools/_weapon_branches.py，只剩认参数与分发 —— 上限跟着收紧
     # （收紧后旧上限就不再是"可以慢慢长回去"的许可）。
-    # +27（P4→D4）：inventory get / loadout get+list 的默认上限与截断话术。
-    "destiny_mcp/tools/assistants.py": 1383,
+    # +7：find 分支恢复可用 + 按类型列武器的默认上限 20。
+    "destiny_mcp/tools/assistants.py": 1401,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     "destiny_mcp/bungie_client.py": 1263,
@@ -49,7 +49,8 @@ CEILINGS = {
     # 再往上就该把"覆盖表 + 挂载"抽出去，而不是继续在这里加 intent。
     "destiny_mcp/tools/_weapon_branches.py": 454,
     # P6：体积口径（定义级不带描述/图标）写在工厂里，349 → 363。
-    "destiny_mcp/services/weapon_payload.py": 363,
+    # +2（4a）：gear_tier=0 → null 时给一句说明。
+    "destiny_mcp/services/weapon_payload.py": 365,
     # P5 新增：本地资料汇总（愿单/选取率/清单/社区 → 每个 plug 的 recommended）
     "destiny_mcp/services/weapon_local_data.py": 403,
 }

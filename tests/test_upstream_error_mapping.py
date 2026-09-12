@@ -121,8 +121,8 @@ def test_no_call_site_re_raises_a_raw_upstream_error():
 async def test_fuzzy_player_search_reports_upstream_failure_instead_of_empty():
     from destiny_mcp.services.player_service import PlayerService
 
-    async def boom(_prefix: str) -> dict:
-        raise aiobungie.HTTPError("SearchUsers 405", HTTPStatus.METHOD_NOT_ALLOWED)
+    async def boom(_prefix: str, page: int = 0) -> dict:
+        raise aiobungie.HTTPError("SearchGlobalName 500", HTTPStatus.INTERNAL_SERVER_ERROR)
 
     service = PlayerService(  # type: ignore[arg-type]
         SimpleNamespace(search_users=boom), SimpleNamespace(), SimpleNamespace()
@@ -132,7 +132,7 @@ async def test_fuzzy_player_search_reports_upstream_failure_instead_of_empty():
         await service.find_players("husky")
 
     message = str(info.value)
-    assert "SearchUsers" in message and "405" in message
+    assert "用户搜索接口" in message and "500" in message
     assert "完整 Bungie 名" in message
 
 
@@ -157,7 +157,9 @@ async def test_fuzzy_player_search_genuinely_empty_still_succeeds_with_warning()
     """真·空结果（上游正常但没候选）仍是 ok=true，但要提醒别当成「不存在」。"""
     from destiny_mcp.tools.assistants import player_assistant
 
-    service = SimpleNamespace(find_players=AsyncMock(return_value=[]))
+    service = SimpleNamespace(find_players=AsyncMock(return_value={
+        "players": [], "page": 0, "has_more": False, "candidate_count": 0,
+    }))
     ctx = SimpleNamespace(request_context=SimpleNamespace(lifespan_context={"player_svc": service}))
     response = await player_assistant(intent="find", name_prefix="zzz", ctx=ctx)
 
@@ -203,3 +205,98 @@ def test_package_main_entry_is_spawn_safe():
         for line in source.splitlines()
         if not line.strip().startswith("#")
     ), "带有相对导入的话，worker 子进程 runpy 重跑本文件会失败"
+
+# ── 模糊找人：换到官方现行端点后的形状映射（别再调废弃路由） ─────────────
+
+
+NEW_SHAPE = {
+    "searchResults": [
+        {
+            "bungieGlobalDisplayName": "Husky",
+            "bungieGlobalDisplayNameCode": 210,
+            "destinyMemberships": [
+                {"membershipId": "4611686018468673478", "membershipType": 3,
+                 "crossSaveOverride": 3, "isPublic": False},
+            ],
+        },
+        {
+            "bungieGlobalDisplayName": "无账号的人",
+            "bungieGlobalDisplayNameCode": 1,
+            "destinyMemberships": [],
+        },
+    ],
+    "page": 0,
+    "hasMore": True,
+}
+
+
+def test_identity_of_maps_the_current_bungie_search_shape():
+    from destiny_mcp.services.player_service import _identity_of
+
+    membership_id, membership_type, display_name = _identity_of(NEW_SHAPE["searchResults"][0])
+
+    assert membership_id == "4611686018468673478"
+    assert membership_type == 3
+    assert display_name == "Husky#210"  # 名字 + 数字码，才能拿去做 intent=search
+
+    # 没有 Destiny 账号的候选：给空 id，由调用方跳过，而不是崩
+    assert _identity_of(NEW_SHAPE["searchResults"][1]) == ("", 0, "无账号的人#1")
+
+
+def test_identity_of_prefers_the_cross_save_membership():
+    from destiny_mcp.services.player_service import _identity_of
+
+    candidate = {
+        "bungieGlobalDisplayName": "Multi",
+        "bungieGlobalDisplayNameCode": 7,
+        "destinyMemberships": [
+            {"membershipId": "steam-id", "membershipType": 3, "crossSaveOverride": 1},
+            {"membershipId": "xbox-id", "membershipType": 1, "crossSaveOverride": 1},
+        ],
+    }
+
+    assert _identity_of(candidate)[0] == "xbox-id"
+
+
+async def test_search_users_calls_the_current_endpoint_not_the_obsolete_one():
+    """回归：`User/SearchUsers/` 已被 Bungie 删除（405），必须走 GlobalName 路由。"""
+    from destiny_mcp.bungie_client import BungieClient
+
+    calls: list[tuple[str, str, dict]] = []
+
+    class _Rest:
+        async def static_request(self, method, path, **kwargs):
+            calls.append((method, path, kwargs))
+            return NEW_SHAPE
+
+    client = object.__new__(BungieClient)
+    client._rest = _Rest()  # type: ignore[attr-defined]  # rest 是只读 property
+
+    result = await client.search_users("husky", page=2)
+
+    assert result is NEW_SHAPE
+    method, path, kwargs = calls[0]
+    assert method == "POST"
+    assert path == "User/Search/GlobalName/2/"
+    assert kwargs["json"] == {"displayNamePrefix": "husky"}
+
+
+async def test_find_players_returns_pagination_and_skips_accountless_candidates():
+    from destiny_mcp.services.player_service import PlayerService
+
+    async def search_users(prefix: str, page: int = 0) -> dict:
+        return NEW_SHAPE
+
+    class _Resolver:
+        async def get_profile(self, membership_id, membership_type, components):
+            return {"characters": {"data": {}}, "profileRecords": {"data": {}}}
+
+    service = PlayerService(  # type: ignore[arg-type]
+        SimpleNamespace(search_users=search_users), SimpleNamespace(), _Resolver()  # type: ignore[arg-type]
+    )
+
+    payload = await service.find_players("husky")
+
+    assert payload["has_more"] is True
+    assert payload["page"] == 0
+    assert [p["display_name"] for p in payload["players"]] == ["Husky#210"]
