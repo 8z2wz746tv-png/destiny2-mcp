@@ -146,9 +146,10 @@ def test_enhanced_pair_points_both_ways(stub_manifest, stub_pairs) -> None:
     )
     options = {option["name"]: option for option in sockets[0]["options"]}
 
-    assert options["狂暴"]["enhanced"] is False
+    # P6：`enhanced` 布尔与 `enhanced_plug_hash` 表达同一件事，只留后者
     assert options["狂暴"]["enhanced_plug_hash"] == 302
-    assert options["强化狂暴"]["enhanced"] is True
+    assert options["狂暴"]["enhanced_plug_hash"] == 302
+    assert options["强化狂暴"]["enhanced_plug_hash"] == 302  # 自己就是强化版时指向自己
     assert options["强化狂暴"]["enhanced_plug_hash"] == 302  # 指自己 = "我就是强化版"
     assert options["退役的 Perk"]["enhanced_plug_hash"] == 0
     assert wp.has_enhanced(sockets) is True

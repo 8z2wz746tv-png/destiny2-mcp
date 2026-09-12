@@ -46,7 +46,8 @@ CEILINGS = {
     # P5：本地资料挂载 + 固定/随机话术 + 覆盖表，各分支都要交代自己带哪些块（444 → 454）。
     # 再往上就该把"覆盖表 + 挂载"抽出去，而不是继续在这里加 intent。
     "destiny_mcp/tools/_weapon_branches.py": 454,
-    "destiny_mcp/services/weapon_payload.py": 349,
+    # P6：体积口径（定义级不带描述/图标）写在工厂里，349 → 363。
+    "destiny_mcp/services/weapon_payload.py": 363,
     # P5 新增：本地资料汇总（愿单/选取率/清单/社区 → 每个 plug 的 recommended）
     "destiny_mcp/services/weapon_local_data.py": 403,
 }

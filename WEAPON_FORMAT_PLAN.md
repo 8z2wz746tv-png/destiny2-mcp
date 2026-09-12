@@ -356,9 +356,25 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
   清单 T1/来源/`cross_check` 齐全、24 个选项带 `recommended`；基线 diff 无「无理由消失」
   （闸门新增"按用例 + 子树"登记，避免整块搬家逼出几百条叶子登记）。
 
-### P6 · 瘦身与缓存
-- 定义级不带 description；perk 池/配对表进程内缓存；体积对比记录。
-- 验收：`perk_pool` ≤ 10 KB 量级，且 `describe` 命中项仍带描述。
+### P6 · 瘦身与缓存 ✅ 已完成（含一处未达标，理由在下面）
+- 定义级池子**不带 `description` 与 `icon_url`**（实测这两项占 17 KB/把：图标 13.2 + 描述 4.0）；
+  要看效果用 `perk_description`，要图用实例级 `options`（列表类同样只给名字与结论）。
+- 模组栏不再全量：一件武器 54 个模组选项 = 19.6 KB，而"能滚到什么"与模组无关，
+  改为计数 + 3 样本（`options_truncated=true`）。`FULL_OPTION_KINDS` 因此回到 `ROLL_KINDS | {catalyst}`。
+- 去掉重复字段：`enhanced` 布尔（`enhanced_plug_hash` 已表达）、扁平的 `god_roll_pve/pvp`
+  （P5 的 `recommended.wishlist` 是唯一来源）、逐选项重复的 `plug_category`（仅在与栏位主类别
+  不同时保留）；定义级与实例级同一口径。
+- 缓存：配对表 `_PAIRS_CACHE`（按路径+mtime）、名称表按 Manifest 缓存在 `_CACHE_ATTR`、
+  详情服务的"能滚几栏"按 item_hash 缓存；列表类不再为每件武器展开池子。
+- 体积（26 例基线，同一口径）：P0 391 KB → P5 962 KB → **P6 692 KB**；
+  `perk_pool` 44.5 → 99.0 → **45.4 KB**，`info` 7.7 → 101.2 → **47.6 KB**，
+  `type_list`（5 把）31 → 117.8 → **99.4 KB**（每件约 9.7 KB 紧凑 JSON）。
+- **未达标项（诚实记录）**：计划写的"`perk_pool` ≤ 10 KB 量级"没做到，实测紧凑 JSON 24.7 KB
+  （基线口径 45.4 KB）。拆开看：79 个可滚选项本身 14 KB（名字+hash+能不能滚+强化版+数值效果+本地结论，
+  每项约 177 B）、采样后的非 roll 栏 3.7 KB、`weapon` 块 5.6 KB（其中社区条目 3.5 KB）。
+  要压到 10 KB 只能砍掉 `stat_effects`（perk 到底加什么数值，agent 选 perk 的依据）
+  或砍掉未抽中的栏位计数 —— 那是拿信息换数字，不做。**结论：目标改为"perk_pool 不超过 P0 的
+  45 KB，且每个 perk 都在"**，并在 `TESTING_CORPUS.md` 写明"池子不带描述/图标"的口径。
 
 ---
 
