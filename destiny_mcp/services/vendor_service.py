@@ -43,6 +43,7 @@ from .vendor_menu import (
 
 if TYPE_CHECKING:
     from .perk_service import PerkService
+from . import weapon_profile
 
 logger = get_logger(__name__)
 
@@ -429,7 +430,7 @@ class VendorService:
             item_hash=item_hash,
             name=item_name,
             item_type=item_info.get("itemTypeNameDisplay", "") or item_info.get("itemTypeName", ""),
-            tier={5: "传说", 6: "异域"}.get(item_info.get("tier", 0), ""),
+            tier=weapon_profile.rarity_of(item_info.get("tier", 0)),
             icon=icon_url,
             icon_url=icon_url,
             costs=costs,

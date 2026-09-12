@@ -22,6 +22,9 @@ class ItemDefinitionMixin:
     _VALID_TABLES = frozenset({
         "DestinyVendorDefinition",
         "DestinyProgressionDefinition",
+        "DestinyDamageTypeDefinition",
+        "DestinyBreakerTypeDefinition",
+        "DestinyStatGroupDefinition",
         "DestinyMilestoneDefinition",
         "DestinyActivityDefinition",
         "DestinyActivityTypeDefinition",

@@ -14,6 +14,8 @@ import yaml
 from ..exceptions import ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
+from ..manifest_names import names_for
+from . import weapon_profile
 
 logger = get_logger(__name__)
 
@@ -21,31 +23,8 @@ logger = get_logger(__name__)
 _CATALYST_MAPPING: dict[int, list[int]] | None = None
 
 # Damage type hash → Chinese name
-DAMAGE_TYPE_NAMES = {
-    1: "动能", 2: "烈日", 3: "电弧", 4: "虚空",
-    5: "冰影", 6: "编织", 7: "棱镜",
-}
-
-# Ammo type hash → Chinese name
-AMMO_TYPE_NAMES = {
-    1: "主要", 2: "特殊", 3: "威能",
-}
-
-# Tier type hash → Chinese name
-TIER_NAMES = {2: "普通", 3: "罕见", 4: "稀有", 5: "传说", 6: "异域"}
 
 # Weapon stat hash → Chinese name
-WEAPON_STAT_NAMES = {
-    1480404414: "攻击", 3897883278: "防御", 1935470627: "力量",
-    2523465841: "速度", 4284893193: "每分钟发射数",
-    3614673599: "爆伤", 2961396640: "射程",
-    155624089: "稳定性", 943549884: "操控性",
-    1345609583: "填装速度", 2715839340: "辅助瞄准",
-    3555269338: "变焦", 2714457168: "空中效率",
-    1263414103: "后坐方向", 3871231066: "弹匣",
-    4043523819: "伤害", 209426660: "护盾",
-}
-
 # Fragment stat hash → Chinese name (Renegades update, consistent with build/constants.py)
 FRAGMENT_STAT_NAMES = {
     2996146975: "武器",
@@ -236,9 +215,9 @@ class ManifestQueryService:
             "name": weapon_zh_name or display.get("name", ""),
             "nameEn": weapon_en_name,
             "weaponType": weapon_def.get("itemTypeDisplayName", ""),
-            "tier": TIER_NAMES.get(tier_type, f"未知({tier_type})"),
-            "damageType": DAMAGE_TYPE_NAMES.get(damage_type, f"未知({damage_type})"),
-            "ammoType": AMMO_TYPE_NAMES.get(ammo_type, f"未知({ammo_type})"),
+            "tier": weapon_profile.rarity_of(tier_type),
+            "damageType": names_for(self._manifest).damage_type(damage_type),
+            "ammoType": names_for(self._manifest).ammo_type(ammo_type),
             "description": display.get("description", "") or weapon_def.get("flavorText", ""),
             "intrinsicPerks": self._extract_intrinsic_perks(weapon_def),
             "stats": self._extract_weapon_stats(weapon_def),
@@ -421,11 +400,20 @@ class ManifestQueryService:
     def _extract_weapon_stats(self, definition: dict) -> dict:
         """Extract weapon investment stats."""
         stats = {}
+        # 属性名走统一名称表；取值优先"显示值"（Bungie 已把框架加成算进去），
+        # 回退投资值 —— 遗产的每分钟发射数就是 65 而不是投资值 30。
+        names = names_for(self._manifest)
+        seen: set[int] = set()
         for s in definition.get("investmentStats", []):
             stat_hash = s.get("statTypeHash", 0)
-            value = s.get("value", 0)
-            stat_name = WEAPON_STAT_NAMES.get(stat_hash)
-            if stat_name and value != 0:
+            if stat_hash in seen:
+                continue
+            seen.add(stat_hash)
+            value = weapon_profile.stat_value(definition, stat_hash)
+            if value is None:
+                value = s.get("value", 0)
+            stat_name = names.stat(stat_hash)
+            if stat_name and value:
                 stats[stat_name] = value
         return stats
 

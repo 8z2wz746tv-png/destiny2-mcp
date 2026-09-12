@@ -13,6 +13,8 @@ from ..manifest import class_type_name, resolve_character_name
 
 if TYPE_CHECKING:
     from ..manifest import ManifestManager
+from ..manifest_names import names_for
+from . import weapon_profile
 
 class WeaponRollFilterService:
     """Filter weapon instances by explicit name, location, and perk terms."""
@@ -269,9 +271,8 @@ class WeaponRollFilterService:
             "icon_url": str(info.get("icon") or "") if isinstance(info, dict) else "",
         }
 
-    @classmethod
     def _compact_catalog_weapon(
-        cls,
+        self,
         weapon: dict[str, Any],
         matched_perks: list[str],
         matched_perk_details: list[dict[str, Any]],
@@ -282,14 +283,9 @@ class WeaponRollFilterService:
             "nameEn": weapon.get("nameEn", ""),
             "item_hash": weapon.get("itemHash", 0),
             "weapon_type": weapon.get("itemTypeNameDisplay", ""),
-            "tier": {5: "传说", 6: "异域"}.get(tier, ""),
-            "damage_type": {
-                0: "", 1: "动能", 2: "电弧", 3: "烈日", 4: "虚空",
-                5: "冰影", 6: "编织", 7: "棱镜",
-            }.get(weapon.get("damageType", 0), ""),
-            "ammo_type": {1: "主要", 2: "特殊", 3: "威能"}.get(
-                weapon.get("ammoType", 0), ""
-            ),
+            "tier": weapon_profile.rarity_of(tier),
+            "damage_type": names_for(self._manifest).damage_type(weapon.get("damageType")),
+            "ammo_type": names_for(self._manifest).ammo_type(weapon.get("ammoType")),
             "matched_perks": matched_perks,
             "matched_perk_details": matched_perk_details,
             "icon_url": weapon.get("icon", ""),

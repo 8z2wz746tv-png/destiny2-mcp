@@ -139,7 +139,8 @@ def diff(before_dir: Path, after_dir: Path, allowlist_path: Path) -> tuple[str, 
         lines.append("")
         lines.append(f"### `{case_id}`")
         if added:
-            lines.append(f"- 新增 {len(added)} 个路径：" + "、" + "".join(f"`{p}`" for p in added[:12]) + ("…" if len(added) > 12 else ""))
+            shown = "、".join(f"`{p}`" for p in added[:12])
+            lines.append(f"- 新增 {len(added)} 个路径：{shown}" + ("…" if len(added) > 12 else ""))
         if changed:
             lines.append(f"- 值变化 {len(changed)} 个（非易变字段）：" + "、".join(f"`{p}`" for p in changed[:8]) + ("…" if len(changed) > 8 else ""))
         for path in removed:

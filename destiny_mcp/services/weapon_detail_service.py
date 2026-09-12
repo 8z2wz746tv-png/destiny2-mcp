@@ -15,6 +15,8 @@ from ..models import (
     WeaponSocketInfo,
     WeaponStats,
 )
+from ..manifest_names import names_for
+from . import weapon_profile
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
 from .inventory_service import (
@@ -28,19 +30,6 @@ logger = get_logger(__name__)
 
 class WeaponDetailService:
     """Comprehensive weapon detail queries by weapon type."""
-
-    # Ammo type mapping
-    _AMMO_TYPES = {1: "白弹", 2: "绿弹", 3: "紫弹"}
-
-    # Damage type hash → name (unsigned, matching API response)
-    _DAMAGE_TYPE_NAMES = {
-        3373582085: "动能",
-        2303181850: "电弧",
-        1847026933: "烈日",
-        3454344768: "虚空",
-        151347233: "冰影",
-        3949783978: "缚丝",
-    }
 
     def __init__(
         self,
@@ -265,7 +254,7 @@ class WeaponDetailService:
             inst_info = instances_data.get(inst_id, {})
             power = inst_info.get("primaryStat", {}).get("value")
             damage_type_hash = inst_info.get("damageTypeHash", 0)
-            damage_type = self._DAMAGE_TYPE_NAMES.get(damage_type_hash, "")
+            damage_type = names_for(self._manifest).damage_type(damage_type_hash)
 
             w_info = hash_to_info.get(item_hash, {})
             weapon_name = w_info.get("name", self._manifest.get_item_name(item_hash))
@@ -273,13 +262,13 @@ class WeaponDetailService:
             icon_url = w_info.get("icon", "")
             weapon_type = w_info.get("itemTypeNameDisplay", type_name)
             tier_num = w_info.get("tier", 0)
-            tier = {5: "传说", 6: "异域"}.get(tier_num, "")
+            tier = weapon_profile.rarity_of(tier_num)
 
             weapon_def = self._manifest.get_item_definition(item_hash)
             ammo_type_val = 0
             if weapon_def:
                 ammo_type_val = weapon_def.get("equippingBlock", {}).get("ammoType", 0)
-            ammo_type = self._AMMO_TYPES.get(ammo_type_val, "")
+            ammo_type = names_for(self._manifest).ammo_type(ammo_type_val)
 
             socket_list = sockets_data.get(inst_id, {}).get("sockets", [])
             sockets: list[WeaponSocketInfo] = []
