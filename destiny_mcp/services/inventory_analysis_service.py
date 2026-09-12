@@ -6,6 +6,7 @@ from typing import Any
 
 from ..exceptions import AuthenticationError, ConfigError
 from ..logging_config import get_logger
+from . import profile_components
 from ..manifest import ManifestManager
 from ..models import InventoryItem
 from ..player_resolver import PlayerResolver
@@ -19,8 +20,8 @@ from ..utils.item_parser import parse_items_from_profile
 
 logger = get_logger(__name__)
 
-PROFILE_COMPONENTS = [102, 200, 201, 205, 300, 304]
-DUPLICATE_WEAPON_PROFILE_COMPONENTS = [102, 200, 201, 205, 300, 305]
+PROFILE_COMPONENTS = profile_components.INVENTORY
+DUPLICATE_WEAPON_PROFILE_COMPONENTS = profile_components.INVENTORY_SOCKETS
 
 _WEAPON_BUCKETS = {"Kinetic Weapons", "Energy Weapons", "Power Weapons"}
 _ARMOR_BUCKETS = {"Helmet", "Gauntlets", "Chest Armor", "Leg Armor", "Class Armor"}

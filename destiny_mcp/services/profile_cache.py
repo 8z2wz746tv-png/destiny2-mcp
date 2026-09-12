@@ -21,15 +21,16 @@ from ..exceptions import DestinyMCPError
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
 from .account_action_lock import ReentrantAsyncLock
+from . import profile_components
 
 logger = logging.getLogger(__name__)
 
 # Components needed for full inventory display + weapon comparison.
 # 302=ItemPerks, 304=ItemStats, 305=ItemSockets, 310=ItemReusablePlugs.
-_FULL_COMPONENTS = [102, 200, 201, 205, 300, 302, 304, 305, 310]
+_FULL_COMPONENTS = profile_components.FULL
 
 # Components for basic inventory (no sockets)
-_BASIC_COMPONENTS = [102, 200, 201, 205, 300, 304]
+_BASIC_COMPONENTS = profile_components.INVENTORY
 
 
 @dataclass
@@ -48,7 +49,7 @@ class ProfileCache:
 
     Usage:
         cache = ProfileCache(resolver, manifest)
-        profile = await cache.get_profile("player#1234", [102, 200, 201, 205, 300, 304])
+        profile = await cache.get_profile("player#1234", profile_components.INVENTORY)
     """
 
     def __init__(

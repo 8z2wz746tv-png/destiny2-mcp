@@ -9,6 +9,7 @@ from __future__ import annotations
 from ..bungie_client import BungieClient
 from ..exceptions import DefinitionNotFoundError
 from ..logging_config import get_logger
+from . import profile_components
 from ..manifest import ManifestManager, resolve_character_name
 from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
@@ -85,7 +86,7 @@ class ArtifactService:
         mtype = p["membership_type"]
 
         profile = await self._resolver.get_profile(
-            mid, mtype, [100, 102, 200, 201, 205, 300, 302]
+            mid, mtype, profile_components.ARTIFACT
         )
 
         characters = profile.get("characters", {}).get("data", {})

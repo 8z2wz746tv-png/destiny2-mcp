@@ -36,7 +36,9 @@ CEILINGS = {
     "destiny_mcp/build/farm_target.py": 1296,
     "destiny_mcp/bungie_client.py": 1219,
     "destiny_mcp/services/build_service.py": 1114,
-    "destiny_mcp/services/loadout_equipment_service.py": 794,
+    # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
+    # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
+    "destiny_mcp/services/loadout_equipment_service.py": 795,
     "destiny_mcp/services/starside_service.py": 769,
 }
 

@@ -69,6 +69,11 @@ ROLL_KINDS: frozenset[str] = frozenset({"intrinsic", "barrel", "magazine", "trai
 FULL_OPTION_KINDS: frozenset[str] = ROLL_KINDS | {"mod", "catalyst"}
 NON_DETAIL_OPTION_SAMPLE = 3
 
+# 实例级（副本级）只对 roll 栏给全量：模组/大师杰作/纪念物这些"每个副本都差不多"的栏，
+# 一件武器能列 17 个模组 + 11 个大师杰作，列表里 5 把武器就撑到 100 KB 以上（实测）。
+# 计数 + 少量样本 + options_truncated 已经能回答"这栏能不能换"，要全量就单把武器再问。
+INSTANCE_FULL_OPTION_KINDS: frozenset[str] = ROLL_KINDS
+
 SLOT_LABELS: dict[str, str] = {
     "intrinsic": "框架",
     "barrel": "枪管",
@@ -516,6 +521,172 @@ def socket_options(
             socket["options_truncated"] = True
         sockets.append(socket)
     return sockets
+
+
+# 物品 state 位（组件 102/201/205 的 item.state）。来源：Bungie 官方 OpenAPI 生成的
+# bungie-api-ts `ItemState`（destiny2/interfaces.js）：
+#   None=0, Locked=1, Tracked=2, Masterwork=4, Crafted=8, HighlightedObjective=16
+# 注意这是**现版本**的位序；老资料里 Crafted=4 / Masterworked=32 已经不对了，别照抄。
+# 真机交叉核对（1873 件）：Locked=250 件；Tracked=0 件（该账号没追踪任务）；
+# Crafted 置位的 204 件里 170 件定义可锻造 —— 与语义一致。
+ITEM_STATE_LOCKED = 1
+ITEM_STATE_TRACKED = 2
+ITEM_STATE_MASTERWORK = 4
+ITEM_STATE_CRAFTED = 8
+
+
+def item_state_flags(state: Any) -> dict[str, bool | None]:
+    """把 item.state 位掩码翻成字段；读不到就给 None（不猜 False）。"""
+    if not isinstance(state, int) or isinstance(state, bool):
+        return {"locked": None, "tracked": None}
+    return {
+        "locked": bool(state & ITEM_STATE_LOCKED),
+        "tracked": bool(state & ITEM_STATE_TRACKED),
+    }
+
+
+def instance_fields(instance: Mapping[str, Any] | None) -> dict[str, Any]:
+    """组件 300（itemInstances）里的副本级字段 + 缺失清单。
+
+    `gear_tier` 是《护甲 3.0》的 T1–T5（0 = 旧装备），`item_level`/`quality` 由 Bungie 给。
+    这些字段**只在账号数据里**，Manifest 里查不到；没取到就留 None，并说明缺了什么，
+    避免调用方把"没读到"当成"没有"。
+    """
+    data: Mapping[str, Any] = instance if isinstance(instance, Mapping) else {}
+    fields: dict[str, Any] = {}
+    missing: list[str] = []
+    for key, source in (("gear_tier", "gearTier"), ("item_level", "itemLevel"), ("quality", "quality")):
+        value = data.get(source)
+        if isinstance(value, int) and not isinstance(value, bool):
+            fields[key] = value
+        else:
+            fields[key] = None
+            missing.append(key)
+    fields["missing"] = missing
+    return fields
+
+
+def _instance_plug_hashes(raw_plugs: Any) -> list[int]:
+    """310 里某一栏的可插 plug：`[{"plugItemHash":…, "canInsert":…}, …]`。"""
+    hashes: list[int] = []
+    seen: set[int] = set()
+    for item in raw_plugs or []:
+        if not isinstance(item, Mapping):
+            continue
+        if item.get("canInsert") is False:
+            continue  # 这个副本插不进去（该栏已被锁死/等级不够）
+        plug_hash = int(item.get("plugItemHash") or 0)
+        if not plug_hash or plug_hash in seen:
+            continue
+        seen.add(plug_hash)
+        hashes.append(plug_hash)
+    return hashes
+
+
+def instance_options(
+    manifest: "ManifestManager",
+    definition: Mapping[str, Any] | None,
+    reusable_plugs: Mapping[str, Any] | None,
+    *,
+    equipped: list[int] | None = None,
+    names: Any = None,
+    pairs: EnhancedPairs | None = None,
+    include_descriptions: bool = True,
+    god_roll_lookup: Callable[[int], tuple[bool, bool]] | None = None,
+) -> list[dict]:
+    """**这一件副本**能换成什么（组件 310 itemReusablePlugs）。
+
+    定义级的池子是"这把枪原则上能出什么"，实例级才是"我手上这把能换成什么"。
+    真机核对了 745 件武器的特性栏（只统计 plug 类别为 frames 的栏，去掉 canInsert=false）：
+
+    | 情形 | 每栏可插数 |
+    | --- | --- |
+    | T5（非锻造） | 大多 3（305 件里 286 件），少数 2 或 1 |
+    | T4（非锻造） | 2（16/16） |
+    | T3（非锻造） | 2（6/7） |
+    | T2（非锻造） | 1（2/2） |
+    | 锻造件（state 含 Crafted=8） | 通常只有 1 —— 310 只给当前选中的那个，不是全部可塑形项 |
+    | 无 T 级的旧装备（T0） | 1–6 不等，没有规律 |
+
+    所以**不能**拿 T 级去算可选项数量，也不能假定锻造件能列全：以 310 为准。
+    插槽与标签沿用定义级，保证两边按 `socket_index`/`slot` 对得上。
+    """
+    if not isinstance(reusable_plugs, Mapping):
+        return []
+    per_socket = reusable_plugs.get("plugs")
+    if not isinstance(per_socket, Mapping):
+        return []
+
+    if names is None:
+        from ..manifest_names import names_for
+
+        names = names_for(manifest)
+    pairs = pairs if pairs is not None else load_enhanced_pairs()
+
+    definition_sockets = socket_options(
+        manifest,
+        definition,
+        names=names,
+        pairs=pairs,
+        include_descriptions=include_descriptions,
+        god_roll_lookup=god_roll_lookup,
+    )
+    meta = {socket["socket_index"]: socket for socket in definition_sockets}
+
+    options: list[dict] = []
+    for key, entry in per_socket.items():
+        try:
+            index = int(key)
+        except (TypeError, ValueError):
+            continue
+        socket = dict(meta.get(index) or {})
+        plug_hashes = _instance_plug_hashes(entry)
+        if not plug_hashes:
+            continue  # 这一栏这个副本没有可换内容（真机上确实会出现 0/N）
+        built: list[dict] = []
+        for plug_hash in plug_hashes:
+            option = _plug_option(
+                manifest,
+                plug_hash=plug_hash,
+                names=names,
+                pairs=pairs,
+                include_descriptions=include_descriptions,
+                god_roll_lookup=god_roll_lookup,
+            )
+            if not option["name"]:
+                continue
+            built.append(option)
+        if not built:
+            continue
+        kind = str(socket.get("kind") or slot_kind(str(built[0].get("plug_category") or "")))
+        socket.update(
+            {
+                "slot": socket.get("slot") or slot_label(kind),
+                "kind": kind,
+                "scope": "instance",
+                "socket_index": index,
+                "option_count": len(built),
+            }
+        )
+        if kind in INSTANCE_FULL_OPTION_KINDS or len(built) <= NON_DETAIL_OPTION_SAMPLE:
+            socket["options"] = built
+        else:
+            socket["options"] = built[:NON_DETAIL_OPTION_SAMPLE]
+            socket["options_truncated"] = True
+        options.append(socket)
+    options.sort(key=lambda socket: socket.get("socket_index", 0))
+
+    # 现在装的是哪个（组件 305）：和可选项放一起，"换成什么"才有对照
+    for socket in options:
+        index = socket["socket_index"]
+        current = 0
+        if equipped and 0 <= index < len(equipped):
+            current = int(equipped[index] or 0)
+        socket["equipped_plug_hash"] = current
+        socket["equipped_name"] = (
+            str((manifest.get_item_info(current) or {}).get("name") or "") if current else ""
+        )
+    return options
 
 
 def roll_summary(sockets: list[dict], *, scope: str = "definition") -> dict:

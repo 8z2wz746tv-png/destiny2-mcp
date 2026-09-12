@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from ..exceptions import AuthenticationError, ConfigError
 from ..logging_config import get_logger
+from . import profile_components
 from ..manifest import ManifestManager, class_type_name
 from ..models import (
     WeaponDetail,
@@ -19,6 +20,7 @@ from ..manifest_names import names_for
 from . import weapon_profile
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
+from .profile_cache import ProfileCache
 from .inventory_service import (
     MISSING_INVENTORY_SCOPE_MESSAGE,
     looks_like_missing_inventory_scope,
@@ -35,9 +37,13 @@ class WeaponDetailService:
         self,
         manifest: ManifestManager,
         resolver: PlayerResolver,
+        profile_cache: ProfileCache | None = None,
     ) -> None:
         self._manifest = manifest
         self._resolver = resolver
+        # 武器详情要组件 310（这一个副本能换什么），真机实测整个 profile 从 3.3 MB 涨到 10.2 MB。
+        # 不接缓存就等于每次 type 查询都重新拉一遍；接上共享缓存后由 TTL 与后台刷新兜住。
+        self._profile_cache = profile_cache
 
     @staticmethod
     def _cat_to_label(cat: str, trait_counter: dict) -> str:
@@ -175,9 +181,14 @@ class WeaponDetailService:
         mid = p["membership_id"]
         mtype = p["membership_type"]
 
-        profile = await self._resolver.get_profile(
-            mid, mtype, [102, 200, 201, 205, 300, 304, 305]
-        )
+        if self._profile_cache:
+            profile = await self._profile_cache.get_profile(
+                player_name, profile_components.WEAPON_DETAIL
+            )
+        else:
+            profile = await self._resolver.get_profile(
+                mid, mtype, profile_components.WEAPON_DETAIL
+            )
         if looks_like_missing_inventory_scope(profile):
             raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)
         require_complete_inventory_components(profile)
@@ -196,6 +207,9 @@ class WeaponDetailService:
         )
         stats_data = (
             profile.get("itemComponents", {}).get("stats", {}).get("data", {})
+        )
+        reusable_data = (
+            profile.get("itemComponents", {}).get("reusablePlugs", {}).get("data", {})
         )
 
         # Step 4: Collect all matching weapon instances
@@ -227,6 +241,7 @@ class WeaponDetailService:
                 "item_hash": item_hash,
                 "location": location,
                 "is_equipped": is_equipped,
+                "state": raw.get("state"),
             })
 
         # From vault
@@ -296,6 +311,31 @@ class WeaponDetailService:
                 if mag_entry:
                     weapon_stats.magazine = mag_entry.get("value", 0)
 
+            # 副本级：T 级/等级/品质（组件 300）、上锁/追踪（item.state）、能换成什么（组件 310）
+            instance = weapon_profile.instance_fields(inst_info)
+            state_flags = weapon_profile.item_state_flags(wi.get("state"))
+            options = weapon_profile.instance_options(
+                self._manifest,
+                weapon_def,
+                reusable_data.get(inst_id),
+                equipped=[int(s.get("plugHash") or 0) for s in socket_list],
+            )
+
+            notes: list[str] = []
+            if instance["missing"]:
+                notes.append(
+                    "该副本缺少实例信息（组件 300 未返回）："
+                    + "、".join(instance["missing"])
+                    + " 为 null"
+                )
+            if state_flags["locked"] is None:
+                notes.append("库存条目未带 state 字段：locked/tracked 为 null")
+            if not options:
+                notes.append(
+                    "该副本没有可更换部件数据（组件 310 未返回）：options 为空，"
+                    "只能看当前已装的 sockets"
+                )
+
             details.append(WeaponDetail(
                 instance_id=inst_id,
                 item_hash=item_hash,
@@ -311,6 +351,13 @@ class WeaponDetailService:
                 perks_complete=perks_complete and bool(sockets),
                 stats=weapon_stats,
                 icon_url=icon_url,
+                gear_tier=instance["gear_tier"],
+                item_level=instance["item_level"],
+                quality=instance["quality"],
+                locked=state_flags["locked"],
+                tracked=state_flags["tracked"],
+                options=options,
+                notes=notes,
             ))
 
         details.sort(key=lambda d: (not d.is_equipped, -(d.power or 0), d.name))

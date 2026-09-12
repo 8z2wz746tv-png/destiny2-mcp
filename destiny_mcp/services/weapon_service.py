@@ -38,7 +38,7 @@ class WeaponService:
         self._compare_svc = WeaponCompareService(
             manifest, resolver, self._perk_svc, wishlist, profile_cache,
         )
-        self._detail_svc = WeaponDetailService(manifest, resolver)
+        self._detail_svc = WeaponDetailService(manifest, resolver, profile_cache)
 
     async def get_weapon_perks(self, weapon_name: str) -> WeaponPerkPool:
         return await self._perk_svc.get_weapon_perks(weapon_name)

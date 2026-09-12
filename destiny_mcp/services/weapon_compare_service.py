@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from ..exceptions import AuthenticationError, ConfigError, ItemNotFoundError
 from ..logging_config import get_logger
+from . import profile_components
 from ..manifest import ManifestManager, class_type_name
 from ..models import (
     PerkInfo,
@@ -105,11 +106,11 @@ class WeaponCompareService:
         # Step 3: Fetch profile with inventory + socket data
         if self._profile_cache:
             profile = await self._profile_cache.get_profile(
-                player_name, [102, 200, 201, 205, 300, 305]
+                player_name, profile_components.INVENTORY_SOCKETS
             )
         else:
             profile = await self._resolver.get_profile(
-                mid, mtype, [102, 200, 201, 205, 300, 305]
+                mid, mtype, profile_components.INVENTORY_SOCKETS
             )
         if looks_like_missing_inventory_scope(profile):
             raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)

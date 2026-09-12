@@ -23,6 +23,7 @@ import aiobungie
 from ..bungie_client import BungieClient
 from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..logging_config import get_logger
+from . import profile_components
 from ..manifest import BUNGIE_BASE_URL, ManifestManager, class_type_name, resolve_character_name
 from ..models import (
     Loadout,
@@ -479,7 +480,7 @@ class LoadoutService:
         p = await self._resolver.resolve_player(player_name)
         mid, mtype = p["membership_id"], p["membership_type"]
         profile = await self._resolver.get_profile(
-            mid, mtype, [102, 200, 201, 205, 206]
+            mid, mtype, profile_components.LOADOUT_SLOTS
         )
 
         loadouts_data = profile.get("characterLoadouts", {}).get("data", {})
@@ -611,7 +612,7 @@ class LoadoutService:
         p = await self._resolver.resolve_player(player_name)
         mid, mtype = p["membership_id"], p["membership_type"]
         profile = await self._resolver.get_profile(
-            mid, mtype, [102, 200, 201, 205, 300, 304, 305]
+            mid, mtype, profile_components.ARMOR_SNAPSHOT
         )
 
         # Find the character ID for this class

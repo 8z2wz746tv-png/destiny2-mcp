@@ -14,6 +14,7 @@ import anyio
 from ..bungie_client import BungieClient
 from ..exceptions import DestinyMCPError, ItemNotFoundError, TransferError
 from ..logging_config import get_logger
+from . import profile_components
 from ..manifest import ManifestManager
 from ..models import (
     Loadout,
@@ -369,7 +370,7 @@ class LoadoutEquipmentService(ModSocketMixin, SubclassSocketMixin):
         p = await self._resolver.resolve_player(player_name)
         mid, mtype = p["membership_id"], p["membership_type"]
         profile = await self._resolver.get_profile(
-            mid, mtype, [102, 200, 201, 205, 300, 304, 305]
+            mid, mtype, profile_components.ARMOR_SNAPSHOT
         )
         chars = profile.get("characters", {}).get("data", {})
         char_id = next(
@@ -599,7 +600,7 @@ class LoadoutEquipmentService(ModSocketMixin, SubclassSocketMixin):
         mtype = recovery["membership_type"]
 
         current_profile = await self._resolver.get_profile(
-            mid, mtype, [102, 200, 201, 205, 300]
+            mid, mtype, profile_components.INVENTORY_MINIMAL
         )
         current_items = {
             item.item_instance_id: item
@@ -757,7 +758,7 @@ class LoadoutEquipmentService(ModSocketMixin, SubclassSocketMixin):
         p = await self._resolver.resolve_player(player_name)
         mid, mtype = p["membership_id"], p["membership_type"]
         profile = await self._resolver.get_profile(
-            mid, mtype, [102, 200, 201, 205, 300, 305]
+            mid, mtype, profile_components.INVENTORY_SOCKETS
         )
         current_items = {
             item.item_instance_id: item

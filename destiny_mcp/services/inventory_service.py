@@ -8,6 +8,7 @@ from __future__ import annotations
 from ..bungie_client import BungieClient
 from ..exceptions import AuthenticationError, ConfigError, ItemNotFoundError
 from ..logging_config import get_logger
+from . import profile_components
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..build.models import InventorySnapshot
 from ..build.constants import ARMOR_SLOT_MAP, STAT_HASH_TO_NAME
@@ -18,8 +19,8 @@ from ..utils.item_parser import parse_items_from_profile
 
 logger = get_logger(__name__)
 
-_INVENTORY_PROFILE_COMPONENTS = [102, 200, 201, 205, 300, 304]
-_ARMOR_SNAPSHOT_COMPONENTS = [102, 200, 201, 205, 300, 304, 305]
+_INVENTORY_PROFILE_COMPONENTS = profile_components.INVENTORY
+_ARMOR_SNAPSHOT_COMPONENTS = profile_components.ARMOR_SNAPSHOT
 MISSING_INVENTORY_SCOPE_MESSAGE = (
     "当前 Bungie OAuth token 缺少库存/仓库权限 ReadDestinyInventoryAndVault，"
     "请在 Bungie Developer Portal 给应用开启该 scope 后重新完成 Bungie 授权。"

@@ -12,6 +12,7 @@ import asyncio
 from ..bungie_client import BungieClient
 from ..exceptions import AuthenticationError, ItemNotFoundError, TransferError
 from ..logging_config import get_logger
+from . import profile_components
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..models import (
     EquipResult,
@@ -57,7 +58,7 @@ class TransferService:
     ) -> list[InventoryItem]:
         """Fetch all items across the account."""
         profile = await self._resolver.get_profile(
-            membership_id, membership_type, [102, 200, 201, 205, 300, 304]
+            membership_id, membership_type, profile_components.INVENTORY
         )
         if looks_like_missing_inventory_scope(profile):
             raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)

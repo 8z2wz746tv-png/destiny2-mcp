@@ -279,9 +279,38 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
   装饰类被裁、箭头制退器效果、强化配对可用；生成物与当前 Manifest 重跑逐条一致。
 - 基线 diff：唯一"消失"是 `data.god_roll`（字符串 → 结构），已按规矩登记 allowlist 与理由。
 
-### P3 · 组件与实例级
-- `profile_components.py` 收拢；加 310/302/308；实例级 `gear_tier`/`item_level`/`quality`/`locked`/`tracked`/`options`。
-- 验收：T5/T4/T3/T2 各一例核对特性栏可选项（3/2/2/1）；未读账号字段为 null + 说明；**对比 P0 的耗时/体积基线**并记录结论。
+### P3 · 组件与实例级 ✅ 已完成
+- `profile_components.py` 收拢 17 处字面量，且**每个常量精确等于它替换掉的那串数字**
+  （`[102,200,201,205,300,305]` 与 `[102,200,201,205,300,304,305]` 是两个集合，替错就悄悄多取组件）。
+  `tests/test_profile_components.py` 把数字钉死，并禁止服务里再出现裸组件字面量。
+- 加 310/302/308：`WEAPON_DETAIL = INVENTORY + [305, 302, 310, 308]`，实例级字段进 `WeaponDetail`：
+  `gear_tier` / `item_level` / `quality` / `locked` / `tracked` / `options`（副本级可换部件）+ `notes`。
+- **`item.state` 位序按官方生成类型**（`bungie-api-ts` 的 `ItemState`）：Locked=1、Tracked=2、
+  Masterwork=4、Crafted=8、HighlightedObjective=16。老资料里的 Crafted=4 / Masterworked=32 是错的；
+  真机交叉核对：Locked 250 件、Tracked 0 件、Crafted 置位的 204 件里 170 件定义可锻造。
+- **"能换几个"以 310 为准，不能拿 T 级去算**（745 件武器特性栏实测）：
+
+  | 情形 | 每栏可插数 |
+  | --- | --- |
+  | T5（非锻造） | 大多 3（305 件中 286 件），少数 2 或 1 |
+  | T4 / T3（非锻造） | 2 |
+  | T2（非锻造） | 1 |
+  | 锻造件（Crafted 位） | 通常只有 1 —— 310 只给当前选中的那个 |
+  | 无 T 的旧装备 | 1–6 不等，无规律 |
+
+- **成本与对策**（P0 基线对比，26 例）：
+  - 体积 391.3 KB → 455.3 KB（+64 KB，全部是新增字段）；唯一明显增长是 `type_list`
+    31 → 89.4 KB（5 把武器带实例选项 ≈ +11.7 KB/把）。已砍一刀：实例级只对 roll 栏给全量，
+    模组/大师杰作/纪念物给"计数 + 3 样本 + `options_truncated`"（砍前该例 135.5 KB）。
+  - 取档：310 让整份 profile 从 **3.3 MB 涨到 10.2 MB**（1425 个实例带 reusablePlugs）。
+    对策：武器详情改走共享 `ProfileCache`，`FULL` 补上 308 以免后台刷新把并集降级；
+    实测第一次 `type` 25.3 s（真实取档 1 次）→ 紧接着同一查询 **2.7 s、0 次取档**。
+  - 耗时总计 44 s → 83 s 受 Bungie 网络波动影响大（本例 `vendor_banshee` 单例就从 3.0 s 飘到 8.5 s），
+    故以"取档次数 + 暖态耗时"为准，不以总耗时为判据。
+  - 未读字段一律 `null` + `notes` 说明（无 310 → `options` 空并注明；无 300 → 三个字段 null；无 state → locked/tracked null）。
+- 验收：`tests/test_weapon_instance.py`（30 条）覆盖位序、缺失、canInsert 过滤、去重、
+  未知槽位下标、裁断、以及服务层"组件缺了要说清楚"；真机四档 T 各一例核对通过；
+  基线 diff 无「无理由消失」。
 
 ### P4 · 十处形状收敛
 - 改 6 个服务 + 工具分支 + `inventory.type` 边界；`stats` 改动态属性；交付 `old → new` 键映射表（写进 `TESTING_CORPUS.md` 武器章节附录）。

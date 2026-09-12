@@ -87,6 +87,21 @@ class WeaponDetail(BaseModel):
     perks_complete: bool = Field(default=False, description="All current socket plugs were resolved")
     stats: WeaponStats = Field(default_factory=WeaponStats, description="Weapon stat values")
     icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
+    # ── 副本级（组件 300/310）：账号数据，Manifest 里没有；没读到就是 None ──
+    gear_tier: int | None = Field(
+        default=None, description="护甲 3.0 的 T1–T5 等级（0 = 旧装备）；没读到为 null"
+    )
+    item_level: int | None = Field(default=None, description="Bungie 给的 itemLevel；没读到为 null")
+    quality: int | None = Field(default=None, description="Bungie 给的 quality；没读到为 null")
+    locked: bool | None = Field(default=None, description="是否已上锁；没读到为 null")
+    tracked: bool | None = Field(default=None, description="是否已追踪；没读到为 null")
+    options: list[dict] = Field(
+        default_factory=list,
+        description="副本级可选部件（组件 310）：这一件能换成什么，按 socket_index 与 sockets 对齐",
+    )
+    notes: list[str] = Field(
+        default_factory=list, description="这把武器的数据说明（哪些账号字段没读到、为什么为空）"
+    )
 
 
 class WeaponDetailResponse(BaseModel):
