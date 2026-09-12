@@ -391,22 +391,26 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
 
 ---
 
-## 7. 验收清单
+## 7. 验收清单（逐条结论，真机数据实测）
 
-- [ ] 稀有度一份表；蓝/绿/白不再是空串（Ψ卷云II=稀有、刚愎自用=普通）；老武器 T 级显示"无"
-- [ ] 身份块含 `frame`/`intrinsic`/`rpm`(遗产 65)/`breaker_type`/`trait_ids`/`source`/`is_craftable`/`has_enhanced`/`gear_tier`/`roll_summary`
-- [ ] 泰拉巴 `frame=null` + `intrinsic="贪食野兽"`，话术用"异域专属特性"
-- [ ] `sockets` 覆盖全部插槽（含大师杰作/模组/纪念物/追踪器）；`kind`/`scope` 正确
-- [ ] 定义级给完整池（遗产特性栏 19 + 退役标记 + 强化配对）；实例级给 T 级与可选项（T5 遗产特性栏 3）
-- [ ] 强化成对（`enhanced` + 互指 `enhanced_plug_hash`）；`has_enhanced` 正确
-- [ ] perk 带 `stat_effects`（箭头制退器：后坐 +30、操控 +10）
-- [ ] `stats` 按 StatGroup 输出，含 冲击力/充能时间
-- [ ] 本地数据都在模板里：`farming`（含必刷特性与 `source_ref.updated_at`）、`popularity`（按 plug_hash 对齐）、`community`、`sources`
-- [ ] 遗产 `farming.list="刷取清单-绿弹紫枪"`、`tier="T1"`、`source="深岩墓室"`；`cross_check` 标出清单的 RPM 65
-- [ ] 同一 perk 的本地结论汇总在 `options[].recommended`
-- [ ] 组件集合唯一；未读账号字段为 null + 说明
-- [ ] 键集合快照通过；列表类都有 `total/returned/truncated`
-- [ ] 人话层与基线一致（只允许增补）；`baseline diff` 无"无理由消失"
-- [ ] 内部消费者回归：社区配装匹配、vendor 愿单标记测试仍绿
-- [ ] `perk_pool` ≤ 10 KB 量级（P6）
-- [ ] `pytest` 全绿、`PARAMETER_GUARD=ok`、8 个工具、语料武器行逐条实跑
+- [x] 稀有度一份表；Ψ卷云II=稀有(4)、刚愎自用=普通(2)、遗产=传说(5)、异域=6；老武器 `gear_tier=0 → null` + 说明
+- [x] 身份块含 `frame`/`intrinsic`/`rpm`/`breaker_type`/`trait_ids`/`is_craftable`/`has_enhanced`/`gear_tier`/`roll_summary`（+`watermark`/`description`/`icon_url`/`name_en`/`rarity_tier`）
+- [x] 泰拉巴 `frame=null` + `intrinsic="贪食野兽"`（异域固有槽是专属特性，不是框架）
+- [x] `sockets` 覆盖全部 15 个插槽（含着色器/模组×3/大师杰作/纪念物/追踪器/装饰）；`kind`/`scope` 枚举固定
+- [x] 定义级给完整池（遗产 枪管 22 / 弹匣 16 / 特性 20+20，含退役 `can_roll=false` 与强化配对）；
+      实例级给 T 级与可选项（T5 每特性栏 3、T4/T3 各 2、T2 为 1；锻造件通常 1）
+- [x] 强化成对：`enhanced_plug_hash` 互指（自己就是强化版时指向自己）；`has_enhanced` 聚合正确
+- [x] perk 带 `stat_effects`：箭头制退器 实测 后坐方向 +30、操控性 +12（计划里写的 +10 是笔误，以数据为准）
+- [x] `stats` 按 `DestinyStatGroupDefinition` 输出，遗产 12 项（含 后坐方向/弹药生成，以前硬编码表里没有）
+- [x] 本地数据都在模板里：`farming`（必刷特性 + `source_ref.updated_at` + `cross_check`）、
+      `popularity`（按 plug_hash 对齐）、`community`、`sources[]`（来源/时间/trust）
+- [x] 遗产 `farming.list="刷取清单-绿弹紫枪"`、`tier="T1"`、`source="深岩墓室"`；
+      `cross_check.frame` = 清单「精确重击 65」 vs Manifest「精确重击框架」 agrees=true
+- [x] 同一 perk 的本地结论汇总在 `options[].recommended`（真机：遗产 24 个选项带结论）
+- [x] 组件集合唯一（`profile_components.py`，测试钉死数字）；未读账号字段 `null` + `notes`
+- [x] 键集合快照通过（`tests/test_weapon_keys_snapshot.py`，含异域场景）；列表类都有 `total/returned/truncated`
+- [x] 人话层只增补；`baseline diff` 无「无理由消失」（26 例）
+- [x] 内部消费者回归：社区配装匹配（starside）、vendor 愿单标记、filter_rolls 全绿
+- [ ] **`perk_pool` ≤ 10 KB 量级：未达成**（紧凑 JSON 24.7 KB / 基线口径 45.4 KB，与 P0 的 44.5 KB 持平）。
+      理由与取舍见 P6 记录：再压只能砍 `stat_effects`（选 perk 的依据）或栏位计数，不拿信息换数字。
+- [x] `pytest` 全绿（1228 条）、`PARAMETER_GUARD=ok`、8 个工具、语料 26 例逐条实跑全部 ok=true
