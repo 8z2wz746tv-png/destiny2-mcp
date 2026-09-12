@@ -275,6 +275,43 @@ perks:    sockets 里 roll 相关栏位（intrinsic/barrel/magazine/trait）的�
 - 写在**别处**的旧字段名会失效：自定义 prompt、第三方前端、外部脚本里如果写死了 `weapon.nameEn`、`god_roll`（字符串）、`perk_pool.slots[].slot_name` 这类，需要一起改（本仓库内已确认没有这类外部消费方）；
 - 切换后必须**新开任务**：工具 schema 与 docstring 是宿主连接时读的。
 
+### 3.7 数据驱动的边界（"改一处会不会牵一发动全身"）
+
+先把话分开：**"乱"的来源不是数据驱动，而是同一个概念有多份定义** —— 稀有度表 3 份、属性硬编码 10 项、组件列表 17 处、名称表 3 张、强化配对 0 份。把数据库接进来、并且**只接一处**，是在减少耦合；让每个服务各自查库、各自硬编码，才是牵一发动全身。
+
+#### 三层边界
+
+| 层 | 归谁 | 内容 | 改这里的影响 |
+| --- | --- | --- | --- |
+| **契约层**（代码，稳定） | 我们定义 | 字段名与结构、枚举取值（`kind`/`scope`/`roll_kind`）、哪些 intent 输出哪几块、话术、上限/截断、错误码 | 显式改契约 + 改快照测试，diff 可见 |
+| **适配层**（代码，薄） | 一处：`weapon_profile` + `manifest_names` | 把 Manifest 翻译成稳定结构；**其它服务不许自己查库** | 只影响这一层内部 |
+| **数据层**（DB，动态） | Bungie | 名称文案、稀有度、属性集合与顺序、插槽集合、perk 池、`can_roll`、强化配对、可锻造、来源、破盾、trait | **不用改代码** |
+
+#### 什么数据驱动、什么写死
+
+| 由 DB 决定（内容动态） | 由代码写死（结构稳定） |
+| --- | --- |
+| 武器有哪些属性、顺序（`DestinyStatGroupDefinition`） | `stats[]` 里的字段名（`name`/`value`/`display`） |
+| 属性名、伤害/弹药/破盾名 | `kind`/`scope`/`roll_kind` 的取值集合 |
+| 有哪些插槽、每个插槽归哪类 | `sockets[]` 的字段名 |
+| perk 池、`can_roll`、强化配对、可锻造 | `options[].*` 的字段名 |
+| 五档稀有度、来源、trait、水印 | `rarity`/`rarity_tier` 这两个键本身 |
+| —— | 3.4 那张"哪个 intent 带哪几块本地数据"的覆盖表 |
+
+一句话：**结构固定、内容动态**。禁止让字段随武器变化（那才会牵一发动全身：调用方无法依赖键、测试无法快照）。
+
+#### 四个护栏
+
+1. **一处翻译 + 契约测试**：键集合快照测试；结构变更必须显式改测试，不允许悄悄变。
+2. **生成物 + 过期检测**：Manifest 里**没有版本号**（实测 83 张表全是 `Destiny*`，无 metadata），所以：下载 Manifest 时写一份指纹（文件 sha256 + 下载时间 + Bungie 响应里的 version 若存在）到 `manifest/fingerprint.json`；生成物（强化配对等）记录该指纹与参与生成的表行数。启动时廉价比对（行数 + 指纹），不一致就**告警"跑一下生成脚本"**，不阻塞启动。
+3. **fail-soft**：DB 缺字段（新属性没名字、新插槽没归类）→ 输出 hash/原值 + warning，**不抛异常、不静默丢**。
+4. **数据变了可追溯**：响应里标 `source` 与 `updated_at`；本地清单/选取率本来就带 `source_ref`。
+
+#### 明确不做
+
+- 不让 JSON 结构由 DB 推导（例如"属性字段随武器类型变"）—— 结构是契约，内容才是数据；
+- 不在服务层各自查库（那会把 17 处组件列表的坑复制到所有字段上）。
+
 ## 4. 分阶段任务
 
 ### P0 · 录基线（改动前）
@@ -284,7 +321,8 @@ perks:    sockets 里 roll 相关栏位（intrinsic/barrel/magazine/trait）的�
 ### P1 · `weapon_profile.py` + 名称表（纯函数，可单测）
 - 稀有度、`frame_of`/`intrinsic_of`/`rpm_of`、`roll_kind`、`socket_kinds`、`is_craftable`、`breaker_type`、`trait_ids`、`slot_kind`、身份块构造函数。
 - `manifest_names.py`：伤害/弹药/破盾/属性名查表（缓存），替掉 3 张硬编码表。
-- 验收：单测覆盖 6 把真实形态 + 框架三情形 + 稀有度 5 档 + 破盾 3 档 + 可锻造判定（遗产 true / 泰拉巴 false）。
+- `manifest/fingerprint.json`：下载 Manifest 时写 sha256 + 时间（+ Bungie version 若有）；生成物记指纹与表行数，启动时比对并在过期时告警。
+- 验收：单测覆盖 6 把真实形态 + 框架三情形 + 稀有度 5 档 + 破盾 3 档 + 可锻造判定（遗产 true / 泰拉巴 false）；指纹不一致时告警文案可见。
 
 ### P2 · 插槽与 perk 块（含强化、can_roll、数值效果、非 perk 插槽）
 - 遍历**所有**插槽（不再只认一个类别 hash），按 plug 类别归 `kind`；保留 `randomized/reusable/single` 三态。
@@ -346,5 +384,7 @@ perks:    sockets 里 roll 相关栏位（intrinsic/barrel/magazine/trait）的�
 - [ ] 响应体积：`perk_pool` 从 32 KB 降到 10 KB 量级（若做 P6）
 - [ ] baseline diff 报告里**没有"无理由消失"的字段**（P0 的硬门槛）
 - [ ] 人话层不变：同一批问法的 `summary`/`warnings`/`next_actions` 与基线一致（只允许增补）
+- [ ] 结构与内容分离：换一份 Manifest（行数变了）时，字段名不变、内容自动跟随；生成物过期会告警而不是静默用旧数据
+- [ ] DB 缺字段时不抛异常：输出 hash/原值 + warning
 - [ ] 内部消费者回归：社区配装库存匹配（starside）与商人商品愿单标记的测试仍绿
 - [ ] `pytest` 全绿、`PARAMETER_GUARD=ok`、8 个工具、语料武器行逐条实跑
