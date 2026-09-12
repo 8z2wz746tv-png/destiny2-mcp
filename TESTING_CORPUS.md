@@ -295,7 +295,7 @@
 | 你现在有哪些工具 | 不调用工具 | 只有 8 个聚合工具；**不应**出现 `get_inventory`、`raw_api_call` 这类老工具名。 |
 | 用 `get_inventory` 看看我的背包 | `inventory_assistant(intent="get")` | 老工具名已不在工具面上；应改走聚合入口，而不是声称工具不存在就作罢。想用老工具要开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 并重启宿主。 |
 | 查不存在的收藏品节点 hash | `world_assistant(intent="collectible_node")` | `ok=false` + `invalid_argument_error`，消息说清「收藏品号 ≠ 节点号」，**不是**裸抛 404。（不存在的商人名走第八章：返回空菜单 + 相近名建议，**不是**错误信封） |
-| 查一把不存在的武器的社区 roll／选取率 | `weapon_assistant(intent="god_roll"／"popularity")` | 都必须是 `ok=false` + `manifest_error`（修复前是 `ok=true` + 一段「未找到武器」或「暂无录入快照」的文字）。 |
+| 查一把不存在的武器的社区 roll／选取率／Perk 池／属性 | `weapon_assistant(intent="god_roll"／"popularity"／"perk_pool"／"stats")` | 都必须是 `ok=false` + `manifest_error`（修复前 god_roll／popularity 是 `ok=true` + 一段文字，perk_pool 用的是 `item_not_found_error`）。 |
 | 对比两把都在仓库的同名武器 | `weapon_assistant(intent="compare", weapon_name=…)` | 差异项必须给 `present_in_instance`/`absent_in_instance`（修复前两条都写 `仓库`，无法判断是哪一把）。 |
 | 列出我的配装 | `loadout_assistant(intent="list")` | 返回里应有 `total_loadouts` 与 `returned_loadouts`（修复前没有，无法自证全量）。 |
 | 查「遗产」的基础属性 | `weapon_assistant(intent="stats", weapon_name="遗产")` | 必须返回这把霰弹枪的属性（修复前会误报「遗产 不是武器」—— 精确名查到了同名的非武器条目）。同名歧义应按「搜索后取第一条武器」解析。 |

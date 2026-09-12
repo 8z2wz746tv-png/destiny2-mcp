@@ -6,7 +6,7 @@ Extracted from weapon_service.py during refactoring.
 
 from __future__ import annotations
 
-from ..exceptions import ItemNotFoundError, ManifestError
+from ..exceptions import ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..models import PerkInfo, WeaponPerkPool, WeaponPerkSlot
@@ -81,7 +81,7 @@ class PerkService:
             WeaponPerkPool with perks grouped by slot.
 
         Raises:
-            ItemNotFoundError: If no weapon matches the name.
+            ManifestError: If no weapon matches the name.
         """
         logger.info("Looking up perk pool for: %s", weapon_name)
 
@@ -93,10 +93,9 @@ class PerkService:
                 weapon = r
                 break
         if not weapon:
-            raise ItemNotFoundError(
-                weapon_name,
-                "No weapon found with that name. Try a different search term.",
-            )
+            # 名字在 Manifest 里找不到武器 —— 这是 manifest_error，不是
+            # item_not_found_error（后者表示"账号里的东西没了"，用在这里会误导）。
+            raise ManifestError(f"找不到武器: {weapon_name}")
 
         item_hash = weapon["itemHash"]
         weapon_display_name = weapon["name"]
@@ -104,10 +103,7 @@ class PerkService:
         # Step 2: Get full weapon definition
         definition = self._manifest.get_item_definition(item_hash)
         if not definition:
-            raise ItemNotFoundError(
-                weapon_name,
-                "Weapon definition not found in manifest.",
-            )
+            raise ManifestError(f"找不到武器定义: {weapon_name}")
 
         weapon_type = definition.get("itemTypeDisplayName", "")
 
