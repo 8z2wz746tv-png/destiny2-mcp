@@ -167,6 +167,44 @@ class _CatalystManifest:
         return ""
 
 
+def test_catalyst_note_names_the_weapon_not_the_identity_block() -> None:
+    """P4 回归：`catalyst.weapon` 从字符串改成身份块后，note 里必须仍写**名字**。
+
+    真机跑语料时发现过 note 打印成 `[{'item_hash': …}]` —— 那种输出等于没说是哪把枪。
+    """
+
+    class _Manifest:
+        def search(self, query: str, *, limit: int = 20) -> list[dict]:
+            return [{"itemHash": 100, "name": "测试异域", "itemType": 3}]
+
+        def get_item_definition(self, item_hash: int) -> dict:
+            return {
+                "hash": 100,
+                "itemType": 3,
+                "itemTypeDisplayName": "榴弹发射器",
+                "displayProperties": {"name": "测试异域", "icon": "/w.png"},
+                "inventory": {"tierType": 6},
+            }
+
+        def get_english_name(self, item_hash: int) -> str:
+            return "Test Exotic"
+
+        def get_definition(self, table: str, hash_id: int) -> dict | None:
+            return None
+
+        def find_items_by_type(self, item_type: int, **kwargs: object) -> list[dict]:
+            return []
+
+    service = object.__new__(ManifestQueryService)
+    service._manifest = _Manifest()  # type: ignore[attr-defined]
+
+    result = service.get_catalyst_details("测试异域")
+
+    assert result["count"] == 0
+    assert "测试异域" in result["note"]
+    assert "item_hash" not in result["note"]
+
+
 def test_catalyst_on_legendary_reports_no_catalyst_instead_of_craft_levels() -> None:
     service = object.__new__(ManifestQueryService)
     service._manifest = _CatalystManifest()  # type: ignore[attr-defined]

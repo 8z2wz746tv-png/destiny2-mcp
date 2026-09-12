@@ -277,7 +277,10 @@ class ManifestQueryService:
         if not result_catalysts:
             return {
                 **base,
-                "note": f"本地 Manifest 里没有「{base['weapon']}」的催化剂定义（它可能确实没有催化剂）。",
+                "note": (
+                    f"本地 Manifest 里没有「{weapon_zh_name}」的催化剂定义"
+                    "（它可能确实没有催化剂）。"
+                ),
             }
 
         return {**base, "count": len(result_catalysts), "catalysts": result_catalysts}
