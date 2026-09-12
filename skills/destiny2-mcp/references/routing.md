@@ -319,13 +319,26 @@ Manifest 侧（**不代表拥有**）：
 
 ## 五、评级刻度：三种刻度不能混
 
-带武器或护甲的结果会附带 `farming_list`：按**精确名称**在本地清单里查的评级。每行都写明来自哪张清单、哪个 `scale`，跨刻度比较是错的。
+单把武器（`info`/`analyze`/`perk_pool`/`god_roll`）的清单评级在 `weapon.farming`，
+列表类（`type`/`catalog`/`filter_rolls`）在顶层 `farming_list`（覆盖整张列表）。
+每行都写明来自哪张清单、哪个 `scale`，跨刻度比较是错的；`weapon.sources[]` 给出来源与更新时间。
 
-### Perk 上的 `god_roll_pve` / `god_roll_pvp`
+`weapon.farming.cross_check` 是清单与**当前 Manifest** 的交叉核对：清单写的框架/伤害类型对不对得上、
+必刷特性现在还滚不滚得到（`in_manifest_pool` / `can_roll`）。`can_roll=false` 表示这个 perk 已退役，
+清单可能早于退役 —— 这时不能照抄清单叫人去刷。
 
-`perk_pool`、`analyze`、`compare` 返回的每个 Perk 都带这两个布尔标记，来源是本地 **DIM 社区愿单**：`true` 表示愿单给这把枪的推荐里包含这个 Perk。它和 `farming_list` 是两套数据，不要混着引用。
+### Perk 上的 `recommended`（本地结论就地汇总）
 
-愿单没装、没下载完，或者愿单里没有这把枪时，两个标记**全是 `false`** —— 那是「本地没收录」，不是「这些 Perk 都不好」。愿单在首次启动时自动下载；`weapon_assistant(intent="god_roll")` 给的是同一份数据的整理结果。
+每个插槽选项的 `recommended` 把四路结论并在一起，不用再按名字跨字段拼：
+
+- `recommended.wishlist`：`{pve, pvp}`，来源本地 **DIM 社区愿单**（`true` = 愿单给这把枪的推荐里包含它）；
+- `recommended.popularity`：`{selection_rate, rank, column}`，来源本地选取率快照（按 `plug_hash` 对齐）；
+- `recommended.farming`：`{columns, must_farm}`，来源刷取清单的必刷特性；
+- `recommended.community`：`{knowledge_id, match}`，社区资料里按**名字子串**命中的条目（只是"去哪儿看"的线索）。
+
+四路各自独立，也可能一个都没有（没装/没收录/没命中）——**缺一路不等于这一路给了否定结论**。
+愿单没装或没这把枪时不会出现 `recommended.wishlist`，不是"这些 Perk 都不好"。
+`weapon_assistant(intent="god_roll")` 给的是愿单那份数据的整理结果。
 
 - `scale="T"` —— 精选刷取清单（白弹／绿弹／威能紫枪、异域武器）。这才是「值不值得刷」的答案。`tier` 是 `T0`–`T4`，可能带限定语，例如 `T0（旧）` 表示旧版本；异域清单给的是 `scenario_tiers`，例如 `{"输出": "T0", "高难": "T0.5"}`，或者 `role` 这样的定位标签（如 `输出工具枪`）——`role` 是定位，不是档位。
 - `scale="S-F"` —— 购物清单（白弹／绿弹／威能／其他）。覆盖全部传说武器的梯队表，`S`–`F` 分级并在同弹种内带 `rank`。只在精选清单没覆盖时用，回答的是「它有多好」，不是「值不值得刷」。

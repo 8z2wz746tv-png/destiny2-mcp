@@ -134,7 +134,7 @@
 | （无） | `weapon.frame` / `rpm` / `roll_kind` / `has_enhanced` / `is_craftable` / `trait_ids` / `watermark` | P1/P2 新增 |
 | `perk_pool.{weapon_name, weapon_type, item_hash, icon_url}` | `weapon.*` | perk 池并入统一身份块 |
 | `perk_pool.slots[].slot_name`（英文） | `sockets[].slot` + `sockets[].kind` | 中文标签 + 稳定枚举；同名栏位编号（特性1/特性2） |
-| `perk_pool.slots[].plugs[] = {plug_hash, name, plug_category, description, icon_url, god_roll_*}` | `sockets[].options[] = {plug_hash, name, plug_category, description, icon_url, can_roll, enhanced, enhanced_plug_hash, stat_effects, god_roll_pve, god_roll_pvp}` | 选项自带"能不能滚到"（退役 perk `can_roll=false`）与强化配对 |
+| `perk_pool.slots[].plugs[] = {plug_hash, name, plug_category, description, icon_url, god_roll_*}` | `sockets[].options[] = {plug_hash, name, can_roll, enhanced_plug_hash}` + 按需 `stat_effects`/`recommended`/`plug_category` | 选项自带"能不能滚到"（退役 `can_roll=false`）与强化配对（`enhanced_plug_hash`）；愿单标记进 `recommended.wishlist`；**定义级不带 `description`/`icon_url`**（P6 体积口径，见下文） |
 | `inventory.weapon_name` | `comparison.weapon`（身份块，含 `owned`） | analyze 的 `inventory` 与 compare 同形状 |
 | `inventory|comparison.instances[].{instance_id, location, power, perks[], god_roll_score, icon_url}` | `instances[].{weapon.instance.{instance_id, location, power, locked, gear_tier, item_level}, sockets, options, stats}` | 副本字段进 `weapon.instance`；已装 plug 在 `sockets[].equipped`；可换项在 `options[]` |
 | `matched[].{nameEn, tier, damage_type, ammo_type}` | `matched[].{name_en, rarity, rarity_tier}` | 列表行 = 精简身份块（字段写死，见 `weapon_payload.LEAN_IDENTITY_KEYS`）；伤害/弹药类型要看 `info`/`analyze` |
