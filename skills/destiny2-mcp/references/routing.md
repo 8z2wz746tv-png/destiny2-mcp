@@ -36,7 +36,7 @@
 | --- | --- | --- |
 | `profile`（`get_profile`、`角色`、`档案`） | 我的角色列表、光等、基本档案 | `player_name` |
 | `search`（`search_player`） | 精确搜玩家，拿 `membership_id` 供后续复用 | `player_name` |
-| `find`（`find_players`、`fuzzy`） | 名字记不全时模糊搜，列候选 | `name_prefix` |
+| `find`（`find_players`、`fuzzy`） | 名字前缀模糊找人 —— ⚠️ **上游接口当前不可用**（返回 `a_p_i_error`）；请让用户给完整 `名字#1234` 走 `search`，别把它当"查无此人" | `name_prefix` |
 
 ### `inventory_assistant` —— 背包与仓库
 

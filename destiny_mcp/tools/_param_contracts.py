@@ -100,11 +100,17 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     # ══ player_assistant ═══════════════════════════════════════════════════
     ("player_assistant", "player_name"): _contract(
         _only("profile", "get_profile", "角色", "档案", "search", "search_player"),
-        hint='名字记不全时用 intent="find" 并把片段传给 name_prefix，而不是 player_name。',
+        hint=(
+            '名字不全时请让用户给出完整 Bungie 名（形如 名字#1234）再查；'
+            '模糊找人（intent="find"）的上游接口当前不可用，不要依赖它。'
+        ),
     ),
     ("player_assistant", "name_prefix"): _contract(
         _only("find", "find_players", "fuzzy"),
-        hint='名字记不全时用 intent="find" 并传 name_prefix；精确查人用 intent="search" 传 player_name。',
+        hint=(
+            '上游模糊搜索接口当前不可用（会返回 a_p_i_error）；'
+            '请让用户给完整 Bungie 名后用 intent="search" 传 player_name。'
+        ),
         suggestion=("player_assistant", "find"),
     ),
     # ══ inventory_assistant ════════════════════════════════════════════════
