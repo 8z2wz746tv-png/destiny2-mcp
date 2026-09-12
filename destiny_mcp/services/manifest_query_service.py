@@ -212,8 +212,8 @@ class ManifestQueryService:
                 self._manifest, weapon_def, instance_stats, names=names
             ),
         }
-        if (weapon_def.get("inventory") or {}).get("tierType") == 6:
-            template["weapon"]["catalysts"] = self._find_catalysts(weapon_def)
+        # 催化剂**不**挂进身份块：它只在 `catalyst` intent 给（`data.catalyst`），
+        # 否则异域武器的身份块会比别的 intent 多一个键，"同一把武器到哪都一个样"就破了。
         return template
 
     def _find_weapon_definition(self, weapon_name: str) -> tuple[int, dict]:

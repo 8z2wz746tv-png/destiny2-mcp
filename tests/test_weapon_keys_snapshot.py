@@ -333,6 +333,34 @@ async def test_list_rows_use_the_lean_identity_block(services) -> None:
     }
 
 
+async def test_exotic_weapons_keep_the_same_weapon_block_keys(services) -> None:
+    """异域武器曾经因为"身份块里塞 catalyst 列表"而比别的 intent 多一个键。
+
+    现在催化剂只在 `catalyst` intent 给（`data.catalyst`），身份块键集合必须处处一致。
+    """
+    services["manifest"]._items[WEAPON_HASH]["tier"] = 6  # 假装它是异域
+    definition = services["manifest"].get_item_definition
+    exotics: list[dict] = []
+
+    def exotic(item_hash: int) -> dict:
+        if item_hash == WEAPON_HASH:
+            exotics.append(item_hash)
+            found = definition(item_hash)
+            found["inventory"] = {"tierType": 6}
+            return found
+        return definition(item_hash)
+
+    services["manifest"].get_item_definition = exotic  # type: ignore[method-assign]
+
+    key_sets = {}
+    for intent in ("info", "perk_pool", "god_roll"):
+        response = await _call(services, intent=intent, weapon_name="测试武器")
+        key_sets[intent] = sorted(response["data"]["weapon"].keys())
+
+    assert key_sets["info"] == key_sets["perk_pool"] == key_sets["god_roll"]
+    assert "catalysts" not in key_sets["info"]
+
+
 async def test_missing_weapon_name_is_an_error_envelope_not_a_crash(services) -> None:
     for intent in ("analyze", "popularity"):
         response = await _call(services, intent=intent)
