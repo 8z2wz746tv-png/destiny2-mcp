@@ -162,7 +162,75 @@ perks:    sockets 里 roll 相关栏位（intrinsic/barrel/magazine/trait）的�
 5. **文档三处同源**：本计划、`TESTING_CORPUS.md` 武器章节、skill `routing.md` 武器章节；在现有"语料路由必须存在"的校验上，再加"武器 intent 覆盖"断言。
 6. **旧键一次性删掉**：不留双份（旧键只被本仓库语料/测试/skill 消费）。
 
-### 3.4 固定 / 随机的语义分支
+### 3.4 本地数据的挂载点（与现有工具功能的接驳）
+
+现在本地数据是**兄弟字段**、不是模板的一部分，五套形状互不相干：
+
+| 本地数据 | 现在挂在哪 | 形状 | 问题 |
+| --- | --- | --- | --- |
+| 刷取清单 `farming_list` | 只有 5 个 intent（info/analyze/perk_pool/type/filter_rolls）的**顶层兄弟字段** | `results[]`：`tier`/`scenario_tiers`/`role`/`frame`/`source`/`perks{三号位,四号位}`/`source_ref` | `god_roll`、`compare`、`popularity`、`catalyst`、`catalog` **完全没有**；清单里的"必刷特性"没进模板 |
+| 愿望单 | 唯一真正挂在 perk 上的：`god_roll_pve/pvp` | PerkInfo 两个布尔 | 只覆盖部分 intent |
+| 选取率 `popularity` | 只有 `intent="popularity"`，自带一套身份 | `perk_columns[].items[{plug_hash?,name,selection_rate}]`/`popular_combinations`/`masterworks`/`mods` | 与模板的 `sockets[].options[]` 无对应关系 |
+| Starside 社区资料 | info/analyze/perk_pool/perk_description 的 `community_references` | `results[{knowledge_id,title,snippet,source}]` + 顶层 `updated_at/snapshot_id` | 按**武器名**搜的通用结果，不按 perk / 不按栏位 |
+| 来源 | Manifest `collectible.sourceString` + 清单 `source` + Starside 文本 | 三处三样 | 模板没有 `sources` 字段 |
+
+清单条目实测（比预期丰富，**它自带一套并行身份**）：
+
+```json
+{"name": "遗产", "list": "刷取清单-绿弹紫枪", "scale": "T", "tier": "T1",
+ "frame": "精确重击 65", "element": "动能", "source": "深岩墓室",
+ "swap_dps": "10610", "remark": "动能合成", "note": "全游戏最高的单弹匣爆发 DPS…",
+ "perks": {"三号位": ["转向"], "四号位": ["聚合充能/级联点", "重组"]},
+ "source_ref": {"updated_at": "2026.9.6", "trust": "untrusted_reference"}}
+```
+
+注意 `frame: "精确重击 65"` —— 清单连**框架和 RPM** 都有，而我们从定义 `investmentStats` 取到的是 30（错的 hash 家族）。所以定两条规则：
+
+1. **Manifest 为准、清单可对照**：`frame`/`rpm` 以 Manifest 推出为准；清单值作为 `cross_check` 附上，两者不一致时标明（这正好是生成物/名称表要修的坑）。
+2. **本地数据统一挂进模板**，不再有兄弟字段：
+
+```jsonc
+"weapon": {
+  "sources": [                                     // 三处来源合并
+    {"kind": "manifest", "text": "异域记忆水晶；极稀有世界掉落"},
+    {"kind": "farming_list", "text": "深岩墓室", "list": "刷取清单-绿弹紫枪"},
+    {"kind": "community", "text": "…", "knowledge_id": "…"} ],
+  "farming": {                                     // 值不值得刷 + 必刷特性
+    "list": "刷取清单-绿弹紫枪", "scale": "T", "tier": "T1",
+    "scenario_tiers": {"输出": "T0"}, "role": null,
+    "rank": null, "note": "…", "cross_check": {"frame": "精确重击 65", "rpm": 65},
+    "recommended_perks": {"三号位": ["转向"], "四号位": ["聚合充能/级联点", "重组"]},
+    "source_ref": {"updated_at": "2026.9.6", "trust": "untrusted_reference"} },
+  "community": {"updated_at": "…", "matches": [{"knowledge_id": "…", "title": "…"}]},
+  "popularity": {"status": "当前", "version_label": "…", "source": {…},
+                 "columns": [{"slot": "枪管", "items": [{plug_hash, name, selection_rate}]}],
+                 "combinations": [...], "masterworks": [...], "mods": [...]} }
+```
+
+```jsonc
+// sockets[].options[] 里每个 plug 带本地结论，按 plug_hash 对齐（不再让调用方自己按名字拼）
+"options": [ { "plug_hash": 1, "name": "重组",
+               "recommended": {
+                 "wishlist":   {"pve": true, "pvp": false},
+                 "popularity": {"selection_rate": 12.4, "rank": 2, "column": "特性2"},
+                 "farming":    {"column": "四号位", "must_farm": true},
+                 "community":  {"knowledge_id": "…", "title": "…"} } } ]
+```
+
+**覆盖规则**（哪些 intent 带哪些本地数据，一次说清、由契约测试钉住）：
+
+| intent | 身份块 | sockets/perks | farming | popularity | community | sources |
+| --- | --- | --- | --- | --- | --- | --- |
+| `analyze` | ✅ | ✅ | ✅ | ✅（有快照时） | ✅ | ✅ |
+| `info` | ✅ | 定义级 | ✅ | — | ✅ | ✅ |
+| `perk_pool` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `god_roll` | ✅ | 固定/推荐 | ✅ | — | ✅ | ✅ |
+| `popularity` | ✅ | ✅（用于对齐） | ✅ | ✅ | — | ✅ |
+| `catalog` / `type` / `filter_rolls` | ✅ 精简 | — | 精简（`tier`+`source`） | — | — | 精简 |
+| `compare` | ✅ | 实例 | ✅ | — | — | ✅ |
+| `catalyst` | ✅ | 催化槽 | — | — | — | ✅ |
+
+### 3.5 固定 / 随机的语义分支
 
 | intent | `roll_kind="fixed"` | `roll_kind="random"` |
 | --- | --- | --- |
@@ -196,7 +264,10 @@ perks:    sockets 里 roll 相关栏位（intrinsic/barrel/magazine/trait）的�
 - `stats` 改为动态属性列表（按 StatGroup 顺序，补上攻击/能量/充能时间/冲击力/弹药生成）。
 - 验收：工具级测试逐 intent 断言键集合；真机四把武器 × 全部 intent 形状一致。
 
-### P5 · 语义分支、测试、语料、skill
+### P5 · 本地数据挂载 + 语义分支 + 测试/语料/skill
+- 把 `farming_list` / `community_references` / `popularity` 三个**兄弟字段**收进模板（`weapon.farming` / `weapon.community` / `weapon.popularity`），并把 wishlist/选取率/清单推荐/社区资料按 `plug_hash` 落到 `options[].recommended`。
+- 覆盖规则按 3.4 的表实现，由契约测试钉住（哪个 intent 必须带哪几块）。
+- 清单与 Manifest 的 `frame`/`rpm` 交叉核对（清单 `frame: "精确重击 65"` vs 我们推出的值），不一致时输出 `cross_check`。
 - 固定/随机分支；语料武器章节重写；skill `routing.md` 武器章节重写；回归测试补齐。
 - 验收：`pytest` 全绿 + `scripts/verify_mcp.py` + 语料武器行逐条实跑。
 
@@ -230,5 +301,9 @@ perks:    sockets 里 roll 相关栏位（intrinsic/barrel/magazine/trait）的�
 - [ ] `stats` 按 StatGroup 输出，含 冲击力/充能时间 等（不再固定 10 项）
 - [ ] 同一次调用的组件集合唯一（310/302 到位）；未读账号时实例字段为 null 并说明来源
 - [ ] 每个 intent 的键集合快照测试通过；列表类都有 `total/returned/truncated`
+- [ ] 本地数据全部在模板里：`weapon.farming`（含 `recommended_perks` 必刷特性与 `source_ref.updated_at`）、`weapon.popularity`（按 plug_hash 与 sockets 对齐）、`weapon.community`、`weapon.sources`
+- [ ] 同一个 perk 的本地结论汇总在一处：`options[].recommended.{wishlist,popularity,farming,community}`，不再让调用方按名字跨四段拼
+- [ ] 遗产的 `farming.list="刷取清单-绿弹紫枪"`、`tier="T1"`、`source="深岩墓室"`、`recommended_perks` 与清单一致
+- [ ] 清单 `frame`/`rpm` 与 Manifest 推出值不一致时输出 `cross_check` 说明（遗产清单写 65）
 - [ ] 响应体积：`perk_pool` 从 32 KB 降到 10 KB 量级（若做 P6）
 - [ ] `pytest` 全绿、`PARAMETER_GUARD=ok`、8 个工具、语料武器行逐条实跑
