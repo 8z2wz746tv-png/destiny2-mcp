@@ -320,11 +320,11 @@
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
-| 猎人现在有哪些可选的技能 | `subclass_assistant(intent="options")` + `element` + `component` | 缺参数返回 `ok=false` + `subclass_error`，消息里列出合法取值；**不能**是 `ok=true` 里塞错误文字，也不能说成「没有可选项」。 |
+| 猎人现在有哪些可选的技能 | `subclass_assistant(intent="options")` + `element` + `component` | 缺参数返回 `ok=false` + `subclass_error`，**一次说清缺哪些字段并列出合法取值**（`element`/`component` 排在"职业"前面，别把矛头指向调用方没填错的字段）；**不能**是 `ok=true` 里塞错误文字，也不能说成「没有可选项」。元素中英文都认：`void/solar/arc/stasis/strand/prism` 与 `虚空/烈日/电弧/冰影/缚丝/棱镜`（`编织` 是 strand 的旧写法，保留兼容）；组件认 `super/melee/grenade/aspect/movement/class_ability` 与中文名。 |
 | 查一下「不存在的碎片」的数值 | `subclass_assistant(intent="fragment_details")` | `ok=false` + `definition_not_found_error`；直说找不到，**不能编效果**。 |
 | 查一个不存在的赛季神器名 | `subclass_assistant(intent="artifact")` | `definition_not_found_error`（**不是** `item_not_found_error` —— 后者是「你的东西被分解了」，用在从没拥有过的定义上会误导）。 |
 | 查一下 hash=999 的神器模组 | `subclass_assistant(intent="artifact_mod", artifact_mod_hash=999)` | `ok=false` + `definition_not_found_error`。 |
-| 查一个不存在的套装效果 | `build_assistant(intent="set_bonus", set_bonus_name=…)` | `ok=false` + `item_not_found_error`；不能包在成功信封里。 |
+| 查一个不存在的套装效果 | `build_assistant(intent="set_bonus", set_bonus_name=…)` | `ok=false` + `definition_not_found_error`（定义类查不到；**不是** `item_not_found_error`，那是"账号里的东西没了"）；不能包在成功信封里。 |
 | 查一把不存在的武器的社区推荐 roll | `weapon_assistant(intent="god_roll", weapon_name="不存在的武器xyz")` | `ok=false` + `manifest_error`；**不能**是 `ok=true` 里带一段「未找到武器」的文字。武器存在但本地愿单没收录时才是成功 + 说明。 |
 | 查一把不存在的武器的选取率 | `weapon_assistant(intent="popularity"／"selection_rates"／"perk_selection")` | 同上 `manifest_error`；**不能**答成「暂无录入的选取率快照」（那会让用户分不清打错名字还是真没数据）。 |
 
@@ -335,7 +335,7 @@
 | 层 | 例子 | 码 | 谁的问题 |
 | --- | --- | --- | --- |
 | schema 层（进不了工具函数） | 拼错参数名、intent 不在枚举里、类型不对 | 协议级 `isError` + pydantic 文本（`literal_error`、`extra_forbidden`） | 调用方写法错，不是业务失败 |
-| 工具层前置校验 | `move` 缺 `destination`、`equip_artifact_mod` hash 为负、`modify` 缺 `changes`、`equip_many` 实例重复 | `invalid_arguments` | 调用方漏参数/越界，**不进服务层** |
+| 工具层前置校验 | `move` 缺 `destination`、`equip_artifact_mod` hash 为负、`modify` 缺 `changes`、`equip_many` 实例重复 | `invalid_arguments`，消息是**中文且说清缺什么**（如「intent=move 需要 目标位置（vault/仓库，或角色名）；请补上后重试。」），**不带** pydantic 的 `Value error,` 前缀 | 调用方漏参数/越界，**不进服务层** |
 | 服务层实体参数 | `pgcr` 缺活动 ID、`clan_leaderboards` 缺 group_id、`collectible_node` 传收藏品号 | `invalid_argument_error` | 参数语义不对，服务层拒绝 |
 | Manifest 找不到东西 | 不存在的武器/物品/套装/赛季神器 | `manifest_error`（`artifact` 等定义类用 `definition_not_found_error`） | 名字或 hash 在本地 Manifest 里没有 |
 | 账号里找不到 | 分解掉的物品、不存在的副本 | `item_not_found_error` | 曾经拥有或以为拥有，实际不在账号里 |

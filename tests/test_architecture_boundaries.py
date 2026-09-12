@@ -232,6 +232,32 @@ async def test_invalid_write_requests_never_enter_services(tool, kwargs) -> None
     assert result["error"]["code"] == "invalid_arguments"
 
 
+@pytest.mark.parametrize("tool, kwargs, expected", [
+    (inventory_assistant, {"intent": "move", "item_name": "测试"},
+     "目标位置"),
+    (inventory_assistant, {"intent": "equip"},
+     "物品实例 ID"),
+    (loadout_assistant, {"intent": "save", "name": "测试"},
+     "角色"),
+    (subclass_assistant, {"intent": "modify", "character": "hunter"},
+     "要改的内容"),
+])
+async def test_invalid_argument_messages_are_readable(tool, kwargs, expected) -> None:
+    """缺参话术要中文、说清缺什么，且**不带** pydantic 的 `Value error,` 前缀。
+
+    （报告 P2-1：以前是 `Value error, intent=move requires destination.`，
+    框架内部串会让人以为系统出错而不是自己漏了参数。）
+    """
+    result = await tool(**kwargs, confirmed=True, ctx=None)
+    message = result["error"]["message"]
+
+    assert result["error"]["code"] == "invalid_arguments"
+    assert not message.startswith("Value error")
+    assert "Value error" not in message
+    assert expected in message
+    assert "请补上" in message or "再" in message
+
+
 async def test_assistant_schemas_publish_intent_enums() -> None:
     for tool in await server.create_server().list_tools():
         assert tool.inputSchema["properties"]["intent"]["enum"]

@@ -53,18 +53,18 @@ def test_no_service_returns_a_top_level_error_dict() -> None:
 def test_fragments_reject_an_unknown_element() -> None:
     service = FragmentService(_EmptyManifest())
 
-    with pytest.raises(SubclassError, match="不支持的元素"):
+    with pytest.raises(SubclassError, match="element 缺失或不认识"):
         service.list_fragments("不存在的元素")
 
 
 def test_subclass_options_reject_unknown_filters() -> None:
     service = FragmentService(_EmptyManifest())
 
-    with pytest.raises(SubclassError, match="不支持的职业"):
+    with pytest.raises(SubclassError, match="职业缺失或不认识"):
         service.list_subclass_options("不存在的职业", "solar", "super")
-    with pytest.raises(SubclassError, match="不支持的元素"):
+    with pytest.raises(SubclassError, match="element 缺失或不认识"):
         service.list_subclass_options("hunter", "不存在的元素", "super")
-    with pytest.raises(SubclassError, match="不支持的组件"):
+    with pytest.raises(SubclassError, match="component 缺失或不认识"):
         service.list_subclass_options("hunter", "solar", "不存在的组件")
 
 
@@ -123,3 +123,19 @@ def test_loadout_identifier_search_rejects_an_unknown_kind() -> None:
 
     with pytest.raises(InvalidArgumentError, match="kind"):
         service.search_official_loadout_identifiers(kind="不存在的种类")
+
+def test_subclass_element_map_accepts_client_chinese_name() -> None:
+    """`缚丝`（游戏客户端叫法）与 `编织`（早期写法）都要认（报告 P3-1）。"""
+    from destiny_mcp.services.fragment_service import _ELEMENT_MAP
+
+    assert _ELEMENT_MAP["缚丝"] == "strand"
+    assert _ELEMENT_MAP["编织"] == "strand"
+    assert _ELEMENT_MAP["strand"] == "strand"
+
+
+def test_subclass_component_map_accepts_plural_and_common_chinese() -> None:
+    from destiny_mcp.services.fragment_service import _COMPONENT_TYPE_MAP
+
+    assert _COMPONENT_TYPE_MAP["移动"] == "movement"
+    assert _COMPONENT_TYPE_MAP["aspects"] == "aspects"
+    assert _COMPONENT_TYPE_MAP["supers"] == "supers"

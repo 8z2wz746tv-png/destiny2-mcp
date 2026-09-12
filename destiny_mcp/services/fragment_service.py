@@ -17,12 +17,15 @@ from ..manifest import ManifestManager, CHARACTER_CLASS_MAP
 logger = get_logger(__name__)
 
 # Element name mapping (input → canonical)
+# 元素名别名表（输入 → 规范名）。
+# 中文以**游戏客户端**的叫法为准：strand=缚丝（「编织」是早期写法，保留兼容）。
+# 权威来源是 `manifest_names` 的伤害类型名称表（那边也是缚丝），这里只是输入别名。
 _ELEMENT_MAP = {
     "void": "void", "虚空": "void",
     "solar": "solar", "烈日": "solar",
     "arc": "arc", "电弧": "arc",
     "stasis": "stasis", "冰影": "stasis",
-    "strand": "strand", "编织": "strand",
+    "strand": "strand", "缚丝": "strand", "编织": "strand",
     "prism": "prism", "prismatic": "prism", "棱镜": "prism",
 }
 
@@ -39,13 +42,20 @@ _CAT_TO_ELEMENT = {
 
 # Component type mapping (input → canonical)
 _COMPONENT_TYPE_MAP = {
-    "超能": "supers", "super": "supers",
+    "超能": "supers", "super": "supers", "supers": "supers",
     "近战": "melee", "melee": "melee",
-    "手雷": "grenades", "grenade": "grenades",
-    "星象": "aspects", "aspect": "aspects",
-    "跳跃": "movement", "movement": "movement",
+    "手雷": "grenades", "grenade": "grenades", "grenades": "grenades",
+    "星象": "aspects", "aspect": "aspects", "aspects": "aspects",
+    "跳跃": "movement", "移动": "movement", "movement": "movement",
     "职业技能": "class_ability", "class_ability": "class_ability",
 }
+
+# 报错时列出的"认得的写法"（与上面两张表保持同步）
+_ELEMENT_HINT = "void/solar/arc/stasis/strand/prism（或 虚空/烈日/电弧/冰影/缚丝/棱镜）"
+_COMPONENT_HINT = (
+    "super/melee/grenade/aspect/movement/class_ability"
+    "（或 超能/近战/手雷/星象/跳跃/职业技能）"
+)
 
 # Fragment stat hash → Chinese name (Renegades update)
 # Standard 6 armor stats — use same names as manifest.py for consistency
@@ -77,7 +87,7 @@ class FragmentService:
         target_element = _ELEMENT_MAP.get(element.lower())
         if not target_element:
             raise SubclassError(
-                f"不支持的元素: {element}，支持: void/solar/arc/stasis/strand/prism"
+                f"element 缺失或不认识（给的是 {element!r}），支持 {_ELEMENT_HINT}"
             )
 
         # Search for items whose plugCategoryIdentifier contains 'fragment' or 'trinket'
@@ -140,16 +150,21 @@ class FragmentService:
         target_element = _ELEMENT_MAP.get(element.lower())
         target_component = _COMPONENT_TYPE_MAP.get(component.lower())
 
-        if target_class is None:
-            raise SubclassError(f"不支持的职业: {class_name}，支持: hunter/warlock/titan")
+        # 缺什么就说什么，而且一次性说完：以前 class 为空时先报"不支持的职业"，
+        # 而调用方真正漏的是 element/component（报错指错字段会把人带偏）。
+        problems: list[str] = []
         if not target_element:
-            raise SubclassError(
-                f"不支持的元素: {element}，支持: void/solar/arc/stasis/strand/prism"
-            )
+            problems.append(f"element 缺失或不认识（给的是 {element!r}），支持 {_ELEMENT_HINT}")
         if not target_component:
-            raise SubclassError(
-                f"不支持的组件: {component}，支持: super/melee/grenade/aspect/movement"
+            problems.append(
+                f"component 缺失或不认识（给的是 {component!r}），支持 {_COMPONENT_HINT}"
             )
+        if target_class is None:
+            problems.append(
+                f"职业缺失或不认识（给的是 {class_name!r}），支持 hunter/warlock/titan 或中文职业名"
+            )
+        if problems:
+            raise SubclassError("；".join(problems) + "。")
 
         if target_component == "grenades":
             target_cat = f"shared.{target_element}.grenades"
