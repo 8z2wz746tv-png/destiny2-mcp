@@ -83,7 +83,7 @@
 | 我仓库里当前带 `<Perk>` 的武器 | `filter_rolls` + `include_inventory=true` | 只筛账号持有副本；给出实例 ID 与位置。 |
 | 对比我这几把 `<武器>` 的 Perk，建议留哪把 | `compare` + `weapon_name`（`item_instance_id` 是**可选**的定位，不能只给实例 ID —— 缺 `weapon_name` 会得到 `config_error`「请提供 weapon_name」） | 每把建议对应**具体实例**；差异项用 `present_in_instance`/`absent_in_instance` 指到副本，**不能只写位置**（两把都在仓库时 `present_in=仓库 / absent_in=仓库` 等于没说）。 |
 | 分析一下 `<武器>` | `analyze` + `include_inventory` | 区分「定义」与「我持有的副本」两部分。 |
-| `<武器>` 大家一般选哪个 Perk | `popularity` | 标明数据来源与版本；**没有快照时明确说缺数据，不能编实时百分比**。 |
+| `<武器>` 大家一般选哪个 Perk | `popularity` | 标明数据来源与版本；**没有快照时 `data.popularity` 为 `null`** 且 summary/warning 明说「暂无录入的选取率快照」，不能编实时百分比（`null` 是"本地没这条数据"，不是 0%）。 |
 | 给我 `<武器>` 的 god roll 建议 | `god_roll` | 来源于社区愿单；标明不是官方推荐。三种情况必须分清：① 愿单里有完整条目 → 列出 Perk；② 有记录但解析不出 Perk → 明说「本地这条数据不完整」；③ 本地没收录 → 明说「暂无社区推荐」。**不允许**只回一个标题的空壳。 |
 
 ### 关键区分（必须答对）
@@ -103,10 +103,14 @@
 - 每个插槽选项上的 `recommended` 是四路结论的就地汇总：
   `wishlist`（愿单 PvE/PvP）、`popularity`（`selection_rate` + `rank` + `column`）、
   `farming`（清单栏位 + `must_farm`）、`community`（`knowledge_id`，按名字子串匹配，只是线索）。
-- **口径**：本地资料是参考（`trust=untrusted_reference`），不是官方事实；
-  `popularity.available=false` 是"本地没这把的快照"，不是 0%；
-  `farming.matched=false` 是"清单没收录"，不是不值得刷；
-  社区条目按名字子串匹配，可能只是同名提及。
+- **口径**：本地资料是参考（`trust=untrusted_reference`），不是官方事实。
+  "没有数据"有三种写法，别混：
+  ① `data.popularity = null`（`popularity` intent）—— 本地没这把枪的快照，不是 0%；
+  ② `weapon.popularity.available = false` 且 note 写「本地没有这把武器的选取率快照」——
+     在别的 intent 里查了但没有，同样不是 0%；
+  ③ `weapon.popularity.available = false` 且 note 写「这个 intent 不带这项本地资料」——
+     是**覆盖表**决定这次不查（如 `info`/`god_roll` 不带选取率），要看去调 `popularity`。
+  `farming.matched=false` 是"清单没收录"，不是不值得刷；社区条目按名字子串匹配，可能只是同名提及。
 - **失败也不能弄坏主结果**：任何一路读失败只是缺一块 + `warnings`，官方数据照常返回。
 
 ### 选项的体积口径（P6 起）
@@ -394,7 +398,19 @@ loadout_assistant  subclass_assistant  activity_assistant  world_assistant
 .venv/bin/python -m pip check
 .venv/bin/python skills/destiny-mcp-setup/scripts/verify_mcp.py   # 或 scripts/verify_mcp.py
 .venv/bin/python -m pytest -q
+.venv/bin/python scripts/run_corpus_weapon_rows.py               # 语料武器行逐条真机实跑
+.venv/bin/python scripts/capture_weapon_baseline.py --out /tmp/after
+.venv/bin/python scripts/diff_weapon_baseline.py --before tests/baselines/weapon_responses --after /tmp/after
 ```
+
+三条命令的分工，别互相替代：
+
+- `pytest`：用替身跑，任何机器都能跑，覆盖形状/边界/回归；**不需要**账号。
+- `run_corpus_weapon_rows.py`：把本文档武器章节的每一行"验收点"当断言，走**真机**跑一遍；
+  它退 0 才说明"文档里写的那些话现在仍然成立"。改形状、口径或话术之后必须重跑。
+- `capture_weapon_baseline.py` + `diff_weapon_baseline.py`：录 26 例基线并比对，
+  任何字段"无声消失"都会让它退非 0（有意消失要登记到
+  `tests/baselines/weapon_response_allowlist.json` 并写明去向）。
 
 - 没有工具：先新开任务或重启宿主，再跑验证脚本。
 - 验证脚本必须同时得到 `BUNGIE_PROFILE_CHECK=ok`、`MCP_TOOL_COUNT=8`、`VERIFY_OK`；仅注册成功不算通过。

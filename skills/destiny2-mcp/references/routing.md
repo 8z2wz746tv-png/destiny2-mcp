@@ -340,6 +340,11 @@ Manifest 侧（**不代表拥有**）：
 愿单没装或没这把枪时不会出现 `recommended.wishlist`，不是"这些 Perk 都不好"。
 `weapon_assistant(intent="god_roll")` 给的是愿单那份数据的整理结果。
 
+"没有数据"的三种写法：`data.popularity = null`（`popularity` intent，本地没快照）、
+`weapon.popularity.available=false` + note「本地没有这把武器的选取率快照」（查了但没有）、
+`weapon.popularity.available=false` + note「这个 intent 不带这项本地资料」（覆盖表决定不查，
+要看去调 `popularity`）。三者都不是 0%，也都不是否定结论。
+
 - `scale="T"` —— 精选刷取清单（白弹／绿弹／威能紫枪、异域武器）。这才是「值不值得刷」的答案。`tier` 是 `T0`–`T4`，可能带限定语，例如 `T0（旧）` 表示旧版本；异域清单给的是 `scenario_tiers`，例如 `{"输出": "T0", "高难": "T0.5"}`，或者 `role` 这样的定位标签（如 `输出工具枪`）——`role` 是定位，不是档位。
 - `scale="S-F"` —— 购物清单（白弹／绿弹／威能／其他）。覆盖全部传说武器的梯队表，`S`–`F` 分级并在同弹种内带 `rank`。只在精选清单没覆盖时用，回答的是「它有多好」，不是「值不值得刷」。
 - `scale="ordered"` —— 刷取清单-护甲套装，29 套。源表没有评级列，所以这些行**没有** `tier`；`source`、`scenario`、`pieces` 才是有用的部分。**不要给它编一个档位。**
