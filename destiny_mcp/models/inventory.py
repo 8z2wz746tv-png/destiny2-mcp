@@ -24,6 +24,21 @@ class InventoryItem(BaseModel):
     character_id: str = Field(default="", description="Character ID if on a character")
     stats: ArmorStats | None = Field(default=None, description="Armor six-stats (only for armor items)")
     icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
+    # 护甲专属：与单件详情、装备回显、farm_target 用同一套槽位键（只加键，不改 bucket_type）
+    slot: str = Field(
+        default="",
+        description="Armor slot key: helmet/gauntlets/chest/legs/class_item (empty for weapons)",
+    )
+    slot_display: str = Field(default="", description="Armor slot in Chinese (e.g. 腿部护甲)")
+    gear_tier: int | None = Field(
+        default=None, description="Armor 3.0 tier 1-5; null = 无分级或无 T 级的护甲"
+    )
+    gear_tier_note: str | None = Field(
+        default=None, description="Why gear_tier is null (null = 有分级)"
+    )
+    armor_system: str = Field(
+        default="", description="armor_3 / legacy；非护甲为空字符串"
+    )
 
 
 class InventoryResponse(BaseModel):

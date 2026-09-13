@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 1348,
+    "elapsed_ms": 2144,
     "is_error": false,
-    "payload_chars": 2378,
+    "payload_chars": 2692,
     "steps": [
       {
         "arguments": {
@@ -47,8 +47,11 @@
     "result": {
       "items": [
         {
+          "armor_system": "armor_3",
           "bucket_type": "Leg Armor",
           "character_id": "2305843009679355779",
+          "gear_tier": 5,
+          "gear_tier_note": null,
           "icon_url": "https://www.bungie.net/common/destiny2_content/icons/342a406ccdedbce8680910cfd93d4263.jpg",
           "is_equipped": false,
           "item_hash": 157934631,
@@ -60,6 +63,8 @@
           "name_en": "Prime Zealot Strides",
           "power": 550,
           "quantity": 1,
+          "slot": "legs",
+          "slot_display": "腿部护甲",
           "stats": {
             "class_stat": 0,
             "grenade": 20,
@@ -70,8 +75,11 @@
           }
         },
         {
+          "armor_system": "armor_3",
           "bucket_type": "Leg Armor",
           "character_id": "2305843009679355779",
+          "gear_tier": 5,
+          "gear_tier_note": null,
           "icon_url": "https://www.bungie.net/common/destiny2_content/icons/342a406ccdedbce8680910cfd93d4263.jpg",
           "is_equipped": true,
           "item_hash": 157934631,
@@ -83,6 +91,8 @@
           "name_en": "Prime Zealot Strides",
           "power": 540,
           "quantity": 1,
+          "slot": "legs",
+          "slot_display": "腿部护甲",
           "stats": {
             "class_stat": 35,
             "grenade": 10,

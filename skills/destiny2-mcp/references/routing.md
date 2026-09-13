@@ -51,6 +51,19 @@
 | `type`（`search_type`） | 按类型列物品 | `type_name`（或 `item_type`）、`location` |
 | `duplicates`（`duplicate_weapons`、`find_duplicates`、`重复武器`） | 按精确 `item_hash` 分组出重复武器 | `item_name`、`type_name`、`limit`、`offset` |
 
+**护甲条目的统一键**（列表 / 单件详情 / 反推 / 社区核对 / 装备回显共用同一套）：
+
+- `slot`（`helmet`/`gauntlets`/`chest`/`legs`/`class_item`）+ `slot_display`（中文）—— 求解器内部
+  用的复数名（`helmets`/`chests`）旁边会补 `slot_key`，调用方不用自己写映射；
+- `gear_tier`：1–5，**`null` 表示"没有 T 级"**（老护甲），并带 `gear_tier_note` 说明原因，
+  不要把 `null` 读成 T0；
+- `armor_system`：`armor_3`（有 T 级，12 槽）或 `legacy`（无 T 级，15 槽）。
+
+列表保持轻量（**不带**插槽/能量）；要看插槽、能量、三层属性（`roll`/`base`/`final`）、
+大师与调谐、词条原型与套装，用 `inventory_assistant(intent="item", item_instance_id=…)`。
+`equip_build` 的确认请求里 `candidates[0].items_preview` 会逐件给出光等、能量、
+现有模组与将要装的模组。
+
 写入（必须 `confirmed=true`，见第六节）：
 
 | intent | 做什么 | 关键参数 |

@@ -176,6 +176,79 @@ def _mod_echo(plan: dict[str, Any], definition: dict[str, Any] | None) -> str:
     )
 
 
+async def equip_preview(svc: Any, player_name: str, canonical_build: dict[str, Any]) -> list[dict[str, Any]]:
+    """装备确认时的逐件预览：光等、槽位、能量、每个模组槽"现在有什么 → 要装什么"。
+
+    放在确认请求里**与 `canonical_build` 并列**，不动 canonical 本身：那份载荷要能被
+    原样回传，往里塞展示字段会让回传被 `ExecutableBuild` 拒掉。
+    """
+    from ..services.armor_payload import SLOT_DISPLAY, socket_kind, slot_key_from_solver
+
+    items = canonical_build.get("items") or []
+    instance_ids = [str(item.get("item_instance_id") or "") for item in items]
+    raw_by_id = await svc["inventory_svc"].get_armor_items(player_name, instance_ids)
+    manifest = svc["manifest"]
+
+    preview: list[dict[str, Any]] = []
+    for item in items:
+        instance_id = str(item.get("item_instance_id") or "")
+        raw = raw_by_id.get(instance_id) or {}
+        definition = raw.get("definition") or {}
+        instance = raw.get("instance") or {}
+        slot_key = slot_key_from_solver(str(item.get("slot") or ""))
+        socket_entries = raw.get("sockets") or []
+        mods: list[dict[str, Any]] = []
+        for mod_hash in item.get("mods") or []:
+            mod_definition = manifest.get_item_definition(int(mod_hash)) or {}
+            mods.append({
+                "hash": int(mod_hash),
+                "name": (mod_definition.get("displayProperties") or {}).get("name", ""),
+                "energy_cost": ((mod_definition.get("plug") or {}).get("energyCost") or {}).get(
+                    "energyCost", 0
+                ),
+                "currently_installed": any(
+                    int(entry.get("plugHash", 0) or 0) == int(mod_hash)
+                    for entry in socket_entries
+                ),
+            })
+        energy = instance.get("energy") or {}
+        current_mods: list[dict[str, Any]] = []
+        for entry in socket_entries:
+            plug_hash = int(entry.get("plugHash", 0) or 0)
+            if not plug_hash:
+                continue
+            plug_definition = manifest.get_item_definition(plug_hash) or {}
+            category = (plug_definition.get("plug") or {}).get("plugCategoryIdentifier", "")
+            kind, _editable = socket_kind(category)
+            if kind not in {"general", "helmet", "gauntlets", "chest", "legs", "class_item",
+                            "artifice", "raid"}:
+                continue
+            current_mods.append({
+                "hash": plug_hash,
+                "name": (plug_definition.get("displayProperties") or {}).get("name", ""),
+                "energy_cost": ((plug_definition.get("plug") or {}).get("energyCost") or {}).get(
+                    "energyCost", 0
+                ),
+            })
+        preview.append({
+            "slot": slot_key,
+            "slot_display": SLOT_DISPLAY.get(slot_key, ""),
+            "item_instance_id": instance_id,
+            "item_hash": item.get("item_hash"),
+            "name": (definition.get("displayProperties") or {}).get("name", ""),
+            "power": (instance.get("primaryStat") or {}).get("value"),
+            "location": raw.get("location", ""),
+            "energy": {
+                "capacity": energy.get("energyCapacity"),
+                "used": energy.get("energyUsed"),
+                "unused": energy.get("energyUnused"),
+            } if energy else None,
+            "mods": mods,
+            "current_mods": current_mods,
+        })
+    return preview
+
+
 async def equip_mod(
     svc: Any,
     player_name: str,
@@ -212,3 +285,33 @@ async def equip_mod(
             f"item_instance_id=\"{plan['item_instance_id']}\")。",
         ],
     )
+
+
+def with_slot_keys(payload: Any) -> Any:
+    """递归给带 `slot` / `replacement_slot` 的条目补 `slot_key` + `slot_display`。
+
+    求解器内部用复数槽位名（`helmets`/`chests`），而工具参数与单件详情用单数
+    （`helmet`/`chest`）。这里**只加键**，不动原字段、也不改求解器模型：
+    调用方从此不用自己写映射表。
+    """
+    from ..services.armor_payload import SLOT_DISPLAY, slot_key_from_solver
+
+    def _walk(node: Any) -> Any:
+        if isinstance(node, dict):
+            for key in ("slot", "replacement_slot"):
+                raw = node.get(key)
+                if isinstance(raw, str) and raw.strip():
+                    slot_key = slot_key_from_solver(raw.strip())
+                    node.setdefault(f"{key}_key" if key == "replacement_slot" else "slot_key", slot_key)
+                    node.setdefault(
+                        "slot_display" if key == "slot" else "replacement_slot_display",
+                        SLOT_DISPLAY.get(slot_key, ""),
+                    )
+            for value in node.values():
+                _walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                _walk(value)
+        return node
+
+    return _walk(payload)

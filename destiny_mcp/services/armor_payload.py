@@ -93,7 +93,7 @@ def slot_key_from_solver(slot: str) -> str:
     return _SOLVER_SLOT_TO_KEY.get(slot, slot)
 
 
-def _socket_kind(category: str) -> tuple[str, bool]:
+def socket_kind(category: str) -> tuple[str, bool]:
     """插槽类别 → (短键, 是否可改)。没登记的类别给一个稳的兜底。"""
     if category in _SOCKET_KINDS:
         return _SOCKET_KINDS[category]
@@ -153,7 +153,8 @@ def _energy(instance: dict[str, Any] | None) -> dict[str, int] | None:
     }
 
 
-def _gear_tier(instance: dict[str, Any] | None) -> tuple[int | None, str | None]:
+def gear_tier_of(instance: dict[str, Any] | None) -> tuple[int | None, str | None]:
+    """返回 (T 级, 说明)。0/缺失 → (None, 说明)，不把 0 当 T0。"""
     raw = (instance or {}).get("gearTier")
     if isinstance(raw, int) and not isinstance(raw, bool) and 1 <= raw <= 5:
         return raw, None
@@ -167,7 +168,7 @@ def armor_system_of(instance: dict[str, Any] | None) -> Literal["armor_3", "lega
     `gearTier: 0`，但它们是 15 槽布局、没有词条原型/调谐槽 —— 按字段判会把这
     54 件误判成 3.0，然后给它们套一套不存在的规则。
     """
-    tier, _note = _gear_tier(instance)
+    tier, _note = gear_tier_of(instance)
     return "armor_3" if tier is not None else "legacy"
 
 
@@ -183,7 +184,7 @@ def _sockets(
         plug_hash = int(entry.get("plugHash", 0) or 0)
         definition = lookup(plug_hash) if plug_hash else None
         category = ((definition or {}).get("plug") or {}).get("plugCategoryIdentifier", "")
-        kind, editable = _socket_kind(category)
+        kind, editable = socket_kind(category)
         name = ((definition or {}).get("displayProperties") or {}).get("name", "")
         if not plug_hash and kind == "other":
             kind = "empty"
@@ -232,7 +233,7 @@ def armor_payload(
     definition = lookup(item_hash) or {}
     display = definition.get("displayProperties") or {}
     name = name or display.get("name", "")
-    gear_tier, gear_tier_note = _gear_tier(instance)
+    gear_tier, gear_tier_note = gear_tier_of(instance)
     system = armor_system_of(instance)
     slot = slot_key_from_bucket(bucket)
 

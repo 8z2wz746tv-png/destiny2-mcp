@@ -7,8 +7,15 @@ raw Bungie API response dicts into typed InventoryItem models.
 from __future__ import annotations
 
 from ..build.constants import STAT_HASH_TO_NAME as _STAT_HASHES
+from ..build.constants import ARMOR_SLOT_MAP
 from ..manifest import ManifestManager, class_type_name
 from ..models import ArmorStats, InventoryItem
+from ..services.armor_payload import (
+    SLOT_DISPLAY,
+    armor_system_of,
+    gear_tier_of,
+    slot_key_from_solver,
+)
 
 # Armor bucket hashes (unsigned)
 _ARMOR_BUCKETS = {3448274439, 3551918588, 14239492, 20886954, 1585787867}
@@ -78,6 +85,22 @@ def parse_items_from_profile(
         # manifest already stores icon as full Bungie CDN URL
         icon_url = info.get("icon", "") if info else ""
 
+        # 护甲：统一槽位键 + T 级（与 intent="item" 的载荷同一套口径）。
+        # gearTier=0/缺失 = 没有 T 级的老护甲，给 note 而不是留个 0 让人读成 T0。
+        slot_key = ""
+        slot_display = ""
+        gear_tier = None
+        gear_tier_note = None
+        armor_system = ""
+        if bucket_hash in _ARMOR_BUCKETS:
+            raw_slot = ARMOR_SLOT_MAP.get(bucket_hash) or ARMOR_SLOT_MAP.get(
+                bucket_hash & 0xFFFFFFFF, ""
+            )
+            slot_key = slot_key_from_solver(raw_slot or "")
+            slot_display = SLOT_DISPLAY.get(slot_key, "")
+            armor_system = armor_system_of(instance) if instance else "legacy"
+            gear_tier, gear_tier_note = gear_tier_of(instance) if instance else (None, None)
+
         return InventoryItem(
             item_instance_id=inst_id,
             item_hash=h,
@@ -102,6 +125,11 @@ def parse_items_from_profile(
             character_id=character_id,
             stats=armor_stats,
             icon_url=icon_url,
+            slot=slot_key,
+            slot_display=slot_display,
+            gear_tier=gear_tier,
+            gear_tier_note=gear_tier_note,
+            armor_system=armor_system,
         )
 
     # Vault items — filter by classType when targeting a specific class

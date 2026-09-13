@@ -880,7 +880,7 @@ async def build_assistant(
 
     if intent == "recommend":
         result = await svc["build_svc"].recommend_build(resolved, request)
-        recommendation = _dump(result)
+        recommendation = armor_branches.with_slot_keys(_dump(result))
         if not recommendation.get("results"):
             return ok_response(
                 "真实库存中没有满足原始硬约束的配装；金装和全部属性目标都保持不变。",
@@ -903,7 +903,7 @@ async def build_assistant(
         result = await svc["build_svc"].find_build(resolved, request)
         return ok_response(
             f"找到 {len(result)} 个候选配装。",
-            {"builds": _dump(result), "query": query},
+            {"builds": armor_branches.with_slot_keys(_dump(result)), "query": query},
         )
 
     if intent == "analyze":
@@ -921,7 +921,7 @@ async def build_assistant(
             baseline=baseline,
             max_replacements=max_replacements,
         )
-        analysis = serialize_farm_target_analysis(result)
+        analysis = armor_branches.with_slot_keys(serialize_farm_target_analysis(result))
         options = analysis.get("farm_options") or []
         plans = analysis.get("farm_plans") or []
         if options:
@@ -952,6 +952,10 @@ async def build_assistant(
                 {
                     "canonical_build": exact_build.model_dump(mode="json"),
                     "character": character,
+                    # 逐件预览（光等/能量/模组）与 canonical 并列：canonical 要能原样回传
+                    "items_preview": await armor_branches.equip_preview(
+                        svc, resolved, exact_build.model_dump(mode="json")
+                    ),
                 },
             )
         result = await svc["build_svc"].equip_build(

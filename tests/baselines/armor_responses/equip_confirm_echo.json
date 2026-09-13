@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 3770,
+    "elapsed_ms": 7428,
     "is_error": false,
-    "payload_chars": 69419,
+    "payload_chars": 78653,
     "steps": [
       {
         "arguments": {
@@ -20,7 +20,7 @@
           "character": "hunter",
           "class_target": 100,
           "confirmed_exotic_hash": -1904495392,
-          "exotic_confirmation_token": "d2bc1.1789309968.SlX7xROOTChvhVE7.41fcc39ef3be8325f7f4d4fff02d2da7d1b760a9abb319a664fe99ac0a094695",
+          "exotic_confirmation_token": "d2bc1.1789310567.ro9owXend3hTGzJU.0ce3575c75e10b2e49be23d031c384e096e2ba4177368cb1d18c83d3b7a97f7b",
           "exotic_name": "快速装弹松身裤",
           "fragment_names": null,
           "grenade_target": null,
@@ -45,7 +45,7 @@
             "aspect_hashes": [],
             "class_ability_hash": null,
             "class_type": "hunter",
-            "execution_id": "EkoqOm_XJg5js2eANrhLUVzg",
+            "execution_id": "XFyyHcJbqtBd-eO-11HKcMHy",
             "exotic_hash": 1793346751,
             "fragment_hashes": [],
             "grenade_hash": null,
@@ -60,6 +60,8 @@
                 "name": "至高狂徒面具",
                 "perks": [],
                 "slot": "helmet",
+                "slot_display": "头盔",
+                "slot_key": "helmet",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -74,6 +76,8 @@
                 "name": "光泽护臂",
                 "perks": [],
                 "slot": "gauntlets",
+                "slot_display": "臂铠",
+                "slot_key": "gauntlets",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -88,6 +92,8 @@
                 "name": "至高狂徒胸甲",
                 "perks": [],
                 "slot": "chest",
+                "slot_display": "胸部护甲",
+                "slot_key": "chest",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -102,6 +108,8 @@
                 "name": "快速装弹松身裤",
                 "perks": [],
                 "slot": "legs",
+                "slot_display": "腿部护甲",
+                "slot_key": "legs",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -116,6 +124,8 @@
                 "name": "众神辉煌披风",
                 "perks": [],
                 "slot": "class_item",
+                "slot_display": "职业护甲",
+                "slot_key": "class_item",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -149,7 +159,7 @@
         "aspect_hashes": [],
         "class_ability_hash": null,
         "class_type": "hunter",
-        "execution_id": "EkoqOm_XJg5js2eANrhLUVzg",
+        "execution_id": "XFyyHcJbqtBd-eO-11HKcMHy",
         "exotic_hash": 1793346751,
         "fragment_hashes": [],
         "grenade_hash": null,
@@ -239,7 +249,229 @@
         },
         "weapon_hashes": []
       },
-      "character": ""
+      "character": "",
+      "items_preview": [
+        {
+          "current_mods": [
+            {
+              "energy_cost": 3,
+              "hash": 2724608735,
+              "name": "超能模组"
+            },
+            {
+              "energy_cost": 3,
+              "hash": 1130820873,
+              "name": "超能洗礼"
+            },
+            {
+              "energy_cost": 2,
+              "hash": 1388734897,
+              "name": "动能虹吸"
+            },
+            {
+              "energy_cost": 3,
+              "hash": 554409585,
+              "name": "重型弹药搜寻者"
+            }
+          ],
+          "energy": {
+            "capacity": 11,
+            "unused": 0,
+            "used": 11
+          },
+          "item_hash": 656307180,
+          "item_instance_id": "6917530189799302086",
+          "location": "hunter",
+          "mods": [
+            {
+              "currently_installed": false,
+              "energy_cost": 3,
+              "hash": 4183296050,
+              "name": "武器模组"
+            }
+          ],
+          "name": "至高狂徒面具",
+          "power": 550,
+          "slot": "helmet",
+          "slot_display": "头盔"
+        },
+        {
+          "current_mods": [
+            {
+              "energy_cost": 3,
+              "hash": 2724608735,
+              "name": "超能模组"
+            },
+            {
+              "energy_cost": 3,
+              "hash": 2447449706,
+              "name": "回天掌法"
+            },
+            {
+              "energy_cost": 2,
+              "hash": 3599522901,
+              "name": "动量转移"
+            },
+            {
+              "energy_cost": 2,
+              "hash": 377010989,
+              "name": "伤害感应"
+            }
+          ],
+          "energy": {
+            "capacity": 11,
+            "unused": 1,
+            "used": 10
+          },
+          "item_hash": 3446591075,
+          "item_instance_id": "6917530189823868633",
+          "location": "hunter",
+          "mods": [
+            {
+              "currently_installed": false,
+              "energy_cost": 3,
+              "hash": 4183296050,
+              "name": "武器模组"
+            }
+          ],
+          "name": "光泽护臂",
+          "power": 540,
+          "slot": "gauntlets",
+          "slot_display": "臂铠"
+        },
+        {
+          "current_mods": [
+            {
+              "energy_cost": 3,
+              "hash": 4204488676,
+              "name": "职业模组"
+            },
+            {
+              "energy_cost": 3,
+              "hash": 707237917,
+              "name": "狙击伤害抗性"
+            },
+            {
+              "energy_cost": 3,
+              "hash": 1763668984,
+              "name": "近战伤害抗性"
+            },
+            {
+              "energy_cost": 2,
+              "hash": 953234331,
+              "name": "电弧抗性"
+            }
+          ],
+          "energy": {
+            "capacity": 11,
+            "unused": 0,
+            "used": 11
+          },
+          "item_hash": 2245093627,
+          "item_instance_id": "6917530198794478661",
+          "location": "hunter",
+          "mods": [
+            {
+              "currently_installed": false,
+              "energy_cost": 3,
+              "hash": 4183296050,
+              "name": "武器模组"
+            }
+          ],
+          "name": "至高狂徒胸甲",
+          "power": 550,
+          "slot": "chest",
+          "slot_display": "胸部护甲"
+        },
+        {
+          "current_mods": [
+            {
+              "energy_cost": 3,
+              "hash": 4204488676,
+              "name": "职业模组"
+            },
+            {
+              "energy_cost": 3,
+              "hash": 4046357305,
+              "name": "武器洗礼"
+            },
+            {
+              "energy_cost": 3,
+              "hash": 2793473444,
+              "name": "宽恕"
+            },
+            {
+              "energy_cost": 1,
+              "hash": 4087056174,
+              "name": "复原"
+            }
+          ],
+          "energy": {
+            "capacity": 11,
+            "unused": 1,
+            "used": 10
+          },
+          "item_hash": 1793346751,
+          "item_instance_id": "6917530189447915522",
+          "location": "hunter",
+          "mods": [
+            {
+              "currently_installed": false,
+              "energy_cost": 3,
+              "hash": 4183296050,
+              "name": "武器模组"
+            }
+          ],
+          "name": "快速装弹松身裤",
+          "power": 550,
+          "slot": "legs",
+          "slot_display": "腿部护甲"
+        },
+        {
+          "current_mods": [
+            {
+              "energy_cost": 3,
+              "hash": 4204488676,
+              "name": "职业模组"
+            },
+            {
+              "energy_cost": 3,
+              "hash": 1193713026,
+              "name": "职业洗礼"
+            },
+            {
+              "energy_cost": 3,
+              "hash": 1755737153,
+              "name": "时间膨胀"
+            },
+            {
+              "energy_cost": 1,
+              "hash": 4188291233,
+              "name": "投弹手"
+            }
+          ],
+          "energy": {
+            "capacity": 11,
+            "unused": 1,
+            "used": 10
+          },
+          "item_hash": 3827624354,
+          "item_instance_id": "6917530188452778286",
+          "location": "hunter",
+          "mods": [
+            {
+              "currently_installed": false,
+              "energy_cost": 3,
+              "hash": 2724608735,
+              "name": "超能模组"
+            }
+          ],
+          "name": "众神辉煌披风",
+          "power": 550,
+          "slot": "class_item",
+          "slot_display": "职业护甲"
+        }
+      ]
     }
   ],
   "error": {

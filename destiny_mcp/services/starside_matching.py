@@ -8,6 +8,7 @@ from typing import Any, Callable
 from ..manifest import ITEM_ALIASES, ManifestManager
 from ..exceptions import DestinyMCPError
 from ..utils.hash_utils import to_unsigned
+from .armor_payload import SLOT_DISPLAY, slot_key_from_bucket, slot_key_from_solver
 
 CLASS_TYPES = {"titan": 0, "hunter": 1, "warlock": 2}
 
@@ -295,6 +296,14 @@ def validate_build(manifest: ManifestManager, build: dict) -> dict:
     }
 
 
+def _armor_slot_key(item: Any) -> str:
+    """库存条目 → 统一槽位键：优先用它已经算好的 `slot`，退回 bucket 显示名。"""
+    slot = getattr(item, "slot", "") or ""
+    if slot:
+        return slot_key_from_solver(slot)
+    return slot_key_from_bucket(getattr(item, "bucket_type", "") or "")
+
+
 def _owned_instances(items, hashes: set[int], *, item_type: str) -> list:
     return [
         item
@@ -453,6 +462,9 @@ async def match_inventory(
                     "instance_id": item.item_instance_id,
                     "name": item.name,
                     "location": item.location,
+                    # 与单件详情/列表同一套槽位键，调用方不用自己猜 bucket 名
+                    "slot": _armor_slot_key(item),
+                    "slot_display": SLOT_DISPLAY.get(_armor_slot_key(item), ""),
                 }
                 for item in candidates
             ]

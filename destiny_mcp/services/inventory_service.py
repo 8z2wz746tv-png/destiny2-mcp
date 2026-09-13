@@ -348,6 +348,43 @@ class InventoryService:
             )
         return found
 
+    async def get_armor_items(
+        self,
+        player_name: str,
+        item_instance_ids: list[str],
+    ) -> dict[str, dict]:
+        """一次 profile 调用取多件护甲的原始组件（装备回显要用五件）。"""
+        wanted = [str(i) for i in item_instance_ids if str(i).strip()]
+        if not wanted:
+            return {}
+        _, profile = await self._resolve_and_fetch(
+            player_name, _ARMOR_SNAPSHOT_COMPONENTS
+        )
+        components = profile.get("itemComponents") or {}
+        instances = (components.get("instances") or {}).get("data") or {}
+        sockets = (components.get("sockets") or {}).get("data") or {}
+        stats = (components.get("stats") or {}).get("data") or {}
+        out: dict[str, dict] = {}
+        for item_instance_id in wanted:
+            located = _locate_instance(profile, item_instance_id)
+            if located is None:
+                continue
+            item, location, character_id = located
+            definition = self._manifest.get_item_definition(item.get("itemHash", 0)) or {}
+            out[item_instance_id] = {
+                "item": item,
+                "definition": definition,
+                "instance": instances.get(item_instance_id) or {},
+                "sockets": (sockets.get(item_instance_id) or {}).get("sockets") or [],
+                "stats": (stats.get(item_instance_id) or {}).get("stats") or {},
+                "location": location,
+                "character_id": character_id,
+                "bucket": self._manifest.bucket_name(
+                    (definition.get("inventory") or {}).get("bucketTypeHash", 0)
+                ),
+            }
+        return out
+
     async def get_armor_item(
         self,
         player_name: str,

@@ -276,3 +276,25 @@ async def test_legacy_stat_names_still_find_the_mod() -> None:
     plan = await service.plan("Tester#1234", "6917", "纪律模组", "hunter")
 
     assert plan["to"]["hash"] == MOD_HASH
+
+
+def test_slot_keys_are_added_without_touching_the_original_fields() -> None:
+    """求解器的复数槽位名旁边补单数键与中文名，原字段不动。"""
+    payload = {
+        "results": [
+            {"build": {"items": [{"slot": "helmets", "name": "铁能面罩"},
+                                 {"slot": "class_items", "name": "印记"}]}},
+        ],
+        "farm_options": [{"replacement_slot": "legs"}],
+    }
+
+    enriched = branches.with_slot_keys(payload)
+
+    items = enriched["results"][0]["build"]["items"]
+    assert items[0]["slot"] == "helmets", "原字段必须保留"
+    assert items[0]["slot_key"] == "helmet"
+    assert items[0]["slot_display"] == "头盔"
+    assert items[1]["slot_key"] == "class_item"
+    assert enriched["farm_options"][0]["replacement_slot"] == "legs"
+    assert enriched["farm_options"][0]["replacement_slot_key"] == "legs"
+    assert enriched["farm_options"][0]["replacement_slot_display"] == "腿部护甲"
