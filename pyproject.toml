@@ -13,7 +13,9 @@ requires-python = ">=3.12"
 dependencies = [
     "aiobungie>=0.5.0",
     "anyio>=4.5",
-    "mcp[cli]>=1.27.2",
+# 上界是必须的：mcp 2.x 把 `mcp.server.fastmcp` 改名成 MCPServer，
+# 没有上界时干净机器上装到 2.x，服务连 import 都过不去（本机装着 1.x 看不出来）。
+    "mcp[cli]>=1.27.2,<2",
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",
     "httpx>=0.28.0",
