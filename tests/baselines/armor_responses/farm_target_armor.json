@@ -1,0 +1,96 @@
+{
+  "_case": {
+    "elapsed_ms": 3221,
+    "is_error": false,
+    "payload_chars": 2635,
+    "steps": [
+      {
+        "arguments": {
+          "character": "hunter",
+          "class_target": 100,
+          "exotic_name": "快速装弹松身裤",
+          "grenade_target": 70,
+          "intent": "farm_target",
+          "max_replacements": 2,
+          "melee_target": 70,
+          "super_target": 80,
+          "weapons_target": 150
+        },
+        "tool": "build_assistant"
+      },
+      {
+        "arguments": {
+          "baseline": "equipped",
+          "character": "hunter",
+          "class_target": 100,
+          "confirmed_exotic_hash": -1904495392,
+          "exotic_confirmation_token": "d2bc1.1789308278.XMX6EhC7PMukLzor.6f790498201ab714d80d952a1ba2f13e7679397a350be8d6d32edfd4290f9b37",
+          "exotic_name": "快速装弹松身裤",
+          "fragment_names": null,
+          "grenade_target": 70,
+          "health_target": null,
+          "include_subclass_fragment": false,
+          "intent": "farm_target",
+          "max_replacements": 2,
+          "melee_target": 70,
+          "player_name": null,
+          "priority_stat": null,
+          "priority_stats": null,
+          "replacement_slot": null,
+          "set_bonus_count": null,
+          "set_bonus_name": null,
+          "super_target": 80,
+          "top_n": 5,
+          "weapons_target": 150
+        },
+        "tool": "build_assistant"
+      }
+    ],
+    "tool": "build_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "farm_target": {
+      "assumptions": [
+        "只生成五阶 Armor 3.0 传奇护甲的合法 30/25/20 模板。",
+        "未拥有的护甲不携带虚拟实例、装备操作或 CanonicalBuild。",
+        "Armor 3.0 未公开 Armor 2.0 能量容量；待刷件不假设可承载属性模组，已拥有的锁定件仍按当前资源验证。",
+        "最多检查 2 件待刷护甲，baseline=equipped。",
+        "两件方案只在完整单件搜索无解后返回；它证明当前基线最少需要替换两件，不代表已列出所有两件组合。"
+      ],
+      "farm_options": [],
+      "farm_plans": [],
+      "max_possible": {},
+      "reason": "unverified_armor3_baseline",
+      "suggested_farm": []
+    },
+    "query": {
+      "baseline": "equipped",
+      "character": "hunter",
+      "exotic_name": "快速装弹松身裤",
+      "max_replacements": 2,
+      "priority_stats": [],
+      "replacement_slot": null,
+      "set_bonus_count": null,
+      "set_bonus_name": null,
+      "targets": {
+        "class": 100,
+        "grenade": 70,
+        "health": null,
+        "melee": 70,
+        "super": 80,
+        "weapons": 150
+      }
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "在允许的替换件数内，合法护甲模板无法满足原始硬约束。",
+  "warnings": [
+    "只生成五阶 Armor 3.0 传奇护甲的合法 30/25/20 模板。",
+    "未拥有的护甲不携带虚拟实例、装备操作或 CanonicalBuild。",
+    "Armor 3.0 未公开 Armor 2.0 能量容量；待刷件不假设可承载属性模组，已拥有的锁定件仍按当前资源验证。",
+    "最多检查 2 件待刷护甲，baseline=equipped。",
+    "两件方案只在完整单件搜索无解后返回；它证明当前基线最少需要替换两件，不代表已列出所有两件组合。"
+  ]
+}

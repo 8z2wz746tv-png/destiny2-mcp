@@ -1,0 +1,676 @@
+{
+  "_case": {
+    "elapsed_ms": 135,
+    "is_error": false,
+    "payload_chars": 26858,
+    "steps": [
+      {
+        "arguments": {
+          "character": "hunter",
+          "intent": "exotic_armor"
+        },
+        "tool": "build_assistant"
+      }
+    ],
+    "tool": "build_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "armor": {
+      "class": "Hunter",
+      "count": 47,
+      "exotics": [
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/a62c52b937c81cea80d6e67689748606.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "瞄准时可显示雷达。强化蹲伏时雷达的分辨率。从视觉上标记目标。对低生命值已标记目标造成更多伤害。小幅提高所有武器的空中效率属性。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/6fd9aecd4c810d6dafd2517ebd50cbe0.png",
+              "name": "升级传感器组"
+            }
+          ],
+          "itemHash": -334040539,
+          "name": "傻瓜雷达",
+          "nameEn": "Knucklehead Radar",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fedf8f208ae4c7f41ef37597d4a671b.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "适度提高主弹药武器的空中效率、腰射时的敏捷、射程和精度。\n\n使用主弹药武器完成最后一击可返还闪身能量，能量满格时可以溢出生成额外的充能。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d1bc9350b3c6a8333936a1fd3ce8922b.png",
+              "name": "死亡之舞"
+            }
+          ],
+          "itemHash": 1702288800,
+          "name": "光辉跳舞机",
+          "nameEn": "Radiant Dance Machines",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/9b5e31b72b4c2b7061a7857eba7f8863.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "你获得额外一次烟雾弹充能，并且在隐形时获得伤害抗性。当你使队友隐形时，他们会在隐形时获得伤害抗性，你还会获得近战能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ae998d23b15b04136f563bcf18990d5a.png",
+              "name": "超越遮罩"
+            }
+          ],
+          "itemHash": -39966008,
+          "name": "全知之眼",
+          "nameEn": "Omnioculus",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c71407afa4e5c092494589f82149c693.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "在冲刺时提升手雷、近战与闪身的回复。\n\n冲刺时获得冰霜护甲层数。当你拥有冰霜护甲时，冰影武器造成额外伤害。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/9b2105255a34673a2b9607f9df1ff2e5.png",
+              "name": "快速冷却"
+            }
+          ],
+          "itemHash": 574694189,
+          "name": "冰霜-EE5",
+          "nameEn": "Fr0st-EE5",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/209d99f147c6d1a88812cebc4c0f2f92.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "使用你的电弧法杖进行防御不会消耗额外超能能量。[超能]  ：提前取消电弧法杖，暂时提升电弧武器伤害并产生致盲爆发。反射攻击会增加爆发伤害，延长你的超能持续时间，并造成额外伤害。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/011ceced7088a20d9c6d217694d3971a.png",
+              "name": "光伏镜面"
+            }
+          ],
+          "itemHash": 863908533,
+          "name": "凋零游侠",
+          "nameEn": "Blight Ranger",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/93792e77d9b88ccf77788bdd9b25b16c.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "击败被削弱的目标时，会释放一股削弱烟雾，并返还虚空近战技能能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/896118bfa352e5f2d4990c1ea822140a.png",
+              "name": "毒液之触"
+            }
+          ],
+          "itemHash": -1537693179,
+          "name": "凯布利之刺",
+          "nameEn": "Khepri's Sting",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/51cdf5976d29b61a6800ad5f4d8b10d8.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "充能近战最后一击将赋予隐身并回复一部分生命值与护盾。终结技和对强大敌人的最后一击将增加隐身的时间与回复护盾及生命值的数量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/961559205e83e96cd590b34c28efadb7.png",
+              "name": "遁形处决"
+            }
+          ],
+          "itemHash": -2091820874,
+          "name": "刺客风帽",
+          "nameEn": "Assassin's Cowl",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4c9ab280a38a769fb4b3c504dadcfa78.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "你的线织幽灵的持续时间与耐久度提升，对其造成伤害会释放出额外的线虫。在你的线织幽灵附近时，你不会出现在雷达上。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/36a16b32c69487cd4fa8b507bb84a67a.png",
+              "name": "奋发"
+            }
+          ],
+          "itemHash": -1954164144,
+          "name": "力量平衡",
+          "nameEn": "Balance of Power",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e266ef647863fafb1541890bcfa4a6c7.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "飞刀最后一击会减少超能的冷却时间。一轮齐射中被利刃弹幕飞刀命中最多的目标会释放一次剧烈的烈日爆炸，发射灼烧烈日碎片。使用利刃弹幕造成命中和最后一击将于超能结束后返还超能能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/467f441de1568bd8c6ad437a76671b5f.png",
+              "name": "锋利棱角"
+            }
+          ],
+          "itemHash": -411680726,
+          "name": "加拉诺碎片",
+          "nameEn": "Shards of Galanor",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b963098bb34446a4119fccf6e3cdbfe8.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "你的感应飞刀会灼烧爆炸时造成伤害的目标，或在最后一击时点燃目标。\n\n在投掷感应飞刀后，你会在飞刀爆炸前获得更高的近战回复能力。当你用灼烧伤害目标时，获得少量近战能量，点燃最后一击会完全返还近战能量，并可满溢为额外的飞刀充能。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cd66bbfb633d559d5c42c6c85e1d6873.png",
+              "name": "烤焦他们"
+            }
+          ],
+          "itemHash": -841925044,
+          "name": "卡利班之手",
+          "nameEn": "Caliban's Hand",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/9b9cf3c53c26c364532bfda3dd372827.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "闪身可迷惑附近的敌人并暂时关闭他们的雷达。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ec0f49f1d1ac107ff075d74f710153f9.png",
+              "name": "迷惑"
+            }
+          ],
+          "itemHash": 1163283805,
+          "name": "双子座小丑",
+          "nameEn": "Gemini Jester",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/aef3f0c6823ea0564d94ff81b40552f0.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "生命值全满时造成最后一击，或长时间脱离战斗后，你的护盾将缓慢充能形成覆盖护盾。\n\n当你拥有覆盖护盾时，提升武器对战斗人员的精度、稳定性、操控性及伤害，覆盖护盾耗尽后，最后一击会在短时间内提供敏捷加成。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/28e26c9a7e6bca0ac431baae14f9fa16.png",
+              "name": "命运"
+            }
+          ],
+          "itemHash": -284643135,
+          "name": "命运眷顾",
+          "nameEn": "Fortune's Favor",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5b7f647435bbe18d2c83d3691758184c.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "你可以从拾取的能量球中获得额外的超能能量。当你的超能能量已满时，拾取能量球来过载充能你的超能，从而在释放时获得爆发治疗效果并额外提升超能伤害。当达到最大过载充能时，你还能获得覆盖护盾。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b29ab6e87ec85bac4563f3d3a432c451.png",
+              "name": "光能盛宴"
+            }
+          ],
+          "itemHash": 1001356380,
+          "name": "噬星者之鳞",
+          "nameEn": "Star-Eater Scales",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4943351eeea32eacd98c50e33c840416.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "使你的暮域手雷的影响范围大幅增加。处于暮域内的盟友会获得冰霜护甲，并且该区域内的目标造成的伤害会减少。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/47fd782cc9b993709e25ca66035d13b8.png",
+              "name": "暮域深处"
+            }
+          ],
+          "itemHash": -2125062245,
+          "name": "复兴之握",
+          "nameEn": "Renewal Grasps",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4365fd49261fb81d069d0db10acb9fd4.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "激活飞升或裂空打击会朝附近目标投掷出不断弹跳的爆炸物，震颤敌人并对其造成伤害。震颤附近目标可为你提供伤害抗性。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/445018df2003ca15a56cb62f07824577.png",
+              "name": "必然馈赠"
+            }
+          ],
+          "itemHash": 1446374842,
+          "name": "天赋信念",
+          "nameEn": "Gifted Conviction",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8571524c477cee2fc3e2dedbaf7aa8bb.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "提升所有隐身效果的持续时间。进入隐身状态时，你的手雷、近战和职业技能会更快地充能。达到最大叠加层数时，还将获得虚空覆盖护盾。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d32d006e7f77b1e5bc4d192232b95d42.png",
+              "name": "消逝暗影"
+            }
+          ],
+          "itemHash": -1521910357,
+          "name": "失重引力子",
+          "nameEn": "Graviton Forfeit",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4abdc33a8ff869fc7bdcbdc83fbaba01.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "每当目标被狩猎陷阱束缚时，都会提供技能能量。莫比乌斯箭袋箭矢数增加一枚。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/392cc994318808b9f3b2bcbec7f285c3.png",
+              "name": "诡异箭矢"
+            }
+          ],
+          "itemHash": -1889695358,
+          "name": "奥菲斯钻机",
+          "nameEn": "Orpheus Rig",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e53f09086747c03e79325763327af977.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "击败目标为一笼忠诚飞蛾充能，飞蛾会飞向附近的目标或盟友。\n \n[手雷]  ：投掷这笼忠诚飞蛾，命中时释放飞蛾。飞蛾接触目标后将引发致盲爆炸；接触盟友后将为其提供虚空覆盖护盾。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5c414274c55de2e49517bd6203912aba.png",
+              "name": "飞翼日蚀"
+            }
+          ],
+          "itemHash": -760793412,
+          "name": "守蛾人裹手",
+          "nameEn": "Mothkeeper's Wraps",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5a3826001ee01b3a28ac26a4ec34eeb5.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "弓箭可以不限时地完美拉弓。根据完美拉弓持续时间，箭矢在射出时会得到相应的伤害加成。中幅提高弓箭的空中效率属性。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/23bd5476f6002f913fd511bc62d37826.png",
+              "name": "金刚扣钩"
+            }
+          ],
+          "itemHash": -411680725,
+          "name": "守誓者",
+          "nameEn": "Oathkeeper",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/159870075afe5423cbf1d8d46e920ccc.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "充能近战和终结技最后一击会提供噩梦激励，提升操控性和空中效率。生效时，新拔出的武器会造成额外伤害并在造成最后一击时提供噩梦激励。获得噩梦激励会填装所有枪套中的武器。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/eabdd8dd9c1abcdbcaf4b0cbe8e97248.png",
+              "name": "噩梦激励"
+            }
+          ],
+          "itemHash": -2128736581,
+          "name": "封印阿罕卡拉护手",
+          "nameEn": "Sealed Ahamkara Grasps",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/560933bda212e02475df32cb7faefd5e.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "进行闪身可填装所有武器，并在一小段时间内提高移动和武器操控速度。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/100cd6b35af5fb3f979807d68ad57380.png",
+              "name": "幻金链甲"
+            }
+          ],
+          "itemHash": -1528857422,
+          "name": "巨龙之影",
+          "nameEn": "The Dragon's Shadow",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d2fdd193c4536cbc9cdaa82e24b7125a.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "装备冰影或电弧超能时，你的闪身会变为一种长距离的快速位移，使用时你会获得部分隐身效果。位移后的短时间内，你的冰影和电弧武器会在短时间内获得可叠加的伤害加成。此加成生效时造成最后一击可返还职业技能能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/201a9a1773ef1b4babff1e92b8447c69.png",
+              "name": "凌光偏转"
+            }
+          ],
+          "itemHash": 508515818,
+          "name": "巴克里斯面具",
+          "nameEn": "Mask of Bakris",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/fa501bf3740c6b0cdc91f2cafd0547a3.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "提升装备手炮时的冲刺、滑行和空中效率。掏出后的短时间内，手炮举枪速度更快且更精准，每次命中战斗人员都会提升手炮伤害。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/efbc5e963de684734f9761785b51a375.png",
+              "name": "非法改装枪套"
+            }
+          ],
+          "itemHash": -1889695357,
+          "name": "幸运裤",
+          "nameEn": "Lucky Pants",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8ccf49029d3c36bbdf3fb697163dcc53.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "电光手雷的连锁能力提升，震颤击中的目标。通过震颤伤害战斗人员或对目标施加震颤，可获得额外的电光手雷能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4bedcf0eb0d6fd52d82d3e5f9ff11e4b.png",
+              "name": "概率矩阵"
+            }
+          ],
+          "itemHash": 419976111,
+          "name": "幸运覆盆子",
+          "nameEn": "Lucky Raspberry",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e8ebba4e0fbbaf71de4bd188f072fe67.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "延长感应手雷的持续时间和爆炸范围。技能伤害可提高感应手雷的能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/28aa0f30e0e57d914bf5f12345c631f0.png",
+              "name": "神龙利齿"
+            }
+          ],
+          "itemHash": -10662054,
+          "name": "幼年阿罕卡拉之脊",
+          "nameEn": "Young Ahamkara's Spine",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8ea4e6ce75fcf446b699029aab9d6060.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "获得一发额外的弹跳手雷充能。弹跳手雷造成伤害会提供电光充能，获得电光充能会提供弹跳手雷能量。电光充能准备就绪时，你会治疗附近的盟友并强化你的下一发弹跳手雷。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5e71bde3f74560840a67842e5c46a8cc.png",
+              "name": "全新招数"
+            }
+          ],
+          "itemHash": 1053737370,
+          "name": "忍野的誓言",
+          "nameEn": "Shinobu's Vow",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/75cd0f60c0c568b2a9071e05a76a6f2f.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "枯萎之刃命中和弹跳会生成一个小冰影水晶并返还一部分近战能量。使用枯萎之刃击碎水晶或冻结目标会释放枯萎之刃。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/72fb65f48503b80d6d29515718c0668f.png",
+              "name": "零因子"
+            }
+          ],
+          "itemHash": -1379792528,
+          "name": "忠诚面具",
+          "nameEn": "Mask of Fealty",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cb2d44c8d1459ea43b0ea82976cf66e0.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "闪身会立即填装你的所有武器并提升你和附近盟友的填装和操控性。此增益生效时，额外的闪身会提升增益强度并刷新计时器，5层时达到上限。造成持续伤害会提供职业技能能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c1afa2683c4762598af01b9b21a9ff7a.png",
+              "name": "紧身"
+            }
+          ],
+          "itemHash": -1904495392,
+          "name": "快速装弹松身裤",
+          "nameEn": "Speedloader Slacks",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/be46f8bd0b86a84be7f77941a3e055fb.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "闪身会在原地留下一个延时引爆的爆炸装置，对周围目标造成伤害并基于你的超能元素施加次级效果：\n•  致盲目标。\n•  灼烧目标。\n•  压制目标。\n•  减速目标。\n•  割裂目标。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/97c352f8ad87a9c7ea68b2a643d821ed.png",
+              "name": "离别赠礼"
+            }
+          ],
+          "itemHash": -2117742739,
+          "name": "投弹手",
+          "nameEn": "The Bombardiers",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/eb2274e11a096c4c050f1be451e63391.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "线织尖刺可弹射至缠结上，引爆后立即返回。被线织尖刺引爆的缠结会被重新编织并回收。无缠结的捕获会返还额外近战能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b1421fef77fe63ec01cdce658911e8ca.png",
+              "name": "捕网猎手"
+            }
+          ],
+          "itemHash": -1647668252,
+          "name": "摩伊拉",
+          "nameEn": "Moirai",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/a7c3ee955c5e8b1c20122206d1bf60ff.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "精准最后一击会减少超能的冷却时间。将黄金枪改造为单发高伤害武器。被其击败的目标会给你超能能量并爆炸。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/22e4a1934ecb6b95295ebcc2d5139ff4.png",
+              "name": "鹰眼骇客"
+            }
+          ],
+          "itemHash": -334040540,
+          "name": "星界夜鹰",
+          "nameEn": "Celestial Nighthawk",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cc4f9b05185e4430b6c0ca42cc7a5c1d.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "启用抓钩会提供织造铠甲。启用期间，织造铠甲会提供抖动抗性，击败目标时恢复生命值。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/358bc75bc96bdadc33cc25d864848de4.png",
+              "name": "特技专注"
+            }
+          ],
+          "itemHash": 192896783,
+          "name": "曲腹蛛的伪装",
+          "nameEn": "Cyrtarachne's Facade",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cec0919e3c95d134d82f701f2f6b87dd.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "提高手枪的空中效率、举枪速度和填装速度。身受重伤时切换至手枪可立即填装并提高其伤害。当此效果生效时，手枪最后一击会填装武器并延长效果的持续时间。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cbea782469054e260fd336b5222adc23.png",
+              "name": "弹簧荷载悬置"
+            }
+          ],
+          "itemHash": -1720948176,
+          "name": "机工诡诈臂袖",
+          "nameEn": "Mechaneer's Tricksleeves",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/693bbd8d8099d9284cf507c7a58d869b.jpg",
+          "intrinsicPerks": [],
+          "itemHash": -1679747034,
+          "name": "永劫雨燕",
+          "nameEn": "Aeon Swift",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8f4613a7a4d1d0cac4cddb50f81d965b.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "被包围时，提高偃月的填装速度和近战伤害。偃月近战最后一击会在弹匣中溢装一发子弹。偃月射弹最后一击会引起爆炸。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4f6f7f7ed33e3c274165705bba5aebc5.png",
+              "name": "戟兵之触"
+            }
+          ],
+          "itemHash": -1201657771,
+          "name": "特里同之罪",
+          "nameEn": "Triton Vice",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/dac0f107efc0dc9c887ffef83fc1bf62.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "每次充能提供一把额外飞刀。使用飞刀造成最后一击时，连续投掷的飞刀会获得临时叠加伤害加成。赌徒闪身会重置加成倒计时。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ab27032269b5faa817000b9d22ee751e.png",
+              "name": "剪刀指"
+            }
+          ],
+          "itemHash": -902224384,
+          "name": "盘蛇苞片",
+          "nameEn": "Ophidia Spathe",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/58ae63b773059e5bd7a4d43298f73a50.jpg",
+          "intrinsicPerks": [],
+          "itemHash": -1485847274,
+          "name": "相对主义",
+          "nameEn": "Relativism",
+          "slot": 1585787867
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e6e10342a97eb3f6b974399ef7214e75.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "你的虚空武器在你从隐身状态现身后会获得不稳定弹药。当你隐身并使用终结技击败一名战斗人员时，你所有的武器都会获得额外伤害；你和附近盟友将获得后备覆盖护盾和更快的职业技能回复速度。这些后备覆盖护盾可通过使用职业技能来部署。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/bd7a131851dd9dad2da3e9f198f67f6e.png",
+              "name": "显身体验"
+            }
+          ],
+          "itemHash": -1847871050,
+          "name": "矛隼胸甲",
+          "nameEn": "Gyrfalcon's Hauberk",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/fe62cafbd9124a2ee12d35dbe6fdde3a.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "获得一次额外的闪身充能。在闪身后的短时间内，你的下一次武器最后一击会生成一个能量球。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/aa2934eb8a1990f6a1e76402ba12f26a.png",
+              "name": "双重闪身"
+            }
+          ],
+          "itemHash": -224406525,
+          "name": "第六郊狼",
+          "nameEn": "The Sixth Coyote",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/791e1be2a37d4deff98d660f2d90c158.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "激活职业技能会提供治愈。快速烈日最后一击提供燃烧之魂层数，从而增加烈日技能的伤害、提升闪身治疗的效力，并将治疗扩散至附近的盟友。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/16f43c6fbb972bdc24764a59aacc8161.png",
+              "name": "燃烧之魂"
+            }
+          ],
+          "itemHash": -1693974863,
+          "name": "虫骸头冠",
+          "nameEn": "Wormhusk Crown",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5f9662bd35f3a32bedde179474ee8d07.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "使用技能对强力战斗人员或守护者造成伤害可暂时提升同种类型的武器伤害。使用与元素匹配的伤害击败该标记目标可生成一个元素拾取物。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c156b7906217d8b61e7573f9c9cc2dc7.png",
+              "name": "无情追踪者"
+            }
+          ],
+          "itemHash": 671504994,
+          "name": "觅敌者",
+          "nameEn": "Foetracer",
+          "slot": 3448274439
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/24e61da37158d8c105650edb74ae2bac.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "提高滑行距离，并能提升二段跳、二段控制和三段跳能力。在空中时受到来自目标的伤害更少。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/1f2c8873254a4d9f6e09f243123168ac.png",
+              "name": "液压推进器"
+            }
+          ],
+          "itemHash": -1889695359,
+          "name": "踢踏5",
+          "nameEn": "St0mp-EE5",
+          "slot": 20886954
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ce855265f8180943a74fafa631bdf0cc.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "权衡飞刀可以弹跳两次。用你的武器获得快速精准命中可为权衡飞刀提供大幅伤害加成和近战加成，并且在短时间内眩晕没有护盾的战斗人员。\n\n强化权衡飞刀克制势不可挡勇士。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2773ee80deb86b097323b0827b3db6e5.png",
+              "name": "飞掠尖刺"
+            }
+          ],
+          "itemHash": -1879198920,
+          "name": "阿斯瑞思之拥",
+          "nameEn": "Athrys's Embrace",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/fdc99d915e90a5992549ebe33c85d2c9.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "激活风起云涌会召唤闪电攻击附近所有目标，震颤他们的同时增幅盟友。击败受到电弧减益的目标会提供少量的风起云涌能量。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/6db788a7e92c10f7f7ee3daddce16cba.png",
+              "name": "莫比乌斯导管"
+            }
+          ],
+          "itemHash": -2026443429,
+          "name": "雷兽的挽具",
+          "nameEn": "Raiju's Harness",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/af16bd8628430cc43cfcb161074a1706.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "使用电弧法杖快速连续攻击可提高伤害输出，延长持续时间，并震颤击中的目标。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3a7f6104736bbfa9305e49063beb1ec2.png",
+              "name": "突触接合"
+            }
+          ],
+          "itemHash": -1528857424,
+          "name": "雷电通流",
+          "nameEn": "Raiden Flux",
+          "slot": 14239492
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/39a2f16e2f092e37f21eb5f61f107594.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "使用电弧近战技能或被近战攻击击中将使你进行一个相当强大的近战反击，同时对你进行治疗。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71a75146e38ba257b7379af0efacd61f.png",
+              "name": "交叉反击"
+            }
+          ],
+          "itemHash": -1545510212,
+          "name": "骗徒的握手",
+          "nameEn": "Liar's Handshake",
+          "slot": 3551918588
+        },
+        {
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ae4ee7545ea763ea935f6386d8743361.jpg",
+          "intrinsicPerks": [
+            {
+              "description": "在你进入鬼灵利刃隐形状态前，你的每次命中或最后一击都会恢复更多的超能能量。\n\n在靠近目标时离开隐形状态，会在你周围产生一团削弱烟雾。",
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/16e8d034dc489095e8ab84a9540835aa.png",
+              "name": "游荡刺客"
+            }
+          ],
+          "itemHash": -224406526,
+          "name": "鬼神胸甲",
+          "nameEn": "Gwisin Vest",
+          "slot": 14239492
+        }
+      ]
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已读取异域护甲列表。",
+  "warnings": []
+}

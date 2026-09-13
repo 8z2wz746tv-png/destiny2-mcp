@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
-"""录武器基线：改动前把"现在返回什么"完整存下来。
+"""录基线：改动前把"现在返回什么"完整存下来（武器面 / 护甲面）。
 
 重构会改 JSON 键名，因此需要一份"改动前快照"作为对照：
 - 每个用例一次真实 MCP 调用，落盘完整响应 + 耗时 + 体积；
 - 后续用 `scripts/diff_weapon_baseline.py` 生成差异报告，
   硬门槛是"任何消失的字段都要有理由"。
 
+用例可以是一步，也可以是**多步**（护甲的 `farm_target` / `equip_build` 回显要先走
+金装确认握手），多步用两种取值指令：
+- `{"$replay_candidate": 0}`：把上一步 `candidates[0].arguments` 原样回传（金装确认）；
+- `{"$canonical_from": "data.builds[0].canonical_build"}`：从上一步取一段塞进参数。
+
 用法：
-    .venv/bin/python scripts/capture_weapon_baseline.py                  # 存到默认目录
+    .venv/bin/python scripts/capture_weapon_baseline.py                  # 武器面，存到默认目录
+    .venv/bin/python scripts/capture_weapon_baseline.py --surface armor  # 护甲面
     .venv/bin/python scripts/capture_weapon_baseline.py --out /tmp/before
 """
 
@@ -59,6 +65,55 @@ CASES: list[tuple[str, str, dict]] = [
     ("vendor_banshee", "world_assistant", {"intent": "vendor", "vendor_name": "班西-44", "limit": 5}),
 ]
 
+# 护甲面：P0 先录现状，P1–P5 用它当"字段不许无理由消失"的闸门。
+# 覆盖：库存列表（部位/稀有度/仓库）、按名检索、概况、异域护甲列表与详情、
+# 套装效果（列表/详情）、护甲模组目录、社区配装的库存核对、反推待刷件、装备确认回显。
+ARMOR_CASES: list[tuple[str, object]] = [
+    ("armor_get_legs", "inventory_assistant", {"intent": "get", "armor_slot": "legs", "limit": 3}),
+    ("armor_get_exotic", "inventory_assistant", {"intent": "get", "armor_slot": "legs", "rarity": "异域", "limit": 2}),
+    ("armor_get_vault", "inventory_assistant", {"intent": "get", "location": "vault", "armor_slot": "class_item", "limit": 2}),
+    ("armor_search", "inventory_assistant", {"intent": "search", "item_name": "至高狂徒腿铠"}),
+    ("inventory_summary", "inventory_assistant", {"intent": "summary"}),
+    ("exotic_armor_list", "build_assistant", {"intent": "exotic_armor", "character": "hunter"}),
+    ("exotic_armor_detail", "build_assistant", {"intent": "exotic_armor", "character": "hunter", "exotic_name": "快速装弹松身裤"}),
+    ("set_bonus_list", "build_assistant", {"intent": "set_bonus"}),
+    ("set_bonus_detail", "build_assistant", {"intent": "set_bonus", "set_bonus_name": "埃希恩记忆"}),
+    ("armor_mods_all", "build_assistant", {"intent": "armor_mods"}),
+    ("armor_mods_stat", "build_assistant", {"intent": "armor_mods", "priority_stat": "武器"}),
+    ("community_build_inventory", "build_assistant", {
+        "intent": "community_build",
+        "community_build_id": "builds/s29/00vivy2a-hunter/index.html#build-1",
+        "include_inventory": True,
+        "character": "hunter",
+    }),
+    # 两步：金装确认握手 → 反推待刷件
+    ("farm_target_armor", [
+        ("build_assistant", {
+            "intent": "farm_target", "character": "hunter", "exotic_name": "快速装弹松身裤",
+            "weapons_target": 150, "class_target": 100, "super_target": 80,
+            "melee_target": 70, "grenade_target": 70, "max_replacements": 2,
+        }),
+        ("build_assistant", {"$replay_candidate": 0}),
+    ]),
+    # 三步：金装确认握手 → 求解 → 装备确认回显（confirmed=false，不写账号）
+    ("equip_confirm_echo", [
+        ("build_assistant", {
+            "intent": "find", "character": "hunter", "exotic_name": "快速装弹松身裤",
+            "weapons_target": 150, "class_target": 100, "super_target": 80,
+        }),
+        ("build_assistant", {"$replay_candidate": 0}),
+        ("build_assistant", {
+            "intent": "equip_build", "confirmed": False,
+            "$canonical_from": "data.builds[0].canonical_build",
+        }),
+    ]),
+]
+
+SURFACES: dict[str, tuple[Path, list]] = {
+    "weapon": (DEFAULT_OUT, CASES),
+    "armor": (ROOT / "tests" / "baselines" / "armor_responses", ARMOR_CASES),
+}
+
 
 async def _call(session: ClientSession, tool: str, args: dict) -> dict:
     started = time.perf_counter()
@@ -84,19 +139,83 @@ async def _call(session: ClientSession, tool: str, args: dict) -> dict:
     return payload
 
 
-async def capture(out_dir: Path) -> int:
+def _as_cases(raw_cases: list) -> list[tuple[str, list[tuple[str, dict]]]]:
+    """把两种写法统一成 `(用例 id, 步骤列表)`。
+
+    单步：`(case_id, tool, args)`；多步：`(case_id, [(tool, args), ...])`。
+    """
+    normalized: list[tuple[str, list[tuple[str, dict]]]] = []
+    for case in raw_cases:
+        if len(case) == 2 and isinstance(case[1], list):
+            normalized.append((case[0], list(case[1])))
+        else:
+            case_id, tool, args = case
+            normalized.append((case_id, [(tool, args)]))
+    return normalized
+
+
+def _resolve(args: dict, previous: dict | None) -> dict:
+    """把两种取值指令换成真实参数。"""
+    if "$replay_candidate" not in args and "$canonical_from" not in args:
+        return args
+    if not isinstance(previous, dict):
+        raise RuntimeError("取值指令需要上一步的响应，但上一步不存在或不是 JSON")
+    resolved = {k: v for k, v in args.items() if not k.startswith("$")}
+    if "$replay_candidate" in args:
+        index = int(args["$replay_candidate"])
+        candidates = previous.get("candidates") or []
+        if index >= len(candidates):
+            raise RuntimeError(f"上一步没有 candidates[{index}]（实际 {len(candidates)} 个）")
+        resolved.update(candidates[index].get("arguments") or {})
+    if "$canonical_from" in args:
+        node: object = previous
+        for part in str(args["$canonical_from"]).split("."):
+            name, _, index = part.partition("[")
+            node = node.get(name) if isinstance(node, dict) else None  # type: ignore[union-attr]
+            if index:
+                position = int(index.rstrip("]"))
+                node = node[position] if isinstance(node, list) and position < len(node) else None
+            if node is None:
+                raise RuntimeError(f"上一步里找不到 {args['$canonical_from']}")
+        resolved["canonical_build"] = node
+    return resolved
+
+
+async def capture(out_dir: Path, cases: list) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     params = StdioServerParameters(command=str(ROOT / ".venv" / "bin" / "destiny-mcp"), args=[])
     index: list[dict] = []
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
-            for case_id, tool, args in CASES:
+            for case_id, steps in cases:
+                payload: dict = {}
+                elapsed_total = 0
+                chars_total = 0
+                resolved_steps: list[dict] = []
                 try:
-                    payload = await _call(session, tool, args)
+                    for tool, raw_args in steps:
+                        args = _resolve(raw_args, payload)
+                        resolved_steps.append({"tool": tool, "arguments": args})
+                        payload = await _call(session, tool, args)
+                        meta = payload.get("_case") or {}
+                        elapsed_total += meta.get("elapsed_ms") or 0
+                        chars_total += meta.get("payload_chars") or 0
+                    payload["_case"] = {
+                        "tool": steps[-1][0],
+                        "steps": resolved_steps,
+                        "elapsed_ms": elapsed_total,
+                        "payload_chars": chars_total,
+                        "is_error": bool(payload.get("_case", {}).get("is_error")),
+                    }
                 except Exception as exc:  # noqa: BLE001 - 基线要记下任何失败形态
                     payload = {
-                        "_case": {"tool": tool, "arguments": args, "raised": type(exc).__name__},
+                        "_case": {
+                            "tool": steps[-1][0],
+                            "steps": resolved_steps
+                            or [{"tool": tool, "arguments": args} for tool, args in steps],
+                            "raised": type(exc).__name__,
+                        },
                         "_exception": str(exc)[:500],
                     }
                 (out_dir / f"{case_id}.json").write_text(
@@ -107,7 +226,7 @@ async def capture(out_dir: Path) -> int:
                 index.append(
                     {
                         "case": case_id,
-                        "tool": tool,
+                        "tool": steps[-1][0],
                         "ok": payload.get("ok"),
                         "error_code": (payload.get("error") or {}).get("code"),
                         "elapsed_ms": meta.get("elapsed_ms"),
@@ -130,9 +249,11 @@ async def capture(out_dir: Path) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--out", type=Path, default=None, help="不填就用该面的默认目录")
+    parser.add_argument("--surface", choices=sorted(SURFACES), default="weapon")
     args = parser.parse_args()
-    return asyncio.run(capture(args.out))
+    default_out, cases = SURFACES[args.surface]
+    return asyncio.run(capture(args.out or default_out, _as_cases(cases)))
 
 
 if __name__ == "__main__":

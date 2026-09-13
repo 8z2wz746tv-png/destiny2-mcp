@@ -1,0 +1,919 @@
+{
+  "_case": {
+    "elapsed_ms": 1244,
+    "is_error": false,
+    "payload_chars": 23671,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "summary"
+        },
+        "tool": "inventory_assistant"
+      }
+    ],
+    "tool": "inventory_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 3,
+      "results": [
+        {
+          "element": "冰影",
+          "frame": "区域拒止 72",
+          "list": "刷取清单-绿弹紫枪",
+          "name": "驱逐引擎",
+          "note": "驱逐引擎和迷失信号是两把面对大部分玩家的最强榴弹，药剂神器风寒（寒风凛凛）是最简单获取高额减伤的来源，而冰粪坑作为高频率 dot 单弹匣武器可以快速叠加冰霜护甲，这套思路在高难宗师和压力环境输出都是 T0 级别，有减速时也可以快速产出冰影碎片。 迷失信号因为三号位的金中藏弹给予的弹药经济多在宗师使用；驱逐引擎因为四号位的优秀增伤和起源特性多在地牢 raid 中使用",
+          "perks": {
+            "三号位": [
+              "自填",
+              "空中扳机"
+            ],
+            "四号位": [
+              "混沌重塑",
+              "聚合充能"
+            ]
+          },
+          "scale": "T",
+          "source": "巅峰 先锋",
+          "source_ref": {
+            "local_path": "share/legendary-special.md",
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "author_markdown",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6"
+          },
+          "tier": "T0"
+        },
+        {
+          "dps": "10964",
+          "list": "刷取清单-异域武器",
+          "name": "需求层级",
+          "note": "虚空三箭猎专属顶级输出武器，三人一起使用时伤害最高搭配好奇之器，大部分情况下使用箭袋腿 宗师少数能刮得动的白弹，没出圈时手感很差",
+          "scale": "T",
+          "scenario_tiers": {
+            "输出": "T0",
+            "高难": "T2"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          },
+          "total_damage": "∞"
+        },
+        {
+          "element": "烈日",
+          "frame": "攻击 600",
+          "list": "刷取清单-威能紫枪",
+          "name": "远方黎明",
+          "note": "三号位燃烧野心",
+          "perks": {
+            "三号位": [
+              "燃烧野心",
+              "三连击/即兴弹药"
+            ],
+            "四号位": [
+              "转向/二元轨道",
+              "辉耀炽热",
+              "击杀记录"
+            ]
+          },
+          "scale": "T",
+          "source": "至日",
+          "source_ref": {
+            "local_path": "share/legendary-heavy.md",
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "author_markdown",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6"
+          },
+          "tier": "T3"
+        }
+      ],
+      "returned_count": 3,
+      "truncated": false,
+      "unmatched": [
+        "光泽胄盔",
+        "加拉诺碎片",
+        "光泽胸甲",
+        "至高狂徒腿铠",
+        "光泽披风"
+      ],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    },
+    "inventory": {
+      "counts": {
+        "by_bucket": [
+          {
+            "count": 1260,
+            "label": "Vault (General)"
+          },
+          {
+            "count": 45,
+            "label": "Modifications"
+          },
+          {
+            "count": 44,
+            "label": "Consumables"
+          },
+          {
+            "count": 31,
+            "label": "Lost Items"
+          },
+          {
+            "count": 31,
+            "label": "Quests"
+          },
+          {
+            "count": 30,
+            "label": "Emblems"
+          },
+          {
+            "count": 30,
+            "label": "Vehicle"
+          },
+          {
+            "count": 28,
+            "label": "Class Armor"
+          },
+          {
+            "count": 28,
+            "label": "Gauntlets"
+          },
+          {
+            "count": 27,
+            "label": "Chest Armor"
+          },
+          {
+            "count": 27,
+            "label": "Ships"
+          },
+          {
+            "count": 26,
+            "label": "Energy Weapons"
+          },
+          {
+            "count": 26,
+            "label": "Helmet"
+          },
+          {
+            "count": 26,
+            "label": "Leg Armor"
+          },
+          {
+            "count": 26,
+            "label": "Power Weapons"
+          },
+          {
+            "count": 24,
+            "label": "Kinetic Weapons"
+          },
+          {
+            "count": 21,
+            "label": "Bucket(3683254069)"
+          },
+          {
+            "count": 21,
+            "label": "Ghost"
+          },
+          {
+            "count": 21,
+            "label": "Seasonal Artifact"
+          },
+          {
+            "count": 18,
+            "label": "Bucket(3284755031)"
+          },
+          {
+            "count": 15,
+            "label": "Bucket(2422292810)"
+          },
+          {
+            "count": 15,
+            "label": "Bucket(635141261)"
+          },
+          {
+            "count": 12,
+            "label": "Engrams"
+          },
+          {
+            "count": 8,
+            "label": "Bucket(2207872501)"
+          },
+          {
+            "count": 7,
+            "label": "Bucket(1801258597)"
+          },
+          {
+            "count": 3,
+            "label": "Accessories"
+          },
+          {
+            "count": 3,
+            "label": "Bucket(1753109658)"
+          },
+          {
+            "count": 3,
+            "label": "Bucket(3621873013)"
+          },
+          {
+            "count": 3,
+            "label": "Bucket(3703306570)"
+          },
+          {
+            "count": 3,
+            "label": "Bucket(444348033)"
+          },
+          {
+            "count": 3,
+            "label": "Bucket(497170007)"
+          },
+          {
+            "count": 3,
+            "label": "Clan Banners"
+          },
+          {
+            "count": 3,
+            "label": "Emotes"
+          },
+          {
+            "count": 1,
+            "label": "Bucket(3703306568)"
+          },
+          {
+            "count": 1,
+            "label": "Bucket(3703306571)"
+          }
+        ],
+        "by_item_type": [
+          {
+            "count": 128,
+            "label": "腿部护甲"
+          },
+          {
+            "count": 124,
+            "label": "手炮"
+          },
+          {
+            "count": 105,
+            "label": "榴弹发射器"
+          },
+          {
+            "count": 103,
+            "label": "臂铠"
+          },
+          {
+            "count": 98,
+            "label": "微型冲锋枪"
+          },
+          {
+            "count": 81,
+            "label": "胸部护甲"
+          },
+          {
+            "count": 75,
+            "label": "自动步枪"
+          },
+          {
+            "count": 73,
+            "label": "头盔"
+          },
+          {
+            "count": 73,
+            "label": "霰弹枪"
+          },
+          {
+            "count": 67,
+            "label": "机枪"
+          },
+          {
+            "count": 67,
+            "label": "狙击步枪"
+          },
+          {
+            "count": 64,
+            "label": "脉冲步枪"
+          },
+          {
+            "count": 63,
+            "label": "融合步枪"
+          },
+          {
+            "count": 57,
+            "label": "手枪"
+          },
+          {
+            "count": 49,
+            "label": "刀剑"
+          },
+          {
+            "count": 49,
+            "label": "火箭发射器"
+          },
+          {
+            "count": 43,
+            "label": "术士臂环"
+          },
+          {
+            "count": 38,
+            "label": "战斗弓箭"
+          },
+          {
+            "count": 38,
+            "label": "斥候步枪"
+          },
+          {
+            "count": 32,
+            "label": "任务步骤"
+          },
+          {
+            "count": 31,
+            "label": "徽标"
+          },
+          {
+            "count": 30,
+            "label": "载具"
+          },
+          {
+            "count": 28,
+            "label": "线性融合步枪"
+          },
+          {
+            "count": 27,
+            "label": "飞船"
+          },
+          {
+            "count": 26,
+            "label": "泰坦印记"
+          },
+          {
+            "count": 24,
+            "label": "猎人披风"
+          },
+          {
+            "count": 21,
+            "label": "机灵外壳"
+          },
+          {
+            "count": 21,
+            "label": "神器"
+          },
+          {
+            "count": 20,
+            "label": "未知类型"
+          },
+          {
+            "count": 20,
+            "label": "材料"
+          },
+          {
+            "count": 18,
+            "label": "消耗品"
+          },
+          {
+            "count": 18,
+            "label": "追踪步枪"
+          },
+          {
+            "count": 17,
+            "label": "终结技"
+          },
+          {
+            "count": 16,
+            "label": "泰坦通用皮肤"
+          },
+          {
+            "count": 15,
+            "label": "猎人通用皮肤"
+          },
+          {
+            "count": 12,
+            "label": "光明记忆水晶"
+          },
+          {
+            "count": 11,
+            "label": "偃月"
+          },
+          {
+            "count": 11,
+            "label": "货币"
+          },
+          {
+            "count": 6,
+            "label": "术士分支职业"
+          },
+          {
+            "count": 6,
+            "label": "枪匠命令"
+          },
+          {
+            "count": 6,
+            "label": "武器皮肤"
+          },
+          {
+            "count": 6,
+            "label": "泰坦分支职业"
+          },
+          {
+            "count": 6,
+            "label": "猎人分支职业"
+          },
+          {
+            "count": 5,
+            "label": "可兑换"
+          },
+          {
+            "count": 5,
+            "label": "机灵投影"
+          },
+          {
+            "count": 5,
+            "label": "铸造厂命令"
+          },
+          {
+            "count": 4,
+            "label": "术士通用皮肤"
+          },
+          {
+            "count": 3,
+            "label": "公会战旗"
+          },
+          {
+            "count": 3,
+            "label": "动作收藏"
+          },
+          {
+            "count": 3,
+            "label": "目的地模组"
+          },
+          {
+            "count": 3,
+            "label": "终结技收藏"
+          },
+          {
+            "count": 3,
+            "label": "配件"
+          },
+          {
+            "count": 2,
+            "label": "二象性命令"
+          },
+          {
+            "count": 2,
+            "label": "可提取"
+          },
+          {
+            "count": 2,
+            "label": "护甲皮肤"
+          },
+          {
+            "count": 2,
+            "label": "高塔命令"
+          },
+          {
+            "count": 1,
+            "label": "Dummy"
+          },
+          {
+            "count": 1,
+            "label": "周常悬赏"
+          },
+          {
+            "count": 1,
+            "label": "周常星马悬赏"
+          },
+          {
+            "count": 1,
+            "label": "术士皮肤"
+          },
+          {
+            "count": 1,
+            "label": "武器模组"
+          },
+          {
+            "count": 1,
+            "label": "猎人终结技"
+          },
+          {
+            "count": 1,
+            "label": "行动加成掉落"
+          },
+          {
+            "count": 1,
+            "label": "阿奇的礼物"
+          }
+        ],
+        "by_location": [
+          {
+            "count": 1260,
+            "label": "仓库"
+          },
+          {
+            "count": 173,
+            "label": "术士"
+          },
+          {
+            "count": 169,
+            "label": "泰坦"
+          },
+          {
+            "count": 169,
+            "label": "猎人"
+          },
+          {
+            "count": 102,
+            "label": "profile"
+          }
+        ]
+      },
+      "equipped": [
+        {
+          "bucket": "Kinetic Weapons",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/33840858a2bc21faedf4c3c45b3100c5.jpg",
+          "instance_id": "6917530198634644757",
+          "location": "猎人",
+          "name": "驱逐引擎",
+          "power": 550,
+          "type": "榴弹发射器"
+        },
+        {
+          "bucket": "Energy Weapons",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8c32410000243e6024130f755b23fbe6.jpg",
+          "instance_id": "6917530191625002623",
+          "location": "猎人",
+          "name": "需求层级",
+          "power": 550,
+          "type": "战斗弓箭"
+        },
+        {
+          "bucket": "Power Weapons",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4529cda72f9df5ae560d67f5ec85c2ed.jpg",
+          "instance_id": "6917530185619044706",
+          "location": "猎人",
+          "name": "远方黎明",
+          "power": 550,
+          "type": "机枪"
+        },
+        {
+          "bucket": "Helmet",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6124b874b6bf7dede7bbf865c7303f4.jpg",
+          "instance_id": "6917530189829824570",
+          "location": "猎人",
+          "name": "光泽胄盔",
+          "power": 540,
+          "stats": {
+            "class_stat": 35,
+            "grenade": 20,
+            "health": 0,
+            "melee": 5,
+            "super_stat": 5,
+            "weapons": 30
+          },
+          "type": "头盔"
+        },
+        {
+          "bucket": "Gauntlets",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e266ef647863fafb1541890bcfa4a6c7.jpg",
+          "instance_id": "6917529977500802473",
+          "location": "猎人",
+          "name": "加拉诺碎片",
+          "power": 10,
+          "stats": {
+            "class_stat": 27,
+            "grenade": 20,
+            "health": 5,
+            "melee": 13,
+            "super_stat": 4,
+            "weapons": 19
+          },
+          "type": "臂铠"
+        },
+        {
+          "bucket": "Chest Armor",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/963f6023c1b0b65d43ac4daab3ecf66b.jpg",
+          "instance_id": "6917530189826090213",
+          "location": "猎人",
+          "name": "光泽胸甲",
+          "power": 540,
+          "stats": {
+            "class_stat": 30,
+            "grenade": 35,
+            "health": 0,
+            "melee": 5,
+            "super_stat": 5,
+            "weapons": 25
+          },
+          "type": "胸部护甲"
+        },
+        {
+          "bucket": "Leg Armor",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/342a406ccdedbce8680910cfd93d4263.jpg",
+          "instance_id": "6917530189799301874",
+          "location": "猎人",
+          "name": "至高狂徒腿铠",
+          "power": 540,
+          "stats": {
+            "class_stat": 35,
+            "grenade": 10,
+            "health": 0,
+            "melee": 5,
+            "super_stat": 20,
+            "weapons": 25
+          },
+          "type": "腿部护甲"
+        },
+        {
+          "bucket": "Class Armor",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0799a3f7e0c754506adc8e6e0cc38a4d.jpg",
+          "instance_id": "6917530189822011304",
+          "location": "猎人",
+          "name": "光泽披风",
+          "power": 540,
+          "stats": {
+            "class_stat": 40,
+            "grenade": 25,
+            "health": 0,
+            "melee": 5,
+            "super_stat": 5,
+            "weapons": 25
+          },
+          "type": "猎人披风"
+        },
+        {
+          "bucket": "Ghost",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3d6bb046424d78c266857de4e33d2e84.jpg",
+          "instance_id": "6917529417851913156",
+          "location": "猎人",
+          "name": "牡蛎机灵",
+          "power": null,
+          "type": "机灵外壳"
+        },
+        {
+          "bucket": "Vehicle",
+          "equipped": true,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b6c69f7aa7cdfe4f859dc84f81610dba.jpg",
+          "instance_id": "6917529173034352324",
+          "location": "猎人",
+          "name": "布瑞科技梦想9",
+          "power": 190,
+          "type": "载具"
+        }
+      ],
+      "highest_power": [
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f513e68c68d76392cffd52d94cc1410a.jpg",
+          "instance_id": "6917529995838501446",
+          "location": "仓库",
+          "name": "玉兔",
+          "power": 550,
+          "type": "斥候步枪"
+        },
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4908362c047a097ccf0426e468221ae7.jpg",
+          "instance_id": "6917530187894220481",
+          "location": "仓库",
+          "name": "巫灵科技印记",
+          "power": 550,
+          "type": "泰坦印记"
+        },
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ba2fec09f6ad5a5b8d2cc96656c38e6d.jpg",
+          "instance_id": "6917530191152661384",
+          "location": "仓库",
+          "name": "凯旋圣歌战靴",
+          "power": 550,
+          "type": "腿部护甲"
+        },
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5f1aebe1385295c785145ac3dbe0a60f.jpg",
+          "instance_id": "6917530195353188246",
+          "location": "仓库",
+          "name": "叫啥来着",
+          "power": 550,
+          "type": "微型冲锋枪"
+        },
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+          "instance_id": "6917530193975673732",
+          "location": "仓库",
+          "name": "信任",
+          "power": 550,
+          "type": "手炮"
+        },
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/6021031720c0abc7e92e358b41d3ecf9.jpg",
+          "instance_id": "6917530187624515391",
+          "location": "仓库",
+          "name": "回路臂铠",
+          "power": 550,
+          "type": "臂铠"
+        },
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5f1aebe1385295c785145ac3dbe0a60f.jpg",
+          "instance_id": "6917530185407233129",
+          "location": "仓库",
+          "name": "叫啥来着",
+          "power": 550,
+          "type": "微型冲锋枪"
+        },
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/59e8d862b6ed35e330cb48311460bd12.jpg",
+          "instance_id": "6917530189689378452",
+          "location": "仓库",
+          "name": "暗夜魅影",
+          "power": 550,
+          "type": "脉冲步枪"
+        },
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e3d2241387a0f536fbd52a80f522d3f4.jpg",
+          "instance_id": "6917530182963706223",
+          "location": "仓库",
+          "name": "庆典飞行",
+          "power": 550,
+          "type": "榴弹发射器"
+        },
+        {
+          "bucket": "Vault (General)",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2bc88cfda69c4cf99a75e2525a392e00.jpg",
+          "instance_id": "6917530194689530221",
+          "location": "仓库",
+          "name": "双重王冠战靴",
+          "power": 550,
+          "type": "腿部护甲"
+        }
+      ],
+      "query": {
+        "item_type": "all",
+        "limit": 10,
+        "location": "all",
+        "player_name": "__destiny_current_oauth_player__"
+      },
+      "sample": [
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/169b89336f0352aa94c533d93dd0c128.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "亵渎圣歌",
+          "power": null,
+          "type": "消耗品"
+        },
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/bb84c09fb53b35797ec0e2e15da98dc3.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "女王箔酊",
+          "power": null,
+          "type": "消耗品"
+        },
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/1dd7699c58fab0eba917952388994bd8.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "不稳定的光能能量",
+          "power": null,
+          "type": "消耗品"
+        },
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4741f9d9258e6888b17fde6794f35a31.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "小米饼",
+          "power": null,
+          "type": "消耗品"
+        },
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4aee689b6b8dffed7c98e48681ddd1a0.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "唤雨师",
+          "power": null,
+          "type": "消耗品"
+        },
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/bd57d7176dac6513b99d2e888caf9655.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "记忆水晶追踪器",
+          "power": null,
+          "type": "Dummy"
+        },
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d446fb2beeaa7b9c4da00086748f0e3b.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "终端过载密钥",
+          "power": null,
+          "type": "可兑换"
+        },
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0a4eb695ed55b4e720ddc401460cc0f9.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "强化核心",
+          "power": null,
+          "type": "材料"
+        },
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e7ab2d33e4d5b88d7124a80da8553f96.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "宝藏钥匙",
+          "power": null,
+          "type": "可兑换"
+        },
+        {
+          "bucket": "Consumables",
+          "equipped": false,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c4d8941f4552afe8c869d7f23399d3b3.jpg",
+          "instance_id": "0",
+          "location": "profile",
+          "name": "光能能量—II阶",
+          "power": null,
+          "type": "消耗品"
+        }
+      ],
+      "total": 1873
+    }
+  },
+  "next_actions": [
+    {
+      "arguments": {
+        "intent": "get"
+      },
+      "label": "查看某个角色或仓库的完整列表",
+      "tool": "inventory_assistant"
+    }
+  ],
+  "ok": true,
+  "summary": "账号背包：共 1873 件物品，武器 1023 件，护甲 478 件。",
+  "warnings": [
+    "仅返回前 10 件示例/最高光物品，完整列表请用 inventory_assistant(intent=\"get\")。"
+  ]
+}

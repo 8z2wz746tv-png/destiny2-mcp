@@ -1,0 +1,135 @@
+{
+  "_case": {
+    "elapsed_ms": 7086,
+    "is_error": false,
+    "payload_chars": 3370,
+    "steps": [
+      {
+        "arguments": {
+          "armor_slot": "legs",
+          "intent": "get",
+          "limit": 3
+        },
+        "tool": "inventory_assistant"
+      }
+    ],
+    "tool": "inventory_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 0,
+      "results": [],
+      "returned_count": 0,
+      "truncated": false,
+      "unmatched": [
+        "至高狂徒腿铠",
+        "噬星者之鳞",
+        "快速装弹松身裤"
+      ],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    },
+    "inventory": {
+      "items": [
+        {
+          "bucket_type": "Leg Armor",
+          "character_id": "2305843009679355779",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/342a406ccdedbce8680910cfd93d4263.jpg",
+          "is_equipped": false,
+          "item_hash": 157934631,
+          "item_instance_id": "6917530198796768597",
+          "item_type": "Armor",
+          "item_type_display": "腿部护甲",
+          "location": "hunter",
+          "name": "至高狂徒腿铠",
+          "name_en": "Prime Zealot Strides",
+          "power": 550,
+          "quantity": 1,
+          "stats": {
+            "class_stat": 0,
+            "grenade": 20,
+            "health": 0,
+            "melee": 0,
+            "super_stat": 25,
+            "weapons": 30
+          }
+        },
+        {
+          "bucket_type": "Leg Armor",
+          "character_id": "2305843009679355779",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5b7f647435bbe18d2c83d3691758184c.jpg",
+          "is_equipped": false,
+          "item_hash": 1006498763,
+          "item_instance_id": "6917530195336950066",
+          "item_type": "Armor",
+          "item_type_display": "腿部护甲",
+          "location": "hunter",
+          "name": "噬星者之鳞",
+          "name_en": "Star-Eater Scales",
+          "power": 550,
+          "quantity": 1,
+          "stats": {
+            "class_stat": 0,
+            "grenade": 20,
+            "health": 0,
+            "melee": 0,
+            "super_stat": 25,
+            "weapons": 30
+          }
+        },
+        {
+          "bucket_type": "Leg Armor",
+          "character_id": "2305843009679355779",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cb2d44c8d1459ea43b0ea82976cf66e0.jpg",
+          "is_equipped": false,
+          "item_hash": 1793346751,
+          "item_instance_id": "6917530189447915522",
+          "item_type": "Armor",
+          "item_type_display": "腿部护甲",
+          "location": "hunter",
+          "name": "快速装弹松身裤",
+          "name_en": "Speedloader Slacks",
+          "power": 550,
+          "quantity": 1,
+          "stats": {
+            "class_stat": 45,
+            "grenade": 5,
+            "health": 0,
+            "melee": 5,
+            "super_stat": 20,
+            "weapons": 25
+          }
+        }
+      ],
+      "location": "all",
+      "next_offset": 3,
+      "returned_items": 3,
+      "total_items": 26,
+      "truncated": true
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已读取背包（3/26 件）",
+  "warnings": [
+    "只返回了 3 / 26 件（按 limit=3 截断）；继续读传 offset=3，或先用 location/item_type/rarity 缩小范围。"
+  ]
+}

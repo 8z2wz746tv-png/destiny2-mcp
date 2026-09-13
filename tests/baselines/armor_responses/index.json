@@ -1,0 +1,116 @@
+{
+  "cases": [
+    {
+      "case": "armor_get_legs",
+      "tool": "inventory_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 7086,
+      "payload_chars": 3370
+    },
+    {
+      "case": "armor_get_exotic",
+      "tool": "inventory_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 1949,
+      "payload_chars": 2590
+    },
+    {
+      "case": "armor_get_vault",
+      "tool": "inventory_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 2158,
+      "payload_chars": 935
+    },
+    {
+      "case": "armor_search",
+      "tool": "inventory_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 1951,
+      "payload_chars": 2378
+    },
+    {
+      "case": "inventory_summary",
+      "tool": "inventory_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 1244,
+      "payload_chars": 23671
+    },
+    {
+      "case": "exotic_armor_list",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 135,
+      "payload_chars": 26858
+    },
+    {
+      "case": "exotic_armor_detail",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 8,
+      "payload_chars": 7349
+    },
+    {
+      "case": "set_bonus_list",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 15,
+      "payload_chars": 26557
+    },
+    {
+      "case": "set_bonus_detail",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 6,
+      "payload_chars": 7765
+    },
+    {
+      "case": "armor_mods_all",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 410,
+      "payload_chars": 70451
+    },
+    {
+      "case": "armor_mods_stat",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 391,
+      "payload_chars": 36425
+    },
+    {
+      "case": "community_build_inventory",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 11690,
+      "payload_chars": 117226
+    },
+    {
+      "case": "farm_target_armor",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 3221,
+      "payload_chars": 2635
+    },
+    {
+      "case": "equip_confirm_echo",
+      "tool": "build_assistant",
+      "ok": false,
+      "error_code": "confirmation_required",
+      "elapsed_ms": 2787,
+      "payload_chars": 69419
+    }
+  ]
+}

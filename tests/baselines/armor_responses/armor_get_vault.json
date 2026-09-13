@@ -1,0 +1,60 @@
+{
+  "_case": {
+    "elapsed_ms": 2158,
+    "is_error": false,
+    "payload_chars": 935,
+    "steps": [
+      {
+        "arguments": {
+          "armor_slot": "class_item",
+          "intent": "get",
+          "limit": 2,
+          "location": "vault"
+        },
+        "tool": "inventory_assistant"
+      }
+    ],
+    "tool": "inventory_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 0,
+      "results": [],
+      "returned_count": 0,
+      "truncated": false,
+      "unmatched": [],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    },
+    "inventory": {
+      "items": [],
+      "location": "vault",
+      "next_offset": null,
+      "returned_items": 0,
+      "total_items": 0,
+      "truncated": false
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已读取背包。",
+  "warnings": []
+}

@@ -1,0 +1,1454 @@
+{
+  "_case": {
+    "elapsed_ms": 391,
+    "is_error": false,
+    "payload_chars": 36425,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "armor_mods",
+          "priority_stat": "武器"
+        },
+        "tool": "build_assistant"
+      }
+    ],
+    "tool": "build_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "match": {
+      "expanded": [
+        "武器"
+      ],
+      "keyword": "武器",
+      "kind": "stat",
+      "matched": 154,
+      "with_stat_bonus": 14
+    },
+    "mods": [
+      {
+        "category": "general",
+        "description": "+10 武器 ▲",
+        "energy_cost": 1,
+        "hash": -486064678,
+        "name": "武器模组",
+        "slot": "general",
+        "stat_bonus": {}
+      },
+      {
+        "category": "general",
+        "description": "+5 武器 ▲",
+        "energy_cost": 1,
+        "hash": 1703647492,
+        "name": "小型武器模组",
+        "slot": "general",
+        "stat_bonus": {
+          "武器": 5
+        }
+      },
+      {
+        "category": "general",
+        "description": "+10 武器 ▲",
+        "energy_cost": 3,
+        "hash": -111671246,
+        "name": "武器模组",
+        "slot": "general",
+        "stat_bonus": {
+          "武器": 10
+        }
+      },
+      {
+        "category": "artifice",
+        "description": "+3 武器 ▲",
+        "energy_cost": 0,
+        "hash": -1972765178,
+        "name": "武器锻造",
+        "slot": "artifice",
+        "stat_bonus": {
+          "武器": 3
+        }
+      },
+      {
+        "category": "chest",
+        "description": "提升缚丝武器的弹药生成速度。",
+        "energy_cost": 0,
+        "hash": -1991549327,
+        "name": "缚丝弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升动能武器的弹药生成速度。",
+        "energy_cost": 0,
+        "hash": -1989230826,
+        "name": "动能弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升虚空武器的弹药生成速度。",
+        "energy_cost": 0,
+        "hash": -1881688421,
+        "name": "虚空弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升冰影武器的弹药生成速度。",
+        "energy_cost": 0,
+        "hash": -1000074864,
+        "name": "冰影弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升电弧武器的弹药生成速度。",
+        "energy_cost": 0,
+        "hash": -11014229,
+        "name": "电弧弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升烈日武器的弹药生成速度。",
+        "energy_cost": 0,
+        "hash": 411014648,
+        "name": "烈日弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升电弧武器的弹药生成速度。; 提升烈日武器的弹药生成速度。; 提升冰影武器的弹药生成速度。; 提升缚丝武器的弹药生成速度。; 提升虚空武器的弹药生成速度。",
+        "energy_cost": 0,
+        "hash": 1103878128,
+        "name": "谐振弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用动能武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 1,
+        "hash": -1969815498,
+        "name": "稳定动能瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用缚丝武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 1,
+        "hash": -695994559,
+        "name": "稳定缚丝瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用虚空武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 1,
+        "hash": -407929861,
+        "name": "稳定虚空瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用电弧武器瞄准时因受到伤害而产生的画面颤动。; 降低用烈日武器瞄准时因受到伤害而产生的画面颤动。; 降低用冰影武器瞄准时因受到伤害而产生的画面颤动。; 降低用缚丝武器瞄准时因受到伤害而产生的画面颤动。; 降低用虚空武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 1,
+        "hash": 293178904,
+        "name": "稳定谐振瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用电弧武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 1,
+        "hash": 792400107,
+        "name": "稳定电弧瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用烈日武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 1,
+        "hash": 1019574576,
+        "name": "稳定烈日瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用冰影武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 1,
+        "hash": 1118428792,
+        "name": "稳定冰影瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升电弧武器的弹药生成速度。; 提升烈日武器的弹药生成速度。; 提升冰影武器的弹药生成速度。; 提升缚丝武器的弹药生成速度。; 提升虚空武器的弹药生成速度。",
+        "energy_cost": 1,
+        "hash": 1971149752,
+        "name": "谐振弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升动能武器的弹药生成速度。",
+        "energy_cost": 2,
+        "hash": -1887568834,
+        "name": "动能弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升烈日武器的弹药生成速度。",
+        "energy_cost": 2,
+        "hash": -1768194016,
+        "name": "烈日弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用电弧武器瞄准时因受到伤害而产生的画面颤动。; 降低用烈日武器瞄准时因受到伤害而产生的画面颤动。; 降低用冰影武器瞄准时因受到伤害而产生的画面颤动。; 降低用缚丝武器瞄准时因受到伤害而产生的画面颤动。; 降低用虚空武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 2,
+        "hash": -1200346640,
+        "name": "稳定谐振瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升冰影武器的弹药生成速度。",
+        "energy_cost": 2,
+        "hash": -832552744,
+        "name": "冰影弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升缚丝武器的弹药生成速度。",
+        "energy_cost": 2,
+        "hash": -7144743,
+        "name": "缚丝弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升电弧武器的弹药生成速度。",
+        "energy_cost": 2,
+        "hash": 450381139,
+        "name": "电弧弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "提升虚空武器的弹药生成速度。",
+        "energy_cost": 2,
+        "hash": 1669792723,
+        "name": "虚空弹药生成",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用冰影武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 3,
+        "hash": -1335462832,
+        "name": "稳定冰影瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用虚空武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 3,
+        "hash": -857644125,
+        "name": "稳定虚空瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用缚丝武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 3,
+        "hash": -315346183,
+        "name": "稳定缚丝瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用电弧武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 3,
+        "hash": 319908131,
+        "name": "稳定电弧瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用动能武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 3,
+        "hash": 1262438062,
+        "name": "稳定动能瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "chest",
+        "description": "降低用烈日武器瞄准时因受到伤害而产生的画面颤动。",
+        "energy_cost": 3,
+        "hash": 1553790504,
+        "name": "稳定烈日瞄准",
+        "slot": "chest",
+        "stat_bonus": {}
+      },
+      {
+        "category": "class_item",
+        "description": "在使用你的职业技能后的短时间内，你的下一次武器最后一击会生成一个能量球。",
+        "energy_cost": 1,
+        "hash": -145285123,
+        "name": "收割者",
+        "slot": "class_item",
+        "stat_bonus": {}
+      },
+      {
+        "category": "class_item",
+        "description": "在使用你的职业技能后的短时间内，你的下一次武器最后一击会生成一个能量球。",
+        "energy_cost": 3,
+        "hash": 40751621,
+        "name": "收割者",
+        "slot": "class_item",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高动能武器的填装速度。",
+        "energy_cost": 1,
+        "hash": -2056992235,
+        "name": "动能装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高冰影武器的收举速度。",
+        "energy_cost": 1,
+        "hash": -2027655749,
+        "name": "冰影灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高电弧武器的收举速度。; 提高烈日武器的收举速度。; 提高冰影武器的收举速度。; 提高缚丝武器的收举速度。; 提高虚空武器的收举速度。",
+        "energy_cost": 1,
+        "hash": -1815670129,
+        "name": "谐振灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高电弧武器的收举速度。",
+        "energy_cost": 1,
+        "hash": -1500607894,
+        "name": "电弧灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高电弧武器的填装速度",
+        "energy_cost": 1,
+        "hash": -1248288754,
+        "name": "电弧装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高虚空武器的填装速度。",
+        "energy_cost": 1,
+        "hash": -1070317550,
+        "name": "虚空装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高缚丝武器的收举速度。",
+        "energy_cost": 1,
+        "hash": -315666868,
+        "name": "缚丝灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高缚丝武器的填装速度。",
+        "energy_cost": 1,
+        "hash": 95934356,
+        "name": "缚丝装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高烈日武器的收举速度。",
+        "energy_cost": 1,
+        "hash": 531665167,
+        "name": "烈日灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高烈日武器的填装速度。",
+        "energy_cost": 1,
+        "hash": 634608391,
+        "name": "烈日装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高冰影武器的填装速度。",
+        "energy_cost": 1,
+        "hash": 703902595,
+        "name": "冰影装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高虚空武器的收举速度。",
+        "energy_cost": 1,
+        "hash": 1017385934,
+        "name": "虚空灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高动能武器的收举速度。",
+        "energy_cost": 1,
+        "hash": 1561736585,
+        "name": "动能灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高电弧武器的填装速度; 提高烈日武器的填装速度。; 提高冰影武器的填装速度。; 提高缚丝武器的填装速度。; 提高虚空武器的填装速度。",
+        "energy_cost": 1,
+        "hash": 1702273159,
+        "name": "谐振装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高电弧武器的填装速度; 提高烈日武器的填装速度。; 提高冰影武器的填装速度。; 提高缚丝武器的填装速度。; 提高虚空武器的填装速度。",
+        "energy_cost": 2,
+        "hash": -1637362513,
+        "name": "谐振装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高电弧武器的收举速度。; 提高烈日武器的收举速度。; 提高冰影武器的收举速度。; 提高缚丝武器的收举速度。; 提高虚空武器的收举速度。",
+        "energy_cost": 2,
+        "hash": 1677180919,
+        "name": "谐振灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高动能武器的填装速度。",
+        "energy_cost": 3,
+        "hash": -1708404483,
+        "name": "动能装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高冰影武器的填装速度。",
+        "energy_cost": 3,
+        "hash": -1501418741,
+        "name": "冰影装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高烈日武器的收举速度。",
+        "energy_cost": 3,
+        "hash": -1227318313,
+        "name": "烈日灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高缚丝武器的收举速度。",
+        "energy_cost": 3,
+        "hash": -971057132,
+        "name": "缚丝灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高虚空武器的填装速度。",
+        "energy_cost": 3,
+        "hash": -314198134,
+        "name": "虚空装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高缚丝武器的填装速度。",
+        "energy_cost": 3,
+        "hash": -50720356,
+        "name": "缚丝装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高冰影武器的收举速度。",
+        "energy_cost": 3,
+        "hash": 193878019,
+        "name": "冰影灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高虚空武器的收举速度。",
+        "energy_cost": 3,
+        "hash": 467550918,
+        "name": "虚空灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高烈日武器的填装速度。",
+        "energy_cost": 3,
+        "hash": 1079896271,
+        "name": "烈日装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高电弧武器的填装速度",
+        "energy_cost": 3,
+        "hash": 1125523126,
+        "name": "电弧装弹装置",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高电弧武器的收举速度。",
+        "energy_cost": 3,
+        "hash": 2059068466,
+        "name": "电弧灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "gauntlets",
+        "description": "提高动能武器的收举速度。",
+        "energy_cost": 3,
+        "hash": 2076329105,
+        "name": "动能灵巧",
+        "slot": "gauntlets",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善动能武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 1,
+        "hash": -2080542713,
+        "name": "动能瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善虚空武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 1,
+        "hash": -1406771820,
+        "name": "虚空瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善缚丝武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 1,
+        "hash": -1281188890,
+        "name": "缚丝瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速冰影武器最后一击可生成能量球。",
+        "energy_cost": 1,
+        "hash": -1106638387,
+        "name": "冰影虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速缚丝武器最后一击可生成能量球。",
+        "energy_cost": 1,
+        "hash": -1015709562,
+        "name": "缚丝虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "增加所有已装备武器的空中效率。",
+        "energy_cost": 1,
+        "hash": -776297181,
+        "name": "空中补偿器",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "提升对特殊弹药量表的所有计入效果。",
+        "energy_cost": 1,
+        "hash": -519166499,
+        "name": "特殊武器弹药搜寻者",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速电弧武器最后一击可生成能量球。; 快速烈日武器最后一击可生成能量球。; 快速冰影武器最后一击可生成能量球。; 快速虚空武器最后一击可生成能量球。; 快速缚丝武器最后一击可生成能量球。",
+        "energy_cost": 1,
+        "hash": -462601277,
+        "name": "谐振虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速电弧武器最后一击可生成能量球。",
+        "energy_cost": 1,
+        "hash": -447495370,
+        "name": "电弧虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善电弧武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 1,
+        "hash": 96682422,
+        "name": "电弧瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善烈日武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 1,
+        "hash": 331268185,
+        "name": "烈日瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速动能武器最后一击可生成能量球。",
+        "energy_cost": 1,
+        "hash": 897335593,
+        "name": "动能虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速烈日武器最后一击可生成能量球。",
+        "energy_cost": 1,
+        "hash": 1086997255,
+        "name": "烈日虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速虚空武器最后一击可生成能量球。",
+        "energy_cost": 1,
+        "hash": 1210012576,
+        "name": "虚空虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善冰影武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 1,
+        "hash": 1801153435,
+        "name": "冰影瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善电弧武器的目标捕获能力、精度和瞄准速度。; 改善烈日武器的目标捕获能力、精度和瞄准速度。; 改善冰影武器的目标捕获能力、精度和瞄准速度。; 改善缚丝武器的目标捕获能力、精度和瞄准速度。; 改善虚空武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 1,
+        "hash": 1891463783,
+        "name": "谐振瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善电弧武器的目标捕获能力、精度和瞄准速度。; 改善烈日武器的目标捕获能力、精度和瞄准速度。; 改善冰影武器的目标捕获能力、精度和瞄准速度。; 改善缚丝武器的目标捕获能力、精度和瞄准速度。; 改善虚空武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 2,
+        "hash": 1305536863,
+        "name": "谐振瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速动能武器最后一击可生成能量球。",
+        "energy_cost": 2,
+        "hash": 1388734897,
+        "name": "动能虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善动能武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 3,
+        "hash": -1827764257,
+        "name": "动能瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "提升对特殊弹药量表的所有计入效果。",
+        "energy_cost": 3,
+        "hash": -1699128059,
+        "name": "特殊武器弹药搜寻者",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善烈日武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 3,
+        "hash": -1575268367,
+        "name": "烈日瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速电弧武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": -1570898786,
+        "name": "电弧虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速动能武器最后一击可生成能量球。; 快速电弧武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": -1561956634,
+        "name": "动能电荷虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速动能武器最后一击可生成能量球。; 快速烈日武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": -1559997225,
+        "name": "动能热量虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速虚空武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": -1521608424,
+        "name": "虚空虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速电弧武器最后一击可生成能量球。; 快速缚丝武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": -1482408251,
+        "name": "电弧/缚丝虹吸组合",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速烈日武器最后一击可生成能量球。; 快速缚丝武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": -1463593134,
+        "name": "烈日/缚丝双虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "增加所有已装备武器的空中效率。",
+        "energy_cost": 3,
+        "hash": -1395461573,
+        "name": "空中补偿器",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善缚丝武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 3,
+        "hash": -1294539234,
+        "name": "缚丝瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速虚空武器最后一击可生成能量球。; 快速冰影武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": -836806828,
+        "name": "虚空/冰影双虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速缚丝武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": -368848050,
+        "name": "缚丝虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速烈日武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": -39873393,
+        "name": "烈日虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速虚空武器最后一击可生成能量球。; 快速缚丝武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": 110793779,
+        "name": "虚空/缚丝双虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速冰影武器最后一击可生成能量球。; 快速烈日武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": 521530777,
+        "name": "热力虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善冰影武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 3,
+        "hash": 721001747,
+        "name": "冰影瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速冰影武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": 837201397,
+        "name": "冰影虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善电弧武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 3,
+        "hash": 967052942,
+        "name": "电弧瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速动能武器最后一击可生成能量球。; 快速虚空武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": 1433540272,
+        "name": "动能混乱虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "改善虚空武器的目标捕获能力、精度和瞄准速度。",
+        "energy_cost": 3,
+        "hash": 1589556860,
+        "name": "虚空瞄准性能",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "helmet",
+        "description": "快速电弧武器最后一击可生成能量球。; 快速冰影武器最后一击可生成能量球。",
+        "energy_cost": 3,
+        "hash": 2077016094,
+        "name": "电弧/冰影双虹吸",
+        "slot": "helmet",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "在拥有任何护甲充能时，你的电弧武器会获得小幅额外伤害加成。你的护甲充能现在会逐渐衰减。",
+        "energy_cost": 1,
+        "hash": -2048651265,
+        "name": "电弧武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "在拥有任何护甲充能时，你的烈日武器会获得小幅额外伤害加成。你的护甲充能现在会逐渐衰减。",
+        "energy_cost": 1,
+        "hash": -2011072962,
+        "name": "烈日武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "在拥有任何护甲充能时，你的动能武器会获得小幅额外伤害加成。你的护甲充能现在会逐渐衰减。",
+        "energy_cost": 1,
+        "hash": -1976300112,
+        "name": "动能武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该电弧武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 1,
+        "hash": -1858495643,
+        "name": "电弧回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "在拥有任何护甲充能时，你的冰影武器会获得小幅额外伤害加成。你的护甲充能现在会逐渐衰减。",
+        "energy_cost": 1,
+        "hash": -1768044874,
+        "name": "冰影武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的虚空武器。",
+        "energy_cost": 1,
+        "hash": -1660180393,
+        "name": "虚空枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的冰影武器。",
+        "energy_cost": 1,
+        "hash": -1493156008,
+        "name": "冰影枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的缚丝武器。",
+        "energy_cost": 1,
+        "hash": -1489112575,
+        "name": "缚丝枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该虚空武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 1,
+        "hash": -1479149339,
+        "name": "虚空回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该冰影武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 1,
+        "hash": -1120195440,
+        "name": "冰影回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的动能武器。",
+        "energy_cost": 1,
+        "hash": -1018689174,
+        "name": "动能枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的烈日武器。",
+        "energy_cost": 1,
+        "hash": -619414128,
+        "name": "烈日枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的电弧武器。",
+        "energy_cost": 1,
+        "hash": -496498729,
+        "name": "电弧枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "在拥有任何护甲充能时，你的虚空武器会获得小幅额外伤害加成。你的护甲充能现在会逐渐衰减。",
+        "energy_cost": 1,
+        "hash": -379994033,
+        "name": "虚空武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的电弧武器。; 逐渐填装你已收起的烈日武器。; 逐渐填装你已收起的冰影武器。; 逐渐填装你已收起的缚丝武器。; 逐渐填装你已收起的虚空武器。",
+        "energy_cost": 1,
+        "hash": -325605904,
+        "name": "谐振枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该烈日武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 1,
+        "hash": 56663992,
+        "name": "烈日回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该动能武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 1,
+        "hash": 579997810,
+        "name": "动能回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该电弧武器所用弹药时，获得额外弹药储量。; 拾取该烈日武器所用弹药时，获得额外弹药储量。; 拾取该冰影武器所用弹药时，获得额外弹药储量。; 拾取该缚丝武器所用弹药时，获得额外弹药储量。; 拾取该虚空武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 1,
+        "hash": 877723168,
+        "name": "谐振回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该缚丝武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 1,
+        "hash": 1305848463,
+        "name": "缚丝回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "在拥有任何护甲充能时，你的缚丝武器会获得小幅额外伤害加成。你的护甲充能现在会逐渐衰减。",
+        "energy_cost": 1,
+        "hash": 1501094193,
+        "name": "缚丝武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "在拥有任何护甲充能时，你会获得额外武器属性。你的护甲充能会逐渐衰减。",
+        "energy_cost": 1,
+        "hash": 1901221009,
+        "name": "武器洗礼",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的虚空武器。",
+        "energy_cost": 2,
+        "hash": -1842421809,
+        "name": "虚空枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的动能武器。",
+        "energy_cost": 2,
+        "hash": -721935342,
+        "name": "动能枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的缚丝武器。",
+        "energy_cost": 2,
+        "hash": -713270647,
+        "name": "缚丝枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的烈日武器。",
+        "energy_cost": 2,
+        "hash": -519050824,
+        "name": "烈日枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的电弧武器。",
+        "energy_cost": 2,
+        "hash": -57633,
+        "name": "电弧枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "逐渐填装你已收起的冰影武器。",
+        "energy_cost": 2,
+        "hash": 335129856,
+        "name": "冰影枪套",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该电弧武器所用弹药时，获得额外弹药储量。; 拾取该烈日武器所用弹药时，获得额外弹药储量。; 拾取该冰影武器所用弹药时，获得额外弹药储量。; 拾取该缚丝武器所用弹药时，获得额外弹药储量。; 拾取该虚空武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 2,
+        "hash": 1301391064,
+        "name": "谐振回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该缚丝武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 3,
+        "hash": -2037728857,
+        "name": "缚丝回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "收集一个能量球会使你获得1层临时的护甲充能。",
+        "energy_cost": 3,
+        "hash": -1975081882,
+        "name": "烈日武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该冰影武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 3,
+        "hash": -1560292568,
+        "name": "冰影回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "收集一个能量球会使你获得1层临时的护甲充能。",
+        "energy_cost": 3,
+        "hash": -1373252738,
+        "name": "冰影武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "收集一个能量球会使你获得1层临时的护甲充能。",
+        "energy_cost": 3,
+        "hash": -1182001671,
+        "name": "缚丝武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "收集一个能量球会使你获得1层临时的护甲充能。",
+        "energy_cost": 3,
+        "hash": -827506873,
+        "name": "虚空武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "收集一个能量球会使你获得1层临时的护甲充能。",
+        "energy_cost": 3,
+        "hash": -248609991,
+        "name": "武器洗礼",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "收集一个能量球会使你获得1层临时的护甲充能。",
+        "energy_cost": 3,
+        "hash": 14520248,
+        "name": "动能武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该电弧武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 3,
+        "hash": 534479613,
+        "name": "电弧回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该烈日武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 3,
+        "hash": 688956976,
+        "name": "烈日回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该虚空武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 3,
+        "hash": 802695661,
+        "name": "虚空回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "拾取该动能武器所用弹药时，获得额外弹药储量。",
+        "energy_cost": 3,
+        "hash": 1097608874,
+        "name": "动能回收器",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "legs",
+        "description": "收集一个能量球会使你获得1层临时的护甲充能。",
+        "energy_cost": 3,
+        "hash": 1834163303,
+        "name": "电弧武器激涌",
+        "slot": "legs",
+        "stat_bonus": {}
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量武器属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": -2050544686,
+        "name": "+超能 / -武器",
+        "slot": "tuning",
+        "stat_bonus": {
+          "超能": 5
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量生命值属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": -1173206497,
+        "name": "+武器 / -生命值",
+        "slot": "tuning",
+        "stat_bonus": {
+          "武器": 5
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "免费对此护甲的三个最低属性进行小幅提升。",
+        "energy_cost": 0,
+        "hash": -1172770080,
+        "name": "平衡调整",
+        "slot": "tuning",
+        "stat_bonus": {
+          "手雷": 1,
+          "武器": 1,
+          "生命值": 1,
+          "职业": 1,
+          "超能": 1,
+          "近战": 1
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量手雷属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": -1010524199,
+        "name": "+武器 / -手雷",
+        "slot": "tuning",
+        "stat_bonus": {
+          "武器": 5
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量武器属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": -274617709,
+        "name": "+近战 / -武器",
+        "slot": "tuning",
+        "stat_bonus": {
+          "近战": 5
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量武器属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": -178578123,
+        "name": "+手雷 / -武器",
+        "slot": "tuning",
+        "stat_bonus": {
+          "手雷": 5
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量武器属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": 323635379,
+        "name": "+职业 / -武器",
+        "slot": "tuning",
+        "stat_bonus": {
+          "职业": 5
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量近战属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": 691392383,
+        "name": "+武器 / -近战",
+        "slot": "tuning",
+        "stat_bonus": {
+          "武器": 5
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量超能属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": 891771298,
+        "name": "+武器 / -超能",
+        "slot": "tuning",
+        "stat_bonus": {
+          "武器": 5
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量职业属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": 1918710127,
+        "name": "+武器 / -职业",
+        "slot": "tuning",
+        "stat_bonus": {
+          "武器": 5
+        }
+      },
+      {
+        "category": "tuning",
+        "description": "以牺牲少量武器属性为代价，提升此护甲的调整属性。",
+        "energy_cost": 0,
+        "hash": 2125798995,
+        "name": "+生命值 / -武器",
+        "slot": "tuning",
+        "stat_bonus": {
+          "生命值": 5
+        }
+      }
+    ]
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已读取护甲模组。",
+  "warnings": []
+}
