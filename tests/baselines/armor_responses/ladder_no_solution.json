@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 18016,
+    "elapsed_ms": 353710,
     "is_error": false,
-    "payload_chars": 5407,
+    "payload_chars": 85670,
     "steps": [
       {
         "arguments": {
@@ -29,7 +29,7 @@
           "character": "hunter",
           "class_target": 100,
           "confirmed_exotic_hash": -1904495392,
-          "exotic_confirmation_token": "d2bc1.1789315308.yuHm4RRao2x2BzTn.22a41fda9e4824d0eaa1334357b310419e40470fcc0a988675ffe0fe92dd68c0",
+          "exotic_confirmation_token": "d2bc1.1789327658.uXDYX7UZjIketvjH.05536c551b8c00c9f61d48645735d8051493dda72e49c7183865ae0ab388704a",
           "exotic_name": "快速装弹松身裤",
           "fragment_names": null,
           "grenade_target": 70,
@@ -59,155 +59,2292 @@
   },
   "candidates": [],
   "data": {
-    "builds": [],
-    "ladder": {
-      "analysis_precision": "exact",
-      "ceiling": {
-        "class_stat": 130,
-        "grenade": 41,
-        "health": 6,
-        "melee": 70,
-        "super_stat": 100,
-        "weapons": 200
-      },
-      "met": [
-        "weapons",
-        "class_stat",
-        "melee",
-        "super_stat"
-      ],
-      "note": "ceiling = 同一套约束下、按某种优先级**同时**能达到的值（实采，逐项取最大）；它不等于「游戏里最多能到多少」，也不等于单项上限。降级只能由用户确认后执行。",
-      "precision": "sampled",
-      "priority": [
-        "weapons",
-        "class_stat",
-        "super_stat",
-        "melee",
-        "grenade",
-        "health"
-      ],
-      "reason": "No valid armor combination found (constraints may conflict with exotic + stat requirements)",
-      "samples": [
-        {
-          "class_stat": 110,
-          "grenade": 30,
-          "health": 0,
-          "melee": 70,
-          "super_stat": 80,
-          "weapons": 180
-        },
-        {
-          "class_stat": 130,
-          "grenade": 41,
-          "health": 6,
-          "melee": 26,
-          "super_stat": 100,
-          "weapons": 200
-        }
-      ],
-      "shortfall": {
-        "grenade": 29
-      },
-      "single_stat_ceiling": {
-        "class_stat": 200,
-        "grenade": 160,
-        "health": 127,
-        "melee": 150,
-        "super_stat": 180,
-        "weapons": 200
-      },
-      "single_stat_note": "single_stat_ceiling 是「把点全堆在这一项上」的上限，**不是**同时能达到的值；ceiling 才是同一套约束下按优先级实采出来的。",
-      "suggestion": {
-        "drop": [
-          "grenade"
+    "builds": [
+      {
+        "active_set_bonuses": [
+          {
+            "perks": [
+              {
+                "description": "拾取能量球后，下一次你的护盾被击破时，在短时间内获得生命值属性加成并向周围释放一股活性放射体液。",
+                "name": "活性放射体液裂隙",
+                "required_count": 2
+              }
+            ],
+            "piece_count": 3,
+            "set_name": "埃希恩记忆"
+          }
         ],
-        "drop_labels": [
-          "手雷"
-        ],
-        "priority": [
-          "weapons",
-          "class_stat",
-          "super_stat",
-          "melee",
-          "grenade",
-          "health"
-        ],
-        "reached": {
-          "class_stat": 110,
-          "grenade": 30,
-          "health": 0,
-          "melee": 70,
-          "super_stat": 80,
-          "weapons": 180
-        },
-        "why": "放下优先级最低的 1 项目标（手雷）之后能解出来：武器=180、职业=110、手雷=30、近战=70、超能=80。这一步要用户明确同意，不能自动降。"
-      },
-      "targets": {
-        "class_stat": 100,
-        "grenade": 70,
-        "melee": 70,
-        "super_stat": 80,
-        "weapons": 150
-      },
-      "trials": [
-        {
-          "dropped": [],
-          "label": "原样：当前硬目标 + 当前优先级",
-          "ok": false,
-          "priority": null,
-          "reached": {}
-        },
-        {
-          "dropped": [
-            "grenade"
-          ],
-          "label": "放下优先级最低的 1 项目标（手雷）",
-          "ok": true,
-          "priority": [
-            "weapons",
-            "class_stat",
-            "super_stat",
-            "melee",
-            "grenade",
-            "health"
-          ],
-          "reached": {
-            "class_stat": 110,
-            "grenade": 30,
+        "build": {
+          "bonus_stats": {
+            "class_stat": 0,
+            "grenade": 20,
             "health": 0,
+            "melee": 20,
+            "super_stat": 0,
+            "weapons": 10
+          },
+          "class_stat": 116,
+          "grenade": 70,
+          "health": 6,
+          "items": [
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "Specialist",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 30,
+                "grenade": 20,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 25
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6124b874b6bf7dede7bbf865c7303f4.jpg",
+              "is_artifice": false,
+              "is_equipped": true,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 1209319450,
+              "item_instance_id": "6917530189829824570",
+              "masterwork_level": 5,
+              "name": "光泽胄盔",
+              "power": 540,
+              "primary_stat": "class_stat",
+              "roll_parse_error": "",
+              "secondary_stat": "weapons",
+              "set_bonus_hash": 3737690559,
+              "set_bonus_name": "光泽",
+              "slot": "helmets",
+              "slot_display": "头盔",
+              "slot_key": "helmet",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 30,
+                "grenade": 20,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 5,
+                "weapons": 30
+              },
+              "tertiary_stat": "grenade",
+              "tier": 5,
+              "tuning_mod_hash": 3121760799,
+              "tuning_name": "+武器 / -生命值"
+            },
+            {
+              "archetype_hash": 544009373,
+              "archetype_name": "Powerhouse",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 20,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c0ef7b4f342a19611f0c34e74db91dbf.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 4105572261,
+              "item_instance_id": "6917530198796765812",
+              "masterwork_level": 5,
+              "name": "至高狂徒手套",
+              "power": 550,
+              "primary_stat": "weapons",
+              "roll_parse_error": "",
+              "secondary_stat": "super_stat",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "gauntlets",
+              "slot_display": "臂铠",
+              "slot_key": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 25,
+                "grenade": 5,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "tertiary_stat": "class_stat",
+              "tier": 5,
+              "tuning_mod_hash": 4030660414,
+              "tuning_name": "+职业 / -生命值"
+            },
+            {
+              "archetype_hash": 544009373,
+              "archetype_name": "Powerhouse",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 20,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f8f4b1a69763ce8cb57e50766aec57b0.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 2245093627,
+              "item_instance_id": "6917530198794478661",
+              "masterwork_level": 5,
+              "name": "至高狂徒胸甲",
+              "power": 550,
+              "primary_stat": "weapons",
+              "roll_parse_error": "",
+              "secondary_stat": "super_stat",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "chests",
+              "slot_display": "胸部护甲",
+              "slot_key": "chest",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 6,
+                "grenade": 20,
+                "health": 6,
+                "melee": 6,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "tertiary_stat": "grenade",
+              "tier": 5,
+              "tuning_mod_hash": 3122197216,
+              "tuning_name": "平衡调整"
+            },
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "Specialist",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 30,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 20,
+                "weapons": 25
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cb2d44c8d1459ea43b0ea82976cf66e0.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": true,
+              "is_masterworked": true,
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "masterwork_level": 5,
+              "name": "快速装弹松身裤",
+              "power": 550,
+              "primary_stat": "class_stat",
+              "roll_parse_error": "",
+              "secondary_stat": "weapons",
+              "set_bonus_hash": null,
+              "set_bonus_name": "",
+              "slot": "legs",
+              "slot_display": "腿部护甲",
+              "slot_key": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 35,
+                "grenade": 5,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 20,
+                "weapons": 25
+              },
+              "tertiary_stat": "super_stat",
+              "tier": 6,
+              "tuning_mod_hash": 4030660414,
+              "tuning_name": "+职业 / -生命值"
+            },
+            {
+              "archetype_hash": 1687144140,
+              "archetype_name": "",
+              "armor3_roll_verified": false,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 0
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/64aca077d2bd3439f0130d59c97ba06c.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 601809810,
+              "item_instance_id": "6917530196710926330",
+              "masterwork_level": 5,
+              "name": "破碎保险库披风",
+              "power": 550,
+              "primary_stat": "",
+              "roll_parse_error": "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。",
+              "secondary_stat": "",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "class_items",
+              "slot_display": "职业护甲",
+              "slot_key": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 20,
+                "grenade": 0,
+                "health": 0,
+                "melee": 30,
+                "super_stat": 5,
+                "weapons": 25
+              },
+              "tertiary_stat": "",
+              "tier": 5,
+              "tuning_mod_hash": 3946669007,
+              "tuning_name": "+超能 / -手雷"
+            }
+          ],
+          "melee": 71,
+          "stat_mods": [
+            4183296050,
+            1435557120,
+            1435557120,
+            4287799666,
+            4287799666
+          ],
+          "subclass_fragment_bonus": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "super_stat": 80,
+          "weapons": 150
+        },
+        "canonical_build": {
+          "aspect_hashes": [],
+          "class_ability_hash": null,
+          "class_type": "hunter",
+          "execution_id": "L5Ckhu5_F7jvsOwC02ddrD-Q",
+          "exotic_hash": 1793346751,
+          "fragment_hashes": [],
+          "grenade_hash": null,
+          "items": [
+            {
+              "item_hash": 1209319450,
+              "item_instance_id": "6917530189829824570",
+              "mod_sockets": {},
+              "mods": [
+                1435557120
+              ],
+              "name": "光泽胄盔",
+              "perks": [],
+              "slot": "helmet",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": true
+            },
+            {
+              "item_hash": 4105572261,
+              "item_instance_id": "6917530198796765812",
+              "mod_sockets": {},
+              "mods": [
+                4287799666
+              ],
+              "name": "至高狂徒手套",
+              "perks": [],
+              "slot": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 2245093627,
+              "item_instance_id": "6917530198794478661",
+              "mod_sockets": {},
+              "mods": [
+                4287799666
+              ],
+              "name": "至高狂徒胸甲",
+              "perks": [],
+              "slot": "chest",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "mod_sockets": {},
+              "mods": [
+                1435557120
+              ],
+              "name": "快速装弹松身裤",
+              "perks": [],
+              "slot": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 601809810,
+              "item_instance_id": "6917530196710926330",
+              "mod_sockets": {},
+              "mods": [
+                4183296050,
+                3946669007
+              ],
+              "name": "破碎保险库披风",
+              "perks": [],
+              "slot": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            }
+          ],
+          "melee_hash": null,
+          "movement_hash": null,
+          "snapshot_version": "867007a8295c137b503256b77971af9855355401663a49d0ebf2d4d82e1d6d4c",
+          "subclass_instance_id": "",
+          "subclass_item_hash": null,
+          "subclass_plug_sockets": {},
+          "super_hash": null,
+          "target_stats": {
+            "class_stat": 100,
+            "grenade": 70,
             "melee": 70,
             "super_stat": 80,
-            "weapons": 180
-          }
+            "weapons": 150
+          },
+          "weapon_hashes": []
         },
-        {
-          "dropped": [
-            "grenade",
-            "melee"
-          ],
-          "label": "放下优先级最低的 2 项目标（手雷、近战）",
-          "ok": true,
-          "priority": [
-            "weapons",
-            "class_stat",
-            "super_stat",
-            "melee",
-            "grenade",
-            "health"
-          ],
-          "reached": {
-            "class_stat": 130,
-            "grenade": 41,
-            "health": 6,
-            "melee": 26,
-            "super_stat": 100,
-            "weapons": 200
+        "completion_rate": 1.0,
+        "fragment_details": [],
+        "missing_requirements": [],
+        "requires_tuning": true,
+        "score": 1040.8,
+        "tuning_changes": [
+          {
+            "decreased": "grenade",
+            "delta": {
+              "super_stat": 5
+            },
+            "from": {
+              "hash": 2121121504,
+              "name": "空调整模组插槽"
+            },
+            "increased": "super_stat",
+            "item_instance_id": "6917530196710926330",
+            "item_name": "破碎保险库披风",
+            "slot": "class_items",
+            "slot_display": "职业护甲",
+            "slot_key": "class_item",
+            "to": {
+              "hash": 3946669007,
+              "name": "+超能 / -手雷"
+            }
           }
-        }
-      ],
-      "tuning_first": [],
-      "tuning_first_note": ""
-    },
+        ],
+        "tuning_note": "这套方案要先把 1 件护甲的调谐改掉才能达标（调谐免费、不占能量，也不影响模组）：破碎保险库披风 改成「+超能 / -手雷」。"
+      },
+      {
+        "active_set_bonuses": [
+          {
+            "perks": [
+              {
+                "description": "接受治疗时暂时为你的烈日武器提升抖动抗性、操控性和填装速度。",
+                "name": "光铸电涌",
+                "required_count": 2
+              }
+            ],
+            "piece_count": 2,
+            "set_name": "光泽"
+          }
+        ],
+        "build": {
+          "bonus_stats": {
+            "class_stat": 0,
+            "grenade": 20,
+            "health": 0,
+            "melee": 20,
+            "super_stat": 0,
+            "weapons": 10
+          },
+          "class_stat": 110,
+          "grenade": 70,
+          "health": 6,
+          "items": [
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "Specialist",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 30,
+                "grenade": 20,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 25
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6124b874b6bf7dede7bbf865c7303f4.jpg",
+              "is_artifice": false,
+              "is_equipped": true,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 1209319450,
+              "item_instance_id": "6917530189829824570",
+              "masterwork_level": 5,
+              "name": "光泽胄盔",
+              "power": 540,
+              "primary_stat": "class_stat",
+              "roll_parse_error": "",
+              "secondary_stat": "weapons",
+              "set_bonus_hash": 3737690559,
+              "set_bonus_name": "光泽",
+              "slot": "helmets",
+              "slot_display": "头盔",
+              "slot_key": "helmet",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 30,
+                "grenade": 20,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 5,
+                "weapons": 30
+              },
+              "tertiary_stat": "grenade",
+              "tier": 5,
+              "tuning_mod_hash": 3121760799,
+              "tuning_name": "+武器 / -生命值"
+            },
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "Specialist",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 30,
+                "grenade": 20,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 25
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/689a75795ccb6955d5f888e7f818f2a7.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 3446591075,
+              "item_instance_id": "6917530189823868633",
+              "masterwork_level": 5,
+              "name": "光泽护臂",
+              "power": 540,
+              "primary_stat": "class_stat",
+              "roll_parse_error": "",
+              "secondary_stat": "weapons",
+              "set_bonus_hash": 3737690559,
+              "set_bonus_name": "光泽",
+              "slot": "gauntlets",
+              "slot_display": "臂铠",
+              "slot_key": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 30,
+                "grenade": 20,
+                "health": 6,
+                "melee": 6,
+                "super_stat": 6,
+                "weapons": 25
+              },
+              "tertiary_stat": "grenade",
+              "tier": 5,
+              "tuning_mod_hash": 3122197216,
+              "tuning_name": "平衡调整"
+            },
+            {
+              "archetype_hash": 4227065942,
+              "archetype_name": "",
+              "armor3_roll_verified": false,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 0
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4cf653856fc76709add5446ea9b37e79.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 4246884536,
+              "item_instance_id": "6917530191124300387",
+              "masterwork_level": 5,
+              "name": "共振狂怒胸甲",
+              "power": 550,
+              "primary_stat": "",
+              "roll_parse_error": "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。",
+              "secondary_stat": "",
+              "set_bonus_hash": 338646742,
+              "set_bonus_name": "共振狂怒",
+              "slot": "chests",
+              "slot_display": "胸部护甲",
+              "slot_key": "chest",
+              "source_character_id": "",
+              "source_location": "vault",
+              "stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 30,
+                "super_stat": 30,
+                "weapons": 20
+              },
+              "tertiary_stat": "",
+              "tier": 5,
+              "tuning_mod_hash": 534630542,
+              "tuning_name": "+近战 / -手雷"
+            },
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "Specialist",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 30,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 20,
+                "weapons": 25
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cb2d44c8d1459ea43b0ea82976cf66e0.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": true,
+              "is_masterworked": true,
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "masterwork_level": 5,
+              "name": "快速装弹松身裤",
+              "power": 550,
+              "primary_stat": "class_stat",
+              "roll_parse_error": "",
+              "secondary_stat": "weapons",
+              "set_bonus_hash": null,
+              "set_bonus_name": "",
+              "slot": "legs",
+              "slot_display": "腿部护甲",
+              "slot_key": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 30,
+                "grenade": 5,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 20,
+                "weapons": 30
+              },
+              "tertiary_stat": "super_stat",
+              "tier": 6,
+              "tuning_mod_hash": 3121760799,
+              "tuning_name": "+武器 / -生命值"
+            },
+            {
+              "archetype_hash": 544009373,
+              "archetype_name": "Powerhouse",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 20,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/64aca077d2bd3439f0130d59c97ba06c.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 601809810,
+              "item_instance_id": "6917530189799302165",
+              "masterwork_level": 5,
+              "name": "破碎保险库披风",
+              "power": 540,
+              "primary_stat": "weapons",
+              "roll_parse_error": "",
+              "secondary_stat": "super_stat",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "class_items",
+              "slot_display": "职业护甲",
+              "slot_key": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 20,
+                "grenade": 5,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 25,
+                "weapons": 35
+              },
+              "tertiary_stat": "class_stat",
+              "tier": 5,
+              "tuning_mod_hash": 3121760799,
+              "tuning_name": "+武器 / -生命值"
+            }
+          ],
+          "melee": 71,
+          "stat_mods": [
+            4183296050,
+            1435557120,
+            1435557120,
+            4287799666,
+            4287799666
+          ],
+          "subclass_fragment_bonus": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "super_stat": 86,
+          "weapons": 150
+        },
+        "canonical_build": {
+          "aspect_hashes": [],
+          "class_ability_hash": null,
+          "class_type": "hunter",
+          "execution_id": "0tXvsnNiuZ0j5PpRtFrrhGtF",
+          "exotic_hash": 1793346751,
+          "fragment_hashes": [],
+          "grenade_hash": null,
+          "items": [
+            {
+              "item_hash": 1209319450,
+              "item_instance_id": "6917530189829824570",
+              "mod_sockets": {},
+              "mods": [
+                4287799666
+              ],
+              "name": "光泽胄盔",
+              "perks": [],
+              "slot": "helmet",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": true
+            },
+            {
+              "item_hash": 3446591075,
+              "item_instance_id": "6917530189823868633",
+              "mod_sockets": {},
+              "mods": [
+                4183296050
+              ],
+              "name": "光泽护臂",
+              "perks": [],
+              "slot": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 4246884536,
+              "item_instance_id": "6917530191124300387",
+              "mod_sockets": {},
+              "mods": [
+                4287799666,
+                534630542
+              ],
+              "name": "共振狂怒胸甲",
+              "perks": [],
+              "slot": "chest",
+              "source_character_id": "",
+              "source_location": "vault",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "mod_sockets": {},
+              "mods": [
+                1435557120,
+                3121760799
+              ],
+              "name": "快速装弹松身裤",
+              "perks": [],
+              "slot": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 601809810,
+              "item_instance_id": "6917530189799302165",
+              "mod_sockets": {},
+              "mods": [
+                1435557120
+              ],
+              "name": "破碎保险库披风",
+              "perks": [],
+              "slot": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            }
+          ],
+          "melee_hash": null,
+          "movement_hash": null,
+          "snapshot_version": "867007a8295c137b503256b77971af9855355401663a49d0ebf2d4d82e1d6d4c",
+          "subclass_instance_id": "",
+          "subclass_item_hash": null,
+          "subclass_plug_sockets": {},
+          "super_hash": null,
+          "target_stats": {
+            "class_stat": 100,
+            "grenade": 70,
+            "melee": 70,
+            "super_stat": 80,
+            "weapons": 150
+          },
+          "weapon_hashes": []
+        },
+        "completion_rate": 1.0,
+        "fragment_details": [],
+        "missing_requirements": [],
+        "requires_tuning": true,
+        "score": 1040.8,
+        "tuning_changes": [
+          {
+            "decreased": "grenade",
+            "delta": {
+              "melee": 5
+            },
+            "from": {
+              "hash": 2121121504,
+              "name": "空调整模组插槽"
+            },
+            "increased": "melee",
+            "item_instance_id": "6917530191124300387",
+            "item_name": "共振狂怒胸甲",
+            "slot": "chests",
+            "slot_display": "胸部护甲",
+            "slot_key": "chest",
+            "to": {
+              "hash": 534630542,
+              "name": "+近战 / -手雷"
+            }
+          },
+          {
+            "decreased": "health",
+            "delta": {
+              "class_stat": -5,
+              "weapons": 5
+            },
+            "from": {
+              "hash": 4030660414,
+              "name": "+职业 / -生命值"
+            },
+            "increased": "weapons",
+            "item_instance_id": "6917530189447915522",
+            "item_name": "快速装弹松身裤",
+            "slot": "legs",
+            "slot_display": "腿部护甲",
+            "slot_key": "legs",
+            "to": {
+              "hash": 3121760799,
+              "name": "+武器 / -生命值"
+            }
+          }
+        ],
+        "tuning_note": "这套方案要先把 2 件护甲的调谐改掉才能达标（调谐免费、不占能量，也不影响模组）：共振狂怒胸甲 改成「+近战 / -手雷」；快速装弹松身裤 改成「+武器 / -生命值」。"
+      },
+      {
+        "active_set_bonuses": [
+          {
+            "perks": [
+              {
+                "description": "拾取能量球后，下一次你的护盾被击破时，在短时间内获得生命值属性加成并向周围释放一股活性放射体液。",
+                "name": "活性放射体液裂隙",
+                "required_count": 2
+              }
+            ],
+            "piece_count": 3,
+            "set_name": "埃希恩记忆"
+          }
+        ],
+        "build": {
+          "bonus_stats": {
+            "class_stat": 0,
+            "grenade": 10,
+            "health": 0,
+            "melee": 20,
+            "super_stat": 10,
+            "weapons": 10
+          },
+          "class_stat": 106,
+          "grenade": 70,
+          "health": 6,
+          "items": [
+            {
+              "archetype_hash": 1807652646,
+              "archetype_name": "",
+              "armor3_roll_verified": false,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 0
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7e85b0b4d539f4ee58a9353fc258b212.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 1074455580,
+              "item_instance_id": "6917530190938176548",
+              "masterwork_level": 5,
+              "name": "众神辉煌面具",
+              "power": 550,
+              "primary_stat": "",
+              "roll_parse_error": "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。",
+              "secondary_stat": "",
+              "set_bonus_hash": 2386215115,
+              "set_bonus_name": "众神辉煌",
+              "slot": "helmets",
+              "slot_display": "头盔",
+              "slot_key": "helmet",
+              "source_character_id": "",
+              "source_location": "vault",
+              "stats": {
+                "class_stat": 20,
+                "grenade": 30,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 30
+              },
+              "tertiary_stat": "",
+              "tier": 5,
+              "tuning_mod_hash": 309000506,
+              "tuning_name": "+手雷 / -近战"
+            },
+            {
+              "archetype_hash": 544009373,
+              "archetype_name": "Powerhouse",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 20,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c0ef7b4f342a19611f0c34e74db91dbf.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 4105572261,
+              "item_instance_id": "6917530198796765812",
+              "masterwork_level": 5,
+              "name": "至高狂徒手套",
+              "power": 550,
+              "primary_stat": "weapons",
+              "roll_parse_error": "",
+              "secondary_stat": "super_stat",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "gauntlets",
+              "slot_display": "臂铠",
+              "slot_key": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 25,
+                "grenade": 5,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "tertiary_stat": "class_stat",
+              "tier": 5,
+              "tuning_mod_hash": 4030660414,
+              "tuning_name": "+职业 / -生命值"
+            },
+            {
+              "archetype_hash": 544009373,
+              "archetype_name": "Powerhouse",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 20,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f8f4b1a69763ce8cb57e50766aec57b0.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 2245093627,
+              "item_instance_id": "6917530198794478661",
+              "masterwork_level": 5,
+              "name": "至高狂徒胸甲",
+              "power": 550,
+              "primary_stat": "weapons",
+              "roll_parse_error": "",
+              "secondary_stat": "super_stat",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "chests",
+              "slot_display": "胸部护甲",
+              "slot_key": "chest",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 6,
+                "grenade": 20,
+                "health": 6,
+                "melee": 6,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "tertiary_stat": "grenade",
+              "tier": 5,
+              "tuning_mod_hash": 3122197216,
+              "tuning_name": "平衡调整"
+            },
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "Specialist",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 30,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 20,
+                "weapons": 25
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cb2d44c8d1459ea43b0ea82976cf66e0.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": true,
+              "is_masterworked": true,
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "masterwork_level": 5,
+              "name": "快速装弹松身裤",
+              "power": 550,
+              "primary_stat": "class_stat",
+              "roll_parse_error": "",
+              "secondary_stat": "weapons",
+              "set_bonus_hash": null,
+              "set_bonus_name": "",
+              "slot": "legs",
+              "slot_display": "腿部护甲",
+              "slot_key": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 35,
+                "grenade": 5,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 20,
+                "weapons": 25
+              },
+              "tertiary_stat": "super_stat",
+              "tier": 6,
+              "tuning_mod_hash": 4030660414,
+              "tuning_name": "+职业 / -生命值"
+            },
+            {
+              "archetype_hash": 1687144140,
+              "archetype_name": "",
+              "armor3_roll_verified": false,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 0
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/64aca077d2bd3439f0130d59c97ba06c.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 601809810,
+              "item_instance_id": "6917530196710926330",
+              "masterwork_level": 5,
+              "name": "破碎保险库披风",
+              "power": 550,
+              "primary_stat": "",
+              "roll_parse_error": "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。",
+              "secondary_stat": "",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "class_items",
+              "slot_display": "职业护甲",
+              "slot_key": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 20,
+                "grenade": 0,
+                "health": 0,
+                "melee": 35,
+                "super_stat": 0,
+                "weapons": 25
+              },
+              "tertiary_stat": "",
+              "tier": 5,
+              "tuning_mod_hash": 311164277,
+              "tuning_name": "+近战 / -超能"
+            }
+          ],
+          "melee": 71,
+          "stat_mods": [
+            4183296050,
+            1435557120,
+            4287799666,
+            4287799666,
+            2724608735
+          ],
+          "subclass_fragment_bonus": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "super_stat": 80,
+          "weapons": 150
+        },
+        "canonical_build": {
+          "aspect_hashes": [],
+          "class_ability_hash": null,
+          "class_type": "hunter",
+          "execution_id": "GtM99hfP6ZdBdauFwkAyoKcW",
+          "exotic_hash": 1793346751,
+          "fragment_hashes": [],
+          "grenade_hash": null,
+          "items": [
+            {
+              "item_hash": 1074455580,
+              "item_instance_id": "6917530190938176548",
+              "mod_sockets": {},
+              "mods": [
+                2724608735,
+                309000506
+              ],
+              "name": "众神辉煌面具",
+              "perks": [],
+              "slot": "helmet",
+              "source_character_id": "",
+              "source_location": "vault",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 4105572261,
+              "item_instance_id": "6917530198796765812",
+              "mod_sockets": {},
+              "mods": [
+                4287799666
+              ],
+              "name": "至高狂徒手套",
+              "perks": [],
+              "slot": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 2245093627,
+              "item_instance_id": "6917530198794478661",
+              "mod_sockets": {},
+              "mods": [
+                4287799666
+              ],
+              "name": "至高狂徒胸甲",
+              "perks": [],
+              "slot": "chest",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "mod_sockets": {},
+              "mods": [
+                1435557120
+              ],
+              "name": "快速装弹松身裤",
+              "perks": [],
+              "slot": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 601809810,
+              "item_instance_id": "6917530196710926330",
+              "mod_sockets": {},
+              "mods": [
+                4183296050,
+                311164277
+              ],
+              "name": "破碎保险库披风",
+              "perks": [],
+              "slot": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            }
+          ],
+          "melee_hash": null,
+          "movement_hash": null,
+          "snapshot_version": "867007a8295c137b503256b77971af9855355401663a49d0ebf2d4d82e1d6d4c",
+          "subclass_instance_id": "",
+          "subclass_item_hash": null,
+          "subclass_plug_sockets": {},
+          "super_hash": null,
+          "target_stats": {
+            "class_stat": 100,
+            "grenade": 70,
+            "melee": 70,
+            "super_stat": 80,
+            "weapons": 150
+          },
+          "weapon_hashes": []
+        },
+        "completion_rate": 1.0,
+        "fragment_details": [],
+        "missing_requirements": [],
+        "requires_tuning": true,
+        "score": 1044.8,
+        "tuning_changes": [
+          {
+            "decreased": "melee",
+            "delta": {
+              "grenade": 5
+            },
+            "from": {
+              "hash": 2121121504,
+              "name": "空调整模组插槽"
+            },
+            "increased": "grenade",
+            "item_instance_id": "6917530190938176548",
+            "item_name": "众神辉煌面具",
+            "slot": "helmets",
+            "slot_display": "头盔",
+            "slot_key": "helmet",
+            "to": {
+              "hash": 309000506,
+              "name": "+手雷 / -近战"
+            }
+          },
+          {
+            "decreased": "super_stat",
+            "delta": {
+              "melee": 5
+            },
+            "from": {
+              "hash": 2121121504,
+              "name": "空调整模组插槽"
+            },
+            "increased": "melee",
+            "item_instance_id": "6917530196710926330",
+            "item_name": "破碎保险库披风",
+            "slot": "class_items",
+            "slot_display": "职业护甲",
+            "slot_key": "class_item",
+            "to": {
+              "hash": 311164277,
+              "name": "+近战 / -超能"
+            }
+          }
+        ],
+        "tuning_note": "这套方案要先把 2 件护甲的调谐改掉才能达标（调谐免费、不占能量，也不影响模组）：众神辉煌面具 改成「+手雷 / -近战」；破碎保险库披风 改成「+近战 / -超能」。"
+      },
+      {
+        "active_set_bonuses": [
+          {
+            "perks": [
+              {
+                "description": "拾取能量球后，下一次你的护盾被击破时，在短时间内获得生命值属性加成并向周围释放一股活性放射体液。",
+                "name": "活性放射体液裂隙",
+                "required_count": 2
+              }
+            ],
+            "piece_count": 3,
+            "set_name": "埃希恩记忆"
+          }
+        ],
+        "build": {
+          "bonus_stats": {
+            "class_stat": 0,
+            "grenade": 10,
+            "health": 0,
+            "melee": 20,
+            "super_stat": 10,
+            "weapons": 10
+          },
+          "class_stat": 106,
+          "grenade": 70,
+          "health": 6,
+          "items": [
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "",
+              "armor3_roll_verified": false,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 0
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6124b874b6bf7dede7bbf865c7303f4.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 1209319450,
+              "item_instance_id": "6917530189823870307",
+              "masterwork_level": 5,
+              "name": "光泽胄盔",
+              "power": 540,
+              "primary_stat": "",
+              "roll_parse_error": "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。",
+              "secondary_stat": "",
+              "set_bonus_hash": 3737690559,
+              "set_bonus_name": "光泽",
+              "slot": "helmets",
+              "slot_display": "头盔",
+              "slot_key": "helmet",
+              "source_character_id": "",
+              "source_location": "vault",
+              "stats": {
+                "class_stat": 30,
+                "grenade": 25,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 25
+              },
+              "tertiary_stat": "",
+              "tier": 5,
+              "tuning_mod_hash": 309000506,
+              "tuning_name": "+手雷 / -近战"
+            },
+            {
+              "archetype_hash": 544009373,
+              "archetype_name": "Powerhouse",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 20,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c0ef7b4f342a19611f0c34e74db91dbf.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 4105572261,
+              "item_instance_id": "6917530198796765812",
+              "masterwork_level": 5,
+              "name": "至高狂徒手套",
+              "power": 550,
+              "primary_stat": "weapons",
+              "roll_parse_error": "",
+              "secondary_stat": "super_stat",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "gauntlets",
+              "slot_display": "臂铠",
+              "slot_key": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 20,
+                "grenade": 10,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "tertiary_stat": "class_stat",
+              "tier": 5,
+              "tuning_mod_hash": 455024236,
+              "tuning_name": "+手雷 / -生命值"
+            },
+            {
+              "archetype_hash": 544009373,
+              "archetype_name": "Powerhouse",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 20,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f8f4b1a69763ce8cb57e50766aec57b0.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 2245093627,
+              "item_instance_id": "6917530198794478661",
+              "masterwork_level": 5,
+              "name": "至高狂徒胸甲",
+              "power": 550,
+              "primary_stat": "weapons",
+              "roll_parse_error": "",
+              "secondary_stat": "super_stat",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "chests",
+              "slot_display": "胸部护甲",
+              "slot_key": "chest",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 6,
+                "grenade": 20,
+                "health": 6,
+                "melee": 6,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "tertiary_stat": "grenade",
+              "tier": 5,
+              "tuning_mod_hash": 3122197216,
+              "tuning_name": "平衡调整"
+            },
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "Specialist",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 30,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 20,
+                "weapons": 25
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cb2d44c8d1459ea43b0ea82976cf66e0.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": true,
+              "is_masterworked": true,
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "masterwork_level": 5,
+              "name": "快速装弹松身裤",
+              "power": 550,
+              "primary_stat": "class_stat",
+              "roll_parse_error": "",
+              "secondary_stat": "weapons",
+              "set_bonus_hash": null,
+              "set_bonus_name": "",
+              "slot": "legs",
+              "slot_display": "腿部护甲",
+              "slot_key": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 30,
+                "grenade": 5,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 20,
+                "weapons": 30
+              },
+              "tertiary_stat": "super_stat",
+              "tier": 6,
+              "tuning_mod_hash": 3121760799,
+              "tuning_name": "+武器 / -生命值"
+            },
+            {
+              "archetype_hash": 1687144140,
+              "archetype_name": "",
+              "armor3_roll_verified": false,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 0
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/64aca077d2bd3439f0130d59c97ba06c.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 601809810,
+              "item_instance_id": "6917530196710926330",
+              "masterwork_level": 5,
+              "name": "破碎保险库披风",
+              "power": 550,
+              "primary_stat": "",
+              "roll_parse_error": "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。",
+              "secondary_stat": "",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "class_items",
+              "slot_display": "职业护甲",
+              "slot_key": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 20,
+                "grenade": 0,
+                "health": 0,
+                "melee": 35,
+                "super_stat": 0,
+                "weapons": 25
+              },
+              "tertiary_stat": "",
+              "tier": 5,
+              "tuning_mod_hash": 311164277,
+              "tuning_name": "+近战 / -超能"
+            }
+          ],
+          "melee": 71,
+          "stat_mods": [
+            4183296050,
+            1435557120,
+            4287799666,
+            4287799666,
+            2724608735
+          ],
+          "subclass_fragment_bonus": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "super_stat": 80,
+          "weapons": 150
+        },
+        "canonical_build": {
+          "aspect_hashes": [],
+          "class_ability_hash": null,
+          "class_type": "hunter",
+          "execution_id": "1paQNpEdE8sg2BMJ7dSAvMn8",
+          "exotic_hash": 1793346751,
+          "fragment_hashes": [],
+          "grenade_hash": null,
+          "items": [
+            {
+              "item_hash": 1209319450,
+              "item_instance_id": "6917530189823870307",
+              "mod_sockets": {},
+              "mods": [
+                2724608735,
+                309000506
+              ],
+              "name": "光泽胄盔",
+              "perks": [],
+              "slot": "helmet",
+              "source_character_id": "",
+              "source_location": "vault",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 4105572261,
+              "item_instance_id": "6917530198796765812",
+              "mod_sockets": {},
+              "mods": [
+                4287799666,
+                455024236
+              ],
+              "name": "至高狂徒手套",
+              "perks": [],
+              "slot": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 2245093627,
+              "item_instance_id": "6917530198794478661",
+              "mod_sockets": {},
+              "mods": [
+                4287799666
+              ],
+              "name": "至高狂徒胸甲",
+              "perks": [],
+              "slot": "chest",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "mod_sockets": {},
+              "mods": [
+                1435557120,
+                3121760799
+              ],
+              "name": "快速装弹松身裤",
+              "perks": [],
+              "slot": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 601809810,
+              "item_instance_id": "6917530196710926330",
+              "mod_sockets": {},
+              "mods": [
+                4183296050,
+                311164277
+              ],
+              "name": "破碎保险库披风",
+              "perks": [],
+              "slot": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            }
+          ],
+          "melee_hash": null,
+          "movement_hash": null,
+          "snapshot_version": "867007a8295c137b503256b77971af9855355401663a49d0ebf2d4d82e1d6d4c",
+          "subclass_instance_id": "",
+          "subclass_item_hash": null,
+          "subclass_plug_sockets": {},
+          "super_hash": null,
+          "target_stats": {
+            "class_stat": 100,
+            "grenade": 70,
+            "melee": 70,
+            "super_stat": 80,
+            "weapons": 150
+          },
+          "weapon_hashes": []
+        },
+        "completion_rate": 1.0,
+        "fragment_details": [],
+        "missing_requirements": [],
+        "requires_tuning": true,
+        "score": 1044.8,
+        "tuning_changes": [
+          {
+            "decreased": "melee",
+            "delta": {
+              "grenade": 5
+            },
+            "from": {
+              "hash": 2121121504,
+              "name": "空调整模组插槽"
+            },
+            "increased": "grenade",
+            "item_instance_id": "6917530189823870307",
+            "item_name": "光泽胄盔",
+            "slot": "helmets",
+            "slot_display": "头盔",
+            "slot_key": "helmet",
+            "to": {
+              "hash": 309000506,
+              "name": "+手雷 / -近战"
+            }
+          },
+          {
+            "decreased": "health",
+            "delta": {
+              "class_stat": -5,
+              "grenade": 5
+            },
+            "from": {
+              "hash": 4030660414,
+              "name": "+职业 / -生命值"
+            },
+            "increased": "grenade",
+            "item_instance_id": "6917530198796765812",
+            "item_name": "至高狂徒手套",
+            "slot": "gauntlets",
+            "slot_display": "臂铠",
+            "slot_key": "gauntlets",
+            "to": {
+              "hash": 455024236,
+              "name": "+手雷 / -生命值"
+            }
+          },
+          {
+            "decreased": "health",
+            "delta": {
+              "class_stat": -5,
+              "weapons": 5
+            },
+            "from": {
+              "hash": 4030660414,
+              "name": "+职业 / -生命值"
+            },
+            "increased": "weapons",
+            "item_instance_id": "6917530189447915522",
+            "item_name": "快速装弹松身裤",
+            "slot": "legs",
+            "slot_display": "腿部护甲",
+            "slot_key": "legs",
+            "to": {
+              "hash": 3121760799,
+              "name": "+武器 / -生命值"
+            }
+          },
+          {
+            "decreased": "super_stat",
+            "delta": {
+              "melee": 5
+            },
+            "from": {
+              "hash": 2121121504,
+              "name": "空调整模组插槽"
+            },
+            "increased": "melee",
+            "item_instance_id": "6917530196710926330",
+            "item_name": "破碎保险库披风",
+            "slot": "class_items",
+            "slot_display": "职业护甲",
+            "slot_key": "class_item",
+            "to": {
+              "hash": 311164277,
+              "name": "+近战 / -超能"
+            }
+          }
+        ],
+        "tuning_note": "这套方案要先把 4 件护甲的调谐改掉才能达标（调谐免费、不占能量，也不影响模组）：光泽胄盔 改成「+手雷 / -近战」；至高狂徒手套 改成「+手雷 / -生命值」；快速装弹松身裤 改成「+武器 / -生命值」；破碎保险库披风 改成「+近战 / -超能」。"
+      },
+      {
+        "active_set_bonuses": [
+          {
+            "perks": [
+              {
+                "description": "拾取能量球后，下一次你的护盾被击破时，在短时间内获得生命值属性加成并向周围释放一股活性放射体液。",
+                "name": "活性放射体液裂隙",
+                "required_count": 2
+              }
+            ],
+            "piece_count": 3,
+            "set_name": "埃希恩记忆"
+          }
+        ],
+        "build": {
+          "bonus_stats": {
+            "class_stat": 0,
+            "grenade": 10,
+            "health": 0,
+            "melee": 20,
+            "super_stat": 10,
+            "weapons": 10
+          },
+          "class_stat": 100,
+          "grenade": 70,
+          "health": 0,
+          "items": [
+            {
+              "archetype_hash": 544009373,
+              "archetype_name": "",
+              "armor3_roll_verified": false,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 0
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/a74303d3afb22d91a66a616766278acc.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 656307180,
+              "item_instance_id": "6917530196710928199",
+              "masterwork_level": 5,
+              "name": "至高狂徒面具",
+              "power": 550,
+              "primary_stat": "",
+              "roll_parse_error": "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。",
+              "secondary_stat": "",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "helmets",
+              "slot_display": "头盔",
+              "slot_key": "helmet",
+              "source_character_id": "",
+              "source_location": "vault",
+              "stats": {
+                "class_stat": 0,
+                "grenade": 25,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "tertiary_stat": "",
+              "tier": 5,
+              "tuning_mod_hash": 309000506,
+              "tuning_name": "+手雷 / -近战"
+            },
+            {
+              "archetype_hash": 544009373,
+              "archetype_name": "Powerhouse",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 20,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c0ef7b4f342a19611f0c34e74db91dbf.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 4105572261,
+              "item_instance_id": "6917530198796765812",
+              "masterwork_level": 5,
+              "name": "至高狂徒手套",
+              "power": 550,
+              "primary_stat": "weapons",
+              "roll_parse_error": "",
+              "secondary_stat": "super_stat",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "gauntlets",
+              "slot_display": "臂铠",
+              "slot_key": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 20,
+                "grenade": 10,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 25,
+                "weapons": 30
+              },
+              "tertiary_stat": "class_stat",
+              "tier": 5,
+              "tuning_mod_hash": 455024236,
+              "tuning_name": "+手雷 / -生命值"
+            },
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "",
+              "armor3_roll_verified": false,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 0
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2154657997b57d335cda989fb4e37cfc.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 1078817668,
+              "item_instance_id": "6917530194351261836",
+              "masterwork_level": 5,
+              "name": "超越胸甲",
+              "power": 550,
+              "primary_stat": "",
+              "roll_parse_error": "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。",
+              "secondary_stat": "",
+              "set_bonus_hash": 640349758,
+              "set_bonus_name": "第三百夫长",
+              "slot": "chests",
+              "slot_display": "胸部护甲",
+              "slot_key": "chest",
+              "source_character_id": "",
+              "source_location": "vault",
+              "stats": {
+                "class_stat": 30,
+                "grenade": 20,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 0,
+                "weapons": 25
+              },
+              "tertiary_stat": "",
+              "tier": 5,
+              "tuning_mod_hash": 311164277,
+              "tuning_name": "+近战 / -超能"
+            },
+            {
+              "archetype_hash": 2230428468,
+              "archetype_name": "Specialist",
+              "armor3_roll_verified": true,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 30,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 20,
+                "weapons": 25
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cb2d44c8d1459ea43b0ea82976cf66e0.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": true,
+              "is_masterworked": true,
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "masterwork_level": 5,
+              "name": "快速装弹松身裤",
+              "power": 550,
+              "primary_stat": "class_stat",
+              "roll_parse_error": "",
+              "secondary_stat": "weapons",
+              "set_bonus_hash": null,
+              "set_bonus_name": "",
+              "slot": "legs",
+              "slot_display": "腿部护甲",
+              "slot_key": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 30,
+                "grenade": 5,
+                "health": 0,
+                "melee": 5,
+                "super_stat": 20,
+                "weapons": 30
+              },
+              "tertiary_stat": "super_stat",
+              "tier": 6,
+              "tuning_mod_hash": 3121760799,
+              "tuning_name": "+武器 / -生命值"
+            },
+            {
+              "archetype_hash": 1687144140,
+              "archetype_name": "",
+              "armor3_roll_verified": false,
+              "armor_system": "armor_3",
+              "base_roll_stats": {
+                "class_stat": 0,
+                "grenade": 0,
+                "health": 0,
+                "melee": 0,
+                "super_stat": 0,
+                "weapons": 0
+              },
+              "energy_capacity": 11,
+              "gear_tier": 5,
+              "has_set_bonus_mod_socket": false,
+              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/64aca077d2bd3439f0130d59c97ba06c.jpg",
+              "is_artifice": false,
+              "is_equipped": false,
+              "is_exotic": false,
+              "is_masterworked": true,
+              "item_hash": 601809810,
+              "item_instance_id": "6917530196710926330",
+              "masterwork_level": 5,
+              "name": "破碎保险库披风",
+              "power": 550,
+              "primary_stat": "",
+              "roll_parse_error": "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。",
+              "secondary_stat": "",
+              "set_bonus_hash": 741162535,
+              "set_bonus_name": "埃希恩记忆",
+              "slot": "class_items",
+              "slot_display": "职业护甲",
+              "slot_key": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "stats": {
+                "class_stat": 20,
+                "grenade": 0,
+                "health": 0,
+                "melee": 35,
+                "super_stat": 0,
+                "weapons": 25
+              },
+              "tertiary_stat": "",
+              "tier": 5,
+              "tuning_mod_hash": 311164277,
+              "tuning_name": "+近战 / -超能"
+            }
+          ],
+          "melee": 70,
+          "stat_mods": [
+            4183296050,
+            1435557120,
+            4287799666,
+            4287799666,
+            2724608735
+          ],
+          "subclass_fragment_bonus": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "super_stat": 80,
+          "weapons": 150
+        },
+        "canonical_build": {
+          "aspect_hashes": [],
+          "class_ability_hash": null,
+          "class_type": "hunter",
+          "execution_id": "dnTZ07qK-VMjJ-28cXggmEcg",
+          "exotic_hash": 1793346751,
+          "fragment_hashes": [],
+          "grenade_hash": null,
+          "items": [
+            {
+              "item_hash": 656307180,
+              "item_instance_id": "6917530196710928199",
+              "mod_sockets": {},
+              "mods": [
+                4287799666,
+                309000506
+              ],
+              "name": "至高狂徒面具",
+              "perks": [],
+              "slot": "helmet",
+              "source_character_id": "",
+              "source_location": "vault",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 4105572261,
+              "item_instance_id": "6917530198796765812",
+              "mod_sockets": {},
+              "mods": [
+                4287799666,
+                455024236
+              ],
+              "name": "至高狂徒手套",
+              "perks": [],
+              "slot": "gauntlets",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 1078817668,
+              "item_instance_id": "6917530194351261836",
+              "mod_sockets": {},
+              "mods": [
+                2724608735,
+                311164277
+              ],
+              "name": "超越胸甲",
+              "perks": [],
+              "slot": "chest",
+              "source_character_id": "",
+              "source_location": "vault",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 1793346751,
+              "item_instance_id": "6917530189447915522",
+              "mod_sockets": {},
+              "mods": [
+                1435557120,
+                3121760799
+              ],
+              "name": "快速装弹松身裤",
+              "perks": [],
+              "slot": "legs",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            },
+            {
+              "item_hash": 601809810,
+              "item_instance_id": "6917530196710926330",
+              "mod_sockets": {},
+              "mods": [
+                4183296050,
+                311164277
+              ],
+              "name": "破碎保险库披风",
+              "perks": [],
+              "slot": "class_item",
+              "source_character_id": "2305843009679355779",
+              "source_location": "hunter",
+              "was_equipped": false
+            }
+          ],
+          "melee_hash": null,
+          "movement_hash": null,
+          "snapshot_version": "867007a8295c137b503256b77971af9855355401663a49d0ebf2d4d82e1d6d4c",
+          "subclass_instance_id": "",
+          "subclass_item_hash": null,
+          "subclass_plug_sockets": {},
+          "super_hash": null,
+          "target_stats": {
+            "class_stat": 100,
+            "grenade": 70,
+            "melee": 70,
+            "super_stat": 80,
+            "weapons": 150
+          },
+          "weapon_hashes": []
+        },
+        "completion_rate": 1.0,
+        "fragment_details": [],
+        "missing_requirements": [],
+        "requires_tuning": true,
+        "score": 1047.0,
+        "tuning_changes": [
+          {
+            "decreased": "melee",
+            "delta": {
+              "grenade": 5
+            },
+            "from": {
+              "hash": 2121121504,
+              "name": "空调整模组插槽"
+            },
+            "increased": "grenade",
+            "item_instance_id": "6917530196710928199",
+            "item_name": "至高狂徒面具",
+            "slot": "helmets",
+            "slot_display": "头盔",
+            "slot_key": "helmet",
+            "to": {
+              "hash": 309000506,
+              "name": "+手雷 / -近战"
+            }
+          },
+          {
+            "decreased": "health",
+            "delta": {
+              "class_stat": -5,
+              "grenade": 5
+            },
+            "from": {
+              "hash": 4030660414,
+              "name": "+职业 / -生命值"
+            },
+            "increased": "grenade",
+            "item_instance_id": "6917530198796765812",
+            "item_name": "至高狂徒手套",
+            "slot": "gauntlets",
+            "slot_display": "臂铠",
+            "slot_key": "gauntlets",
+            "to": {
+              "hash": 455024236,
+              "name": "+手雷 / -生命值"
+            }
+          },
+          {
+            "decreased": "super_stat",
+            "delta": {
+              "melee": 5
+            },
+            "from": {
+              "hash": 2121121504,
+              "name": "空调整模组插槽"
+            },
+            "increased": "melee",
+            "item_instance_id": "6917530194351261836",
+            "item_name": "超越胸甲",
+            "slot": "chests",
+            "slot_display": "胸部护甲",
+            "slot_key": "chest",
+            "to": {
+              "hash": 311164277,
+              "name": "+近战 / -超能"
+            }
+          },
+          {
+            "decreased": "health",
+            "delta": {
+              "class_stat": -5,
+              "weapons": 5
+            },
+            "from": {
+              "hash": 4030660414,
+              "name": "+职业 / -生命值"
+            },
+            "increased": "weapons",
+            "item_instance_id": "6917530189447915522",
+            "item_name": "快速装弹松身裤",
+            "slot": "legs",
+            "slot_display": "腿部护甲",
+            "slot_key": "legs",
+            "to": {
+              "hash": 3121760799,
+              "name": "+武器 / -生命值"
+            }
+          },
+          {
+            "decreased": "super_stat",
+            "delta": {
+              "melee": 5
+            },
+            "from": {
+              "hash": 2121121504,
+              "name": "空调整模组插槽"
+            },
+            "increased": "melee",
+            "item_instance_id": "6917530196710926330",
+            "item_name": "破碎保险库披风",
+            "slot": "class_items",
+            "slot_display": "职业护甲",
+            "slot_key": "class_item",
+            "to": {
+              "hash": 311164277,
+              "name": "+近战 / -超能"
+            }
+          }
+        ],
+        "tuning_note": "这套方案要先把 5 件护甲的调谐改掉才能达标（调谐免费、不占能量，也不影响模组）：至高狂徒面具 改成「+手雷 / -近战」；至高狂徒手套 改成「+手雷 / -生命值」；超越胸甲 改成「+近战 / -超能」；快速装弹松身裤 改成「+武器 / -生命值」；破碎保险库披风 改成「+近战 / -超能」。"
+      }
+    ],
     "query": {
       "character": "hunter",
       "exotic_name": "快速装弹松身裤",
@@ -226,12 +2363,302 @@
         "super": 80,
         "weapons": 150
       }
+    },
+    "tuning": {
+      "build_count": 5,
+      "change_count": 14,
+      "changes": [
+        {
+          "decreased": "grenade",
+          "delta": {
+            "super_stat": 5
+          },
+          "from": {
+            "hash": 2121121504,
+            "name": "空调整模组插槽"
+          },
+          "increased": "super_stat",
+          "item_instance_id": "6917530196710926330",
+          "item_name": "破碎保险库披风",
+          "slot": "class_items",
+          "slot_display": "职业护甲",
+          "slot_key": "class_item",
+          "to": {
+            "hash": 3946669007,
+            "name": "+超能 / -手雷"
+          }
+        },
+        {
+          "decreased": "grenade",
+          "delta": {
+            "melee": 5
+          },
+          "from": {
+            "hash": 2121121504,
+            "name": "空调整模组插槽"
+          },
+          "increased": "melee",
+          "item_instance_id": "6917530191124300387",
+          "item_name": "共振狂怒胸甲",
+          "slot": "chests",
+          "slot_display": "胸部护甲",
+          "slot_key": "chest",
+          "to": {
+            "hash": 534630542,
+            "name": "+近战 / -手雷"
+          }
+        },
+        {
+          "decreased": "health",
+          "delta": {
+            "class_stat": -5,
+            "weapons": 5
+          },
+          "from": {
+            "hash": 4030660414,
+            "name": "+职业 / -生命值"
+          },
+          "increased": "weapons",
+          "item_instance_id": "6917530189447915522",
+          "item_name": "快速装弹松身裤",
+          "slot": "legs",
+          "slot_display": "腿部护甲",
+          "slot_key": "legs",
+          "to": {
+            "hash": 3121760799,
+            "name": "+武器 / -生命值"
+          }
+        },
+        {
+          "decreased": "melee",
+          "delta": {
+            "grenade": 5
+          },
+          "from": {
+            "hash": 2121121504,
+            "name": "空调整模组插槽"
+          },
+          "increased": "grenade",
+          "item_instance_id": "6917530190938176548",
+          "item_name": "众神辉煌面具",
+          "slot": "helmets",
+          "slot_display": "头盔",
+          "slot_key": "helmet",
+          "to": {
+            "hash": 309000506,
+            "name": "+手雷 / -近战"
+          }
+        },
+        {
+          "decreased": "super_stat",
+          "delta": {
+            "melee": 5
+          },
+          "from": {
+            "hash": 2121121504,
+            "name": "空调整模组插槽"
+          },
+          "increased": "melee",
+          "item_instance_id": "6917530196710926330",
+          "item_name": "破碎保险库披风",
+          "slot": "class_items",
+          "slot_display": "职业护甲",
+          "slot_key": "class_item",
+          "to": {
+            "hash": 311164277,
+            "name": "+近战 / -超能"
+          }
+        },
+        {
+          "decreased": "melee",
+          "delta": {
+            "grenade": 5
+          },
+          "from": {
+            "hash": 2121121504,
+            "name": "空调整模组插槽"
+          },
+          "increased": "grenade",
+          "item_instance_id": "6917530189823870307",
+          "item_name": "光泽胄盔",
+          "slot": "helmets",
+          "slot_display": "头盔",
+          "slot_key": "helmet",
+          "to": {
+            "hash": 309000506,
+            "name": "+手雷 / -近战"
+          }
+        },
+        {
+          "decreased": "health",
+          "delta": {
+            "class_stat": -5,
+            "grenade": 5
+          },
+          "from": {
+            "hash": 4030660414,
+            "name": "+职业 / -生命值"
+          },
+          "increased": "grenade",
+          "item_instance_id": "6917530198796765812",
+          "item_name": "至高狂徒手套",
+          "slot": "gauntlets",
+          "slot_display": "臂铠",
+          "slot_key": "gauntlets",
+          "to": {
+            "hash": 455024236,
+            "name": "+手雷 / -生命值"
+          }
+        },
+        {
+          "decreased": "health",
+          "delta": {
+            "class_stat": -5,
+            "weapons": 5
+          },
+          "from": {
+            "hash": 4030660414,
+            "name": "+职业 / -生命值"
+          },
+          "increased": "weapons",
+          "item_instance_id": "6917530189447915522",
+          "item_name": "快速装弹松身裤",
+          "slot": "legs",
+          "slot_display": "腿部护甲",
+          "slot_key": "legs",
+          "to": {
+            "hash": 3121760799,
+            "name": "+武器 / -生命值"
+          }
+        },
+        {
+          "decreased": "super_stat",
+          "delta": {
+            "melee": 5
+          },
+          "from": {
+            "hash": 2121121504,
+            "name": "空调整模组插槽"
+          },
+          "increased": "melee",
+          "item_instance_id": "6917530196710926330",
+          "item_name": "破碎保险库披风",
+          "slot": "class_items",
+          "slot_display": "职业护甲",
+          "slot_key": "class_item",
+          "to": {
+            "hash": 311164277,
+            "name": "+近战 / -超能"
+          }
+        },
+        {
+          "decreased": "melee",
+          "delta": {
+            "grenade": 5
+          },
+          "from": {
+            "hash": 2121121504,
+            "name": "空调整模组插槽"
+          },
+          "increased": "grenade",
+          "item_instance_id": "6917530196710928199",
+          "item_name": "至高狂徒面具",
+          "slot": "helmets",
+          "slot_display": "头盔",
+          "slot_key": "helmet",
+          "to": {
+            "hash": 309000506,
+            "name": "+手雷 / -近战"
+          }
+        },
+        {
+          "decreased": "health",
+          "delta": {
+            "class_stat": -5,
+            "grenade": 5
+          },
+          "from": {
+            "hash": 4030660414,
+            "name": "+职业 / -生命值"
+          },
+          "increased": "grenade",
+          "item_instance_id": "6917530198796765812",
+          "item_name": "至高狂徒手套",
+          "slot": "gauntlets",
+          "slot_display": "臂铠",
+          "slot_key": "gauntlets",
+          "to": {
+            "hash": 455024236,
+            "name": "+手雷 / -生命值"
+          }
+        },
+        {
+          "decreased": "super_stat",
+          "delta": {
+            "melee": 5
+          },
+          "from": {
+            "hash": 2121121504,
+            "name": "空调整模组插槽"
+          },
+          "increased": "melee",
+          "item_instance_id": "6917530194351261836",
+          "item_name": "超越胸甲",
+          "slot": "chests",
+          "slot_display": "胸部护甲",
+          "slot_key": "chest",
+          "to": {
+            "hash": 311164277,
+            "name": "+近战 / -超能"
+          }
+        },
+        {
+          "decreased": "health",
+          "delta": {
+            "class_stat": -5,
+            "weapons": 5
+          },
+          "from": {
+            "hash": 4030660414,
+            "name": "+职业 / -生命值"
+          },
+          "increased": "weapons",
+          "item_instance_id": "6917530189447915522",
+          "item_name": "快速装弹松身裤",
+          "slot": "legs",
+          "slot_display": "腿部护甲",
+          "slot_key": "legs",
+          "to": {
+            "hash": 3121760799,
+            "name": "+武器 / -生命值"
+          }
+        },
+        {
+          "decreased": "super_stat",
+          "delta": {
+            "melee": 5
+          },
+          "from": {
+            "hash": 2121121504,
+            "name": "空调整模组插槽"
+          },
+          "increased": "melee",
+          "item_instance_id": "6917530196710926330",
+          "item_name": "破碎保险库披风",
+          "slot": "class_items",
+          "slot_display": "职业护甲",
+          "slot_key": "class_item",
+          "to": {
+            "hash": 311164277,
+            "name": "+近战 / -超能"
+          }
+        }
+      ],
+      "note": "这些方案是「按原目标求解器没达标 → 放宽目标复解 → 用真实目标逐套复核」找出来的；tuning_changes 里是要改的调谐（从什么改成什么、六维怎么变）。执行时不用手改：确认 equip_build 用的 canonical_build 里已经带上这些调谐插件。"
     }
   },
-  "next_actions": [
-    "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；降级要用户同意后再重试。"
-  ],
+  "next_actions": [],
   "ok": true,
-  "summary": "找到 0 个候选配装。",
+  "summary": "找到 5 个候选配装。其中 5 个要先改调谐才能达标（调谐免费、不占能量；逐件改动见各自的 tuning_changes）。",
   "warnings": []
 }

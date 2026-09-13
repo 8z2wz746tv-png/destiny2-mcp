@@ -90,6 +90,30 @@ async def recommend(
     )
 
 
+def _tuning_summary(builds: Any) -> dict[str, Any] | None:
+    """结果里有没有"要靠调谐才达标"的方案；没有就返回 None（不占响应）。"""
+    if not isinstance(builds, list):
+        return None
+    rows = [
+        build
+        for build in builds
+        if isinstance(build, dict) and build.get("tuning_changes")
+    ]
+    if not rows:
+        return None
+    changes = [change for row in rows for change in row.get("tuning_changes") or []]
+    return {
+        "build_count": len(rows),
+        "change_count": len(changes),
+        "changes": changes,
+        "note": (
+            "这些方案是「按原目标求解器没达标 → 放宽目标复解 → 用真实目标逐套复核」"
+            "找出来的；tuning_changes 里是要改的调谐（从什么改成什么、六维怎么变）。"
+            "执行时不用手改：确认 equip_build 用的 canonical_build 里已经带上这些调谐插件。"
+        ),
+    }
+
+
 async def find(
     svc: Any,
     player_name: str,
@@ -102,6 +126,7 @@ async def find(
     except BuildTooLargeError as exc:
         return _not_computed(str(exc), query, key="builds")
     builds = with_slot_keys(dump(result))
+    tuning = _tuning_summary(builds)
     if not builds:
         ladder = await armor_ladder.no_solution_ladder(svc, player_name, request)
         return ok_response(
@@ -120,10 +145,15 @@ async def find(
                     "completion_rate_note",
                     "没有硬目标时这个比例没有意义（不是 0%）。",
                 )
-    return ok_response(
-        f"找到 {len(builds)} 个候选配装。",
-        {"builds": builds, "query": query},
-    )
+    payload: dict[str, Any] = {"builds": builds, "query": query}
+    message = f"找到 {len(builds)} 个候选配装。"
+    if tuning is not None:
+        payload["tuning"] = tuning
+        message += (
+            f"其中 {tuning['build_count']} 个要先改调谐才能达标"
+            "（调谐免费、不占能量；逐件改动见各自的 tuning_changes）。"
+        )
+    return ok_response(message, payload)
 
 
 async def analyze(

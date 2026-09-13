@@ -12,11 +12,14 @@ from destiny_mcp.services.armor_mod_service import ArmorModService
 from destiny_mcp.tools import _armor_branches as branches
 
 STAT_GRENADE = 1735777505
+STAT_CLASS = 1943323491
 
 MOD_HASH = 5001
 EMPTY_GENERAL = 2001
 EMPTY_LEGS = 2002
 TUNING = 4001
+# 真机 Manifest 里 "+职业 / -手雷" 的 hash（实机抓过）
+TUNING_CLASS_UP_GRENADE_DOWN = 1879022254
 
 DEFS: dict[int, dict[str, Any]] = {
     157934631: {
@@ -49,16 +52,34 @@ DEFS: dict[int, dict[str, Any]] = {
         "plug": {"plugCategoryIdentifier": "core.gear_systems.armor_tiering.plugs.tuning.mods",
                  "plugCategoryHash": 3481777685, "energyCost": {"energyCost": 0}},
     },
+    TUNING_CLASS_UP_GRENADE_DOWN: {
+        "displayProperties": {"name": "+职业 / -手雷"},
+        "itemType": 19,
+        "plug": {"plugCategoryIdentifier": "core.gear_systems.armor_tiering.plugs.tuning.mods",
+                 "plugCategoryHash": 3481777685, "energyCost": {"energyCost": 0}},
+        "investmentStats": [
+            {"statTypeHash": STAT_CLASS, "value": 5},
+            {"statTypeHash": STAT_GRENADE, "value": -5},
+        ],
+    },
 }
 
 # 定义里的插槽：0 号槽接受 general 类模组（plug set 里有 MOD_HASH）
 SOCKET_ENTRIES = [
     {"reusablePlugSetHash": 900, "plugSources": 2},
     {"reusablePlugSetHash": 901, "plugSources": 2},
+    # 2 号槽 = 调谐槽（实机 plug set 就是 1155052024）
+    {"reusablePlugSetHash": 1155052024, "plugSources": 7},
 ]
 PLUG_SETS = {
     900: {"reusablePlugItems": [{"plugItemHash": EMPTY_GENERAL}, {"plugItemHash": MOD_HASH}]},
     901: {"reusablePlugItems": [{"plugItemHash": EMPTY_LEGS}]},
+    1155052024: {
+        "reusablePlugItems": [
+            {"plugItemHash": TUNING},
+            {"plugItemHash": TUNING_CLASS_UP_GRENADE_DOWN},
+        ]
+    },
 }
 
 
@@ -81,7 +102,15 @@ class _Manifest:
         return PLUG_SETS.get(key)
 
     def search(self, query: str, limit: int = 0):
-        return [{"itemHash": MOD_HASH, "itemType": 19}] if "纪律" in query else []
+        if "纪律" in query:
+            return [{"itemHash": MOD_HASH, "itemType": 19}]
+        if query.replace(" ", "") == "+职业/-手雷":
+            return [{"itemHash": TUNING_CLASS_UP_GRENADE_DOWN, "itemType": 19}]
+        return []
+
+    def get_item_name(self, item_hash: int):
+        definition = DEFS.get(item_hash) or {}
+        return (definition.get("displayProperties") or {}).get("name", "")
 
 
 class _Resolver:
@@ -103,7 +132,8 @@ class _Resolver:
                                                 "energy": {"energyCapacity": 11, "energyUsed": 0,
                                                            "energyUnused": 11}}}},
                 "sockets": {"data": {"6917": {"sockets": [
-                    {"plugHash": EMPTY_GENERAL}, {"plugHash": TUNING},
+                    {"plugHash": EMPTY_GENERAL}, {"plugHash": EMPTY_LEGS},
+                    {"plugHash": TUNING},
                 ]}}},
             },
         }
@@ -340,3 +370,54 @@ async def test_alternatives_use_readable_six_stat_keys() -> None:
         assert set(alternative["stat_bonus"]) <= {
             "weapons", "health", "class_stat", "grenade", "super_stat", "melee",
         }, "非六维属性（如 3578062600 费用）不许出现"
+
+
+# ── 调谐：同一个写入路径，但免费、且不进"已装模组"快照 ─────────────────
+
+
+async def test_plan_can_change_tuning_by_its_full_name() -> None:
+    plan = await _service().plan("Tester#1234", "6917", "+职业 / -手雷", "hunter")
+
+    assert plan["kind"] == "tuning"
+    assert plan["socket_index"] == 2, "调谐要装进调谐槽（实机是 11 号槽，这份替身是 2 号）"
+    assert plan["to"]["hash"] == TUNING_CLASS_UP_GRENADE_DOWN
+    assert plan["to"]["energy_cost"] == 0
+    assert plan["to"]["stat_bonus"] == {"class_stat": 5, "grenade": -5}
+    assert plan["energy"]["after"] == plan["energy"]["used"], "调谐不吃能量"
+    assert "零和" in plan["note"]
+
+
+async def test_tuning_is_written_through_the_free_endpoint() -> None:
+    bungie = _Bungie()
+    service = _service(bungie)
+
+    plan = await service.plan("Tester#1234", "6917", "+职业 / -手雷", "hunter")
+    result = await service.apply(plan)
+
+    assert result["success"] is True
+    assert bungie.inserts[0][0] == "free", "能量为 0 的插件走免费插槽接口"
+    _, args = bungie.inserts[0]
+    assert args[1] == TUNING_CLASS_UP_GRENADE_DOWN and args[2] == 2
+
+
+async def test_ambiguous_tuning_query_makes_the_caller_pick_one() -> None:
+    """"手雷调谐"没说要减哪一项：不许替用户猜，列出 5 个选项。"""
+    with pytest.raises(InvalidArgumentError, match="零和"):
+        await _service().plan("Tester#1234", "6917", "手雷调谐", "hunter")
+
+
+async def test_tuning_shows_up_in_mod_snapshots_like_any_other_plug() -> None:
+    """实测口径：调谐本来就在护甲模组类别里，所以读取快照时一视同仁（含调谐）。"""
+    service = _service()
+    sockets = {"6917": {"sockets": [
+        {"plugHash": EMPTY_GENERAL},
+        {"plugHash": EMPTY_LEGS},
+        {"plugHash": TUNING},
+    ]}}
+
+    mods = service.read_armor_mods("6917", sockets)
+
+    assert mods == [EMPTY_GENERAL, EMPTY_LEGS, TUNING], (
+        "调谐的 plug 类别 3481777685 属于 _ARMOR_MOD_CATEGORIES，"
+        "所以 read_armor_mods 会像其它插件一样读出来"
+    )

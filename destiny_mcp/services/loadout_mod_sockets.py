@@ -21,6 +21,11 @@ class ModSocketMixin(PlugLookupMixin):
         3315022374,  # Legacy EnhancementsV2ArmorOnly
     }
 
+    # 调谐（`core.gear_systems.armor_tiering.plugs.tuning.mods`）。
+    # 实测纠正一条旧假设：它**本来就在** `_MOD_CATEGORY_HASHES` 里
+    # （那个集合由 `ManifestManager._ARMOR_MOD_CATEGORIES` 生成，其中 3481777685 → "tuning"），
+    # 所以 `_find_mod_socket` 一直允许往调谐槽写、`read_armor_mods` 也一直会读到它。
+    # 唯一为它特判的地方是"腾能量"那一段（调谐免费，清掉它腾不出能量，见下面的 continue）。
     _PLUG_CAT_TUNING = 3481777685
 
     def read_armor_mod_sockets(

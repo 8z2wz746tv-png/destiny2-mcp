@@ -1,7 +1,7 @@
 """P0 护甲基线与差异闸门：护甲重构期间"消失字段必须有理由"。
 
 和 `tests/test_weapon_baseline.py` 同一套规则，换成护甲面：
-`scripts/capture_weapon_baseline.py --surface armor` 录的 14 例（库存列表/检索/概况、
+`scripts/capture_weapon_baseline.py --surface armor` 录的 20 例（库存列表/检索/概况、
 异域护甲、套装效果、护甲模组、社区核对、反推待刷件、装备确认回显）就是护甲重构的
 对照物；P1–P5 只要动了护甲序列化，就必须让这里的 diff 保持"零无理由消失"。
 """

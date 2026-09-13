@@ -786,6 +786,21 @@ class BuildResult(BaseModel):
         default=None,
         description="Exact executable build contract generated from this result",
     )
+    tuning_changes: list[dict] = Field(
+        default_factory=list,
+        description=(
+            "达标要改的调谐：逐件 {item_instance_id,item_name,slot,from,to,delta}；"
+            "空表示这套不用动调谐"
+        ),
+    )
+    requires_tuning: bool = Field(
+        default=False,
+        description="这套要先改调谐才达标（调谐免费、不占能量、不影响模组）",
+    )
+    tuning_note: str = Field(
+        default="",
+        description="调谐改动的人话说明；不用动调谐时为空串",
+    )
 
 
 class BuildAnalysis(BaseModel):

@@ -26,6 +26,21 @@ from .loadout_mod_sockets import ModSocketMixin
 # 所以解析模组名时只在"护甲模组"这一类里找。
 _MOD_ITEM_TYPE = 19
 
+#: 调谐插件的 plug 类别（`core.gear_systems.armor_tiering.plugs.tuning.mods`）。
+_TUNING_CATEGORY_HASH = 3481777685
+
+#: "手雷调谐"这类说法里的属性词 → 六维键。调谐是零和的，光说加哪一项不够，
+#: 还得说减哪一项，所以这种说法一律让调用方明确到具体那一个插件。
+_TUNING_STAT_WORDS = {
+    "武器": "weapons",
+    "生命值": "health",
+    "生命": "health",
+    "职业": "class_stat",
+    "手雷": "grenade",
+    "超能": "super_stat",
+    "近战": "melee",
+}
+
 
 def _stat_bonus_of(definition: dict[str, Any] | None) -> dict[str, int]:
     """插件定义的六维增量：只认六维、键名与 `to.stat_bonus` 同一套。
@@ -103,11 +118,49 @@ class ArmorModService(ModSocketMixin):
             if translated != query:
                 candidates = self._search_mods(translated)
         if not candidates:
+            tuning_hash = self._resolve_tuning(query)
+            if tuning_hash is not None:
+                return [tuning_hash]
+        if not candidates:
             raise InvalidArgumentError(
                 f"没找到护甲模组 {mod_name!r}。可用 `build_assistant(intent=\"armor_mods\")` "
                 "列出现有模组名，再逐字传进来（六维新名：武器/生命/职业/手雷/超能/近战）。"
             )
         return candidates
+
+    def _resolve_tuning(self, query: str) -> int | None:
+        """按名字认调谐插件；"手雷调谐"这种没说要减哪一项的说法直接让调用方挑。
+
+        返回 None = 这不像调谐的名字（交给调用方报"没找到护甲模组"）。
+        """
+        from ..build.tuning import tuning_catalog  # 局部导入，避免把 build 层拖进工具面
+
+        catalog = tuning_catalog(self._manifest)
+        squeezed = query.replace(" ", "")
+        for choice in catalog:
+            if choice.kind != "empty" and choice.name.replace(" ", "") == squeezed:
+                return choice.plug_hash
+        stat = next(
+            (value for word, value in _TUNING_STAT_WORDS.items() if word in query),
+            None,
+        )
+        if stat is None or not any(
+            word in query.lower() for word in ("调谐", "调整", "tuning")
+        ):
+            return None
+        options = [
+            choice
+            for choice in catalog
+            if choice.kind == "directional" and choice.increased == stat
+        ]
+        if len(options) == 1:  # pragma: no cover - 六维每项都有 5 个方向，走不到
+            return options[0].plug_hash
+        raise InvalidArgumentError(
+            f"{query!r} 对应 {len(options)} 个调谐插件："
+            + "、".join(choice.name for choice in options)
+            + "。调谐是零和的（+5 一项一定 −5 另一项），得指定减哪一项 —— "
+            '把 mod_name 写成其中一个的完整名字，例如 mod_name="+手雷 / -职业"。'
+        )
 
     # ── 方案 ─────────────────────────────────────────────────────────
 
@@ -220,9 +273,17 @@ class ArmorModService(ModSocketMixin):
                     "socket_index": alt_socket,
                 })
 
+        is_tuning = self._plug_category_hash(matched_hash) == _TUNING_CATEGORY_HASH
         return {
             "player_name": player_name,
             "item_instance_id": item_instance_id,
+            "kind": "tuning" if is_tuning else "mod",
+            "note": (
+                "调谐不花能量、也不占模组槽；它是零和的："
+                "to.stat_bonus 里同时有 +5 和 −5 两项。"
+                if is_tuning
+                else ""
+            ),
             "alternatives": alternatives,
             "item_hash": item_hash,
             "item_name": definition.get("displayProperties", {}).get("name", ""),

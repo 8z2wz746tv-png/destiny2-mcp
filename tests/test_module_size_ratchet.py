@@ -40,7 +40,10 @@ CEILINGS = {
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     "destiny_mcp/bungie_client.py": 1263,
-    "destiny_mcp/services/build_service.py": 1114,
+    # P7：结果翻译层（ProcessArmorSet → BuildResult/canonical_build + 目标统计）
+    # 整个搬到 services/build_results.py，1114 → 906，上限跟着收紧 ——
+    # 调谐（tuning）的对外字段也落在那边的翻译层里，不再往这里堆。
+    "destiny_mcp/services/build_service.py": 902,
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     "destiny_mcp/services/loadout_equipment_service.py": 795,

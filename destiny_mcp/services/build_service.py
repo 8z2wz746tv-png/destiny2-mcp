@@ -16,49 +16,41 @@ from __future__ import annotations
 
 import hashlib
 import json
-import secrets
 import time
 from collections import OrderedDict
 from difflib import SequenceMatcher
 from typing import Literal, cast
 
-from ..build import solver as _solver
 from ..build.analyzer import analyze, ensure_within_combination_limit
 from ..build.constants import MAIN_STAT_HASHES, STAT_NAMES, SUBCLASS_BONUSES
 from ..build.constraints import parse as _parse_constraints
 from ..build.farm_target import find_farm_targets
 from ..build.models import (
     BuildAnalysis,
-    BuildCandidate,
     BuildRecommendation,
     BuildRequest,
     BuildResult,
 )
-from ..build.scorer import score as _score
 from ..bungie_client import BungieClient
 from ..build_contracts import CanonicalBuild, ExecutableBuild
 from ..exceptions import BuildValidationError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
-from ..models import Loadout, LoadoutItem, LoadoutSubclassConfig
+from ..models import Loadout, LoadoutSubclassConfig
 from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
+from .build_tuning import solve_with_tuning
+from .build_results import (
+    LOADOUT_SLOT_NAMES as _LOADOUT_SLOT_NAMES,
+    ResultContext,
+    build_results as _build_results,
+)
 from .loadout_equipment_service import LoadoutEquipmentService
 from .build_compute import BuildCompute
 
 logger = get_logger(__name__)
 
 
-_LOADOUT_SLOT_NAMES = {
-    "helmets": "helmet",
-    "helmet": "helmet",
-    "gauntlets": "gauntlets",
-    "chests": "chest",
-    "chest": "chest",
-    "legs": "legs",
-    "class_items": "class_item",
-    "class_item": "class_item",
-}
 _EXPECTED_ARMOR_SLOTS = {"helmet", "gauntlets", "chest", "legs", "class_item"}
 _MAX_BUILD_CANDIDATES = 200
 _BUILD_CANDIDATE_TTL_SECONDS = 10 * 60
@@ -586,160 +578,30 @@ class BuildService:
             parsed.fragment_stats = fragment_stats
             bonus_vector = parsed.subclass_and_fragment_vector()
 
-        # Step 3: Solve (DIM algorithm with mod assignment)
-        process_result = await self._compute.run(_solver.solve, snapshot, parsed)
-        logger.info("Solver: %d combos processed, %d valid sets", process_result.combos, len(process_result.sets))
-
-        if not process_result.sets:
+        # Step 3: Solve（含调谐补齐，见 services/build_tuning.py）——达标就原样返回；
+        # 没达标才用调谐额度复解一遍（把"差 5 点"变成可执行方案）并逐套精确复核。
+        pool, tuning_map = await solve_with_tuning(self._compute, snapshot, parsed, self._manifest)
+        logger.info("Solver: %d sets (%d 靠调谐补齐)", len(pool), len(tuning_map))
+        if not pool:
             logger.warning("No build satisfies constraints for %s", player_name)
             return []
 
-        # Step 4: Convert ProcessArmorSet to BuildResult
-        results: list[BuildResult] = []
-        for armor_set in process_result.sets[:parsed.top_n]:
-            # Build the final stats (base + bonus from mods + subclass + fragments)
-            bonus_dict: dict[str, int] = {}
-            for i, stat_name in enumerate(STAT_NAMES):
-                if i < len(armor_set.bonus_stats):
-                    bonus_dict[stat_name] = armor_set.bonus_stats[i]
-
-            # Create BuildCandidate with final stats (armor + mod + subclass + fragment).
-            # bonus_vector contains subclass + fragment bonuses.
-            # armor_set.armor contains Armor objects from the snapshot
-            stats = armor_set.stats
-            candidate = BuildCandidate(
-                items=list(armor_set.armor),
-                weapons=(stats[0] + bonus_dict.get("weapons", 0) + bonus_vector[0]) if len(stats) > 0 else 0,
-                health=(stats[1] + bonus_dict.get("health", 0) + bonus_vector[1]) if len(stats) > 1 else 0,
-                class_stat=(stats[2] + bonus_dict.get("class_stat", 0) + bonus_vector[2]) if len(stats) > 2 else 0,
-                grenade=(stats[3] + bonus_dict.get("grenade", 0) + bonus_vector[3]) if len(stats) > 3 else 0,
-                melee=(stats[4] + bonus_dict.get("melee", 0) + bonus_vector[4]) if len(stats) > 4 else 0,
-                super_stat=(stats[5] + bonus_dict.get("super_stat", 0) + bonus_vector[5]) if len(stats) > 5 else 0,
-                bonus_stats=bonus_dict,
-                stat_mods=armor_set.stat_mods,
-                # Store subclass/fragment bonuses separately for reference
-                subclass_fragment_bonus=bonus_vector,
-            )
-
-            # Calculate active set bonuses
-            active_set_bonuses = _calculate_set_bonuses(
-                list(armor_set.armor), self._manifest
-            )
-
-            # Score for ranking
-            score = _score(candidate, parsed)
-            missing = _missing_requirements(candidate, parsed)
-            met = _count_met(candidate, parsed)
-            targets = _count_targets(parsed)
-
-            results.append(
-                BuildResult(
-                    score=round(score, 2),
-                    completion_rate=met / max(1, targets),
-                    build=candidate,
-                    missing_requirements=missing,
-                    fragment_details=fragment_details,
-                    active_set_bonuses=active_set_bonuses,
-                    canonical_build=ExecutableBuild(
-                        class_type=canonical_class,
-                        exotic_hash=next(
-                            (
-                                item.item_hash
-                                for item in armor_set.armor
-                                if item.is_exotic
-                            ),
-                            None,
-                        ),
-                        subclass_item_hash=(
-                            execution_subclass.subclass_item_hash
-                            if execution_subclass
-                            else None
-                        ),
-                        subclass_instance_id=(
-                            execution_subclass.subclass_instance_id
-                            if execution_subclass
-                            else ""
-                        ),
-                        subclass_plug_sockets=(
-                            execution_subclass.plug_sockets
-                            if execution_subclass
-                            else {}
-                        ),
-                        super_hash=(
-                            execution_subclass.super_hash
-                            if execution_subclass
-                            else None
-                        ),
-                        grenade_hash=(
-                            execution_subclass.grenade_hash
-                            if execution_subclass
-                            else None
-                        ),
-                        melee_hash=(
-                            execution_subclass.melee_hash
-                            if execution_subclass
-                            else None
-                        ),
-                        class_ability_hash=(
-                            execution_subclass.class_ability_hash
-                            if execution_subclass
-                            else None
-                        ),
-                        movement_hash=(
-                            execution_subclass.movement_hash
-                            if execution_subclass
-                            else None
-                        ),
-                        aspect_hashes=(
-                            execution_subclass.aspect_hashes
-                            if execution_subclass
-                            else []
-                        ),
-                        fragment_hashes=(
-                            execution_subclass.fragment_hashes
-                            if execution_subclass
-                            else []
-                        ),
-                        target_stats={
-                            name: value
-                            for name, value in {
-                                "weapons": request.weapons_target,
-                                "health": request.health_target,
-                                "class_stat": request.class_target,
-                                "grenade": request.grenade_target,
-                                "melee": request.melee_target,
-                                "super_stat": request.super_target,
-                            }.items()
-                            if value is not None
-                        },
-                        items=[
-                            LoadoutItem(
-                                item_hash=armor.item_hash,
-                                name=armor.name,
-                                slot=_LOADOUT_SLOT_NAMES.get(armor.slot, armor.slot),
-                                item_instance_id=armor.item_instance_id,
-                                mods=list(
-                                    armor_set.stat_mod_assignments.get(
-                                        armor.item_instance_id, []
-                                    )
-                                ),
-                                source_location=getattr(
-                                    armor, "source_location", ""
-                                ),
-                                source_character_id=getattr(
-                                    armor, "source_character_id", ""
-                                ),
-                                was_equipped=getattr(
-                                    armor, "is_equipped", False
-                                ),
-                            )
-                            for armor in armor_set.armor
-                        ],
-                        snapshot_version=snapshot_version,
-                        execution_id=secrets.token_urlsafe(18),
-                    ),
-                )
-            )
+        # Step 4: Convert ProcessArmorSet to BuildResult（翻译层在 services/build_results.py）
+        # 调谐补齐在 Step 3.5 已经写进 tuning_map：这套要改哪几件的调谐才达标。
+        results = _build_results(
+            pool,
+            ResultContext(
+                parsed=parsed,
+                request=request,
+                manifest=self._manifest,
+                class_type=canonical_class,
+                snapshot_version=snapshot_version,
+                bonus_vector=bonus_vector,
+                fragment_details=fragment_details,
+                execution_subclass=execution_subclass,
+                tuning=tuning_map,
+            ),
+        )
 
         priority_indices = parsed.ordered_priority_indices
         if priority_indices:
@@ -1038,76 +900,3 @@ class BuildService:
             "code": "exact_build_required",
             "message": "不能再按浮点 score 重新求解并装备；请传回 find_build 返回的 canonical_build。",
         }
-
-
-def _count_targets(parsed) -> int:
-    """Count how many stat targets (non-zero minimums) are set."""
-    return sum(1 for v in parsed.as_vector() if v > 0)
-
-
-def _count_met(candidate, parsed) -> int:
-    """Count how many stat targets are met."""
-    met = 0
-    for stat_name in STAT_NAMES:
-        target = getattr(parsed, f"{stat_name}_min")
-        if target > 0 and candidate.stat(stat_name) >= target:
-            met += 1
-    return met
-
-
-def _missing_requirements(candidate, parsed) -> list[str]:
-    """List stat targets that were not met."""
-    missing: list[str] = []
-    for stat_name in STAT_NAMES:
-        target = getattr(parsed, f"{stat_name}_min")
-        actual = candidate.stat(stat_name)
-        if target > 0 and actual < target:
-            missing.append(f"{stat_name}: {actual}/{target}")
-    return missing
-
-
-def _calculate_set_bonuses(armor_list: list, manifest) -> list[dict]:
-    """Calculate active set bonuses for a list of armor pieces.
-
-    Groups armor by set_bonus_hash, counts pieces per set, and looks up
-    which perks are active based on required_set_count.
-
-    Returns:
-        List of {set_name, piece_count, perks: [{name, description}]}
-    """
-    # Count pieces per set
-    set_counts: dict[int, int] = {}
-    set_names: dict[int, str] = {}
-    for armor in armor_list:
-        if armor.set_bonus_hash:
-            set_counts[armor.set_bonus_hash] = set_counts.get(armor.set_bonus_hash, 0) + 1
-            set_names[armor.set_bonus_hash] = armor.set_bonus_name
-
-    # Look up active perks for each set
-    active_bonuses = []
-    for set_hash, count in set_counts.items():
-        if count < 2:
-            continue  # Need at least 2 pieces for any bonus
-
-        set_info = manifest.get_set_bonus_by_hash(set_hash)
-        if not set_info:
-            continue
-
-        active_perks = []
-        for perk in set_info.get("perks", []):
-            required = perk.get("required_set_count", 0)
-            if count >= required:
-                active_perks.append({
-                    "name": perk.get("perk_name", ""),
-                    "description": perk.get("perk_description", ""),
-                    "required_count": required,
-                })
-
-        if active_perks:
-            active_bonuses.append({
-                "set_name": set_names.get(set_hash, set_info.get("set_name", "")),
-                "piece_count": count,
-                "perks": active_perks,
-            })
-
-    return active_bonuses

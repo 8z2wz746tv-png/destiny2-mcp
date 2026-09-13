@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 2195,
+    "elapsed_ms": 3796,
     "is_error": false,
-    "payload_chars": 1444,
+    "payload_chars": 1483,
     "steps": [
       {
         "arguments": {
@@ -53,8 +53,10 @@
       "item_hash": 157934631,
       "item_instance_id": "6917530198796768597",
       "item_name": "至高狂徒腿铠",
+      "kind": "mod",
       "membership_id": "4611686018492803873",
       "membership_type": 3,
+      "note": "",
       "player_name": "__destiny_current_oauth_player__",
       "power": 550,
       "slot": "legs",

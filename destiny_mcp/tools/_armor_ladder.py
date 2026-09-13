@@ -154,6 +154,7 @@ def build_ladder(
     precision: str,
     reason: str = "",
     samples: Sequence[dict[str, int]] = (),
+    tuning: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """把上限、差距与台阶摊平成一张表（只提议，不改目标）。"""
     targets = _targets(request)
@@ -183,34 +184,100 @@ def build_ladder(
                 "这一步要用户明确同意，不能自动降。"
             ),
         }
-    # 先看"免费的杠杆"：每件护甲一个 ±5 调谐槽、一个 +10/+5 属性模组槽。
-    # 实测：求解器目前**只对虚拟待刷件**建模调谐，对已有护甲不试 —— 所以这里只能
-    # 如实说"这一项差得不多，可以用调谐/模组补，未必要降目标"，不能假装已经算进去了。
+    # "免费的杠杆"：每件护甲一个 ±5 调谐槽（零和）、一个 +10/+5 属性模组槽。
+    # P7 之后求解器**真的会试调谐**（services/build_tuning.py）：能靠调谐达标的方案
+    # 会直接出现在结果里，轮到这个阶梯就说明"试过了、没成"。所以这里的措辞必须分两种：
+    # 有额度数据时给证据（差多少、每项最多能补多少、为什么补不上），
+    # 没有额度数据时只能老实说"这是杠杆提示"。
+    tuning = tuning or {}
+    per_stat_gain = {
+        str(stat): int(value)
+        for stat, value in (tuning.get("per_stat_max_gain") or {}).items()
+    }
+    attempted = bool(tuning)
     tuning_first: list[dict[str, Any]] = []
     for stat, gap in sorted(shortfall.items(), key=lambda item: item[1]):
-        if gap <= 5:
-            tuning_first.append({
+        headroom = per_stat_gain.get(stat, 0)
+        # 有额度数据就是"有证据"：per_stat_max_gain 里没有这项 = 这项补不了 0 点以上。
+        evidence = attempted
+        if evidence and gap <= headroom:
+            rung = {
                 "stat": stat,
                 "stat_label": STAT_LABELS[stat],
                 "gap": gap,
+                "headroom": headroom,
+                "lever": "tuning",
+                "why": (
+                    f"{STAT_LABELS[stat]}差 {gap} 点，而现有护甲的调谐每项最多能补 {headroom} 点："
+                    "求解器已经试过调谐组合，仍然没有合规方案 —— 多半卡在"
+                    "「调谐零和，+5 这一项就得 −5 另一项，而那一项让不出来」。"
+                    "可以先用 inventory_assistant(intent=\"item\") 看哪几件的调谐是空的/有余量，"
+                    "再决定要不要降目标。"
+                ),
+            }
+            if attempted:
+                rung["solver_attempted"] = True
+        elif not evidence and gap <= 5:
+            rung = {
+                "stat": stat,
+                "stat_label": STAT_LABELS[stat],
+                "gap": gap,
+                "headroom": headroom,
                 "lever": "tuning",
                 "why": (
                     f"{STAT_LABELS[stat]}只差 {gap} 点：一件护甲的调谐（+5/−5）就能补上，"
-                    "先用 inventory_assistant(intent=\"item\") 看哪件还有空调谐槽，"
+                    "先用 inventory_assistant(intent=\"item\") 看哪件还有调谐余量，"
                     "再决定要不要降目标。"
                 ),
-            })
-        elif gap <= 10:
-            tuning_first.append({
+            }
+        elif evidence and gap <= 5:
+            rung = {
                 "stat": stat,
                 "stat_label": STAT_LABELS[stat],
                 "gap": gap,
+                "headroom": headroom,
+                "lever": "no_tuning",
+                "why": (
+                    (
+                        f"{STAT_LABELS[stat]}只差 {gap} 点，但现有护甲的调谐每项最多只补 "
+                        f"{headroom} 点，补不上；只能看属性模组或降目标。"
+                    )
+                    if headroom
+                    else (
+                        f"{STAT_LABELS[stat]}只差 {gap} 点，但这批护甲没有可用的调谐槽"
+                        "（legacy 护甲没有调谐），靠调谐补不了；只能看属性模组或降目标。"
+                    )
+                ),
+            }
+        elif evidence and gap > headroom:
+            rung = {
+                "stat": stat,
+                "stat_label": STAT_LABELS[stat],
+                "gap": gap,
+                "headroom": headroom,
+                "lever": "tuning_insufficient",
+                "solver_attempted": True,
+                "why": (
+                    f"{STAT_LABELS[stat]}差 {gap} 点，而现有护甲的调谐每项最多只能补 "
+                    f"{headroom} 点：调谐补不上这一档，要么降目标，要么换更强的护甲。"
+                ),
+            }
+        elif gap <= 10:
+            rung = {
+                "stat": stat,
+                "stat_label": STAT_LABELS[stat],
+                "gap": gap,
+                "headroom": headroom,
                 "lever": "stat_mod",
                 "why": (
                     f"{STAT_LABELS[stat]}差 {gap} 点：一件护甲的属性模组（+10 花 3 能量）"
                     "可能就够，先看能量还剩多少再决定要不要降目标。"
                 ),
-            })
+            }
+        else:
+            rung = None
+        if rung is not None:
+            tuning_first.append(rung)
 
     return {
         "targets": targets,
@@ -223,11 +290,20 @@ def build_ladder(
         "samples": list(samples),
         "tuning_first": tuning_first,
         "tuning_first_note": (
-            "求解器目前只对**待刷的虚拟件**建模调谐，对已有护甲不试；所以这一档是"
-            "**人工可用的杠杆提示**，不是已经算进 ceiling 的方案。"
-            if tuning_first
-            else ""
+            (
+                "求解器已经试过调谐（每项最多 +{} 点，零和：+5 一项要 −5 另一项），"
+                "上面这些是「试过仍不达标」的项，不是「没试」。"
+            ).format(max(per_stat_gain.values(), default=0))
+            if tuning_first and attempted
+            else (
+                "这一档是**人工可用的杠杆提示**：本次没有拿到调谐额度数据，"
+                "不能当作已经算进 ceiling 的方案。"
+                if tuning_first
+                else ""
+            )
         ),
+        "tuning_headroom": per_stat_gain,
+        "tuning_attempted": attempted,
         "suggestion": suggestion,
         "note": (
             "ceiling = 同一套约束下、按某种优先级**同时**能达到的值（实采，逐项取最大）；"
@@ -237,6 +313,30 @@ def build_ladder(
             "ceiling 留空而不是编 0。"
         ),
     }
+
+
+async def _tuning_evidence(
+    svc: Any,
+    player_name: str,
+    request: Any,
+) -> dict[str, Any] | None:
+    """调谐额度证据（能用就用，拿不到就不装作有）。
+
+    走的是同一个库存快照接口；失败（角色名不对、组件缺失）不能让无解诊断跟着崩。
+    """
+    inventory = svc.get("inventory_svc")
+    manifest = svc.get("manifest")
+    if inventory is None or manifest is None:
+        return None
+    try:
+        from ..services.build_tuning import headroom_payload
+
+        snapshot = await inventory.get_armor_snapshot(
+            player_name, getattr(request, "character_class", "") or ""
+        )
+        return headroom_payload(snapshot, manifest)
+    except Exception:  # noqa: BLE001 - 证据拿不到就退回"杠杆提示"口径
+        return None
 
 
 async def no_solution_ladder(
@@ -299,9 +399,28 @@ async def no_solution_ladder(
     ceiling = ceiling_from_samples(samples)
     precision = "sampled" if samples else "not_computed"
     table = build_ladder(
-        request, ceiling=ceiling, precision=precision, reason=reason, samples=samples
+        request,
+        ceiling=ceiling,
+        precision=precision,
+        reason=reason,
+        samples=samples,
+        tuning=await _tuning_evidence(svc, player_name, request),
     )
     table["trials"] = trials
+    # 「原样」那一档实测没解 = 这批护甲不可能同时满足原始目标。
+    # 说清楚 ceiling 是**逐项**取最大（来自不同探测），免得读成"其实都能满足"。
+    # 这张阶梯**只在工具按原始请求 0 候选时**才会生成，所以 satisfiable 一定是 false；
+    # 但 trials 里可能有 ok=true 的档 —— 那是"换了优先级顺序"或"放下目标"之后的结果。
+    # 实机踩过：把 trials[0].ok 当结论会说成"其实配得出来"，而工具自己那一次是 0 候选。
+    table["verdict"] = {
+        "satisfiable": False,
+        "evidence": "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）",
+        "note": (
+            "ceiling 是各次探测**逐项**取的最大值，不等于同一套护甲能同时达到；"
+            "trials 里 ok=true 的档是**换了优先级顺序或放下目标**之后的解，原始请求一个字没改。"
+        ),
+        "solved_after_rotation": bool(trials and trials[0]["ok"]),
+    }
     table["single_stat_ceiling"] = single_stat
     table["analysis_precision"] = analysis_precision
     # 台阶优先给"最小改动就能穿"的那一档；全都没解就给 None（不编）。

@@ -95,6 +95,15 @@ ARMOR_CASES: list[tuple[str, object]] = [
         }),
         ("build_assistant", {"$replay_candidate": 0}),
     ]),
+    # 0.1.6：原来那条 `ladder_no_solution`（150/100/80/70/70 + 金装）现在**有解了** ——
+    # 调谐补齐只用改 1 件调谐就能达标，所以阶梯不再出现。这条用例专门锁"真的配不出来"
+    # 的那条路（`verdict.satisfiable=false` + 逐项 ceiling 的口径说明）。
+    ("ladder_infeasible_verdict", "build_assistant", {
+        "intent": "find", "character": "hunter",
+        "weapons_target": 150, "class_target": 100, "super_target": 80,
+        "melee_target": 70, "health_target": 200,
+        "priority_stats": ["weapons", "class_stat", "super_stat", "melee"],
+    }),
     ("equip_mod_wrong_slot", "inventory_assistant", {
         "intent": "equip_mod", "item_instance_id": "6917530198796768597",
         "mod_name": "手雷快速启动", "character": "hunter", "confirmed": False,

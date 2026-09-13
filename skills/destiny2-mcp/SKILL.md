@@ -32,6 +32,10 @@ Read only the relevant reference before a complex request:
 3. Never call `catalog` to answer what the player owns; use `filter_rolls` or an account inventory query.
 4. `build_template`, community records, `farm_options`, and `solver_handoff` are not executable builds.
 5. Only a server-returned, instance-bound `canonical_build` may be sent to `equip_build`.
+   A build that needs tuning carries the tuning plugs inside
+   `canonical_build.items[].mods`; report `tuning_changes` to the player instead of
+   editing their armor by hand, and never claim a target is unreachable while a
+   returned build meets it.
 6. If a response is incomplete, failed, or has an uncertainty/coverage warning, report that limitation instead of filling it from model memory.
 7. A parameter the chosen `intent` does not read is rejected with `ignored_parameter`; switch to the intent named in the message instead of retrying the same call.
 8. The `community` intent of `weapon`, `build`, `subclass` and `activity` searches only its own category. A zero result there does not mean the archive lacks the topic; retry with `world_assistant(intent="community")` and name the category searched.

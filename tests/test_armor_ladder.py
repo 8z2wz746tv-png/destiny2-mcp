@@ -196,7 +196,7 @@ async def test_completion_rate_stays_when_targets_are_given() -> None:
 
 
 def test_tuning_first_rung_comes_before_dropping_targets() -> None:
-    """缺口 ≤5 时先给"调谐能补"的提示；≤10 给属性模组；更大才只剩降目标。"""
+    """没有额度数据时：缺口 ≤5 给"调谐能补"的提示，≤10 给属性模组，更大只剩降目标。"""
     request = _Request(weapons_target=150, grenade_target=70, melee_target=60)
     ceiling = {"weapons": 145, "grenade": 61, "melee": 20}
 
@@ -206,7 +206,56 @@ def test_tuning_first_rung_comes_before_dropping_targets() -> None:
     assert levers == {"weapons": "tuning", "grenade": "stat_mod"}
     assert "melee" not in levers, "差 40 点不是调谐/模组能补的，别给出误导性提示"
     assert any("调谐" in item["why"] for item in table["tuning_first"])
-    assert "只对**待刷的虚拟件**建模调谐" in table["tuning_first_note"]
+    # 没有额度数据时必须自认是"杠杆提示"，不能假装已经算进 ceiling
+    assert "人工可用的杠杆提示" in table["tuning_first_note"]
+    assert table["tuning_attempted"] is False
+
+
+def test_tuning_rung_uses_headroom_evidence_when_available() -> None:
+    """有额度数据时：说清"试过了、每项最多补多少、为什么补不上"。"""
+    request = _Request(grenade_target=70, melee_target=60)
+    ceiling = {"grenade": 65, "melee": 20}
+    tuning = {"per_stat_max_gain": {"grenade": 25, "melee": 25}, "allowance": {}}
+
+    table = ladder.build_ladder(
+        request, ceiling=ceiling, precision="sampled", tuning=tuning
+    )
+
+    rung = next(item for item in table["tuning_first"] if item["stat"] == "grenade")
+    assert rung["lever"] == "tuning"
+    assert rung["headroom"] == 25
+    assert rung["solver_attempted"] is True
+    assert "已经试过调谐" in rung["why"]
+    assert "已经试过调谐" in table["tuning_first_note"]
+    assert table["tuning_headroom"]["grenade"] == 25
+
+
+def test_tuning_rung_says_so_when_armor_cannot_be_tuned() -> None:
+    """额度是 0（legacy 护甲没有调谐槽）时不能劝人去改调谐。"""
+    request = _Request(grenade_target=70)
+    tuning = {"per_stat_max_gain": {}, "allowance": {"grenade": 0}}
+
+    table = ladder.build_ladder(
+        request, ceiling={"grenade": 65}, precision="sampled", tuning=tuning
+    )
+
+    rung = table["tuning_first"][0]
+    assert rung["lever"] == "no_tuning"
+    assert "没有可用的调谐槽" in rung["why"]
+
+
+def test_partial_headroom_is_reported_as_insufficient() -> None:
+    """额度只够补一部分（差 5、最多补 3）时，别劝人白折腾。"""
+    request = _Request(grenade_target=70)
+    tuning = {"per_stat_max_gain": {"grenade": 3}, "allowance": {"grenade": 3}}
+
+    table = ladder.build_ladder(
+        request, ceiling={"grenade": 65}, precision="sampled", tuning=tuning
+    )
+
+    rung = table["tuning_first"][0]
+    assert rung["lever"] == "no_tuning"
+    assert "最多只补 3 点" in rung["why"]
 
 
 def test_tuning_first_is_absent_when_everything_is_met() -> None:
@@ -252,3 +301,227 @@ async def test_too_large_requests_are_refused_with_narrowing_advice() -> None:
     )
     assert found["ok"] is True and found["data"]["builds"] == []
     assert found["data"]["not_computed"]["reason"].startswith("这次分析的组合规模太大")
+
+
+class _StubManifest:
+    """只回答调谐相关的两个问题：这件有调谐槽吗、这个插件叫什么。"""
+
+    def get_item_definition(self, item_hash):
+        from destiny_mcp.build.tuning import EMPTY_TUNING_PLUG_HASH, TUNING_PLUG_SET_HASH
+
+        return {
+            "sockets": {
+                "socketEntries": [
+                    {
+                        "reusablePlugSetHash": TUNING_PLUG_SET_HASH,
+                        "singleInitialItemHash": EMPTY_TUNING_PLUG_HASH,
+                    }
+                ]
+            }
+        }
+
+    def get_item_name(self, plug_hash):
+        return ""
+
+
+def _tunable_snapshot():
+    from destiny_mcp.build.models import Armor, ArmorStats, InventorySnapshot
+    from destiny_mcp.build.constants import STAT_NAMES
+
+    buckets = {}
+    for slot in ("helmets", "gauntlets", "chests", "legs", "class_items"):
+        buckets[slot] = [
+            Armor(
+                item_instance_id=f"inst-{slot}",
+                item_hash=1,
+                name=slot,
+                slot=slot,
+                stats=ArmorStats(**{name: 10 for name in STAT_NAMES}),
+                armor_system="armor_3",
+                gear_tier=5,
+            )
+        ]
+    return InventorySnapshot(**buckets)
+
+
+@pytest.mark.asyncio
+async def test_ladder_pulls_tuning_evidence_from_the_inventory_service() -> None:
+    """有库存服务时，阶梯要说"已经试过调谐"并给出每项额度，而不是老口径的提示。"""
+    analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
+
+    class _Build:
+        async def analyze_build(self, player_name, request):
+            return analysis
+
+        async def find_build(self, player_name, request):
+            # 放开目标那一档能解出手雷 65（于是原目标 70 差 5 点）
+            if request.grenade_target is None:
+                return [SimpleNamespace(build=SimpleNamespace(grenade=65))]
+            return []
+
+    class _Inventory:
+        async def get_armor_snapshot(self, player_name, character_class):
+            return _tunable_snapshot()
+
+    table = await ladder.no_solution_ladder(
+        {"build_svc": _Build(), "inventory_svc": _Inventory(), "manifest": _StubManifest()},
+        "Tester#1234",
+        _Request(grenade_target=70),
+    )
+
+    assert table["tuning_attempted"] is True
+    assert table["tuning_headroom"]["grenade"] == 25
+    rung = table["tuning_first"][0]
+    assert rung["lever"] == "tuning"
+    assert rung["solver_attempted"] is True
+    assert "已经试过调谐" in table["tuning_first_note"]
+
+
+@pytest.mark.asyncio
+async def test_ladder_survives_a_failing_inventory_lookup() -> None:
+    """拿不到额度数据时退回"杠杆提示"，不能让诊断跟着崩。"""
+    analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
+
+    class _Build:
+        async def analyze_build(self, player_name, request):
+            return analysis
+
+        async def find_build(self, player_name, request):
+            return []
+
+    class _Inventory:
+        async def get_armor_snapshot(self, player_name, character_class):
+            raise RuntimeError("组件缺失")
+
+    class _BuildWithSample(_Build):
+        async def find_build(self, player_name, request):
+            if request.grenade_target is None:
+                return [SimpleNamespace(build=SimpleNamespace(grenade=65))]
+            return []
+
+    table = await ladder.no_solution_ladder(
+        {"build_svc": _BuildWithSample(), "inventory_svc": _Inventory(), "manifest": _StubManifest()},
+        "Tester#1234",
+        _Request(grenade_target=70),
+    )
+
+    assert table["tuning_attempted"] is False
+    assert table["tuning_first"][0]["lever"] == "tuning"
+    assert "人工可用的杠杆提示" in table["tuning_first_note"]
+
+
+@pytest.mark.asyncio
+async def test_find_reports_which_candidates_need_tuning() -> None:
+    """要靠调谐才达标的方案必须在响应里点名，并说清改动在哪。"""
+    from destiny_mcp.tools import _build_flow
+
+    change = {
+        "item_instance_id": "inst-legs",
+        "item_name": "测试腿甲",
+        "slot": "legs",
+        "from": {"hash": 1, "name": "空调整模组插槽"},
+        "to": {"hash": 1922571986, "name": "+手雷 / -职业"},
+        "delta": {"grenade": 5, "class_stat": -5},
+    }
+
+    class _Build:
+        async def find_build(self, player_name, request):
+            return [
+                {
+                    "score": 50.0,
+                    "completion_rate": 1.0,
+                    "build": {"items": [{"slot": "legs"}]},
+                    "tuning_changes": [change],
+                    "requires_tuning": True,
+                    "tuning_note": "这套方案要先把 1 件护甲的调谐改掉才能达标。",
+                }
+            ]
+
+    response = await _build_flow.find(
+        {"build_svc": _Build()}, "Tester#1234", _Request(grenade_target=70),
+        {"character": "hunter"}, lambda value: value,
+    )
+    data = response["data"]
+
+    assert data["tuning"]["build_count"] == 1
+    assert data["tuning"]["change_count"] == 1
+    assert data["tuning"]["changes"][0]["to"]["name"] == "+手雷 / -职业"
+    assert "要先改调谐" in response["summary"]
+    assert data["builds"][0]["tuning_changes"] == [change]
+
+
+@pytest.mark.asyncio
+async def test_find_hides_the_tuning_block_when_nothing_needs_it() -> None:
+    from destiny_mcp.tools import _build_flow
+
+    class _Build:
+        async def find_build(self, player_name, request):
+            return [
+                {
+                    "score": 50.0,
+                    "completion_rate": 1.0,
+                    "build": {"items": []},
+                    "tuning_changes": [],
+                    "requires_tuning": False,
+                    "tuning_note": "",
+                }
+            ]
+
+    response = await _build_flow.find(
+        {"build_svc": _Build()}, "Tester#1234", _Request(grenade_target=70),
+        {"character": "hunter"}, lambda value: value,
+    )
+
+    assert "tuning" not in response["data"]
+    assert response["summary"] == "找到 1 个候选配装。"
+
+
+@pytest.mark.asyncio
+async def test_ladder_says_when_the_original_targets_are_impossible() -> None:
+    """「原样」实测 0 候选时必须给 verdict，别让 ceiling 的逐项最大值看起来像"其实能满足"。"""
+    analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
+
+    class _Build:
+        async def analyze_build(self, player_name, request):
+            return analysis
+
+        async def find_build(self, player_name, request):
+            return []
+
+    table = await ladder.no_solution_ladder(
+        {"build_svc": _Build()}, "Tester#1234", _Request(grenade_target=70)
+    )
+
+    assert table["verdict"]["satisfiable"] is False
+    assert "0 候选" in table["verdict"]["evidence"]
+    assert "逐项" in table["verdict"]["note"]
+    assert table["tuning_first"] == []
+
+
+@pytest.mark.asyncio
+async def test_ladder_reports_insufficient_tuning_headroom_instead_of_silence() -> None:
+    """缺口比调谐额度大：也要有一档说明"补不上"，不能什么都不给。"""
+    analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
+
+    class _Build:
+        async def analyze_build(self, player_name, request):
+            return analysis
+
+        async def find_build(self, player_name, request):
+            if request.grenade_target is None:
+                return [SimpleNamespace(build=SimpleNamespace(grenade=20))]
+            return []
+
+    class _Inventory:
+        async def get_armor_snapshot(self, player_name, character_class):
+            return _tunable_snapshot()
+
+    table = await ladder.no_solution_ladder(
+        {"build_svc": _Build(), "inventory_svc": _Inventory(), "manifest": _StubManifest()},
+        "Tester#1234",
+        _Request(grenade_target=70),
+    )
+
+    rung = table["tuning_first"][0]
+    assert rung["lever"] == "tuning_insufficient"
+    assert "补不上这一档" in rung["why"]

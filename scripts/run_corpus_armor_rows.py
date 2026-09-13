@@ -152,28 +152,46 @@ async def main():
             f" 能量={preview[0].get('energy') if preview else None}",
         )
 
-        # 5. 无解时的六维阶梯
-        ladder_call = dict(found["candidates"][0]["arguments"]) if found.get("candidates") else {}
-        blocked = await build(intent="find", character="hunter", exotic_name="快速装弹松身裤",
+        # 5. 曾经"无解"的那组目标：0.1.6 起调谐补齐能救回来（这条是本轮的核心证据）
+        rescued = await build(intent="find", character="hunter", exotic_name="快速装弹松身裤",
                               weapons_target=150, class_target=100, super_target=80,
                               melee_target=70, grenade_target=70,
                               priority_stats=["weapons", "class_stat", "super_stat", "melee", "grenade"])
-        if (blocked.get("error") or {}).get("code") == "exotic_confirmation_required":
-            blocked = await build(**dict(blocked["candidates"][0]["arguments"]))
-        data = blocked.get("data") or {}
-        ladder = data.get("ladder") or {}
+        if (rescued.get("error") or {}).get("code") == "exotic_confirmation_required":
+            rescued = await build(**dict(rescued["candidates"][0]["arguments"]))
+        rdata = rescued.get("data") or {}
+        rbuilds = rdata.get("builds") or []
+        rtop = rbuilds[0] if rbuilds else {}
         check(
-            "⑩ 无解：find 给 0 候选 + ladder（shortfall/ceiling/suggestion 三件套）",
-            blocked["ok"] and not (data.get("builds") or [])
+            "⑩ 调谐补齐把「差一点」变成方案：候选带 tuning_changes 且逐项目标达标",
+            rescued["ok"] and bool(rbuilds) and bool(rtop.get("requires_tuning"))
+            and bool(rtop.get("tuning_changes")) and not (rtop.get("missing_requirements") or [])
+            and bool(rdata.get("tuning")),
+            f"builds={len(rbuilds)} requires_tuning={rtop.get('requires_tuning')} "
+            f"changes={len(rtop.get('tuning_changes') or [])} "
+            f"missing={rtop.get('missing_requirements')}",
+        )
+
+        # 5b. 真的配不出来时：阶梯 + verdict，且原始目标一个字没改
+        blocked = await build(intent="find", character="hunter",
+                              weapons_target=150, class_target=100, super_target=80,
+                              melee_target=70, health_target=200,
+                              priority_stats=["weapons", "class_stat", "super_stat", "melee"])
+        bdata = blocked.get("data") or {}
+        ladder = bdata.get("ladder") or {}
+        check(
+            "⑪ 真无解：find 给 0 候选 + ladder（ceiling/suggestion/verdict 都在）",
+            blocked["ok"] and not (bdata.get("builds") or [])
             and ladder.get("ceiling") and ladder.get("suggestion")
-            and ladder.get("single_stat_ceiling"),
+            and ladder.get("single_stat_ceiling")
+            and (ladder.get("verdict") or {}).get("satisfiable") is False,
             f"ceiling={ladder.get('ceiling')} shortfall={ladder.get('shortfall')} "
-            f"suggestion drop={ladder.get('suggestion', {}).get('drop')}",
+            f"verdict={ladder.get('verdict', {}).get('satisfiable')}",
         )
         check(
-            "⑪ 阶梯只提议：原始硬约束没被改（targets 里还是 近战70/手雷70）",
+            "⑪b 阶梯只提议：原始硬约束没被改（targets 里还是 近战70/生命200）",
             (ladder.get("targets") or {}).get("melee") == 70
-            and (ladder.get("targets") or {}).get("grenade") == 70,
+            and (ladder.get("targets") or {}).get("health") == 200,
             f"targets={ladder.get('targets')}",
         )
 
@@ -313,6 +331,64 @@ async def main():
             and any("金装" in action for action in (heavy.get("next_actions") or [])),
             f"precision={(heavy_data.get('not_computed') or {}).get('precision')} "
             f"next_actions={len(heavy.get('next_actions') or [])}",
+        )
+
+        # 15. 调谐（P7）：写路径认得调谐插件名，歧义说法让调用方挑，且确认前不写
+        legs_id = T5_LEGS
+        plan_tuning = await inv(intent="equip_mod", item_instance_id=legs_id,
+                                mod_name="+武器 / -生命值", character="hunter",
+                                confirmed=False)
+        pending = (plan_tuning.get("candidates") or [{}])[0]
+        bonus = (pending.get("to") or {}).get("stat_bonus") or {}
+        energy = pending.get("energy") or {}
+        check(
+            "㉑ 调谐可规划：equip_mod 给出「从哪个调谐改成哪个」且确认前不写账号",
+            (plan_tuning.get("error") or {}).get("code") == "confirmation_required"
+            and pending.get("kind") == "tuning"
+            and (pending.get("to") or {}).get("energy_cost") == 0
+            and energy.get("after") == energy.get("used")
+            and any(value < 0 for value in bonus.values()),
+            f"code={(plan_tuning.get('error') or {}).get('code')} kind={pending.get('kind')} "
+            f"socket={pending.get('socket_index')} to={(pending.get('to') or {}).get('name')!r} "
+            f"stat_bonus={bonus} energy={energy}",
+        )
+
+        # 16. 调谐是零和的：歧义说法（只说加哪一项）必须让调用方挑一个
+        ambiguous = await inv(intent="equip_mod", item_instance_id=legs_id,
+                              mod_name="手雷调谐", character="hunter", confirmed=False)
+        check(
+            "㉒ 调谐歧义说法报错并列出选项（不许替用户猜减哪一项）",
+            not ambiguous["ok"]
+            and (ambiguous.get("error") or {}).get("code") == "invalid_argument_error"
+            and "零和" in str((ambiguous.get("error") or {}).get("message") or ""),
+            f"code={(ambiguous.get('error') or {}).get('code')} "
+            f"msg={str((ambiguous.get('error') or {}).get('message'))[:80]!r}",
+        )
+
+        # 17. 目标"差一点"时：要么给带 tuning_changes 的候选，要么给 verdict 说清配不出来
+        edge = await build(intent="find", character="hunter",
+                           weapons_target=150, health_target=103)
+        edge_data = edge.get("data") or {}
+        edge_builds = edge_data.get("builds") or []
+        if edge_builds:
+            top = edge_builds[0]
+            ok_edge = bool(top.get("requires_tuning")) and bool(top.get("tuning_changes"))
+            evidence = (f"builds={len(edge_builds)} requires_tuning={top.get('requires_tuning')} "
+                        f"changes={len(top.get('tuning_changes') or [])}")
+        else:
+            verdict = (edge_data.get("ladder") or {}).get("verdict") or {}
+            ok_edge = (
+                verdict.get("satisfiable") is False
+                and bool(verdict.get("note"))
+                and "原始优先级" in str(verdict.get("evidence") or "")
+            )
+            evidence = (f"builds=0 satisfiable={verdict.get('satisfiable')} "
+                        f"note={bool(verdict.get('note'))} "
+                        f"rotation={verdict.get('solved_after_rotation')}")
+        check(
+            "㉓ 差一点的目标：给出调谐方案，或明确说「这批护甲配不出来」（不沉默）",
+            edge["ok"] and ok_edge,
+            evidence,
         )
 
     print("\n=== 汇总 ===")

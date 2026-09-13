@@ -8,7 +8,7 @@
 | 层 | 跑什么 | 什么时候跑 |
 | --- | --- | --- |
 | **L1 自动化**（不需要账号） | `pytest -q`（1272 条）／`scripts/verify_mcp.py`／`tests/agent_behavior_cases.yaml`（路由） | 每次提交 |
-| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 20 行）／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 19 例基线） | 改动武器或护甲响应后 |
+| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 25 行）／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线） | 改动武器或护甲响应后 |
 | **L2 冒烟**（本文件带 ⭐ 的行，25 条） | 真机逐条调用 | 每轮回归开始时跑一遍 |
 | **L3 补测**（本文件其余行） | 真机逐条调用 | **只在该工具被改动时**跑它那一章 |
 
@@ -371,9 +371,12 @@
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
-| ⭐ 照社区配装的六维来一套，配不出来告诉我差在哪 | `build_assistant(intent="find")` 带模板硬约束（如 近战70+手雷70） | 0 候选 + `ladder`：`shortfall`（差多少）、`ceiling`（**同一套约束下同时能达到**的上限，实采）、`trials`（逐级放松各档成不成）、`suggestion`（最小可行降档） |
+| ⭐ 照社区配装的六维来一套 | `build_assistant(intent="find")` 带模板硬约束（猎人 武器150/职业100/超能80/近战70/手雷70 + 金装 快速装弹松身裤） | 0.1.6 起**有解**：5 套候选、每套 `requires_tuning=true` 且只改 1 件调谐就达标（这条以前是"无解"的样板，现在是调谐补齐的核心实机证据） |
+| 真的配不出来时告诉我差在哪 | 同上，但把生命值推到 `health_target=200` | 0 候选 + `ladder`：`shortfall`、`ceiling`（**同一套约束下同时能达到**的上限，实采）、`trials`、`suggestion`，以及 `verdict.satisfiable=false`（按**原始优先级**实测 0 候选；并说明 ceiling 是逐项最大值、trials 里 ok=true 的档是换了优先级之后的解） |
 | 这个"上限"是什么上限 | `ladder.single_stat_ceiling` | 那是**单项**上限（把点全堆一项）；拿它当"同时能达到"会得出"你什么都够"。两个字段都在，回答时不能混 |
-| 只差几点，非降目标不可吗 | `ladder.tuning_first` | 缺口 ≤5 给"调谐（±5）可补"、≤10 给"属性模组（+10/3 能量）可补"的提示，并注明**这只是杠杆提示**（求解器只对待刷虚拟件建模调谐） |
+| 只差几点，非降目标不可吗 | `ladder.tuning_first` + `find` 的 `tuning_changes` | 求解器**真的试过调谐**（没达标时用调谐额度复解 + 逐套精确复核）：能补的直接给带 `tuning_changes` 的候选（`requires_tuning=true`）；补不上时这一档如实分三种口径（额度够但让不出来 / 额度不够 / 只差 ≤10 看属性模组），并带 `solver_attempted` |
+| 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` + `canonical_build.items[].mods` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` 里那件护甲的 `mods` 已经带上要装的调谐插件，执行不用手改 |
+| 目标根本配不出来时怎么说 | `ladder.verdict` | `satisfiable=false`（按原始优先级实测 0 候选）+ 说明 `ceiling` 是**逐项**最大值、不等于同一套能同时达到；`solved_after_rotation` 标出"换优先级能出解"这件事 |
 | 阶梯会不会偷偷改我的目标 | `ladder.targets` + 原始请求 | `targets` 里仍是用户给的数（如 近战70/手雷70）；降级只是提议，**未经确认不许改**；`recommend` 的无解响应继续带"不得自动降低"的 warning |
 | 只给优先级、不给硬目标 | `intent="recommend"` + 只有 `priority_stats` | `completion_rate` 是 `null` + `completion_rate_note`，**不是 0.0**（0.0 会被读成"一个都没满足"） |
 | 要装备该用哪个 intent | `find` vs `recommend` | **要装备走 `find`**（只有它的候选带 `canonical_build`）；`recommend` 只给排序建议，把它的结果丢给 `equip_build` 会被拒（`invalid_canonical_build`） |

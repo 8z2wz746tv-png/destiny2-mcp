@@ -1,0 +1,229 @@
+{
+  "_case": {
+    "elapsed_ms": 82967,
+    "is_error": false,
+    "payload_chars": 4854,
+    "steps": [
+      {
+        "arguments": {
+          "character": "hunter",
+          "class_target": 100,
+          "health_target": 200,
+          "intent": "find",
+          "melee_target": 70,
+          "priority_stats": [
+            "weapons",
+            "class_stat",
+            "super_stat",
+            "melee"
+          ],
+          "super_target": 80,
+          "weapons_target": 150
+        },
+        "tool": "build_assistant"
+      }
+    ],
+    "tool": "build_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "builds": [],
+    "ladder": {
+      "analysis_precision": "exact",
+      "ceiling": {
+        "class_stat": 130,
+        "grenade": 41,
+        "health": 12,
+        "melee": 70,
+        "super_stat": 100,
+        "weapons": 200
+      },
+      "met": [
+        "weapons",
+        "class_stat",
+        "melee",
+        "super_stat"
+      ],
+      "note": "ceiling = 同一套约束下、按某种优先级**同时**能达到的值（实采，逐项取最大）；它不等于「游戏里最多能到多少」，也不等于单项上限。降级只能由用户确认后执行。",
+      "precision": "sampled",
+      "priority": [
+        "weapons",
+        "class_stat",
+        "super_stat",
+        "melee",
+        "health",
+        "grenade"
+      ],
+      "reason": "Cannot meet 1 stat target(s) with current inventory. health: need 200, max possible is 134 (gap: 66)",
+      "samples": [
+        {
+          "class_stat": 105,
+          "grenade": 17,
+          "health": 12,
+          "melee": 70,
+          "super_stat": 87,
+          "weapons": 185
+        },
+        {
+          "class_stat": 130,
+          "grenade": 41,
+          "health": 6,
+          "melee": 26,
+          "super_stat": 100,
+          "weapons": 200
+        }
+      ],
+      "shortfall": {
+        "health": 188
+      },
+      "single_stat_ceiling": {
+        "class_stat": 200,
+        "grenade": 190,
+        "health": 134,
+        "melee": 181,
+        "super_stat": 195,
+        "weapons": 200
+      },
+      "single_stat_note": "single_stat_ceiling 是「把点全堆在这一项上」的上限，**不是**同时能达到的值；ceiling 才是同一套约束下按优先级实采出来的。",
+      "suggestion": {
+        "drop": [
+          "health"
+        ],
+        "drop_labels": [
+          "生命"
+        ],
+        "priority": [
+          "weapons",
+          "class_stat",
+          "super_stat",
+          "melee",
+          "health",
+          "grenade"
+        ],
+        "reached": {
+          "class_stat": 105,
+          "grenade": 17,
+          "health": 12,
+          "melee": 70,
+          "super_stat": 87,
+          "weapons": 185
+        },
+        "why": "放下优先级最低的 1 项目标（生命）之后能解出来：武器=185、生命=12、职业=105、手雷=17、近战=70、超能=87。这一步要用户明确同意，不能自动降。"
+      },
+      "targets": {
+        "class_stat": 100,
+        "health": 200,
+        "melee": 70,
+        "super_stat": 80,
+        "weapons": 150
+      },
+      "trials": [
+        {
+          "dropped": [],
+          "label": "原样：当前硬目标 + 当前优先级",
+          "ok": false,
+          "priority": null,
+          "reached": {}
+        },
+        {
+          "dropped": [
+            "health"
+          ],
+          "label": "放下优先级最低的 1 项目标（生命）",
+          "ok": true,
+          "priority": [
+            "weapons",
+            "class_stat",
+            "super_stat",
+            "melee",
+            "health",
+            "grenade"
+          ],
+          "reached": {
+            "class_stat": 105,
+            "grenade": 17,
+            "health": 12,
+            "melee": 70,
+            "super_stat": 87,
+            "weapons": 185
+          }
+        },
+        {
+          "dropped": [
+            "health",
+            "melee"
+          ],
+          "label": "放下优先级最低的 2 项目标（生命、近战）",
+          "ok": true,
+          "priority": [
+            "weapons",
+            "class_stat",
+            "super_stat",
+            "melee",
+            "health",
+            "grenade"
+          ],
+          "reached": {
+            "class_stat": 130,
+            "grenade": 41,
+            "health": 6,
+            "melee": 26,
+            "super_stat": 100,
+            "weapons": 200
+          }
+        }
+      ],
+      "tuning_attempted": true,
+      "tuning_first": [
+        {
+          "gap": 188,
+          "headroom": 50,
+          "lever": "tuning_insufficient",
+          "solver_attempted": true,
+          "stat": "health",
+          "stat_label": "生命",
+          "why": "生命差 188 点，而现有护甲的调谐每项最多只能补 50 点：调谐补不上这一档，要么降目标，要么换更强的护甲。"
+        }
+      ],
+      "tuning_first_note": "求解器已经试过调谐（每项最多 +50 点，零和：+5 一项要 −5 另一项），上面这些是「试过仍不达标」的项，不是「没试」。",
+      "tuning_headroom": {
+        "class_stat": 25,
+        "grenade": 25,
+        "health": 50,
+        "melee": 30,
+        "super_stat": 25,
+        "weapons": 25
+      },
+      "verdict": {
+        "evidence": "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）",
+        "note": "ceiling 是各次探测**逐项**取的最大值，不等于同一套护甲能同时达到；trials 里 ok=true 的档是**换了优先级顺序或放下目标**之后的解，原始请求一个字没改。",
+        "satisfiable": false,
+        "solved_after_rotation": false
+      }
+    },
+    "query": {
+      "character": "hunter",
+      "exotic_name": null,
+      "priority_stats": [
+        "weapons",
+        "class_stat",
+        "super_stat",
+        "melee"
+      ],
+      "targets": {
+        "class": 100,
+        "grenade": null,
+        "health": 200,
+        "melee": 70,
+        "super": 80,
+        "weapons": 150
+      }
+    }
+  },
+  "next_actions": [
+    "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；降级要用户同意后再重试。"
+  ],
+  "ok": true,
+  "summary": "找到 0 个候选配装。",
+  "warnings": []
+}
