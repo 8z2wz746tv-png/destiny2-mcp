@@ -338,7 +338,7 @@ P0 基线 → P1 形状 → P2 详情 → P4 换模组 → P3 统一 → P5 阶�
 | P3 五处统一 | `8c8300a` | 列表/单件/反推/社区核对/装备回显共用槽位与属性口径（纯新增、零删除） |
 | P5 六维阶梯 | `0eb6fc3` | 无解给 `shortfall`/`ceiling`/`trials`/`suggestion`；`completion_rate` 标 N/A |
 | P6 语料与发版 | `ad1c5d8` | 护甲语料 12 行真机脚本 + 章节 + 0.1.3 |
-| P7 调谐进求解器 | 本次 | `build/tuning.py` + `services/build_tuning.py`；两趟求解 + 精确复核；`tuning_changes`/`requires_tuning`/`tuning` 字段；`equip_mod` 支持调谐；阶梯 `verdict`；结果翻译层搬去 `services/build_results.py`（`build_service.py` 1114 → 902，上限同步收紧） |
+| P7 调谐进求解器 | `a404566` | `build/tuning.py` + `services/build_tuning.py`；两趟求解 + 精确复核；`tuning_changes`/`requires_tuning`/`tuning` 字段；`equip_mod` 支持调谐；阶梯 `verdict`；结果翻译层搬去 `services/build_results.py`（`build_service.py` 1114 → 902，上限同步收紧） |
 
 **过程中修掉的真问题**（都是实机勘测才发现）：
 
