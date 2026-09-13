@@ -85,6 +85,16 @@ ARMOR_CASES: list[tuple[str, object]] = [
         "intent": "equip_mod", "item_instance_id": "6917530198796768597",
         "mod_name": "手雷模组", "character": "hunter", "confirmed": False,
     }),
+    # 无解时的六维阶梯：社区模板那套硬约束（近战70+手雷70）实机就是无解
+    ("ladder_no_solution", [
+        ("build_assistant", {
+            "intent": "find", "character": "hunter", "exotic_name": "快速装弹松身裤",
+            "weapons_target": 150, "class_target": 100, "super_target": 80,
+            "melee_target": 70, "grenade_target": 70,
+            "priority_stats": ["weapons", "class_stat", "super_stat", "melee", "grenade"],
+        }),
+        ("build_assistant", {"$replay_candidate": 0}),
+    ]),
     ("equip_mod_wrong_slot", "inventory_assistant", {
         "intent": "equip_mod", "item_instance_id": "6917530198796768597",
         "mod_name": "手雷快速启动", "character": "hunter", "confirmed": False,

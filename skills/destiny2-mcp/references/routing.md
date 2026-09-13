@@ -156,7 +156,8 @@ Manifest 侧（**不代表拥有**）：
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
 | `recommend` | 按硬约束求解一套配装 | `character`、`exotic_name`、`weapons_target`、`health_target`、`class_target`、`grenade_target`、`melee_target`、`super_target`、`priority_stats`、`fragment_names`、`include_subclass_fragment`、`top_n` |
-| `find` | 列出满足约束的候选（同上参数） | 同上 |
+| `find` | 列出满足约束的候选（同上参数）。**要装备就走这条**：只有它的每条候选带 `canonical_build`，`recommend` 只给排序建议 | 同上 |
+| `recommend` | 按分数排序的推荐（含 `completion_rate`）；**不带**可执行载荷，无解时会给 `ladder` | 同上 |
 | `analyze` | 无解时诊断差在哪 | 同上 |
 | `farm_target` | 反推该刷哪件护甲 | `replacement_slot`、`baseline`、`max_replacements`、`set_bonus_name`、`set_bonus_count`、`character` |
 | `equip_build` | 装备**服务端签发**的候选（写入） | `canonical_build`、`character`、`confirmed` |
@@ -164,6 +165,18 @@ Manifest 侧（**不代表拥有**）：
 | `exotic_armor` | 异域护甲列表或详情 | `exotic_name`、`character` |
 | `set_bonus` | 套装 2 件／4 件效果 | `set_bonus_name` |
 | `community`（`community_build`、`starside`） | 社区配装模板搜索／详情／库存匹配 | `query`、`character`、`scenario`、`category`、`community_build_id`、`include_inventory`、`top_n`、`offset` |
+
+**无解时看 `ladder`（`find`/`recommend` 都会带）**：
+
+- `shortfall`：哪个属性差多少（对着**同时能达到**的 `ceiling` 算，不是单项上限）；
+- `ceiling`：同一套约束下按某种优先级**同时**能达到的值（实采，逐项取最大）；
+  `single_stat_ceiling` 才是"把点全堆一项"的上限 —— 两者不能混，混了会得出"你什么都够"；
+- `trials`：每一档放松试了什么、成不成（逐级放下优先级最低的目标）；
+- `suggestion`：**最小改动就能解出来**的那一档（放下哪几项目标 + 那一档能到的六维）。
+  这是**提议**：原始硬约束一个字没改，要用户点头后才带着新参数重试。
+
+只给优先级、不给硬目标时 `completion_rate` 会是 `null`（附 `completion_rate_note`）——
+那不代表"一个都没满足"。
 
 指定 `exotic_name` 的首次查询**必须**返回候选并等玩家确认，重试时原样回传 `confirmed_exotic_hash` 与 `exotic_confirmation_token`，其它参数不得丢失。`community_build_id` 只对 `community` 有效，传给别的 intent 会被拒绝。
 

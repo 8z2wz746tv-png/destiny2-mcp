@@ -1,0 +1,235 @@
+{
+  "_case": {
+    "elapsed_ms": 12277,
+    "is_error": false,
+    "payload_chars": 5350,
+    "steps": [
+      {
+        "arguments": {
+          "character": "hunter",
+          "class_target": 100,
+          "exotic_name": "快速装弹松身裤",
+          "grenade_target": 70,
+          "intent": "find",
+          "melee_target": 70,
+          "priority_stats": [
+            "weapons",
+            "class_stat",
+            "super_stat",
+            "melee",
+            "grenade"
+          ],
+          "super_target": 80,
+          "weapons_target": 150
+        },
+        "tool": "build_assistant"
+      },
+      {
+        "arguments": {
+          "character": "hunter",
+          "class_target": 100,
+          "confirmed_exotic_hash": -1904495392,
+          "exotic_confirmation_token": "d2bc1.1789311190.EEuvuJAXUEh8lwQx.07516911556a03deeb445b39dfc79535f38048e211f5539cd90d4cb339ec0c78",
+          "exotic_name": "快速装弹松身裤",
+          "fragment_names": null,
+          "grenade_target": 70,
+          "health_target": null,
+          "include_subclass_fragment": false,
+          "intent": "find",
+          "melee_target": 70,
+          "player_name": null,
+          "priority_stat": null,
+          "priority_stats": [
+            "weapons",
+            "class_stat",
+            "super_stat",
+            "melee",
+            "grenade"
+          ],
+          "set_bonus_count": null,
+          "set_bonus_name": null,
+          "super_target": 80,
+          "top_n": 5,
+          "weapons_target": 150
+        },
+        "tool": "build_assistant"
+      }
+    ],
+    "tool": "build_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "builds": [],
+    "ladder": {
+      "analysis_precision": "exact",
+      "ceiling": {
+        "class_stat": 130,
+        "grenade": 41,
+        "health": 6,
+        "melee": 70,
+        "super_stat": 100,
+        "weapons": 200
+      },
+      "met": [
+        "weapons",
+        "class_stat",
+        "melee",
+        "super_stat"
+      ],
+      "note": "ceiling = 同一套约束下、按某种优先级**同时**能达到的值（实采，逐项取最大）；它不等于「游戏里最多能到多少」，也不等于单项上限。降级只能由用户确认后执行。",
+      "precision": "sampled",
+      "priority": [
+        "weapons",
+        "class_stat",
+        "super_stat",
+        "melee",
+        "grenade",
+        "health"
+      ],
+      "reason": "No valid armor combination found (constraints may conflict with exotic + stat requirements)",
+      "samples": [
+        {
+          "class_stat": 110,
+          "grenade": 30,
+          "health": 0,
+          "melee": 70,
+          "super_stat": 80,
+          "weapons": 180
+        },
+        {
+          "class_stat": 130,
+          "grenade": 41,
+          "health": 6,
+          "melee": 26,
+          "super_stat": 100,
+          "weapons": 200
+        }
+      ],
+      "shortfall": {
+        "grenade": 29
+      },
+      "single_stat_ceiling": {
+        "class_stat": 200,
+        "grenade": 160,
+        "health": 127,
+        "melee": 150,
+        "super_stat": 180,
+        "weapons": 200
+      },
+      "single_stat_note": "single_stat_ceiling 是「把点全堆在这一项上」的上限，**不是**同时能达到的值；ceiling 才是同一套约束下按优先级实采出来的。",
+      "suggestion": {
+        "drop": [
+          "grenade"
+        ],
+        "drop_labels": [
+          "手雷"
+        ],
+        "priority": [
+          "weapons",
+          "class_stat",
+          "super_stat",
+          "melee",
+          "grenade",
+          "health"
+        ],
+        "reached": {
+          "class_stat": 110,
+          "grenade": 30,
+          "health": 0,
+          "melee": 70,
+          "super_stat": 80,
+          "weapons": 180
+        },
+        "why": "放下优先级最低的 1 项目标（手雷）之后能解出来：武器=180、职业=110、手雷=30、近战=70、超能=80。这一步要用户明确同意，不能自动降。"
+      },
+      "targets": {
+        "class_stat": 100,
+        "grenade": 70,
+        "melee": 70,
+        "super_stat": 80,
+        "weapons": 150
+      },
+      "trials": [
+        {
+          "dropped": [],
+          "label": "原样：当前硬目标 + 当前优先级",
+          "ok": false,
+          "priority": null,
+          "reached": {}
+        },
+        {
+          "dropped": [
+            "grenade"
+          ],
+          "label": "放下优先级最低的 1 项目标（手雷）",
+          "ok": true,
+          "priority": [
+            "weapons",
+            "class_stat",
+            "super_stat",
+            "melee",
+            "grenade",
+            "health"
+          ],
+          "reached": {
+            "class_stat": 110,
+            "grenade": 30,
+            "health": 0,
+            "melee": 70,
+            "super_stat": 80,
+            "weapons": 180
+          }
+        },
+        {
+          "dropped": [
+            "grenade",
+            "melee"
+          ],
+          "label": "放下优先级最低的 2 项目标（手雷、近战）",
+          "ok": true,
+          "priority": [
+            "weapons",
+            "class_stat",
+            "super_stat",
+            "melee",
+            "grenade",
+            "health"
+          ],
+          "reached": {
+            "class_stat": 130,
+            "grenade": 41,
+            "health": 6,
+            "melee": 26,
+            "super_stat": 100,
+            "weapons": 200
+          }
+        }
+      ]
+    },
+    "query": {
+      "character": "hunter",
+      "exotic_name": "快速装弹松身裤",
+      "priority_stats": [
+        "weapons",
+        "class_stat",
+        "super_stat",
+        "melee",
+        "grenade"
+      ],
+      "targets": {
+        "class": 100,
+        "grenade": 70,
+        "health": null,
+        "melee": 70,
+        "super": 80,
+        "weapons": 150
+      }
+    }
+  },
+  "next_actions": [
+    "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；降级要用户同意后再重试。"
+  ],
+  "ok": true,
+  "summary": "找到 0 个候选配装。",
+  "warnings": []
+}

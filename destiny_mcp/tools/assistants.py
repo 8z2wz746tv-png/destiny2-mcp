@@ -23,6 +23,7 @@ from ._build_confirmation import (
 from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from . import _armor_branches as armor_branches
+from . import _build_flow as build_flow
 from . import _weapon_branches as weapon_branches
 from ._enrichment import community_enrichment, community_read
 from ._farming import farming_reference as _farming_reference
@@ -879,39 +880,14 @@ async def build_assistant(
         query["set_bonus_count"] = request.set_bonus_count
 
     if intent == "recommend":
-        result = await svc["build_svc"].recommend_build(resolved, request)
-        recommendation = armor_branches.with_slot_keys(_dump(result))
-        if not recommendation.get("results"):
-            return ok_response(
-                "真实库存中没有满足原始硬约束的配装；金装和全部属性目标都保持不变。",
-                {"recommendation": recommendation, "query": query},
-                next_actions=[
-                    "如果玩家想知道如何达标，保留本次全部参数调用 "
-                    "build_assistant(intent='farm_target', max_replacements=2)；"
-                    "只有待刷反推也无解时才询问是否调整硬约束。"
-                ],
-                warnings=[
-                    "原始硬约束未改变。无解时不能自动降低属性目标、替换指定金装或去掉碎片设置。"
-                ],
-            )
-        return ok_response(
-            "已生成配装推荐。",
-            {"recommendation": recommendation, "query": query},
-        )
+        return await build_flow.recommend(svc, resolved, request, query, _dump)
 
     if intent == "find":
-        result = await svc["build_svc"].find_build(resolved, request)
-        return ok_response(
-            f"找到 {len(result)} 个候选配装。",
-            {"builds": armor_branches.with_slot_keys(_dump(result)), "query": query},
-        )
+        return await build_flow.find(svc, resolved, request, query, _dump)
 
     if intent == "analyze":
-        result = await svc["build_svc"].analyze_build(resolved, request)
-        return ok_response(
-            "已分析配装约束。",
-            {"analysis": _dump(result), "query": query},
-        )
+        return await build_flow.analyze(svc, resolved, request, query, _dump)
+
 
     if intent == "farm_target":
         result = await svc["build_svc"].infer_required_armor(
