@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 12277,
+    "elapsed_ms": 21664,
     "is_error": false,
-    "payload_chars": 5350,
+    "payload_chars": 5407,
     "steps": [
       {
         "arguments": {
@@ -29,7 +29,7 @@
           "character": "hunter",
           "class_target": 100,
           "confirmed_exotic_hash": -1904495392,
-          "exotic_confirmation_token": "d2bc1.1789311190.EEuvuJAXUEh8lwQx.07516911556a03deeb445b39dfc79535f38048e211f5539cd90d4cb339ec0c78",
+          "exotic_confirmation_token": "d2bc1.1789312025.q2td7UXPh3lNVLLC.9adcca4c20af8aa4f0d34a33c9b46e4bec771092565a193f63fbe00951cd619f",
           "exotic_name": "快速装弹松身裤",
           "fragment_names": null,
           "grenade_target": 70,
@@ -204,7 +204,9 @@
             "weapons": 200
           }
         }
-      ]
+      ],
+      "tuning_first": [],
+      "tuning_first_note": ""
     },
     "query": {
       "character": "hunter",

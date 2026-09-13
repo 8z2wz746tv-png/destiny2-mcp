@@ -5,7 +5,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 4406,
+      "elapsed_ms": 4518,
       "payload_chars": 3841
     },
     {
@@ -13,7 +13,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1336,
+      "elapsed_ms": 1376,
       "payload_chars": 2904
     },
     {
@@ -21,7 +21,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1232,
+      "elapsed_ms": 1239,
       "payload_chars": 935
     },
     {
@@ -29,7 +29,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1310,
+      "elapsed_ms": 1560,
       "payload_chars": 2692
     },
     {
@@ -37,7 +37,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 3835,
+      "elapsed_ms": 1965,
       "payload_chars": 5858
     },
     {
@@ -45,7 +45,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1340,
+      "elapsed_ms": 1904,
       "payload_chars": 10536
     },
     {
@@ -53,7 +53,7 @@
       "tool": "inventory_assistant",
       "ok": false,
       "error_code": "confirmation_required",
-      "elapsed_ms": 1692,
+      "elapsed_ms": 3211,
       "payload_chars": 1529
     },
     {
@@ -61,15 +61,15 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 12277,
-      "payload_chars": 5350
+      "elapsed_ms": 21664,
+      "payload_chars": 5407
     },
     {
       "case": "equip_mod_wrong_slot",
       "tool": "inventory_assistant",
       "ok": false,
       "error_code": "invalid_argument_error",
-      "elapsed_ms": 1771,
+      "elapsed_ms": 2835,
       "payload_chars": 285
     },
     {
@@ -77,7 +77,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1317,
+      "elapsed_ms": 1994,
       "payload_chars": 23671
     },
     {
@@ -85,7 +85,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 211,
+      "elapsed_ms": 202,
       "payload_chars": 26858
     },
     {
@@ -93,7 +93,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 10,
+      "elapsed_ms": 9,
       "payload_chars": 7349
     },
     {
@@ -117,7 +117,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 438,
+      "elapsed_ms": 427,
       "payload_chars": 70451
     },
     {
@@ -125,7 +125,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 439,
+      "elapsed_ms": 426,
       "payload_chars": 36425
     },
     {
@@ -133,7 +133,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 34826,
+      "elapsed_ms": 12816,
       "payload_chars": 117370
     },
     {
@@ -141,7 +141,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 4523,
+      "elapsed_ms": 3492,
       "payload_chars": 2635
     },
     {
@@ -149,7 +149,7 @@
       "tool": "build_assistant",
       "ok": false,
       "error_code": "confirmation_required",
-      "elapsed_ms": 7841,
+      "elapsed_ms": 5170,
       "payload_chars": 78653
     }
   ]
