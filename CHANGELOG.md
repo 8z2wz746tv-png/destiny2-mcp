@@ -2,6 +2,21 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.1.1 — 2026-09-13
+
+**修 P0：干净环境装出来起不来。**
+
+- 根因：`pyproject.toml` 只写了 `mcp[cli]>=1.27.2`，从零安装解析到 **mcp 2.2.0**；
+  2.x 把 `mcp.server.fastmcp` 改名成 `MCPServer`，服务在 import 阶段就炸，
+  自检报 `VERIFY_FAILED=MCPError: Connection closed`。开发机装着 1.x，本地测不出来。
+- 改成 `mcp[cli]>=1.27.2,<2`，并新增 `tests/test_dependency_bounds.py`
+  （上界 + lock 钉 1.x + 代码确实用 v1 API，三条一起才算完整约束）。
+- 验证方式：从 GitHub 克隆到干净目录 → `python -m venv .venv` → `pip install -e .`
+  → 下载预构建 Manifest → OAuth 登录 → `verify_mcp.py` 全绿（8 工具、
+  `BUNGIE_PROFILE_CHECK=ok`）→ 12 项真机冒烟全部符合文档。此时装到的是 mcp 1.30.0。
+
+`v0.1.0` 的 tag 停留在修复前，请用 `v0.1.1`。
+
 ## 0.1.0 — 2026-09-13
 
 第一次公开快照：本地运行的 Destiny 2 MCP 服务器，通过 8 个面向自然语言的聚合工具
