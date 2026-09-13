@@ -2,6 +2,24 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.1.5 — 2026-09-13
+
+**L2 冒烟集全跑（25 条 ⭐ 行）抓出来的两个问题。**
+
+- **我自己的回归（P1）**：0.1.4 重构 `analyze` 的提前返回时，把
+  `precision="not_computed"` 那一行一起删掉了 —— 结果超规模时 `reason` 说的是
+  "没算"，`precision` 却报 `exact` 且 `max_possible={}`，调用方会读成"你什么都达不到"。
+  已补回，并新增 `tests/test_build_size_guard.py`（4 条）把这条口径钉死：
+  超限必须 `precision="not_computed"` + 空 `max_possible`，两条路（analyze / find）同一句说明。
+- **语料自己写错了路径（文档 bug）**：武器 T 级那条原来写 `analyze` 的 `weapon.gear_tier`，
+  实测 `analyze` 的 T 级在 `data.inventory.instances[].weapon.gear_tier`（逐副本），
+  `type` 才是 `weapons.items[].weapon.gear_tier`；而且 `gear_tier_note` 并非处处都有
+  （`owned.instances[]` 里有，`analyze` 的副本块只有 `gear_tier` 本身）。语料行按实测改写，
+  并给武器逐行脚本加了第 17 行锁住这三条路径（真机 `type.gear_tier=5`、遗产各副本 `[None, 5]`）。
+
+冒烟集结果：**26/26 PASS**（25 条 ⭐ + 工具面核对），覆盖 8 个工具、写入拦截、
+参数误用指路、schema 层拒绝、社区资料不可信提示、护甲四条新行。
+
 ## 0.1.4 — 2026-09-13
 
 **修 0.1.3 实测跑出来的 5 个问题**（都是护甲那轮改动暴露的）：

@@ -120,6 +120,9 @@ def analyze(
         )
         return BuildAnalysis(
             reason=too_large_reason(total, counts, limit),
+            # 这一行不能少：默认值是 "exact"，漏了就会变成"精确算过、上限为空"——
+            # 调用方会读成"你什么都达不到"。实测 smoke 行抓到过这次回归。
+            precision="not_computed",
         )
 
     max_possible = _max_possible_stats(snapshot, constraints)

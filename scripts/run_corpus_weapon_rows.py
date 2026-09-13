@@ -232,6 +232,21 @@ async def main():
         else:
             check("⑮ 能不能换成某 Perk", False, "这个类型下没有带实例可换项的武器样本")
 
+        # 17. 武器 T 级：逐副本 + 路径要对（语料里"三个 T 不能混"那条）
+        r = await call(intent="type", weapon_type="手炮", limit=1)
+        type_item = ((r["data"]["weapons"].get("items") or [{}])[0]).get("weapon") or {}
+        r2 = await call(intent="analyze", weapon_name="遗产", include_inventory=True)
+        copies = ((r2["data"].get("inventory") or {}).get("instances")) or []
+        tiers = [(c.get("weapon") or {}).get("gear_tier") for c in copies]
+        check(
+            "⑰ 武器 T 级：type 在 weapon.gear_tier、analyze 逐副本在 inventory.instances[].weapon.gear_tier",
+            "gear_tier" in type_item
+            and len(copies) >= 2
+            and all("gear_tier" in (c.get("weapon") or {}) for c in copies),
+            f"type.gear_tier={type_item.get('gear_tier')} 各副本={tiers}"
+            "（null = 不在分级体系内，不是 T0）",
+        )
+
     print("\n=== 汇总 ===")
     failed = [row for row, ok, _ in RESULTS if not ok]
     print(f"共 {len(RESULTS)} 行，PASS {len(RESULTS) - len(failed)}，FAIL {len(failed)}")
