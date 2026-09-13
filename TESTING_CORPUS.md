@@ -32,7 +32,7 @@
 | --- | --- | --- |
 | ⭐ 看看我的角色概况，只读 | `profile` | 返回角色列表与光等；不编造未读到的字段，不触发任何写入。 |
 | 搜一下叫 `<完整名>` 的玩家 | `search` | 返回 membership_id 与 membership_type，供后续查询复用。 |
-| ⭐ 我名字记不全，找找前缀是 `<片段>` 的玩家 | `find` + `name_prefix` | 返回按置信度排序的候选（`display_name` 形如 `Husky#210`、`confidence`、`playtime_hours`、`last_played`、`membership_id`/`membership_type`）与 `has_more`，为真时带 warning。**空候选不能说成「没这个人」**；上游失败必须给 `ok=false` + 错误信封，不能静默返回空列表。 |
+| ⭐ 我名字记不全，找找前缀是 `<片段>` 的玩家 | `find` + `name_prefix` | 返回按置信度排序的候选（`display_name` 形如 `Guardian#210`、`confidence`、`playtime_hours`、`last_played`、`membership_id`/`membership_type`）与 `has_more`，为真时带 warning。**空候选不能说成「没这个人」**；上游失败必须给 `ok=false` + 错误信封，不能静默返回空列表。 |
 | 默认玩家是谁 | 不调用工具 | 说明来自 `DESTINY_DEFAULT_PLAYER`；未配置时说明会用当前 OAuth 账号。 |
 
 > 路由与参数所有权已由 `tests/agent_behavior_cases.yaml` + `tests/test_skill_contracts.py` 覆盖。
@@ -137,7 +137,7 @@
 | ⭐ 帮我分析一下为什么配不出 `<职业>` 的这套 | `analyze` | 规模在阈值内 → **精确**上限（`max_possible` + `precision="exact"`，泰坦 ~15s）；**超规模立刻返回**（术士 4.5s，以前干等 300s）：`precision="not_computed"`、`max_possible={}`（**不是"上限为零"**）、`reason` 给组合数与收窄手段（指定金装／减少目标／`farm_target`／调 `DESTINY_BUILD_MAX_COMBINATIONS`）。 |
 | 指定金装 `<异域护甲原名>` | 先返回候选 | **首次查询必须返回金装候选并等确认**，不得自行选定；重试要原样回传 `confirmed_exotic_hash` + token，职业/目标/优先级/碎片不得丢失。 |
 | 不降目标，反推我该刷哪件护甲 | `farm_target`（可加 `baseline="equipped"`、`replacement_slot`） | 先查单件、再两件；待刷数值来自工具，**不能自己相减拼出来**；待刷目标不能当成已拥有。 |
-| 有哪些护甲模组／`<套装名>` 的套装效果 | `armor_mods`／`set_bonus` | 中英词表都认，传词表外的词 → `invalid_argument_error` 并列出词表（**不能把 0 条当成「没有这种模组」**）；不存在的套装 → `definition_not_found_error`。 |
+| 有哪些护甲模组／`<套装名>` 的套装效果 | `armor_mods`／`set_bonus` | 中英词表都认；词表外且一条都没命中 → `invalid_argument_error` 并列出词表；词表外但**蒙中**（如「速度」）→ 带 `match.kind="keyword"` + warning，说清这些模组并不加该属性；词表内 0 条 → `match.kind="stat"` + 「本地数据里没有」的 warning（**三种都不能读成「没有这种模组」**）；不存在的套装 → `definition_not_found_error`。 |
 | ⭐ 这套方案穿上去 | `equip_build`，`confirmed=false` | **必须传回服务端签发的 `canonical_build`**；用 `score` 或自己拼 hash 会被拒；改过库存后旧候选要重新求解。 |
 | 有什么热门的 `<职业>` 配装／就用第一套看我缺什么 | `community`（+ `community_build_id` + `include_inventory`） | 走**社区**模板，**不得用 `loadout_assistant`**；指定 `community_build_id` 后响应**不应再带** `results`/`next_offset`（那会把响应撑到上百 KB），只留 `selected_build` + `matched_count`；缺件来源看 `sourcing` 字段（没有 sourcing intent）；`build_template`/`solver_handoff`/`farm_options` **都不是可执行方案**。 |
 
@@ -251,7 +251,7 @@
 | 说什么 | 期望 | 验收点 |
 | --- | --- | --- |
 | ⭐ 用一个不存在的 intent | 任意工具 + 乱填 intent | 在 **schema 层**就被拒：`isError` + pydantic `literal_error`，消息列出允许的取值。**不要**期待 `unsupported_intent` 信封；底线是**不要静默降级成默认行为**。 |
-| 有哪些加武器的护甲模组／搜官方配装标识 | `armor_mods`／`search_identifiers` | 传词表外的词（如「武器伤害」、`kind="乱填"`）→ `invalid_argument_error` 并列出合法取值，**不能把 0 条当成「没有」**。 |
+| 有哪些加武器的护甲模组／搜官方配装标识 | `armor_mods`／`search_identifiers` | 传词表外的词（如「武器伤害」、`kind="乱填"`）→ `invalid_argument_error` 并列出合法取值；词表外但蒙中（「速度」）→ 结果带 `match.kind="keyword"` 与 warning，**不能把 0 条或蒙中的一批当成「没有」/「就是这些」**。 |
 | 看下（不给活动 ID）这一场的结算／不说公会／不给收藏品节点 | `pgcr`／`clan_leaderboards`／`collectible_node` | `ok=false` + `invalid_argument_error`，消息告诉下一步（先用 `history`／给数字 group_id／先搜节点）。 |
 
 

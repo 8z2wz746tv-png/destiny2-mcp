@@ -86,3 +86,38 @@ def test_login_success_requires_exchange_and_save(
     assert "synthetic-refresh" not in output
     if outcome == "exchange_failure":
         save.assert_not_called()
+
+
+def test_missing_openssl_explains_the_manual_route(tmp_path, monkeypatch):
+    """缺 openssl 时给的是人话 + --manual，不是裸 traceback。
+
+    Windows 默认没有 openssl；以前的实现直接抛 FileNotFoundError，
+    用户看不出还有一条不需要本地回调的路。
+    """
+    def boom(*args, **kwargs):
+        raise FileNotFoundError(2, "No such file or directory", "openssl")
+
+    monkeypatch.setattr(oauth_setup.subprocess, "run", boom)
+
+    with pytest.raises(SystemExit) as excinfo:
+        oauth_setup._generate_self_signed_cert(tmp_path)
+
+    message = str(excinfo.value)
+    assert "--manual" in message
+    assert "openssl" in message
+
+
+def test_openssl_failure_reports_its_output(tmp_path, monkeypatch):
+    def boom(*args, **kwargs):
+        raise oauth_setup.subprocess.CalledProcessError(
+            1, "openssl", stderr=b"synthetic openssl failure"
+        )
+
+    monkeypatch.setattr(oauth_setup.subprocess, "run", boom)
+
+    with pytest.raises(SystemExit) as excinfo:
+        oauth_setup._generate_self_signed_cert(tmp_path)
+
+    message = str(excinfo.value)
+    assert "--manual" in message
+    assert "synthetic openssl failure" in message

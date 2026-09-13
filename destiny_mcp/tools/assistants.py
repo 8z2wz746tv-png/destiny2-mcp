@@ -13,7 +13,7 @@ from mcp.server.fastmcp import Context
 from pydantic import Field, ValidationError
 
 from ..build.models import BuildRequest
-from ..build_contracts import ExecutableBuild
+from ..build_contracts import ExecutableBuild, canonical_build_error_message
 from ..exceptions import DestinyMCPError
 from ._registry import mcp
 from ._build_confirmation import (
@@ -935,7 +935,7 @@ async def build_assistant(
         try:
             exact_build = ExecutableBuild.model_validate(canonical_build)
         except ValidationError as exc:
-            return error_response("invalid_canonical_build", str(exc))
+            return error_response("invalid_canonical_build", canonical_build_error_message(exc))
         if not confirmed:
             return _confirmation_required(
                 intent,
@@ -961,8 +961,17 @@ async def build_assistant(
         return ok_response("配装装备流程已执行。", {"result": _dump(result)})
 
     if intent == "armor_mods":
-        mods = svc["manifest"].get_armor_mods(slot="", category="all", stat=priority_stat or "")
-        return ok_response("已读取护甲模组。", {"mods": mods})
+        # match 一起返回：词表外的词（如"速度"）会靠名字/描述子串蒙中一批模组，
+        # 光看 mods 分不出"按属性筛的"和"只在描述里出现过的"。
+        picked = svc["manifest"].get_armor_mods_filtered(
+            slot="", category="all", stat=priority_stat or ""
+        )
+        warning = picked["match"].get("warning")
+        return ok_response(
+            "已读取护甲模组。",
+            {"mods": picked["mods"], "match": picked["match"]},
+            warnings=[warning] if warning else None,
+        )
 
     if intent == "exotic_armor":
         if exotic_name:

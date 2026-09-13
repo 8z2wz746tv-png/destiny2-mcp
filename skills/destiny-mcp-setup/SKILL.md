@@ -137,11 +137,26 @@ The entry must be enabled, use stdio, and point to the expected `.venv/bin/desti
 
 ## 6. Verify a real MCP startup
 
+Before the first handshake, decide whether the Manifest databases are already present:
+
+```bash
+ls manifest/*.sqlite3 2>/dev/null || echo "MANIFEST_MISSING"
+```
+
+`MANIFEST_MISSING` is not a failure, but the first startup then downloads about **717 MB** from Bungie and builds both indexes before answering any tool call — tens of minutes on a normal connection. Prefer fetching the prebuilt pair first, and only run the verifier after they exist:
+
+```bash
+mkdir -p manifest
+gh release download manifest-data-v1 -R 8z2wz746tv-png/destiny2-mcp -D manifest
+```
+
 Run the bundled verifier after OAuth succeeds:
 
 ```bash
 .venv/bin/python skills/destiny-mcp-setup/scripts/verify_mcp.py
 ```
+
+The verifier raises its own timeout to 1800s and prints `MANIFEST=missing ...` when the databases are absent; keep it running instead of treating the wait as a hang. On a slow link, or with an older copy of the script, pass `--timeout 1800` explicitly.
 
 Allow Bungie network and token-file access when the sandbox requires approval. The verifier starts the same stdio command, initializes an MCP client session, calls the read-only `player_assistant(intent="profile")`, and then calls `list_tools` without printing secrets or profile data.
 
@@ -176,6 +191,16 @@ Inspect the OAuth command's terminal output. A common cause is an empty `BUNGIE_
 ### Browser certificate warning
 
 Confirm the URL is exactly `https://localhost:<port>/callback` and the OAuth helper is running. Continue past the temporary localhost certificate warning. Never replace `localhost` with `127.0.0.1`; Bungie rejects the numeric host for this application flow.
+
+The helper creates its temporary certificate with the `openssl` command-line tool. If `openssl` is missing (common on Windows), it stops with a message telling you to use the manual path instead of a traceback:
+
+```bash
+.venv/bin/destiny-mcp-oauth --manual
+```
+
+### First verification times out
+
+A cold start downloads and indexes about 717 MB of Manifest data before the server answers. Leave it running; the verifier raises its own timeout to 1800s and prints `MANIFEST=missing ...` when this is the reason. With an older copy of the verifier, pass `--timeout 1800`. Fetching the prebuilt `manifest-data-v1` pair first avoids the wait entirely.
 
 ### Missing or invalid state
 

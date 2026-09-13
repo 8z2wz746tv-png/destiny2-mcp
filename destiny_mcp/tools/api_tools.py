@@ -56,8 +56,9 @@ async def raw_api_call(
     Examples:
         raw_api_call("GET", "Destiny2/Milestones/")
         raw_api_call("GET", "Destiny2/Stats/PostGameCarnageReport/12345678901/")
-        raw_api_call("GET", "Destiny2/3/Profile/4611686018467260756/Character/2305843009754046315/Stats/Activities/", params={"mode": "4", "count": "10"})
-        raw_api_call("GET", "GroupV2/4611686018467260756/Members/")
+        # 下面的数字都是占位符，不是真实会员/角色/公会 ID，用时换成自己的
+        raw_api_call("GET", "Destiny2/3/Profile/4611686018000000001/Character/2305843009000000001/Stats/Activities/", params={"mode": "4", "count": "10"})
+        raw_api_call("GET", "GroupV2/4611686018000000001/Members/")
 
     Args:
         method: HTTP method ("GET" or "POST").

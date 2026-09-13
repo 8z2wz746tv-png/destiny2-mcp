@@ -1,11 +1,14 @@
 [build-system]
-requires = ["setuptools>=68.0"]
+# >=77 才有 PEP 639 的 `license = "MIT"` + `license-files`（老版本只认 table 写法）。
+requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "destiny-mcp"
 version = "0.1.0"
 description = "Destiny 2 MCP Server — 通过 AI Agent 管理武器和装备"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = [
     "aiobungie>=0.5.0",

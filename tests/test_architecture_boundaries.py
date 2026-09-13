@@ -208,7 +208,8 @@ def test_build_recipe_is_not_an_executable_plan() -> None:
     plan = ExecutableBuild(**payload)
     assert CanonicalBuild(**payload).model_dump() == plan.model_dump()
     payload["items"][0].item_instance_id = "2"
-    with pytest.raises(ValidationError, match="unique"):
+    # 消息是给调用方看的中文（以前是 pydantic 的英文原文 "Five unique item ..."）。
+    with pytest.raises(ValidationError, match="互不相同"):
         ExecutableBuild(**payload)
 
 

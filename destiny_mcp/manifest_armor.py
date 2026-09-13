@@ -100,16 +100,74 @@ class ArmorCatalogMixin:
     def get_armor_mods(
         self, slot: str = "", category: str = "all", stat: str = ""
     ) -> list[dict]:
-        """从 manifest 查询护甲模组的真实名称和效果。
+        """按部位/类别/属性筛护甲模组，只要列表。
 
-        Args:
-            slot: 过滤部位 — "helmet"/"gauntlets"/"chest"/"legs"/"class_item"，空=全部
-            category: 过滤类别 — "general"(属性模组)/"slot_specific"(部位专属)/"artifice"(精工)/"all"
-            stat: 按效果关键词过滤 — 匹配 stat_bonus 的 key 或 description 中包含该关键词的模组
+        要判断"这次是按属性筛中的，还是只在描述里蒙到的"，用
+        `get_armor_mods_filtered()` —— 它额外返回 match 说明。
+        """
+        return self.get_armor_mods_filtered(slot=slot, category=category, stat=stat)["mods"]
+
+    def get_armor_mods_filtered(
+        self, slot: str = "", category: str = "all", stat: str = ""
+    ) -> dict:
+        """筛模组，并说清这次筛选是哪种口径。
 
         Returns:
-            [{name, hash, description, slot, stat_bonus, energy_cost, category}, ...]
+            {"mods": [...], "match": {kind, keyword, expanded, matched, with_stat_bonus, warning?}}
+            kind: "all"（没传筛选词）/ "stat"（词表里的属性）/ "keyword"（词表外，只在名字或描述里出现）
+
+        为什么要有 match：词表外的词只要在名字/描述里出现过就算命中，
+        `速度` 会拿到 57 条描述里提到速度、但一条属性都不加的弹药类模组。
+        调用方无法从列表本身看出"这不是按属性筛的"，于是把无关结果当答案。
+        词表内的属性词命中 0 条时同理：那是"这批数据里没有"，不是"游戏里没有这种模组"。
         """
+        results = self._collect_armor_mods(slot=slot, category=category)
+
+        keyword = (stat or "").strip()
+        if not keyword:
+            return {"mods": results, "match": {"kind": "all", "keyword": ""}}
+
+        keywords = self._stat_keywords(keyword)
+        filtered = [
+            mod for mod in results if self._mod_matches_keywords(mod, keywords)
+        ]
+        known = keyword.lower() in self._STAT_ALIASES
+        # 一条都没匹配上、而且这个词也不在词表里 —— 说明是个不认识的筛选词。
+        # 直接报错并列出词表，别让调用方把 0 条读成"游戏里没有这种模组"。
+        if not filtered and not known:
+            english = sorted(key for key in self._STAT_ALIASES if key.isascii())
+            raise InvalidArgumentError(
+                f"不认识的属性筛选词: {stat!r}，可用: {'/'.join(english)}"
+                "，或中文名（武器/生命/职业/手雷/超能/近战/敏捷/韧性/恢复/纪律/智慧）"
+            )
+
+        with_stat_bonus = sum(1 for mod in filtered if mod.get("stat_bonus"))
+        match: dict = {
+            "kind": "stat" if known else "keyword",
+            "keyword": keyword,
+            "expanded": list(keywords),
+            "matched": len(filtered),
+            "with_stat_bonus": with_stat_bonus,
+        }
+        if known and not filtered:
+            match["warning"] = (
+                f"词表认「{keyword}」，但当前 Manifest 里没有加该属性的护甲模组。"
+                "这是「本地数据里没有」，不等于游戏里没有这种模组。"
+            )
+        elif not known:
+            match["warning"] = (
+                f"「{keyword}」不在属性词表里（武器/生命/职业/手雷/超能/近战/敏捷/韧性/恢复/纪律/智慧）。"
+                f"这 {len(filtered)} 条只是名字或描述里出现该词的模组，"
+                f"其中 {with_stat_bonus} 条真的加属性；要按属性筛请改用词表里的说法。"
+            )
+
+        results = filtered
+        # Sort: general mods first, then by slot, then by energy cost
+        results.sort(key=lambda x: (x["slot"] != "general", x["slot"], x["energy_cost"]))
+        return {"mods": results, "match": match}
+
+    def _collect_armor_mods(self, slot: str = "", category: str = "all") -> list[dict]:
+        """按部位/类别取出全部候选模组（不筛属性）。"""
         conn = self._zh_conn or self._conn
         if not conn:
             return []
@@ -213,24 +271,6 @@ class ArmorCatalogMixin:
                 "energy_cost": energy,
                 "category": category if category != "all" else slot_name,
             })
-
-        # Filter by stat keyword if specified
-        if stat:
-            keywords = self._stat_keywords(stat)
-            filtered = [
-                mod for mod in results if self._mod_matches_keywords(mod, keywords)
-            ]
-            # 一条都没匹配上、而且这个词也不在词表里 —— 说明是个不认识的筛选词。
-            # 直接报错并列出词表，别让调用方把 0 条读成"游戏里没有这种模组"。
-            if not filtered and stat.strip().lower() not in self._STAT_ALIASES:
-                english = sorted(
-                    key for key in self._STAT_ALIASES if key.isascii()
-                )
-                raise InvalidArgumentError(
-                    f"不认识的属性筛选词: {stat!r}，可用: {'/'.join(english)}"
-                    "，或中文名（武器/生命/职业/手雷/超能/近战/敏捷/韧性/恢复/纪律/智慧）"
-                )
-            results = filtered
 
         # Sort: general mods first, then by slot, then by energy cost
         results.sort(key=lambda x: (x["slot"] != "general", x["slot"], x["energy_cost"]))

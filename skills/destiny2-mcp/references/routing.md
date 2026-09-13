@@ -36,7 +36,7 @@
 | --- | --- | --- |
 | `profile`（`get_profile`、`角色`、`档案`） | 我的角色列表、光等、基本档案 | `player_name` |
 | `search`（`search_player`） | 精确搜玩家，拿 `membership_id` 供后续复用 | `player_name` |
-| `find`（`find_players`、`fuzzy`） | 名字记不全时按前缀模糊找人，返回按置信度排序的候选（`display_name` 形如 `Husky#210`、`confidence`、`has_more`）；拿到完整名后用 `search` 精确定位。**空候选不等于"没这个人"** | `name_prefix` |
+| `find`（`find_players`、`fuzzy`） | 名字记不全时按前缀模糊找人，返回按置信度排序的候选（`display_name` 形如 `Guardian#210`、`confidence`、`has_more`）；拿到完整名后用 `search` 精确定位。**空候选不等于"没这个人"** | `name_prefix` |
 
 ### `inventory_assistant` —— 背包与仓库
 
@@ -145,7 +145,7 @@ Manifest 侧（**不代表拥有**）：
 | `analyze` | 无解时诊断差在哪 | 同上 |
 | `farm_target` | 反推该刷哪件护甲 | `replacement_slot`、`baseline`、`max_replacements`、`set_bonus_name`、`set_bonus_count`、`character` |
 | `equip_build` | 装备**服务端签发**的候选（写入） | `canonical_build`、`character`、`confirmed` |
-| `armor_mods` | 护甲模组列表 | `priority_stat`（属性筛选：weapons/health/class_stat/grenade/super_stat/melee，或中文名） |
+| `armor_mods` | 护甲模组列表，带 `match` 说明本次筛选口径 | `priority_stat`（属性筛选：weapons/health/class_stat/grenade/super_stat/melee，或中文名） |
 | `exotic_armor` | 异域护甲列表或详情 | `exotic_name`、`character` |
 | `set_bonus` | 套装 2 件／4 件效果 | `set_bonus_name` |
 | `community`（`community_build`、`starside`） | 社区配装模板搜索／详情／库存匹配 | `query`、`character`、`scenario`、`category`、`community_build_id`、`include_inventory`、`top_n`、`offset` |
@@ -318,6 +318,8 @@ Manifest 侧（**不代表拥有**）：
 <!-- 参数归属表结束 -->
 
 **封闭词表的筛选项不认就报错，不会安静返回 0 条**：`armor_mods` 的 `priority_stat`、`loadout_assistant(intent="search_identifiers")` 的 `kind` 都是这样。拿到 `invalid_argument_error` 说明这个词不在词表里，消息里会列出可用取值 —— 不要把它读成「游戏里没有这种东西」。
+
+**`armor_mods` 的 `match` 是判据，不是装饰**：`match.kind="stat"` 才是按属性筛的；`"keyword"` 表示这个词不在词表里，只是名字/描述里出现过（真机案例：`速度` 命中 57 条，`with_stat_bonus=0`）。`kind="stat"` 且 `matched=0` 时是「本地数据里没有」，不是「游戏里没有」。返回 0 条或 `keyword` 命中时，`warnings` 里会有一句现成的说明，照它回答，别自己改口径。
 
 `confirmed` 是有意不登记的：它是写入确认门槛，读 intent 收到它被忽略不改变任何结果，而登记会误伤那些每次都把 `confirmed=true` 一起发过来的客户端。`community_build_id` 传给非 community intent 时，代码里已经有一段更贴切的 `community_template_not_executable` 说明。
 

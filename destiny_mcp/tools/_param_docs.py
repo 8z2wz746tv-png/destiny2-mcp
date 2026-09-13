@@ -218,7 +218,10 @@ _LIMIT_DESCRIPTION = (
     "最多返回多少条；null（或不传）= 没指定，按该 intent 的默认条数（背包清单 100 件、"
     "配装 5 套、按类型列武器 20、武器目录/筛选 50、重复武器 10、商人菜单 15／详情 40）。传 0 或负数等于没指定。"
     "只限制返回条数，不限制扫描范围；被截断时响应里会带 truncated、总数与 next_offset，"
-    "翻页把 next_offset 传给 offset。不读它的 intent 传了会被拒绝。"
+    "翻页把 next_offset 传给 offset。"
+    "上面这些默认值只在声明了 limit 的工具里生效：同一个工具里不读它的 intent 传了会拿到"
+    "`ignored_parameter` 并被指到该用的 intent；而没声明 limit 的工具（如 build_assistant、"
+    "player_assistant）传了会在 schema 层被拒（`extra_forbidden`），不是被忽略。"
 )
 
 # 默认值是 null 而不是某个数字：显式传 12 和"没传"必须分得开，
@@ -448,6 +451,8 @@ PriorityStat = Annotated[
     str | None,
     Field(description=(
         'intent="armor_mods" 时是模组属性筛选词：weapons/health/class_stat/grenade/super_stat/melee'
-        "（也认 武器/生命/职业/手雷/超能/近战）；求解类 intent 里是排序用的优先级属性名。"
+        "（也认 武器/生命/职业/手雷/超能/近战/敏捷/韧性/恢复/纪律/智慧）；词表外的词只在模组名字或描述里"
+        "做子串匹配，响应会用 match.kind=keyword 标出来，别当成按属性筛的结果。"
+        "求解类 intent 里是排序用的优先级属性名。"
     )),
 ]

@@ -33,6 +33,21 @@ REQUIRED_CREDENTIALS = (
     "BUNGIE_CLIENT_SECRET",
 )
 
+# 未写进 .env 时按运行时的默认值判定：登录助手本来就用这个地址
+# （destiny_mcp/oauth_setup.py 的 DEFAULT_REDIRECT_URI），不填也能登录成功。
+# 以前这里只认 .env 里的显式值，照着 README 装的人第一次自检就会看到
+# VERIFY_FAILED —— 功能其实是好的，是自检在误报。
+DEFAULT_REDIRECT_URI = "https://localhost:8765/callback"
+
+# venv 布局按平台分支：Windows 下是 .venv\Scripts\destiny-mcp.exe。
+_VENV_BIN_DIR = "Scripts" if os.name == "nt" else "bin"
+_ENTRY_EXE = ".exe" if os.name == "nt" else ""
+
+
+def _missing_manifest(root: Path) -> bool:
+    """首次运行要不要现下 Manifest（约 717 MB）—— 决定超时放宽多少。"""
+    return not any((root / "manifest").glob("*.sqlite3"))
+
 
 def _default_root() -> Path:
     configured_root = os.getenv("DESTINY_MCP_ROOT")
@@ -52,7 +67,7 @@ def _default_root() -> Path:
 def _preflight(root: Path) -> Path:
     errors: list[str] = []
     env_path = root / ".env"
-    command = root / ".venv" / "bin" / "destiny-mcp"
+    command = root / ".venv" / _VENV_BIN_DIR / f"destiny-mcp{_ENTRY_EXE}"
 
     if not env_path.is_file():
         raise RuntimeError(f"Missing environment file: {env_path}")
@@ -73,7 +88,8 @@ def _preflight(root: Path) -> Path:
     if client_id and not client_id.isdigit():
         errors.append("BUNGIE_CLIENT_ID must be numeric")
 
-    redirect_uri = values.get("DESTINY_OAUTH_REDIRECT_URI", "")
+    configured_redirect = values.get("DESTINY_OAUTH_REDIRECT_URI", "")
+    redirect_uri = configured_redirect or DEFAULT_REDIRECT_URI
     parsed = urlparse(redirect_uri)
     redirect_valid = (
         parsed.scheme == "https"
@@ -81,7 +97,11 @@ def _preflight(root: Path) -> Path:
         and parsed.port is not None
         and parsed.path == "/callback"
     )
-    print(f"DESTINY_OAUTH_REDIRECT_URI={'valid' if redirect_valid else 'invalid'}")
+    origin = "from .env" if configured_redirect else f"default {DEFAULT_REDIRECT_URI}"
+    print(
+        f"DESTINY_OAUTH_REDIRECT_URI="
+        f"{'valid' if redirect_valid else 'invalid'} ({origin})"
+    )
     if not redirect_valid:
         errors.append(
             "DESTINY_OAUTH_REDIRECT_URI must match "
@@ -107,7 +127,11 @@ def _preflight(root: Path) -> Path:
 
         mode = stat.S_IMODE(token_path.stat().st_mode)
         print(f"OAUTH_TOKEN_PERMISSIONS={mode:04o}")
-        if mode & 0o077:
+        if os.name == "nt":
+            # Windows 的 st_mode 恒为 0o666，看不到真正的 ACL；照 POSIX 位判断
+            # 会让每个 Windows 用户都卡在自检上。这里只提示，不判失败。
+            print("OAUTH_TOKEN_PERMISSIONS_CHECK=skipped (Windows ACLs are not visible via st_mode)")
+        elif mode & 0o077:
             errors.append("OAuth token file must not be accessible by group or others")
 
     if errors:
@@ -216,9 +240,20 @@ def main() -> int:
     args = parser.parse_args()
     root = args.root.expanduser().resolve()
 
+    timeout = args.timeout
+    if _missing_manifest(root):
+        # 没有本地库时，服务启动的第一件事就是下载 Manifest 并建库（约 717 MB）。
+        # 默认 90 秒必然不够 —— 照 README 走的人会以为装坏了。这里自动放宽，
+        # 并把原因打出来，免得变成"魔法超时"。
+        timeout = max(timeout, 1800.0)
+        print(
+            "MANIFEST=missing → 首次启动要下载 Manifest 并建库（约 717 MB，耗时取决于网速），"
+            f"本次超时自动放宽到 {timeout:.0f}s"
+        )
+
     try:
         command = _preflight(root)
-        asyncio.run(_verify(root, command, args.timeout))
+        asyncio.run(_verify(root, command, timeout))
     except Exception as exc:
         print(f"VERIFY_FAILED={_exception_summary(exc)}", file=sys.stderr)
         return 1

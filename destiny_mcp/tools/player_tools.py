@@ -53,7 +53,7 @@ async def find_players(
 
     Examples:
         find_players(name="husky")
-        find_players(name="OneTop")
+        find_players(name="guardian")
     """
     svc = get_ctx(ctx)
     payload = await svc['player_svc'].find_players(name)

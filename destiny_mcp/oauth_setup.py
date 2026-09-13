@@ -178,28 +178,49 @@ def _auth_url(client_id: str, redirect_uri: str, state: str) -> str:
 def _generate_self_signed_cert(cert_dir: Path) -> tuple[Path, Path]:
     key_file = cert_dir / "key.pem"
     cert_file = cert_dir / "cert.pem"
-    subprocess.run(
-        [
-            "openssl",
-            "req",
-            "-x509",
-            "-newkey",
-            "rsa:2048",
-            "-keyout",
-            str(key_file),
-            "-out",
-            str(cert_file),
-            "-days",
-            "7",
-            "-nodes",
-            "-subj",
-            "/CN=localhost",
-            "-addext",
-            "subjectAltName=DNS:localhost,IP:127.0.0.1",
-        ],
-        check=True,
-        capture_output=True,
-    )
+    try:
+        subprocess.run(
+            [
+                "openssl",
+                "req",
+                "-x509",
+                "-newkey",
+                "rsa:2048",
+                "-keyout",
+                str(key_file),
+                "-out",
+                str(cert_file),
+                "-days",
+                "7",
+                "-nodes",
+                "-subj",
+                "/CN=localhost",
+                "-addext",
+                "subjectAltName=DNS:localhost,IP:127.0.0.1",
+            ],
+            check=True,
+            capture_output=True,
+        )
+    except FileNotFoundError as exc:
+        # 以前这里裸抛 FileNotFoundError：Windows 默认没有 openssl，用户看到的是
+        # 一坨 traceback，也看不出还有 --manual 这条不需要证书的路。
+        raise SystemExit(
+            "❌ 没找到 `openssl` 命令，无法为 https://localhost 回调生成临时证书。\n"
+            "   两条路任选：\n"
+            "   1) 改用不需要本地回调的手动方式：\n"
+            "        .venv/bin/destiny-mcp-oauth --manual\n"
+            "      （浏览器里授权后把地址栏的整条回调 URL 或 code 粘回来）\n"
+            "   2) 装上 openssl 后重试：Windows 可用 Git for Windows 自带的 openssl，"
+            "或 `winget install ShiningLight.OpenSSL`；macOS/Linux 一般已自带。\n"
+            f"   原始错误：{exc}"
+        ) from exc
+    except subprocess.CalledProcessError as exc:
+        detail = (exc.stderr or b"").decode("utf-8", "replace").strip()
+        raise SystemExit(
+            "❌ `openssl` 生成临时证书失败，无法启动 https 回调。\n"
+            "   可以改用 `.venv/bin/destiny-mcp-oauth --manual` 手动完成登录。\n"
+            f"   openssl 输出：{detail or exc}"
+        ) from exc
     return cert_file, key_file
 
 

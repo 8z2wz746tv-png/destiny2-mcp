@@ -10,7 +10,7 @@ from mcp.server.fastmcp import Context
 from pydantic import ValidationError
 
 from ..build.models import BuildRequest
-from ..build_contracts import ExecutableBuild
+from ..build_contracts import ExecutableBuild, canonical_build_error_message
 from ..exceptions import DestinyMCPError
 from ._registry import mcp
 from ._farm_target_response import serialize_farm_target_analysis
@@ -621,7 +621,7 @@ async def equip_build(
     try:
         exact_build = ExecutableBuild.model_validate(canonical_build)
     except ValidationError as exc:
-        return error_response("invalid_canonical_build", str(exc))
+        return error_response("invalid_canonical_build", canonical_build_error_message(exc))
     if not confirmed:
         return confirmation_required_response(
             "equip_build",

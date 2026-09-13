@@ -22,6 +22,8 @@ Destiny 2 装备管理 MCP Server — 通过 AI Agent 管理武器和装备。
 
 这是个人本地版，推荐让本地 Agent 按下面流程安装。用户只需要完成一次 Bungie 登录，之后 token 会保存在本机。
 
+**装之前先看 [前置条件与已知限制](#前置条件与已知限制)**：平台支持、必须自备的 Bungie 应用、717 MB 的首次 Manifest、数据落在本机哪里，都写在那里。别人把这套装到你机器上时，最容易误判成"装坏了"的就是首次下载那一步。
+
 本项目提供两层 Agent 指引：
 
 - [`destiny2-mcp` 通用 Skill](skills/destiny2-mcp/SKILL.md)：工具路由、证据范围、Starside 配装和确认边界；任何能读取 Markdown 的 Agent 都可以使用。
@@ -106,8 +108,10 @@ DESTINY_MCP_ENABLE_LEGACY_TOOLS=1   # 打开历史工具，配合下面的 profi
 
 ### 3. 准备可选数据（Manifest / DIM Wish List）
 
-**Manifest（省去首次建库）**：服务首次启动会从 Bungie 下载 Manifest 并建库，两个库
-合计约 685 MB，需要能访问 Bungie 且耗时较长。想跳过这一步，可直接取预构建好的数据库：
+**Manifest（强烈建议先下预构建库）**：服务首次启动会从 Bungie 下载 Manifest 并建库，
+两个库合计约 **717 MB**（`342 MB + 342 MB`）。实测这一步只受网速限制：几百兆的下载
+加建库索引，通常要 **十几分钟到半小时**，期间服务不会响应任何工具调用。想跳过就先取
+预构建好的数据库：
 
 ```bash
 mkdir -p manifest
@@ -115,8 +119,12 @@ gh release download manifest-data-v1 -R 8z2wz746tv-png/destiny2-mcp -D manifest
 ```
 
 也可以从 [Releases](https://github.com/8z2wz746tv-png/destiny2-mcp/releases) 页面手动
-下载后放进 `manifest/`。仓库不直接包含这两个库——单文件超过 GitHub 的 100 MB 限制。
-缺少时服务仍会自行下载重建，这一步不影响安装能否成功。
+下载后放进 `manifest/`（没有 `gh` 命令就用这条）。仓库不直接包含这两个库——单文件超过
+GitHub 的 100 MB 限制。
+
+**这一步不影响安装能否成功**，但影响"第一次自检要等多久"：没有本地库时
+`scripts/verify_mcp.py` 会把超时自动放宽到 1800 秒并打印原因；如果 30 秒就超时失败，
+说明你在用旧版本自检脚本，加 `--timeout 1800` 即可。
 
 **DIM Wish List**：MCP 启动时如果发现数据不存在，会自动下载。Agent 也可以提前运行：
 
@@ -175,13 +183,20 @@ MCP stdio 配置示例：
 ```bash
 .venv/bin/destiny-mcp
 
-# 或直接运行
-.venv/bin/python -m destiny_mcp.server
+# 或等价的模块方式（推荐写这个）
+.venv/bin/python -m destiny_mcp
 ```
 
 如果提示没有 OAuth token，先重新执行第 4 步登录。
 
-个人版不需要 Docker。
+**别用 `python -m destiny_mcp.server` 启动。** 那条路径在配装求解时会让子进程起不来
+（`build_validation_error`）：anyio 的 worker 会按路径重跑父进程主模块，而
+`destiny_mcp.server` 是带相对导入的模块，重跑必然 ImportError。`python -m destiny_mcp`
+是同一个入口的包级写法，支持 `-m`，也是给子进程用的那条。
+
+个人版不需要 Docker。仓库里那份早期部署用的 `Dockerfile` 因为长期引用不存在的
+`src/` 目录（`docker build` 必失败）已经删掉，需要容器化请自行基于 `python:3.12-slim`
+写一份，入口是 `python -m destiny_mcp`。
 
 ### 7. 通用 MCP 验证
 
@@ -217,6 +232,29 @@ VERIFY_OK=Destiny MCP is ready
 - `loadout_assistant(intent="list")`：玩家已存配装和官方槽位。
 
 行为测试还要确认写操作先展示目标并等待确认，社区模板不会直接传给 `equip_build`，以及不完整扫描不会被回答成“账号没有”。记录实际工具、intent 和关键参数，不要记录密钥、Token 或未经脱敏的账号日志。
+
+## 前置条件与已知限制
+
+**能装之前得先知道这些**（第一次跑之前请读完这张表）：
+
+| 项 | 现状 |
+| --- | --- |
+| Python | 3.12+（只在 3.13 上长期实测） |
+| 平台 | macOS 实测通过；Linux 应当可用但未逐一验证；**Windows 未实测**——命令要换成 `.venv\Scripts\...`，且登录助手生成临时证书依赖 `openssl`，缺了就用 `destiny-mcp-oauth --manual`（自检脚本已按平台分支，不再用 POSIX 权限位判 Windows） |
+| 网络 | 需要能访问 `bungie.net`、GitHub（下预构建 Manifest）、PyPI |
+| Bungie 应用 | **每个使用者必须用自己的** API Key + Confidential client_id/secret，回调地址填 `https://localhost:8765/callback`（创建应用即分配 key，不需要等审批）；**不要共用同一份 key**，写操作还要在门户里额外勾 `AdvancedWriteActions` |
+| 首次运行 | 要下载并建库约 **717 MB** Manifest，几十分钟内不可用；可先取预构建库跳过（见第 3 步）。DIM 愿单在启动时自动下载，失败只降级 |
+| 构建/测试 | `pip install -e .` 只装运行依赖；跑 `pytest` 需要 `pip install -e ".[dev]"`。干净克隆（没有 `.env`）时 `tests/test_bungie_client_lifecycle.py` 与 `tests/test_exact_build_execution.py` 共 5 条会失败，先按第 2 步建 `.env` 即可全绿 |
+| Docker | 不支持。早期那份 `Dockerfile` 引用了不存在的 `src/` 目录，已删除 |
+| 数据落在哪 | Token 在 `~/.destiny_mcp/tokens.json`（0600）。**每次工具调用的审计日志写在 `~/.destiny_mcp/audit/YYYYMMDD/`**，含调用参数与最多 5 万字符的结果摘要，明文保存、不加密、不上传；不想要就删该目录。没有遥测，也不向本项目之外的服务器上报任何内容 |
+
+**已知功能限制**（细节与复现话术见 [TESTING_CORPUS.md](TESTING_CORPUS.md) 的「已知问题」）：
+
+- 单进程、单用户；不要同时开两个实例操作同一账号，跨进程互斥不在设计范围内。
+- 社区资料是**本地快照**：哈希只能证明快照来源，不能证明数值适用于当前游戏版本。
+- 大规模配装求解很慢（术士全套组合可到 2 亿量级，会直接返回 `precision="not_computed"` 并给出收窄建议）；只有 T5 护甲做词条反推。
+- 部分上游失败消息会把 Bungie 返回的原文带出来；写入成功后暂不返回 `next_actions`。
+- 不支持多账号切换或双实例。
 
 ## 技术栈
 
@@ -358,4 +396,10 @@ PvP、强化和待验证数值保留为 `[pvp]`、`[enh]`、`[unsure]` 标记。
 
 ## License
 
-MIT
+MIT，全文见 [LICENSE](LICENSE)。
+
+这个许可只覆盖本仓库的**软件**。随附的社区资料（`share/` 下的 Starside Markdown、
+`data/starside/` 里的归档）是按网站作者的许可再分发的，不因为 MIT 而改变归属；
+运行时才下载的 Bungie Manifest、DIM 愿单等第三方数据同理。细节见
+[COMMUNITY_DATA_NOTICE.md](COMMUNITY_DATA_NOTICE.md)。仅供个人非商业使用，
+本项目与 Bungie 无关、也未获其背书。

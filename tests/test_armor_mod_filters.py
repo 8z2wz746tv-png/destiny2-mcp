@@ -150,3 +150,55 @@ def test_no_filter_returns_every_mod() -> None:
 
 def test_missing_connection_is_empty_not_an_error() -> None:
     assert ManifestManager().get_armor_mods(stat="weapons") == []
+
+
+def test_keyword_hit_outside_the_vocabulary_is_marked_as_fuzzy() -> None:
+    """词表外的词靠描述蒙中时，必须说清这不是按属性筛的。
+
+    真机案例：`速度` 返回 57 条弹药类模组，`stat_bonus` 全空，调用方却只会看到
+    "ok=true + 57 条"，很容易当成"这些是加速度的模组"。
+    """
+    manager = ManifestManager()
+    manager._zh_conn = _connection([
+        (1, _mod("弹药生成", description="提高换弹速度")),
+        (2, _mod("武器模组", stat_hash=STAT_WEAPONS)),
+    ])
+
+    picked = manager.get_armor_mods_filtered(stat="速度")
+
+    assert _names(picked["mods"]) == {"弹药生成"}
+    assert picked["match"]["kind"] == "keyword"
+    assert picked["match"]["matched"] == 1
+    assert picked["match"]["with_stat_bonus"] == 0
+    assert "不在属性词表里" in picked["match"]["warning"]
+
+
+def test_vocabulary_word_is_marked_as_stat_match() -> None:
+    manager = _manager()
+
+    picked = manager.get_armor_mods_filtered(stat="武器")
+
+    assert picked["match"]["kind"] == "stat"
+    assert "warning" not in picked["match"]
+    assert _names(picked["mods"]) == {"武器模组"}
+
+
+def test_vocabulary_word_with_zero_hits_explains_itself() -> None:
+    """词表认这个词、但这批数据里一条都没有：不能沉默返回 0 条。"""
+    manager = _manager()
+
+    picked = manager.get_armor_mods_filtered(stat="敏捷")
+
+    assert picked["mods"] == []
+    assert picked["match"]["kind"] == "stat"
+    assert "本地数据里没有" in picked["match"]["warning"]
+
+
+def test_blank_stat_is_not_a_filter() -> None:
+    """空格不该被当成筛选词（以前 `" "` 会命中全部模组）。"""
+    manager = _manager()
+
+    picked = manager.get_armor_mods_filtered(stat="   ")
+
+    assert picked["match"]["kind"] == "all"
+    assert len(picked["mods"]) == 5
