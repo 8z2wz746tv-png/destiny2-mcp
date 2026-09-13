@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .manifest import ManifestManager
     from .player_resolver import PlayerResolver
     from .services.build_service import BuildService
+    from .services.armor_mod_service import ArmorModService
     from .services.build_import_service import BuildImportService
     from .services.collection_service import CollectionService
     from .services.inventory_analysis_service import InventoryAnalysisService
@@ -44,6 +45,7 @@ class ServiceContext(TypedDict):
     inventory_svc: InventoryService
     inventory_analysis_svc: InventoryAnalysisService
     transfer_svc: TransferService
+    armor_mod_svc: ArmorModService
     subclass_svc: SubclassService
     perk_svc: PerkService
     weapon_compare_svc: WeaponCompareService

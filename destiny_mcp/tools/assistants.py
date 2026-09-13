@@ -91,7 +91,7 @@ def _perk_filter_terms(required_perks: list[str] | str | None, perk_name: str) -
 # 这些写入由工具自己校验，不走通用确认入口：equip_build 必须先验证服务端签发的一次性
 # 候选，确认时必须原样回传该候选。它们仍然在 WRITE_INTENTS 里，契约测试会检查两条路径
 # 合起来覆盖全部写入 intent，避免出现无人守卫的写入。
-SELF_GUARDED_WRITE_INTENTS: frozenset[str] = frozenset({"equip_build"})
+SELF_GUARDED_WRITE_INTENTS: frozenset[str] = frozenset({"equip_build", "equip_mod"})
 
 
 def _requires_confirmation(intent: str) -> bool:
@@ -196,6 +196,7 @@ async def inventory_assistant(
     confirmed: fields.Confirmed = False,
     limit: fields.Limit = None,
     offset: fields.Offset = 0,
+    mod_name: fields.ModName = "",
     ctx: Context = None,
 ) -> dict:
     """背包/仓库聚合入口。
@@ -268,6 +269,11 @@ async def inventory_assistant(
 
     if intent == "item":
         return await armor_branches.armor_item(svc, resolved, item_instance_id)
+
+    if intent == "equip_mod":
+        return await armor_branches.equip_mod(
+            svc, resolved, item_instance_id, mod_name, character, confirmed
+        )
 
     if intent in {"get", "inventory", "list"}:
         # 传 0/负数 = 没指定 → 回到默认上限（项目统一约定），要更多用 offset 翻页。

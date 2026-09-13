@@ -1,0 +1,29 @@
+{
+  "_case": {
+    "elapsed_ms": 1790,
+    "is_error": false,
+    "payload_chars": 285,
+    "steps": [
+      {
+        "arguments": {
+          "character": "hunter",
+          "confirmed": false,
+          "intent": "equip_mod",
+          "item_instance_id": "6917530198796768597",
+          "mod_name": "手雷快速启动"
+        },
+        "tool": "inventory_assistant"
+      }
+    ],
+    "tool": "inventory_assistant"
+  },
+  "candidates": [],
+  "error": {
+    "code": "invalid_argument_error",
+    "message": "至高狂徒腿铠 没有能装 '手雷快速启动' 的插槽。用 inventory_assistant(intent=\"item\") 看它有哪些槽，属性模组要装进 kind=\"general\" 的槽，部位模组装进部位槽。",
+    "recoverable": true
+  },
+  "next_actions": [],
+  "ok": false,
+  "warnings": []
+}

@@ -1,0 +1,84 @@
+{
+  "_case": {
+    "elapsed_ms": 2393,
+    "is_error": false,
+    "payload_chars": 1529,
+    "steps": [
+      {
+        "arguments": {
+          "character": "hunter",
+          "confirmed": false,
+          "intent": "equip_mod",
+          "item_instance_id": "6917530198796768597",
+          "mod_name": "手雷模组"
+        },
+        "tool": "inventory_assistant"
+      }
+    ],
+    "tool": "inventory_assistant"
+  },
+  "candidates": [
+    {
+      "alternatives": [
+        {
+          "energy_cost": 1,
+          "hash": -398826200,
+          "name": "手雷模组",
+          "socket_index": 0,
+          "stat_bonus_hashes": {
+            "3578062600": 1
+          }
+        },
+        {
+          "energy_cost": 1,
+          "hash": -273176987,
+          "name": "小型手雷模组",
+          "socket_index": 0,
+          "stat_bonus_hashes": {
+            "1735777505": 5,
+            "3578062600": 1
+          }
+        }
+      ],
+      "character": "hunter",
+      "character_id": "2305843009679355779",
+      "energy": {
+        "after": 3,
+        "capacity": 11,
+        "used": 0
+      },
+      "from": {
+        "energy_cost": 0,
+        "hash": null,
+        "name": null
+      },
+      "gear_tier": 5,
+      "item_hash": 157934631,
+      "item_instance_id": "6917530198796768597",
+      "item_name": "至高狂徒腿铠",
+      "membership_id": "4611686018492803873",
+      "membership_type": 3,
+      "player_name": "__destiny_current_oauth_player__",
+      "power": 550,
+      "slot": "legs",
+      "socket_index": 0,
+      "summary": "至高狂徒腿铠（腿部护甲，550，T5）槽 0：空 → 手雷模组（+10 手雷），能量 0/11 → 3/11",
+      "to": {
+        "energy_cost": 3,
+        "hash": 1435557120,
+        "name": "手雷模组",
+        "stat_bonus": {
+          "grenade": 10
+        }
+      }
+    }
+  ],
+  "error": {
+    "code": "confirmation_required",
+    "message": "equip_mod 会修改账号状态。请确认后用 confirmed=true 重新调用。",
+    "recoverable": true
+  },
+  "next_actions": [],
+  "ok": false,
+  "warnings": []
+}

@@ -13,7 +13,8 @@ PlayerIntent = Literal["profile", "get_profile", "角色", "档案", "search", "
 InventoryIntent = Literal[
     "summary", "summarize", "概况", "duplicates", "duplicate_weapons", "find_duplicates", "重复武器",
     "get", "inventory", "list", "item", "search", "find_item", "type", "search_type", "move", "transfer",
-    "equip", "equip_many", "equip_items", "pull_postmaster", "lock", "track_quest", "quest_tracking",
+    "equip", "equip_many", "equip_items", "equip_mod", "pull_postmaster", "lock",
+    "track_quest", "quest_tracking",
 ]
 WeaponIntent = Literal[
     "analyze", "catalog", "search_catalog", "all_weapons", "global", "search_all", "filter_rolls",
@@ -33,7 +34,7 @@ NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)
 WRITE_INTENTS: frozenset[str] = frozenset(
     {
         # inventory_assistant
-        "move", "transfer", "equip", "equip_many", "equip_items",
+        "move", "transfer", "equip", "equip_many", "equip_items", "equip_mod",
         "pull_postmaster", "lock", "track_quest", "quest_tracking",
         # loadout_assistant
         "save", "delete", "equip_loadout", "snapshot_official",

@@ -44,6 +44,7 @@ from .logging_config import get_logger, setup_logging
 from .manifest import ManifestManager
 from .player_resolver import PlayerResolver
 from .services.build_service import BuildService
+from .services.armor_mod_service import ArmorModService
 from .services.build_import_service import BuildImportService
 from .services.collection_service import CollectionService
 from .services.inventory_analysis_service import InventoryAnalysisService
@@ -124,6 +125,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
         set_bonus_svc = SetBonusService(manifest)
         collection_svc = CollectionService(bungie, manifest, resolver)
         starside_svc = StarsideService(manifest)
+        armor_mod_svc = ArmorModService(bungie, manifest, resolver)
 
         stack.push_async_callback(profile_cache.stop_refresh)
         stack.push_async_callback(loadout_svc.stop_refresh)
@@ -156,6 +158,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
             "set_bonus_svc": set_bonus_svc,
             "collection_svc": collection_svc,
             "starside_svc": starside_svc,
+            "armor_mod_svc": armor_mod_svc,
         }
         logger.info("Destiny MCP server ready (standalone)")
         yield context

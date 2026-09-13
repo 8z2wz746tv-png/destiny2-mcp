@@ -233,6 +233,14 @@ Offset = Annotated[
     Field(ge=0, description="翻页偏移，配合 next_offset 继续读；只有支持翻页的 intent 会读它。"),
 ]
 
+ModName = Annotated[
+    str,
+    Field(description=(
+        "护甲模组名称（中英文均可）。只有 intent=\"equip_mod\" 读它，且必填；"
+        "用 build_assistant(intent=\"armor_mods\") 查有哪些模组名。"
+    )),
+]
+
 Query = Annotated[
     str,
     Field(description="关键词。搜社区资料、搜收藏品节点、搜官方配装标识时用它，具体搜哪里取决于 intent。"),

@@ -130,6 +130,11 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ("inventory_assistant", "armor_slot"): _contract(
         _only(*_INV_GET), hint="部位过滤只作用于护甲，且只有列出清单的 intent 读它。"
     ),
+    ("inventory_assistant", "mod_name"): _contract(
+        _only("equip_mod"),
+        hint='看有哪些模组用 build_assistant(intent="armor_mods")；换模组本身用 intent="equip_mod"。',
+        suggestion=("build_assistant", "armor_mods"),
+    ),
     ("inventory_assistant", "rarity"): _contract(
         _only(*_INV_GET), hint="稀有度过滤只有列出清单的 intent 读它。"
     ),
@@ -141,7 +146,7 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ("inventory_assistant", "item_instance_id"): _contract(
         _only(
             *_INV_ITEM,
-            "move", "transfer", "equip", "pull_postmaster",
+            "move", "transfer", "equip", "equip_mod", "pull_postmaster",
             "lock", "track_quest", "quest_tracking",
         ),
         hint=(
@@ -175,10 +180,10 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ),
     ("inventory_assistant", "character"): _contract(
         _only(
-            "equip", "equip_many", "equip_items", "pull_postmaster",
+            "equip", "equip_many", "equip_items", "equip_mod", "pull_postmaster",
             "lock", "track_quest", "quest_tracking",
         ),
-        hint="只有装备、批量装备、取回、锁定、任务追踪这几个写入 intent 需要指定角色。",
+        hint="装备、批量装备、换模组、取回、锁定、任务追踪这几个写入 intent 需要指定角色。",
     ),
     ("inventory_assistant", "locked"): _contract(
         _only("lock"), hint='锁定/解锁用 intent="lock"，locked=true 锁、false 解锁。',

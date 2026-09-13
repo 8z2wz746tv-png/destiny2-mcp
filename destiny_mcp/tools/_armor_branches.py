@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from ._enrichment import community_enrichment
-from ._responses import error_response, ok_response
+from ._responses import confirmation_required_response, error_response, ok_response
 from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..services.armor_payload import armor_payload
 
@@ -131,3 +131,84 @@ def set_bonus(svc: Any, set_bonus_name: str) -> dict:
 
 
 __all__ = ["armor_item", "exotic_armor", "set_bonus", "error_response"]
+
+
+_STAT_LABELS = {
+    "weapons": "武器",
+    "health": "生命",
+    "class_stat": "职业",
+    "grenade": "手雷",
+    "super_stat": "超能",
+    "melee": "近战",
+}
+
+
+def _stat_bonus(definition: dict[str, Any] | None) -> dict[str, int]:
+    """模组的六维增量（读 Manifest，不猜）。"""
+    from ..services.armor_payload import STAT_HASH_TO_KEY
+
+    out: dict[str, int] = {}
+    for entry in (definition or {}).get("investmentStats") or []:
+        key = STAT_HASH_TO_KEY.get(entry.get("statTypeHash", 0))
+        value = entry.get("value", 0)
+        if key and value:
+            out[key] = out.get(key, 0) + int(value)
+    return out
+
+
+def _mod_echo(plan: dict[str, Any], definition: dict[str, Any] | None) -> str:
+    """确认请求里给人看的那一行。"""
+    from ..services.armor_payload import SLOT_DISPLAY
+
+    tier = f"T{plan['gear_tier']}" if plan.get("gear_tier") else "无分级"
+    slot = SLOT_DISPLAY.get(plan.get("slot", ""), plan.get("slot", ""))
+    old = plan["from"].get("name") or "空"
+    new = plan["to"].get("name") or "空"
+    bonus = plan["to"].get("stat_bonus") or {}
+    bonus_text = "".join(
+        f"（+{value} {_STAT_LABELS.get(key, key)}）" for key, value in bonus.items()
+    )
+    energy = plan["energy"]
+    return (
+        f"{plan['item_name']}（{slot}，{plan.get('power')}，{tier}）"
+        f"槽 {plan['socket_index']}：{old} → {new}{bonus_text}，"
+        f"能量 {energy['used']}/{energy['capacity']} → {energy['after']}/{energy['capacity']}"
+    )
+
+
+async def equip_mod(
+    svc: Any,
+    player_name: str,
+    item_instance_id: str,
+    mod_name: str,
+    character: str,
+    confirmed: bool,
+) -> dict:
+    """`inventory_assistant(intent="equip_mod")`：给一件护甲换一个模组。
+
+    自己管确认：`confirmed=false` 时返回**带 from/to/能量变化**的确认请求（通用写入
+    确认只能回显参数，看不出到底要改什么），确认后才写账号。
+    """
+    plan = await svc["armor_mod_svc"].plan(player_name, item_instance_id, mod_name, character)
+    definition = svc["manifest"].get_item_definition(plan["to"]["hash"]) or {}
+    plan["to"]["stat_bonus"] = _stat_bonus(definition)
+    if plan["from"].get("name") and "空" in plan["from"]["name"]:
+        plan["from"] = {"hash": None, "name": None, "energy_cost": 0}
+    plan["summary"] = _mod_echo(plan, definition)
+
+    if not confirmed:
+        return confirmation_required_response("equip_mod", plan)
+
+    result = await svc["armor_mod_svc"].apply(plan)
+    armor_mod: dict[str, Any] = {"summary": plan["summary"]}
+    if isinstance(result, dict):
+        armor_mod.update(result)
+    return ok_response(
+        f"已把 {plan['item_name']} 的槽 {plan['socket_index']} 换成 "
+        f"{plan['to']['name']}（能量 {plan['energy']['after']}/{plan['energy']['capacity']}）。",
+        {"armor_mod": armor_mod},
+        next_actions=[
+            "要看这件护甲现在的完整状态，用 inventory_assistant(intent=\"item\", "
+            f"item_instance_id=\"{plan['item_instance_id']}\")。",
+        ],
+    )

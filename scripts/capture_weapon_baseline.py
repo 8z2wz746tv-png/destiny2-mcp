@@ -80,6 +80,15 @@ ARMOR_CASES: list[tuple[str, object]] = [
     ("armor_item_legacy", "inventory_assistant", {
         "intent": "item", "item_instance_id": "6917529740500777594",
     }),
+    # 换模组的确认路径（confirmed=false，基线里**不写账号**）
+    ("equip_mod_confirm", "inventory_assistant", {
+        "intent": "equip_mod", "item_instance_id": "6917530198796768597",
+        "mod_name": "手雷模组", "character": "hunter", "confirmed": False,
+    }),
+    ("equip_mod_wrong_slot", "inventory_assistant", {
+        "intent": "equip_mod", "item_instance_id": "6917530198796768597",
+        "mod_name": "手雷快速启动", "character": "hunter", "confirmed": False,
+    }),
     ("inventory_summary", "inventory_assistant", {"intent": "summary"}),
     ("exotic_armor_list", "build_assistant", {"intent": "exotic_armor", "character": "hunter"}),
     ("exotic_armor_detail", "build_assistant", {"intent": "exotic_armor", "character": "hunter", "exotic_name": "快速装弹松身裤"}),

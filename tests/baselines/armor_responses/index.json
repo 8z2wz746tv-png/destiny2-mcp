@@ -5,7 +5,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 4629,
+      "elapsed_ms": 4280,
       "payload_chars": 3370
     },
     {
@@ -13,7 +13,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1633,
+      "elapsed_ms": 1298,
       "payload_chars": 2590
     },
     {
@@ -21,7 +21,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1601,
+      "elapsed_ms": 1008,
       "payload_chars": 935
     },
     {
@@ -29,7 +29,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1612,
+      "elapsed_ms": 1348,
       "payload_chars": 2378
     },
     {
@@ -37,7 +37,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 2022,
+      "elapsed_ms": 4088,
       "payload_chars": 5858
     },
     {
@@ -45,15 +45,31 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1802,
+      "elapsed_ms": 1334,
       "payload_chars": 10536
+    },
+    {
+      "case": "equip_mod_confirm",
+      "tool": "inventory_assistant",
+      "ok": false,
+      "error_code": "confirmation_required",
+      "elapsed_ms": 2393,
+      "payload_chars": 1529
+    },
+    {
+      "case": "equip_mod_wrong_slot",
+      "tool": "inventory_assistant",
+      "ok": false,
+      "error_code": "invalid_argument_error",
+      "elapsed_ms": 1790,
+      "payload_chars": 285
     },
     {
       "case": "inventory_summary",
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1647,
+      "elapsed_ms": 1707,
       "payload_chars": 23671
     },
     {
@@ -69,7 +85,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 9,
+      "elapsed_ms": 8,
       "payload_chars": 7349
     },
     {
@@ -77,7 +93,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 12,
+      "elapsed_ms": 13,
       "payload_chars": 26557
     },
     {
@@ -85,7 +101,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 7,
+      "elapsed_ms": 6,
       "payload_chars": 7765
     },
     {
@@ -93,7 +109,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 445,
+      "elapsed_ms": 413,
       "payload_chars": 70451
     },
     {
@@ -101,7 +117,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 428,
+      "elapsed_ms": 404,
       "payload_chars": 36425
     },
     {
@@ -109,7 +125,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 12324,
+      "elapsed_ms": 23027,
       "payload_chars": 117226
     },
     {
@@ -117,7 +133,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 3825,
+      "elapsed_ms": 4377,
       "payload_chars": 2635
     },
     {
@@ -125,7 +141,7 @@
       "tool": "build_assistant",
       "ok": false,
       "error_code": "confirmation_required",
-      "elapsed_ms": 2833,
+      "elapsed_ms": 3770,
       "payload_chars": 69419
     }
   ]

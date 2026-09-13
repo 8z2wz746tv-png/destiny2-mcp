@@ -55,6 +55,7 @@
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
+| `equip_mod` | 给一件护甲换一个模组：先返回「哪件、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写 | `item_instance_id`、`mod_name`、`character` |
 | `move` | 移动物品，可顺带装备 | `item_name`、`destination`、`equip`、`from_character`、`item_instance_id` |
 | `transfer` | 按实例 ID 转移到指定角色 | `item_instance_id`、`to_character`、`from_character` |
 | `equip` | 按实例 ID 装备到指定角色 | `item_instance_id`、`character` |
@@ -250,7 +251,7 @@ Manifest 侧（**不代表拥有**）：
 | `canonical_build` | `build_assistant`：`equip_build` |
 | `category` | `build_assistant`：`community`、`community_build`、`starside` |
 | `changes` | `subclass_assistant`：`modify` |
-| `character` | `activity_assistant`：除 `clan_leaderboards`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`set_bonus` 外全部；`inventory_assistant`：`equip`、`equip_items`、`equip_many`、`lock`、`pull_postmaster`、`quest_tracking`、`track_quest`；`loadout_assistant`：`clear_official`、`get`、`list`、`save`、`snapshot_official`、`update_official_identifiers`；`subclass_assistant`：`community`、`equip_artifact_mod`、`get`、`modify`、`options`、`subclass`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`vendor` |
+| `character` | `activity_assistant`：除 `clan_leaderboards`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`set_bonus` 外全部；`inventory_assistant`：`equip`、`equip_items`、`equip_many`、`equip_mod`、`lock`、`pull_postmaster`、`quest_tracking`、`track_quest`；`loadout_assistant`：`clear_official`、`get`、`list`、`save`、`snapshot_official`、`update_official_identifiers`；`subclass_assistant`：`community`、`equip_artifact_mod`、`get`、`modify`、`options`、`subclass`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`vendor` |
 | `class_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `collectible_node_hash` | `world_assistant`：`collectible_node` |
 | `color_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
@@ -275,7 +276,7 @@ Manifest 侧（**不代表拥有**）：
 | `include_inventory` | `build_assistant`：`community`、`community_build`、`starside`；`weapon_assistant`：`analyze`、`filter_rolls` |
 | `include_invisible` | `world_assistant`：`collectible_node` |
 | `include_subclass_fragment` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
-| `item_instance_id` | `inventory_assistant`：`equip`、`item`、`lock`、`move`、`pull_postmaster`、`quest_tracking`、`track_quest`、`transfer`；`weapon_assistant`：`compare`、`compare_duplicates` |
+| `item_instance_id` | `inventory_assistant`：`equip`、`equip_mod`、`item`、`lock`、`move`、`pull_postmaster`、`quest_tracking`、`track_quest`、`transfer`；`weapon_assistant`：`compare`、`compare_duplicates` |
 | `item_instance_ids` | `inventory_assistant`：`equip_items`、`equip_many` |
 | `item_name` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`find_item`、`move`、`search`、`重复武器`；`world_assistant`：`collectible_item`、`community` |
 | `item_type` | `inventory_assistant`：`get`、`inventory`、`list`、`search_type`、`summarize`、`summary`、`type`、`概况` |
@@ -288,6 +289,7 @@ Manifest 侧（**不代表拥有**）：
 | `max_replacements` | `build_assistant`：`farm_target` |
 | `maxtop` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
 | `melee_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
+| `mod_name` | `inventory_assistant`：`equip_mod` |
 | `mode` | `activity_assistant`：`clan_leaderboards`、`community`、`history`、`leaderboard`、`leaderboards` |
 | `name` | `loadout_assistant`：`save` |
 | `name_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
@@ -377,7 +379,7 @@ Manifest 侧（**不代表拥有**）：
 
 ## 六、写入：确认与红线
 
-`move`、`transfer`、`equip`、`equip_many`（`equip_items`）、`pull_postmaster`、`lock`、`track_quest`（`quest_tracking`）、`save`、`delete`、`equip_loadout`、`snapshot_official`、`update_official_identifiers`、`clear_official`、`modify`、`equip_artifact_mod`、`equip_build` 都会改变账号状态（这份清单与 `_requests.WRITE_INTENTS` 一致，由测试保证）。
+`move`、`transfer`、`equip`、`equip_many`（`equip_items`）、`equip_mod`、`pull_postmaster`、`lock`、`track_quest`（`quest_tracking`）、`save`、`delete`、`equip_loadout`、`snapshot_official`、`update_official_identifiers`、`clear_official`、`modify`、`equip_artifact_mod`、`equip_build` 都会改变账号状态（这份清单与 `_requests.WRITE_INTENTS` 一致，由测试保证）。
 
 - `confirmed=false` 时返回 `confirmation_required`，**服务层不会被调用**，游戏状态不变。确认必须来自用户的明确同意，不能由 Agent 自己推断——用户说「不用问了直接执行」也不行。
 - 展示确认时要给精确目标：实例 ID、槽位号、数值，而不是笼统描述。

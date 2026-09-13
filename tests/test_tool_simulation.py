@@ -102,6 +102,10 @@ class _Reply:
     def get(self, key: object, default: object = None) -> "_Reply":
         return _Reply()
 
+    def __setitem__(self, key: object, value: object) -> None:
+        """工具会把服务返回值当 dict 补几个展示字段，这里照单全收。"""
+        return None
+
     def model_dump(self, *args: object, **kwargs: object) -> "_Reply":
         """让 `_dump()` 原样返回本对象，从而保留对缺失键的宽容。"""
         return self
@@ -268,6 +272,11 @@ async def test_write_intents_do_not_reach_the_service_layer_unconfirmed() -> Non
     """
     from destiny_mcp.tools._requests import WRITE_INTENTS
 
+    # `equip_mod` 的确认请求要显示"从什么换成什么、能量怎么变"，所以它在确认前会**读**
+    # 一次账号（plan）。这条规则要守的是"未确认不许写"，不是"不许读"——对这个 intent
+    # 只盯写入方法（`.apply`）。其余写入 intent 保持"一个服务层调用都不许有"。
+    read_before_confirm = {"equip_mod"}
+
     violations: list[str] = []
     checked = 0
     for definition in _definitions():
@@ -283,6 +292,14 @@ async def test_write_intents_do_not_reach_the_service_layer_unconfirmed() -> Non
             if isinstance(result, dict) and result.get("error", {}).get("code") == "unsupported_intent":
                 continue
             checked += 1
+            if intent in read_before_confirm:
+                writes = [call for call in ctx.called if call.endswith(".apply")]
+                if writes:
+                    violations.append(f"{definition.function.__name__}({intent}) 未确认就写入 -> {writes[0]}")
+                code = (result.get("error") or {}).get("code") if isinstance(result, dict) else None
+                if code != "confirmation_required":
+                    violations.append(f"{definition.function.__name__}({intent}) 未确认时没有返回确认请求（{code}）")
+                continue
             if ctx.called:
                 violations.append(f"{definition.function.__name__}({intent}) -> {ctx.called[0]}")
 

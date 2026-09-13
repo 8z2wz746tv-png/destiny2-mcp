@@ -237,33 +237,33 @@ async def apply_mod(
     item_instance_id: str = "",
     mod_name: str = "",
     character: str = "",
+    confirmed: bool = False,
     ctx: Context = None,
 ) -> dict:
-    """给护甲装备模组。
+    """给护甲换一个模组（**先确认，再写入**）。
 
     何时使用：用户说"给XXX装手雷模组"时。
-    何时使用：配装引擎推荐模组后自动安装时。
-    何时跳过：用户只想看有哪些模组可用（用 get_armor_mods）。
+    何时跳过：用户只想看有哪些模组可用（用 `build_assistant(intent="armor_mods")`）。
+
+    和历史行为的区别：这个工具以前**不确认就直接改账号**。现在它和
+    `inventory_assistant(intent="equip_mod")` 走同一条路 —— `confirmed=false` 时返回
+    「哪件护甲、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写。
 
     Args:
         player_name: Bungie 名称。不填则使用默认玩家。
-        item_instance_id: 护甲实例 ID（从 search_items 获取）。
-        mod_name: 模组名称（中英文均可，如 '手雷模组'、'Grenade Mod'）。
+        item_instance_id: 护甲实例 ID（从 `inventory_assistant` 的 get/search 获取）。
+        mod_name: 模组名称（中英文均可，如 '手雷模组'、'纪律模组'）。
         character: 角色名（hunter/warlock/titan，或中文）。
+        confirmed: 必须显式传 true 才真的写入。
 
     Examples:
         apply_mod(player_name="husky#1234", item_instance_id="123456", mod_name="手雷模组", character="warlock")
-        apply_mod(item_instance_id="123456", mod_name="恢复模组", character="hunter")
+        apply_mod(item_instance_id="123456", mod_name="恢复模组", character="hunter", confirmed=True)
     """
-    if not item_instance_id:
-        return {"success": False, "message": "必须提供 item_instance_id。"}
-    if not mod_name:
-        return {"success": False, "message": "必须提供 mod_name。"}
-    if not character:
-        return {"success": False, "message": "必须提供 character。"}
+    from ._armor_branches import equip_mod
 
     player_name = resolve_player_name(player_name)
     svc = get_ctx(ctx)
-    return await svc['transfer_svc'].apply_mod(
-        player_name, item_instance_id, mod_name, character
+    return await equip_mod(
+        svc, player_name, item_instance_id, mod_name, character, confirmed
     )
