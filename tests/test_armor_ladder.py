@@ -193,3 +193,25 @@ async def test_completion_rate_stays_when_targets_are_given() -> None:
     )
 
     assert response["data"]["recommendation"]["results"][0]["completion_rate"] == 1.0
+
+
+def test_tuning_first_rung_comes_before_dropping_targets() -> None:
+    """缺口 ≤5 时先给"调谐能补"的提示；≤10 给属性模组；更大才只剩降目标。"""
+    request = _Request(weapons_target=150, grenade_target=70, melee_target=60)
+    ceiling = {"weapons": 145, "grenade": 61, "melee": 20}
+
+    table = ladder.build_ladder(request, ceiling=ceiling, precision="sampled")
+
+    levers = {item["stat"]: item["lever"] for item in table["tuning_first"]}
+    assert levers == {"weapons": "tuning", "grenade": "stat_mod"}
+    assert "melee" not in levers, "差 40 点不是调谐/模组能补的，别给出误导性提示"
+    assert any("调谐" in item["why"] for item in table["tuning_first"])
+    assert "只对**待刷的虚拟件**建模调谐" in table["tuning_first_note"]
+
+
+def test_tuning_first_is_absent_when_everything_is_met() -> None:
+    request = _Request(weapons_target=100)
+    table = ladder.build_ladder(request, ceiling={"weapons": 200}, precision="exact")
+
+    assert table["tuning_first"] == []
+    assert table["tuning_first_note"] == ""

@@ -183,6 +183,35 @@ def build_ladder(
                 "这一步要用户明确同意，不能自动降。"
             ),
         }
+    # 先看"免费的杠杆"：每件护甲一个 ±5 调谐槽、一个 +10/+5 属性模组槽。
+    # 实测：求解器目前**只对虚拟待刷件**建模调谐，对已有护甲不试 —— 所以这里只能
+    # 如实说"这一项差得不多，可以用调谐/模组补，未必要降目标"，不能假装已经算进去了。
+    tuning_first: list[dict[str, Any]] = []
+    for stat, gap in sorted(shortfall.items(), key=lambda item: item[1]):
+        if gap <= 5:
+            tuning_first.append({
+                "stat": stat,
+                "stat_label": STAT_LABELS[stat],
+                "gap": gap,
+                "lever": "tuning",
+                "why": (
+                    f"{STAT_LABELS[stat]}只差 {gap} 点：一件护甲的调谐（+5/−5）就能补上，"
+                    "先用 inventory_assistant(intent=\"item\") 看哪件还有空调谐槽，"
+                    "再决定要不要降目标。"
+                ),
+            })
+        elif gap <= 10:
+            tuning_first.append({
+                "stat": stat,
+                "stat_label": STAT_LABELS[stat],
+                "gap": gap,
+                "lever": "stat_mod",
+                "why": (
+                    f"{STAT_LABELS[stat]}差 {gap} 点：一件护甲的属性模组（+10 花 3 能量）"
+                    "可能就够，先看能量还剩多少再决定要不要降目标。"
+                ),
+            })
+
     return {
         "targets": targets,
         "priority": priority,
@@ -192,6 +221,13 @@ def build_ladder(
         "precision": precision,
         "reason": reason,
         "samples": list(samples),
+        "tuning_first": tuning_first,
+        "tuning_first_note": (
+            "求解器目前只对**待刷的虚拟件**建模调谐，对已有护甲不试；所以这一档是"
+            "**人工可用的杠杆提示**，不是已经算进 ceiling 的方案。"
+            if tuning_first
+            else ""
+        ),
         "suggestion": suggestion,
         "note": (
             "ceiling = 同一套约束下、按某种优先级**同时**能达到的值（实采，逐项取最大）；"
