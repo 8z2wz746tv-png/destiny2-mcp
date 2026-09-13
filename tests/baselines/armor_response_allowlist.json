@@ -1,4 +1,6 @@
 {
   "_note": "护甲面的「允许消失」登记：键是路径（list 索引写成 []），值写明去向。三种键都认：`用例::路径`（只在某个用例消失）、`路径`（所有用例）、`用例::块根`（子树，字段整块改名时用）。没登记的消失会让 scripts/diff_weapon_baseline.py 退出码非 0。P0 建立时为空 —— 护甲重构（ARMOR_FORMAT_PLAN.md）改键名时在这里逐条登记去向。",
-  "removed": {}
+  "removed": {
+    "equip_mod_confirm::candidates[].alternatives[].stat_bonus_hashes": "0.1.4：alternatives 的加成改用与 to.stat_bonus 同一套六维可读键（stat_bonus），原始 hash（含非六维的费用属性 3578062600）不再外露 —— 那个字段会让调用方把「费用 1」读成「有加成」。见 tests/test_equip_mod.py 的同名断言。"
+  }
 }

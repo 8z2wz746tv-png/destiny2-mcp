@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 1904,
+    "elapsed_ms": 1689,
     "is_error": false,
-    "payload_chars": 10536,
+    "payload_chars": 10607,
     "steps": [
       {
         "arguments": {
@@ -337,7 +337,7 @@
     }
   },
   "next_actions": [
-    "要看某个模组能不能装进这件护甲，先看 armor.sockets 里该槽的 kind 与 energy_cost；换模组的写入动作在 equip_mod（后续阶段提供）。"
+    "要看某个模组能不能装进这件护甲，先看 armor.sockets 里该槽的 kind 与 energy_cost；要换模组用 inventory_assistant(intent=\"equip_mod\", item_instance_id=…, mod_name=…, character=…)，确认后才写。"
   ],
   "ok": true,
   "summary": "虚无镣铐（臂铠，无分级，10 光等）",

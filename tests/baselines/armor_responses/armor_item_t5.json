@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 1965,
+    "elapsed_ms": 2136,
     "is_error": false,
-    "payload_chars": 5858,
+    "payload_chars": 5929,
     "steps": [
       {
         "arguments": {
@@ -241,7 +241,7 @@
     }
   },
   "next_actions": [
-    "要看某个模组能不能装进这件护甲，先看 armor.sockets 里该槽的 kind 与 energy_cost；换模组的写入动作在 equip_mod（后续阶段提供）。"
+    "要看某个模组能不能装进这件护甲，先看 armor.sockets 里该槽的 kind 与 energy_cost；要换模组用 inventory_assistant(intent=\"equip_mod\", item_instance_id=…, mod_name=…, character=…)，确认后才写。"
   ],
   "ok": true,
   "summary": "至高狂徒腿铠（腿部护甲，T5，550 光等），词条 高能者",

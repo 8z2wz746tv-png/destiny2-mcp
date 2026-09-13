@@ -96,7 +96,8 @@ async def armor_item(svc: Any, player_name: str, item_instance_id: str) -> dict:
         },
         next_actions=[
             "要看某个模组能不能装进这件护甲，先看 armor.sockets 里该槽的 kind 与 energy_cost；"
-            "换模组的写入动作在 equip_mod（后续阶段提供）。",
+            "要换模组用 inventory_assistant(intent=\"equip_mod\", item_instance_id=…, mod_name=…, "
+            "character=…)，确认后才写。",
         ],
         warnings=[w for w in warnings if w],
     )
@@ -143,20 +144,7 @@ _STAT_LABELS = {
 }
 
 
-def _stat_bonus(definition: dict[str, Any] | None) -> dict[str, int]:
-    """模组的六维增量（读 Manifest，不猜）。"""
-    from ..services.armor_payload import STAT_HASH_TO_KEY
-
-    out: dict[str, int] = {}
-    for entry in (definition or {}).get("investmentStats") or []:
-        key = STAT_HASH_TO_KEY.get(entry.get("statTypeHash", 0))
-        value = entry.get("value", 0)
-        if key and value:
-            out[key] = out.get(key, 0) + int(value)
-    return out
-
-
-def _mod_echo(plan: dict[str, Any], definition: dict[str, Any] | None) -> str:
+def _mod_echo(plan: dict[str, Any]) -> str:
     """确认请求里给人看的那一行。"""
     from ..services.armor_payload import SLOT_DISPLAY
 
@@ -263,11 +251,9 @@ async def equip_mod(
     确认只能回显参数，看不出到底要改什么），确认后才写账号。
     """
     plan = await svc["armor_mod_svc"].plan(player_name, item_instance_id, mod_name, character)
-    definition = svc["manifest"].get_item_definition(plan["to"]["hash"]) or {}
-    plan["to"]["stat_bonus"] = _stat_bonus(definition)
     if plan["from"].get("name") and "空" in plan["from"]["name"]:
         plan["from"] = {"hash": None, "name": None, "energy_cost": 0}
-    plan["summary"] = _mod_echo(plan, definition)
+    plan["summary"] = _mod_echo(plan)
 
     if not confirmed:
         return confirmation_required_response("equip_mod", plan)
@@ -307,7 +293,10 @@ def with_slot_keys(payload: Any) -> Any:
                         "slot_display" if key == "slot" else "replacement_slot_display",
                         SLOT_DISPLAY.get(slot_key, ""),
                     )
-            for value in node.values():
+            for child_key, value in node.items():
+                # canonical_build 是"要原样回传"的可执行载荷，展示字段一律不进去
+                if child_key == "canonical_build":
+                    continue
                 _walk(value)
         elif isinstance(node, list):
             for value in node:

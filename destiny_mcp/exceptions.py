@@ -148,3 +148,16 @@ class BungieServiceUnavailableError(APIError):
             detail
             or "Bungie 官方接口暂时不可用，可能正在维护或限流。请稍后重试。",
         )
+
+
+class BuildTooLargeError(DestinyMCPError):
+    """组合规模超过上限，本次**没有**计算。
+
+    和"无解"是两件事：无解是算过了、没有可行组合；这里是压根没跑。
+    以前只有 `analyze` 有这道闸门，`recommend`/`find` 会真的去枚举上亿种组合，
+    客户端等到超时也拿不到答案（实测术士 2.43 亿组合 → `-32001 Request timed out`）。
+    """
+
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+        super().__init__(reason)

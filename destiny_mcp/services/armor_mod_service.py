@@ -27,13 +27,20 @@ from .loadout_mod_sockets import ModSocketMixin
 _MOD_ITEM_TYPE = 19
 
 
-def _stat_bonus_of(definition: dict[str, Any] | None) -> dict[int, int]:
-    """插件定义的六维增量（按 stat hash 归并）。"""
-    out: dict[int, int] = {}
+def _stat_bonus_of(definition: dict[str, Any] | None) -> dict[str, int]:
+    """插件定义的六维增量：只认六维、键名与 `to.stat_bonus` 同一套。
+
+    以前这里给的是原始 stat hash，还把非六维的"费用"属性（3578062600）也算进来 ——
+    调用方会把它读成"这个版本也有加成"。
+    """
+    from .armor_payload import STAT_HASH_TO_KEY
+
+    out: dict[str, int] = {}
     for entry in (definition or {}).get("investmentStats") or []:
+        key = STAT_HASH_TO_KEY.get(entry.get("statTypeHash", 0))
         value = entry.get("value", 0)
-        if value:
-            out[int(entry.get("statTypeHash", 0))] = out.get(int(entry.get("statTypeHash", 0)), 0) + int(value)
+        if key and value:
+            out[key] = out.get(key, 0) + int(value)
     return out
 
 # 角色背包 + 已装备 + 实例 + 插槽：够判断"在谁身上、能不能装、能量够不够"
@@ -208,7 +215,7 @@ class ArmorModService(ModSocketMixin):
                 alternatives.append({
                     "hash": alt_hash,
                     "name": _mod_label(self._manifest.get_item_definition(alt_hash), mod_name),
-                    "stat_bonus_hashes": bonus,
+                    "stat_bonus": bonus,
                     "energy_cost": self._plug_energy_cost(alt_hash) or 0,
                     "socket_index": alt_socket,
                 })
@@ -240,6 +247,8 @@ class ArmorModService(ModSocketMixin):
                 "hash": matched_hash,
                 "name": _mod_label(self._manifest.get_item_definition(matched_hash), mod_name),
                 "energy_cost": new_cost,
+                # 六维可读键，和 alternatives 同一套（工具层不用再自己算一遍）
+                "stat_bonus": _stat_bonus_of(self._manifest.get_item_definition(matched_hash)),
             },
             "energy": {"capacity": capacity, "used": used, "after": after},
         }

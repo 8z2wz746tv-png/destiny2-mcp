@@ -298,3 +298,45 @@ def test_slot_keys_are_added_without_touching_the_original_fields() -> None:
     assert enriched["farm_options"][0]["replacement_slot"] == "legs"
     assert enriched["farm_options"][0]["replacement_slot_key"] == "legs"
     assert enriched["farm_options"][0]["replacement_slot_display"] == "腿部护甲"
+
+
+async def test_alternatives_use_readable_six_stat_keys() -> None:
+    """alternatives 的加成要和 `to.stat_bonus` 同一套键名，且不含非六维属性。"""
+    weak, strong = 6001, 6002
+
+    class _TwoVariants(_Manifest):
+        def get_item_definition(self, item_hash: int):
+            if item_hash == weak:
+                return {"displayProperties": {"name": "手雷模组"}, "itemType": 19,
+                        "plug": {"plugCategoryIdentifier": "enhancements.v2_general",
+                                 "plugCategoryHash": 2487827355,
+                                 "energyCost": {"energyCost": 1}},
+                        "investmentStats": [{"statTypeHash": 3578062600, "value": 1}]}
+            if item_hash == strong:
+                return {"displayProperties": {"name": "手雷模组"}, "itemType": 19,
+                        "plug": {"plugCategoryIdentifier": "enhancements.v2_general",
+                                 "plugCategoryHash": 2487827355,
+                                 "energyCost": {"energyCost": 3}},
+                        "investmentStats": [{"statTypeHash": STAT_GRENADE, "value": 10}]}
+            return super().get_item_definition(item_hash)
+
+        def search(self, query: str, limit: int = 0):
+            return [{"itemHash": weak, "itemType": 19}, {"itemHash": strong, "itemType": 19}]
+
+        def get_definition(self, table: str, key: int):
+            if key == 900:
+                return {"reusablePlugItems": [{"plugItemHash": EMPTY_GENERAL},
+                                              {"plugItemHash": weak},
+                                              {"plugItemHash": strong}]}
+            return super().get_definition(table, key)
+
+    service = _service()
+    service._manifest = _TwoVariants()
+    plan = await service.plan("Tester#1234", "6917", "手雷模组", "hunter")
+
+    assert plan["to"]["stat_bonus"] == {} or plan["to"]["stat_bonus"] == {"grenade": 10}
+    for alternative in plan["alternatives"]:
+        assert "stat_bonus_hashes" not in alternative, "原始 hash 字段已换成可读键"
+        assert set(alternative["stat_bonus"]) <= {
+            "weapons", "health", "class_stat", "grenade", "super_stat", "melee",
+        }, "非六维属性（如 3578062600 费用）不许出现"

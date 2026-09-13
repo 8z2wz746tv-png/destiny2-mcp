@@ -23,7 +23,7 @@ from difflib import SequenceMatcher
 from typing import Literal, cast
 
 from ..build import solver as _solver
-from ..build.analyzer import analyze
+from ..build.analyzer import analyze, ensure_within_combination_limit
 from ..build.constants import MAIN_STAT_HASHES, STAT_NAMES, SUBCLASS_BONUSES
 from ..build.constraints import parse as _parse_constraints
 from ..build.farm_target import find_farm_targets
@@ -129,7 +129,6 @@ def _canonical_subclass(build: CanonicalBuild) -> LoadoutSubclassConfig | None:
     ]):
         return None
     return LoadoutSubclassConfig(**values)
-
 
 class BuildService:
     """Orchestrates the full Build Engine pipeline.
@@ -536,8 +535,8 @@ class BuildService:
         snapshot_version = _snapshot_version(snapshot)
         logger.info("Snapshot: %d pieces across 5 slots", snapshot.total_pieces)
 
-        # Step 2: Parse constraints + subclass/fragment stats
         parsed = _parse_constraints(request, self._manifest)
+        ensure_within_combination_limit(snapshot, parsed)  # 规模超限就别跑，先给收窄建议
         bonus_vector = [0] * 6
         fragment_details: list[dict] = []
         execution_subclass: LoadoutSubclassConfig | None = None

@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 3211,
+    "elapsed_ms": 2195,
     "is_error": false,
-    "payload_chars": 1529,
+    "payload_chars": 1444,
     "steps": [
       {
         "arguments": {
@@ -25,18 +25,15 @@
           "hash": -398826200,
           "name": "手雷模组",
           "socket_index": 0,
-          "stat_bonus_hashes": {
-            "3578062600": 1
-          }
+          "stat_bonus": {}
         },
         {
           "energy_cost": 1,
           "hash": -273176987,
           "name": "小型手雷模组",
           "socket_index": 0,
-          "stat_bonus_hashes": {
-            "1735777505": 5,
-            "3578062600": 1
+          "stat_bonus": {
+            "grenade": 5
           }
         }
       ],

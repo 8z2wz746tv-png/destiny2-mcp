@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 1376,
+    "elapsed_ms": 1321,
     "is_error": false,
-    "payload_chars": 2904,
+    "payload_chars": 2902,
     "steps": [
       {
         "arguments": {
@@ -38,8 +38,8 @@
       "returned_count": 0,
       "truncated": false,
       "unmatched": [
-        "至高狂徒腿铠",
-        "噬星者之鳞"
+        "噬星者之鳞",
+        "快速装弹松身裤"
       ],
       "warnings": [
         "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
@@ -49,34 +49,6 @@
     },
     "inventory": {
       "items": [
-        {
-          "armor_system": "armor_3",
-          "bucket_type": "Leg Armor",
-          "character_id": "2305843009679355779",
-          "gear_tier": 5,
-          "gear_tier_note": null,
-          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/342a406ccdedbce8680910cfd93d4263.jpg",
-          "is_equipped": false,
-          "item_hash": 157934631,
-          "item_instance_id": "6917530198796768597",
-          "item_type": "Armor",
-          "item_type_display": "腿部护甲",
-          "location": "hunter",
-          "name": "至高狂徒腿铠",
-          "name_en": "Prime Zealot Strides",
-          "power": 550,
-          "quantity": 1,
-          "slot": "legs",
-          "slot_display": "腿部护甲",
-          "stats": {
-            "class_stat": 0,
-            "grenade": 20,
-            "health": 0,
-            "melee": 0,
-            "super_stat": 25,
-            "weapons": 30
-          }
-        },
         {
           "armor_system": "armor_3",
           "bucket_type": "Leg Armor",
@@ -104,19 +76,47 @@
             "super_stat": 25,
             "weapons": 30
           }
+        },
+        {
+          "armor_system": "armor_3",
+          "bucket_type": "Leg Armor",
+          "character_id": "2305843009679355779",
+          "gear_tier": 5,
+          "gear_tier_note": null,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cb2d44c8d1459ea43b0ea82976cf66e0.jpg",
+          "is_equipped": false,
+          "item_hash": 1793346751,
+          "item_instance_id": "6917530189447915522",
+          "item_type": "Armor",
+          "item_type_display": "腿部护甲",
+          "location": "hunter",
+          "name": "快速装弹松身裤",
+          "name_en": "Speedloader Slacks",
+          "power": 550,
+          "quantity": 1,
+          "slot": "legs",
+          "slot_display": "腿部护甲",
+          "stats": {
+            "class_stat": 45,
+            "grenade": 5,
+            "health": 0,
+            "melee": 5,
+            "super_stat": 20,
+            "weapons": 25
+          }
         }
       ],
       "location": "all",
       "next_offset": 2,
       "returned_items": 2,
-      "total_items": 26,
+      "total_items": 8,
       "truncated": true
     }
   },
   "next_actions": [],
   "ok": true,
-  "summary": "已读取背包（2/26 件）",
+  "summary": "已读取背包（2/8 件）",
   "warnings": [
-    "只返回了 2 / 26 件（按 limit=2 截断）；继续读传 offset=2，或先用 location/item_type/rarity 缩小范围。"
+    "只返回了 2 / 8 件（按 limit=2 截断）；继续读传 offset=2，或先用 location/item_type/rarity 缩小范围。"
   ]
 }

@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 5170,
+    "elapsed_ms": 4402,
     "is_error": false,
-    "payload_chars": 78653,
+    "payload_chars": 76803,
     "steps": [
       {
         "arguments": {
@@ -20,7 +20,7 @@
           "character": "hunter",
           "class_target": 100,
           "confirmed_exotic_hash": -1904495392,
-          "exotic_confirmation_token": "d2bc1.1789312069.bIWnbscUXVQG7Aqw.001faefe80f292b008f7f9b20d37ba5a23bd01d6170526150e9f57a3f21dd235",
+          "exotic_confirmation_token": "d2bc1.1789315349.ilMIdkqVooG1QHCq.9d00d39128f11293a95409faa07ed8709863faaa394d578a514ea70b4ab42e20",
           "exotic_name": "快速装弹松身裤",
           "fragment_names": null,
           "grenade_target": null,
@@ -45,7 +45,7 @@
             "aspect_hashes": [],
             "class_ability_hash": null,
             "class_type": "hunter",
-            "execution_id": "2_5suknLOytbVl_KwVIFylKl",
+            "execution_id": "_VCURDTIddA9cm2d8oVl53SW",
             "exotic_hash": 1793346751,
             "fragment_hashes": [],
             "grenade_hash": null,
@@ -60,8 +60,6 @@
                 "name": "至高狂徒面具",
                 "perks": [],
                 "slot": "helmet",
-                "slot_display": "头盔",
-                "slot_key": "helmet",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -76,8 +74,6 @@
                 "name": "光泽护臂",
                 "perks": [],
                 "slot": "gauntlets",
-                "slot_display": "臂铠",
-                "slot_key": "gauntlets",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -92,8 +88,6 @@
                 "name": "至高狂徒胸甲",
                 "perks": [],
                 "slot": "chest",
-                "slot_display": "胸部护甲",
-                "slot_key": "chest",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -108,8 +102,6 @@
                 "name": "快速装弹松身裤",
                 "perks": [],
                 "slot": "legs",
-                "slot_display": "腿部护甲",
-                "slot_key": "legs",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -124,8 +116,6 @@
                 "name": "众神辉煌披风",
                 "perks": [],
                 "slot": "class_item",
-                "slot_display": "职业护甲",
-                "slot_key": "class_item",
                 "source_character_id": "2305843009679355779",
                 "source_location": "hunter",
                 "was_equipped": false
@@ -159,7 +149,7 @@
         "aspect_hashes": [],
         "class_ability_hash": null,
         "class_type": "hunter",
-        "execution_id": "2_5suknLOytbVl_KwVIFylKl",
+        "execution_id": "_VCURDTIddA9cm2d8oVl53SW",
         "exotic_hash": 1793346751,
         "fragment_hashes": [],
         "grenade_hash": null,

@@ -195,6 +195,9 @@ def main() -> int:
     parser.add_argument("--allowlist", type=Path, default=DEFAULT_ALLOWLIST)
     parser.add_argument("--report", type=Path, default=None)
     args = parser.parse_args()
+    # 相对路径要先转绝对：报告里要用相对仓库根打印"该登记到哪"，相对路径会在这里崩，
+    # 把真正的差异吞掉（踩过）。
+    args.allowlist = args.allowlist.resolve()
 
     report, ok = diff(args.before, args.after, args.allowlist)
     if args.report:

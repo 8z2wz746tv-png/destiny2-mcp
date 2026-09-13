@@ -215,3 +215,40 @@ def test_tuning_first_is_absent_when_everything_is_met() -> None:
 
     assert table["tuning_first"] == []
     assert table["tuning_first_note"] == ""
+
+
+@pytest.mark.asyncio
+async def test_too_large_requests_are_refused_with_narrowing_advice() -> None:
+    """规模超限是"没算"，不是"无解"：给收窄建议，而不是让调用方等到超时。"""
+    from destiny_mcp.build.analyzer import too_large_reason
+    from destiny_mcp.exceptions import BuildTooLargeError
+    from destiny_mcp.tools import _build_flow
+
+    reason = too_large_reason(243_400_640, [38, 56, 38, 70, 43], 20_000_000)
+
+    class _Build:
+        async def recommend_build(self, player_name, request):
+            raise BuildTooLargeError(reason)
+
+        async def find_build(self, player_name, request):
+            raise BuildTooLargeError(reason)
+
+    svc = {"build_svc": _Build()}
+    response = await _build_flow.recommend(
+        svc, "Tester#1234", _Request(priority_stats=["weapons"]), {"character": "warlock"},
+        lambda value: value,
+    )
+    data = response["data"]
+
+    assert response["ok"] is True, "这不是错误，而是「没有计算」"
+    assert data["not_computed"]["precision"] == "not_computed"
+    assert data["recommendation"]["results"] == [], "不许把「没算」答成「无解」"
+    assert any("金装" in action for action in response["next_actions"]), "要给收窄建议"
+    assert "ladder" not in data, "没算就别做阶梯（采样也只是再撞一次闸门）"
+
+    found = await _build_flow.find(
+        svc, "Tester#1234", _Request(priority_stats=["weapons"]), {"character": "warlock"},
+        lambda value: value,
+    )
+    assert found["ok"] is True and found["data"]["builds"] == []
+    assert found["data"]["not_computed"]["reason"].startswith("这次分析的组合规模太大")

@@ -12,6 +12,8 @@ from typing import Any, Callable
 from . import _armor_ladder as armor_ladder
 from ._armor_branches import with_slot_keys
 from ._responses import ok_response
+from ..build.analyzer import narrowing_actions
+from ..exceptions import BuildTooLargeError
 
 
 def _has_hard_targets(request: Any) -> bool:
@@ -33,6 +35,26 @@ def _mark_completion_rate_na(payload: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
+def _not_computed(reason: str, query: dict[str, Any], *, key: str) -> dict[str, Any]:
+    """规模超限的统一响应：**没算**就是没算，不能答成"无解"。
+
+    与 `analyze` 的 `precision="not_computed"` 同一套口径：`max_possible` 留空，
+    并给可操作的收窄建议。
+    """
+    analysis = {"reason": reason, "precision": "not_computed", "max_possible": {}}
+    payload: dict[str, Any] = {"query": query, "not_computed": analysis}
+    if key == "recommendation":
+        payload["recommendation"] = {"results": [], "analysis": analysis}
+    else:
+        payload["builds"] = []
+    return ok_response(
+        "这次组合规模太大，本次**没有计算**（这不是「配不出来」）。",
+        payload,
+        next_actions=narrowing_actions(),
+        warnings=["没算就是没算：不要把这次结果读成「现有装备配不出」。", reason],
+    )
+
+
 async def recommend(
     svc: Any,
     player_name: str,
@@ -40,7 +62,10 @@ async def recommend(
     query: dict[str, Any],
     dump: Callable[[Any], Any],
 ) -> dict[str, Any]:
-    result = await svc["build_svc"].recommend_build(player_name, request)
+    try:
+        result = await svc["build_svc"].recommend_build(player_name, request)
+    except BuildTooLargeError as exc:
+        return _not_computed(str(exc), query, key="recommendation")
     recommendation = with_slot_keys(dump(result))
     if not _has_hard_targets(request):
         _mark_completion_rate_na(recommendation)
@@ -72,7 +97,10 @@ async def find(
     query: dict[str, Any],
     dump: Callable[[Any], Any],
 ) -> dict[str, Any]:
-    result = await svc["build_svc"].find_build(player_name, request)
+    try:
+        result = await svc["build_svc"].find_build(player_name, request)
+    except BuildTooLargeError as exc:
+        return _not_computed(str(exc), query, key="builds")
     builds = with_slot_keys(dump(result))
     if not builds:
         ladder = await armor_ladder.no_solution_ladder(svc, player_name, request)

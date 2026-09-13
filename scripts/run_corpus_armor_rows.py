@@ -287,6 +287,34 @@ async def main():
             f"副本={[(row.get('item_instance_id'), row.get('power')) for row in copies[:3]]}",
         )
 
+        # 13. 稀有度：中英必须同结果；乱填必须报错（以前中文被静默忽略）
+        zh = await inv(intent="get", armor_slot="legs", rarity="异域", limit=50)
+        en = await inv(intent="get", armor_slot="legs", rarity="exotic", limit=50)
+        bad = await inv(intent="get", armor_slot="legs", rarity="紫装", limit=5)
+        zh_total = ((zh.get("data") or {}).get("inventory") or {}).get("total_items")
+        en_total = ((en.get("data") or {}).get("inventory") or {}).get("total_items")
+        all_total = (((await inv(intent="get", armor_slot="legs", limit=1)).get("data") or {})
+                     .get("inventory") or {}).get("total_items")
+        check(
+            "⑲ rarity 中英同结果 + 乱填报错（不能静默返回未过滤清单）",
+            zh["ok"] and en["ok"] and zh_total == en_total and zh_total != all_total
+            and not bad["ok"] and (bad.get("error") or {}).get("code") == "invalid_argument_error",
+            f"异域={zh_total} exotic={en_total} 未筛={all_total} 乱填 code={(bad.get('error') or {}).get('code')}",
+        )
+
+        # 14. 组合规模超限：立刻给收窄建议，不是超时也不是"无解"
+        heavy = await build(intent="recommend", character="warlock",
+                            priority_stats=["weapons", "class_stat"], top_n=1)
+        heavy_data = heavy.get("data") or {}
+        check(
+            "⑳ 组合规模超限：立刻返回 not_computed + 收窄建议（不跑到超时）",
+            heavy["ok"] and (heavy_data.get("not_computed") or {}).get("precision") == "not_computed"
+            and (heavy_data.get("recommendation") or {}).get("results") == []
+            and any("金装" in action for action in (heavy.get("next_actions") or [])),
+            f"precision={(heavy_data.get('not_computed') or {}).get('precision')} "
+            f"next_actions={len(heavy.get('next_actions') or [])}",
+        )
+
     print("\n=== 汇总 ===")
     failed = [row for row, ok, _ in RESULTS if not ok]
     print(f"共 {len(RESULTS)} 行，PASS {len(RESULTS) - len(failed)}，FAIL {len(failed)}")

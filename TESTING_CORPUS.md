@@ -8,8 +8,8 @@
 | 层 | 跑什么 | 什么时候跑 |
 | --- | --- | --- |
 | **L1 自动化**（不需要账号） | `pytest -q`（1272 条）／`scripts/verify_mcp.py`／`tests/agent_behavior_cases.yaml`（路由） | 每次提交 |
-| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 18 行）／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 19 例基线） | 改动武器或护甲响应后 |
-| **L2 冒烟**（本文件带 ⭐ 的行，24 条） | 真机逐条调用 | 每轮回归开始时跑一遍 |
+| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 20 行）／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 19 例基线） | 改动武器或护甲响应后 |
+| **L2 冒烟**（本文件带 ⭐ 的行，25 条） | 真机逐条调用 | 每轮回归开始时跑一遍 |
 | **L3 补测**（本文件其余行） | 真机逐条调用 | **只在该工具被改动时**跑它那一章 |
 
 **停止线（决定"修不修"）：**
@@ -330,7 +330,9 @@
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | ⭐ 我有哪些腿部护甲 | `inventory_assistant(intent="get", armor_slot="legs")` | 每件带 `slot="legs"`、`slot_display="腿部护甲"`、`gear_tier`、`armor_system`；**`bucket_type` 仍在**（武器行也在用它，不许删）；默认 100 件上限与截断字段照旧 |
-| 我有哪些异域护甲（按稀有度筛） | `intent="get", armor_slot="legs", rarity="异域"` | 只出异域；**列表保持轻量**：不带 `sockets`／`energy`（要看这些走 C 节） |
+| ⭐ 我有哪些异域护甲（按稀有度筛） | `intent="get", armor_slot="legs", rarity="异域"` | 中英都认（异域/传说/稀有 = exotic/legendary/rare），**数量必须与英文一致**；**列表保持轻量**：不带 `sockets`／`energy`（要看这些走 C 节） |
+| 稀有度写错（如 `rarity="紫装"`） | 同上 | `invalid_argument_error` 并列出可用取值，**不能静默返回未过滤的清单**（以前中文值会被忽略，传说件混进"异域"答案里） |
+| 只给优先级、不给任何硬目标（组合规模大的职业） | `intent="recommend"`/`"find"`（如术士） | 规模超限时**立刻**返回：`not_computed.precision="not_computed"` + 收窄建议（指定金装／减少目标／`farm_target`／调高上限），**不是超时、也不是"无解"**；`results`/`builds` 为空数组 |
 | 我的武器列表有没有被护甲改动波及 | `intent="get", item_type="weapon"` | 武器行**不带** `slot`/`slot_display`，`bucket_type` 照旧 |
 | 同一件护甲在三个地方叫什么 | 列表 / `intent="item"` / `farm_target` 的 `replacement_slot` | 都用 `helmet`/`gauntlets`/`chest`/`legs`/`class_item`；求解器内部的复数名（`helmets`）旁边会补 `slot_key`，不要让调用方自己写映射 |
 

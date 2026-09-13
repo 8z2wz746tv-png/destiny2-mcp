@@ -8,6 +8,7 @@ cannot be met. It also suggests farming activities for each stat.
 from __future__ import annotations
 
 from .. import config
+from ..exceptions import BuildTooLargeError
 from ..logging_config import get_logger
 from .models import (
     STAT_NAMES,
@@ -58,6 +59,43 @@ def estimate_combinations(
     return total, counts
 
 
+def ensure_within_combination_limit(
+    snapshot: InventorySnapshot,
+    constraints: BuildConstraints,
+) -> None:
+    """规模超限就抛 `BuildTooLargeError`：**先给怎么收窄**，而不是让调用方等到超时。
+
+    与 `analyze` 共用同一个估算函数和同一句说明，两条路的建议不会漂移。
+    """
+    total, counts = estimate_combinations(snapshot, constraints)
+    limit = config.BUILD_MAX_COMBINATIONS
+    if limit > 0 and total > limit:
+        logger.info(
+            "Combination estimate %s exceeds limit %s; refusing to enumerate", total, limit
+        )
+        raise BuildTooLargeError(too_large_reason(total, counts, limit))
+
+def narrowing_actions() -> list[str]:
+    """规模超限时可以怎么收窄（工具层的 next_actions 用同一份，避免两处说法漂移）。"""
+    return [
+        "指定一件金装：该部位直接锁成它，收窄最明显。",
+        "减少属性目标，或只留最在意的一两项。",
+        "只想补某一个部位，用 build_assistant(intent=\"farm_target\") 反推那一件。",
+        "确实要跑，把 DESTINY_BUILD_MAX_COMBINATIONS 设为 0 或调高上限后重试。",
+    ]
+
+
+def too_large_reason(total: int, counts: list[int], limit: int) -> str:
+    """组合规模超限时的统一说明（analyze 与 recommend/find 共用同一句话）。"""
+    return (
+        f"这次分析的组合规模太大（各部位 {counts[0]}/{counts[1]}/{counts[2]}/"
+        f"{counts[3]}/{counts[4]} 件，预估约 {total:,} 种组合，超过上限 {limit:,}），"
+        "没有做精确的属性上限推算。可以这样收窄：①指定一件金装（该部位直接锁成它，"
+        "收窄最明显）；②减少属性目标，或只留最在意的一两项；③只想补某一个部位，"
+        "用 intent=\"farm_target\" 反推那一件；④确实要跑精确分析，把 "
+        "DESTINY_BUILD_MAX_COMBINATIONS 设为 0 或调高上限后重试。"
+    )
+
 def analyze(
     snapshot: InventorySnapshot,
     constraints: BuildConstraints,
@@ -81,17 +119,7 @@ def analyze(
             "Analyzer: combination estimate %s exceeds limit %s; returning early", total, limit
         )
         return BuildAnalysis(
-            reason=(
-                f"这次分析的组合规模太大（各部位 {counts[0]}/{counts[1]}/{counts[2]}/"
-                f"{counts[3]}/{counts[4]} 件，预估约 {total:,} 种组合，超过上限 {limit:,}），"
-                "没有做精确的属性上限推算。可以这样收窄：①指定一件金装（该部位直接锁成它，"
-                "收窄最明显）；②减少属性目标，或只留最在意的一两项；③只想补某一个部位，"
-                "用 intent=\"farm_target\" 反推那一件；④确实要跑精确分析，"
-                "把 DESTINY_BUILD_MAX_COMBINATIONS 设为 0 或调高上限后重试。"
-            ),
-            max_possible={},
-            precision="not_computed",
-            suggested_farm=[],
+            reason=too_large_reason(total, counts, limit),
         )
 
     max_possible = _max_possible_stats(snapshot, constraints)

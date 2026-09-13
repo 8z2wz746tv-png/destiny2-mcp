@@ -158,3 +158,25 @@ async def test_legacy_piece_gets_a_plain_language_warning() -> None:
     assert armor["identity"]["armor_system"] == "legacy"
     assert armor["identity"]["gear_tier"] is None
     assert any("老护甲" in warning for warning in result["warnings"])
+
+
+def test_display_fields_never_leak_into_canonical_build() -> None:
+    """canonical_build 是要原样回传的可执行载荷：展示字段一律不进去。"""
+    from destiny_mcp.tools._armor_branches import with_slot_keys
+
+    payload = {
+        "builds": [{
+            "canonical_build": {"items": [{"slot": "helmet", "item_instance_id": "1"}]},
+            "items": [{"slot": "helmets", "item_instance_id": "1"}],
+        }],
+        "recommendation": {"results": [{"build": {"items": [{"slot": "chests"}]}}]},
+    }
+
+    enriched = with_slot_keys(payload)
+
+    canonical_item = enriched["builds"][0]["canonical_build"]["items"][0]
+    assert "slot_key" not in canonical_item and "slot_display" not in canonical_item, (
+        "canonical_build 里不许出现展示字段"
+    )
+    assert enriched["builds"][0]["items"][0]["slot_key"] == "helmet", "其它位置照旧补键"
+    assert enriched["recommendation"]["results"][0]["build"]["items"][0]["slot_key"] == "chest"

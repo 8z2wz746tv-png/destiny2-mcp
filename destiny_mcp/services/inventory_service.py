@@ -32,6 +32,16 @@ MISSING_INVENTORY_SCOPE_MESSAGE = (
     "当前只读到了已装备装备，不能判断仓库或角色背包是否为空。"
 )
 
+# 稀有度：英文键 → Manifest 的 tierType（6 异域 / 5 传说 / 4 稀有）
+_RARITY_ALIASES: dict[str, int] = {
+    "exotic": 6,
+    "异域": 6,
+    "legendary": 5,
+    "传说": 5,
+    "rare": 4,
+    "稀有": 4,
+}
+
 _INVENTORY_ITEM_TYPE_ALIASES = {
     "": None,
     "all": "all",
@@ -183,20 +193,21 @@ class InventoryService:
             if target_bucket:
                 result = [i for i in result if i.bucket_type == target_bucket]
 
-        # Filter by rarity (tier)
-        if rarity and rarity.lower() not in ("all", ""):
-            tier_map = {
-                "exotic": 6,
-                "legendary": 5,
-                "rare": 4,
-            }
-            target_tier = tier_map.get(rarity.lower())
-            if target_tier is not None:
-                # Need to look up tier from manifest
-                result = [
-                    i for i in result
-                    if self._get_item_tier(i.item_hash) == target_tier
-                ]
+        # Filter by rarity (tier)。封闭词表：认不出来就报错，不能当成"没传"。
+        # 以前只映射英文，传"异域"会安静地返回未过滤的清单 —— 而参数说明里写着中文可用，
+        # 调用方会以为筛过了，把传说件当异域答。
+        if rarity and rarity.strip().lower() not in ("all", "", "全部"):
+            key = rarity.strip().lower()
+            target_tier = _RARITY_ALIASES.get(key)
+            if target_tier is None:
+                raise InvalidArgumentError(
+                    f"rarity={rarity!r} 不受支持。可用：exotic/legendary/rare"
+                    "（也认 异域/传说/稀有）。不传或传 all = 不筛。"
+                )
+            result = [
+                i for i in result
+                if self._get_item_tier(i.item_hash) == target_tier
+            ]
 
         return result
 
