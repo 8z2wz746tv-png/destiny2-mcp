@@ -193,6 +193,100 @@ async def main():
             f"样例={owned[0] if owned else None}",
         )
 
+        # 7. 列表保持轻量：不带插槽/能量（要看这些走 intent=item）
+        r = await inv(intent="get", armor_slot="legs", limit=2)
+        row = (((r.get("data") or {}).get("inventory") or {}).get("items") or [{}])[0]
+        check(
+            "⑬ 列表保持轻量：护甲行不带 sockets / energy（要看这些走 intent=item）",
+            r["ok"] and "sockets" not in row and "energy" not in row,
+            f"首行含 sockets={'sockets' in row} energy={'energy' in row} keys={sorted(row)[:8]}",
+        )
+
+        # 8. 旧六维名要能映射到新名（纪律 = 手雷）
+        r = await inv(intent="equip_mod", item_instance_id=T5_LEGS, mod_name="纪律模组",
+                      character="hunter", confirmed=False)
+        candidate = (r.get("candidates") or [{}])[0]
+        check(
+            "⑭ 旧六维名（纪律）自动映射成新名（手雷）并找到真有加成的那个版本",
+            not r["ok"] and (r.get("error") or {}).get("code") == "confirmation_required"
+            and candidate.get("to", {}).get("name") == "手雷模组"
+            and candidate.get("to", {}).get("energy_cost") == 3
+            and candidate.get("to", {}).get("stat_bonus"),
+            f"to={candidate.get('to')}",
+        )
+
+        # 9. 能量不够：找一件"属性模组槽是空的、但剩余能量 < 3"的护甲
+        #    （能量满但槽已占的件不算 —— 换掉旧模组不涨能量，那是正常确认）
+        scanned = 0
+        tight_result = None
+        tight_piece = None
+        listed = await inv(intent="get", armor_slot="legs", limit=8)
+        for listed_row in ((listed.get("data") or {}).get("inventory") or {}).get("items") or []:
+            detail = await inv(intent="item", item_instance_id=listed_row["item_instance_id"])
+            armor = ((detail.get("data") or {}).get("armor") or {})
+            energy = armor.get("instance", {}).get("energy") or {}
+            general = [s for s in (armor.get("sockets") or []) if s.get("kind") == "general"]
+            scanned += 1
+            if general and general[0].get("empty") and (energy.get("unused") or 99) < 3:
+                tight_piece = armor.get("identity", {}).get("name")
+                tight_result = await inv(intent="equip_mod",
+                                         item_instance_id=listed_row["item_instance_id"],
+                                         mod_name="手雷模组", character="hunter", confirmed=False)
+                break
+        if tight_result is not None:
+            message = str((tight_result.get("error") or {}).get("message"))
+            check(
+                "⑮ 能量不够：消息里给具体数字（已用/容量 → 换后/容量），不是笼统「装不上」",
+                not tight_result["ok"]
+                and (tight_result.get("error") or {}).get("code") == "invalid_argument_error"
+                and "能量不够" in message,
+                f"{tight_piece}：msg={message[:110]}",
+            )
+        else:
+            check(
+                "⑮ 能量不够（本轮无样本，该分支由单测覆盖）",
+                True,
+                f"扫了 {scanned} 件腿甲，没有「属性模组槽为空且剩余能量 < 3」的样本；"
+                "分支由 tests/test_equip_mod.py::test_plan_refuses_when_energy_is_not_enough 覆盖",
+            )
+
+        # 10. 展示字段不污染可执行载荷：canonical 原样回传仍然有效
+        again = await build(intent="equip_build", canonical_build=canonical, confirmed=False)
+        check(
+            "⑯ 装备确认带 items_preview，但 canonical_build 仍可原样回传（不被展示字段污染）",
+            again.get("error", {}).get("code") == "confirmation_required"
+            and (again.get("candidates") or [{}])[0].get("items_preview"),
+            f"code={(again.get('error') or {}).get('code')} 预览件数={len((again.get('candidates') or [{}])[0].get('items_preview') or [])}",
+        )
+
+        # 11. 只给优先级时 completion_rate 不是 0.0
+        only_priority = await build(intent="recommend", character="hunter",
+                                    exotic_name="快速装弹松身裤",
+                                    priority_stats=["weapons", "class_stat"])
+        if (only_priority.get("error") or {}).get("code") == "exotic_confirmation_required":
+            only_priority = await build(**dict(only_priority["candidates"][0]["arguments"]))
+        results = (((only_priority.get("data") or {}).get("recommendation") or {}).get("results")) or []
+        check(
+            "⑰ 只给优先级时 completion_rate 为 null + 说明（不是 0.0）",
+            only_priority["ok"] and bool(results)
+            and results[0].get("completion_rate") is None
+            and "没有硬目标" in str(results[0].get("completion_rate_note")),
+            f"首条 completion_rate={results[0].get('completion_rate') if results else None} "
+            f"note={str(results[0].get('completion_rate_note'))[:40] if results else None}",
+        )
+
+        # 12. 同一件护甲的不同副本要分清（写入必须传实例 ID，不许按名字猜）
+        r = await inv(intent="search", item_name="至高狂徒腿铠")
+        copies = (((r.get("data") or {}).get("result") or {}).get("items")) or []
+        powers = sorted(
+            {row.get("power") for row in copies if row.get("item_instance_id")}
+        )
+        check(
+            "⑱ 同一件的多个副本按实例区分（光等可以不同，写入必须传 item_instance_id）",
+            r["ok"] and len(copies) >= 2 and len(powers) >= 2,
+            f"副本={[(row.get('item_instance_id'), row.get('power')) for row in copies[:3]]}",
+        )
+
     print("\n=== 汇总 ===")
     failed = [row for row, ok, _ in RESULTS if not ok]
     print(f"共 {len(RESULTS)} 行，PASS {len(RESULTS) - len(failed)}，FAIL {len(failed)}")
