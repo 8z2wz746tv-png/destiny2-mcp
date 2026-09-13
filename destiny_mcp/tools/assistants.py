@@ -22,6 +22,7 @@ from ._build_confirmation import (
 )
 from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
+from . import _armor_branches as armor_branches
 from . import _weapon_branches as weapon_branches
 from ._enrichment import community_enrichment, community_read
 from ._farming import farming_reference as _farming_reference
@@ -264,6 +265,9 @@ async def inventory_assistant(
             },
             warnings=result["warnings"],
         )
+
+    if intent == "item":
+        return await armor_branches.armor_item(svc, resolved, item_instance_id)
 
     if intent in {"get", "inventory", "list"}:
         # 传 0/负数 = 没指定 → 回到默认上限（项目统一约定），要更多用 offset 翻页。
@@ -974,28 +978,10 @@ async def build_assistant(
         )
 
     if intent == "exotic_armor":
-        if exotic_name:
-            return ok_response("已读取异域护甲详情。", {
-                "armor": svc["manifest_query_svc"].get_exotic_armor_details(exotic_name),
-                "community_references": _community_enrichment(
-                    svc.get("starside_svc"), exotic_name, "armor"
-                ),
-            })
-        return ok_response("已读取异域护甲列表。", {
-            "armor": svc["manifest_query_svc"].get_exotic_armor_list(character)
-        })
+        return armor_branches.exotic_armor(svc, character, exotic_name)
 
     if intent == "set_bonus":
-        if set_bonus_name:
-            return ok_response("已读取套装效果。", {
-                "set_bonus": svc["set_bonus_svc"].lookup_armor_set(set_bonus_name),
-                "community_references": _community_enrichment(
-                    svc.get("starside_svc"), set_bonus_name, "armor"
-                ),
-            })
-        return ok_response("已读取套装效果列表。", {
-            "set_bonuses": svc["set_bonus_svc"].list_all_set_bonuses()
-        })
+        return armor_branches.set_bonus(svc, set_bonus_name)
 
     return error_response("unsupported_intent", f"build_assistant 不支持 intent={intent!r}。")
 

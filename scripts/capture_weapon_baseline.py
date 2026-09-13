@@ -73,6 +73,13 @@ ARMOR_CASES: list[tuple[str, object]] = [
     ("armor_get_exotic", "inventory_assistant", {"intent": "get", "armor_slot": "legs", "rarity": "异域", "limit": 2}),
     ("armor_get_vault", "inventory_assistant", {"intent": "get", "location": "vault", "armor_slot": "class_item", "limit": 2}),
     ("armor_search", "inventory_assistant", {"intent": "search", "item_name": "至高狂徒腿铠"}),
+    # 单件详情：T5（有词条/调谐/能量）与老护甲（15 槽、无词条原型）各一件
+    ("armor_item_t5", "inventory_assistant", {
+        "intent": "item", "item_instance_id": "6917530198796768597",
+    }),
+    ("armor_item_legacy", "inventory_assistant", {
+        "intent": "item", "item_instance_id": "6917529740500777594",
+    }),
     ("inventory_summary", "inventory_assistant", {"intent": "summary"}),
     ("exotic_armor_list", "build_assistant", {"intent": "exotic_armor", "character": "hunter"}),
     ("exotic_armor_detail", "build_assistant", {"intent": "exotic_armor", "character": "hunter", "exotic_name": "快速装弹松身裤"}),

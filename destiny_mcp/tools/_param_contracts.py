@@ -80,6 +80,8 @@ def _contract(
 _INV_DUPLICATES = ("duplicates", "duplicate_weapons", "find_duplicates", "重复武器")
 _INV_SUMMARY = ("summary", "summarize", "概况")
 _INV_GET = ("get", "inventory", "list")
+# 单件详情：只看一件护甲的完整载荷（插槽/能量/三层属性），不参与列清单的参数
+_INV_ITEM = ("item",)
 _INV_TYPE = ("type", "search_type")
 # ── weapon_assistant ────────────────────────────────────────────────────────
 _W_CATALOG = ("catalog", "search_catalog", "all_weapons", "global", "search_all")
@@ -138,14 +140,16 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ),
     ("inventory_assistant", "item_instance_id"): _contract(
         _only(
+            *_INV_ITEM,
             "move", "transfer", "equip", "pull_postmaster",
             "lock", "track_quest", "quest_tracking",
         ),
         hint=(
-            '读某个副本当前 Perk 用 weapon_assistant(intent="compare", weapon_name=..., '
+            '读某件护甲的完整载荷（插槽/能量/三层属性）用 intent="item" + item_instance_id；'
+            '读某个武器副本当前 Perk 用 weapon_assistant(intent="compare", weapon_name=..., '
             'item_instance_id=...)；移动/装备/锁定/取回分别用 intent="move"/"equip"/"lock"/"pull_postmaster"。'
         ),
-        suggestion=("weapon_assistant", "compare"),
+        suggestion=("inventory_assistant", "item"),
     ),
     ("inventory_assistant", "item_instance_ids"): _contract(
         _only("equip_many", "equip_items"),

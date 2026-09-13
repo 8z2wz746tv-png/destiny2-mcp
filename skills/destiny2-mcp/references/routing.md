@@ -46,6 +46,7 @@
 | --- | --- | --- |
 | `summary`（`summarize`、`概况`） | 背包／仓库数量概况 | `location`、`item_type`、`limit` |
 | `get`（`inventory`、`list`） | 列出物品清单 | `location`、`item_type`、`armor_slot`、`rarity` |
+| `item` | 单件护甲的完整载荷：插槽（含 `editable`）、能量、三层属性（`roll`/`base`/`final`）、大师与调谐、词条原型、套装 | `item_instance_id`（必填） |
 | `search`（`find_item`） | 按名字找某件东西 | `item_name`、`location` |
 | `type`（`search_type`） | 按类型列物品 | `type_name`（或 `item_type`）、`location` |
 | `duplicates`（`duplicate_weapons`、`find_duplicates`、`重复武器`） | 按精确 `item_hash` 分组出重复武器 | `item_name`、`type_name`、`limit`、`offset` |
@@ -274,7 +275,7 @@ Manifest 侧（**不代表拥有**）：
 | `include_inventory` | `build_assistant`：`community`、`community_build`、`starside`；`weapon_assistant`：`analyze`、`filter_rolls` |
 | `include_invisible` | `world_assistant`：`collectible_node` |
 | `include_subclass_fragment` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
-| `item_instance_id` | `inventory_assistant`：`equip`、`lock`、`move`、`pull_postmaster`、`quest_tracking`、`track_quest`、`transfer`；`weapon_assistant`：`compare`、`compare_duplicates` |
+| `item_instance_id` | `inventory_assistant`：`equip`、`item`、`lock`、`move`、`pull_postmaster`、`quest_tracking`、`track_quest`、`transfer`；`weapon_assistant`：`compare`、`compare_duplicates` |
 | `item_instance_ids` | `inventory_assistant`：`equip_items`、`equip_many` |
 | `item_name` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`find_item`、`move`、`search`、`重复武器`；`world_assistant`：`collectible_item`、`community` |
 | `item_type` | `inventory_assistant`：`get`、`inventory`、`list`、`search_type`、`summarize`、`summary`、`type`、`概况` |

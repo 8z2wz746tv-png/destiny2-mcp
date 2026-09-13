@@ -12,7 +12,7 @@ from ._responses import error_response
 PlayerIntent = Literal["profile", "get_profile", "角色", "档案", "search", "search_player", "find", "find_players", "fuzzy"]
 InventoryIntent = Literal[
     "summary", "summarize", "概况", "duplicates", "duplicate_weapons", "find_duplicates", "重复武器",
-    "get", "inventory", "list", "search", "find_item", "type", "search_type", "move", "transfer",
+    "get", "inventory", "list", "item", "search", "find_item", "type", "search_type", "move", "transfer",
     "equip", "equip_many", "equip_items", "pull_postmaster", "lock", "track_quest", "quest_tracking",
 ]
 WeaponIntent = Literal[

@@ -6,7 +6,12 @@ Extracted from server.py per Rule 1: tools should not contain business logic.
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
-from ..exceptions import AuthenticationError, ConfigError, ItemNotFoundError
+from ..exceptions import (
+    AuthenticationError,
+    ConfigError,
+    InvalidArgumentError,
+    ItemNotFoundError,
+)
 from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
@@ -343,6 +348,52 @@ class InventoryService:
             )
         return found
 
+    async def get_armor_item(
+        self,
+        player_name: str,
+        item_instance_id: str,
+    ) -> dict:
+        """取一件护甲的原始组件，够 `armor_payload` 拼出完整载荷。
+
+        和 `find_item` 的区别：那条路用的是轻量组件集（没有插槽），够列清单、不够回答
+        "这件现在装了什么、能量还剩多少"。这里按护甲快照的组件集取，并额外回报它在
+        哪个容器里（仓库/角色）。
+
+        Raises:
+            PlayerNotFoundError: 玩家名解析失败。
+            ItemNotFoundError: 这件实例不在账号里（可能已分解或转移）。
+        """
+        if not item_instance_id.strip():
+            raise InvalidArgumentError("必须提供 item_instance_id（护甲实例 ID）。")
+        logger.info("Reading armor item instance: %s", item_instance_id)
+        _, profile = await self._resolve_and_fetch(
+            player_name, _ARMOR_SNAPSHOT_COMPONENTS
+        )
+        located = _locate_instance(profile, item_instance_id)
+        if located is None:
+            raise ItemNotFoundError(
+                item_instance_id,
+                "It may have been moved or dismantled.",
+            )
+        item, location, character_id = located
+        components = profile.get("itemComponents") or {}
+        instances = (components.get("instances") or {}).get("data") or {}
+        sockets = (components.get("sockets") or {}).get("data") or {}
+        stats = (components.get("stats") or {}).get("data") or {}
+        return {
+            "item": item,
+            "definition": self._manifest.get_item_definition(item.get("itemHash", 0)) or {},
+            "instance": instances.get(item_instance_id) or {},
+            "sockets": (sockets.get(item_instance_id) or {}).get("sockets") or [],
+            "stats": (stats.get(item_instance_id) or {}).get("stats") or {},
+            "location": location,
+            "character_id": character_id,
+            "bucket": self._manifest.bucket_name(
+                ((self._manifest.get_item_definition(item.get("itemHash", 0)) or {})
+                 .get("inventory") or {}).get("bucketTypeHash", 0)
+            ),
+        }
+
     # ── Armor Snapshot (Build Engine) ─────────────────────────────────
 
     async def get_armor_snapshot(self, player_name: str, character_class: str = "") -> InventorySnapshot:
@@ -465,6 +516,33 @@ class InventoryService:
                 f"有 {incomplete} 件候选护甲缺少实例、属性或插槽数据，"
                 "已停止配装计算，避免把缺失值当成 0。"
             )
+
+
+def _locate_instance(
+    profile: dict, item_instance_id: str
+) -> tuple[dict, str, str] | None:
+    """在仓库/角色背包/已装备里找一件实例，返回 (item, 位置, 角色 ID)。"""
+    containers: list[tuple[str, str, list]] = [
+        ("vault", "", ((profile.get("profileInventory") or {}).get("data") or {}).get("items") or []),
+    ]
+    for char_id, inv in (((profile.get("characterInventories") or {}).get("data")) or {}).items():
+        containers.append((_character_location(profile, char_id), char_id, (inv or {}).get("items") or []))
+    for char_id, eq in (((profile.get("characterEquipment") or {}).get("data")) or {}).items():
+        containers.append((_character_location(profile, char_id), char_id, (eq or {}).get("items") or []))
+    for location, char_id, items in containers:
+        for item in items:
+            if str(item.get("itemInstanceId") or "") == item_instance_id:
+                return item, location, char_id
+    return None
+
+
+_CLASS_LOCATION = {0: "titan", 1: "hunter", 2: "warlock"}
+
+
+def _character_location(profile: dict, character_id: str) -> str:
+    characters = ((profile.get("characters") or {}).get("data")) or {}
+    entry = characters.get(character_id) or {}
+    return _CLASS_LOCATION.get(entry.get("classType"), "character")
 
 
 def require_complete_inventory_components(profile: dict) -> None:

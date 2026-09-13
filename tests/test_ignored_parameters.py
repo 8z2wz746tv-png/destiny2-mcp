@@ -86,6 +86,7 @@ BASELINE: dict[tuple[str, str], dict[str, Any]] = {
     ("weapon_assistant", "perk_selection"): {"weapon_name": "测试武器"},
     ("weapon_assistant", "selection"): {"weapon_name": "测试武器"},
     ("weapon_assistant", "usage_rates"): {"weapon_name": "测试武器"},
+    ("inventory_assistant", "item"): {"item_instance_id": "示例实例"},
     ("build_assistant", "equip_build"): {"canonical_build": _canonical(CANONICAL_PROBE)},
     ("loadout_assistant", "save"): {"name": "测试配装", "character": "hunter"},
     ("loadout_assistant", "delete"): {"loadout_id": "local:1"},
