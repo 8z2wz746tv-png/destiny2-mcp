@@ -8,7 +8,7 @@
 | 层 | 跑什么 | 什么时候跑 |
 | --- | --- | --- |
 | **L1 自动化**（不需要账号） | `pytest -q`（1272 条）／`scripts/verify_mcp.py`／`tests/agent_behavior_cases.yaml`（路由） | 每次提交 |
-| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节逐行断言）／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（26 例基线） | 改动武器响应后 |
+| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 12 行）／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 19 例基线） | 改动武器或护甲响应后 |
 | **L2 冒烟**（本文件带 ⭐ 的行，约 20 条） | 真机逐条调用 | 每轮回归开始时跑一遍 |
 | **L3 补测**（本文件其余行） | 真机逐条调用 | **只在该工具被改动时**跑它那一章 |
 
@@ -312,6 +312,24 @@
 一轮回归里默认**不做任何写入**。
 
 ---
+
+## 十六、护甲：槽位、T 级与换模组
+
+护甲的字段级断言由 `scripts/run_corpus_armor_rows.py` 逐行实跑（12 行）；这里写"该看到什么"。
+
+| 说什么 | 期望路由 | 验收点 |
+| --- | --- | --- |
+| 我有哪些腿部护甲 | `inventory_assistant(intent="get", armor_slot="legs")` | 每件带 `slot="legs"`、`slot_display="腿部护甲"`、`gear_tier`、`armor_system`；`bucket_type` 保留（武器行也在用它） |
+| 这件护甲现在装了什么 | `intent="item"` + `item_instance_id` | 三层属性：`roll`（词条本体）/`base`/`final`；`stats.notes` 说明算不出来的原因；`armor_3` 的 `base == roll` |
+| 这是 T 几 | 同上 `identity.gear_tier` | **`null` = 没有 T 级**（老护甲，15 槽布局），配 `gear_tier_note`；不能读成 T0，也不能说成"数据丢了" |
+| 哪些槽能换 | 同上 `sockets[]` | 每槽带 `kind`/`editable`/`energy_cost`；**词条本体槽（kind=roll）与 intrinsic 标 `editable=false`**，不要提议改它们 |
+| 把槽 0 换成手雷模组 | `intent="equip_mod"` + `mod_name` + `character`，`confirmed=false` | 确认请求带 `from`/`to`（含 `stat_bonus`）/`energy` 与一句中文摘要；**服务层未被写入** |
+| 把腿甲模组装到腿甲上／装到别的部位 | 同上 | 装得下 → 确认请求；装错部位 → `invalid_argument_error` 说"没有该插槽"；不在该角色身上 → 让调用方先 `move` |
+| 我这套配不出来，差在哪 | `build_assistant(intent="find")` 无解 | `ladder`：`shortfall`（差多少）、`ceiling`（**同时**能达到的上限，实采）、`single_stat_ceiling`（单项上限，别混）、`trials`（逐级放松试过哪些档）、`suggestion`（最小可行降档，**只是提议**） |
+| 这套穿上会换成什么 | `build_assistant(intent="equip_build")`，`confirmed=false` | `candidates[0].items_preview` 五件齐全，逐件给光等/能量/现有模组/将要装的模组；`canonical_build` 保持可原样回传（展示字段不塞进去） |
+
+**已知边界**：只对 **T5** 建模词条反推（T1–T4 与老护甲明确说"不支持反推 + 原因"）；
+待刷的虚拟件没有能量数据，`energy` 为 `null` 而不是 0。
 
 ## 已知问题（测到这些不算新 bug）
 

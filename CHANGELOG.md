@@ -2,6 +2,32 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.1.3 — 2026-09-13
+
+**护甲：统一格式 + 换单个模组 + 无解时的六维阶梯。**
+
+以前护甲在六个地方出没、字段各不相同，而且**换不了单个模组**（默认工具面里没有写入入口，
+legacy `apply_mod` 又不确认直接改账号）。这一版按 `ARMOR_FORMAT_PLAN.md` 的 P0–P6 做完：
+
+- **统一载荷**（`ArmorPayload`）：`identity`（`slot`/`slot_display`/`gear_tier`/`archetype`/套装）+
+  `instance`（光等/位置/能量/大师/调谐）+ **三层属性** `roll`/`base`/`final` + 插槽清单。
+  列表保持轻量（只加 `slot`/`slot_display`/`gear_tier`/`armor_system`，`bucket_type` 保留），
+  要看插槽走新 intent。
+- **新 intent `inventory_assistant(intent="item")`**：单件护甲的完整载荷。词条本体槽与
+  `intrinsics` 标 `editable=false`。
+- **新 intent `inventory_assistant(intent="equip_mod")`**：换一个模组。`confirmed=false` 给
+  「哪件护甲、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写；校验实例在不在该角色身上、
+  该槽收不收这个模组、能量够不够。**legacy `apply_mod` 收编**到同一条确认路。
+- **无解时的 `ladder`**：`shortfall`（差多少）、`ceiling`（同一套约束下**同时**能达到的上限，
+  实采）、`single_stat_ceiling`（单项上限，两者不能混）、`trials`（逐级放松试了哪些档）、
+  `suggestion`（最小可行降档，**只是提议**，不自动降目标）。
+- **装备确认逐件预览**：`candidates[0].items_preview` 给五件的光等/能量/现有模组/将要装的模组。
+- 实机勘测修掉的两个真问题：老护甲也带 `gearTier: 0`（按字段分族会误判成 3.0）；
+  异域护甲的固定属性分布在 `intrinsics` 里（不算进 `roll` 会把大师等级算成 30）。
+- 文档：`routing.md` 补护甲统一键口径、`find` vs `recommend` 分工（**要装备走 `find`**）、
+  `ladder` 读法；`TESTING_CORPUS.md` 新增「十六、护甲」章与逐行脚本
+  `scripts/run_corpus_armor_rows.py`（12 行）；护甲基线 19 例（`--surface armor`）。
+
 ## 0.1.2 — 2026-09-13
 
 **装给正在跟你说话的那个 Agent。**
