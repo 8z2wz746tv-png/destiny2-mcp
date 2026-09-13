@@ -151,3 +151,110 @@ def test_installed_payload_has_no_absolute_paths(name: str) -> None:
 
     assert str(Path.home()) not in text
     assert "/Users/" not in text
+
+
+def test_dsh_is_a_known_host_with_the_documented_roots() -> None:
+    """DeepSeek Harness 的技能根是 `~/.dsh/skills`（DSH 文档里的 user-dsh 行）。"""
+    dsh = [host for host in installer._hosts() if host.name == "dsh"]
+    assert dsh, "install_skill 不认识 dsh 宿主"
+    host = dsh[0]
+    assert host.skills == "skills"
+    assert host.root.name == ".dsh"
+    assert host.mcp == "dsh-patch"
+
+
+def test_running_host_is_detected_from_the_environment(monkeypatch) -> None:
+    """默认装到"正在说话的那个宿主"，靠环境变量认出来。"""
+    for marker in ("DSH_HOME", "DSH_SHELL", "DSH_SESSION_ID",
+                   "CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT",
+                   "CODEX_HOME", "CODEX_SANDBOX"):
+        monkeypatch.delenv(marker, raising=False)
+
+    assert installer._running_host() is None
+
+    monkeypatch.setenv("DSH_HOME", "/tmp/dsh-home")
+    assert installer._running_host().name == "dsh"
+
+    monkeypatch.delenv("DSH_HOME")
+    monkeypatch.setenv("CLAUDECODE", "1")
+    assert installer._running_host().name == "claude"
+
+
+def test_select_hosts_prefers_the_running_host(monkeypatch) -> None:
+    """没有 --all / --host 时不能把 Codex、Claude 都铺一遍。"""
+    monkeypatch.setenv("DSH_HOME", "/tmp/dsh-home")
+    selected = installer._select_hosts(explicit=None, install_all=False)
+    assert [host.name for host in selected] == ["dsh"]
+
+    monkeypatch.setenv("CLAUDECODE", "1")
+    # DSH 会话里会同时设好几个标记，只删 DSH_HOME 不够
+    for marker in ("DSH_HOME", "DSH_SHELL", "DSH_SESSION_ID"):
+        monkeypatch.delenv(marker, raising=False)
+    assert [host.name for host in installer._select_hosts(explicit=None, install_all=False)] == ["claude"]
+
+    # 显式指定优先于"当前宿主"
+    assert [host.name for host in installer._select_hosts(explicit="codex", install_all=False)] == ["codex"]
+
+    # --all 才是"都装"（这里只断言包含 dsh，不依赖本机有哪些目录）
+    every = [host.name for host in installer._select_hosts(explicit=None, install_all=True)]
+    assert "dsh" in every
+
+
+def test_unknown_host_is_rejected(monkeypatch) -> None:
+    monkeypatch.setenv("DSH_HOME", "/tmp/dsh-home")
+    with pytest.raises(SystemExit, match="未知宿主"):
+        installer._select_hosts(explicit="not-a-host", install_all=False)
+
+
+def test_dsh_patch_block_is_marked_and_complete(tmp_path: Path) -> None:
+    block = installer.dsh_patch_block(tmp_path)
+
+    assert installer.DSH_PATCH_BEGIN in block and installer.DSH_PATCH_END in block
+    assert "serverName: destiny" in block
+    assert f"command: {tmp_path.resolve() / '.venv' / 'bin' / 'destiny-mcp'}" in block
+    assert f"DESTINY_MCP_ROOT: {tmp_path.resolve()}" in block
+    assert "toolCallTimeoutMs: 180000" in block
+
+    import yaml
+
+    parsed = yaml.safe_load(block.split("\n", 3)[3] if False else "\n".join(
+        line for line in block.splitlines()
+        if not line.startswith("# destiny2-mcp:mcp-begin") and not line.startswith("# destiny2-mcp:mcp-end")
+    ))
+    assert parsed[0]["insert"][0]["id"] == "mcp-destiny"
+
+
+def test_dsh_mcp_registration_is_idempotent(tmp_path: Path, monkeypatch, capsys) -> None:
+    """重复运行只能有一条 mcp-destiny；两条会让后一条加载失败。"""
+    profile = tmp_path / "profiles" / "web"
+    profile.mkdir(parents=True)
+    patch = profile / "cordis.patch.yml"
+    patch.write_text("[]\n", encoding="utf-8")
+    monkeypatch.setattr(installer, "_dsh_profile_dir", lambda: profile)
+
+    assert installer.install_dsh_mcp(tmp_path / "repo", dry_run=False) is True
+    first = patch.read_text(encoding="utf-8")
+    assert first.count("mcp-destiny") == 1
+
+    installer.install_dsh_mcp(tmp_path / "repo", dry_run=False)
+    second = patch.read_text(encoding="utf-8")
+    assert second == first
+    assert second.count("mcp-destiny") == 1
+    assert "已是最新" in capsys.readouterr().out
+
+    # dry-run 一个字节都不写
+    installer.install_dsh_mcp(tmp_path / "repo", dry_run=True)
+    assert patch.read_text(encoding="utf-8") == first
+
+
+def test_other_hosts_get_a_paste_ready_command(tmp_path: Path) -> None:
+    """不方便替用户改配置的宿主：给一条能直接粘的命令，而不是静默写它的配置。"""
+    hosts = {host.name: host for host in installer._hosts()}
+    claude = installer.mcp_registration_hint(hosts["claude"], tmp_path)
+    codex = installer.mcp_registration_hint(hosts["codex"], tmp_path)
+
+    assert claude.startswith("claude mcp add destiny")
+    assert codex.startswith("codex mcp add destiny")
+    for hint in (claude, codex):
+        assert str(tmp_path.resolve()) in hint
+        assert "destiny-mcp" in hint

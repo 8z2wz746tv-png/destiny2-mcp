@@ -108,7 +108,37 @@ Have the user paste the full callback URL into the local terminal prompt, not in
 
 If changing the callback port, update both the Bungie application and `DESTINY_OAUTH_REDIRECT_URI`. When that environment variable is set, do not assume `--port` overrides it.
 
-## 5. Register the stdio server with Codex
+## 5. Register the stdio server with the host that is running you
+
+**Register into the agent the user is actually talking to, not into every agent on the machine.**
+Ask which host this is if the environment does not say so; DSH sets `DSH_HOME`, Claude Code sets
+`CLAUDECODE`, Codex sets `CODEX_*`. `scripts/install_skill.py --list` prints the host it detected
+and where it would write; `--host <name>` overrides it.
+
+For DeepSeek Harness (DSH), the registration is a profile patch and the installer can write it
+idempotently:
+
+```bash
+# once per profile, if the MCP client plugin is missing
+(cd "$DSH_HOME/profiles/web" && pnpm add @deepseek-ai/dsh-mcp-client)
+# idempotent: inserts or refreshes one marked entry, backs the file up first
+.venv/bin/python scripts/install_skill.py --mcp
+```
+
+The entry points at this checkout's `.venv/bin/destiny-mcp` with `DESTINY_MCP_ROOT`,
+`DESTINY_MCP_TOOL_PROFILE=normal` and `toolCallTimeoutMs: 180000` (the 60s default is too short for
+the first Manifest load). Tools appear as `mcp__destiny__*` after the harness reloads. The skill
+half needs no restart: DSH discovers `~/.dsh/skills/` live.
+
+For hosts with their own CLI, the installer prints the exact command instead of editing their
+configuration behind the user's back:
+
+```bash
+.venv/bin/python scripts/install_skill.py --host claude --mcp   # prints a `claude mcp add ...` line
+.venv/bin/python scripts/install_skill.py --host codex --mcp    # prints a `codex mcp add ...` line
+```
+
+### Codex, in detail
 
 Inspect an existing entry first:
 

@@ -2,6 +2,27 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.1.2 — 2026-09-13
+
+**装给正在跟你说话的那个 Agent。**
+
+以前的 `install_skill.py` 会把技能铺给**本机探测到的每一个宿主**（Codex、Claude、Cursor…），
+对一个新用户来说这是错的：他是在某个 Agent 里提问，只想让**那个** Agent 用上这套 MCP。
+
+- 默认只装当前宿主，靠环境变量认：`DSH_HOME`/`DSH_SHELL` → dsh、`CLAUDECODE` → claude、
+  `CODEX_*` → codex；认不出来才退回旧行为（已存在的都装）。`--all` 保留全装，
+  `--host <name>` 显式指定，`--list` 会标出"← 当前"。
+- 新增 DeepSeek Harness 宿主：技能根 `~/.dsh/skills/`（DSH 会**热发现**，装完不用重启），
+  全局指令文件 `~/.dsh/AGENTS.md`。
+- 新增 `--mcp`：注册 MCP 服务器。DSH 直接幂等写入 `$DSH_HOME/profiles/web/cordis.patch.yml`
+  （带 `destiny2-mcp:mcp-begin/end` 标记，先备份、重复跑只更新），工具以 `mcp__destiny__*`
+  出现；Claude Code / Codex 只**打印**可以直接粘的 `claude mcp add` / `codex mcp add` 命令，
+  不替用户改它们的配置。
+- README / AGENTS.md / 安装 Skill：把"装给提问的 Agent"写成显式规则，并补上 DSH 的注册步骤。
+
+首次安装的耗时预期也写进了 README：`pip install -e .` 约 5 分钟（下依赖，无进度条）、
+预构建 Manifest 685 MB 约 5 分钟。
+
 ## 0.1.1 — 2026-09-13
 
 **修 P0：干净环境装出来起不来。**

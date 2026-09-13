@@ -27,26 +27,38 @@ Destiny 2 装备管理 MCP Server — 通过 AI Agent 管理武器和装备。
 本项目提供两层 Agent 指引：
 
 - [`destiny2-mcp` 通用 Skill](skills/destiny2-mcp/SKILL.md)：工具路由、证据范围、Starside 配装和确认边界；任何能读取 Markdown 的 Agent 都可以使用。
-- [`destiny-mcp-setup` 安装 Skill](skills/destiny-mcp-setup/SKILL.md)：本地安装、OAuth、MCP 注册和故障排查；注册部分与具体宿主相关，仓库里以 Codex 的命令为例。
+- [`destiny-mcp-setup` 安装 Skill](skills/destiny-mcp-setup/SKILL.md)：本地安装、OAuth、MCP 注册和故障排查。
+
+**装给谁：装给正在跟你说话的那个 Agent。** 你是在 DSH 里问，就装进 DSH；在 Claude Code
+里问，就装进 Claude Code。不需要（也不应该）给每个宿主都铺一遍，更不用把凭据交给任何第三方。
 
 这份文档**不针对任何平台**，但不同宿主的加载能力不一样，所以按能力分三种落点 —— 不按品牌：
 
 | 宿主能力 | 落点 | 怎么做 |
 | --- | --- | --- |
-| 有 skills 目录 | `~/.codex/skills/`、`~/.claude/skills/` 等 | 运行 `scripts/install_skill.py`（自动探测本机已存在的宿主） |
-| 只读全局指令文件 | `~/.codex/AGENTS.md`、`~/.claude/CLAUDE.md` 等 | 加 `--pointer`，写入一段指向文档的指针（幂等，重复跑不会堆积） |
+| 有 skills 目录 | DSH `~/.dsh/skills/`、Claude Code `~/.claude/skills/`、Codex `~/.codex/skills/` 等 | 运行 `scripts/install_skill.py`：**默认只装当前宿主**（靠环境变量认），`--all` 才是全装 |
+| 只读全局指令文件 | DSH `~/.dsh/AGENTS.md`、Claude `~/.claude/CLAUDE.md`、Codex `~/.codex/AGENTS.md` | 加 `--pointer`，写入一段指向文档的指针（幂等，重复跑不会堆积） |
 | 只连 MCP、不读文件 | MCP 握手 `instructions` 里的**线上地址** | 什么都不用做：能联网的客户端可以自己去读 |
 
 ```bash
-.venv/bin/python scripts/install_skill.py --list                  # 看本机探测到哪些宿主、会写到哪里
-.venv/bin/python scripts/install_skill.py --dry-run               # 先看会改哪些文件
-.venv/bin/python scripts/install_skill.py                         # 装到探测到的宿主 skills 目录
-.venv/bin/python scripts/install_skill.py --pointer               # 往全局指令文件写指针块
+.venv/bin/python scripts/install_skill.py --list                  # 看当前宿主是谁、本机有哪些宿主
+.venv/bin/python scripts/install_skill.py --dry-run               # 先看会改哪些文件（默认只对当前宿主）
+.venv/bin/python scripts/install_skill.py                         # 装到当前宿主的 skills 目录
+.venv/bin/python scripts/install_skill.py --mcp                   # 注册 MCP 服务器（DSH 直接写好；其它打印命令）
+.venv/bin/python scripts/install_skill.py --all                   # 所有探测到的宿主（一般用不上）
+.venv/bin/python scripts/install_skill.py --host dsh              # 指定宿主
 .venv/bin/python scripts/install_skill.py --target <目录>          # 其它宿主的 skills 目录
 .venv/bin/python scripts/install_skill.py --pointer <文件>         # 其它宿主的规则文件（如 ~/AGENTS.md）
 ```
 
-仓库始终是唯一源头：脚本只做镜像复制和写入带标记的指针块，不改宿主配置，也不碰宿主自己管理的目录（例如 Cursor 的 `skills-cursor`）。**不装也能用**：MCP 握手的 `instructions` 和 8 个工具的 schema 每个客户端都会收到，线上还有这份完整文档。
+仓库始终是唯一源头：脚本只做镜像复制、写入带标记的指针块，以及（DSH）幂等更新 MCP 注册；
+不改 Codex/Claude 的配置，也不碰宿主自己管理的目录（例如 Cursor 的 `skills-cursor`）。
+**不装也能用**：MCP 握手的 `instructions` 和 8 个工具的 schema 每个客户端都会收到，线上还有这份完整文档。
+
+**DSH 用户**：`--mcp` 会往 `$DSH_HOME/profiles/web/cordis.patch.yml` 插一条
+`@deepseek-ai/dsh-mcp-client` 条目（带 `destiny2-mcp:mcp-begin/end` 标记，重复跑只更新不重复插），
+工具会以 `mcp__destiny__*` 出现；技能根是 `~/.dsh/skills/`，**热发现，装完不用重启**。
+先确认那个 profile 里装了插件：`pnpm add @deepseek-ai/dsh-mcp-client`（在 `$DSH_HOME/profiles/web` 下执行）。
 
 ### 使用任意 Agent 安装
 
