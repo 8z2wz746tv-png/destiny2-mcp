@@ -347,7 +347,8 @@ async def main():
             and pending.get("kind") == "tuning"
             and pending.get("writable") is False
             and pending.get("written") is False
-            and "游戏内" in str((plan_tuning.get("warnings") or [""])[0])
+            and "游戏" in str((plan_tuning.get("warnings") or [""])[0])
+            and "in-game" in str((plan_tuning.get("warnings") or [""])[0])
             and (pending.get("to") or {}).get("energy_cost") == 0
             and energy.get("after") == energy.get("used")
             and any(value < 0 for value in bonus.values()),
