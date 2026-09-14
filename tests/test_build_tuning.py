@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import json
+from types import SimpleNamespace
 import sqlite3
 
 import pytest
@@ -475,3 +476,89 @@ def test_worth_search_is_a_cheap_necessary_condition() -> None:
 
     assert _worth_search(armors, armor_only, {"grenade": 55}, 0, tunable) is True
     assert _worth_search(armors, armor_only, {"grenade": 95}, 0, tunable) is False
+
+
+# ── 池子上限（P7 边界修复）────────────────────────────────────────────
+
+
+def test_relaxed_pass_asks_for_a_wider_pool(monkeypatch) -> None:
+    """放宽那一趟必须多留候选：实测 200 时一套可救的都没有，1500 时能救回 16 套。"""
+    import destiny_mcp.build.solver as solver_mod
+    from destiny_mcp.services import build_tuning as bt
+
+    seen: dict[str, Any] = {}
+
+    def fake_solve(snapshot, constraints, **kwargs):
+        seen.update(kwargs)
+        return SimpleNamespace(sets=[])
+
+    monkeypatch.setattr(solver_mod, "solve", fake_solve)
+
+    bt._solve_wide(object(), object())
+
+    assert seen["returned_sets"] == bt._RELAXED_POOL_SIZE
+    assert bt._RELAXED_POOL_SIZE > 200, "默认池是 200，放宽这趟要比它大"
+
+
+def test_solver_returned_sets_parameter_caps_the_pool() -> None:
+    """`returned_sets` 是加出来的口子：不传就是老行为（200），传了就按它留。"""
+    from destiny_mcp.build import solver as solver_mod
+    from destiny_mcp.build.models import BuildConstraints
+    from destiny_mcp.build.tuning import piece_tuning
+
+    manifest = _manifest()
+    # 每个部位两件 → 2^5 = 32 套组合，够看出上限差别
+    armors: list[Armor] = []
+    for slot in ("helmets", "gauntlets", "chests", "legs", "class_items"):
+        for variant in range(2):
+            piece = _armor(slot, {"grenade": 10 + variant, "weapons": 8})
+            piece.item_instance_id = f"inst-{slot}-{variant}"
+            armors.append(piece)
+    snapshot = _snapshot(armors)
+    constraints = BuildConstraints(grenade_min=30)
+
+    wide = solver_mod.solve(snapshot, constraints, returned_sets=32)
+    narrow = solver_mod.solve(snapshot, constraints, returned_sets=2)
+
+    assert len(wide.sets) > len(narrow.sets)
+    assert len(narrow.sets) <= 2
+
+
+def test_pick_and_rescue_verifies_only_the_top_k(monkeypatch) -> None:
+    """池子放大后只复核"最值得"的前 K 套（排序是算术，复核才是裁判）。"""
+    from destiny_mcp.services import build_tuning as bt
+
+    manifest = _manifest()
+    armors = _five(grenade=50, weapons=40)
+    snapshot = _snapshot(armors)
+    constraints = BuildConstraints(grenade_min=55)
+    allowance = bt.tuning_allowance(snapshot, manifest)
+
+    # 造 60 套候选：手雷越高越值得（残差越小）
+    candidates = []
+    for index in range(60):
+        armor_set = _set_from(armors)
+        armor_set.stats[STAT_INDEX["grenade"]] = 10 + index
+        candidates.append(armor_set)
+
+    captured: dict[str, Any] = {}
+
+    def fake_rescue(snap, cons, man, sets):
+        captured["grenade"] = [armor_set.stats[STAT_INDEX["grenade"]] for armor_set in sets]
+        return []
+
+    monkeypatch.setattr(bt, "rescue_sets", fake_rescue)
+
+    bt._pick_and_rescue(snapshot, constraints, manifest, allowance, candidates)
+
+    picked = set(captured["grenade"])
+    all_grenade = [armor_set.stats[STAT_INDEX["grenade"]] for armor_set in candidates]
+    assert 0 < len(picked) <= bt._VERIFY_TOP_K
+
+    def residual(grenade: int) -> int:
+        return max(0, 55 - grenade - allowance["grenade"])
+
+    # 被挑中的必须是残差最小的那批：最大的被挑残差 ≤ 最小的落选残差
+    assert max(residual(g) for g in picked) <= min(
+        residual(g) for g in all_grenade if g not in picked
+    ), "排序要按残差从小到大，复核只做最值得的前 K 套"

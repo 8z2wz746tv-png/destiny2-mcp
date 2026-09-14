@@ -42,6 +42,13 @@ from .build_results import set_key
 #: 五个护甲部位在快照里的属性名。
 SLOT_ATTRS = ("helmets", "gauntlets", "chests", "legs", "class_items")
 
+#: 放宽那一趟要多留多少套。实测（猎人 118 件，武器150+生命103）：
+#: 上限 200 时一套可救的都没有，1500 时能救回 16 套 —— 可救的方案按"放宽后的目标"
+#: 排名排在 200 名之外，只留 200 就永远看不到它们。
+_RELAXED_POOL_SIZE = 1500
+#: 复核很贵（实测每套约 0.1 秒），所以池子放大之后只挑最值得的前 K 套去复核。
+_VERIFY_TOP_K = 40
+
 
 def tuning_allowance(snapshot: Any, manifest: Any) -> dict[str, int]:
     """每项最多能靠调谐加多少点（**一套护甲**的口径）。
@@ -306,6 +313,64 @@ def _donor_penalty(name: str, raw_targets: dict[str, int], priority: Sequence[st
     return rank
 
 
+def _pick_and_rescue(
+    snapshot: Any,
+    constraints: BuildConstraints,
+    manifest: Any,
+    allowance: dict[str, int],
+    candidate_sets: Sequence[ProcessArmorSet],
+) -> list[Rescue]:
+    """从大池子里挑出最值得复核的前 K 套，再交给 `rescue_sets`。
+
+    为什么需要挑：放宽那一趟为了不漏掉可救的方案，池子放到了 1500 套（实测依据见
+    `_RELAXED_POOL_SIZE`），而精确复核每套约 0.1 秒 —— 1500 套全复核要三分钟，
+    工具会超时。排序用**便宜的算术**（估计"护甲 + 调谐额度"之后还差多少），
+    复核仍然是唯一的裁判：挑进来的还要逐套过 `rescue_sets` 才会出现在结果里。
+    """
+    if not candidate_sets:
+        return []
+    context = prepare_fixed_set_context(snapshot, constraints)
+    names = list(STAT_NAMES)
+    raw_min = constraints.as_vector()
+    raw_targets = {
+        name: int(raw_min[index])
+        for index, name in enumerate(names)
+        if raw_min[index] > 0
+    }
+
+    def residual(armor_set: ProcessArmorSet) -> int:
+        """估计还差多少点（越小越值得复核）。"""
+        stats = list(armor_set.stats or [0] * len(names))
+        return sum(
+            max(0, int(raw_min[index]) - int(stats[index]) - allowance.get(names[index], 0))
+            for index in range(len(names))
+            if raw_min[index] > 0
+        )
+
+    picked: list[ProcessArmorSet] = []
+    for armor_set in sorted(candidate_sets, key=residual):
+        arms = list(armor_set.armor)
+        tunable = [
+            piece
+            for armor in arms
+            if (piece := piece_tuning(armor, manifest)) is not None
+        ]
+        if not _worth_search(
+            arms,
+            list(armor_set.stats or [0] * len(names)),
+            raw_targets,
+            _mod_budget(arms, context),
+            tunable,
+        ):
+            continue
+        picked.append(armor_set)
+        if len(picked) >= _VERIFY_TOP_K:
+            break
+    if not picked:
+        return []
+    return rescue_sets(snapshot, constraints, manifest, picked)
+
+
 def _worth_search(
     arms: Sequence[Armor],
     armor_only: Sequence[int],
@@ -522,9 +587,11 @@ async def solve_with_tuning(
     reachable = within_tuning_reach(strict_sets, constraints, allowance) if strict_sets else True
     relaxed = relax_targets(constraints, allowance) if reachable else None
     if relaxed is not None and any(value > 0 for value in allowance.values()):
-        relaxed_solved = await compute.run(_solve, snapshot, relaxed)
+        relaxed_solved = await compute.run(_solve_wide, snapshot, relaxed)
         # 复核用**真实**目标：放宽只负责把候选找出来，达标与否按原目标算。
-        for rescue in rescue_sets(snapshot, constraints, manifest, list(relaxed_solved.sets)):
+        for rescue in _pick_and_rescue(
+            snapshot, constraints, manifest, allowance, list(relaxed_solved.sets)
+        ):
             key = set_key(rescue.armor_set.armor)
             if key in rescued_keys:
                 continue
@@ -546,6 +613,13 @@ def _solve(snapshot: Any, constraints: BuildConstraints) -> Any:
     from ..build import solver as _solver
 
     return _solver.solve(snapshot, constraints)
+
+
+def _solve_wide(snapshot: Any, constraints: BuildConstraints) -> Any:
+    """放宽目标那一趟：多留一些候选（见 `_RELAXED_POOL_SIZE` 的实测依据）。"""
+    from ..build import solver as _solver
+
+    return _solver.solve(snapshot, constraints, returned_sets=_RELAXED_POOL_SIZE)
 
 
 def headroom_payload(snapshot: Any, manifest: Any) -> dict[str, Any]:

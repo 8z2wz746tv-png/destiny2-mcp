@@ -366,6 +366,7 @@ def solve(
     constraints: BuildConstraints,
     auto_mod_data: AutoModData | None = None,
     mod_stat_totals: list[int] | None = None,
+    returned_sets: int | None = None,
 ) -> ProcessResult:
     """Find optimal armor combinations with mod assignment.
 
@@ -389,6 +390,10 @@ def solve(
             manifest-backed definitions stored on the inventory snapshot.
         mod_stat_totals: Stat bonuses from user-picked mods, in STAT_HASHES order.
                         Added to base stats before solving. None = all zeros.
+        returned_sets: How many sets the tracker keeps (default
+                        `RETURNED_ARMOR_SETS` = 200). 放宽目标复解时会给一个更大的值 ——
+                        实测：同一组目标在上限 200 时一套可救的都没有，放到 1500 能救回 16 套，
+                        因为可救的那些按"放宽后的目标"排名排在 200 名之外。
 
     Returns:
         ProcessResult with top-N armor sets.
@@ -494,7 +499,7 @@ def solve(
     info = context.info
 
     # ── Build tracker ──────────────────────────────────────────────────
-    tracker = HeapSetTracker(RETURNED_ARMOR_SETS)
+    tracker = HeapSetTracker(returned_sets or RETURNED_ARMOR_SETS)
 
     # Track stat ranges for reporting
     stat_ranges: list[list[int]] = [[MAX_STAT, 0] for _ in range(6)]
