@@ -4,277 +4,251 @@
 
 ## 0.1.12 — 2026-09-14
 
-**强化版 perk 现在一眼可辨**：展示名后面加 `↑`，普通版保持原字符串不变。
+强化版 perk 的展示名后面加 `↑`，普通版保持原字符串不变。
 
-- 口径：`高爆载荷` 是普通版，`高爆载荷↑` 是强化版。落点覆盖
-  `weapons[].sockets[].options[].name`、`equipped.name`、实例可换项，
-  以及社区核对的三层字段（`perks_current_match` / `perks_available_to_switch`）；
-  带箭头的项同时给 `name_plain`（Manifest 规范名），需要按名字查表/比对时用它。
-- 内部按名字索引的地方（刷取清单 `farm_index`、愿单、`filter_rolls` 的匹配）一律用规范名，
-  避免箭头污染匹配；`weapon_local_data` 直接用选项上的 `name_plain` 取规范名。
-- 顺带修掉一个真实的口径问题：`analyze` 的 `differences` 以前按**名字**比对两把副本，
-  于是"一把普通版 + 一把强化版"会显示成**双向缺失**；现在名字本身能区分版本，diff 才说得通。
-- 结构：`with_equipped` 从 `weapon_payload.py`（顶在 365 行上限）搬去 `weapon_profile.py`，
-  上限同步收紧到 334 —— 这也是给这次改动腾出空间的方式（不抬上限）。
+- 约定：`高爆载荷` 是普通版，`高爆载荷↑` 是强化版。适用位置包括
+  `weapons[].sockets[].options[].name`、`equipped.name`、实例可换项，以及社区核对里的
+  `perks_current_match` / `perks_available_to_switch`。带箭头的项同时给 `name_plain`
+  （Manifest 规范名），按名字查表或比对时用它。
+- 内部按名字索引的地方（刷取清单 `farm_index`、愿单、`filter_rolls` 的匹配）改用规范名，
+  避免箭头影响匹配；`weapon_local_data` 直接读选项上的 `name_plain`。
+- 修正 `analyze` 的 `differences` 口径：它以前按名字比对副本，一把普通版加一把强化版会显示成
+  双向缺失；现在名字能区分版本，差异才有意义。
+- 结构调整：`with_equipped` 从 `weapon_payload.py`（已顶到 365 行上限）移到
+  `weapon_profile.py`，该文件上限同步收紧到 334，用搬移而不是抬上限来腾空间。
 
-实机复验（术士邮政长里的「无感」）：特性栏 `现在=快速命中↑ / 可换=[快速命中↑, 即兴弹药↑, 集体爆破↑]`、
-`现在=高爆载荷↑ / 可换=[高爆载荷↑, 肾上腺素成瘾↑, 盒式呼吸法↑]`；
-社区核对里 `巅峰捕食者` 一把显示 `perks_current_match=['爆炸光能↑','爆炸协议']`，其余几把是普通版。
+实机复验（术士邮政长里的「无感」）：特性 1 显示 `现在=快速命中↑ / 可换=[快速命中↑, 即兴弹药↑, 集体爆破↑]`，
+特性 2 显示 `现在=高爆载荷↑ / 可换=[高爆载荷↑, 肾上腺素成瘾↑, 盒式呼吸法↑]`；社区核对里
+`巅峰捕食者` 的一把为 `perks_current_match=['爆炸光能↑','爆炸协议']`，其余副本是普通版。
 
-**顺带把武器面基线重录了一次**：它从 0.1.6 前后就没再录过，累积了若干版本的漂移
-（hash 统一成无符号、`farming_list` 挂载、`name_en` 等）。核对过：`catalog_*` / `filter_rolls_*`
-的"命中集合变化"其实是有符号/无符号的同一批物品（例：-1205549507 ↔ 3089417789），
-不是筛选逻辑变了；diff 的消失项全部是早期登记过的（P4 精简身份块）。
+同时重录了武器面基线：它从 0.1.6 前后就没再录过，累积了若干版本的漂移（hash 统一为无符号、
+`farming_list` 挂载、`name_en` 字段等）。核对过 `catalog_*` / `filter_rolls_*` 的命中集合变化，
+是有符号与无符号的同一批物品（例：-1205549507 与 3089417789），不是筛选逻辑变化；
+diff 报出的消失项全部是早期登记过的（P4 精简身份块）。
 
 ## 0.1.11 — 2026-09-14
 
-**把「可切换但没装的 Perk」真查出来**（0.1.10 只做到"诚实地说没查"）。
+把「可切换但未装备的 Perk」真正查出来。0.1.10 只做到如实说明没有查。
 
-- 武器详情新增**可选**开关 `include_selectable_plugs`（默认关，别的调用方载荷一个字不变），
-  打开时给每栏挂 `selectable_plug_hashes`（组件 310 的 **hash**，不是展开成名字的 options）。
-  社区配装匹配走这条路，于是每个副本能报三层：
-  `perks_current_match`（现在装着）/ `perks_available_to_switch`（换一下就行）/
-  `perks_unavailable`（换也换不到）；行状态相应为 `current_roll_matched` →
+- 武器详情新增可选开关 `include_selectable_plugs`（默认关闭，其他调用方载荷不变），打开后给每栏
+  挂 `selectable_plug_hashes`（组件 310 的 hash，不展开为带名字的 options）。社区配装匹配走这条路，
+  因此每个副本能报三层：`perks_current_match`（当前装备）、`perks_available_to_switch`（可换栏可达）、
+  `perks_unavailable`（两者都没有）；行状态依次为 `current_roll_matched` →
   `owned_alternate_roll_available` → `owned_no_current_roll_match`。
-- **"没读"和"读了没有"分开**：`selectable_plug_status` = `available` / `none` / `not_read`；
-  只有 `available` 时"换也换不到"才是结论，否则仍是 `alternate_perk_options_checked=false` + 原因。
-- 两条边界写进字段：判定范围是 `any_selectable_socket`（不校验栏位与模板是否一致）；
-  锻造件的 310 只列当前选中项（`alternate_perk_options_caveat`），未命中不等于换不到。
-- 实现里踩了一个正好相反的坑并修掉：组件 310 的真实形状是 `{"plugs": {"<槽>": […]}}`，
-  第一版直接遍历外层，`_instance_plug_hashes` 收到 Mapping → 静默空集
-  → 把"有 4 栏可换"报成了"读了、但没有可换项"。实机复验才抓到（`selectable_plug_status` 是为此加的）。
+- 「没读」与「读了没有」分开：`selectable_plug_status` 取 `available` / `none` / `not_read`，
+  只有 `available` 时「换也换不到」才是结论，否则仍是 `alternate_perk_options_checked=false` 加原因。
+- 两条边界写进字段：判定范围是 `any_selectable_socket`，不校验栏位是否与模板一致；锻造件的组件 310
+  只列当前选中项（`alternate_perk_options_caveat`），未命中不等于换不到。
+- 实现过程中修掉一个方向相反的坑：组件 310 的真实形状是 `{"plugs": {"<槽>": [...]}}`，第一版直接遍历
+  外层，`_instance_plug_hashes` 收到的是 Mapping，静默返回空集，于是「有 4 栏可换」被报成「读了但没有
+  可换项」。实机复验时才发现，`selectable_plug_status` 就是为区分这种情况加的。
 
-实机复验（复盘里的同一套配装）：`笛卡尔坐标` 两把的 `重建/洪涝/老兵睿智` 三个 Perk
-**确证换也换不到**（`perks_unavailable`，`selectable_plug_status=available`）；
-`巅峰捕食者` 一把是"爆炸光能+爆炸协议现在装着、爆破专家换也换不到"——
-复盘里那句"有枪无 roll"现在有逐项的、可核对的说法。
+实机复验（复盘里的同一套配装）：`笛卡尔坐标` 两把的 `重建/洪涝/老兵睿智` 确证换也换不到
+（`perks_unavailable`，`selectable_plug_status=available`）；`巅峰捕食者` 一把的
+`爆炸光能`、`爆炸协议` 当前装备，`爆破专家` 换也换不到。
 
 ## 0.1.10 — 2026-09-14
 
-**按另一台机器的实机复盘（Windows / 另一个 agent）修「否定结论的表达」**。那次事故的链条是：
-模板要求「玻璃拱顶 ×4」→ 工具标 `unresolved`、调用方标「❓待自查」→ 最后却回了「这套能直接玩」，
-而同一份响应里明明写着 `execution_supported=false` / `execution_eligible=false`。
-根因不是缺数据，是**否定结论没有被推到调用方一定会看到的地方**。
+按另一台机器的实机复盘（Windows，另一个 agent）修正否定结论的表达。那次事故的链条是：模板要求
+「玻璃拱顶 ×4」，工具标 `unresolved`，调用方标「待自查」，最后却回了「这套能直接玩」，
+而同一份响应里已经写着 `execution_supported=false` / `execution_eligible=false`。
+问题不在数据，是否定结论没有出现在调用方一定会读到的位置。
 
-- **summary 现在带可执行性判定**：社区详情返回「已读取社区配装：X；**不可直接执行**（社区模板不是服务器签发的 ExecutableBuild）」，
-  并把 `execution_eligible=false` + 首要 blocker + 「要装备必须走 find → canonical_build → 确认」
-  放进**第一条 warning**。summary 是 agent 唯一一定会引用的字段，判定不能再只躺在 payload 里。
-- **活动名 → 套装名解析**：社区模板按活动称呼套装（玻璃拱顶），Manifest 与玩家物品用套装名
-  （埃希恩记忆）。已核对的映射自动解析并说明来路（`resolved_via`/`alias_from`/`resolved_name`）；
-  没登记的给 `unresolved_reason=name_not_matched_candidates_available` + `set_name_candidates`
-  相似候选，让调用方去问用户，而不是只剩「查不到」。
-- **「这套我有几件」能直接读**：套装行新增 `owned_count` / `owned_distinct_slot_count` /
-  `missing_slot_count` / `wildcard_count`（以前只有列表，没人去数——复盘里就是「❓待自查」）。
-  实机复验（同一套配装）：`玻璃拱顶 → 埃希恩记忆`，需 4 件、持有 20 件覆盖 5 个部位、缺 0。
-- **「没校验」与「没有」彻底分开**：所有 `not_account_checked` 行带 `unverifiable_reason` 枚举
-  （`mod_unlock_state_not_available` / `artifact_*` / `subclass_unlock_state_not_available` /
-  `stat_feasibility_not_checked` / `free_text_not_checkable` …）；
-  `unresolved` 行带 `unresolved_reason`；武器行补
-  `alternate_perk_options_reason=instance_socket_options_not_read`，并把警告改成明说
-  「`owned_no_current_roll_match` 是『当前选中的 Perk 不符』，**不是**『这把枪不行』」。
-- **参数说明补「哪些 intent 不读它」**：`character` 那栏列出会返回 `ignored_parameter` 的 intent；
-  `component` 那栏写明「碎片不是一类 component，要用 `intent=fragments`」
-  （复盘里这两处各浪费了一次调用）。
+- summary 带可执行性判定：社区详情返回「已读取社区配装：X；不可直接执行（社区模板不是服务器签发的
+  ExecutableBuild）」，并把 `execution_eligible=false`、首要 blocker、以及「要装备必须走
+  find → canonical_build → 确认」放进第一条 warning。
+- 活动名到套装名的解析：社区模板按活动称呼套装（玻璃拱顶），Manifest 与玩家物品用套装名
+  （埃希恩记忆）。已核对的映射会自动解析并说明来路（`resolved_via` / `alias_from` / `resolved_name`）；
+  没有登记的返回 `unresolved_reason=name_not_matched_candidates_available` 和 `set_name_candidates`
+  相似候选，调用方可以据此向用户确认，而不是只得到「查不到」。
+- 套装持有数量可以直接读：套装行新增 `owned_count`、`owned_distinct_slot_count`、
+  `missing_slot_count`、`wildcard_count`。实机复验同一套配装：玻璃拱顶解析为埃希恩记忆，需 4 件，
+  持有 20 件覆盖 5 个部位，缺 0。
+- 「没校验」与「没有」分开：所有 `not_account_checked` 行带 `unverifiable_reason` 枚举
+  （`mod_unlock_state_not_available`、`artifact_*`、`subclass_unlock_state_not_available`、
+  `stat_feasibility_not_checked`、`free_text_not_checkable` 等）；`unresolved` 行带
+  `unresolved_reason`；武器行补 `alternate_perk_options_reason=instance_socket_options_not_read`，
+  警告文字改为说明 `owned_no_current_roll_match` 只表示当前选中的 Perk 不符。
+- 参数说明补上各 intent 读取范围：`character` 一栏列出会返回 `ignored_parameter` 的 intent；
+  `component` 一栏写明碎片不属于 component，应使用 `intent=fragments`。
 
-**仍未做（写在明处）**：`alternate_perk_options_checked` 目前恒为 `false` + 说明原因 ——
-真正的「可切换但未选中」比对需要武器详情载荷带上实例可换项（组件 310），
-属于武器面的改动（有自己的基线与体积上限），留作下一步。
+当时仍未做的：真正的「可切换但未选中」比对需要武器详情载荷带上实例可换项（组件 310），
+属于武器面改动，有自己的基线与体积上限，留到 0.1.11 完成。
 
 ## 0.1.9 — 2026-09-14
 
-**干净安装冒烟（从 GitHub 装 v0.1.8 到全新 venv）抓出来的两处一致性问题。**
+干净安装冒烟（从 GitHub 安装 v0.1.8 到全新 venv）发现两处一致性问题。
 
-- **包内 `__version__` 停在 0.1.0**：不管发到哪个版本，`destiny_mcp.__version__` 一直写着 0.1.0。
-  现在改成"源码树读 `pyproject.toml`、安装后读发行版元数据"，`tests/test_package_version.py`
-  把"两处一致"钉住，避免再漂。
-- **注册模板的客户端超时 180 秒余量太薄**：无解诊断实测 80–165 秒（还要叠加调谐补齐那一趟），
-  慢一次就会被客户端掐断、用户看到的不是阶梯而是超时。模板与文档统一改成 **300000 ms**。
+- 包内 `__version__` 停在 0.1.0：无论发布到哪个版本，`destiny_mcp.__version__` 一直写着 0.1.0。
+  现在改为源码树读 `pyproject.toml`、安装后读发行版元数据，`tests/test_package_version.py`
+  校验两处一致。
+- 注册模板里的客户端超时 180 秒余量偏小：无解诊断实测 80–165 秒，还要叠加调谐补齐那一趟，
+  慢一次就会被客户端中断，用户看到的是超时而不是阶梯。模板与文档统一改为 300000 ms。
 
-冒烟结果（可复现步骤见 `scripts/`）：从 `git+https://…@v0.1.9` 装进全新 venv → 8 个工具握手成功 →
-复用 tokens/manifest 后真机读取正常；技能安装器在临时 `DSH_HOME` 里正确写出指针块与 MCP 注册文件。
+冒烟结果：从 `git+https://…@v0.1.9` 装进全新 venv，8 个工具握手成功；复用 tokens 与 manifest 后
+真机读取正常；技能安装器在临时 `DSH_HOME` 下正确写出指针块与 MCP 注册文件。
 
 ## 0.1.8 — 2026-09-14
 
-**真机写入实测抓出来的两个发布阻断问题**（用户要求"全部实测一遍"，这次实测值回票价）。
+真机写入实测发现两个发布阻断问题。
 
-**① 写入失败被报成成功（真 bug）**
-`ArmorModService.apply()` 拿到的是老约定形状 `{"ErrorCode": …, "Message": …}` —— Bungie 把
-**错误也放在 200 响应的信封里**。以前这里不看内容直接 `success: True`：实测换调谐时账号
-**一个字节没变**，工具却回"已把槽 11 换成 +手雷 / -职业"。现在必须核对 `ErrorCode == 1`，
-否则抛 `TransferError` 并把 Bungie 原文带出来；权限类错误（`AccessNotPermittedByApplicationScope`）
-会点名 `AdvancedWriteActions`，不再被读成"稍后重试"。回归测试写进 `tests/test_equip_mod.py`
-（假客户端改成 Bungie 的真实信封形状 —— 以前回 `{"success": True}`，正好把这个 bug 遮住了）。
+写入失败被报成成功。`ArmorModService.apply()` 收到的形状是 `{"ErrorCode": …, "Message": …}`，
+Bungie 把错误也放在 200 响应的信封里，而这里以前不看内容直接返回 `success: True`。
+实测换调谐时账号一个字节都没变，工具却回了「已把槽 11 换成 +手雷 / -职业」。现在必须核对
+`ErrorCode == 1`，否则抛 `TransferError` 并带出 Bungie 原文；权限类错误
+（`AccessNotPermittedByApplicationScope`）会点名 `AdvancedWriteActions`。回归测试写进
+`tests/test_equip_mod.py`，假客户端改成 Bungie 的真实信封形状（以前回 `{"success": True}`，
+正好遮住了这个 bug）。
 
-**② 调谐根本写不进去（实测结论，改设计）**
-- 免费插槽接口（`InsertSocketPlugFree`）对调谐回 `This action can only be done in-game.`（ErrorCode 1663）；
-- 付费接口（`InsertSocketPlug`）要 Bungie 应用的 `AdvancedWriteActions` 权限，当前授权没有 → 403。
+调谐无法通过 API 写入，据此改了设计：免费插槽接口（`InsertSocketPlugFree`）对调谐返回
+`This action can only be done in-game.`（ErrorCode 1663）；付费接口（`InsertSocketPlug`）需要
+Bungie 应用的 `AdvancedWriteActions` 权限，当前授权没有，返回 403。因此 0.1.6 与 0.1.7 里
+「`canonical_build` 已带上调谐插件、确认即可执行」是做不到的承诺。本版改为：`equip_mod` 对调谐
+只给方案（`writable=false`、`written=false`，附「只能在游戏内改」的 warning，`confirmed=true`
+也不写账号）；`canonical_build.items[].mods` 不再包含调谐插件；`tuning_changes` 明确为给玩家的
+手动清单，`tuning_note` 同步改写。
 
-所以 0.1.6/0.1.7 里"`canonical_build` 已带上调谐插件、确认即可执行"是**做不到的承诺**，这版改掉：
-`equip_mod` 对调谐直接给方案（`writable=false` / `written=false` + 「只能在游戏内改」的 warning，
-`confirmed=true` 也不写账号）；`canonical_build.items[].mods` 不再包含调谐插件；
-`tuning_changes` 明确是**给玩家的手动清单**，`tuning_note` 也照此改写。
-（这也解释了为什么"改完调谐才达标"的方案必须把清单交给玩家：六维达标以玩家手动改完为前提。）
-
-**③ 顺带**：README 补了「写入权限」「调谐只能游戏内改」「无解诊断 80–165 秒 → 客户端超时建议 300 秒」；
-语料护甲章节加了两行（调谐只给方案不写、付费写入如实报权限），共 26 行。
+其他：README 补充写入权限、调谐只能游戏内修改、无解诊断 80–165 秒与客户端超时建议；
+语料护甲章节新增两行（调谐只给方案、付费写入如实报权限），共 26 行。
 
 ## 0.1.7 — 2026-09-14
 
-**池子上限这条边界（实测发现并修掉）**：求解器只保留排名前 200 套（`RETURNED_ARMOR_SETS`，
-DIM 的原始设计），而放宽那一趟的池子是按**放宽后的目标**排名的 —— 可救的方案可能排在
-200 名之外，于是"明明能补却说补不上"。实测（猎人 118 件，武器150+生命103）：
-池 200 时救回 **0** 套，放到 1500 时救回 **16** 套。修法有两步：
-`solve()` 加了一个**可选**参数 `returned_sets`（不传就是老行为），放宽那一趟传 1500；
-池子变大后不能每套都精确复核（每套约 0.1 秒，1500 套要三分钟），所以按
-"护甲 + 调谐额度之后还差多少"排序，**只复核最值得的前 40 套**（复核仍是唯一裁判）。
-修完实测：武器150+生命103 从 0 候选变成 **5 套候选、每套只改 1 件调谐**（47 秒）；
-武器150+生命106 变成 5 套、2 件调谐（36 秒）。
+修掉调谐救援的候选池上限。求解器只保留排名前 200 套（`RETURNED_ARMOR_SETS`，沿用 DIM 的设计），
+而放宽目标那一趟的池子按放宽后的目标排名，可救的方案可能排在 200 名之外，表现为明明能补却报补不上。
+实测（猎人 118 件护甲，目标武器 150 加生命 103）：池上限 200 时救回 0 套，放到 1500 时救回 16 套。
 
-**已知限制（写在明处）**：救援覆盖的是"放宽解排名前 1500 套里、且复核能过"的方案；
-再往后的套仍然看不到（要彻底解决得像 DIM 那样把调谐变体放进主循环，本实现的组合上限
-扛不住那个展开量）。挑候选用的是算术估计，理论上可能把可救的套排在 40 名之外。
+修法两步：`solve()` 增加可选参数 `returned_sets`（不传即旧行为），放宽那一趟传 1500；
+池子变大后无法逐套精确复核（每套约 0.1 秒，1500 套约三分钟），改为按「护甲加调谐额度之后还差多少」
+排序，只复核最值得的前 40 套，复核仍是唯一裁判。修完实测：武器 150 加生命 103 从 0 候选变为
+5 套候选、每套只改 1 件调谐（47 秒）；武器 150 加生命 106 为 5 套、2 件调谐（36 秒）。
+
+已知限制：救援覆盖放宽解排名前 1500 套且复核能过的方案，再往后的套仍然看不到；
+挑候选用的是算术估计，理论上可能把可救的套排在 40 名之外。
 
 ## 0.1.6 — 2026-09-14
 
-**调谐（Tuning）真的进求解器了**（P7）：以前"差 5 点"只能给一句人工提示，现在
-`find`/`recommend` 会**真的去改调谐再算一遍**，能补上就直接给带方案的候选。
+调谐进入求解器。此前目标差 5 点只能给人工提示，现在 `find` 与 `recommend` 会实际尝试更换调谐再算一遍，
+能补上就直接返回带方案的候选。
 
-- **怎么做的**（两趟 + 精确复核）：按原目标解一次，达标就原样返回（基线里那些绿方案一个字没改）；
-  没达标才用"调谐额度"把目标放宽复解一遍，然后对候选**逐套精确复核**——用真实目标重新分配
-  属性模组、逐项比对六维，过了复核才算数。这样不动求解器里已经验证过的精确数学。
-- **对外字段**：`builds[].tuning_changes`（逐件 `from`/`to`/`delta`，中文名 + hash）、
-  `requires_tuning`、`tuning_note`，以及响应级 `tuning` 汇总；`canonical_build.items[].mods`
-  里已经带上要装的调谐插件，`equip_build` 直接就能执行（调谐能量为 0，走免费插槽接口）。
-- **`equip_mod` 支持调谐**：报全名（如 `"+武器 / -生命值"`）即可换调谐，方案里给
-  `kind="tuning"`、`stat_bonus`（含 −5 那一侧）与 `energy`（不变）；
-  只说"手雷调谐"这种**没讲减哪一项**的说法会报错并列出全部 5 个选项，不替用户猜。
-- **阶梯口径改实**：`tuning_first` 现在是"已经试过调谐"之后的结论，并新增
-  `solver_attempted` 与三种 lever（额度够但让不出来 / 额度不够 / 只看属性模组）；
-  新增 `verdict`：`satisfiable=false` = 「原样」那一档实采 0 候选，并说明 `ceiling`
-  是各次探测**逐项**取的最大值、不等于同一套能同时达到。
+- 做法是两趟加精确复核：按原目标解一次，达标就原样返回（基线里的绿方案不变）；没达标才按调谐额度
+  放宽目标复解，然后对候选逐套精确复核，用真实目标重新分配属性模组并逐项比对六维，通过复核才算数。
+- 对外字段：`builds[].tuning_changes`（逐件 from/to/delta，中文名加 hash）、`requires_tuning`、
+  `tuning_note`，以及响应级 `tuning` 汇总。
+- `equip_mod` 支持调谐：报全名（如 `+武器 / -生命值`）即可，方案里给 `kind="tuning"`、
+  `stat_bonus`（含 −5 一侧）与 `energy`；只说「手雷调谐」这类未指明减少项的说法会报错并列出 5 个选项。
+- 阶梯口径改实：`tuning_first` 变成「已经试过调谐」之后的结论，新增 `solver_attempted` 与三种 lever
+  （额度够但无法让步、额度不够、只看属性模组）；新增 `verdict`，`satisfiable=false` 表示按原始优先级
+  实采 0 候选，并说明 `ceiling` 是各次探测逐项取的最大值、不等于同一套能同时达到。
 
-**实机验证**（118 件护甲的猎人，只读）：
+实机验证（118 件护甲的猎人，只读）：调谐额度实测为每个部位取最强的一件、五项合计 25 点，
+含撤掉反向调谐的 +10 情况，所以单件上限是 10 而不是 5；`武器 150 加生命 103` 严格解为 0 候选，
+放宽复解后给出 4 套达标方案并逐件列出调谐改动；`武器 150 加生命 106` 返回
+`verdict.satisfiable=false`，与手算边界一致（护甲 110/52 加模组 50 加调谐最多 33，凑不出 150/106）。
 
-- 调谐额度实测：每个部位取最强的一件，五项合计 25 点（含"撤掉反向调谐"的 +10 情况，
-  所以单件上限是 10 不是 5）；
-- 一个真实救援案例：`武器150 + 生命103` 严格解 0 候选，放宽复解后给出 4 套达标方案，
-  逐件列出调谐改动（如「光泽胄盔 +职业/−近战 → +生命值/−超能」）；
-- 一个真实"补不上"案例：`武器150 + 生命106` 给出 `verdict.satisfiable=false`——
-  手算边界一致（护甲 110/52 + 模组 50 + 调谐最多 33，凑不出 150/106）。
+对比 DIM（读源码后的结论）：DIM 在主循环里展开调谐变体，非金装逐件展开成多个 ProcessItem，
+金装因为一套只能有一件而改成在主循环里换 variant，并用 dump stat 把变体数压到个位数。
+本项目的组合上限是 2000 万，扛不住那种展开量，所以采用同样思路的收敛版：零和语义加牺牲价值最低的一项，
+能否达标交给精确复核裁决，另加一个复核驱动的局部搜索兜底（最多改 5 件，每步都过复核）。
 
-**对比 DIM（读源码后的结论）**：DIM 是在主循环里展开调谐变体（非金装逐件展开成多个
-ProcessItem，金装因为一套只能有一件、改成在主循环里换 variant），并用"牺牲哪一项"
-（dump stat）把变体数压到个位数。这个 Python 实现扛不住那种展开量（组合上限 2000 万），
-所以采用同样思路的收敛版：**零和语义 + 牺牲价值最低那一项**，但把"能不能达标"交给
-精确复核裁决，另外加一个复核驱动的局部搜索兜底（最多改 5 件，每步都过复核）。
-
-**过程中的实机 bug（都是先算错、再被抓出来的）**：调谐额度把整个仓库相加（118 件 →
-"每项能补 563 点"）；规划基线把求解器已配的模组又加一遍（同一笔模组算两次）；
-剪枝用"每件最多 +5"，漏掉"撤掉反向调谐 = +10"与模组预算，把可行组合整支砍掉；
-`plan_tuning` 把 −5 打在本就为 0 的项上当成有代价（游戏里属性夹在 0，白给）。
+过程中修掉的实机问题：调谐额度把整个仓库相加（118 件得出每项能补 563 点）；规划基线把求解器已配的
+模组又加一遍；剪枝按每件最多 +5 计算，漏掉撤掉反向调谐等于 +10 与模组预算，把可行组合整支砍掉；
+`plan_tuning` 把 −5 打在本就为 0 的属性上当成有代价（游戏里属性下限为 0，属于白给）。
 
 ## 0.1.5 — 2026-09-13
 
-**L2 冒烟集全跑（25 条 ⭐ 行）抓出来的两个问题。**
+L2 冒烟集全跑（25 条 ⭐ 行）发现两个问题。
 
-- **我自己的回归（P1）**：0.1.4 重构 `analyze` 的提前返回时，把
-  `precision="not_computed"` 那一行一起删掉了 —— 结果超规模时 `reason` 说的是
-  "没算"，`precision` 却报 `exact` 且 `max_possible={}`，调用方会读成"你什么都达不到"。
-  已补回，并新增 `tests/test_build_size_guard.py`（4 条）把这条口径钉死：
-  超限必须 `precision="not_computed"` + 空 `max_possible`，两条路（analyze / find）同一句说明。
-- **语料自己写错了路径（文档 bug）**：武器 T 级那条原来写 `analyze` 的 `weapon.gear_tier`，
-  实测 `analyze` 的 T 级在 `data.inventory.instances[].weapon.gear_tier`（逐副本），
-  `type` 才是 `weapons.items[].weapon.gear_tier`；而且 `gear_tier_note` 并非处处都有
-  （`owned.instances[]` 里有，`analyze` 的副本块只有 `gear_tier` 本身）。语料行按实测改写，
-  并给武器逐行脚本加了第 17 行锁住这三条路径（真机 `type.gear_tier=5`、遗产各副本 `[None, 5]`）。
+- 0.1.4 重构 `analyze` 提前返回时，把 `precision="not_computed"` 一并删掉了：超规模时 `reason`
+  说明没算，`precision` 却报 `exact` 且 `max_possible={}`，调用方会读成什么都达不到。已补回，
+  并新增 `tests/test_build_size_guard.py`（4 条）固定该口径：超限必须
+  `precision="not_computed"` 加空 `max_possible`，analyze 与 find 两条路同一句说明。
+- 语料写错了路径：武器 T 级那条原写 `analyze` 的 `weapon.gear_tier`，实测 `analyze` 的 T 级在
+  `data.inventory.instances[].weapon.gear_tier`（逐副本），`type` 才是
+  `weapons.items[].weapon.gear_tier`；`gear_tier_note` 也并非处处都有（`owned.instances[]` 里有，
+  `analyze` 的副本块只有 `gear_tier`）。语料行按实测改写，武器逐行脚本新增第 17 行锁住这三条路径。
 
-冒烟集结果：**26/26 PASS**（25 条 ⭐ + 工具面核对），覆盖 8 个工具、写入拦截、
-参数误用指路、schema 层拒绝、社区资料不可信提示、护甲四条新行。
+冒烟集结果 26/26 PASS（25 条 ⭐ 加工具面核对），覆盖 8 个工具、写入拦截、参数误用指路、
+schema 层拒绝、社区资料不可信提示、护甲四条新行。
 
 ## 0.1.4 — 2026-09-13
 
-**修 0.1.3 实测跑出来的 5 个问题**（都是护甲那轮改动暴露的）：
+修 0.1.3 实测跑出来的 5 个问题。
 
-- **`rarity` 中文值被静默忽略**：参数说明写着"传说/异域"可用，但代码只映射英文，取不到就
-  直接跳过过滤 —— 问"我有哪些异域腿甲"会把传说件一起端回来（实测 `异域`=26 件、`exotic`=8 件）。
-  现在中英同结果，**不认识的稀有度直接报错并列出可用取值**（照 `item_type` 的封闭词表做法）。
-- **`recommend`/`find` 组合规模超限会跑到客户端超时**：术士同参数 `analyze` 秒回
-  "2.43 亿组合超上限、未计算"，而 `recommend` 会真的去枚举，客户端拿到
-  `-32001 Request timed out`。现在两道门共用同一个估算与同一句收窄建议，
-  超限立刻返回 `not_computed` + 四条可操作建议（**不是**"无解"）。
-- `equip_mod` 的 `alternatives[].stat_bonus_hashes` 口径不一致（原始 hash，还把非六维的
-  "费用"属性算进去）→ 改成与 `to.stat_bonus` 同一套六维可读键。
-- `with_slot_keys` 会把展示字段塞进 `canonical_build.items[]`（目前 pydantic 容忍，但违背
-  "canonical 只放可执行内容"）→ 递归时跳过 `canonical_build` 子树，并加断言。
-- `intent="item"` 的 `next_actions` 还写着"换模组后续阶段提供" → 改成指向 `equip_mod` 的正确用法。
+- `rarity` 中文值被静默忽略：参数说明写着传说/异域可用，代码只映射英文，取不到就跳过过滤，
+  问有哪些异域腿甲会把传说件一起返回（实测 `异域` 26 件、`exotic` 8 件）。现在中英结果一致，
+  不认识的稀有度直接报错并列出可用取值。
+- `recommend` 与 `find` 在组合规模超限时会跑到客户端超时：术士同参数下 `analyze` 秒回
+  「2.43 亿组合超上限、未计算」，而 `recommend` 会真的枚举，客户端拿到
+  `-32001 Request timed out`。现在两条路共用同一套估算与同一句收窄建议，超限立即返回
+  `not_computed` 和四条可操作建议。
+- `equip_mod` 的 `alternatives[].stat_bonus_hashes` 口径不一致（原始 hash，还把非六维的费用属性算进去），
+  改成与 `to.stat_bonus` 同一套六维可读键。
+- `with_slot_keys` 会把展示字段塞进 `canonical_build.items[]`，改为递归时跳过 `canonical_build` 子树，
+  并加断言。
+- `intent="item"` 的 `next_actions` 还写着「换模组后续阶段提供」，改为指向 `equip_mod` 的正确用法。
 
-顺带修了差异闸门自己的一个小 bug：`--allowlist` 传相对路径时，报错分支会
-`relative_to` 崩掉，把真正的字段消失吞成一条 traceback。
-
-语料：护甲章节 18 → 20 行（新增稀有度中英一致/乱填报错、组合规模超限两行），
-冒烟 ⭐ 25 条；`diff_weapon_baseline.py` 的路径处理加注释说明。
+另外修了差异闸门自身的问题：`--allowlist` 传相对路径时，报错分支的 `relative_to` 会崩，
+把真正的字段消失吞成一条 traceback。语料护甲章节从 18 行扩到 20 行，冒烟 ⭐ 25 条。
 
 ## 0.1.3 — 2026-09-13
 
-**护甲：统一格式 + 换单个模组 + 无解时的六维阶梯。**
+护甲部分统一格式、支持更换单个模组、无解时给出六维阶梯。
 
-以前护甲在六个地方出没、字段各不相同，而且**换不了单个模组**（默认工具面里没有写入入口，
-legacy `apply_mod` 又不确认直接改账号）。这一版按 `ARMOR_FORMAT_PLAN.md` 的 P0–P6 做完：
+此前护甲在六个地方出现且字段各不相同，也无法更换单个模组（默认工具面没有写入入口，
+legacy `apply_mod` 又不经确认直接改账号）。本版按 `ARMOR_FORMAT_PLAN.md` 的 P0–P6 完成：
 
-- **统一载荷**（`ArmorPayload`）：`identity`（`slot`/`slot_display`/`gear_tier`/`archetype`/套装）+
-  `instance`（光等/位置/能量/大师/调谐）+ **三层属性** `roll`/`base`/`final` + 插槽清单。
-  列表保持轻量（只加 `slot`/`slot_display`/`gear_tier`/`armor_system`，`bucket_type` 保留），
-  要看插槽走新 intent。
-- **新 intent `inventory_assistant(intent="item")`**：单件护甲的完整载荷。词条本体槽与
-  `intrinsics` 标 `editable=false`。
-- **新 intent `inventory_assistant(intent="equip_mod")`**：换一个模组。`confirmed=false` 给
-  「哪件护甲、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写；校验实例在不在该角色身上、
-  该槽收不收这个模组、能量够不够。**legacy `apply_mod` 收编**到同一条确认路。
-- **无解时的 `ladder`**：`shortfall`（差多少）、`ceiling`（同一套约束下**同时**能达到的上限，
-  实采）、`single_stat_ceiling`（单项上限，两者不能混）、`trials`（逐级放松试了哪些档）、
-  `suggestion`（最小可行降档，**只是提议**，不自动降目标）。
-- **装备确认逐件预览**：`candidates[0].items_preview` 给五件的光等/能量/现有模组/将要装的模组。
-- 实机勘测修掉的两个真问题：老护甲也带 `gearTier: 0`（按字段分族会误判成 3.0）；
-  异域护甲的固定属性分布在 `intrinsics` 里（不算进 `roll` 会把大师等级算成 30）。
-- 文档：`routing.md` 补护甲统一键口径、`find` vs `recommend` 分工（**要装备走 `find`**）、
-  `ladder` 读法；`TESTING_CORPUS.md` 新增「十六、护甲」章与逐行脚本
-  `scripts/run_corpus_armor_rows.py`（12 行）；护甲基线 19 例（`--surface armor`）。
+- 统一载荷 `ArmorPayload`：`identity`（`slot`/`slot_display`/`gear_tier`/`archetype`/套装）加
+  `instance`（光等、位置、能量、大师、调谐）加三层属性 `roll`/`base`/`final` 加插槽清单。
+  列表保持轻量（只加 `slot`/`slot_display`/`gear_tier`/`armor_system`，`bucket_type` 保留）。
+- 新增 `inventory_assistant(intent="item")`：单件护甲的完整载荷，词条本体槽与 `intrinsics`
+  标 `editable=false`。
+- 新增 `inventory_assistant(intent="equip_mod")`：更换一个模组。`confirmed=false` 时返回
+  「哪件护甲、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写；校验实例是否在该角色身上、
+  该槽是否接受该模组、能量是否足够。legacy `apply_mod` 收编到同一条确认路径。
+- 无解时返回 `ladder`：`shortfall`（差多少）、`ceiling`（同一套约束下同时能达到的上限，实采）、
+  `single_stat_ceiling`（单项上限，两者不能混用）、`trials`（逐级放松试了哪些档）、
+  `suggestion`（最小可行降档，只是提议，不自动降目标）。
+- 装备确认逐件预览：`candidates[0].items_preview` 给出五件的光等、能量、现有模组与将要装的模组。
+- 实机勘测修掉两个问题：老护甲也带 `gearTier: 0`（按字段分族会误判为 3.0）；异域护甲的固定属性
+  分布在 `intrinsics` 里（不算进 `roll` 会把大师等级算成 30）。
+- 文档：`routing.md` 补护甲统一键口径与 `find`/`recommend` 分工（要装备走 `find`）、`ladder` 读法；
+  `TESTING_CORPUS.md` 新增「十六、护甲」章与逐行脚本 `scripts/run_corpus_armor_rows.py`（12 行）；
+  护甲基线 19 例（`--surface armor`）。
 
 ## 0.1.2 — 2026-09-13
 
-**装给正在跟你说话的那个 Agent。**
+技能只装给正在对话的那个 Agent。
 
-以前的 `install_skill.py` 会把技能铺给**本机探测到的每一个宿主**（Codex、Claude、Cursor…），
-对一个新用户来说这是错的：他是在某个 Agent 里提问，只想让**那个** Agent 用上这套 MCP。
+此前 `install_skill.py` 会把技能铺给本机探测到的每一个宿主（Codex、Claude、Cursor 等），
+对新用户来说是错的：他在某个 Agent 里提问，只需要那个 Agent 用上这套 MCP。
 
-- 默认只装当前宿主，靠环境变量认：`DSH_HOME`/`DSH_SHELL` → dsh、`CLAUDECODE` → claude、
-  `CODEX_*` → codex；认不出来才退回旧行为（已存在的都装）。`--all` 保留全装，
-  `--host <name>` 显式指定，`--list` 会标出"← 当前"。
-- 新增 DeepSeek Harness 宿主：技能根 `~/.dsh/skills/`（DSH 会**热发现**，装完不用重启），
+- 默认只装当前宿主，靠环境变量识别：`DSH_HOME`/`DSH_SHELL` 对应 dsh、`CLAUDECODE` 对应 claude、
+  `CODEX_*` 对应 codex；识别不出来才退回旧行为。`--all` 保留全装，`--host <name>` 显式指定，
+  `--list` 会标出当前宿主。
+- 新增 DeepSeek Harness 宿主支持：技能根 `~/.dsh/skills/`（DSH 热发现，装完不用重启），
   全局指令文件 `~/.dsh/AGENTS.md`。
 - 新增 `--mcp`：注册 MCP 服务器。DSH 直接幂等写入 `$DSH_HOME/profiles/web/cordis.patch.yml`
-  （带 `destiny2-mcp:mcp-begin/end` 标记，先备份、重复跑只更新），工具以 `mcp__destiny__*`
-  出现；Claude Code / Codex 只**打印**可以直接粘的 `claude mcp add` / `codex mcp add` 命令，
-  不替用户改它们的配置。
-- README / AGENTS.md / 安装 Skill：把"装给提问的 Agent"写成显式规则，并补上 DSH 的注册步骤。
+  （带 `destiny2-mcp:mcp-begin/end` 标记，先备份、重复运行只更新），工具以 `mcp__destiny__*` 出现；
+  Claude Code 与 Codex 只打印可直接粘贴的 `claude mcp add` / `codex mcp add` 命令，不改它们的配置。
+- README、AGENTS.md、安装 Skill 把「装给提问的 Agent」写成显式规则，并补上 DSH 的注册步骤。
 
-首次安装的耗时预期也写进了 README：`pip install -e .` 约 5 分钟（下依赖，无进度条）、
+首次安装的耗时预期也写进 README：`pip install -e .` 约 5 分钟（下载依赖，无进度条），
 预构建 Manifest 685 MB 约 5 分钟。
 
 ## 0.1.1 — 2026-09-13
 
-**修 P0：干净环境装出来起不来。**
+修 P0：干净环境安装后无法启动。
 
-- 根因：`pyproject.toml` 只写了 `mcp[cli]>=1.27.2`，从零安装解析到 **mcp 2.2.0**；
-  2.x 把 `mcp.server.fastmcp` 改名成 `MCPServer`，服务在 import 阶段就炸，
-  自检报 `VERIFY_FAILED=MCPError: Connection closed`。开发机装着 1.x，本地测不出来。
-- 改成 `mcp[cli]>=1.27.2,<2`，并新增 `tests/test_dependency_bounds.py`
-  （上界 + lock 钉 1.x + 代码确实用 v1 API，三条一起才算完整约束）。
-- 验证方式：从 GitHub 克隆到干净目录 → `python -m venv .venv` → `pip install -e .`
-  → 下载预构建 Manifest → OAuth 登录 → `verify_mcp.py` 全绿（8 工具、
-  `BUNGIE_PROFILE_CHECK=ok`）→ 12 项真机冒烟全部符合文档。此时装到的是 mcp 1.30.0。
+- 原因：`pyproject.toml` 只写了 `mcp[cli]>=1.27.2`，从零安装会解析到 mcp 2.2.0；2.x 把
+  `mcp.server.fastmcp` 改名为 `MCPServer`，服务在 import 阶段即失败，自检报
+  `VERIFY_FAILED=MCPError: Connection closed`。开发机装着 1.x，本地测不出来。
+- 改为 `mcp[cli]>=1.27.2,<2`，并新增 `tests/test_dependency_bounds.py`（上界、lock 钉住 1.x、
+  代码确实使用 v1 API，三条一起才算完整约束）。
+- 验证方式：从 GitHub 克隆到干净目录，建立 venv 并 `pip install -e .`，下载预构建 Manifest，
+  完成 OAuth 登录，`verify_mcp.py` 全绿（8 工具、`BUNGIE_PROFILE_CHECK=ok`），12 项真机冒烟
+  全部符合文档。此时安装到的是 mcp 1.30.0。
 
-`v0.1.0` 的 tag 停留在修复前，请用 `v0.1.1`。
+`v0.1.0` 的 tag 停留在修复前，请使用 `v0.1.1`。
 
 ## 0.1.0 — 2026-09-13
 
@@ -283,37 +257,36 @@ legacy `apply_mod` 又不确认直接改账号）。这一版按 `ARMOR_FORMAT_P
 `loadout_assistant` / `subclass_assistant` / `activity_assistant` / `world_assistant`，
 共 108 个 intent）读取 Bungie 账号、Manifest 定义与本地社区资料。
 
-**能做什么**
+能做什么
 
-- 只读为主：角色概况、模糊找人、仓库/背包检索、武器词条与 god roll 标注、护甲词条反推、
+- 以只读为主：角色概况、模糊找人、仓库与背包检索、武器词条与 god roll 标注、护甲词条反推、
   商人货架、单场结算、收藏品解锁状态、官方配装与本地配装读取。
-- 写入类（转移、装备、改模组、存配装）一律先返回确认请求，`confirmed=false` 时**不触碰账号**；
-  装备配装还要求传回服务端签发的 `canonical_build`，自拼 hash 会被拒。
+- 写入类操作（转移、装备、改模组、存配装）一律先返回确认请求，`confirmed=false` 时不触碰账号；
+  装备配装还要求传回服务端签发的 `canonical_build`，自拼 hash 会被拒绝。
 - 证据分层：账号数据、Manifest 定义、社区资料三类来源在响应里分开放，缺数据就说缺数据，
-  不把"没扫完"答成"你没有"。
+  不把没扫完答成你没有。
 
-**安装与运行**
+安装与运行
 
 - Python 3.12+；`pip install -e .`；自带 OAuth 登录助手与 MCP 自检脚本。
 - 首次启动需要约 717 MB Manifest（可先取 `manifest-data-v1` 预构建库）。
-- 只暴露 8 个聚合工具；69 个历史工具要 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 才出现。
+- 只暴露 8 个聚合工具；69 个历史工具需要 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 才出现。
 
-**这一版为公开发布做的准备**
+为公开发布做的准备
 
-- 修正 `README` 推荐的启动方式：`python -m destiny_mcp.server` 会让配装求解的子进程起不来，
+- 修正 README 推荐的启动方式：`python -m destiny_mcp.server` 会让配装求解的子进程起不来，
   改为 `python -m destiny_mcp`。
 - 自检脚本不再误报：`DESTINY_OAUTH_REDIRECT_URI` 未写进 `.env` 时按运行时默认值判定；
   缺 Manifest 时自动把超时放宽到 1800 秒并打印原因；venv 路径与 token 权限检查按平台分支
-  （Windows 不再必失败）。
-- 登录助手缺 `openssl` 时给人话提示并指向 `--manual`，不再裸抛 traceback。
-- `equip_build` 传错 `canonical_build` 时改成中文说明（缺哪些字段、该先跑哪个 intent），
-  不再直接甩 pydantic 的英文堆栈。
-- 护甲模组筛选补 `match` 口径：词表外的词只在名字/描述里蒙中时标 `kind="keyword"` 并给 warning，
-  词表内 0 条时说明"本地数据里没有"，不再让 `速度` 这类词安静返回一堆无关模组。
+  （Windows 不再必然失败）。
+- 登录助手缺 `openssl` 时给出提示并指向 `--manual`，不再直接抛出 traceback。
+- `equip_build` 传错 `canonical_build` 时改为中文说明（缺哪些字段、应先运行哪个 intent）。
+- 护甲模组筛选补 `match` 口径：词表外的词只在名字或描述里命中时标 `kind="keyword"` 并给 warning；
+  词表内 0 条时说明本地数据里没有。
 - 补 `LICENSE`（MIT）与 `pyproject` 的 license 元数据；README 增加「前置条件与已知限制」，
   写明平台支持、审计日志落盘位置（`~/.destiny_mcp/audit/`，明文、不上传）、
   跑测试需要 `pip install -e ".[dev]"`。
 - 删除长期失效的 `Dockerfile`（引用了不存在的 `src/`）；补 `tests/conftest.py`，
   干净克隆（没有 `.env`）也能跑全量测试。
 
-**已知限制**：见 README「前置条件与已知限制」与 `TESTING_CORPUS.md` 的「已知问题」。
+已知限制见 README「前置条件与已知限制」与 `TESTING_CORPUS.md` 的「已知问题」。

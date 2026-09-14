@@ -88,7 +88,10 @@ def test_diff_gate_detects_a_removed_field(diff_module, tmp_path: Path) -> None:
         (after / source.name).write_text(text, encoding="utf-8")
         payload = json.loads(text)
         if source.name == "stats_legendary.json":
-            payload["data"]["stats"]["__probe__"] = "闸门探针"
+            # 探针挂在 `data` 这一层：它一定是对象，不受各用例内部形状变化影响
+            # （以前挂在 data.stats.* 上，`stats` 从对象变列表后这条自测直接崩了）。
+            payload["data"]["__probe__"] = "闸门探针"
+            probe_path = "data.__probe__"
         (before / source.name).write_text(
             json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8"
         )
@@ -96,4 +99,4 @@ def test_diff_gate_detects_a_removed_field(diff_module, tmp_path: Path) -> None:
     report, ok = diff_module.diff(before, after, ALLOWLIST)
 
     assert not ok, "删掉未登记的字段必须让闸门失败"
-    assert "data.stats.__probe__" in report
+    assert probe_path in report
