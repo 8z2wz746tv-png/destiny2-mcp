@@ -1,20 +1,413 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "god_roll",
-      "weapon_name": "泰拉巴"
-    },
-    "elapsed_ms": 6,
+    "elapsed_ms": 18,
     "is_error": false,
-    "payload_chars": 251,
+    "payload_chars": 13188,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "god_roll",
+          "weapon_name": "泰拉巴"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
   "data": {
-    "god_roll": "「泰拉巴」在本地愿单里有记录（来源: Mercules904/mercules_crown_of_sorrow.txt），但这条记录解析不出 PvE/PvP 推荐 Perk。这不代表它没有推荐，只是本地这条数据不完整。"
+    "god_roll": {
+      "fixed_perks": [
+        {
+          "name": "贪食野兽",
+          "plug_hash": 2540536653
+        },
+        {
+          "name": "无尽食欲",
+          "plug_hash": 3351002503
+        }
+      ],
+      "kind": "fixed",
+      "note": "固定 roll 武器：没有可推荐的随机 roll，上面列的是它固定的固有特性与特性栏内容。",
+      "pve": [],
+      "pvp": [],
+      "source": "manifest",
+      "weapon_name": "泰拉巴"
+    },
+    "sockets": [
+      {
+        "equipped": null,
+        "kind": "intrinsic",
+        "option_count": 1,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "贪食野兽",
+            "plug_hash": 2540536653
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "框架",
+        "socket_index": 0
+      },
+      {
+        "equipped": null,
+        "kind": "barrel",
+        "option_count": 1,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "加长枪管",
+            "plug_hash": 1467527085,
+            "stat_effects": [
+              {
+                "stat": "操控性",
+                "value": -10
+              },
+              {
+                "stat": "射程",
+                "value": 10
+              },
+              {
+                "stat": "后坐方向",
+                "value": 10
+              }
+            ]
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "枪管",
+        "socket_index": 1
+      },
+      {
+        "equipped": null,
+        "kind": "magazine",
+        "option_count": 1,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "穿甲弹",
+            "plug_hash": 1968497646,
+            "stat_effects": [
+              {
+                "stat": "射程",
+                "value": 5
+              }
+            ]
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "弹匣",
+        "socket_index": 2
+      },
+      {
+        "equipped": null,
+        "kind": "trait",
+        "option_count": 1,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "无尽食欲",
+            "plug_hash": 3351002503
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "特性",
+        "socket_index": 3
+      },
+      {
+        "equipped": null,
+        "kind": "grip",
+        "option_count": 1,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "手托枪托",
+            "plug_hash": 990298390,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 10
+              }
+            ]
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "握把",
+        "socket_index": 4
+      },
+      {
+        "equipped": null,
+        "kind": "ornament",
+        "option_count": 3,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "默认皮肤",
+            "plug_hash": 2931483505
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "狼吞虎咽",
+            "plug_category": "v450_new_submachinegun0_skins",
+            "plug_hash": 343223696
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "霍克斯伯里恶魔",
+            "plug_category": "v450_new_submachinegun0_skins",
+            "plug_hash": 806209283
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "装饰",
+        "socket_index": 5
+      },
+      {
+        "equipped": null,
+        "kind": "tracker",
+        "option_count": 2,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "击杀记录器",
+            "plug_hash": 905869860
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "熔炉竞技场击杀记录器",
+            "plug_category": "v400.plugs.weapons.masterworks.trackers",
+            "plug_hash": 3244015567
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "追踪器",
+        "socket_index": 9
+      },
+      {
+        "equipped": null,
+        "kind": "masterwork",
+        "option_count": 1,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "空催化插槽",
+            "plug_hash": 1498917124
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "大师杰作",
+        "socket_index": 10
+      }
+    ],
+    "weapon": {
+      "ammo_type": "白弹",
+      "breaker_type": "",
+      "community": {
+        "archive_available": true,
+        "error": null,
+        "matched_count": 8,
+        "results": [
+          {
+            "category": "weapons",
+            "group": "能量武器",
+            "kind": "description",
+            "knowledge_id": "description:ed296bd04f0f9f689092ba61",
+            "page_id": "page:exotic-weapon/index.html",
+            "snippet": "烈日攻击型微型冲锋枪。\n贪食野兽充满后长按填装键即可快速激活。\n贪食野兽充能：\n每次造成伤害提供 2%[pvp][5%][/pvp] 充能。\n命中处于灼烧的战斗人员提供 3%[pvp][6.7%][/pvp]。\n击杀提供 10%。\n每受到一次伤害提供 1%。\n收起泰拉巴会清掉当前充能的 50%（例：70% → 20%）。\n贪食野兽效果：激活时立即填满弹匣。\n非精准伤害提高 187%[pvp][120%][/pvp]，精准伤害提高 99%[pvp][52.7%][/pvp]，0.8× 射速恢复延迟。\n+100 操控性、+100 填装速度、0.8× 填装时长倍率。\n+100 敏捷，滑铲距离由 6.5 米 提高到 8.5 米。\n50%[pvp][15%][/pvp] 烈日伤害抗性。\n贪食野兽持续 8 秒。每次命中延长 0.05[pvp][0.06][/pvp] 秒。\n剩余时长 ≤3 秒时，命中红血与橙血战斗人员每次延长 0.3 秒。\n↑催化剂：提供「刺客野心」Perk。",
+            "snippet_offset": 0,
+            "snippet_truncated": false,
+            "source": {
+              "archive_updated_at": "2026-09-09T05:57:18.563583+00:00",
+              "content_scope": "annotated_description",
+              "export_sha256": "d81c355ddd06d5711c0b4b8be57379193cecbcf71e51f987538aec5679a69080",
+              "fetched_at": "2026-09-09T05:27:42.962252+00:00",
+              "game_version_verified": false,
+              "inline_semantics_preserved": true,
+              "provider": "starside",
+              "record_sha256": "57bc99a841ac9cd1046fae2f42371a2faec403ede572e74d2993bc09cc4968ec",
+              "redistribution_license": "not_established",
+              "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+              "source_html_sha256": "aa9c1391aa7c0eb7c6e96c98e78c75040ac222d6ff6d5b1307152a0a6323c351",
+              "source_type": "web_archive_v2",
+              "title": "异域武器详解 · Starside",
+              "trust": "untrusted_reference",
+              "updated_at": "2026.8.30",
+              "url": "https://starside.work/exotic-weapon/index.html"
+            },
+            "title": "泰拉巴"
+          },
+          {
+            "category": "weapons",
+            "group": "异域武器详解 / 能量武器",
+            "kind": "table_row",
+            "knowledge_id": "share-row:aefafdcd543f61625605cce1",
+            "page_id": "page:share/exotic-weapon.md",
+            "snippet": "异域武器详解 / 能量武器\n武器：泰拉巴\n异域 PERK：贪食野兽\n无尽食欲\n↑刺客野心\n说明：烈日攻击型微型冲锋枪。\n贪食野兽充满后长按填装键即可快速激活。\n贪食野兽充能：\n每次造成伤害提供 2%[pvp][5%][/pvp] 充能。\n命中处于灼烧的战斗人员提供 3%[pvp][6.7%][/pvp]。\n击杀提供 10%。\n每受到一次伤害提供 1%。\n收起泰拉巴会清掉当前充能的 50%（例：70% → 20%）。\n贪食野兽效果：激活时立即填满弹匣。\n非精准伤害提高 187%[pvp][120%][/pvp]，精准伤害提高 99%[pvp][52.7%][/pvp]，0.8× 射速恢复延迟。\n+100 操控性、+100 填装速度、0.8× 填装时长倍率。\n+100 敏捷，滑铲距离由 6.5 米 提高到 8.5 米。\n50%[pvp][15%][/pvp] 烈日伤害抗性。\n贪食野兽持续 8 秒。每次命中延长 0.05[pvp][0.06][/pvp] 秒。\n剩余时长 ≤3 秒时，命中红血与橙血战斗人员每次延长 0.3 秒。\n↑催化剂：提供「刺客野心」Perk。",
+            "snippet_offset": 0,
+            "snippet_truncated": false,
+            "source": {
+              "archive_updated_at": null,
+              "content_scope": "table_row",
+              "declared_source": null,
+              "fetched_at": null,
+              "freshness_warning": null,
+              "game_version_verified": false,
+              "inline_semantics_preserved": true,
+              "line_end": 116,
+              "line_start": 116,
+              "local_path": "share/exotic-weapon.md",
+              "provider": "starside",
+              "record_sha256": "f63cb0fd02a9ae0a0cbca31e64c10f91978199b2fdcdd3ed48eda4320181c5a6",
+              "redistribution_license": "used_with_author_permission",
+              "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+              "source_markdown_sha256": "f63cb0fd02a9ae0a0cbca31e64c10f91978199b2fdcdd3ed48eda4320181c5a6",
+              "source_type": "author_markdown",
+              "title": "异域武器详解",
+              "trust": "untrusted_reference",
+              "updated_at": "2026.8.30",
+              "url": null
+            },
+            "title": "泰拉巴"
+          },
+          {
+            "category": "weapons",
+            "group": "评级",
+            "kind": "entry",
+            "knowledge_id": "entry:351b916ebc8c66997c33bdb7",
+            "page_id": "page:exotic-weapons/index.html",
+            "snippet": "泰拉巴 清怪：T1（火伤场景更合适） 适合搭配女王香炉的发热寒颤与火种扳机、精密射线快速进入野兽模式，获得火伤抗性。本身 100 弹药生成，非常不错的清怪枪",
+            "snippet_offset": 0,
+            "snippet_truncated": false,
+            "source": {
+              "archive_updated_at": "2026-09-09T05:57:18.563583+00:00",
+              "content_scope": "search_index_excerpt",
+              "export_sha256": "2ba6fc36af7b47f57e57a9aebbe79d67d04aafa6bcb7b6b020212b06a1609ddb",
+              "fetched_at": "2026-09-09T05:35:31.473080+00:00",
+              "game_version_verified": false,
+              "inline_semantics_preserved": false,
+              "provider": "starside",
+              "record_sha256": "cb6d2d1fcbaa5a007a6964c7174cd5072979b75293c73d25161f741d9c365133",
+              "redistribution_license": "not_established",
+              "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+              "source_html_sha256": "ff6d73bb89048bed69919703a0171d94bdf3a202dd72efa44373edaea6b5b4ce",
+              "source_type": "web_archive_v2",
+              "title": "刷取清单-异域武器 · Starside",
+              "trust": "untrusted_reference",
+              "updated_at": "2026.9.6",
+              "url": "https://starside.work/exotic-weapons/index.html#sec-1"
+            },
+            "title": "泰拉巴"
+          }
+        ]
+      },
+      "damage_type": "烈日",
+      "description": "我们在先祖曾走过的道路上行走。",
+      "farming": {
+        "available": true,
+        "coverage_scope": "indexed_rated_lists_only",
+        "cross_check": {
+          "element": {
+            "agrees": false,
+            "listed": "",
+            "manifest": "烈日"
+          },
+          "frame": {
+            "agrees": false,
+            "listed": "",
+            "manifest": "贪食野兽"
+          },
+          "note": "cross_check 只说明清单与当前 Manifest 是否对得上；can_roll=false 表示这个 perk 已退役（清单可能早于退役）。",
+          "perks": []
+        },
+        "list": "刷取清单-异域武器",
+        "matched": true,
+        "note": "适合搭配女王香炉的发热寒颤与火种扳机、精密射线快速进入野兽模式，获得火伤抗性。本身 100 弹药生成，非常不错的清怪枪",
+        "recommended_perks": {},
+        "remark": "",
+        "scale": "T",
+        "source": "",
+        "source_ref": {
+          "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+          "source_type": "web_archive_v2",
+          "trust": "untrusted_reference",
+          "updated_at": "2026.9.6",
+          "url": "https://starside.work/exotic-weapons/index.html"
+        },
+        "tier": ""
+      },
+      "frame": null,
+      "has_enhanced": false,
+      "icon_url": "https://www.bungie.net/common/destiny2_content/icons/88ea7e35e14f29c4cda6588cb258333b.jpg",
+      "intrinsic": "贪食野兽",
+      "is_craftable": false,
+      "item_hash": 3110698812,
+      "name": "泰拉巴",
+      "name_en": "Tarrabah",
+      "popularity": {
+        "available": false,
+        "note": "这个 intent 不带这项本地资料；需要时用对应的 intent 查。"
+      },
+      "rarity": "异域",
+      "rarity_tier": 6,
+      "roll_kind": "fixed",
+      "roll_summary": {
+        "option_counts": {},
+        "random_columns": [],
+        "roll_kind": "fixed",
+        "scope": "definition"
+      },
+      "rpm": 720,
+      "sources": [
+        {
+          "kind": "farming_list",
+          "name": "刷取清单-异域武器",
+          "path": "",
+          "trust": "untrusted_reference",
+          "updated_at": "2026.9.6"
+        },
+        {
+          "kind": "community_archive",
+          "matched_count": 8,
+          "name": "Starside 社区资料",
+          "trust": "untrusted_reference",
+          "updated_at": "2026-09-09T05:57:18.563583+00:00"
+        }
+      ],
+      "trait_ids": [
+        "foundry.tex_mechanica",
+        "item.weapon.submachinegun",
+        "item.weapon.exotic",
+        "releases.v450.season"
+      ],
+      "watermark": "/common/destiny2_content/icons/58d3ec8338cc9746a2e0cf901fbcec0e.png",
+      "weapon_type": "微型冲锋枪"
+    },
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,
-  "summary": "已读取社区推荐 roll。",
-  "warnings": []
+  "summary": "「泰拉巴」是固定 roll 武器，没有可推荐的随机 roll。",
+  "warnings": [
+    "固定 roll 武器：没有可推荐的随机 roll，上面列的是它固定的固有特性与特性栏内容。"
+  ]
 }

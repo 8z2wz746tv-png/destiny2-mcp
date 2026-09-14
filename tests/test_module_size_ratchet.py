@@ -55,7 +55,9 @@ CEILINGS = {
     "destiny_mcp/tools/_weapon_branches.py": 454,
     # P6：体积口径（定义级不带描述/图标）写在工厂里，349 → 363。
     # +2（4a）：gear_tier=0 → null 时给一句说明。
-    "destiny_mcp/services/weapon_payload.py": 365,
+    # 0.1.12：`with_equipped`（定义级 sockets 标"现在装的是哪个"）搬去
+    # `weapon_profile.py` —— 那里才是插槽助手的老家，也顺便给"强化版名标 ↑"腾出空间。
+    "destiny_mcp/services/weapon_payload.py": 334,
     # P5 新增：本地资料汇总（愿单/选取率/清单/社区 → 每个 plug 的 recommended）
     "destiny_mcp/services/weapon_local_data.py": 403,
 }

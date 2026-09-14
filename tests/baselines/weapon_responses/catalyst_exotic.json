@@ -1,12 +1,17 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "catalyst",
-      "weapon_name": "牵引器火炮"
-    },
-    "elapsed_ms": 553,
+    "elapsed_ms": 519,
     "is_error": false,
-    "payload_chars": 748,
+    "payload_chars": 1206,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "catalyst",
+          "weapon_name": "牵引器火炮"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
@@ -30,12 +35,26 @@
       "count": 1,
       "is_exotic": true,
       "unlock_state": "not_checked",
-      "weapon": "牵引器火炮",
-      "weaponEn": "Tractor Cannon"
-    }
+      "weapon": {
+        "frame": null,
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/6afd31f787ff68d32e1f574686494606.jpg",
+        "is_craftable": false,
+        "item_hash": 3580904581,
+        "name": "牵引器火炮",
+        "name_en": "Tractor Cannon",
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": null,
+        "rpm": 80,
+        "weapon_type": "霰弹枪"
+      }
+    },
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,
-  "summary": "已读取催化剂信息。",
-  "warnings": []
+  "summary": "已读取「牵引器火炮」的 1 个催化剂定义。",
+  "warnings": [
+    "本地不读账号的催化剂解锁记录：unlock_state=not_checked 表示没查，不是没解锁。"
+  ]
 }

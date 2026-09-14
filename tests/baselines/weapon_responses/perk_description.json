@@ -1,12 +1,17 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "perk_description",
-      "perk_name": "狂暴"
-    },
-    "elapsed_ms": 18,
+    "elapsed_ms": 15,
     "is_error": false,
-    "payload_chars": 5880,
+    "payload_chars": 5981,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "perk_description",
+          "perk_name": "狂暴"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
@@ -137,14 +142,17 @@
     },
     "perk": {
       "description": "完成最后一击可提高武器伤害力，持续时间延长。可叠加3次。",
-      "flavorText": "",
+      "flavor_text": "",
       "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8976ead57430e4f5f8af1b3005de4f83.png",
+      "item_hash": 288411554,
       "name": "狂暴",
-      "nameEn": "Rampage"
-    }
+      "name_en": "Rampage",
+      "plug_category": "frames"
+    },
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,
-  "summary": "已读取 perk 描述。",
+  "summary": "已读取 Perk「狂暴」的说明。",
   "warnings": []
 }

@@ -362,6 +362,20 @@ def validate_build(manifest: ManifestManager, build: dict) -> dict:
     }
 
 
+def _marked_perk(name: str, matched_hashes: set[int]) -> str:
+    """命中项按同一套展示口径标强化版：普通版原样，强化版加 ↑。
+
+    判定方式是查配对表（`base_of(hash) != 0` 即这个 hash 本身是强化版），
+    所以命中的是强化版时名字带箭头，读的人一眼能看出"这是强化过的"。
+    """
+    from .weapon_profile import load_enhanced_pairs
+
+    pairs = load_enhanced_pairs()
+    enhanced = any(pairs.base_of(int(hash_value)) != 0 for hash_value in matched_hashes)
+    text = str(name or "").strip()
+    return f"{text}↑" if enhanced and text else text
+
+
 def _armor_slot_key(item: Any) -> str:
     """库存条目 → 统一槽位键：优先用它已经算好的 `slot`，退回 bucket 显示名。"""
     slot = getattr(item, "slot", "") or ""
@@ -531,9 +545,11 @@ async def match_inventory(
                                 for definition in perk["definitions"]
                             }
                             if current_hashes & perk_hashes:
-                                current_ok.append(perk["name"])
+                                current_ok.append(_marked_perk(perk["name"], current_hashes & perk_hashes))
                             elif selectable_hashes & perk_hashes:
-                                alternate_ok.append(perk["name"])
+                                alternate_ok.append(
+                                    _marked_perk(perk["name"], selectable_hashes & perk_hashes)
+                                )
                             else:
                                 missing.append(perk["name"])
                         instance["perks_current_match"] = current_ok

@@ -1,18 +1,102 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "catalog",
-      "limit": 5,
-      "weapon_type": "手炮"
-    },
-    "elapsed_ms": 2314,
+    "elapsed_ms": 3131,
     "is_error": false,
-    "payload_chars": 2952,
+    "payload_chars": 5965,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "catalog",
+          "limit": 5,
+          "weapon_type": "手炮"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
   "data": {
     "checked_count": 228,
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 3,
+      "results": [
+        {
+          "dps": "13514",
+          "list": "刷取清单-异域武器",
+          "name": "叛贼",
+          "note": "叛贼 bug，在触发了叛贼 buff 后开脱手大，大招结束后马上切到爆炸武器会把叛贼的 30% 增伤转移到该武器上左侧的 DPS 是在触发了叛贼 buff 后的双增伤光芒复仇是目前游戏中能够被实际应用的最高 DPS 叛贼“潜藏能量”进度快，能够频繁进入“释放力量”模式释放力量模式自带虚弱高爆弹药，邪恶收割虚空覆盖护盾弥补了持续扣血的不足",
+          "scale": "T",
+          "scenario_tiers": {
+            "清怪": "T1",
+            "输出": "T0"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          },
+          "total_damage": "118926"
+        },
+        {
+          "list": "刷取清单-异域武器",
+          "name": "流明",
+          "note": "在没有汇编腿的情况给予队友高尚弹药 35% 增伤也有流明勾爪的玩法",
+          "role": "特殊用途",
+          "scale": "T",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          }
+        },
+        {
+          "list": "刷取清单-异域武器",
+          "name": "烈日弹丸",
+          "note": "高爆弹药和烈日爆炸都是非常不错的清怪组件",
+          "scale": "T",
+          "scenario_tiers": {
+            "清怪": "T0.5"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          }
+        }
+      ],
+      "returned_count": 3,
+      "truncated": false,
+      "unmatched": [
+        "引力子尖刺",
+        "渎职"
+      ],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    },
     "filters": {
       "any_perks": [],
       "excluded_perks": [],
@@ -22,78 +106,93 @@
     },
     "matched": [
       {
-        "ammo_type": "主要",
-        "damage_type": "虚空",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/39441735ec0f1e7f7760775f6ee4bd24.jpg",
+        "is_craftable": false,
         "item_hash": 253843484,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "叛贼",
-        "nameEn": "Turncoat",
+        "name_en": "Turncoat",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "fixed",
+        "rpm": 140,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "手炮"
       },
       {
-        "ammo_type": "主要",
-        "damage_type": "电弧",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ac56ad66eb1ebb8a371f9d3d3c768c5a.jpg",
+        "is_craftable": true,
         "item_hash": 648595258,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "引力子尖刺",
-        "nameEn": "Graviton Spike",
+        "name_en": "Graviton Spike",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "random",
+        "rpm": 150,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "手炮"
       },
       {
-        "ammo_type": "主要",
-        "damage_type": "动能",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/65735eb5048ba941145e35224014e479.jpg",
-        "item_hash": -782952492,
+        "is_craftable": false,
+        "item_hash": 3512014804,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "流明",
-        "nameEn": "Lumina",
+        "name_en": "Lumina",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "fixed",
+        "rpm": 140,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "手炮"
       },
       {
-        "ammo_type": "主要",
-        "damage_type": "动能",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5564a17ddf52e36f56e7256ad9946a17.jpg",
+        "is_craftable": false,
         "item_hash": 204878059,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "渎职",
-        "nameEn": "Malfeasance",
+        "name_en": "Malfeasance",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "fixed",
+        "rpm": 180,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "手炮"
       },
       {
-        "ammo_type": "主要",
-        "damage_type": "烈日",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f45a7d8e52bf0d88bbd43d4354878313.jpg",
-        "item_hash": -1387837739,
+        "is_craftable": false,
+        "item_hash": 2907129557,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "烈日弹丸",
-        "nameEn": "Sunshot",
+        "name_en": "Sunshot",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "fixed",
+        "rpm": 150,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "手炮"
       }
     ],
@@ -101,12 +200,14 @@
     "returned_count": 5,
     "scope": "manifest_catalog",
     "scope_label": "全量武器定义候选（未读取账号持有情况）",
-    "truncated": true
+    "truncated": true,
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,
   "summary": "全量武器定义检查 228 把，命中 228 把。",
   "warnings": [
-    "这些是 Manifest 全量候选，未读取账号持有情况。"
+    "include_inventory=false：这些是 Manifest 全量候选，未读取账号持有情况。",
+    "命中的 4 把是固定 roll 武器（如 叛贼）：没有 roll 可变，按 perk 筛只是确认它自带什么。"
   ]
 }

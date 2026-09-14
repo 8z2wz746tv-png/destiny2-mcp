@@ -1,39 +1,136 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "stats",
-      "weapon_name": "遗产"
-    },
     "elapsed_ms": 4,
     "is_error": false,
-    "payload_chars": 580,
+    "payload_chars": 2767,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "stats",
+          "weapon_name": "遗产"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
   "data": {
-    "stats": {
-      "icon_url": "https://www.bungie.net/common/destiny2_content/icons/07619f9f7115a2295c080f08179deb98.jpg",
-      "name": "遗产",
-      "nameEn": "Heritage",
-      "stats": {
-        "伤害": 70,
-        "变焦": 12,
-        "后坐方向": 60,
-        "填装速度": 45,
-        "射程": 68,
-        "弹匣": 60,
-        "弹药生成": 49,
-        "操控性": 70,
-        "每分钟发射数": 30,
-        "稳定性": 43,
-        "空中效率": 5,
-        "辅助瞄准": 68
+    "stats": [
+      {
+        "display": "65",
+        "display_as_numeric": true,
+        "is_primary": false,
+        "name": "每分钟发射数",
+        "stat_hash": 4284893193,
+        "value": 65
       },
-      "weaponType": "霰弹枪"
-    }
+      {
+        "display": "70",
+        "display_as_numeric": false,
+        "is_primary": false,
+        "name": "伤害",
+        "stat_hash": 4043523819,
+        "value": 70
+      },
+      {
+        "display": "68",
+        "display_as_numeric": false,
+        "is_primary": false,
+        "name": "射程",
+        "stat_hash": 1240592695,
+        "value": 68
+      },
+      {
+        "display": "43",
+        "display_as_numeric": false,
+        "is_primary": false,
+        "name": "稳定性",
+        "stat_hash": 155624089,
+        "value": 43
+      },
+      {
+        "display": "70",
+        "display_as_numeric": false,
+        "is_primary": false,
+        "name": "操控性",
+        "stat_hash": 943549884,
+        "value": 70
+      },
+      {
+        "display": "45",
+        "display_as_numeric": false,
+        "is_primary": false,
+        "name": "填装速度",
+        "stat_hash": 4188031367,
+        "value": 45
+      },
+      {
+        "display": "6",
+        "display_as_numeric": true,
+        "is_primary": false,
+        "name": "弹匣",
+        "stat_hash": 3871231066,
+        "value": 6
+      },
+      {
+        "display": "68",
+        "display_as_numeric": false,
+        "is_primary": false,
+        "name": "辅助瞄准",
+        "stat_hash": 1345609583,
+        "value": 68
+      },
+      {
+        "display": "12",
+        "display_as_numeric": false,
+        "is_primary": false,
+        "name": "变焦",
+        "stat_hash": 3555269338,
+        "value": 12
+      },
+      {
+        "display": "60",
+        "display_as_numeric": true,
+        "is_primary": false,
+        "name": "后坐方向",
+        "stat_hash": 2715839340,
+        "value": 60
+      },
+      {
+        "display": "5",
+        "display_as_numeric": false,
+        "is_primary": false,
+        "name": "空中效率",
+        "stat_hash": 2714457168,
+        "value": 5
+      },
+      {
+        "display": "49",
+        "display_as_numeric": false,
+        "is_primary": false,
+        "name": "弹药生成",
+        "stat_hash": 1931675084,
+        "value": 49
+      }
+    ],
+    "weapon": {
+      "frame": "精确重击框架",
+      "icon_url": "https://www.bungie.net/common/destiny2_content/icons/07619f9f7115a2295c080f08179deb98.jpg",
+      "is_craftable": true,
+      "item_hash": 4248569242,
+      "name": "遗产",
+      "name_en": "Heritage",
+      "rarity": "传说",
+      "rarity_tier": 5,
+      "roll_kind": "random",
+      "rpm": 65,
+      "weapon_type": "霰弹枪"
+    },
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,
-  "summary": "已读取武器属性。",
+  "summary": "已读取「遗产」的 12 项属性。",
   "warnings": []
 }

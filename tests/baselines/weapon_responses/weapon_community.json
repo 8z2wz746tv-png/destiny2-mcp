@@ -1,12 +1,17 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "community",
-      "weapon_name": "辉耀炽热"
-    },
     "elapsed_ms": 13,
     "is_error": false,
     "payload_chars": 31783,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "community",
+          "weapon_name": "辉耀炽热"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],

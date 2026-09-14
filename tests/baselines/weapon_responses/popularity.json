@@ -1,17 +1,142 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "popularity",
-      "weapon_name": "遗产"
-    },
-    "elapsed_ms": 4,
+    "elapsed_ms": 15,
     "is_error": false,
-    "payload_chars": 183,
+    "payload_chars": 3461,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "popularity",
+          "weapon_name": "遗产"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
   "data": {
-    "popularity": null
+    "popularity": null,
+    "weapon": {
+      "ammo_type": "绿弹",
+      "breaker_type": "",
+      "community": {
+        "archive_available": false,
+        "matched_count": 0,
+        "note": "这个 intent 不带这项本地资料；需要时用对应的 intent 查。",
+        "results": []
+      },
+      "damage_type": "动能",
+      "description": "枪管内部刻着一个名字：“威廉明娜-1”",
+      "farming": {
+        "available": true,
+        "coverage_scope": "indexed_rated_lists_only",
+        "cross_check": {
+          "element": {
+            "agrees": true,
+            "listed": "动能",
+            "manifest": "动能"
+          },
+          "frame": {
+            "agrees": true,
+            "listed": "精确重击 65",
+            "manifest": "精确重击框架"
+          },
+          "note": "cross_check 只说明清单与当前 Manifest 是否对得上；can_roll=false 表示这个 perk 已退役（清单可能早于退役）。",
+          "perks": [
+            {
+              "can_roll": true,
+              "column": "三号位",
+              "in_manifest_pool": true,
+              "name": "转向"
+            },
+            {
+              "can_roll": null,
+              "column": "四号位",
+              "in_manifest_pool": false,
+              "name": "聚合充能/级联点"
+            },
+            {
+              "can_roll": true,
+              "column": "四号位",
+              "in_manifest_pool": true,
+              "name": "重组"
+            }
+          ]
+        },
+        "list": "刷取清单-绿弹紫枪",
+        "matched": true,
+        "note": "全游戏最高的单弹匣爆发 DPS，转向+重组的组合很有意思",
+        "recommended_perks": {
+          "三号位": [
+            "转向"
+          ],
+          "四号位": [
+            "聚合充能/级联点",
+            "重组"
+          ]
+        },
+        "remark": "动能合成",
+        "scale": "T",
+        "source": "深岩墓室",
+        "source_ref": {
+          "local_path": "share/legendary-special.md",
+          "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+          "source_type": "author_markdown",
+          "trust": "untrusted_reference",
+          "updated_at": "2026.9.6"
+        },
+        "tier": "T1"
+      },
+      "frame": "精确重击框架",
+      "has_enhanced": true,
+      "icon_url": "https://www.bungie.net/common/destiny2_content/icons/07619f9f7115a2295c080f08179deb98.jpg",
+      "intrinsic": "精确重击框架",
+      "is_craftable": true,
+      "item_hash": 4248569242,
+      "name": "遗产",
+      "name_en": "Heritage",
+      "popularity": {
+        "available": false,
+        "note": "本地没有这把武器的选取率快照；没有不等于没人用。"
+      },
+      "rarity": "传说",
+      "rarity_tier": 5,
+      "roll_kind": "random",
+      "roll_summary": {
+        "option_counts": {
+          "弹匣": 16,
+          "枪管": 22,
+          "特性1": 20,
+          "特性2": 20
+        },
+        "random_columns": [
+          "枪管",
+          "弹匣",
+          "特性1",
+          "特性2"
+        ],
+        "roll_kind": "random",
+        "scope": "definition"
+      },
+      "rpm": 65,
+      "sources": [
+        {
+          "kind": "farming_list",
+          "name": "刷取清单-绿弹紫枪",
+          "path": "share/legendary-special.md",
+          "trust": "untrusted_reference",
+          "updated_at": "2026.9.6"
+        }
+      ],
+      "trait_ids": [
+        "item.weapon.shotgun",
+        "releases.v500.annual"
+      ],
+      "watermark": "/common/destiny2_content/icons/bce51cf90464e28026140df77c4eb6ce.png",
+      "weapon_type": "霰弹枪"
+    },
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,

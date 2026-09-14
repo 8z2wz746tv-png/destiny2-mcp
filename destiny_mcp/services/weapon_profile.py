@@ -419,6 +419,25 @@ def _stat_effects(manifest: "ManifestManager", names: Any, plug_hash: int) -> li
     return effects
 
 
+#: 强化版（Enhanced）在**展示名**后面加这个箭头；普通版保持原字符串不变。
+#: 为什么拼进字符串而不是另开字段：agent 读的就是 `name`，另开字段等于没标。
+#: 内部按名字索引的地方（清单/愿单/筛选）必须用 `strip_enhanced_marker` 归一化。
+ENHANCED_MARKER = "↑"
+
+
+def display_perk_name(name: str, *, enhanced: bool) -> str:
+    """展示用 perk 名：强化版加 `↑`，普通版原样。"""
+    text = str(name or "").strip()
+    if not text or not enhanced or text.endswith(ENHANCED_MARKER):
+        return text
+    return f"{text}{ENHANCED_MARKER}"
+
+
+def strip_enhanced_marker(name: str) -> str:
+    """去掉展示箭头，拿回 Manifest 里的规范名字（内部匹配/索引只用这个）。"""
+    return str(name or "").replace(ENHANCED_MARKER, "").strip()
+
+
 def _plug_option(
     manifest: "ManifestManager",
     *,
@@ -435,15 +454,19 @@ def _plug_option(
     info = manifest.get_item_info(plug_hash) or {}
     option_name = str(name or info.get("name") or "").strip()
     plug_category = str(category or manifest.get_plug_category_identifier(plug_hash) or "")
+    is_enhanced = pairs.base_of(plug_hash) != 0
     option: dict[str, Any] = {
         "plug_hash": int(plug_hash),
-        "name": option_name,
+        "name": display_perk_name(option_name, enhanced=is_enhanced),
         "plug_category": plug_category,
         "can_roll": bool(can_roll),
         # `enhanced` 布尔与 `enhanced_plug_hash` 表达同一件事（自己就是强化版时后者指向自己），
         # 保留一个即可；`recommended.wishlist` 也取代了原来的扁平 god_roll_pve/pvp。
         "enhanced_plug_hash": pairs.enhanced_of(plug_hash),
     }
+    if is_enhanced and option_name:
+        # 带箭头的是展示名；要拿去比对/查表用这个
+        option["name_plain"] = option_name
     if include_descriptions:
         description = ""
         sandbox = manifest.get_sandbox_perk_description(plug_hash)
@@ -869,8 +892,12 @@ def instance_options(
         if equipped and 0 <= index < len(equipped):
             current = int(equipped[index] or 0)
         socket["equipped_plug_hash"] = current
-        socket["equipped_name"] = (
+        # 与可换项同一套展示口径：强化版带 ↑（实例 options 块用的是 equipped_name）
+        equipped_name = (
             str((manifest.get_item_info(current) or {}).get("name") or "") if current else ""
+        )
+        socket["equipped_name"] = display_perk_name(
+            equipped_name, enhanced=bool(current) and load_enhanced_pairs().base_of(current) != 0
         )
     return options
 
@@ -916,3 +943,45 @@ def fixed_roll_perks(sockets: list[dict]) -> list[dict]:
         if socket.get("kind") == "trait" and socket.get("option_count", 0) == 1:
             perks.extend(socket.get("options") or [])
     return perks
+
+
+def with_equipped(
+    sockets: list[dict[str, Any]],
+    equipped: list[int] | None,
+    manifest: "ManifestManager" | None = None,
+    pairs: EnhancedPairs | None = None,
+) -> list[dict[str, Any]]:
+    """给**定义级** sockets 标上"这一件现在装的是哪个"（按 `socket_index` 对齐组件 305）。
+
+    定义级看"能出什么"，`equipped` 看"我手上这件装的是什么" —— 两者放一起才回答得了
+    "我这把要不要换"。没有实例数据时 `equipped` 为 null，不假装没装。
+    """
+    annotated: list[dict[str, Any]] = []
+    for socket in sockets:
+        item = dict(socket)
+        item["equipped"] = None
+        index = item.get("socket_index")
+        plug_hash = 0
+        if (
+            equipped
+            and isinstance(index, int)
+            and 0 <= index < len(equipped)
+        ):
+            plug_hash = int(equipped[index] or 0)
+        if plug_hash:
+            name = ""
+            if manifest is not None:
+                name = str((manifest.get_item_info(plug_hash) or {}).get("name") or "")
+            # 现在装的是强化版也要标出来（equipped 名走的是同一条展示口径）。
+            # pairs 允许调用方注入：自己闷头读真实配对表会让替身数据（测试/别的来源）永远标不上。
+            table = pairs if pairs is not None else load_enhanced_pairs()
+            enhanced = table.base_of(int(plug_hash)) != 0
+            equipped_block: dict[str, Any] = {
+                "plug_hash": plug_hash,
+                "name": display_perk_name(name, enhanced=enhanced),
+            }
+            if enhanced and name:
+                equipped_block["name_plain"] = name
+            item["equipped"] = equipped_block
+        annotated.append(item)
+    return annotated

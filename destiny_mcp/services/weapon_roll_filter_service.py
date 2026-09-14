@@ -6,6 +6,8 @@ not judge god rolls or dismantle candidates; it only applies explicit filters.
 
 from __future__ import annotations
 
+from . import weapon_profile as wp
+
 from typing import TYPE_CHECKING, Any
 
 from ..exceptions import ManifestError
@@ -148,7 +150,12 @@ class WeaponRollFilterService:
             if not isinstance(definition, dict):
                 continue
             perk_details = self._catalog_perk_details(candidate)
-            perk_names = [str(perk["name"]) for perk in perk_details if perk.get("name")]
+            # 展示名可能带强化版箭头；匹配用规范名（输出仍保留带箭头的那种）
+            perk_names = [
+                wp.strip_enhanced_marker(str(perk["name"]))
+                for perk in perk_details
+                if perk.get("name")
+            ]
             perk_keys = [name.casefold() for name in perk_names]
             has_required = all(
                 any(term in perk for perk in perk_keys) for term in required
@@ -263,8 +270,9 @@ class WeaponRollFilterService:
 
     @classmethod
     def _perk_names(cls, weapon: dict[str, Any]) -> list[str]:
+        # 比较/筛选用规范名；带 ↑ 的展示名留给响应
         return [
-            str(plug.get("name") or "")
+            wp.strip_enhanced_marker(str(plug.get("name")))
             for plug in cls._equipped_plugs(weapon)
             if plug.get("name")
         ]

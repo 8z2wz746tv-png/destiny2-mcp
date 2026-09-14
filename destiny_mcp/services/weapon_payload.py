@@ -156,38 +156,7 @@ def column_list(
         item["options"] = []
         item["options_available"] = False
         columns.append(item)
-    return with_equipped(columns, equipped, manifest)
-
-
-def with_equipped(
-    sockets: list[dict[str, Any]],
-    equipped: list[int] | None,
-    manifest: "ManifestManager" | None = None,
-) -> list[dict[str, Any]]:
-    """给**定义级** sockets 标上"这一件现在装的是哪个"（按 `socket_index` 对齐组件 305）。
-
-    定义级看"能出什么"，`equipped` 看"我手上这件装的是什么" —— 两者放一起才回答得了
-    "我这把要不要换"。没有实例数据时 `equipped` 为 null，不假装没装。
-    """
-    annotated: list[dict[str, Any]] = []
-    for socket in sockets:
-        item = dict(socket)
-        item["equipped"] = None
-        index = item.get("socket_index")
-        plug_hash = 0
-        if (
-            equipped
-            and isinstance(index, int)
-            and 0 <= index < len(equipped)
-        ):
-            plug_hash = int(equipped[index] or 0)
-        if plug_hash:
-            name = ""
-            if manifest is not None:
-                name = str((manifest.get_item_info(plug_hash) or {}).get("name") or "")
-            item["equipped"] = {"plug_hash": plug_hash, "name": name}
-        annotated.append(item)
-    return annotated
+    return weapon_profile.with_equipped(columns, equipped, manifest)
 
 
 def socket_list(
@@ -244,7 +213,7 @@ def socket_list(
         _normalize_equipped(dict(socket)) | {"options_available": True}
         for socket in raw
     ]
-    return with_equipped(expanded, equipped, manifest)
+    return weapon_profile.with_equipped(expanded, equipped, manifest, pairs)
 
 
 def roll_summary(sockets: list[dict[str, Any]], *, scope: str = "definition") -> dict[str, Any]:

@@ -148,9 +148,11 @@ def test_enhanced_pair_points_both_ways(stub_manifest, stub_pairs) -> None:
 
     # P6：`enhanced` 布尔与 `enhanced_plug_hash` 表达同一件事，只留后者
     assert options["狂暴"]["enhanced_plug_hash"] == 302
-    assert options["狂暴"]["enhanced_plug_hash"] == 302
-    assert options["强化狂暴"]["enhanced_plug_hash"] == 302  # 自己就是强化版时指向自己
-    assert options["强化狂暴"]["enhanced_plug_hash"] == 302  # 指自己 = "我就是强化版"
+    # 强化版的展示名带 ↑（普通版原样）；规范名留在 name_plain 里
+    assert options["强化狂暴↑"]["enhanced_plug_hash"] == 302  # 指自己 = "我就是强化版"
+    assert options["强化狂暴↑"]["name_plain"] == "强化狂暴"
+    assert "name_plain" not in options["狂暴"]
+    assert wp.strip_enhanced_marker("强化狂暴↑") == "强化狂暴"
     assert options["退役的 Perk"]["enhanced_plug_hash"] == 0
     assert wp.has_enhanced(sockets) is True
 
@@ -339,3 +341,29 @@ def test_real_enhanced_pairs_are_usable(real_manifest: ManifestManager) -> None:
 
     assert wp.has_enhanced(sockets) is True
     assert any(option["enhanced_plug_hash"] for option in trait["options"]), "特性栏应能指出强化版"
+
+
+def test_enhanced_marker_is_applied_to_equipped_names_too(stub_manifest, stub_pairs) -> None:
+    """同一件武器里，"现在装的"和"可换项"必须用同一套展示口径（都带 ↑）。"""
+    definition = stub_manifest.get_item_definition(100)
+    sockets = wp.socket_options(
+        stub_manifest, definition, names=names_for(stub_manifest), pairs=stub_pairs
+    )
+
+    annotated = wp.with_equipped(sockets, [302], stub_manifest, stub_pairs)
+    equipped = annotated[0]["equipped"]
+    assert equipped is not None
+    assert equipped["name"].endswith(wp.ENHANCED_MARKER)
+    assert equipped["name_plain"] == equipped["name"].rstrip(wp.ENHANCED_MARKER)
+
+
+def test_enhanced_marker_does_not_leak_into_plain_names(stub_manifest, stub_pairs) -> None:
+    """普通版的名字必须一字不变（这是这次改动的硬约束）。"""
+    definition = stub_manifest.get_item_definition(100)
+    sockets = wp.socket_options(
+        stub_manifest, definition, names=names_for(stub_manifest), pairs=stub_pairs
+    )
+
+    names = [option["name"] for option in sockets[0]["options"]]
+    assert "狂暴" in names, "普通版名字不能带箭头"
+    assert not any(name == "狂暴↑" for name in names)

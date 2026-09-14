@@ -381,6 +381,7 @@
 | ⭐ 社区配装能不能直接穿 | `build_assistant(intent="community", community_build_id=…, include_inventory=true)` | summary 里必须出现「**不可直接执行**」，第一条 warning 给 `execution_supported=false` + blocker + 「要走 find → canonical_build → 确认」；`execution_eligible` 是 false |
 | 社区模板说的套装我没见过 | 同上的 `armor_set` 行 | 活动名（玻璃拱顶）自动解析成套装名（埃希恩记忆）并标 `resolved_via=activity_alias`；对不上时给 `unresolved_reason` + `set_name_candidates`；行里直接有 `owned_count`/`missing_slot_count`（几件、缺几件） |
 | 这一项是「没有」还是「没查」 | 任意 requirement 行 | `not_account_checked` 必带 `unverifiable_reason` 枚举；`unresolved` 必带 `unresolved_reason`；武器 roll 分三层：`perks_current_match`（现在装着）/ `perks_available_to_switch`（换一下就行）/ `perks_unavailable`（换也换不到）；只有 `selectable_plug_status="available"` 才说明这一层真读了，没读时是 `alternate_perk_options_checked=false` + 原因 |
+| 哪个 perk 是强化版 | `weapon_assistant(intent="analyze")` 的 `options[].name` / `equipped.name`，以及社区核对的 `perks_current_match` | 普通版名字原样；**强化版名字后面带 `↑`**（例 `高爆载荷↑`），并另给 `name_plain` 作为规范名 |
 | 目标根本配不出来时怎么说 | `ladder.verdict` | `satisfiable=false`（按原始优先级实测 0 候选）+ 说明 `ceiling` 是**逐项**最大值、不等于同一套能同时达到；`solved_after_rotation` 标出"换优先级能出解"这件事 |
 | 阶梯会不会偷偷改我的目标 | `ladder.targets` + 原始请求 | `targets` 里仍是用户给的数（如 近战70/手雷70）；降级只是提议，**未经确认不许改**；`recommend` 的无解响应继续带"不得自动降低"的 warning |
 | 只给优先级、不给硬目标 | `intent="recommend"` + 只有 `priority_stats` | `completion_rate` 是 `null` + `completion_rate_note`，**不是 0.0**（0.0 会被读成"一个都没满足"） |

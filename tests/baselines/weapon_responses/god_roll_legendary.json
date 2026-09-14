@@ -1,20 +1,1888 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "god_roll",
-      "weapon_name": "遗产"
-    },
-    "elapsed_ms": 7,
+    "elapsed_ms": 27,
     "is_error": false,
-    "payload_chars": 895,
+    "payload_chars": 50349,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "god_roll",
+          "weapon_name": "遗产"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
   "data": {
-    "god_roll": "=== 遗产 God Roll 推荐 ===\n来源: pandapaxxy, File, AyyItsChevy/super_pog.txt, AyyItsChevy/super_pog_s13.txt, YeezyGT/YeezyGT_S16.txt, pandapaxxy, File, YeezyGT/YeezyGT_S16.txt, pandapaxxy, File, AyyItsChevy/super_pog.txt, AyyItsChevy/super_pog_s13.txt, YeezyGT/YeezyGT_S16.txt, Speedrunner, pandapaxxy, File, pandapaxxy, File, AyyItsChevy/super_pog.txt, AyyItsChevy/super_pog_s13.txt\n\n【PvE】推荐 perk (17 个):\n  • 不法之徒\n  • 加大弹匣\n  • 小口径枪膛\n  • 战术弹匣\n  • 敲打\n  • 槽化枪管\n  • 滑行射击\n  • 突击弹匣\n  • 箭头制退器\n  • 精确弹药\n  • 自动填装枪套\n  • 螺旋膛线\n  • 轻质弹匣\n  • 重建\n  • 重组\n  • 锻造膛线\n  • 附加弹匣\n\n【PvP】推荐 perk (16 个):\n  • 不法之徒\n  • 小口径枪膛\n  • 战术弹匣\n  • 杀人风\n  • 槽化枪管\n  • 滑行射击\n  • 移动目标\n  • 突击弹匣\n  • 箭头制退器\n  • 精确弹药\n  • 腰射握把\n  • 螺旋膛线\n  • 轻质弹匣\n  • 速射瞄准\n  • 重建\n  • 锻造膛线"
+    "god_roll": {
+      "kind": "recommended",
+      "pve": [
+        {
+          "name": "加大弹匣",
+          "plug_hash": -1874072196
+        },
+        {
+          "name": "敲打",
+          "plug_hash": -1568495426
+        },
+        {
+          "name": "精确弹药",
+          "plug_hash": -1152677585
+        },
+        {
+          "name": "滑行射击",
+          "plug_hash": -1133150708
+        },
+        {
+          "name": "锻造膛线",
+          "plug_hash": -1044932743
+        },
+        {
+          "name": "自动填装枪套",
+          "plug_hash": -994151068
+        },
+        {
+          "name": "螺旋膛线",
+          "plug_hash": -204315848
+        },
+        {
+          "name": "战术弹匣",
+          "plug_hash": 106909392
+        },
+        {
+          "name": "重组",
+          "plug_hash": 469285294
+        },
+        {
+          "name": "轻质弹匣",
+          "plug_hash": 679225683
+        },
+        {
+          "name": "突击弹匣",
+          "plug_hash": 791862061
+        },
+        {
+          "name": "箭头制退器",
+          "plug_hash": 839105230
+        },
+        {
+          "name": "附加弹匣",
+          "plug_hash": 1087426260
+        },
+        {
+          "name": "不法之徒",
+          "plug_hash": 1168162263
+        },
+        {
+          "name": "小口径枪膛",
+          "plug_hash": 1482024992
+        },
+        {
+          "name": "重建",
+          "plug_hash": 1523832109
+        },
+        {
+          "name": "槽化枪管",
+          "plug_hash": 1840239774
+        }
+      ],
+      "pvp": [
+        {
+          "name": "杀人风",
+          "plug_hash": -1844178773
+        },
+        {
+          "name": "精确弹药",
+          "plug_hash": -1152677585
+        },
+        {
+          "name": "滑行射击",
+          "plug_hash": -1133150708
+        },
+        {
+          "name": "锻造膛线",
+          "plug_hash": -1044932743
+        },
+        {
+          "name": "螺旋膛线",
+          "plug_hash": -204315848
+        },
+        {
+          "name": "战术弹匣",
+          "plug_hash": 106909392
+        },
+        {
+          "name": "移动目标",
+          "plug_hash": 588594999
+        },
+        {
+          "name": "轻质弹匣",
+          "plug_hash": 679225683
+        },
+        {
+          "name": "突击弹匣",
+          "plug_hash": 791862061
+        },
+        {
+          "name": "箭头制退器",
+          "plug_hash": 839105230
+        },
+        {
+          "name": "速射瞄准",
+          "plug_hash": 957782887
+        },
+        {
+          "name": "不法之徒",
+          "plug_hash": 1168162263
+        },
+        {
+          "name": "小口径枪膛",
+          "plug_hash": 1482024992
+        },
+        {
+          "name": "重建",
+          "plug_hash": 1523832109
+        },
+        {
+          "name": "槽化枪管",
+          "plug_hash": 1840239774
+        },
+        {
+          "name": "腰射握把",
+          "plug_hash": 1866048759
+        }
+      ],
+      "source": "dim_wishlist",
+      "source_detail": "pandapaxxy, File, AyyItsChevy/super_pog.txt, AyyItsChevy/super_pog_s13.txt, YeezyGT/YeezyGT_S16.txt, pandapaxxy, File, YeezyGT/YeezyGT_S16.txt, pandapaxxy, File, AyyItsChevy/super_pog.txt, AyyItsChevy/super_pog_s13.txt, YeezyGT/YeezyGT_S16.txt, Speedrunner, pandapaxxy, File, pandapaxxy, File, AyyItsChevy/super_pog.txt, AyyItsChevy/super_pog_s13.txt",
+      "weapon_name": "遗产"
+    },
+    "sockets": [
+      {
+        "equipped": null,
+        "kind": "intrinsic",
+        "option_count": 1,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "精确重击框架",
+            "plug_hash": 918679156
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "框架",
+        "socket_index": 0
+      },
+      {
+        "equipped": null,
+        "kind": "barrel",
+        "option_count": 22,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "箭头制退器",
+            "plug_hash": 839105230,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "后坐方向",
+                "value": 30
+              },
+              {
+                "stat": "操控性",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "枪膛修正钮",
+            "plug_category": "barrels",
+            "plug_hash": 3661387068,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 10
+              },
+              {
+                "stat": "后坐方向",
+                "value": 10
+              },
+              {
+                "stat": "操控性",
+                "value": -5
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "螺旋膛线",
+            "plug_category": "barrels",
+            "plug_hash": 4090651448,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 5
+              },
+              {
+                "stat": "射程",
+                "value": 5
+              },
+              {
+                "stat": "操控性",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "加长枪管",
+            "plug_category": "barrels",
+            "plug_hash": 1467527085,
+            "stat_effects": [
+              {
+                "stat": "操控性",
+                "value": -10
+              },
+              {
+                "stat": "射程",
+                "value": 10
+              },
+              {
+                "stat": "后坐方向",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "槽化枪管",
+            "plug_category": "barrels",
+            "plug_hash": 1840239774,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 5
+              },
+              {
+                "stat": "操控性",
+                "value": 15
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "全口径枪膛",
+            "plug_category": "barrels",
+            "plug_hash": 202670084,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": -10
+              },
+              {
+                "stat": "射程",
+                "value": 15
+              },
+              {
+                "stat": "操控性",
+                "value": -5
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "锻造膛线",
+            "plug_category": "barrels",
+            "plug_hash": 3250034553,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "射程",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "多边形膛线",
+            "plug_category": "barrels",
+            "plug_hash": 1392496348,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "小口径枪膛",
+            "plug_category": "barrels",
+            "plug_hash": 1482024992,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 7
+              },
+              {
+                "stat": "射程",
+                "value": 7
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "箭头制退器",
+            "plug_category": "barrels",
+            "plug_hash": 3048246338,
+            "stat_effects": [
+              {
+                "stat": "后坐方向",
+                "value": 30
+              },
+              {
+                "stat": "操控性",
+                "value": 12
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "枪膛修正钮",
+            "plug_category": "barrels",
+            "plug_hash": 3399528164,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 11
+              },
+              {
+                "stat": "后坐方向",
+                "value": 10
+              },
+              {
+                "stat": "操控性",
+                "value": -4
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "螺旋膛线",
+            "plug_category": "barrels",
+            "plug_hash": 111235976,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 6
+              },
+              {
+                "stat": "射程",
+                "value": 6
+              },
+              {
+                "stat": "操控性",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "加长枪管",
+            "plug_category": "barrels",
+            "plug_hash": 1932356121,
+            "stat_effects": [
+              {
+                "stat": "操控性",
+                "value": -9
+              },
+              {
+                "stat": "射程",
+                "value": 11
+              },
+              {
+                "stat": "后坐方向",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "槽化枪管",
+            "plug_category": "barrels",
+            "plug_hash": 1124871858,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 6
+              },
+              {
+                "stat": "操控性",
+                "value": 16
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "全口径枪膛",
+            "plug_category": "barrels",
+            "plug_hash": 1871180748,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": -9
+              },
+              {
+                "stat": "射程",
+                "value": 15
+              },
+              {
+                "stat": "操控性",
+                "value": -4
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "锻造膛线",
+            "plug_category": "barrels",
+            "plug_hash": 1147230557,
+            "stat_effects": [
+              {
+                "stat": "射程",
+                "value": 12
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "多边形膛线",
+            "plug_category": "barrels",
+            "plug_hash": 3966296580,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 12
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "小口径枪膛",
+            "plug_category": "barrels",
+            "plug_hash": 2860123632,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 8
+              },
+              {
+                "stat": "射程",
+                "value": 8
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "高密度收束器",
+            "plug_category": "barrels",
+            "plug_hash": 1047830412
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "膛线枪管",
+            "plug_category": "barrels",
+            "plug_hash": 1332244541,
+            "stat_effects": [
+              {
+                "stat": "射程",
+                "value": 10
+              },
+              {
+                "stat": "操控性",
+                "value": -15
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "高密度收束器",
+            "plug_category": "barrels",
+            "plug_hash": 3311319252,
+            "stat_effects": [
+              {
+                "stat": "操控性",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "膛线枪管",
+            "plug_category": "barrels",
+            "plug_hash": 1987021001,
+            "stat_effects": [
+              {
+                "stat": "射程",
+                "value": 11
+              },
+              {
+                "stat": "操控性",
+                "value": -14
+              }
+            ]
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "枪管",
+        "socket_index": 1
+      },
+      {
+        "equipped": null,
+        "kind": "magazine",
+        "option_count": 16,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "突击弹匣",
+            "plug_hash": 791862061,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "每分钟发射数",
+                "value": 10
+              },
+              {
+                "stat": "稳定性",
+                "value": 15
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "附加弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 1087426260,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": false
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "弹匣",
+                "value": 20
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "战术弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 106909392,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "弹匣",
+                "value": 10
+              },
+              {
+                "stat": "填装速度",
+                "value": 10
+              },
+              {
+                "stat": "稳定性",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "加大弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 2420895100,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": false
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "弹匣",
+                "value": 30
+              },
+              {
+                "stat": "填装速度",
+                "value": -20
+              },
+              {
+                "stat": "空中效率",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "稳固弹药",
+            "plug_category": "magazines",
+            "plug_hash": 3177308360,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 15
+              },
+              {
+                "stat": "射程",
+                "value": -5
+              },
+              {
+                "stat": "空中效率",
+                "value": 7
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "精确弹药",
+            "plug_category": "magazines",
+            "plug_hash": 3142289711,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "射程",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "轻质弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 679225683,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            },
+            "stat_effects": [
+              {
+                "stat": "填装速度",
+                "value": 10
+              },
+              {
+                "stat": "射程",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "突击弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 1488599449,
+            "stat_effects": [
+              {
+                "stat": "每分钟发射数",
+                "value": 11
+              },
+              {
+                "stat": "稳定性",
+                "value": 16
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "附加弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 1065371964,
+            "stat_effects": [
+              {
+                "stat": "弹匣",
+                "value": 20
+              },
+              {
+                "stat": "填装速度",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "战术弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 1783397184,
+            "stat_effects": [
+              {
+                "stat": "弹匣",
+                "value": 10
+              },
+              {
+                "stat": "填装速度",
+                "value": 11
+              },
+              {
+                "stat": "稳定性",
+                "value": 6
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "加大弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 1890997540,
+            "stat_effects": [
+              {
+                "stat": "弹匣",
+                "value": 30
+              },
+              {
+                "stat": "填装速度",
+                "value": -18
+              },
+              {
+                "stat": "空中效率",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "稳固弹药",
+            "plug_category": "magazines",
+            "plug_hash": 1002206008,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 16
+              },
+              {
+                "stat": "射程",
+                "value": -4
+              },
+              {
+                "stat": "空中效率",
+                "value": 7
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "精确弹药",
+            "plug_category": "magazines",
+            "plug_hash": 3267421167,
+            "stat_effects": [
+              {
+                "stat": "射程",
+                "value": 12
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "轻质弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 1807273211,
+            "stat_effects": [
+              {
+                "stat": "填装速度",
+                "value": 11
+              },
+              {
+                "stat": "射程",
+                "value": 6
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "广口弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 3230963543,
+            "stat_effects": [
+              {
+                "stat": "填装速度",
+                "value": 15
+              },
+              {
+                "stat": "稳定性",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "广口弹匣",
+            "plug_category": "magazines",
+            "plug_hash": 1709045111,
+            "stat_effects": [
+              {
+                "stat": "填装速度",
+                "value": 16
+              },
+              {
+                "stat": "稳定性",
+                "value": 6
+              }
+            ]
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "弹匣",
+        "socket_index": 2
+      },
+      {
+        "equipped": null,
+        "kind": "trait",
+        "option_count": 20,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3118144663,
+            "name": "腰射握把",
+            "plug_hash": 1866048759,
+            "recommended": {
+              "wishlist": {
+                "pve": false,
+                "pvp": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 461595545,
+            "name": "重建",
+            "plug_category": "frames",
+            "plug_hash": 1523832109,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3528046508,
+            "name": "自动填装枪套",
+            "plug_category": "frames",
+            "plug_hash": 3300816228,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": false
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3143051906,
+            "name": "双重装填",
+            "plug_category": "frames",
+            "plug_hash": 25606670
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 191144788,
+            "name": "滑行射击",
+            "plug_category": "frames",
+            "plug_hash": 3161816588,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 1347741687,
+            "name": "不法之徒",
+            "plug_category": "frames",
+            "plug_hash": 1168162263,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 494941759,
+            "name": "威胁探测",
+            "plug_category": "frames",
+            "plug_hash": 4071163871
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 536173722,
+            "name": "拳击手",
+            "plug_category": "frames",
+            "plug_hash": 691659142
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 1906147653,
+            "name": "爆破专家",
+            "plug_category": "frames",
+            "plug_hash": 3523296417
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 1545231802,
+            "name": "转向",
+            "plug_category": "frames",
+            "plug_hash": 3201496230,
+            "recommended": {
+              "farming": {
+                "columns": [
+                  "三号位"
+                ],
+                "must_farm": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 2817499044,
+            "name": "嫉妒军械库",
+            "plug_category": "frames",
+            "plug_hash": 3987942396
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 1906147653,
+            "name": "爆破专家↑",
+            "name_plain": "爆破专家",
+            "plug_category": "frames",
+            "plug_hash": 1906147653
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3528046508,
+            "name": "自动填装枪套↑",
+            "name_plain": "自动填装枪套",
+            "plug_category": "frames",
+            "plug_hash": 3528046508
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3118144663,
+            "name": "腰射握把↑",
+            "name_plain": "腰射握把",
+            "plug_category": "frames",
+            "plug_hash": 3118144663
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 191144788,
+            "name": "滑行射击↑",
+            "name_plain": "滑行射击",
+            "plug_category": "frames",
+            "plug_hash": 191144788
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 536173722,
+            "name": "拳击手↑",
+            "name_plain": "拳击手",
+            "plug_category": "frames",
+            "plug_hash": 536173722
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 461595545,
+            "name": "重建↑",
+            "name_plain": "重建",
+            "plug_category": "frames",
+            "plug_hash": 461595545
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 494941759,
+            "name": "威胁探测↑",
+            "name_plain": "威胁探测",
+            "plug_category": "frames",
+            "plug_hash": 494941759
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 1545231802,
+            "name": "转向↑",
+            "name_plain": "转向",
+            "plug_category": "frames",
+            "plug_hash": 1545231802,
+            "recommended": {
+              "farming": {
+                "columns": [
+                  "三号位"
+                ],
+                "must_farm": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 2817499044,
+            "name": "嫉妒军械库↑",
+            "name_plain": "嫉妒军械库",
+            "plug_category": "frames",
+            "plug_hash": 2817499044,
+            "stat_effects": [
+              {
+                "conditional": true,
+                "stat": "弹药生成",
+                "value": 10
+              }
+            ]
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "特性1",
+        "socket_index": 3
+      },
+      {
+        "equipped": null,
+        "kind": "trait",
+        "option_count": 20,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 4207509907,
+            "name": "杀人风",
+            "plug_hash": 2450788523,
+            "recommended": {
+              "wishlist": {
+                "pve": false,
+                "pvp": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 1172413778,
+            "name": "敲打",
+            "plug_category": "frames",
+            "plug_hash": 2726471870,
+            "recommended": {
+              "wishlist": {
+                "pve": true,
+                "pvp": false
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 855168139,
+            "name": "不屈",
+            "plug_category": "frames",
+            "plug_hash": 3108830275
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3335686050,
+            "name": "重组",
+            "plug_category": "frames",
+            "plug_hash": 469285294,
+            "recommended": {
+              "farming": {
+                "columns": [
+                  "四号位"
+                ],
+                "must_farm": true
+              },
+              "wishlist": {
+                "pve": true,
+                "pvp": false
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 4116820839,
+            "name": "速射瞄准",
+            "plug_category": "frames",
+            "plug_hash": 957782887,
+            "recommended": {
+              "wishlist": {
+                "pve": false,
+                "pvp": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 2717805783,
+            "name": "移动目标",
+            "plug_category": "frames",
+            "plug_hash": 588594999,
+            "recommended": {
+              "wishlist": {
+                "pve": false,
+                "pvp": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 2402480669,
+            "name": "聚焦狂怒",
+            "plug_category": "frames",
+            "plug_hash": 2896038713
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 1161469972,
+            "name": "斗剑士",
+            "plug_category": "frames",
+            "plug_hash": 4082225868
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3050799639,
+            "name": "即时打击",
+            "plug_category": "frames",
+            "plug_hash": 2416023159
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3192447905,
+            "name": "聚合充能",
+            "plug_category": "frames",
+            "plug_hash": 3764420437
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 331667533,
+            "name": "级联点",
+            "plug_category": "frames",
+            "plug_hash": 3751912585
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 4116820839,
+            "name": "速射瞄准↑",
+            "name_plain": "速射瞄准",
+            "plug_category": "frames",
+            "plug_hash": 4116820839,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 2717805783,
+            "name": "移动目标↑",
+            "name_plain": "移动目标",
+            "plug_category": "frames",
+            "plug_hash": 2717805783
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3050799639,
+            "name": "即时打击↑",
+            "name_plain": "即时打击",
+            "plug_category": "frames",
+            "plug_hash": 3050799639
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 4207509907,
+            "name": "杀人风↑",
+            "name_plain": "杀人风",
+            "plug_category": "frames",
+            "plug_hash": 4207509907
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 1161469972,
+            "name": "斗剑士↑",
+            "name_plain": "斗剑士",
+            "plug_category": "frames",
+            "plug_hash": 1161469972
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3335686050,
+            "name": "重组↑",
+            "name_plain": "重组",
+            "plug_category": "frames",
+            "plug_hash": 3335686050,
+            "recommended": {
+              "farming": {
+                "columns": [
+                  "四号位"
+                ],
+                "must_farm": true
+              }
+            }
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 2402480669,
+            "name": "聚焦狂怒↑",
+            "name_plain": "聚焦狂怒",
+            "plug_category": "frames",
+            "plug_hash": 2402480669
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 3192447905,
+            "name": "聚合充能↑",
+            "name_plain": "聚合充能",
+            "plug_category": "frames",
+            "plug_hash": 3192447905
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 331667533,
+            "name": "级联点↑",
+            "name_plain": "级联点",
+            "plug_category": "frames",
+            "plug_hash": 331667533
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "特性2",
+        "socket_index": 4
+      },
+      {
+        "equipped": null,
+        "kind": "shader",
+        "option_count": 694,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "星象仪",
+            "plug_hash": 2412474869
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "玻璃纪念",
+            "plug_category": "shader",
+            "plug_hash": 1545278261
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "救赎花园纪念",
+            "plug_category": "shader",
+            "plug_hash": 3387636832
+          }
+        ],
+        "options_available": true,
+        "options_truncated": true,
+        "scope": "definition",
+        "slot": "着色器",
+        "socket_index": 5
+      },
+      {
+        "equipped": null,
+        "kind": "mod",
+        "option_count": 38,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "空模组插槽",
+            "plug_hash": 2323986101
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "平衡枪托",
+            "plug_category": "v400.weapon.mod_guns",
+            "plug_hash": 1588595445,
+            "stat_effects": [
+              {
+                "stat": "后坐方向",
+                "value": 15
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "备用弹匣",
+            "plug_category": "v400.weapon.mod_magazine",
+            "plug_hash": 3336648220,
+            "stat_effects": [
+              {
+                "stat": "弹匣",
+                "value": 30
+              },
+              {
+                "conditional": true,
+                "stat": "弹药容量",
+                "value": 30
+              }
+            ]
+          }
+        ],
+        "options_available": true,
+        "options_truncated": true,
+        "scope": "definition",
+        "slot": "模组1",
+        "socket_index": 6
+      },
+      {
+        "equipped": null,
+        "kind": "masterwork",
+        "option_count": 167,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "1阶：稳定性",
+            "plug_hash": 1590375901,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "2阶：稳定性",
+            "plug_category": "v400.plugs.weapons.masterworks.stat.stability",
+            "plug_hash": 1590375902,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "3阶：稳定性",
+            "plug_category": "v400.plugs.weapons.masterworks.stat.stability",
+            "plug_hash": 1590375903,
+            "stat_effects": [
+              {
+                "stat": "稳定性",
+                "value": 3
+              }
+            ]
+          }
+        ],
+        "options_available": true,
+        "options_truncated": true,
+        "scope": "definition",
+        "slot": "大师杰作",
+        "socket_index": 7
+      },
+      {
+        "equipped": null,
+        "kind": "other",
+        "option_count": 1,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "空原始插槽",
+            "plug_hash": 2542427991
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "插槽1",
+        "socket_index": 8
+      },
+      {
+        "equipped": null,
+        "kind": "tracker",
+        "option_count": 15,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "试炼纪念物记录器",
+            "plug_hash": 3915764595
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "日落纪念物记录器",
+            "plug_category": "v400.plugs.weapons.masterworks.trackers",
+            "plug_hash": 3915764594
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "智谋纪念物记录器",
+            "plug_category": "v400.plugs.weapons.masterworks.trackers",
+            "plug_hash": 3915764593
+          }
+        ],
+        "options_available": true,
+        "options_truncated": true,
+        "scope": "definition",
+        "slot": "追踪器",
+        "socket_index": 9
+      },
+      {
+        "equipped": null,
+        "kind": "memento",
+        "option_count": 37,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "试炼纪念物",
+            "plug_hash": 3408716127
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "试炼纪念物",
+            "plug_category": "mementos",
+            "plug_hash": 2012491044
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "试炼纪念物",
+            "plug_category": "mementos",
+            "plug_hash": 3831031876
+          }
+        ],
+        "options_available": true,
+        "options_truncated": true,
+        "scope": "definition",
+        "slot": "纪念物",
+        "socket_index": 11
+      },
+      {
+        "equipped": null,
+        "kind": "mod",
+        "option_count": 5,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "深视共振",
+            "plug_hash": 2400712188
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "深视共振",
+            "plug_category": "crafting.plugs.weapons.mods.memories",
+            "plug_hash": 213377779
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "深视共振",
+            "plug_category": "crafting.plugs.weapons.mods.memories",
+            "plug_hash": 3632593563
+          }
+        ],
+        "options_available": true,
+        "options_truncated": true,
+        "scope": "definition",
+        "slot": "模组2",
+        "socket_index": 12
+      },
+      {
+        "equipped": null,
+        "kind": "mod",
+        "option_count": 11,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "提升武器等级",
+            "plug_hash": 4275472612
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "提升武器等级",
+            "plug_category": "crafting.plugs.weapons.mods.transfusers.level",
+            "plug_hash": 4275472613
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "提升武器等级",
+            "plug_category": "crafting.plugs.weapons.mods.transfusers.level",
+            "plug_hash": 4275472614
+          }
+        ],
+        "options_available": true,
+        "options_truncated": true,
+        "scope": "definition",
+        "slot": "模组3",
+        "socket_index": 13
+      },
+      {
+        "equipped": null,
+        "kind": "ornament",
+        "option_count": 1,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "默认皮肤",
+            "plug_hash": 3854296178
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "装饰",
+        "socket_index": 14
+      },
+      {
+        "equipped": null,
+        "kind": "other",
+        "option_count": 2,
+        "options": [
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "默认战斗特效",
+            "plug_hash": 1892982956
+          },
+          {
+            "can_roll": true,
+            "enhanced_plug_hash": 0,
+            "name": "抛洒糖果",
+            "plug_category": "v900weapon.mod_confetti",
+            "plug_hash": 2771440667
+          }
+        ],
+        "options_available": true,
+        "scope": "definition",
+        "slot": "插槽2",
+        "socket_index": 15
+      }
+    ],
+    "weapon": {
+      "ammo_type": "绿弹",
+      "breaker_type": "",
+      "community": {
+        "archive_available": true,
+        "error": null,
+        "matched_count": 38,
+        "results": [
+          {
+            "category": "weapons",
+            "group": "刷取清单-绿弹紫枪 / 霰弹枪",
+            "kind": "table_row",
+            "knowledge_id": "share-row:2a82b016cd33a3b9d5a34705",
+            "page_id": "page:share/legendary-special.md",
+            "snippet": "刷取清单-绿弹紫枪 / 霰弹枪\n武器：遗产\n评级：T1\n框架\n射速：精确重击\n65\n属性：动能\nPerk 三号位：转向\nPerk 四号位：聚合充能/级联点\n重组\n获取地点：深岩墓室\n切换 DPS：10610\n备注：动能合成\n评级理由：全游戏最高的单弹匣爆发 DPS，转向+重组的组合很有意思",
+            "snippet_offset": 0,
+            "snippet_truncated": false,
+            "source": {
+              "archive_updated_at": null,
+              "content_scope": "table_row",
+              "declared_source": null,
+              "fetched_at": null,
+              "freshness_warning": null,
+              "game_version_verified": false,
+              "inline_semantics_preserved": true,
+              "line_end": 111,
+              "line_start": 111,
+              "local_path": "share/legendary-special.md",
+              "provider": "starside",
+              "record_sha256": "ac98701f93a47cb53b1d4149d38eb233773c95acf34e15e4b6a4ce8ba1af1954",
+              "redistribution_license": "used_with_author_permission",
+              "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+              "source_markdown_sha256": "ac98701f93a47cb53b1d4149d38eb233773c95acf34e15e4b6a4ce8ba1af1954",
+              "source_type": "author_markdown",
+              "title": "刷取清单-绿弹紫枪",
+              "trust": "untrusted_reference",
+              "updated_at": "2026.9.6",
+              "url": null
+            },
+            "title": "遗产"
+          },
+          {
+            "category": "weapons",
+            "group": "霰弹枪",
+            "kind": "entry",
+            "knowledge_id": "entry:9a61e5abcc92bd9609676d88",
+            "page_id": "page:shopping-special/index.html",
+            "snippet": "遗产 4 S 动能 精确重击 12 深岩墓室 49 槽化枪管 突击弹匣 操控性 填装 转向 重建 级联点 聚合充能 重组 布瑞遗产 可能是所有传说特殊武器里单弹匣爆发最高的武器",
+            "snippet_offset": 0,
+            "snippet_truncated": false,
+            "source": {
+              "archive_updated_at": "2026-09-09T05:57:18.563583+00:00",
+              "content_scope": "search_index_excerpt",
+              "export_sha256": "2ba6fc36af7b47f57e57a9aebbe79d67d04aafa6bcb7b6b020212b06a1609ddb",
+              "fetched_at": "2026-09-09T05:35:35.392891+00:00",
+              "game_version_verified": false,
+              "inline_semantics_preserved": false,
+              "provider": "starside",
+              "record_sha256": "b70d5255dcdd1fb1f24a35c377ca034f0f7e6bc971e2d6cee6b9b5636ac6d6b3",
+              "redistribution_license": "not_established",
+              "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+              "source_html_sha256": "fe3c6c45c35d1ddf870356d0a96ba89c25501185ffae6bc94bbe3c04b1eff67b",
+              "source_type": "web_archive_v2",
+              "title": "购物清单-绿弹 · Starside",
+              "trust": "untrusted_reference",
+              "updated_at": "2026.8.30",
+              "url": "https://starside.work/shopping-special/index.html#sec-5"
+            },
+            "title": "遗产"
+          },
+          {
+            "category": "weapons",
+            "group": "霰弹枪",
+            "kind": "entry",
+            "knowledge_id": "entry:a39e770f366142bec449d778",
+            "page_id": "page:legendary-special/index.html",
+            "snippet": "遗产 T1 精确重击 65 动能 转向 聚合充能/级联点 重组 深岩墓室 10610 动能合成 全游戏最高的单弹匣爆发 DPS，转向+重组的组合很有意思",
+            "snippet_offset": 0,
+            "snippet_truncated": false,
+            "source": {
+              "archive_updated_at": "2026-09-09T05:57:18.563583+00:00",
+              "content_scope": "search_index_excerpt",
+              "export_sha256": "2ba6fc36af7b47f57e57a9aebbe79d67d04aafa6bcb7b6b020212b06a1609ddb",
+              "fetched_at": "2026-09-09T05:35:32.672657+00:00",
+              "game_version_verified": false,
+              "inline_semantics_preserved": false,
+              "provider": "starside",
+              "record_sha256": "d9fe494812efcd4142372cb16e6caeaad1129c7ed4064391596da1db8748047f",
+              "redistribution_license": "not_established",
+              "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+              "source_html_sha256": "4523af4b608b98a8c8228095d9d4d290a4f18d7593d7bd50fa2f04ed418bed6c",
+              "source_type": "web_archive_v2",
+              "title": "刷取清单-绿弹紫枪 · Starside",
+              "trust": "untrusted_reference",
+              "updated_at": "2026.9.6",
+              "url": "https://starside.work/legendary-special/index.html#sec-4"
+            },
+            "title": "遗产"
+          }
+        ]
+      },
+      "damage_type": "动能",
+      "description": "枪管内部刻着一个名字：“威廉明娜-1”",
+      "farming": {
+        "available": true,
+        "coverage_scope": "indexed_rated_lists_only",
+        "cross_check": {
+          "element": {
+            "agrees": true,
+            "listed": "动能",
+            "manifest": "动能"
+          },
+          "frame": {
+            "agrees": true,
+            "listed": "精确重击 65",
+            "manifest": "精确重击框架"
+          },
+          "note": "cross_check 只说明清单与当前 Manifest 是否对得上；can_roll=false 表示这个 perk 已退役（清单可能早于退役）。",
+          "perks": [
+            {
+              "can_roll": true,
+              "column": "三号位",
+              "in_manifest_pool": true,
+              "name": "转向"
+            },
+            {
+              "can_roll": null,
+              "column": "四号位",
+              "in_manifest_pool": false,
+              "name": "聚合充能/级联点"
+            },
+            {
+              "can_roll": true,
+              "column": "四号位",
+              "in_manifest_pool": true,
+              "name": "重组"
+            }
+          ]
+        },
+        "list": "刷取清单-绿弹紫枪",
+        "matched": true,
+        "note": "全游戏最高的单弹匣爆发 DPS，转向+重组的组合很有意思",
+        "recommended_perks": {
+          "三号位": [
+            "转向"
+          ],
+          "四号位": [
+            "聚合充能/级联点",
+            "重组"
+          ]
+        },
+        "remark": "动能合成",
+        "scale": "T",
+        "source": "深岩墓室",
+        "source_ref": {
+          "local_path": "share/legendary-special.md",
+          "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+          "source_type": "author_markdown",
+          "trust": "untrusted_reference",
+          "updated_at": "2026.9.6"
+        },
+        "tier": "T1"
+      },
+      "frame": "精确重击框架",
+      "has_enhanced": true,
+      "icon_url": "https://www.bungie.net/common/destiny2_content/icons/07619f9f7115a2295c080f08179deb98.jpg",
+      "intrinsic": "精确重击框架",
+      "is_craftable": true,
+      "item_hash": 4248569242,
+      "name": "遗产",
+      "name_en": "Heritage",
+      "popularity": {
+        "available": false,
+        "note": "这个 intent 不带这项本地资料；需要时用对应的 intent 查。"
+      },
+      "rarity": "传说",
+      "rarity_tier": 5,
+      "roll_kind": "random",
+      "roll_summary": {
+        "option_counts": {
+          "弹匣": 16,
+          "枪管": 22,
+          "特性1": 20,
+          "特性2": 20
+        },
+        "random_columns": [
+          "枪管",
+          "弹匣",
+          "特性1",
+          "特性2"
+        ],
+        "roll_kind": "random",
+        "scope": "definition"
+      },
+      "rpm": 65,
+      "sources": [
+        {
+          "kind": "farming_list",
+          "name": "刷取清单-绿弹紫枪",
+          "path": "share/legendary-special.md",
+          "trust": "untrusted_reference",
+          "updated_at": "2026.9.6"
+        },
+        {
+          "kind": "community_archive",
+          "matched_count": 38,
+          "name": "Starside 社区资料",
+          "trust": "untrusted_reference",
+          "updated_at": "2026-09-09T05:57:18.563583+00:00"
+        }
+      ],
+      "trait_ids": [
+        "item.weapon.shotgun",
+        "releases.v500.annual"
+      ],
+      "watermark": "/common/destiny2_content/icons/bce51cf90464e28026140df77c4eb6ce.png",
+      "weapon_type": "霰弹枪"
+    },
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,
-  "summary": "已读取社区推荐 roll。",
+  "summary": "已读取「遗产」的社区推荐 roll。",
   "warnings": []
 }

@@ -183,6 +183,11 @@ Manifest 侧（**不代表拥有**）：
 - `suggestion`：**最小改动就能解出来**的那一档（放下哪几项目标 + 那一档能到的六维）。
   这是**提议**：原始硬约束一个字没改，要用户点头后才带着新参数重试。
 
+**展示约定：perk 名字后面的 `↑` 表示强化版（Enhanced）** —— 普通版名字保持原样、不带任何标记
+（例：`高爆载荷` 是普通版，`高爆载荷↑` 是强化版）。装备与武器查询里的 `options[].name`、
+`equipped.name`、以及社区核对里的 `perks_current_match` / `perks_available_to_switch` 都用这套口径；
+带箭头的项另给 `name_plain`（Manifest 规范名），要拿名字查表/比对时用它。
+
 只给优先级、不给硬目标时 `completion_rate` 会是 `null`（附 `completion_rate_note`）——
 那不代表"一个都没满足"。
 

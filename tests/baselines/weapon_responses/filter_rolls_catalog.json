@@ -1,14 +1,19 @@
 {
   "_case": {
-    "arguments": {
-      "include_inventory": false,
-      "intent": "filter_rolls",
-      "limit": 5,
-      "weapon_type": "微型冲锋枪"
-    },
-    "elapsed_ms": 1682,
+    "elapsed_ms": 1809,
     "is_error": false,
-    "payload_chars": 6400,
+    "payload_chars": 6878,
+    "steps": [
+      {
+        "arguments": {
+          "include_inventory": false,
+          "intent": "filter_rolls",
+          "limit": 5,
+          "weapon_type": "微型冲锋枪"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
@@ -128,78 +133,93 @@
     },
     "matched": [
       {
-        "ammo_type": "主要",
-        "damage_type": "棱镜",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/938bc6eb5c5c772e2f3d066380179d36.jpg",
+        "is_craftable": true,
         "item_hash": 1481594633,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "墓园双星",
-        "nameEn": "Barrow-Dyad",
+        "name_en": "Barrow-Dyad",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "random",
+        "rpm": 720,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "微型冲锋枪"
       },
       {
-        "ammo_type": "主要",
-        "damage_type": "动能",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2752ee2761149f004df20e78749c1bab.jpg",
+        "is_craftable": true,
         "item_hash": 46524085,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "枯骨鳞片",
-        "nameEn": "Osteo Striga",
+        "name_en": "Osteo Striga",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "random",
+        "rpm": 600,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "微型冲锋枪"
       },
       {
-        "ammo_type": "主要",
-        "damage_type": "烈日",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/88ea7e35e14f29c4cda6588cb258333b.jpg",
-        "item_hash": -1184268484,
+        "is_craftable": false,
+        "item_hash": 3110698812,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "泰拉巴",
-        "nameEn": "Tarrabah",
+        "name_en": "Tarrabah",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "fixed",
+        "rpm": 720,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "微型冲锋枪"
       },
       {
-        "ammo_type": "主要",
-        "damage_type": "虚空",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b52c06c2497831876503dbbe795b1e59.jpg",
+        "is_craftable": false,
         "item_hash": 219145368,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "蝎狮",
-        "nameEn": "The Manticore",
+        "name_en": "The Manticore",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "fixed",
+        "rpm": 900,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "微型冲锋枪"
       },
       {
-        "ammo_type": "主要",
-        "damage_type": "电弧",
+        "frame": null,
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0b7fa10956ee9f16899ce1838c3c0e31.jpg",
-        "item_hash": -1205549507,
+        "is_craftable": false,
+        "item_hash": 3089417789,
         "matched_perk_details": [],
         "matched_perks": [],
         "name": "赴险者",
-        "nameEn": "Riskrunner",
+        "name_en": "Riskrunner",
         "owned": false,
         "ownership_checked": false,
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "fixed",
+        "rpm": 900,
         "source": "manifest_catalog",
-        "tier": "异域",
         "weapon_type": "微型冲锋枪"
       }
     ],
@@ -207,12 +227,14 @@
     "returned_count": 5,
     "scope": "manifest_catalog",
     "scope_label": "全量武器定义候选（未读取账号持有情况）",
-    "truncated": true
+    "truncated": true,
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,
   "summary": "全量武器定义检查 160 把，命中 160 把。",
   "warnings": [
-    "include_inventory=false：这些是 Manifest 全量候选，未读取账号持有情况。"
+    "include_inventory=false：这些是 Manifest 全量候选，未读取账号持有情况。",
+    "命中的 3 把是固定 roll 武器（如 泰拉巴）：没有 roll 可变，按 perk 筛只是确认它自带什么。"
   ]
 }

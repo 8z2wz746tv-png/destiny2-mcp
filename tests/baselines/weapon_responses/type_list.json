@@ -1,13 +1,18 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "type",
-      "limit": 5,
-      "weapon_type": "手炮"
-    },
-    "elapsed_ms": 4610,
+    "elapsed_ms": 6930,
     "is_error": false,
-    "payload_chars": 31789,
+    "payload_chars": 99385,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "type",
+          "limit": 5,
+          "weapon_type": "手炮"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
@@ -27,7 +32,7 @@
         "购物清单-白弹",
         "购物清单-绿弹"
       ],
-      "matched_count": 3,
+      "matched_count": 1,
       "results": [
         {
           "element": "冰影",
@@ -55,746 +60,3312 @@
             "url": "https://starside.work/shopping-primary/index.html"
           },
           "tier": "A"
-        },
-        {
-          "element": "烈日",
-          "frame": "精密",
-          "list": "购物清单-白弹",
-          "name": "信任",
-          "note": "有双溅射 Perk 和不错框架 但 Perk 多样性少 起源也差",
-          "perks": {
-            "三号位": [
-              "萤火虫"
-            ],
-            "四号位": [
-              "辉耀炽热",
-              "高爆载荷"
-            ]
-          },
-          "rank": "20",
-          "scale": "S-F",
-          "source": "智谋",
-          "source_ref": {
-            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
-            "source_type": "web_archive_v2",
-            "trust": "untrusted_reference",
-            "updated_at": "2026.8.30",
-            "url": "https://starside.work/shopping-primary/index.html"
-          },
-          "tier": "A"
-        },
-        {
-          "element": "动能",
-          "frame": "攻击型",
-          "list": "购物清单-白弹",
-          "name": "克瑞米尔之匕",
-          "note": "起源不错 + 框架最差 溅射 Perk 尚可",
-          "perks": {
-            "三号位": [
-              "萤火虫"
-            ],
-            "四号位": [
-              "高爆载荷"
-            ]
-          },
-          "rank": "47",
-          "scale": "S-F",
-          "source": "铁旗",
-          "source_ref": {
-            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
-            "source_type": "web_archive_v2",
-            "trust": "untrusted_reference",
-            "updated_at": "2026.8.30",
-            "url": "https://starside.work/shopping-primary/index.html"
-          },
-          "tier": "C"
         }
       ],
-      "returned_count": 3,
+      "returned_count": 1,
       "truncated": false,
-      "unmatched": [],
+      "unmatched": [
+        "购物清单-白弹",
+        "散射",
+        "枪管套筒",
+        "战术弹匣",
+        "盗墓者↑",
+        "雪上加霜↑",
+        "大奖赢家"
+      ],
       "warnings": [
         "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
         "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
         "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
       ]
     },
+    "weapon_schema_version": 1,
     "weapons": {
-      "returned_weapons": 5,
-      "total_weapons": 124,
-      "truncated": true,
-      "weapon_type_query": "手炮",
-      "weapons": [
+      "items": [
         {
-          "ammo_type": "白弹",
-          "damage_type": "冰影",
-          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/95f79ae16f450a7d3fe0af1f49f5768f.jpg",
-          "instance_id": "6917530183210837452",
-          "is_equipped": false,
-          "item_hash": 2908653246,
-          "location": "仓库",
-          "name": "三冠得主",
-          "perks_complete": true,
-          "power": 550,
-          "sockets": [
+          "notes": [],
+          "options": [
             {
-              "description": "发射短射程的散弹。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b473eb1143bf843be894a88bedee0550.png",
-              "plug_category": "intrinsics",
-              "plug_hash": 2427219599,
-              "plug_name": "散射",
-              "slot_label": "框架"
+              "equipped": {
+                "name": "枪管套筒",
+                "plug_hash": 2371713880
+              },
+              "kind": "barrel",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "枪管套筒",
+                  "plug_hash": 2371713880,
+                  "stat_effects": [
+                    {
+                      "stat": "稳定性",
+                      "value": 11
+                    },
+                    {
+                      "stat": "操控性",
+                      "value": 11
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "高密度收束器",
+                  "plug_hash": 3311319252,
+                  "stat_effects": [
+                    {
+                      "stat": "操控性",
+                      "value": 2
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "枪管",
+              "socket_index": 1
             },
             {
-              "description": "均衡型霰弹枪枪管。\n  •  提高稳定性\n  •  提高操控速度",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d9e5e8fa07a84c29252b78b0e7b3106d.png",
-              "plug_category": "barrels",
-              "plug_hash": 2371713880,
-              "plug_name": "枪管套筒",
-              "slot_label": "枪管"
+              "equipped": {
+                "name": "战术弹匣",
+                "plug_hash": 1783397184
+              },
+              "kind": "magazine",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "战术弹匣",
+                  "plug_hash": 1783397184,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 10
+                    },
+                    {
+                      "stat": "填装速度",
+                      "value": 11
+                    },
+                    {
+                      "stat": "稳定性",
+                      "value": 6
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "加大弹匣",
+                  "plug_hash": 1890997540,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 30
+                    },
+                    {
+                      "stat": "填装速度",
+                      "value": -18
+                    },
+                    {
+                      "stat": "空中效率",
+                      "value": 10
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "弹匣",
+              "socket_index": 2
             },
             {
-              "description": "对多种战术进行提高。\n  •  略微提高稳定性\n  •  提高填装速度\n  •  略微增大弹匣容量",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f0e309a267b25279a871d182f8910bcc.png",
-              "plug_category": "magazines",
-              "plug_hash": 1783397184,
-              "plug_name": "战术弹匣",
-              "slot_label": "弹匣"
+              "equipped": {
+                "name": "盗墓者↑",
+                "plug_hash": 402033656
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 509594246,
+                  "name": "测距仪↑",
+                  "name_plain": "测距仪",
+                  "plug_hash": 509594246,
+                  "stat_effects": [
+                    {
+                      "stat": "操控性",
+                      "value": 5
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 3797647183,
+                  "name": "刺客野心↑",
+                  "name_plain": "刺客野心",
+                  "plug_hash": 3797647183,
+                  "stat_effects": [
+                    {
+                      "stat": "填装速度",
+                      "value": 5
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 402033656,
+                  "name": "盗墓者↑",
+                  "name_plain": "盗墓者",
+                  "plug_hash": 402033656,
+                  "stat_effects": [
+                    {
+                      "stat": "操控性",
+                      "value": 5
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性1",
+              "socket_index": 3
             },
             {
-              "description": "近战最后一击或使用充能近战造成伤害会从储存弹药中填装此武器的弹匣。提升操控性。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/043d100167af67d6041719044a033221.png",
-              "plug_category": "frames",
-              "plug_hash": 402033656,
-              "plug_name": "盗墓者",
-              "slot_label": "特性1"
+              "equipped": {
+                "name": "雪上加霜↑",
+                "plug_hash": 788178929
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 788178929,
+                  "name": "雪上加霜↑",
+                  "name_plain": "雪上加霜",
+                  "plug_hash": 788178929
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 1817983009,
+                  "name": "混沌重塑↑",
+                  "name_plain": "混沌重塑",
+                  "plug_hash": 1817983009
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2459015849,
+                  "name": "战嚎炮管↑",
+                  "name_plain": "战嚎炮管",
+                  "plug_hash": 2459015849
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性2",
+              "socket_index": 4
             },
             {
-              "description": "一发弹药的几乎所有弹片均命中同一目标可在短时间内提高近战伤害。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/013a56db7dc9c3f89012a381f601a4ff.png",
-              "plug_category": "frames",
-              "plug_hash": 788178929,
-              "plug_name": "雪上加霜",
-              "slot_label": "特性2"
+              "equipped": {
+                "name": "战术",
+                "plug_hash": 1772241052
+              },
+              "kind": "mod",
+              "option_count": 19,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "平衡枪托",
+                  "plug_hash": 285783873,
+                  "stat_effects": [
+                    {
+                      "stat": "后坐方向",
+                      "value": 35
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "备用弹匣",
+                  "plug_category": "v400.weapon.mod_magazine",
+                  "plug_hash": 1523545668,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 40
+                    },
+                    {
+                      "conditional": true,
+                      "stat": "弹药容量",
+                      "value": 40
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "徒手握把",
+                  "plug_hash": 2268413950
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "模组1",
+              "socket_index": 6
             },
             {
-              "description": "使用此着色器更改装备配色。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/6622aa22307b3ef8db4cea8a9c54c92b.jpg",
-              "plug_category": "shader",
-              "plug_hash": 211863483,
-              "plug_name": "大奖赢家",
-              "slot_label": "着色器"
+              "equipped": {
+                "name": "优秀竞争者",
+                "plug_hash": 2523469161
+              },
+              "kind": "trait",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "优秀竞争者",
+                  "plug_hash": 2523469161
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "Häkke突入武装",
+                  "plug_hash": 250902314
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性3",
+              "socket_index": 8
             },
             {
-              "description": "",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b8f6e3e41a381e4b27f2d50d6f3a9de0.png",
-              "plug_category": "v400.weapon.mod_guns",
-              "plug_hash": 1772241052,
-              "plug_name": "战术",
-              "slot_label": "模组"
-            },
-            {
-              "description": "最高属性。\n\n为此武器应用等同于武器阶级的额外属性。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/a9f6aee3209300eded5032e7528f80d1.jpg",
-              "plug_category": "v400.plugs.weapons.masterworks.stat.stability",
-              "plug_hash": 3513245618,
-              "plug_name": "大师杰作：稳定性",
-              "slot_label": "大师杰作"
-            },
-            {
-              "description": "使用此武器完成最后一击可获得更多职业技能能量。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/ea99a5550787bc2196c717e98baff076.png",
-              "plug_category": "origins",
-              "plug_hash": 2523469161,
-              "plug_name": "优秀竞争者",
-              "slot_label": "插槽9"
-            },
-            {
-              "description": "记录使用武器消灭的敌人数量。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fa9b8e2b358de10643b14a058094f4b.png",
-              "plug_category": "v400.plugs.weapons.masterworks.trackers",
-              "plug_hash": 2302094943,
-              "plug_name": "击杀记录器",
-              "slot_label": "追踪器"
-            },
-            {
-              "description": "将武器重置为默认外观。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3bb544f2136894a13a73875639f376d5.png",
-              "plug_category": "weapon_tiering_tier5_skins",
-              "plug_hash": 3854296178,
-              "plug_name": "默认皮肤",
-              "slot_label": "纪念物"
-            },
-            {
-              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/1f455d55b85156ae92c1219252fea12a.png",
-              "plug_category": "weapon_tiering_kill_vfx",
-              "plug_hash": 165824714,
-              "plug_name": "淘气光束",
-              "slot_label": "战斗特效"
-            },
-            {
-              "description": "此武器的特性可通过更高的装备阶级等级强化。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
-              "plug_category": "weapon_tiering.plugs.mods.enhancers",
-              "plug_hash": 780815822,
-              "plug_name": "空的装备阶级升级",
-              "slot_label": "模组"
+              "equipped": {
+                "name": "默认皮肤",
+                "plug_hash": 3854296178
+              },
+              "kind": "ornament",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "恶名三冠得主",
+                  "plug_hash": 3620108268
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "装饰",
+              "socket_index": 10
             }
           ],
-          "stats": {
-            "aim_assist": 61,
-            "airborne_effectiveness": 22,
-            "damage": 96,
-            "handling": 55,
-            "magazine": 8,
-            "range": 33,
-            "recoil_direction": 82,
-            "reload_speed": 47,
+          "perks_complete": true,
+          "sockets": [
+            {
+              "equipped": {
+                "name": "散射",
+                "plug_hash": 2427219599
+              },
+              "kind": "intrinsic",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "框架",
+              "socket_index": 0
+            },
+            {
+              "equipped": {
+                "name": "枪管套筒",
+                "plug_hash": 2371713880
+              },
+              "kind": "barrel",
+              "option_count": 12,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "枪管",
+              "socket_index": 1
+            },
+            {
+              "equipped": {
+                "name": "战术弹匣",
+                "plug_hash": 1783397184
+              },
+              "kind": "magazine",
+              "option_count": 26,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "弹匣",
+              "socket_index": 2
+            },
+            {
+              "equipped": {
+                "name": "盗墓者↑",
+                "name_plain": "盗墓者",
+                "plug_hash": 402033656
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 3
+            },
+            {
+              "equipped": {
+                "name": "雪上加霜↑",
+                "name_plain": "雪上加霜",
+                "plug_hash": 788178929
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 4
+            },
+            {
+              "equipped": {
+                "name": "大奖赢家",
+                "plug_hash": 211863483
+              },
+              "kind": "shader",
+              "option_count": 694,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "着色器",
+              "socket_index": 5
+            },
+            {
+              "equipped": {
+                "name": "战术",
+                "plug_hash": 1772241052
+              },
+              "kind": "mod",
+              "option_count": 39,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 6
+            },
+            {
+              "equipped": {
+                "name": "大师杰作：稳定性",
+                "plug_hash": 3513245618
+              },
+              "kind": "masterwork",
+              "option_count": 167,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "大师杰作",
+              "socket_index": 7
+            },
+            {
+              "equipped": {
+                "name": "优秀竞争者",
+                "plug_hash": 2523469161
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 8
+            },
+            {
+              "equipped": {
+                "name": "击杀记录器",
+                "plug_hash": 2302094943
+              },
+              "kind": "tracker",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "追踪器",
+              "socket_index": 9
+            },
+            {
+              "equipped": {
+                "name": "默认皮肤",
+                "plug_hash": 3854296178
+              },
+              "kind": "ornament",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "装饰",
+              "socket_index": 10
+            },
+            {
+              "equipped": {
+                "name": "淘气光束",
+                "plug_hash": 165824714
+              },
+              "kind": "other",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "插槽",
+              "socket_index": 11
+            },
+            {
+              "equipped": {
+                "name": "空的装备阶级升级",
+                "plug_hash": 780815822
+              },
+              "kind": "mod",
+              "option_count": 5,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 12
+            }
+          ],
+          "stats": [
+            {
+              "display": "100",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 100
+            },
+            {
+              "display": "96",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 96
+            },
+            {
+              "display": "33",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 33
+            },
+            {
+              "display": "51",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 51
+            },
+            {
+              "display": "55",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 55
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 47
+            },
+            {
+              "display": "8",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 8
+            },
+            {
+              "display": "61",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 61
+            },
+            {
+              "display": "12",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 12
+            },
+            {
+              "display": "82",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 82
+            },
+            {
+              "display": "22",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 22
+            },
+            {
+              "display": "56",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 56
+            }
+          ],
+          "weapon": {
+            "ammo_type": "白弹",
+            "breaker_type": "",
+            "community": {
+              "archive_available": false,
+              "matched_count": 0,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。",
+              "results": []
+            },
+            "damage_type": "冰影",
+            "description": "别沉溺于胜利。",
+            "farming": {
+              "available": true,
+              "list": "购物清单-白弹",
+              "matched": true,
+              "recommended_perks": {
+                "三号位": [
+                  "结晶残花"
+                ],
+                "四号位": [
+                  "混沌重塑",
+                  "战嚎炮管"
+                ]
+              },
+              "source": "忠诚纪念碑",
+              "tier": "A",
+              "updated_at": "2026.8.30"
+            },
+            "frame": null,
+            "gear_tier": 5,
+            "has_enhanced": false,
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/95f79ae16f450a7d3fe0af1f49f5768f.jpg",
+            "instance": {
+              "instance_id": "6917530183210837452",
+              "is_equipped": false,
+              "location": "仓库",
+              "locked": false,
+              "power": 550,
+              "tracked": false
+            },
+            "intrinsic": "散射",
+            "is_craftable": false,
+            "item_hash": 2908653246,
+            "item_level": 55,
+            "name": "三冠得主",
+            "name_en": "Triple Laureate",
+            "popularity": {
+              "available": false,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。"
+            },
+            "quality": 0,
+            "rarity": "传说",
+            "rarity_tier": 5,
+            "roll_kind": "random",
+            "roll_summary": {
+              "option_counts": {
+                "弹匣": 26,
+                "枪管": 12,
+                "特性1": 1
+              },
+              "random_columns": [
+                "枪管",
+                "弹匣",
+                "特性1",
+                "特性1"
+              ],
+              "roll_kind": "random",
+              "scope": "definition"
+            },
             "rpm": 100,
-            "stability": 51,
-            "zoom": 12
-          },
-          "tier": "传说",
-          "weapon_type": "手炮"
+            "sources": [
+              {
+                "kind": "farming_list",
+                "name": "购物清单-白弹",
+                "path": "",
+                "trust": "untrusted_reference",
+                "updated_at": "2026.8.30"
+              }
+            ],
+            "trait_ids": [
+              "foundry.hakke",
+              "item.weapon.hand_cannon",
+              "releases.v950.core"
+            ],
+            "watermark": "/common/destiny2_content/icons/9c091ec0e22c01dacc25efb63b46eb9b.png",
+            "weapon_type": "手炮"
+          }
         },
         {
-          "ammo_type": "白弹",
-          "damage_type": "烈日",
-          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
-          "instance_id": "6917530193975673732",
-          "is_equipped": false,
-          "item_hash": 810474118,
-          "location": "仓库",
-          "name": "信任",
-          "perks_complete": true,
-          "power": 550,
-          "sockets": [
+          "notes": [],
+          "options": [
             {
-              "description": "此武器的后坐力模式可预测地偏向垂直方向。可进行拥有高精度的快速射击。装备此武器时，瞄准时的移动速度更快。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e9dd736124e8ef94048901a279a5bb18.png",
-              "plug_category": "intrinsics",
-              "plug_hash": 1322370662,
-              "plug_name": "精密框架",
-              "slot_label": "框架"
+              "equipped": {
+                "name": "箭头制退器",
+                "plug_hash": 3048246338
+              },
+              "kind": "barrel",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "箭头制退器",
+                  "plug_hash": 3048246338,
+                  "stat_effects": [
+                    {
+                      "stat": "后坐方向",
+                      "value": 30
+                    },
+                    {
+                      "stat": "操控性",
+                      "value": 12
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "加长枪管",
+                  "plug_hash": 1932356121,
+                  "stat_effects": [
+                    {
+                      "stat": "操控性",
+                      "value": -9
+                    },
+                    {
+                      "stat": "射程",
+                      "value": 11
+                    },
+                    {
+                      "stat": "后坐方向",
+                      "value": 10
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "枪管",
+              "socket_index": 1
             },
             {
-              "description": "轻微弯曲型枪管。\n  •  大幅增强对后坐力的控制\n  •  提高操控速度",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8f7fb54687aa52a9c2595d90ce9c9417.png",
-              "plug_category": "barrels",
-              "plug_hash": 3048246338,
-              "plug_name": "箭头制退器",
-              "slot_label": "枪管"
+              "equipped": {
+                "name": "附加弹匣",
+                "plug_hash": 1065371964
+              },
+              "kind": "magazine",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "附加弹匣",
+                  "plug_hash": 1065371964,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 20
+                    },
+                    {
+                      "stat": "填装速度",
+                      "value": 2
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "加大弹匣",
+                  "plug_hash": 1890997540,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 30
+                    },
+                    {
+                      "stat": "填装速度",
+                      "value": -18
+                    },
+                    {
+                      "stat": "空中效率",
+                      "value": 10
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "弹匣",
+              "socket_index": 2
             },
             {
-              "description": "弹匣容量提高。\n  •  增大弹匣容量",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d9f468cce26fe35d9db413e2f8451127.png",
-              "plug_category": "magazines",
-              "plug_hash": 1065371964,
-              "plug_name": "附加弹匣",
-              "slot_label": "弹匣"
+              "equipped": {
+                "name": "萤火虫↑",
+                "plug_hash": 1183436451
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2938480696,
+                  "name": "快速命中↑",
+                  "name_plain": "快速命中",
+                  "plug_hash": 2938480696
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 1183436451,
+                  "name": "萤火虫↑",
+                  "name_plain": "萤火虫",
+                  "plug_hash": 1183436451
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 3198323828,
+                  "name": "切勿靠近↑",
+                  "name_plain": "切勿靠近",
+                  "plug_hash": 3198323828
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性1",
+              "socket_index": 3
             },
             {
-              "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
-              "plug_category": "frames",
-              "plug_hash": 1183436451,
-              "plug_name": "萤火虫",
-              "slot_label": "特性1"
+              "equipped": {
+                "name": "蜻蜓↑",
+                "plug_hash": 169755979
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 169755979,
+                  "name": "蜻蜓↑",
+                  "name_plain": "蜻蜓",
+                  "plug_hash": 169755979
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 332733060,
+                  "name": "精准工具↑",
+                  "name_plain": "精准工具",
+                  "plug_hash": 332733060
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 3042219245,
+                  "name": "宏伟之嚎↑",
+                  "name_plain": "宏伟之嚎",
+                  "plug_hash": 3042219245
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性2",
+              "socket_index": 4
             },
             {
-              "description": "精准最后一击可产生元素伤害爆炸。提高填装速度。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/c87b03bb6d56b393f8582e128b337332.png",
-              "plug_category": "frames",
-              "plug_hash": 169755979,
-              "plug_name": "蜻蜓",
-              "slot_label": "特性2"
+              "equipped": {
+                "name": "空模组插槽",
+                "plug_hash": 2323986101
+              },
+              "kind": "mod",
+              "option_count": 19,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "平衡枪托",
+                  "plug_hash": 285783873,
+                  "stat_effects": [
+                    {
+                      "stat": "后坐方向",
+                      "value": 35
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "备用弹匣",
+                  "plug_category": "v400.weapon.mod_magazine",
+                  "plug_hash": 1523545668,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 40
+                    },
+                    {
+                      "conditional": true,
+                      "stat": "弹药容量",
+                      "value": 40
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "徒手握把",
+                  "plug_hash": 2268413950
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "模组1",
+              "socket_index": 6
             },
             {
-              "description": "将装备恢复为默认颜色。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/96831e244728f0350340bb7d5d05b463.png",
-              "plug_category": "shader",
-              "plug_hash": 4248210736,
-              "plug_name": "默认着色器",
-              "slot_label": "着色器"
+              "equipped": {
+                "name": "3阶：填装速度",
+                "plug_hash": 4283235141
+              },
+              "kind": "masterwork",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "4阶：填装速度",
+                  "plug_hash": 4283235138,
+                  "stat_effects": [
+                    {
+                      "stat": "填装速度",
+                      "value": 4
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "大师杰作",
+              "socket_index": 7
             },
             {
-              "description": "当前未选择模组。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/431cc8304da4f5eb44c5c10a5c1866ce.jpg",
-              "plug_category": "v400.weapon.mod_empty",
-              "plug_hash": 2323986101,
-              "plug_name": "空模组插槽",
-              "slot_label": "模组"
+              "equipped": {
+                "name": "边打边跑",
+                "plug_hash": 859855990
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "边打边跑",
+                  "plug_hash": 859855990
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性3",
+              "socket_index": 8
             },
             {
-              "description": "属性略微提高。提高武器阶层，将其铸造为大师杰作物品。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e3a74e6dd4c520ea17eb1fdaf2128213.jpg",
-              "plug_category": "v400.plugs.weapons.masterworks.stat.reload",
-              "plug_hash": 4283235141,
-              "plug_name": "3阶：填装速度",
-              "slot_label": "大师杰作"
+              "equipped": {
+                "name": "怀疑",
+                "plug_hash": 2319265678
+              },
+              "kind": "ornament",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "信任",
+                  "plug_hash": 3364068341
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "装饰",
+              "socket_index": 10
             },
             {
-              "description": "击败目标可在更长时间内获得边打边跑层数。短暂冲刺消耗一层效果并从储备弹药中部分填装此武器的弹匣。如为弓箭，则在更长时间内提升拉弓速度。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5011e479f02ede344fb16099cfecd800.png",
-              "plug_category": "origins",
-              "plug_hash": 859855990,
-              "plug_name": "边打边跑",
-              "slot_label": "插槽9"
-            },
-            {
-              "description": "记录使用武器消灭的敌人数量。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fa9b8e2b358de10643b14a058094f4b.png",
-              "plug_category": "v400.plugs.weapons.masterworks.trackers",
-              "plug_hash": 905869860,
-              "plug_name": "击杀记录器",
-              "slot_label": "追踪器"
-            },
-            {
-              "description": "装备此武器皮肤以改变信任的外观。当你解锁一个皮肤后，你帐号中的所有角色都将解锁获得的皮肤。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cf0a81fe5497f59c6ed6747f844a595e.jpg",
-              "plug_category": "v400_activities_gambit_hand_cannon0_skins",
-              "plug_hash": 2319265678,
-              "plug_name": "怀疑",
-              "slot_label": "纪念物"
-            },
-            {
-              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8c28abb43d902b731365e1045f467a95.png",
-              "plug_category": "weapon_tiering_kill_vfx",
-              "plug_hash": 1335132356,
-              "plug_name": "凯旋脉动",
-              "slot_label": "战斗特效"
-            },
-            {
-              "description": "此武器的特性可通过更高的装备阶级等级强化。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
-              "plug_category": "weapon_tiering.plugs.mods.enhancers",
-              "plug_hash": 780815822,
-              "plug_name": "空的装备阶级升级",
-              "slot_label": "模组"
+              "equipped": {
+                "name": "凯旋脉动",
+                "plug_hash": 1335132356
+              },
+              "kind": "other",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "凯旋脉动",
+                  "plug_hash": 1335132356
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "插槽",
+              "socket_index": 11
             }
           ],
-          "stats": {
-            "aim_assist": 78,
-            "airborne_effectiveness": 35,
-            "damage": 78,
-            "handling": 47,
-            "magazine": 15,
-            "range": 37,
-            "recoil_direction": 100,
-            "reload_speed": 55,
+          "perks_complete": true,
+          "sockets": [
+            {
+              "equipped": {
+                "name": "精密框架",
+                "plug_hash": 1322370662
+              },
+              "kind": "intrinsic",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "框架",
+              "socket_index": 0
+            },
+            {
+              "equipped": {
+                "name": "箭头制退器",
+                "plug_hash": 3048246338
+              },
+              "kind": "barrel",
+              "option_count": 22,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "枪管",
+              "socket_index": 1
+            },
+            {
+              "equipped": {
+                "name": "附加弹匣",
+                "plug_hash": 1065371964
+              },
+              "kind": "magazine",
+              "option_count": 26,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "弹匣",
+              "socket_index": 2
+            },
+            {
+              "equipped": {
+                "name": "萤火虫↑",
+                "name_plain": "萤火虫",
+                "plug_hash": 1183436451
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 3
+            },
+            {
+              "equipped": {
+                "name": "蜻蜓↑",
+                "name_plain": "蜻蜓",
+                "plug_hash": 169755979
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 4
+            },
+            {
+              "equipped": {
+                "name": "默认着色器",
+                "plug_hash": 4248210736
+              },
+              "kind": "shader",
+              "option_count": 694,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "着色器",
+              "socket_index": 5
+            },
+            {
+              "equipped": {
+                "name": "空模组插槽",
+                "plug_hash": 2323986101
+              },
+              "kind": "mod",
+              "option_count": 39,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 6
+            },
+            {
+              "equipped": {
+                "name": "3阶：填装速度",
+                "plug_hash": 4283235141
+              },
+              "kind": "masterwork",
+              "option_count": 167,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "大师杰作",
+              "socket_index": 7
+            },
+            {
+              "equipped": {
+                "name": "边打边跑",
+                "plug_hash": 859855990
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 8
+            },
+            {
+              "equipped": {
+                "name": "击杀记录器",
+                "plug_hash": 905869860
+              },
+              "kind": "tracker",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "追踪器",
+              "socket_index": 9
+            },
+            {
+              "equipped": {
+                "name": "怀疑",
+                "plug_hash": 2319265678
+              },
+              "kind": "ornament",
+              "option_count": 4,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "装饰",
+              "socket_index": 10
+            },
+            {
+              "equipped": {
+                "name": "凯旋脉动",
+                "plug_hash": 1335132356
+              },
+              "kind": "other",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "插槽",
+              "socket_index": 11
+            },
+            {
+              "equipped": {
+                "name": "空的装备阶级升级",
+                "plug_hash": 780815822
+              },
+              "kind": "mod",
+              "option_count": 5,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 12
+            }
+          ],
+          "stats": [
+            {
+              "display": "180",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 180
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 78
+            },
+            {
+              "display": "37",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 37
+            },
+            {
+              "display": "56",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 56
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 47
+            },
+            {
+              "display": "55",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 55
+            },
+            {
+              "display": "15",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 15
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 78
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "100",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 100
+            },
+            {
+              "display": "35",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 35
+            },
+            {
+              "display": "60",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 60
+            }
+          ],
+          "weapon": {
+            "ammo_type": "白弹",
+            "breaker_type": "",
+            "community": {
+              "archive_available": false,
+              "matched_count": 0,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。",
+              "results": []
+            },
+            "damage_type": "烈日",
+            "description": "“世界都会有个终结。当你的末日来临时，身边一定要有个值得依赖的同伴。”——浪客",
+            "farming": {
+              "available": true,
+              "list": "购物清单-白弹",
+              "matched": true,
+              "recommended_perks": {
+                "三号位": [
+                  "萤火虫"
+                ],
+                "四号位": [
+                  "辉耀炽热",
+                  "高爆载荷"
+                ]
+              },
+              "source": "智谋",
+              "tier": "A",
+              "updated_at": "2026.8.30"
+            },
+            "frame": "精密框架",
+            "gear_tier": 5,
+            "has_enhanced": false,
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+            "instance": {
+              "instance_id": "6917530193975673732",
+              "is_equipped": false,
+              "location": "仓库",
+              "locked": false,
+              "power": 550,
+              "tracked": false
+            },
+            "intrinsic": "精密框架",
+            "is_craftable": false,
+            "item_hash": 810474118,
+            "item_level": 55,
+            "name": "信任",
+            "name_en": "Trust",
+            "popularity": {
+              "available": false,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。"
+            },
+            "quality": 0,
+            "rarity": "传说",
+            "rarity_tier": 5,
+            "roll_kind": "random",
+            "roll_summary": {
+              "option_counts": {
+                "弹匣": 26,
+                "枪管": 22,
+                "特性1": 1
+              },
+              "random_columns": [
+                "枪管",
+                "弹匣",
+                "特性1",
+                "特性1"
+              ],
+              "roll_kind": "random",
+              "scope": "definition"
+            },
             "rpm": 180,
-            "stability": 56,
-            "zoom": 14
-          },
-          "tier": "传说",
-          "weapon_type": "手炮"
+            "sources": [
+              {
+                "kind": "farming_list",
+                "name": "购物清单-白弹",
+                "path": "",
+                "trust": "untrusted_reference",
+                "updated_at": "2026.8.30"
+              }
+            ],
+            "trait_ids": [
+              "item.weapon.hand_cannon",
+              "releases.v970.core"
+            ],
+            "watermark": "/common/destiny2_content/icons/e78fd9419f99464816ac8f628bc3c4af.png",
+            "weapon_type": "手炮"
+          }
         },
         {
-          "ammo_type": "白弹",
-          "damage_type": "烈日",
-          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
-          "instance_id": "6917530193973399564",
-          "is_equipped": false,
-          "item_hash": 810474118,
-          "location": "仓库",
-          "name": "信任",
-          "perks_complete": true,
-          "power": 550,
-          "sockets": [
+          "notes": [],
+          "options": [
             {
-              "description": "此武器的后坐力模式可预测地偏向垂直方向。可进行拥有高精度的快速射击。装备此武器时，瞄准时的移动速度更快。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e9dd736124e8ef94048901a279a5bb18.png",
-              "plug_category": "intrinsics",
-              "plug_hash": 1322370662,
-              "plug_name": "精密框架",
-              "slot_label": "框架"
+              "equipped": {
+                "name": "多边形膛线",
+                "plug_hash": 3966296580
+              },
+              "kind": "barrel",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "多边形膛线",
+                  "plug_hash": 3966296580,
+                  "stat_effects": [
+                    {
+                      "stat": "稳定性",
+                      "value": 12
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "小口径枪膛",
+                  "plug_hash": 2860123632,
+                  "stat_effects": [
+                    {
+                      "stat": "稳定性",
+                      "value": 8
+                    },
+                    {
+                      "stat": "射程",
+                      "value": 8
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "枪管",
+              "socket_index": 1
             },
             {
-              "description": "经优化减少后坐力的枪管。\n  •  提高稳定性",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7d7aaccee29cf450d4057a9de871cdc8.png",
-              "plug_category": "barrels",
-              "plug_hash": 3966296580,
-              "plug_name": "多边形膛线",
-              "slot_label": "枪管"
+              "equipped": {
+                "name": "稳固弹药",
+                "plug_hash": 1002206008
+              },
+              "kind": "magazine",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "稳固弹药",
+                  "plug_hash": 1002206008,
+                  "stat_effects": [
+                    {
+                      "stat": "稳定性",
+                      "value": 16
+                    },
+                    {
+                      "stat": "射程",
+                      "value": -4
+                    },
+                    {
+                      "stat": "空中效率",
+                      "value": 7
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "广口弹匣",
+                  "plug_hash": 1709045111,
+                  "stat_effects": [
+                    {
+                      "stat": "填装速度",
+                      "value": 16
+                    },
+                    {
+                      "stat": "稳定性",
+                      "value": 6
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "弹匣",
+              "socket_index": 2
             },
             {
-              "description": "经优化提高对后坐力控制的弹匣。\n  •  大幅提高稳定性\n  •  略微缩短射程\n  • 增加空中效率",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/6c6e1cc341487a8afd0b0c714a229255.png",
-              "plug_category": "magazines",
-              "plug_hash": 1002206008,
-              "plug_name": "稳固弹药",
-              "slot_label": "弹匣"
+              "equipped": {
+                "name": "快速命中↑",
+                "plug_hash": 2938480696
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2938480696,
+                  "name": "快速命中↑",
+                  "name_plain": "快速命中",
+                  "plug_hash": 2938480696
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 1370847713,
+                  "name": "强力首发↑",
+                  "name_plain": "强力首发",
+                  "plug_hash": 1370847713
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 191144788,
+                  "name": "滑行射击↑",
+                  "name_plain": "滑行射击",
+                  "plug_hash": 191144788
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性1",
+              "socket_index": 3
             },
             {
-              "description": "快速精准命中目标会暂时大幅提高稳定性和填装速度。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/de22847fa94634a487758041887bcdaa.png",
-              "plug_category": "frames",
-              "plug_hash": 2938480696,
-              "plug_name": "快速命中",
-              "slot_label": "特性1"
+              "equipped": {
+                "name": "辉耀炽热↑",
+                "plug_hash": 2675184851
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2675184851,
+                  "name": "辉耀炽热↑",
+                  "name_plain": "辉耀炽热",
+                  "plug_hash": 2675184851
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 332733060,
+                  "name": "精准工具↑",
+                  "name_plain": "精准工具",
+                  "plug_hash": 332733060
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2717805783,
+                  "name": "移动目标↑",
+                  "name_plain": "移动目标",
+                  "plug_hash": 2717805783
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性2",
+              "socket_index": 4
             },
             {
-              "description": "消灭一个目标会向附近目标蔓延持续时间更长的灼烧效果。\n更强大的战斗人员和敌方守护者会在更大的范围内造成灼烧效果。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/22ed4a2cd5a0eb129a14ce77db49373f.png",
-              "plug_category": "frames",
-              "plug_hash": 2675184851,
-              "plug_name": "辉耀炽热",
-              "slot_label": "特性2"
+              "equipped": {
+                "name": "空模组插槽",
+                "plug_hash": 2323986101
+              },
+              "kind": "mod",
+              "option_count": 19,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "平衡枪托",
+                  "plug_hash": 285783873,
+                  "stat_effects": [
+                    {
+                      "stat": "后坐方向",
+                      "value": 35
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "备用弹匣",
+                  "plug_category": "v400.weapon.mod_magazine",
+                  "plug_hash": 1523545668,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 40
+                    },
+                    {
+                      "conditional": true,
+                      "stat": "弹药容量",
+                      "value": 40
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "徒手握把",
+                  "plug_hash": 2268413950
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "模组1",
+              "socket_index": 6
             },
             {
-              "description": "将装备恢复为默认颜色。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/96831e244728f0350340bb7d5d05b463.png",
-              "plug_category": "shader",
-              "plug_hash": 4248210736,
-              "plug_name": "默认着色器",
-              "slot_label": "着色器"
+              "equipped": {
+                "name": "3阶：操控性",
+                "plug_hash": 518224745
+              },
+              "kind": "masterwork",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "4阶：操控性",
+                  "plug_hash": 518224750,
+                  "stat_effects": [
+                    {
+                      "stat": "操控性",
+                      "value": 4
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "大师杰作",
+              "socket_index": 7
             },
             {
-              "description": "当前未选择模组。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/431cc8304da4f5eb44c5c10a5c1866ce.jpg",
-              "plug_category": "v400.weapon.mod_empty",
-              "plug_hash": 2323986101,
-              "plug_name": "空模组插槽",
-              "slot_label": "模组"
+              "equipped": {
+                "name": "边打边跑",
+                "plug_hash": 859855990
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "边打边跑",
+                  "plug_hash": 859855990
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性3",
+              "socket_index": 8
             },
             {
-              "description": "属性略微提高。提高武器阶层，将其铸造为大师杰作物品。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d2e1ab2542f585d025fb4cc1a3885164.jpg",
-              "plug_category": "v400.plugs.weapons.masterworks.stat.handling",
-              "plug_hash": 518224745,
-              "plug_name": "3阶：操控性",
-              "slot_label": "大师杰作"
+              "equipped": {
+                "name": "默认皮肤",
+                "plug_hash": 3854296178
+              },
+              "kind": "ornament",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "信任",
+                  "plug_hash": 3364068341
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "装饰",
+              "socket_index": 10
             },
             {
-              "description": "击败目标可在更长时间内获得边打边跑层数。短暂冲刺消耗一层效果并从储备弹药中部分填装此武器的弹匣。如为弓箭，则在更长时间内提升拉弓速度。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5011e479f02ede344fb16099cfecd800.png",
-              "plug_category": "origins",
-              "plug_hash": 859855990,
-              "plug_name": "边打边跑",
-              "slot_label": "插槽9"
-            },
-            {
-              "description": "记录使用武器消灭的敌人数量。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fa9b8e2b358de10643b14a058094f4b.png",
-              "plug_category": "v400.plugs.weapons.masterworks.trackers",
-              "plug_hash": 905869860,
-              "plug_name": "击杀记录器",
-              "slot_label": "追踪器"
-            },
-            {
-              "description": "将武器重置为默认外观。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3bb544f2136894a13a73875639f376d5.png",
-              "plug_category": "weapon_tiering_tier5_skins",
-              "plug_hash": 3854296178,
-              "plug_name": "默认皮肤",
-              "slot_label": "纪念物"
-            },
-            {
-              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8c28abb43d902b731365e1045f467a95.png",
-              "plug_category": "weapon_tiering_kill_vfx",
-              "plug_hash": 1335132356,
-              "plug_name": "凯旋脉动",
-              "slot_label": "战斗特效"
-            },
-            {
-              "description": "此武器的特性可通过更高的装备阶级等级强化。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
-              "plug_category": "weapon_tiering.plugs.mods.enhancers",
-              "plug_hash": 780815822,
-              "plug_name": "空的装备阶级升级",
-              "slot_label": "模组"
+              "equipped": {
+                "name": "凯旋脉动",
+                "plug_hash": 1335132356
+              },
+              "kind": "other",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "凯旋脉动",
+                  "plug_hash": 1335132356
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "插槽",
+              "socket_index": 11
             }
           ],
-          "stats": {
-            "aim_assist": 78,
-            "airborne_effectiveness": 42,
-            "damage": 78,
-            "handling": 38,
-            "magazine": 12,
-            "range": 33,
-            "recoil_direction": 96,
-            "reload_speed": 50,
+          "perks_complete": true,
+          "sockets": [
+            {
+              "equipped": {
+                "name": "精密框架",
+                "plug_hash": 1322370662
+              },
+              "kind": "intrinsic",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "框架",
+              "socket_index": 0
+            },
+            {
+              "equipped": {
+                "name": "多边形膛线",
+                "plug_hash": 3966296580
+              },
+              "kind": "barrel",
+              "option_count": 22,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "枪管",
+              "socket_index": 1
+            },
+            {
+              "equipped": {
+                "name": "稳固弹药",
+                "plug_hash": 1002206008
+              },
+              "kind": "magazine",
+              "option_count": 26,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "弹匣",
+              "socket_index": 2
+            },
+            {
+              "equipped": {
+                "name": "快速命中↑",
+                "name_plain": "快速命中",
+                "plug_hash": 2938480696
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 3
+            },
+            {
+              "equipped": {
+                "name": "辉耀炽热↑",
+                "name_plain": "辉耀炽热",
+                "plug_hash": 2675184851
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 4
+            },
+            {
+              "equipped": {
+                "name": "默认着色器",
+                "plug_hash": 4248210736
+              },
+              "kind": "shader",
+              "option_count": 694,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "着色器",
+              "socket_index": 5
+            },
+            {
+              "equipped": {
+                "name": "空模组插槽",
+                "plug_hash": 2323986101
+              },
+              "kind": "mod",
+              "option_count": 39,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 6
+            },
+            {
+              "equipped": {
+                "name": "3阶：操控性",
+                "plug_hash": 518224745
+              },
+              "kind": "masterwork",
+              "option_count": 167,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "大师杰作",
+              "socket_index": 7
+            },
+            {
+              "equipped": {
+                "name": "边打边跑",
+                "plug_hash": 859855990
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 8
+            },
+            {
+              "equipped": {
+                "name": "击杀记录器",
+                "plug_hash": 905869860
+              },
+              "kind": "tracker",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "追踪器",
+              "socket_index": 9
+            },
+            {
+              "equipped": {
+                "name": "默认皮肤",
+                "plug_hash": 3854296178
+              },
+              "kind": "ornament",
+              "option_count": 4,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "装饰",
+              "socket_index": 10
+            },
+            {
+              "equipped": {
+                "name": "凯旋脉动",
+                "plug_hash": 1335132356
+              },
+              "kind": "other",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "插槽",
+              "socket_index": 11
+            },
+            {
+              "equipped": {
+                "name": "空的装备阶级升级",
+                "plug_hash": 780815822
+              },
+              "kind": "mod",
+              "option_count": 5,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 12
+            }
+          ],
+          "stats": [
+            {
+              "display": "180",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 180
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 78
+            },
+            {
+              "display": "33",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 33
+            },
+            {
+              "display": "84",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 84
+            },
+            {
+              "display": "38",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 38
+            },
+            {
+              "display": "50",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 50
+            },
+            {
+              "display": "12",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 12
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 78
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "96",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 96
+            },
+            {
+              "display": "42",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 42
+            },
+            {
+              "display": "60",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 60
+            }
+          ],
+          "weapon": {
+            "ammo_type": "白弹",
+            "breaker_type": "",
+            "community": {
+              "archive_available": false,
+              "matched_count": 0,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。",
+              "results": []
+            },
+            "damage_type": "烈日",
+            "description": "“世界都会有个终结。当你的末日来临时，身边一定要有个值得依赖的同伴。”——浪客",
+            "farming": {
+              "available": true,
+              "list": "购物清单-白弹",
+              "matched": true,
+              "recommended_perks": {
+                "三号位": [
+                  "萤火虫"
+                ],
+                "四号位": [
+                  "辉耀炽热",
+                  "高爆载荷"
+                ]
+              },
+              "source": "智谋",
+              "tier": "A",
+              "updated_at": "2026.8.30"
+            },
+            "frame": "精密框架",
+            "gear_tier": 5,
+            "has_enhanced": false,
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+            "instance": {
+              "instance_id": "6917530193973399564",
+              "is_equipped": false,
+              "location": "仓库",
+              "locked": false,
+              "power": 550,
+              "tracked": false
+            },
+            "intrinsic": "精密框架",
+            "is_craftable": false,
+            "item_hash": 810474118,
+            "item_level": 55,
+            "name": "信任",
+            "name_en": "Trust",
+            "popularity": {
+              "available": false,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。"
+            },
+            "quality": 0,
+            "rarity": "传说",
+            "rarity_tier": 5,
+            "roll_kind": "random",
+            "roll_summary": {
+              "option_counts": {
+                "弹匣": 26,
+                "枪管": 22,
+                "特性1": 1
+              },
+              "random_columns": [
+                "枪管",
+                "弹匣",
+                "特性1",
+                "特性1"
+              ],
+              "roll_kind": "random",
+              "scope": "definition"
+            },
             "rpm": 180,
-            "stability": 84,
-            "zoom": 14
-          },
-          "tier": "传说",
-          "weapon_type": "手炮"
+            "sources": [
+              {
+                "kind": "farming_list",
+                "name": "购物清单-白弹",
+                "path": "",
+                "trust": "untrusted_reference",
+                "updated_at": "2026.8.30"
+              }
+            ],
+            "trait_ids": [
+              "item.weapon.hand_cannon",
+              "releases.v970.core"
+            ],
+            "watermark": "/common/destiny2_content/icons/e78fd9419f99464816ac8f628bc3c4af.png",
+            "weapon_type": "手炮"
+          }
         },
         {
-          "ammo_type": "白弹",
-          "damage_type": "烈日",
-          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
-          "instance_id": "6917530193978049636",
-          "is_equipped": false,
-          "item_hash": 810474118,
-          "location": "Hunter",
-          "name": "信任",
-          "perks_complete": true,
-          "power": 550,
-          "sockets": [
+          "notes": [],
+          "options": [
             {
-              "description": "此武器的后坐力模式可预测地偏向垂直方向。可进行拥有高精度的快速射击。装备此武器时，瞄准时的移动速度更快。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e9dd736124e8ef94048901a279a5bb18.png",
-              "plug_category": "intrinsics",
-              "plug_hash": 1322370662,
-              "plug_name": "精密框架",
-              "slot_label": "框架"
+              "equipped": {
+                "name": "槽化枪管",
+                "plug_hash": 1124871858
+              },
+              "kind": "barrel",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "箭头制退器",
+                  "plug_hash": 3048246338,
+                  "stat_effects": [
+                    {
+                      "stat": "后坐方向",
+                      "value": 30
+                    },
+                    {
+                      "stat": "操控性",
+                      "value": 12
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "槽化枪管",
+                  "plug_hash": 1124871858,
+                  "stat_effects": [
+                    {
+                      "stat": "稳定性",
+                      "value": 6
+                    },
+                    {
+                      "stat": "操控性",
+                      "value": 16
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "枪管",
+              "socket_index": 1
             },
             {
-              "description": "极轻型枪管。\n  •  大幅提高操控速度\n  •  略微提高稳定性",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/260eba9dd149dbb94b1306c9ed4dd8db.png",
-              "plug_category": "barrels",
-              "plug_hash": 1124871858,
-              "plug_name": "槽化枪管",
-              "slot_label": "枪管"
+              "equipped": {
+                "name": "广口弹匣",
+                "plug_hash": 1709045111
+              },
+              "kind": "magazine",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "战术弹匣",
+                  "plug_hash": 1783397184,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 10
+                    },
+                    {
+                      "stat": "填装速度",
+                      "value": 11
+                    },
+                    {
+                      "stat": "稳定性",
+                      "value": 6
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "广口弹匣",
+                  "plug_hash": 1709045111,
+                  "stat_effects": [
+                    {
+                      "stat": "填装速度",
+                      "value": 16
+                    },
+                    {
+                      "stat": "稳定性",
+                      "value": 6
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "弹匣",
+              "socket_index": 2
             },
             {
-              "description": "经优化提高填装速度。\n  •  略微提高稳定性\n  •  大幅提高填装速度",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f95e67e4ff37466505d66d3fa1030782.png",
-              "plug_category": "magazines",
-              "plug_hash": 1709045111,
-              "plug_name": "广口弹匣",
-              "slot_label": "弹匣"
+              "equipped": {
+                "name": "萤火虫↑",
+                "plug_hash": 1183436451
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2938480696,
+                  "name": "快速命中↑",
+                  "name_plain": "快速命中",
+                  "plug_hash": 2938480696
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 4116820839,
+                  "name": "速射瞄准↑",
+                  "name_plain": "速射瞄准",
+                  "plug_hash": 4116820839,
+                  "stat_effects": [
+                    {
+                      "stat": "稳定性",
+                      "value": 5
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 1183436451,
+                  "name": "萤火虫↑",
+                  "name_plain": "萤火虫",
+                  "plug_hash": 1183436451
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性1",
+              "socket_index": 3
             },
             {
-              "description": "此武器完成精准最后一击可以大幅提高填装速度并使目标爆炸，对附近的目标造成烈日伤害。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/629e225e6f8214326bc1eb0a911a6f6d.png",
-              "plug_category": "frames",
-              "plug_hash": 1183436451,
-              "plug_name": "萤火虫",
-              "slot_label": "特性1"
+              "equipped": {
+                "name": "辉耀炽热↑",
+                "plug_hash": 2675184851
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2675184851,
+                  "name": "辉耀炽热↑",
+                  "name_plain": "辉耀炽热",
+                  "plug_hash": 2675184851
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 332733060,
+                  "name": "精准工具↑",
+                  "name_plain": "精准工具",
+                  "plug_hash": 332733060
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2717805783,
+                  "name": "移动目标↑",
+                  "name_plain": "移动目标",
+                  "plug_hash": 2717805783
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性2",
+              "socket_index": 4
             },
             {
-              "description": "消灭一个目标会向附近目标蔓延持续时间更长的灼烧效果。\n更强大的战斗人员和敌方守护者会在更大的范围内造成灼烧效果。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/22ed4a2cd5a0eb129a14ce77db49373f.png",
-              "plug_category": "frames",
-              "plug_hash": 2675184851,
-              "plug_name": "辉耀炽热",
-              "slot_label": "特性2"
+              "equipped": {
+                "name": "丰足弹药",
+                "plug_hash": 325500297
+              },
+              "kind": "mod",
+              "option_count": 19,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "平衡枪托",
+                  "plug_hash": 285783873,
+                  "stat_effects": [
+                    {
+                      "stat": "后坐方向",
+                      "value": 35
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "备用弹匣",
+                  "plug_category": "v400.weapon.mod_magazine",
+                  "plug_hash": 1523545668,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 40
+                    },
+                    {
+                      "conditional": true,
+                      "stat": "弹药容量",
+                      "value": 40
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "徒手握把",
+                  "plug_hash": 2268413950
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "模组1",
+              "socket_index": 6
             },
             {
-              "description": "使用此着色器更改装备配色。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/033984aaa9fbce32a4d7ad4d771ee21d.jpg",
-              "plug_category": "shader",
-              "plug_hash": 3812602472,
-              "plug_name": "冷热交替",
-              "slot_label": "着色器"
+              "equipped": {
+                "name": "边打边跑",
+                "plug_hash": 859855990
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "边打边跑",
+                  "plug_hash": 859855990
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性3",
+              "socket_index": 8
             },
             {
-              "description": "小幅提升弹药生成速度。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/26614af76b46d7a5f178eeaeedc79c36.png",
-              "plug_category": "v400.weapon.mod_guns",
-              "plug_hash": 325500297,
-              "plug_name": "丰足弹药",
-              "slot_label": "模组"
+              "equipped": {
+                "name": "怀疑",
+                "plug_hash": 2319265678
+              },
+              "kind": "ornament",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "信任",
+                  "plug_hash": 3364068341
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "装饰",
+              "socket_index": 10
             },
             {
-              "description": "最高属性。\n\n为此武器应用等同于武器阶级的额外属性。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2ed55f129d92647218ccb05f31e31cc8.jpg",
-              "plug_category": "v400.plugs.weapons.masterworks.stat.range",
-              "plug_hash": 622249644,
-              "plug_name": "大师杰作：射程",
-              "slot_label": "大师杰作"
-            },
-            {
-              "description": "击败目标可在更长时间内获得边打边跑层数。短暂冲刺消耗一层效果并从储备弹药中部分填装此武器的弹匣。如为弓箭，则在更长时间内提升拉弓速度。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/5011e479f02ede344fb16099cfecd800.png",
-              "plug_category": "origins",
-              "plug_hash": 859855990,
-              "plug_name": "边打边跑",
-              "slot_label": "插槽9"
-            },
-            {
-              "description": "记录使用武器消灭的敌人数量。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2fa9b8e2b358de10643b14a058094f4b.png",
-              "plug_category": "v400.plugs.weapons.masterworks.trackers",
-              "plug_hash": 905869860,
-              "plug_name": "击杀记录器",
-              "slot_label": "追踪器"
-            },
-            {
-              "description": "装备此武器皮肤以改变信任的外观。当你解锁一个皮肤后，你帐号中的所有角色都将解锁获得的皮肤。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/cf0a81fe5497f59c6ed6747f844a595e.jpg",
-              "plug_category": "v400_activities_gambit_hand_cannon0_skins",
-              "plug_hash": 2319265678,
-              "plug_name": "怀疑",
-              "slot_label": "纪念物"
-            },
-            {
-              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8c28abb43d902b731365e1045f467a95.png",
-              "plug_category": "weapon_tiering_kill_vfx",
-              "plug_hash": 1335132356,
-              "plug_name": "凯旋脉动",
-              "slot_label": "战斗特效"
-            },
-            {
-              "description": "此武器的特性可通过更高的装备阶级等级强化。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
-              "plug_category": "weapon_tiering.plugs.mods.enhancers",
-              "plug_hash": 780815822,
-              "plug_name": "空的装备阶级升级",
-              "slot_label": "模组"
+              "equipped": {
+                "name": "凯旋脉动",
+                "plug_hash": 1335132356
+              },
+              "kind": "other",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "凯旋脉动",
+                  "plug_hash": 1335132356
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "插槽",
+              "socket_index": 11
             }
           ],
-          "stats": {
-            "aim_assist": 78,
-            "airborne_effectiveness": 35,
-            "damage": 78,
-            "handling": 51,
-            "magazine": 12,
-            "range": 47,
-            "recoil_direction": 96,
-            "reload_speed": 66,
+          "perks_complete": true,
+          "sockets": [
+            {
+              "equipped": {
+                "name": "精密框架",
+                "plug_hash": 1322370662
+              },
+              "kind": "intrinsic",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "框架",
+              "socket_index": 0
+            },
+            {
+              "equipped": {
+                "name": "槽化枪管",
+                "plug_hash": 1124871858
+              },
+              "kind": "barrel",
+              "option_count": 22,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "枪管",
+              "socket_index": 1
+            },
+            {
+              "equipped": {
+                "name": "广口弹匣",
+                "plug_hash": 1709045111
+              },
+              "kind": "magazine",
+              "option_count": 26,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "弹匣",
+              "socket_index": 2
+            },
+            {
+              "equipped": {
+                "name": "萤火虫↑",
+                "name_plain": "萤火虫",
+                "plug_hash": 1183436451
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 3
+            },
+            {
+              "equipped": {
+                "name": "辉耀炽热↑",
+                "name_plain": "辉耀炽热",
+                "plug_hash": 2675184851
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 4
+            },
+            {
+              "equipped": {
+                "name": "冷热交替",
+                "plug_hash": 3812602472
+              },
+              "kind": "shader",
+              "option_count": 694,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "着色器",
+              "socket_index": 5
+            },
+            {
+              "equipped": {
+                "name": "丰足弹药",
+                "plug_hash": 325500297
+              },
+              "kind": "mod",
+              "option_count": 39,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 6
+            },
+            {
+              "equipped": {
+                "name": "大师杰作：射程",
+                "plug_hash": 622249644
+              },
+              "kind": "masterwork",
+              "option_count": 167,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "大师杰作",
+              "socket_index": 7
+            },
+            {
+              "equipped": {
+                "name": "边打边跑",
+                "plug_hash": 859855990
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 8
+            },
+            {
+              "equipped": {
+                "name": "击杀记录器",
+                "plug_hash": 905869860
+              },
+              "kind": "tracker",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "追踪器",
+              "socket_index": 9
+            },
+            {
+              "equipped": {
+                "name": "怀疑",
+                "plug_hash": 2319265678
+              },
+              "kind": "ornament",
+              "option_count": 4,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "装饰",
+              "socket_index": 10
+            },
+            {
+              "equipped": {
+                "name": "凯旋脉动",
+                "plug_hash": 1335132356
+              },
+              "kind": "other",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "插槽",
+              "socket_index": 11
+            },
+            {
+              "equipped": {
+                "name": "空的装备阶级升级",
+                "plug_hash": 780815822
+              },
+              "kind": "mod",
+              "option_count": 5,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 12
+            }
+          ],
+          "stats": [
+            {
+              "display": "180",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 180
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 78
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 47
+            },
+            {
+              "display": "68",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 68
+            },
+            {
+              "display": "51",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 51
+            },
+            {
+              "display": "66",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 66
+            },
+            {
+              "display": "12",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 12
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 78
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "96",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 96
+            },
+            {
+              "display": "35",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 35
+            },
+            {
+              "display": "72",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 72
+            }
+          ],
+          "weapon": {
+            "ammo_type": "白弹",
+            "breaker_type": "",
+            "community": {
+              "archive_available": false,
+              "matched_count": 0,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。",
+              "results": []
+            },
+            "damage_type": "烈日",
+            "description": "“世界都会有个终结。当你的末日来临时，身边一定要有个值得依赖的同伴。”——浪客",
+            "farming": {
+              "available": true,
+              "list": "购物清单-白弹",
+              "matched": true,
+              "recommended_perks": {
+                "三号位": [
+                  "萤火虫"
+                ],
+                "四号位": [
+                  "辉耀炽热",
+                  "高爆载荷"
+                ]
+              },
+              "source": "智谋",
+              "tier": "A",
+              "updated_at": "2026.8.30"
+            },
+            "frame": "精密框架",
+            "gear_tier": 5,
+            "has_enhanced": false,
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+            "instance": {
+              "instance_id": "6917530193978049636",
+              "is_equipped": false,
+              "location": "Hunter",
+              "locked": false,
+              "power": 550,
+              "tracked": false
+            },
+            "intrinsic": "精密框架",
+            "is_craftable": false,
+            "item_hash": 810474118,
+            "item_level": 55,
+            "name": "信任",
+            "name_en": "Trust",
+            "popularity": {
+              "available": false,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。"
+            },
+            "quality": 0,
+            "rarity": "传说",
+            "rarity_tier": 5,
+            "roll_kind": "random",
+            "roll_summary": {
+              "option_counts": {
+                "弹匣": 26,
+                "枪管": 22,
+                "特性1": 1
+              },
+              "random_columns": [
+                "枪管",
+                "弹匣",
+                "特性1",
+                "特性1"
+              ],
+              "roll_kind": "random",
+              "scope": "definition"
+            },
             "rpm": 180,
-            "stability": 68,
-            "zoom": 14
-          },
-          "tier": "传说",
-          "weapon_type": "手炮"
+            "sources": [
+              {
+                "kind": "farming_list",
+                "name": "购物清单-白弹",
+                "path": "",
+                "trust": "untrusted_reference",
+                "updated_at": "2026.8.30"
+              }
+            ],
+            "trait_ids": [
+              "item.weapon.hand_cannon",
+              "releases.v970.core"
+            ],
+            "watermark": "/common/destiny2_content/icons/e78fd9419f99464816ac8f628bc3c4af.png",
+            "weapon_type": "手炮"
+          }
         },
         {
-          "ammo_type": "白弹",
-          "damage_type": "动能",
-          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/063b3d4db62ef73dff4297c33ea1ec88.jpg",
-          "instance_id": "6917530195652349780",
-          "is_equipped": false,
-          "item_hash": 1617917863,
-          "location": "仓库",
-          "name": "克瑞米尔之匕",
-          "perks_complete": true,
-          "power": 550,
-          "sockets": [
+          "notes": [],
+          "options": [
             {
-              "description": "高伤害，高后坐力。为远程射击进行优化。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/64209c4fd20513b33109c374179d0958.png",
-              "plug_category": "intrinsics",
-              "plug_hash": 2757685314,
-              "plug_name": "攻击型框架",
-              "slot_label": "框架"
+              "equipped": {
+                "name": "槽化枪管",
+                "plug_hash": 1124871858
+              },
+              "kind": "barrel",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "箭头制退器",
+                  "plug_hash": 3048246338,
+                  "stat_effects": [
+                    {
+                      "stat": "后坐方向",
+                      "value": 30
+                    },
+                    {
+                      "stat": "操控性",
+                      "value": 12
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "槽化枪管",
+                  "plug_hash": 1124871858,
+                  "stat_effects": [
+                    {
+                      "stat": "稳定性",
+                      "value": 6
+                    },
+                    {
+                      "stat": "操控性",
+                      "value": 16
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "枪管",
+              "socket_index": 1
             },
             {
-              "description": "极轻型枪管。\n  •  大幅提高操控速度\n  •  略微提高稳定性",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/260eba9dd149dbb94b1306c9ed4dd8db.png",
-              "plug_category": "barrels",
-              "plug_hash": 1124871858,
-              "plug_name": "槽化枪管",
-              "slot_label": "枪管"
+              "equipped": {
+                "name": "精确弹药",
+                "plug_hash": 3267421167
+              },
+              "kind": "magazine",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "精确弹药",
+                  "plug_hash": 3267421167,
+                  "stat_effects": [
+                    {
+                      "stat": "射程",
+                      "value": 12
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "广口弹匣",
+                  "plug_hash": 1709045111,
+                  "stat_effects": [
+                    {
+                      "stat": "填装速度",
+                      "value": 16
+                    },
+                    {
+                      "stat": "稳定性",
+                      "value": 6
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "弹匣",
+              "socket_index": 2
             },
             {
-              "description": "射程提高。\n  •  增加射程",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d85024478504205359c7fb52dbc4f6b6.png",
-              "plug_category": "magazines",
-              "plug_hash": 3267421167,
-              "plug_name": "精确弹药",
-              "slot_label": "弹匣"
+              "equipped": {
+                "name": "孤狼↑",
+                "plug_hash": 2073244114
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2717805783,
+                  "name": "移动目标↑",
+                  "name_plain": "移动目标",
+                  "plug_hash": 2717805783
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 2073244114,
+                  "name": "孤狼↑",
+                  "name_plain": "孤狼",
+                  "plug_hash": 2073244114
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 1370847713,
+                  "name": "强力首发↑",
+                  "name_plain": "强力首发",
+                  "plug_hash": 1370847713
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性1",
+              "socket_index": 3
             },
             {
-              "description": "提升瞄准辅助、瞄准速度和空中效率。附近没有盟友时这些效果将提升。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/4c244b847778a484726543e5c35935ef.png",
-              "plug_category": "frames",
-              "plug_hash": 2073244114,
-              "plug_name": "孤狼",
-              "slot_label": "特性1"
+              "equipped": {
+                "name": "精准工具↑",
+                "plug_hash": 332733060
+              },
+              "kind": "trait",
+              "option_count": 3,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 332733060,
+                  "name": "精准工具↑",
+                  "name_plain": "精准工具",
+                  "plug_hash": 332733060
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 3719974635,
+                  "name": "风暴之眼↑",
+                  "name_plain": "风暴之眼",
+                  "plug_hash": 3719974635
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 509594246,
+                  "name": "测距仪↑",
+                  "name_plain": "测距仪",
+                  "plug_hash": 509594246,
+                  "stat_effects": [
+                    {
+                      "stat": "操控性",
+                      "value": 5
+                    }
+                  ]
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性2",
+              "socket_index": 4
             },
             {
-              "description": "造成精准伤害会大幅提升精准伤害。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e6a4ebc1a8a73e4c7fcfc21c69000ce2.png",
-              "plug_category": "frames",
-              "plug_hash": 332733060,
-              "plug_name": "精准工具",
-              "slot_label": "特性2"
+              "equipped": {
+                "name": "强化稳定性",
+                "plug_hash": 2057879635
+              },
+              "kind": "mod",
+              "option_count": 19,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "平衡枪托",
+                  "plug_hash": 285783873,
+                  "stat_effects": [
+                    {
+                      "stat": "后坐方向",
+                      "value": 35
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "备用弹匣",
+                  "plug_category": "v400.weapon.mod_magazine",
+                  "plug_hash": 1523545668,
+                  "stat_effects": [
+                    {
+                      "stat": "弹匣",
+                      "value": 40
+                    },
+                    {
+                      "conditional": true,
+                      "stat": "弹药容量",
+                      "value": 40
+                    }
+                  ]
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "徒手握把",
+                  "plug_hash": 2268413950
+                }
+              ],
+              "options_available": true,
+              "options_truncated": true,
+              "scope": "instance",
+              "slot": "模组1",
+              "socket_index": 6
             },
             {
-              "description": "使用此着色器更改装备配色。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/de8240e503da2b7bea9ecc6674f99fe8.jpg",
-              "plug_category": "shader",
-              "plug_hash": 1364828722,
-              "plug_name": "星晶体",
-              "slot_label": "着色器"
+              "equipped": {
+                "name": "藏匿之狼",
+                "plug_hash": 1831023215
+              },
+              "kind": "trait",
+              "option_count": 2,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "藏匿之狼",
+                  "plug_hash": 1831023215
+                },
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "Häkke突入武装",
+                  "plug_hash": 250902314
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "特性3",
+              "socket_index": 8
             },
             {
-              "description": "",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/9ddce607dd85d55bef0631473cfbf939.png",
-              "plug_category": "v400.weapon.mod_damage",
-              "plug_hash": 2057879635,
-              "plug_name": "强化稳定性",
-              "slot_label": "模组"
+              "equipped": {
+                "name": "默认皮肤",
+                "plug_hash": 3854296178
+              },
+              "kind": "ornament",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "克瑞米尔之匕",
+                  "plug_hash": 445022290
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "装饰",
+              "socket_index": 10
             },
             {
-              "description": "最高属性。\n\n为此武器应用等同于武器阶级的额外属性。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/2ed55f129d92647218ccb05f31e31cc8.jpg",
-              "plug_category": "v400.plugs.weapons.masterworks.stat.range",
-              "plug_hash": 622249644,
-              "plug_name": "大师杰作：射程",
-              "slot_label": "大师杰作"
-            },
-            {
-              "description": "生命值低下时，使用此武器造成最后一击可提供强化雷达，将你从敌方守护者雷达上移除，并减少战斗人员对你的攻击性，效果持续时间更长。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/451e0f091bd3e7245a82e4efc01ad8c3.png",
-              "plug_category": "origins",
-              "plug_hash": 1831023215,
-              "plug_name": "藏匿之狼",
-              "slot_label": "插槽9"
-            },
-            {
-              "description": "记录使用武器击败熔炉竞技场对手的数量。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/b444ae01d264d6242d7a114fc6f23b9b.png",
-              "plug_category": "v400.plugs.weapons.masterworks.trackers",
-              "plug_hash": 38912240,
-              "plug_name": "熔炉竞技场击杀记录器",
-              "slot_label": "追踪器"
-            },
-            {
-              "description": "将武器重置为默认外观。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3bb544f2136894a13a73875639f376d5.png",
-              "plug_category": "weapon_tiering_tier5_skins",
-              "plug_hash": 3854296178,
-              "plug_name": "默认皮肤",
-              "slot_label": "纪念物"
-            },
-            {
-              "description": "应用此武器模组，来添加击败战斗人员时的庆祝视觉效果。\n\n此模组仅适用于5阶武器。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/8c28abb43d902b731365e1045f467a95.png",
-              "plug_category": "weapon_tiering_kill_vfx",
-              "plug_hash": 1335132356,
-              "plug_name": "凯旋脉动",
-              "slot_label": "战斗特效"
-            },
-            {
-              "description": "此武器的特性可通过更高的装备阶级等级强化。",
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/71dd675f6d9177fddb6be7d0893b92a8.jpg",
-              "plug_category": "weapon_tiering.plugs.mods.enhancers",
-              "plug_hash": 780815822,
-              "plug_name": "空的装备阶级升级",
-              "slot_label": "模组"
+              "equipped": {
+                "name": "凯旋脉动",
+                "plug_hash": 1335132356
+              },
+              "kind": "other",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "enhanced_plug_hash": 0,
+                  "name": "凯旋脉动",
+                  "plug_hash": 1335132356
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "插槽",
+              "socket_index": 11
             }
           ],
-          "stats": {
-            "aim_assist": 67,
-            "airborne_effectiveness": 21,
-            "damage": 92,
-            "handling": 47,
-            "magazine": 8,
-            "range": 82,
-            "recoil_direction": 98,
-            "reload_speed": 24,
+          "perks_complete": true,
+          "sockets": [
+            {
+              "equipped": {
+                "name": "攻击型框架",
+                "plug_hash": 2757685314
+              },
+              "kind": "intrinsic",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "框架",
+              "socket_index": 0
+            },
+            {
+              "equipped": {
+                "name": "槽化枪管",
+                "plug_hash": 1124871858
+              },
+              "kind": "barrel",
+              "option_count": 22,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "枪管",
+              "socket_index": 1
+            },
+            {
+              "equipped": {
+                "name": "精确弹药",
+                "plug_hash": 3267421167
+              },
+              "kind": "magazine",
+              "option_count": 26,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "弹匣",
+              "socket_index": 2
+            },
+            {
+              "equipped": {
+                "name": "孤狼↑",
+                "name_plain": "孤狼",
+                "plug_hash": 2073244114
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 3
+            },
+            {
+              "equipped": {
+                "name": "精准工具↑",
+                "name_plain": "精准工具",
+                "plug_hash": 332733060
+              },
+              "kind": "trait",
+              "option_count": 14,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 4
+            },
+            {
+              "equipped": {
+                "name": "星晶体",
+                "plug_hash": 1364828722
+              },
+              "kind": "shader",
+              "option_count": 694,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "着色器",
+              "socket_index": 5
+            },
+            {
+              "equipped": {
+                "name": "强化稳定性",
+                "plug_hash": 2057879635
+              },
+              "kind": "mod",
+              "option_count": 39,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 6
+            },
+            {
+              "equipped": {
+                "name": "大师杰作：射程",
+                "plug_hash": 622249644
+              },
+              "kind": "masterwork",
+              "option_count": 167,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "大师杰作",
+              "socket_index": 7
+            },
+            {
+              "equipped": {
+                "name": "藏匿之狼",
+                "plug_hash": 1831023215
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 8
+            },
+            {
+              "equipped": {
+                "name": "熔炉竞技场击杀记录器",
+                "plug_hash": 38912240
+              },
+              "kind": "tracker",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "追踪器",
+              "socket_index": 9
+            },
+            {
+              "equipped": {
+                "name": "默认皮肤",
+                "plug_hash": 3854296178
+              },
+              "kind": "ornament",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "装饰",
+              "socket_index": 10
+            },
+            {
+              "equipped": {
+                "name": "凯旋脉动",
+                "plug_hash": 1335132356
+              },
+              "kind": "other",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "插槽",
+              "socket_index": 11
+            },
+            {
+              "equipped": {
+                "name": "空的装备阶级升级",
+                "plug_hash": 780815822
+              },
+              "kind": "mod",
+              "option_count": 5,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "模组1",
+              "socket_index": 12
+            }
+          ],
+          "stats": [
+            {
+              "display": "120",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 120
+            },
+            {
+              "display": "92",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 92
+            },
+            {
+              "display": "82",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 82
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 47
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 47
+            },
+            {
+              "display": "24",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 24
+            },
+            {
+              "display": "8",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 8
+            },
+            {
+              "display": "67",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 67
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "98",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 98
+            },
+            {
+              "display": "21",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 21
+            },
+            {
+              "display": "56",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 56
+            }
+          ],
+          "weapon": {
+            "ammo_type": "白弹",
+            "breaker_type": "",
+            "community": {
+              "archive_available": false,
+              "matched_count": 0,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。",
+              "results": []
+            },
+            "damage_type": "动能",
+            "description": "“她只是想给予帮助。我现在知道了。”——领主萨拉丁",
+            "farming": {
+              "available": true,
+              "list": "购物清单-白弹",
+              "matched": true,
+              "recommended_perks": {
+                "三号位": [
+                  "萤火虫"
+                ],
+                "四号位": [
+                  "高爆载荷"
+                ]
+              },
+              "source": "铁旗",
+              "tier": "C",
+              "updated_at": "2026.8.30"
+            },
+            "frame": "攻击型框架",
+            "gear_tier": 5,
+            "has_enhanced": false,
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/063b3d4db62ef73dff4297c33ea1ec88.jpg",
+            "instance": {
+              "instance_id": "6917530195652349780",
+              "is_equipped": false,
+              "location": "仓库",
+              "locked": false,
+              "power": 550,
+              "tracked": false
+            },
+            "intrinsic": "攻击型框架",
+            "is_craftable": false,
+            "item_hash": 1617917863,
+            "item_level": 55,
+            "name": "克瑞米尔之匕",
+            "name_en": "Crimil's Dagger",
+            "popularity": {
+              "available": false,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。"
+            },
+            "quality": 0,
+            "rarity": "传说",
+            "rarity_tier": 5,
+            "roll_kind": "random",
+            "roll_summary": {
+              "option_counts": {
+                "弹匣": 26,
+                "枪管": 22,
+                "特性1": 1
+              },
+              "random_columns": [
+                "枪管",
+                "弹匣",
+                "特性1",
+                "特性1"
+              ],
+              "roll_kind": "random",
+              "scope": "definition"
+            },
             "rpm": 120,
-            "stability": 47,
-            "zoom": 14
-          },
-          "tier": "传说",
-          "weapon_type": "手炮"
+            "sources": [
+              {
+                "kind": "farming_list",
+                "name": "购物清单-白弹",
+                "path": "",
+                "trust": "untrusted_reference",
+                "updated_at": "2026.8.30"
+              }
+            ],
+            "trait_ids": [
+              "foundry.hakke",
+              "item.weapon.hand_cannon",
+              "activities.iron_banner",
+              "releases.v970.core"
+            ],
+            "watermark": "/common/destiny2_content/icons/e78fd9419f99464816ac8f628bc3c4af.png",
+            "weapon_type": "手炮"
+          }
         }
-      ]
+      ],
+      "query": "手炮",
+      "returned": 5,
+      "total": 124,
+      "truncated": true
     }
   },
   "next_actions": [],
   "ok": true,
-  "summary": "已按武器类型读取详情。",
-  "warnings": []
+  "summary": "已读取「手炮」持有 124 件，本次返回 5 件（已截断）。",
+  "warnings": [
+    "只返回了前 5 件；提高 limit 或缩小 weapon_type 才能看全。"
+  ]
 }

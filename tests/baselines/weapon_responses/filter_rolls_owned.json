@@ -1,12 +1,17 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "filter_rolls",
-      "weapon_name": "刚玉战锤"
-    },
-    "elapsed_ms": 2052,
+    "elapsed_ms": 2771,
     "is_error": false,
-    "payload_chars": 2779,
+    "payload_chars": 3031,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "filter_rolls",
+          "weapon_name": "刚玉战锤"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
@@ -79,12 +84,16 @@
     },
     "matched": [
       {
+        "frame": "适配框架",
         "icon_url": "https://www.bungie.net/common/destiny2_content/icons/86e4372fd618aabc649d851a5ba5dfcb.jpg",
         "instance_id": "6917530197987359694",
+        "is_craftable": false,
         "is_equipped": false,
         "item_hash": 2263462407,
         "location": "仓库",
+        "locked": false,
         "name": "刚玉战锤",
+        "name_en": "Corundum Hammer",
         "perks": [
           "适配框架",
           "小口径枪膛",
@@ -101,7 +110,11 @@
           "5阶升级"
         ],
         "power": 300,
+        "rarity": "传说",
+        "rarity_tier": 5,
         "reason": "命中筛选条件",
+        "roll_kind": "random",
+        "rpm": 140,
         "weapon_type": "手炮"
       }
     ],
@@ -114,7 +127,8 @@
     "scoped_count": 1,
     "truncated": false,
     "unknown": [],
-    "unknown_count": 0
+    "unknown_count": 0,
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,

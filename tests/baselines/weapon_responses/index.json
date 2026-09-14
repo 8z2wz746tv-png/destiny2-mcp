@@ -5,64 +5,64 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 21843,
-      "payload_chars": 56330
+      "elapsed_ms": 28209,
+      "payload_chars": 55880
     },
     {
       "case": "catalog_type",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 2314,
-      "payload_chars": 2952
+      "elapsed_ms": 3131,
+      "payload_chars": 5965
     },
     {
       "case": "type_list",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 4610,
-      "payload_chars": 31789
+      "elapsed_ms": 6930,
+      "payload_chars": 99385
     },
     {
       "case": "filter_rolls_owned",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 2052,
-      "payload_chars": 2779
+      "elapsed_ms": 2771,
+      "payload_chars": 3031
     },
     {
       "case": "filter_rolls_catalog",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 1682,
-      "payload_chars": 6400
+      "elapsed_ms": 1809,
+      "payload_chars": 6878
     },
     {
       "case": "inventory_type",
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 2870,
-      "payload_chars": 70764
+      "elapsed_ms": 1860,
+      "payload_chars": 79829
     },
     {
       "case": "info_legendary",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 11,
-      "payload_chars": 7892
+      "elapsed_ms": 15,
+      "payload_chars": 49377
     },
     {
       "case": "info_exotic",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 265,
-      "payload_chars": 8447
+      "elapsed_ms": 11,
+      "payload_chars": 15017
     },
     {
       "case": "info_rare",
@@ -70,7 +70,7 @@
       "ok": true,
       "error_code": null,
       "elapsed_ms": 11,
-      "payload_chars": 2585
+      "payload_chars": 7770
     },
     {
       "case": "info_common",
@@ -78,7 +78,7 @@
       "ok": true,
       "error_code": null,
       "elapsed_ms": 10,
-      "payload_chars": 2611
+      "payload_chars": 4799
     },
     {
       "case": "stats_legendary",
@@ -86,103 +86,103 @@
       "ok": true,
       "error_code": null,
       "elapsed_ms": 4,
-      "payload_chars": 580
+      "payload_chars": 2767
     },
     {
       "case": "perk_pool_legendary",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 20,
-      "payload_chars": 45580
+      "elapsed_ms": 14,
+      "payload_chars": 47141
     },
     {
       "case": "perk_pool_exotic",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 12,
-      "payload_chars": 10700
+      "elapsed_ms": 11,
+      "payload_chars": 12763
     },
     {
       "case": "perk_pool_craftable",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 14,
-      "payload_chars": 18375
+      "elapsed_ms": 13,
+      "payload_chars": 23428
     },
     {
       "case": "analyze_legendary",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 3599,
-      "payload_chars": 56661
+      "elapsed_ms": 449,
+      "payload_chars": 108675
     },
     {
       "case": "analyze_exotic",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 705,
-      "payload_chars": 14607
+      "elapsed_ms": 342,
+      "payload_chars": 24402
     },
     {
       "case": "god_roll_legendary",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 7,
-      "payload_chars": 895
+      "elapsed_ms": 27,
+      "payload_chars": 50349
     },
     {
       "case": "god_roll_exotic",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 6,
-      "payload_chars": 251
+      "elapsed_ms": 18,
+      "payload_chars": 13188
     },
     {
       "case": "catalyst_legendary",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 7,
-      "payload_chars": 339
+      "elapsed_ms": 6,
+      "payload_chars": 825
     },
     {
       "case": "catalyst_exotic",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 553,
-      "payload_chars": 748
+      "elapsed_ms": 519,
+      "payload_chars": 1206
     },
     {
       "case": "popularity",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 4,
-      "payload_chars": 183
+      "elapsed_ms": 15,
+      "payload_chars": 3461
     },
     {
       "case": "compare",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 447,
-      "payload_chars": 7458
+      "elapsed_ms": 380,
+      "payload_chars": 19033
     },
     {
       "case": "perk_description",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 18,
-      "payload_chars": 5880
+      "elapsed_ms": 15,
+      "payload_chars": 5981
     },
     {
       "case": "weapon_community",
@@ -205,7 +205,7 @@
       "tool": "world_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 2972,
+      "elapsed_ms": 2143,
       "payload_chars": 6589
     }
   ]

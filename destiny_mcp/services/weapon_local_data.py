@@ -105,7 +105,7 @@ def _cross_check(
     pool: dict[str, dict[str, Any]] = {}
     for socket in sockets:
         for option in socket.get("options") or []:
-            name = str(option.get("name") or "").strip()
+            name = str(option.get("name_plain") or option.get("name") or "").strip()  # 规范名（强化版在 name_plain）
             if name:
                 pool.setdefault(name, option)
 
@@ -315,7 +315,7 @@ def attach(
         for socket in sockets:
             for option in socket.get("options") or []:
                 plug_hash = int(option.get("plug_hash") or 0)
-                name = str(option.get("name") or "").strip()
+                name = str(option.get("name_plain") or option.get("name") or "").strip()
                 entry: dict[str, Any] = {}
                 if plug_hash in perk_index:
                     entry["popularity"] = perk_index[plug_hash]

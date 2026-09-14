@@ -1,13 +1,18 @@
 {
   "_case": {
-    "arguments": {
-      "character": "hunter",
-      "intent": "community",
-      "top_n": 2
-    },
     "elapsed_ms": 4,
     "is_error": false,
     "payload_chars": 7510,
+    "steps": [
+      {
+        "arguments": {
+          "character": "hunter",
+          "intent": "community",
+          "top_n": 2
+        },
+        "tool": "build_assistant"
+      }
+    ],
     "tool": "build_assistant"
   },
   "candidates": [],

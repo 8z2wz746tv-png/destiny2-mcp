@@ -1,12 +1,17 @@
 {
   "_case": {
-    "arguments": {
-      "intent": "compare",
-      "weapon_name": "挽歌"
-    },
-    "elapsed_ms": 447,
+    "elapsed_ms": 380,
     "is_error": false,
-    "payload_chars": 7458,
+    "payload_chars": 19033,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "compare",
+          "weapon_name": "挽歌"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
     "tool": "weapon_assistant"
   },
   "candidates": [],
@@ -16,8 +21,22 @@
         {
           "absent_in_instance": "6917529229627545524",
           "absent_in_location": "仓库",
+          "perk_name": "邪剑守则",
+          "present_in_instance": "6917529210691585418",
+          "present_in_location": "仓库"
+        },
+        {
+          "absent_in_instance": "6917529229627545524",
+          "absent_in_location": "仓库",
           "perk_name": "空催化插槽",
           "present_in_instance": "6917529210691585418",
+          "present_in_location": "仓库"
+        },
+        {
+          "absent_in_instance": "6917529210691585418",
+          "absent_in_location": "仓库",
+          "perk_name": "骑士哀歌",
+          "present_in_instance": "6917529229627545524",
           "present_in_location": "仓库"
         },
         {
@@ -30,133 +49,544 @@
       ],
       "instances": [
         {
-          "god_roll_score": "",
-          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6844ca3eb572c546e97a340c24531d5.jpg",
-          "instance_id": "6917529210691585418",
-          "location": "仓库",
-          "perks": [
+          "options": [
             {
-              "description": "[格挡]  ：长按以旋转剑刃。\n• 伤害提升，同时为所有攻击附加 护盾穿透效果。\n• 旋转攻击造成伤害时会叠加层数。\n• 额外层数会提高重攻击的伤害和伤害抗性。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3a2fe8c1bd3fa1219922bf180b8e96e8.png",
-              "name": "女妖之嚎",
-              "plug_category": "intrinsics",
-              "plug_hash": 2179914730
-            },
-            {
-              "description": "伤害提高，剑刃弹药容量降低。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d9a508b43ae6935d68fc5030c90b5b4a.png",
-              "name": "锯齿刀锋",
-              "plug_category": "blades",
-              "plug_hash": 3666208348
-            },
-            {
-              "description": "刀剑格挡拥有高持久和低抗性。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f41732ca49953994397e5ab50fdc3a2e.png",
-              "name": "耐力刀剑格",
-              "plug_category": "guards",
-              "plug_hash": 599007201
-            },
-            {
-              "description": "每隔一次的赋能刀剑击杀都可提供刀剑弹药。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d597ced6ce0812d168ce86b31eaaeb03.png",
-              "name": "无倦利刃",
-              "plug_category": "frames",
-              "plug_hash": 2590710093
-            },
-            {
-              "description": "对战斗人员造成伤害可以治疗武器的使用者。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/19a92359d87ad5585413ea3f6a953931.png",
-              "name": "急速消耗",
-              "plug_category": "frames",
-              "plug_hash": 290014589
-            },
-            {
-              "description": "可以将异域催化插入此插槽。\n\n查看成就中的异域催化部分，了解在哪里可以获得催化。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/62890cb9e33bbed6a3587a1064dc860e.png",
-              "name": "空催化插槽",
-              "plug_category": "v400.empty.exotic.masterwork",
-              "plug_hash": 1498917124
+              "equipped": {
+                "name": "空催化插槽",
+                "plug_hash": 1498917124
+              },
+              "kind": "masterwork",
+              "option_count": 1,
+              "options": [
+                {
+                  "can_roll": true,
+                  "description": "将此武器升级为大师杰作。升级后，武器将获得强化能力，如提高的属性和/或额外的特性。\n\n使用此武器消灭目标以解锁这项升级。",
+                  "enhanced_plug_hash": 0,
+                  "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e1b22c5abde048b49abcb61e307c3dc4.jpg",
+                  "name": "挽歌催化",
+                  "plug_hash": 1218164788
+                }
+              ],
+              "options_available": true,
+              "scope": "instance",
+              "slot": "大师杰作",
+              "socket_index": 10
             }
           ],
-          "power": 10
+          "sockets": [
+            {
+              "equipped": {
+                "name": "女妖之嚎",
+                "plug_hash": 2179914730
+              },
+              "kind": "intrinsic",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "框架",
+              "socket_index": 0
+            },
+            {
+              "equipped": {
+                "name": "锯齿刀锋",
+                "plug_hash": 3666208348
+              },
+              "kind": "other",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "插槽1",
+              "socket_index": 1
+            },
+            {
+              "equipped": {
+                "name": "耐力刀剑格",
+                "plug_hash": 599007201
+              },
+              "kind": "other",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "插槽1",
+              "socket_index": 2
+            },
+            {
+              "equipped": {
+                "name": "无倦利刃",
+                "plug_hash": 2590710093
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 3
+            },
+            {
+              "equipped": {
+                "name": "急速消耗",
+                "plug_hash": 290014589
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 4
+            },
+            {
+              "equipped": {
+                "name": "邪剑守则",
+                "plug_hash": 1141818699
+              },
+              "kind": "ornament",
+              "option_count": 6,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "装饰",
+              "socket_index": 6
+            },
+            {
+              "equipped": {
+                "name": "击杀记录器",
+                "plug_hash": 2240097604
+              },
+              "kind": "tracker",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "追踪器",
+              "socket_index": 9
+            },
+            {
+              "equipped": {
+                "name": "空催化插槽",
+                "plug_hash": 1498917124
+              },
+              "kind": "masterwork",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "大师杰作",
+              "socket_index": 10
+            }
+          ],
+          "stats": [
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 78
+            },
+            {
+              "display": "40",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "挥舞速度",
+              "stat_hash": 2837207746,
+              "value": 40
+            },
+            {
+              "display": "20",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "充能效率",
+              "stat_hash": 3022301683,
+              "value": 20
+            },
+            {
+              "display": "50",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "防御抗性",
+              "stat_hash": 209426660,
+              "value": 50
+            },
+            {
+              "display": "90",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "防御持久",
+              "stat_hash": 3736848092,
+              "value": 90
+            },
+            {
+              "display": "65",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹药容量",
+              "stat_hash": 925767036,
+              "value": 65
+            }
+          ],
+          "weapon": {
+            "ammo_type": "威能",
+            "breaker_type": "",
+            "community": {
+              "archive_available": false,
+              "matched_count": 0,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。",
+              "results": []
+            },
+            "damage_type": "烈日",
+            "description": "Vex听到的最后一样东西，是一只堕落女妖的痛苦哀嚎。",
+            "farming": {
+              "available": true,
+              "list": "刷取清单-异域武器",
+              "matched": true,
+              "recommended_perks": {},
+              "source": "",
+              "tier": "",
+              "updated_at": "2026.9.6"
+            },
+            "frame": null,
+            "gear_tier": null,
+            "has_enhanced": false,
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6844ca3eb572c546e97a340c24531d5.jpg",
+            "instance": {
+              "god_roll_score": "",
+              "instance_id": "6917529210691585418",
+              "is_equipped": false,
+              "location": "仓库",
+              "locked": true,
+              "power": 10
+            },
+            "intrinsic": "女妖之嚎",
+            "is_craftable": false,
+            "item_hash": 3487253372,
+            "item_level": 1,
+            "name": "挽歌",
+            "name_en": "The Lament",
+            "popularity": {
+              "available": false,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。"
+            },
+            "quality": 0,
+            "rarity": "异域",
+            "rarity_tier": 6,
+            "roll_kind": "fixed",
+            "roll_summary": {
+              "option_counts": {},
+              "random_columns": [],
+              "roll_kind": "fixed",
+              "scope": "definition"
+            },
+            "rpm": null,
+            "sources": [
+              {
+                "kind": "farming_list",
+                "name": "刷取清单-异域武器",
+                "path": "",
+                "trust": "untrusted_reference",
+                "updated_at": "2026.9.6"
+              }
+            ],
+            "trait_ids": [
+              "item.weapon.sword",
+              "item.weapon.exotic",
+              "releases.v500.annual"
+            ],
+            "watermark": "/common/destiny2_content/icons/bce51cf90464e28026140df77c4eb6ce.png",
+            "weapon_type": "刀剑"
+          }
         },
         {
-          "god_roll_score": "",
-          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6844ca3eb572c546e97a340c24531d5.jpg",
-          "instance_id": "6917529229627545524",
-          "location": "仓库",
-          "perks": [
+          "options": [],
+          "sockets": [
             {
-              "description": "[格挡]  ：长按以旋转剑刃。\n• 伤害提升，同时为所有攻击附加 护盾穿透效果。\n• 旋转攻击造成伤害时会叠加层数。\n• 额外层数会提高重攻击的伤害和伤害抗性。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/3a2fe8c1bd3fa1219922bf180b8e96e8.png",
-              "name": "女妖之嚎",
-              "plug_category": "intrinsics",
-              "plug_hash": 2179914730
+              "equipped": {
+                "name": "女妖之嚎",
+                "plug_hash": 2179914730
+              },
+              "kind": "intrinsic",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "框架",
+              "socket_index": 0
             },
             {
-              "description": "伤害提高，剑刃弹药容量降低。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d9a508b43ae6935d68fc5030c90b5b4a.png",
-              "name": "锯齿刀锋",
-              "plug_category": "blades",
-              "plug_hash": 3666208348
+              "equipped": {
+                "name": "锯齿刀锋",
+                "plug_hash": 3666208348
+              },
+              "kind": "other",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "插槽1",
+              "socket_index": 1
             },
             {
-              "description": "刀剑格挡拥有高持久和低抗性。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f41732ca49953994397e5ab50fdc3a2e.png",
-              "name": "耐力刀剑格",
-              "plug_category": "guards",
-              "plug_hash": 599007201
+              "equipped": {
+                "name": "耐力刀剑格",
+                "plug_hash": 599007201
+              },
+              "kind": "other",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "插槽1",
+              "socket_index": 2
             },
             {
-              "description": "每隔一次的赋能刀剑击杀都可提供刀剑弹药。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/d597ced6ce0812d168ce86b31eaaeb03.png",
-              "name": "无倦利刃",
-              "plug_category": "frames",
-              "plug_hash": 2590710093
+              "equipped": {
+                "name": "无倦利刃",
+                "plug_hash": 2590710093
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 3
             },
             {
-              "description": "对战斗人员造成伤害可以治疗武器的使用者。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/19a92359d87ad5585413ea3f6a953931.png",
-              "name": "急速消耗",
-              "plug_category": "frames",
-              "plug_hash": 290014589
+              "equipped": {
+                "name": "急速消耗",
+                "plug_hash": 290014589
+              },
+              "kind": "trait",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "特性1",
+              "socket_index": 4
             },
             {
-              "description": "将此武器升级为大师杰作。升级后，武器将获得强化能力，如提高的属性和/或额外的特性。\n\n使用此武器消灭目标以解锁这项升级。",
-              "god_roll_pve": false,
-              "god_roll_pvp": false,
-              "icon_url": "https://www.bungie.net/common/destiny2_content/icons/e1b22c5abde048b49abcb61e307c3dc4.jpg",
-              "name": "挽歌催化",
-              "plug_category": "v500.new.sword0.masterwork",
-              "plug_hash": 1218164788
+              "equipped": {
+                "name": "骑士哀歌",
+                "plug_hash": 1138782604
+              },
+              "kind": "ornament",
+              "option_count": 6,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "装饰",
+              "socket_index": 6
+            },
+            {
+              "equipped": {
+                "name": "击杀记录器",
+                "plug_hash": 2240097604
+              },
+              "kind": "tracker",
+              "option_count": 2,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "追踪器",
+              "socket_index": 9
+            },
+            {
+              "equipped": {
+                "name": "挽歌催化",
+                "plug_hash": 1218164788
+              },
+              "kind": "masterwork",
+              "option_count": 1,
+              "options": [],
+              "options_available": false,
+              "scope": "definition",
+              "slot": "大师杰作",
+              "socket_index": 10
             }
           ],
-          "power": 482
+          "stats": [
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 78
+            },
+            {
+              "display": "40",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "挥舞速度",
+              "stat_hash": 2837207746,
+              "value": 40
+            },
+            {
+              "display": "20",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "充能效率",
+              "stat_hash": 3022301683,
+              "value": 20
+            },
+            {
+              "display": "50",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "防御抗性",
+              "stat_hash": 209426660,
+              "value": 50
+            },
+            {
+              "display": "90",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "防御持久",
+              "stat_hash": 3736848092,
+              "value": 90
+            },
+            {
+              "display": "65",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹药容量",
+              "stat_hash": 925767036,
+              "value": 65
+            }
+          ],
+          "weapon": {
+            "ammo_type": "威能",
+            "breaker_type": "",
+            "community": {
+              "archive_available": false,
+              "matched_count": 0,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。",
+              "results": []
+            },
+            "damage_type": "烈日",
+            "description": "Vex听到的最后一样东西，是一只堕落女妖的痛苦哀嚎。",
+            "farming": {
+              "available": true,
+              "list": "刷取清单-异域武器",
+              "matched": true,
+              "recommended_perks": {},
+              "source": "",
+              "tier": "",
+              "updated_at": "2026.9.6"
+            },
+            "frame": null,
+            "gear_tier": null,
+            "has_enhanced": false,
+            "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6844ca3eb572c546e97a340c24531d5.jpg",
+            "instance": {
+              "god_roll_score": "",
+              "instance_id": "6917529229627545524",
+              "is_equipped": false,
+              "location": "仓库",
+              "locked": true,
+              "power": 482
+            },
+            "intrinsic": "女妖之嚎",
+            "is_craftable": false,
+            "item_hash": 3487253372,
+            "item_level": 48,
+            "name": "挽歌",
+            "name_en": "The Lament",
+            "popularity": {
+              "available": false,
+              "note": "列表类不逐个武器读本地资料；要看这把的本地结论用 info/analyze。"
+            },
+            "quality": 2,
+            "rarity": "异域",
+            "rarity_tier": 6,
+            "roll_kind": "fixed",
+            "roll_summary": {
+              "option_counts": {},
+              "random_columns": [],
+              "roll_kind": "fixed",
+              "scope": "definition"
+            },
+            "rpm": null,
+            "sources": [
+              {
+                "kind": "farming_list",
+                "name": "刷取清单-异域武器",
+                "path": "",
+                "trust": "untrusted_reference",
+                "updated_at": "2026.9.6"
+              }
+            ],
+            "trait_ids": [
+              "item.weapon.sword",
+              "item.weapon.exotic",
+              "releases.v500.annual"
+            ],
+            "watermark": "/common/destiny2_content/icons/bce51cf90464e28026140df77c4eb6ce.png",
+            "weapon_type": "刀剑"
+          }
         }
       ],
-      "weapon_name": "挽歌"
+      "weapon": {
+        "ammo_type": "威能",
+        "breaker_type": "",
+        "damage_type": "烈日",
+        "description": "Vex听到的最后一样东西，是一只堕落女妖的痛苦哀嚎。",
+        "frame": null,
+        "has_enhanced": true,
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/f6844ca3eb572c546e97a340c24531d5.jpg",
+        "intrinsic": "女妖之嚎",
+        "is_craftable": false,
+        "item_hash": 3487253372,
+        "name": "挽歌",
+        "name_en": "The Lament",
+        "owned": {
+          "count": 2,
+          "instances": [
+            {
+              "gear_tier": null,
+              "gear_tier_note": "这件不在分级体系内（组件里的 gearTier=0），不是 T0",
+              "instance_id": "6917529210691585418",
+              "is_equipped": false,
+              "item_level": 1,
+              "location": "仓库",
+              "locked": true,
+              "power": 10
+            },
+            {
+              "gear_tier": null,
+              "gear_tier_note": "这件不在分级体系内（组件里的 gearTier=0），不是 T0",
+              "instance_id": "6917529229627545524",
+              "is_equipped": false,
+              "item_level": 48,
+              "location": "仓库",
+              "locked": true,
+              "power": 482
+            }
+          ],
+          "status": "checked"
+        },
+        "rarity": "异域",
+        "rarity_tier": 6,
+        "roll_kind": "fixed",
+        "roll_summary": {
+          "option_counts": {},
+          "random_columns": [],
+          "roll_kind": "fixed",
+          "scope": "definition"
+        },
+        "rpm": null,
+        "trait_ids": [
+          "item.weapon.sword",
+          "item.weapon.exotic",
+          "releases.v500.annual"
+        ],
+        "watermark": "/common/destiny2_content/icons/bce51cf90464e28026140df77c4eb6ce.png",
+        "weapon_type": "刀剑"
+      }
     },
     "farming_list": {
       "available": true,
@@ -203,10 +633,14 @@
         "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
         "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
       ]
-    }
+    },
+    "weapon_schema_version": 1
   },
   "next_actions": [],
   "ok": true,
-  "summary": "已对比同名武器副本。",
-  "warnings": []
+  "summary": "已对比「挽歌」的 2 个副本，有 4 处已装 perk 差异。",
+  "warnings": [
+    "部分副本没有可用的愿单评分；空字符串表示本地愿单没收录，不是 0 分。",
+    "部分副本没有可更换部件数据（组件 310 未返回）：options 为空。"
+  ]
 }
