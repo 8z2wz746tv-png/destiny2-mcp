@@ -722,6 +722,46 @@ def _instance_plug_hashes(raw_plugs: Any) -> list[int]:
     return hashes
 
 
+def instance_selectable_plug_hashes(
+    manifest: "ManifestManager",
+    definition: Mapping[str, Any] | None,
+    reusable_plugs: Mapping[str, Any] | None,
+) -> dict[int, list[int]]:
+    """这一件副本**能换成哪些 plug**，只给 hash（组件 310），带槽位索引。
+
+    和 `instance_options` 的区别：那个会把每个可选项展开成带名字/描述的字典（列表里太贵），
+    这里只回答"某个 perk 在不在可换集合里"——社区配装的 roll 核对只需要这个。
+    过滤口径与 `_instance_plug_hashes` 一致（`canInsert=false` 不算），
+    另外丢掉 Manifest 里不是插件的条目（310 偶尔混入非插件 hash）。
+
+    已知盲区（`instance_options` 实测记录）：**锻造件的 310 只给当前选中的那一个**，
+    所以"没在集合里"对锻造件不等于"换不到"——调用方必须如实这么写。
+    """
+    if not isinstance(reusable_plugs, Mapping):
+        return {}
+    # 组件 310 的真实形状是 {"plugs": {"<socket_index>": [{"plugItemHash": …}, …]}}；
+    # 直接遍历外层会拿到 "plugs" 这个键本身，`_instance_plug_hashes` 收到的是
+    # 一个 Mapping（不是列表）→ 静默返回空集合。实机复验时正是这里把"有 4 栏可换"
+    # 变成了"读到了、但没有可换项"（最危险的那种错：把"有"说成"没有"）。
+    per_socket = reusable_plugs.get("plugs")
+    if not isinstance(per_socket, Mapping):
+        return {}
+    result: dict[int, list[int]] = {}
+    for key, entry in per_socket.items():
+        try:
+            index = int(key)
+        except (TypeError, ValueError):
+            continue
+        hashes = [
+            int(plug_hash) & 0xFFFFFFFF
+            for plug_hash in _instance_plug_hashes(entry)
+            if isinstance(manifest.get_item_definition(plug_hash), dict)
+        ]
+        if hashes:
+            result[index] = sorted(set(hashes))
+    return result
+
+
 def instance_options(
     manifest: "ManifestManager",
     definition: Mapping[str, Any] | None,

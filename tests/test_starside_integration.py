@@ -1007,3 +1007,139 @@ async def test_community_detail_summary_carries_the_not_executable_verdict(tmp_p
     assert "不可直接执行" in response["summary"]
     assert "execution_eligible=false" in response["warnings"][0]
     assert "canonical_build" in response["warnings"][0]
+
+
+# ── 0.1.11：真的去查"能换到但没装"的 perk ────────────────────────────────
+
+
+def _weapon_detail_with_selectable(
+    instance_id: str,
+    item_hash: int,
+    installed: list[tuple[int, str]],
+    *,
+    selectable: dict[int, list[int]] | None = None,
+):
+    """带组件 310 可换集合的副本替身（`selectable` 缺省 = 这次没读）。"""
+    sockets = [{"equipped": {"plug_hash": h, "name": n}} for h, n in installed]
+    if selectable is not None:
+        for index, hashes in selectable.items():
+            while len(sockets) <= index:
+                sockets.append({})
+            sockets[index]["selectable_plug_hashes"] = list(hashes)
+        for socket in sockets:
+            socket.setdefault("selectable_plug_hashes", [])
+    return SimpleNamespace(
+        weapon={"item_hash": item_hash, "instance": {"instance_id": instance_id}},
+        perks_complete=True,
+        sockets=sockets,
+    )
+
+
+async def _match_one_weapon(*, detail, required="测试 Perk"):
+    """造一套只要一把武器（1 个 perk + 1 个套装件）的最小配装并跑匹配。"""
+    block = (
+        "# Build\n"
+        "## 职业\n职业：猎人\n"
+        "## 武器\n传说武器：测试武器 | " + required + "\n"
+        "## 护甲\n异域护甲：测试金装\n"
+    )
+    build = parse_build(block, build_id="a", source={"title": "A"})
+    inventory_service = SimpleNamespace(
+        get_inventory=AsyncMock(
+            return_value=SimpleNamespace(
+                items=[
+                    SimpleNamespace(
+                        item_instance_id="w1",
+                        item_hash=4294967295,
+                        item_type="weapon",
+                        name="测试武器",
+                        location="vault",
+                    )
+                ]
+            )
+        ),
+        get_armor_snapshot=AsyncMock(return_value=None),
+    )
+    detail_service = SimpleNamespace(
+        get_weapon_details_by_type=AsyncMock(
+            return_value=SimpleNamespace(weapons=[detail])
+        )
+    )
+    result = await match_inventory(
+        _Manifest(), "player", build, inventory_service, detail_service
+    )
+    return next(row for row in result["requirements"] if row["kind"] == "weapon"), result
+
+
+async def test_switchable_perk_counts_as_available_not_missing() -> None:
+    """模板要的 perk 现在没装、但可换栏里有 → 是「换一下就行」，不是「没有」。"""
+    detail = _weapon_detail_with_selectable(
+        "w1", 4294967295, [(3, "别的 Perk")], selectable={3: [9]}
+    )
+
+    weapon, result = await _match_one_weapon(detail=detail)
+
+    assert weapon["inventory_status"] == "owned_alternate_roll_available"
+    assert weapon["alternate_perk_options_checked"] is True
+    assert weapon["alternate_perk_options_scope"] == "any_selectable_socket"
+    instance = weapon["owned_instances"][0]
+    assert instance["perks_available_to_switch"] == ["测试 Perk"]
+    assert instance["perks_unavailable"] == []
+    assert instance["alternate_roll_match"] is True
+    assert not any(row["name"] == "测试武器" for row in result["known_missing_requirements"])
+
+
+async def test_perk_nowhere_is_reported_with_the_perk_name() -> None:
+    """可换栏里也没有 → 老实说没有，并点名是哪个 perk。"""
+    detail = _weapon_detail_with_selectable(
+        "w1", 4294967295, [(3, "别的 Perk")], selectable={3: [5]}
+    )
+
+    weapon, _ = await _match_one_weapon(detail=detail)
+
+    assert weapon["inventory_status"] == "owned_no_current_roll_match"
+    instance = weapon["owned_instances"][0]
+    assert instance["perks_unavailable"] == ["测试 Perk"]
+    assert instance["perks_available_to_switch"] == []
+    assert instance["alternate_roll_match"] is False
+
+
+async def test_unread_socket_options_are_not_reported_as_missing() -> None:
+    """没读可换集合（字段缺失）≠ 没有：必须回到"没查 + 原因"。"""
+    detail = _weapon_detail("w1", 4294967295, [(3, "别的 Perk")])
+
+    weapon, _ = await _match_one_weapon(detail=detail)
+
+    assert weapon["inventory_status"] == "owned_no_current_roll_match"
+    assert weapon["alternate_perk_options_checked"] is False
+    assert weapon["alternate_perk_options_reason"] == "instance_socket_options_not_read"
+    assert weapon["owned_instances"][0]["selectable_plug_status"] == "not_read"
+
+
+async def test_community_match_asks_for_selectable_plugs() -> None:
+    """社区匹配必须显式要这一层数据（默认关闭，别的调用方载荷不变）。"""
+    detail = _weapon_detail_with_selectable(
+        "w1", 4294967295, [(3, "别的 Perk")], selectable={3: [9]}
+    )
+    block = "# Build\n## 职业\n职业：猎人\n## 武器\n传说武器：测试武器 | 测试 Perk\n## 护甲\n异域护甲：测试金装\n"
+    build = parse_build(block, build_id="a", source={"title": "A"})
+    detail_service = SimpleNamespace(
+        get_weapon_details_by_type=AsyncMock(
+            return_value=SimpleNamespace(weapons=[detail])
+        )
+    )
+
+    await match_inventory(
+        _Manifest(),
+        "player",
+        build,
+        SimpleNamespace(
+            get_inventory=AsyncMock(return_value=SimpleNamespace(items=[])),
+            get_armor_snapshot=AsyncMock(return_value=None),
+        ),
+        detail_service,
+    )
+
+    assert detail_service.get_weapon_details_by_type.await_args.kwargs[
+        "include_selectable_plugs"
+    ] is True

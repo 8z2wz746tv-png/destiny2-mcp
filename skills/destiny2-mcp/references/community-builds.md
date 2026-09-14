@@ -47,9 +47,17 @@ saying anything is absent:
 - `unverifiable_reason` — this check was **not performed**, with the reason
   (`mod_unlock_state_not_available`, `artifact_*`, `subclass_unlock_state_not_available`,
   `stat_feasibility_not_checked`, …). Never turn it into "you do not have it".
-- `owned_no_current_roll_match` — the **currently selected** perks do not match.
-  `alternate_perk_options_reason=instance_socket_options_not_read` means selectable-but-unselected
-  perks were not read in this call; say that, not "this gun is wrong".
+- Weapon rolls are read in three layers, and each owned instance reports all three:
+  `perks_current_match` (already equipped), `perks_available_to_switch` (present in a reusable
+  socket, i.e. one swap away) and `perks_unavailable` (neither). The row status follows:
+  `current_roll_matched` → `owned_alternate_roll_available` → `owned_no_current_roll_match`.
+  So "this gun is wrong" is only justified when the perk is in `perks_unavailable` **and**
+  `selectable_plug_status="available"` (the reusable-plug data was actually read).
+  `alternate_perk_options_checked=false` plus `alternate_perk_options_reason` means the layer was
+  not read at all — never downgrade that to "missing".
+  Two stated limits: the check is `any_selectable_socket` (it does not verify the perk sits in the
+  column the template expects), and crafted weapons expose only the currently selected plug in
+  component 310 (`alternate_perk_options_caveat`), so a miss there is not proof.
 
 Armor-set rows also carry `required_count`, `owned_count`, `owned_distinct_slot_count`,
 `missing_slot_count` and `wildcard_count`, so "do I have the 4-piece set?" is answered directly.

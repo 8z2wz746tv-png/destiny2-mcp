@@ -44,7 +44,11 @@ class WeaponDetailService:
         self._lookup_factory = lookup_factory
 
     async def get_weapon_details_by_type(
-        self, player_name: str, type_name: str, limit: int | None = None
+        self,
+        player_name: str,
+        type_name: str,
+        limit: int | None = None,
+        include_selectable_plugs: bool = False,
     ) -> WeaponDetailResponse:
         """Get comprehensive details for all weapons of a given type.
 
@@ -181,6 +185,20 @@ class WeaponDetailService:
             sockets = weapon_payload.column_list(
                 self._manifest, weapon_def, equipped=plug_hashes
             )
+            if include_selectable_plugs:
+                # 只在社区配装的 roll 核对里开：给每栏挂上"这一件能换成哪些 plug"的
+                # **hash**（不是展开成名字的 options）——列表体积几乎不变，
+                # 足够回答"模板要的 perk 是现在装着、还是能换到、还是压根没有"。
+                selectable = weapon_profile.instance_selectable_plug_hashes(
+                    self._manifest, weapon_def, reusable_data.get(inst_id)
+                )
+                # 没有这一件的 310 数据就**不挂这个键**：下游据此区分"读到了、确实没有"
+                # 与"这次没读"（挂成空列表会把前者冒充成后者，或反过来）。
+                if selectable:
+                    for socket in sockets:
+                        socket["selectable_plug_hashes"] = selectable.get(
+                            int(socket.get("socket_index", -1)), []
+                        )
             options = weapon_payload.socket_list(
                 self._manifest,
                 weapon_def,

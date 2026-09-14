@@ -402,7 +402,7 @@ async def match_inventory(
     ):
         try:
             details = await weapon_detail_service.get_weapon_details_by_type(
-                player_name, ""
+                player_name, "", include_selectable_plugs=True
             )
         except DestinyMCPError as exc:
             read_errors.append(
@@ -502,6 +502,46 @@ async def match_inventory(
                         if instance["socket_status"] == "complete" and perk_resolved
                         else None
                     )
+                    # 「能换到但没装」这一层（0.1.11）：以前只声明"没查"，实机复盘里
+                    # 被读成"这把枪不行"。现在按组件 310 的 hash 集合逐 perk 判定：
+                    # 现在装着 / 能换到 / 两者都没有。
+                    detail_sockets = detail.sockets if detail else []
+                    # 「字段在不在」和「集合空不空」是两件事：字段缺失 = 这次没读，
+                    # 字段存在但为空 = 读了、这件确实没有可换项。混在一起会把"没查"说成"没有"。
+                    hashes_provided = any(
+                        "selectable_plug_hashes" in socket for socket in detail_sockets
+                    )
+                    selectable_hashes = {
+                        int(hash_value) & 0xFFFFFFFF
+                        for socket in detail_sockets
+                        for hash_value in (socket.get("selectable_plug_hashes") or [])
+                    }
+                    instance["selectable_plug_status"] = (
+                        "available"
+                        if selectable_hashes
+                        else "none"
+                        if hashes_provided
+                        else "not_read"
+                    )
+                    if perk_resolved and instance["socket_status"] == "complete" and hashes_provided:
+                        current_ok, alternate_ok, missing = [], [], []
+                        for perk in row["perk_resolutions"]:
+                            perk_hashes = {
+                                to_unsigned(definition["item_hash"])
+                                for definition in perk["definitions"]
+                            }
+                            if current_hashes & perk_hashes:
+                                current_ok.append(perk["name"])
+                            elif selectable_hashes & perk_hashes:
+                                alternate_ok.append(perk["name"])
+                            else:
+                                missing.append(perk["name"])
+                        instance["perks_current_match"] = current_ok
+                        instance["perks_available_to_switch"] = alternate_ok
+                        instance["perks_unavailable"] = missing
+                        instance["alternate_roll_match"] = (
+                            not missing and bool(alternate_ok)
+                        )
                 row["owned_instances"].append(instance)
             if not candidates:
                 row["inventory_status"] = "missing"
@@ -513,6 +553,11 @@ async def match_inventory(
             ):
                 row["inventory_status"] = "current_roll_matched"
             elif any(
+                item.get("alternate_roll_match") is True for item in row["owned_instances"]
+            ):
+                # 换一下 perk 就能达标：这不是"没有"，说清是"换栏可达"
+                row["inventory_status"] = "owned_alternate_roll_available"
+            elif any(
                 item["current_roll_match"] is None for item in row["owned_instances"]
             ):
                 row["inventory_status"] = "unknown_current_roll"
@@ -520,9 +565,22 @@ async def match_inventory(
             else:
                 row["inventory_status"] = "owned_no_current_roll_match"
             if row["required_perks"]:
-                row["alternate_perk_options_checked"] = False
-                # 明确"没查"的原因，别让 owned_no_current_roll_match 被读成"这把枪不行"
-                row["alternate_perk_options_reason"] = "instance_socket_options_not_read"
+                checked = any(
+                    item.get("perks_available_to_switch") is not None
+                    or item.get("perks_unavailable") is not None
+                    for item in row["owned_instances"]
+                )
+                row["alternate_perk_options_checked"] = checked
+                if checked:
+                    # 说清这一层的边界：只判断"这个 perk 在这把枪的某个可换栏里"，
+                    # 不判断栏位对不对；锻造件的 310 只给当前选中项，可能漏报。
+                    row["alternate_perk_options_scope"] = "any_selectable_socket"
+                    row["alternate_perk_options_caveat"] = (
+                        "锻造件的组件 310 只列当前选中的项，未命中不等于换不到"
+                    )
+                else:
+                    # 明确"没查"的原因，别让 owned_no_current_roll_match 被读成"这把枪不行"
+                    row["alternate_perk_options_reason"] = "instance_socket_options_not_read"
             ownership.append(row)
         elif row["kind"] == "exotic_armor":
             hashes = {definition["item_hash"] for definition in row["definitions"]}
@@ -672,9 +730,12 @@ async def match_inventory(
         "execution_eligible": False,
         "warnings": [
             "missing 仅表示 Manifest 已精确解析且完整库存中未达到要求；unknown/not_account_checked 不能解释为缺少。",
-            "current_roll_match 只检查当前选中的 Perk；owned_no_current_roll_match 的意思是"
-            "「当前选中的 Perk 不符」，**不是**「这把枪不行」—— 可切换但未选中的 Perk 本次没有读"
-            "（见 alternate_perk_options_checked / alternate_perk_options_reason）。",
+            "武器 roll 分三层看：current_roll_match=现在装着的就行；"
+            "owned_alternate_roll_available=换一下可换栏就能达标（见 owned_instances[].perks_available_to_switch）；"
+            "owned_no_current_roll_match=现在没装、可换栏里也没有（见 perks_unavailable），"
+            "**不是**「这把枪不行」；alternate_perk_options_checked=false 才表示这一层没查"
+            "（并给 alternate_perk_options_reason）。判定范围只到「这个 perk 在这把枪的某个可换栏里」，"
+            "不校验栏位与模板是否一致；锻造件的组件 310 只列当前选中项，未命中不等于换不到。",
             "unresolved_reason=name_not_matched 表示名字在 Manifest 里对不上（常见于社区模板用"
             "活动名称呼套装），不是玩家缺少该装备；有 set_name_candidates 时请先跟用户确认名字。",
             "unverifiable_reason 说明这一项**没做账号校验**的原因（例如模组解锁状态接口没有暴露），"

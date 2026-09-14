@@ -2,6 +2,29 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.1.11 — 2026-09-14
+
+**把「可切换但没装的 Perk」真查出来**（0.1.10 只做到"诚实地说没查"）。
+
+- 武器详情新增**可选**开关 `include_selectable_plugs`（默认关，别的调用方载荷一个字不变），
+  打开时给每栏挂 `selectable_plug_hashes`（组件 310 的 **hash**，不是展开成名字的 options）。
+  社区配装匹配走这条路，于是每个副本能报三层：
+  `perks_current_match`（现在装着）/ `perks_available_to_switch`（换一下就行）/
+  `perks_unavailable`（换也换不到）；行状态相应为 `current_roll_matched` →
+  `owned_alternate_roll_available` → `owned_no_current_roll_match`。
+- **"没读"和"读了没有"分开**：`selectable_plug_status` = `available` / `none` / `not_read`；
+  只有 `available` 时"换也换不到"才是结论，否则仍是 `alternate_perk_options_checked=false` + 原因。
+- 两条边界写进字段：判定范围是 `any_selectable_socket`（不校验栏位与模板是否一致）；
+  锻造件的 310 只列当前选中项（`alternate_perk_options_caveat`），未命中不等于换不到。
+- 实现里踩了一个正好相反的坑并修掉：组件 310 的真实形状是 `{"plugs": {"<槽>": […]}}`，
+  第一版直接遍历外层，`_instance_plug_hashes` 收到 Mapping → 静默空集
+  → 把"有 4 栏可换"报成了"读了、但没有可换项"。实机复验才抓到（`selectable_plug_status` 是为此加的）。
+
+实机复验（复盘里的同一套配装）：`笛卡尔坐标` 两把的 `重建/洪涝/老兵睿智` 三个 Perk
+**确证换也换不到**（`perks_unavailable`，`selectable_plug_status=available`）；
+`巅峰捕食者` 一把是"爆炸光能+爆炸协议现在装着、爆破专家换也换不到"——
+复盘里那句"有枪无 roll"现在有逐项的、可核对的说法。
+
 ## 0.1.10 — 2026-09-14
 
 **按另一台机器的实机复盘（Windows / 另一个 agent）修「否定结论的表达」**。那次事故的链条是：

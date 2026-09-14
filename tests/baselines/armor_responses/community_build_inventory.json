@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 13286,
+    "elapsed_ms": 7098,
     "is_error": false,
-    "payload_chars": 123879,
+    "payload_chars": 125361,
     "steps": [
       {
         "arguments": {
@@ -266,8 +266,9 @@
             "unverifiable_reason": "name_not_matched"
           },
           {
-            "alternate_perk_options_checked": false,
-            "alternate_perk_options_reason": "instance_socket_options_not_read",
+            "alternate_perk_options_caveat": "锻造件的组件 310 只列当前选中的项，未命中不等于换不到",
+            "alternate_perk_options_checked": true,
+            "alternate_perk_options_scope": "any_selectable_socket",
             "definitions": [
               {
                 "class_type": 3,
@@ -286,11 +287,12 @@
                 "tier": 5
               }
             ],
-            "inventory_status": "owned_no_current_roll_match",
+            "inventory_status": "owned_alternate_roll_available",
             "kind": "weapon",
             "name": "驱逐引擎",
             "owned_instances": [
               {
+                "alternate_roll_match": false,
                 "current_perks": [
                   "区域拒止框架",
                   "热发发射管",
@@ -310,9 +312,18 @@
                 "instance_id": "6917530185696180053",
                 "location": "vault",
                 "name": "驱逐引擎",
+                "perks_available_to_switch": [
+                  "混沌重塑"
+                ],
+                "perks_current_match": [],
+                "perks_unavailable": [
+                  "空中扳机"
+                ],
+                "selectable_plug_status": "available",
                 "socket_status": "complete"
               },
               {
+                "alternate_roll_match": true,
                 "current_perks": [
                   "区域拒止框架",
                   "密闭发射",
@@ -332,9 +343,17 @@
                 "instance_id": "6917530198634644757",
                 "location": "hunter",
                 "name": "驱逐引擎",
+                "perks_available_to_switch": [
+                  "空中扳机",
+                  "混沌重塑"
+                ],
+                "perks_current_match": [],
+                "perks_unavailable": [],
+                "selectable_plug_status": "available",
                 "socket_status": "complete"
               },
               {
+                "alternate_roll_match": false,
                 "current_perks": [
                   "区域拒止框架",
                   "热发发射管",
@@ -354,9 +373,17 @@
                 "instance_id": "6917530185645646924",
                 "location": "warlock",
                 "name": "驱逐引擎",
+                "perks_available_to_switch": [],
+                "perks_current_match": [],
+                "perks_unavailable": [
+                  "空中扳机",
+                  "混沌重塑"
+                ],
+                "selectable_plug_status": "available",
                 "socket_status": "complete"
               },
               {
+                "alternate_roll_match": true,
                 "current_perks": [
                   "区域拒止框架",
                   "高速发射",
@@ -376,6 +403,14 @@
                 "instance_id": "6917530193641893728",
                 "location": "titan",
                 "name": "驱逐引擎",
+                "perks_available_to_switch": [
+                  "空中扳机"
+                ],
+                "perks_current_match": [
+                  "混沌重塑"
+                ],
+                "perks_unavailable": [],
+                "selectable_plug_status": "available",
                 "socket_status": "complete"
               }
             ],
@@ -2839,7 +2874,7 @@
         ],
         "warnings": [
           "missing 仅表示 Manifest 已精确解析且完整库存中未达到要求；unknown/not_account_checked 不能解释为缺少。",
-          "current_roll_match 只检查当前选中的 Perk；owned_no_current_roll_match 的意思是「当前选中的 Perk 不符」，**不是**「这把枪不行」—— 可切换但未选中的 Perk 本次没有读（见 alternate_perk_options_checked / alternate_perk_options_reason）。",
+          "武器 roll 分三层看：current_roll_match=现在装着的就行；owned_alternate_roll_available=换一下可换栏就能达标（见 owned_instances[].perks_available_to_switch）；owned_no_current_roll_match=现在没装、可换栏里也没有（见 perks_unavailable），**不是**「这把枪不行」；alternate_perk_options_checked=false 才表示这一层没查（并给 alternate_perk_options_reason）。判定范围只到「这个 perk 在这把枪的某个可换栏里」，不校验栏位与模板是否一致；锻造件的组件 310 只列当前选中项，未命中不等于换不到。",
           "unresolved_reason=name_not_matched 表示名字在 Manifest 里对不上（常见于社区模板用活动名称呼套装），不是玩家缺少该装备；有 set_name_candidates 时请先跟用户确认名字。",
           "unverifiable_reason 说明这一项**没做账号校验**的原因（例如模组解锁状态接口没有暴露），任何以它为由的「你没有」都是误读。",
           "sourcing 里的 source 来自社区清单快照，不是官方实时掉落；推荐 Perk 是同一栏位的备选，与 required_perks 不是同一回事。no_adapter 表示该类别还没有来源数据源，不能读成「没有来源」或「刷不到」。",
