@@ -2,6 +2,41 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.1.13 — 2026-09-15
+
+新增一份全面语料：`TESTING_CORPUS_FULL.md` + `scripts/run_corpus_all_rows.py`，把八个工具面
+**全部 110 个 intent** 的信封体检、其余六个工具面的字段级契约和 MCP 协议层都变成可执行断言。
+第一轮真机跑（205 行）抓出 7 个问题，这次一并修掉：
+
+- **`analyze` 不再替求解器下结论**（P1）：`build/analyzer.py` 的兜底文案以前写死
+  `No valid armor combination found`，但它只算了单项上限，从来没验证过有没有合法组合 ——
+  实机出现过 analyze 说配不出来、**同一组约束** `recommend` 给出 `completion_rate=1.0` 的方案，
+  而且 `max_possible.health=134 ≥ 目标 100`。现在如实说明「各项目标都在单项上限内，单看上限
+  解释不了」并指路 `recommend`/`find`；两处 reason 与刷取建议也一起中文化（以前是英文）。
+- **`exotic_armor` 与 `intent="item"` 统一键集**（P2）：`get_exotic_armor_details` /
+  `get_exotic_armor_list` 以前直吐 Manifest 原始键（`nameEn`/`flavorText`/`classType`/`tierType`/
+  `intrinsicPerks`），同一件护甲两条路径两套键集。现在走同一个身份块工厂
+  （`armor_payload.armor_definition_payload`）：`identity.{name, name_en, slot, slot_display,
+  item_type_display, rarity_tier, class_type, class_display, …}` + `intrinsic_perks`。
+  定义级没有实例，`gear_tier`/`armor_system` 给 `null` 并附说明，不编 T 级。
+- **收藏品 hash 统一无符号**（P2）：`collectible_item` / `collectible_node` 以前直接吐 Manifest
+  原值，同一份响应里有正有负（实测 `-2064629060`、`-1315203219` 等，负数拿去别的面按 hash 查
+  必然查不中）。现在对外统一 `to_unsigned`，读收藏状态时无符号与有符号两种键都试。
+- **`artifact` 不带名字也给当前神器**（P2）：`get_seasonal_artifact("")` 现在也返回
+  `current_artifact`，「我现在用哪个神器」不用先知道神器名字。
+- **报错不再叠句号**（P3）：`SubclassError` / `APIError` 的包装遇到已经带句号的整句不再拼第二个
+  句号（实测出现「…或中文职业名。。」）。
+- **背包搜索未命中说「没找到」**（P3）：0 命中时 summary 从「已搜索物品。」改成
+  「没找到叫「X」的物品。」；文案抽到 `_formatters.inventory_search_summary`，
+  `tools/assistants.py` 的行数上限同步收紧到 1403。
+- **`intent="item"` 传 null 不再裸抛**（P3）：`armor_item` 的实例 ID 判断补 `or ""`。
+  真 MCP 路径本来就被 schema 层拦住（`string_type`），这是进程内的防御性缺口。
+
+语料第一轮结果：sweep 110 个 intent 全部干净（无异常、无超时、无「ok=true 但 data 空」、
+无写入漏网），mcp 组 11 行全过；上面 7 条都是 rows 组抓出来的。回归锁见
+`tests/test_corpus_full_regressions.py`（12 条），另外更正了主语料里两处被实测证伪的口径
+（「subclass 默认 10 条」其实只有 `community` 读 `limit`；`leaderboards` 不是恒失败而是间歇）。
+
 ## 0.1.12 — 2026-09-14
 
 强化版 perk 的展示名后面加 `↑`，普通版保持原字符串不变。

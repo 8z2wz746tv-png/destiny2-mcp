@@ -8,7 +8,7 @@
 | 层 | 跑什么 | 什么时候跑 |
 | --- | --- | --- |
 | **L1 自动化**（不需要账号） | `pytest -q`（1272 条）／`scripts/verify_mcp.py`／`tests/agent_behavior_cases.yaml`（路由） | 每次提交 |
-| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 25 行）／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线） | 改动武器或护甲响应后 |
+| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 25 行）／**`scripts/run_corpus_all_rows.py`（八工具面全 intent + 字段级 + 协议层，见 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)）**／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线） | 改动任一工具面后 |
 | **L2 冒烟**（本文件带 ⭐ 的行，25 条） | 真机逐条调用 | 每轮回归开始时跑一遍 |
 | **L3 补测**（本文件其余行） | 真机逐条调用 | **只在该工具被改动时**跑它那一章 |
 
@@ -223,7 +223,7 @@
 | ⭐ 我有 `<物品名>` 吗 | `inventory_assistant(intent="search", item_name=…)` | 若先试了 `summary`／`get` 再带 `item_name`，必须收到 `ignored_parameter` 并改走 `search`；**不能**拿背包概况当回答。 |
 | 读一下我的官方配装槽 3／按武器类型列定义 | `loadout_assistant(intent="get")`／`weapon_assistant(intent="type")` | 传 `loadout_id`/`slot_number` 或 `weapon_name` 会拿到 `ignored_parameter` 并给出正确参数名（`weapon_type`）。 |
 | 宿主把 schema 默认值一起发来（`confirmed=false`、`offset=0`、`item_name=""`） | 放行 | 空值 = 没指定，**不能误拒**。 |
-| 不传 `limit` 时的默认条数 | 各 intent 的默认上限 | 背包清单 100、配装 5、按类型列武器 20、武器目录/筛选 50、重复武器 10、商人菜单 15／详情 40、subclass 10、activity `count` 20；默认值不对或报错都算不合格。 |
+| 不传 `limit` 时的默认条数 | 各 intent 的默认上限 | 背包清单 100、配装 5、按类型列武器 20（`weapon_assistant`）、武器目录/筛选 50、重复武器 10、商人菜单 15／详情 40、activity `count` 20；默认值不对或报错都算不合格。**`subclass_assistant` 只有 `community` 读 `limit`**，`fragments`/`options` 传 `limit` 会拿到 `ignored_parameter`（实测 void 碎片返回全量 19 条）——这一章原来写的「subclass 10」是错的，已按实机更正。 |
 
 ### B. 失败必须是失败（不能在 `ok=true` 里裹错误）
 
@@ -262,7 +262,7 @@
 | `<武器>` 的 Perk 池里哪些是社区推荐的 | 选项上带 `recommended.wishlist`；异域可能没有 —— 要说明「本地愿单没收录」，**不能说「这些 Perk 都不好」** | 真机抽一条 |
 | 查「遗产」的催化剂／「泰拉巴」的社区 roll | 传说 `count=0` + 原因；固定 roll 武器明说没有随机推荐 | 真机抽一条 |
 | 全游戏能滚出「萤火虫」的武器／列出我的配装 | `matched_count > returned_count` 时必须 `truncated=true`；配装列表带四个分页字段 | 基线闸门 + `test_large_response_limits.py` |
-| 你现在有哪些工具／用 `get_inventory` 试试 | 只有 8 个聚合工具；老工具名应改走聚合入口（要用得开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 并重启） | `test_tool_profiles.py` |
+| 你现在有哪些工具／用 `get_inventory` 试试 | 只有 8 个聚合工具；老工具名应改走聚合入口。要用老工具必须**同时**设 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**和** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 再重启：实测只设开关、工具面留在 `normal` 时仍是 8 个工具，而且**不会给 warning**（full+开关 = 77 个、expert+开关 = 49 个） | `test_tool_profiles.py` |
 
 ## 十四、只跑一次就够的整链路
 
@@ -407,7 +407,7 @@
 | 现象 | 真实原因（已核实） | 状态 |
 | --- | --- | --- |
 | （已修）`player_assistant(intent="find")` 曾恒失败 | 根因是本地在调 Bungie **已废弃**的 `POST /User/SearchUsers/`（405），不是上游失效；已改用 `POST /User/Search/GlobalName/{page}/` 并适配新形状 | 已修（真机 `find("husky")` 返回 10 个候选 + `has_more`） |
-| `activity_assistant(intent="leaderboards")` 恒 `ok=false` + `a_p_i_error` | **上游失败**：Bungie 对账号榜单返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`，SDK 把空响应拆成 `None`，码在这一层已经拿不到 | 消息已说明「上游接口问题、不是账号问题，不要凭记忆给排名」；要带具体上游码需绕过 SDK（未做） |
+| `activity_assistant(intent="leaderboards")` 常 `ok=false` + `a_p_i_error`（**间歇**：实测同一轮里成功过 1 次、随后连测 3 次都失败） | **上游失败**：Bungie 对账号榜单返回 `HTTP 200 + ErrorCode:3 UnhandledException + Response:null`，SDK 把空响应拆成 `None`，码在这一层已经拿不到 | 消息已说明「上游接口问题、不是账号问题，不要凭记忆给排名」；要带具体上游码需绕过 SDK（未做） |
 | 术士求解慢 | 预算可配（`DESTINY_BUILD_TIMEOUT_SECONDS`，默认 300s）。实测：猎人 ~10s、泰坦 ~5–19s、术士 recommend 190s ✓ / find 187s ✓、farm_target 7.5s ✓ | `analyze` 已加组合规模闸（术士 2.43 亿组合 → 4.5s 返回可操作建议）；阈值 `DESTINY_BUILD_MAX_COMBINATIONS`（默认 2000 万，0=关闭） |
 | 非 T5 护甲不做词条反推 | 只对 tier 5 反推（`build/models.py`） | 消息已中文化（「目前只对 T5 护甲做词条反推；这件是 T{n}」） |
 | 动作类失败消息里带着上游原文（Bungie URL、内部错误串） | 信封是对的，但 message 泄露开发者信息 | 待修（backlog，P3） |
@@ -440,6 +440,7 @@
 | 武器形状/键集合/插槽/实例/本地资料/体积口径 | `test_weapon_keys_snapshot.py`、`test_weapon_profile.py`、`test_weapon_sockets.py`、`test_weapon_instance.py`、`test_weapon_local_data.py` |
 | 武器基线差异（字段无声消失） | `tests/test_weapon_baseline.py` + `scripts/capture|diff_weapon_baseline.py` |
 | 武器章节的端到端断言（真机） | `scripts/run_corpus_weapon_rows.py`（16 行） |
+| 八工具面全 intent 体检 + 其余六面字段级 + 协议层（真机） | `scripts/run_corpus_all_rows.py`（见 `TESTING_CORPUS_FULL.md`） |
 | 错误码与信封 | `test_failure_envelope_regressions.py`、`test_upstream_error_mapping.py`、`test_service_error_contract.py` |
 | 大响应限流与翻页 | `test_large_response_limits.py` |
 | 组件集合收拢 | `test_profile_components.py` |

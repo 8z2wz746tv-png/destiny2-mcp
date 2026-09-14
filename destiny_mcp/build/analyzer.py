@@ -16,17 +16,18 @@ from .models import (
     BuildConstraints,
     InventorySnapshot,
 )
+from .tuning import STAT_LABELS_ZH
 
 logger = get_logger(__name__)
 
 # Which stats are hard to farm (needs specific activities)
 _STAT_ADVICE: dict[str, str] = {
-    "weapons": "Focus armor engrams at the HELM with Weapons Ghost mod",
-    "health": "Focus armor engrams at the HELM with Health Ghost mod",
-    "class_stat": "Focus armor engrams at the HELM with Class Ghost mod",
-    "grenade": "Focus armor engrams at the HELM with Grenade Ghost mod",
-    "melee": "Focus armor engrams at the HELM with Melee Ghost mod",
-    "super_stat": "Focus armor engrams at the HELM with Super Ghost mod",
+    "weapons": "在 HELM 用「武器」机灵模组聚焦护甲（偏武器属性）",
+    "health": "在 HELM 用「生命值」机灵模组聚焦护甲（偏生命属性）",
+    "class_stat": "在 HELM 用「职业」机灵模组聚焦护甲（偏职业属性）",
+    "grenade": "在 HELM 用「手雷」机灵模组聚焦护甲（偏手雷属性）",
+    "melee": "在 HELM 用「近战」机灵模组聚焦护甲（偏近战属性）",
+    "super_stat": "在 HELM 用「超能」机灵模组聚焦护甲（偏超能属性）",
 }
 
 
@@ -134,9 +135,9 @@ def analyze(
         target = getattr(constraints, f"{stat_name}_min")
         if target > 0 and target > max_possible[stat_name]:
             gap = target - max_possible[stat_name]
+            label = STAT_LABELS_ZH.get(stat_name, stat_name)
             failures.append(
-                f"{stat_name}: need {target}, max possible is {max_possible[stat_name]} "
-                f"(gap: {gap})"
+                f"{label}要 {target}，把点全堆这一项也只有 {max_possible[stat_name]}（差 {gap}）"
             )
             if stat_name in _STAT_ADVICE:
                 suggestions.append(_STAT_ADVICE[stat_name])
@@ -146,11 +147,20 @@ def analyze(
 
     if failures:
         reason = (
-            f"Cannot meet {len(failures)} stat target(s) with current inventory. "
-            + "; ".join(failures)
+            f"有 {len(failures)} 项目标超过当前背包的单项上限："
+            + "；".join(failures)
+            + "。单项上限是把点全堆一项时的最大值，不是同一套护甲能同时达到的值。"
         )
     else:
-        reason = "No valid armor combination found (constraints may conflict with exotic + stat requirements)"
+        # 这条分支以前写的是 "No valid armor combination found"：它**没有**验证过
+        # 有没有合法组合（只算了单项上限），实机出现过「analyze 说配不出来、同约束
+        # recommend 给出 completion_rate=1.0 的方案」。不能替求解器下结论。
+        reason = (
+            "各项目标单看都在单项上限之内，所以配不出来的原因不在「某一项堆不上去」，"
+            "而在同一套护甲要同时满足这些目标（还可能被金装、优先级与组合规模限制）。"
+            "这里只算单项上限，不下「能不能配出来」的结论；"
+            "要结论请用 intent=\"recommend\"/\"find\"，或指定金装/减少目标后再看。"
+        )
 
     logger.info("Analyzer: %d failures, %d suggestions", len(failures), len(suggestions))
     return BuildAnalysis(

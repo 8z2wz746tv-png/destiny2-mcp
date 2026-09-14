@@ -15,7 +15,7 @@ from ..exceptions import ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..manifest_names import names_for
-from . import weapon_payload, weapon_profile
+from . import armor_payload, weapon_payload, weapon_profile
 
 logger = get_logger(__name__)
 
@@ -107,76 +107,85 @@ class ManifestQueryService:
     def get_exotic_armor_details(self, armor_name: str) -> dict:
         """Get exotic armor details with intrinsic perks.
 
-        Returns enriched dict. Raises ManifestError if not found.
+        形状与 `inventory_assistant(intent="item")` 同一套身份块（snake_case）：
+        以前这里直吐 Manifest 原始键（`nameEn`/`flavorText`/`classType`/`tierType`/
+        `intrinsicPerks`），同一件护甲在两条路径上是两套键集，语料实跑抓到后统一。
+        定义级没有实例，所以不编 T 级与分族。Raises ManifestError if not found.
         """
         results = self._manifest.search(armor_name, limit=5)
         if not results:
             raise ManifestError(f"找不到物品：{armor_name}")
 
-        exotic_armor = None
-        for item in results:
-            if item.get("tier") == 6 and item.get("itemType") == 2:
-                exotic_armor = item
-                break
-
+        exotic_armor = next(
+            (item for item in results if item.get("tier") == 6 and item.get("itemType") == 2),
+            None,
+        )
         if not exotic_armor:
             raise ManifestError(f"找不到异域护甲：{armor_name}")
 
-        definition = self._manifest.get_item_definition(exotic_armor["itemHash"])
+        item_hash = int(exotic_armor["itemHash"])
+        definition = self._manifest.get_item_definition(item_hash)
         if not definition:
             raise ManifestError(f"找不到物品定义：{armor_name}")
 
         display = definition.get("displayProperties", {})
         icon = display.get("icon") or ""
-        icon_url = f"https://www.bungie.net{icon}" if icon else ""
-        en_name = self._get_en_name(definition.get("hash", 0))
-        intrinsic_perks = self._extract_intrinsic_perks(definition)
-
-        return {
-            "name": display.get("name", ""),
-            "nameEn": en_name,
-            "description": display.get("description", ""),
-            "flavorText": definition.get("flavorText", ""),
-            "itemTypeDisplayName": definition.get("itemTypeDisplayName", ""),
-            "tierType": definition.get("tierType", 0),
-            "classType": {0: "Titan", 1: "Hunter", 2: "Warlock"}.get(
-                definition.get("classType", -1), "Any"
-            ),
-            "intrinsicPerks": intrinsic_perks,
-            "icon_url": icon_url,
-        }
+        return armor_payload.armor_definition_payload(
+            item_hash=item_hash,
+            lookup=self._manifest.get_item_definition,
+            name=display.get("name", ""),
+            name_en=self._get_en_name(definition.get("hash", 0)),
+            item_type_display=definition.get("itemTypeDisplayName", ""),
+            icon_url=f"https://www.bungie.net{icon}" if icon else "",
+            class_type=definition.get("classType"),
+            description=display.get("description", ""),
+            flavor_text=definition.get("flavorText", ""),
+            intrinsic_perks=self._extract_intrinsic_perks(definition),
+        )
 
     def get_exotic_armor_list(self, class_name: str) -> dict:
-        """Get all exotic armor for a class with intrinsic perks."""
+        """Get all exotic armor for a class with intrinsic perks.
+
+        每行是与详情同一个身份块（去掉 `flavor_text` 这类长文案，列表保持轻量）。
+        """
         exotics = self._manifest.get_exotic_armor_by_class(class_name)
         if not exotics:
             raise ManifestError(f"找不到 {class_name} 的异域护甲")
 
-        class_type_map = {0: "Titan", 1: "Hunter", 2: "Warlock"}
+        class_key = armor_payload.class_key_of(exotics[0].get("classType"))
         results = []
         for item in exotics:
-            item_hash = item.get("itemHash", 0)
+            item_hash = int(item.get("itemHash", 0))
             definition = self._manifest.get_item_definition(item_hash)
             if not definition:
                 continue
 
-            en_name = self._get_en_name(item_hash)
-            intrinsic_perks = self._extract_intrinsic_perks(definition)
-
-            icon = item.get("icon", "")
-            results.append({
-                "name": item.get("name", ""),
-                "nameEn": en_name,
-                "itemHash": item_hash,
-                "slot": item.get("bucketTypeHash", 0),
-                "intrinsicPerks": intrinsic_perks,
-                "icon_url": icon,
-            })
+            display = definition.get("displayProperties", {})
+            icon = item.get("icon") or display.get("icon") or ""
+            payload = armor_payload.armor_definition_payload(
+                item_hash=item_hash,
+                lookup=self._manifest.get_item_definition,
+                name=item.get("name", "") or display.get("name", ""),
+                name_en=self._get_en_name(item_hash),
+                item_type_display=definition.get("itemTypeDisplayName", ""),
+                icon_url=f"https://www.bungie.net{icon}" if icon.startswith("/") else icon,
+                class_type=definition.get("classType", exotics[0].get("classType")),
+                description=display.get("description", ""),
+                flavor_text="",
+                intrinsic_perks=self._extract_intrinsic_perks(definition),
+            )
+            identity = payload["identity"]
+            identity.pop("flavor_text", None)
+            results.append(
+                {"identity": identity, "intrinsic_perks": payload["intrinsic_perks"]}
+            )
 
         return {
-            "class": class_type_map.get(exotics[0].get("classType", -1), class_name),
+            "class": class_key or class_name,
+            "class_display": armor_payload.CLASS_DISPLAY.get(class_key, ""),
             "count": len(results),
             "exotics": results,
+            "armor_schema_version": armor_payload.ARMOR_SCHEMA_VERSION,
         }
 
     # ── Weapon Info ──────────────────────────────────────────────────

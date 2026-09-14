@@ -138,3 +138,14 @@ def format_armor_mods(mods: list[dict], slot: str, category: str) -> str:
             lines.append(f"{i}. {name} | {cost}能量")
 
     return "\n".join(lines)
+
+
+def inventory_search_summary(item_name: str, hits: object) -> str:
+    """背包搜索的 summary：0 命中要说「没找到」，列全量（没给名字）时保持中性。
+
+    以前无论有没有命中都是「已搜索物品。」，调用方只能自己去翻空 items；
+    语料实跑把这条和"未命中不能说成全账号没有"一起抓了出来。
+    """
+    if hits or not item_name.strip():
+        return "已搜索物品。"
+    return f"没找到叫「{item_name}」的物品。"

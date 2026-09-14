@@ -36,7 +36,7 @@ CEILINGS = {
     # +7：find 分支恢复可用 + 按类型列武器的默认上限 20。
     # +6：armor_mods 分支改取 get_armor_mods_filtered 并把 match/warning 带出去
     # （判断逻辑在 services/manifest_armor.py，这里只是多接一层返回值）。
-    "destiny_mcp/tools/assistants.py": 1407,
+    "destiny_mcp/tools/assistants.py": 1403,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     "destiny_mcp/bungie_client.py": 1263,

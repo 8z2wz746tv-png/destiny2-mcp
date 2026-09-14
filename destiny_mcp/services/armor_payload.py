@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from typing import Any, Callable, Literal
 
+from ..utils.hash_utils import to_unsigned
+
 ARMOR_SCHEMA_VERSION = 1
 
 DefinitionLookup = Callable[[int], dict[str, Any] | None]
@@ -59,6 +61,22 @@ SLOT_DISPLAY: dict[str, str] = {
     "class_item": "职业护甲",
 }
 
+# 反向：定义级查询手里只有 `itemTypeDisplayName`（"腿部护甲"），没有 bucket 字符串
+_DISPLAY_TO_SLOT: dict[str, str] = {value: key for key, value in SLOT_DISPLAY.items()}
+
+# 定义级没有实例，就不给 T 级 / 分族结论（族是按实例结构判的）
+DEFINITION_TIER_NOTE = (
+    "这是定义级查询，没有具体副本：T 级与护甲分族要看实例，"
+    '用 inventory_assistant(intent="item", item_instance_id=…) 读某一件。'
+)
+
+CLASS_DISPLAY: dict[str, str] = {"titan": "泰坦", "hunter": "猎人", "warlock": "术士"}
+
+
+def class_key_of(class_type: int | None) -> str:
+    """组件里的 classType → 工具面统一的键（hunter/warlock/titan）。未登记给空串。"""
+    return {0: "titan", 1: "hunter", 2: "warlock"}.get(class_type, "")  # type: ignore[arg-type]
+
 # 插槽类别 → 短键 + 是否玩家可改
 _SOCKET_KINDS: dict[str, tuple[str, bool]] = {
     "enhancements.v2_general": ("general", True),
@@ -91,6 +109,11 @@ def slot_key_from_bucket(bucket: str) -> str:
 def slot_key_from_solver(slot: str) -> str:
     """求解器的复数槽位名 → 统一键（`chests` → `chest`）。"""
     return _SOLVER_SLOT_TO_KEY.get(slot, slot)
+
+
+def slot_key_from_display(item_type_display: str) -> str:
+    """`"腿部护甲"` → `"legs"`；认不出来给空串（定义级只有显示名可用）。"""
+    return _DISPLAY_TO_SLOT.get(item_type_display, "")
 
 
 def socket_kind(category: str) -> tuple[str, bool]:
@@ -394,3 +417,53 @@ def armor_payload(
         if raid_family:
             payload["instance"]["raid_family"] = raid_family
     return payload
+
+
+def armor_definition_payload(
+    *,
+    item_hash: int,
+    lookup: DefinitionLookup,
+    name: str = "",
+    name_en: str = "",
+    item_type_display: str = "",
+    icon_url: str = "",
+    class_type: int | None = None,
+    rarity: str = "异域",
+    rarity_tier: int = 6,
+    description: str = "",
+    flavor_text: str = "",
+    intrinsic_perks: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """一件护甲的**定义级**载荷（没有实例）：与 `armor_payload` 同一套身份块。
+
+    `exotic_armor` 以前直接吐 Manifest 的原始键（`nameEn`/`flavorText`/`classType`/
+    `tierType`/`intrinsicPerks`），和 `intent="item"` 是两套键集；语料实跑抓到后统一到这里。
+    没有实例就**不编** T 级与分族：`gear_tier`/`armor_system` 给 `null` 并附说明。
+    """
+    definition = lookup(item_hash) or {}
+    display = definition.get("displayProperties") or {}
+    item_type_display = item_type_display or definition.get("itemTypeDisplayName", "")
+    slot = slot_key_from_display(item_type_display)
+    class_key = class_key_of(class_type)
+    return {
+        "identity": {
+            "item_hash": to_unsigned(item_hash),
+            "name": name or display.get("name", ""),
+            "name_en": name_en,
+            "slot": slot,
+            "slot_display": SLOT_DISPLAY.get(slot, item_type_display),
+            "item_type_display": item_type_display,
+            "gear_tier": None,
+            "gear_tier_note": DEFINITION_TIER_NOTE,
+            "armor_system": None,
+            "rarity": rarity,
+            "rarity_tier": rarity_tier,
+            "class_type": class_key,
+            "class_display": CLASS_DISPLAY.get(class_key, ""),
+            "icon_url": icon_url,
+            "description": description or display.get("description", ""),
+            "flavor_text": flavor_text or definition.get("flavorText", ""),
+        },
+        "intrinsic_perks": intrinsic_perks or [],
+        "armor_schema_version": ARMOR_SCHEMA_VERSION,
+    }

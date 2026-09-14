@@ -21,6 +21,7 @@ from ._build_confirmation import (
     verify_exotic_confirmation_token,
 )
 from ._farm_target_response import serialize_farm_target_analysis
+from ._formatters import inventory_search_summary
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
@@ -312,7 +313,9 @@ async def inventory_assistant(
     if intent in {"search", "find_item"}:
         result = await svc["inventory_svc"].search_items(resolved, item_name, location)
         searched = _dump(result)
-        return ok_response("已搜索物品。", {
+        # 0 命中要说「没找到」（文案在 _formatters，别把 assistants 撑到上限）
+        hits = searched.get("items") if isinstance(searched, dict) else None
+        return ok_response(inventory_search_summary(item_name, hits), {
             "result": searched,
             "farming_list": _farming_reference(
                 svc.get("starside_svc"),

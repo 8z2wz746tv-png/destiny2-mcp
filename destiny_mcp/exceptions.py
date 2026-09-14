@@ -98,13 +98,21 @@ class AuthenticationError(DestinyMCPError):
     """OAuth token is missing, expired, or invalid."""
 
 
+def _sentence(text: str) -> str:
+    """补句号，但别把已有的句号叠成「。。」（调用方常直接传整句）。"""
+    stripped = text.rstrip()
+    if not stripped:
+        return ""
+    return stripped if stripped[-1] in "。！？.!?" else stripped + "。"
+
+
 class SubclassError(DestinyMCPError):
     """A subclass modification operation failed."""
 
     def __init__(self, operation: str, detail: str = "") -> None:
         self.operation = operation
         super().__init__(
-            f"子职业操作失败：{operation}。"
+            f"子职业操作失败：{_sentence(operation)}"
             + (f"{detail}" if detail else "")
         )
 
@@ -115,7 +123,7 @@ class APIError(DestinyMCPError):
     def __init__(self, operation: str, detail: str = "") -> None:
         self.operation = operation
         super().__init__(
-            f"API 调用失败：{operation}。"
+            f"API 调用失败：{_sentence(operation)}"
             + (f"{detail}" if detail else "")
         )
 

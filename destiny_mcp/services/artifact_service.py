@@ -36,6 +36,9 @@ class ArtifactService:
             return {
                 "success": True,
                 "artifacts": artifacts,
+                # 「我现在用哪个神器」不该要求调用方先知道神器名字：不带名字也要给当前神器
+                # （以前只有按名字查那条分支才附 current_artifact，语料实跑抓到的）。
+                "current_artifact": self._manifest.get_current_artifact(),
                 "message": f"找到 {len(artifacts)} 个赛季神器。",
             }
 

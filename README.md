@@ -359,7 +359,7 @@ Starside 是现有工具的本地资料层，不新增第九个工具，也不�
 .venv/bin/python scripts/verify_starside.py --inventory
 ```
 
-自然语言测试话术、期望路由与验收标准统一放在 [TESTING_CORPUS.md](TESTING_CORPUS.md)（含 8 个工具与 108 个 intent 的语料、环境与流程、已知问题）。代码或文档更新后，重启 Agent 宿主或新开一个任务，避免继续使用旧的服务进程。
+自然语言测试话术、期望路由与验收标准统一放在 [TESTING_CORPUS.md](TESTING_CORPUS.md)（含 8 个工具与 108 个 intent 的语料、环境与流程、已知问题）；八个工具面全部 intent 的可执行体检与字段级契约在 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)，一条命令跑完：`.venv/bin/python scripts/run_corpus_all_rows.py`。代码或文档更新后，重启 Agent 宿主或新开一个任务，避免继续使用旧的服务进程。
 
 ## License
 

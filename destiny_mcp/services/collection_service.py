@@ -7,6 +7,7 @@ from ..exceptions import InvalidArgumentError, APIError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
+from ..utils.hash_utils import to_signed, to_unsigned
 
 logger = get_logger(__name__)
 
@@ -119,23 +120,30 @@ class CollectionService:
         candidates = self._manifest.search(item_name, limit=max(1, min(limit, 50)))
         items: list[dict] = []
         for candidate in candidates:
-            item_hash = int(candidate.get("itemHash", 0))
-            item_def = self._manifest.get_item_definition(item_hash) or {}
-            collectible_hash = int(item_def.get("collectibleHash", 0) or 0)
+            # Manifest 里两种约定混着：搜索结果里的 itemHash 可能是有符号的，
+            # 而 API 组件用无符号做键。以前直接把原始值吐出去，于是同一份响应里
+            # 有正有负（负数拿去别的面按 hash 查必然查不中）。对外统一成无符号，
+            # 查表时两种形式都试。
+            raw_item_hash = int(candidate.get("itemHash", 0))
+            item_hash = to_unsigned(raw_item_hash)
+            item_def = self._manifest.get_item_definition(raw_item_hash) or {}
+            raw_collectible = int(item_def.get("collectibleHash", 0) or 0)
+            collectible_hash = to_unsigned(raw_collectible) if raw_collectible else 0
             collectible_def = None
-            if collectible_hash:
+            if raw_collectible:
                 collectible_def = self._manifest.get_definition(
                     "DestinyCollectibleDefinition",
-                    collectible_hash,
+                    raw_collectible,
                 )
             else:
-                collectible_def = self._manifest.find_collectible_by_item_hash(item_hash)
-                collectible_hash = int((collectible_def or {}).get("hash", 0) or 0)
+                collectible_def = self._manifest.find_collectible_by_item_hash(raw_item_hash)
+                raw_found = int((collectible_def or {}).get("hash", 0) or 0)
+                collectible_hash = to_unsigned(raw_found) if raw_found else 0
 
             if not collectible_hash:
                 items.append({
                     "item_hash": item_hash,
-                    "name": candidate.get("name", self._manifest.get_item_name(item_hash)),
+                    "name": candidate.get("name", self._manifest.get_item_name(raw_item_hash)),
                     "collectible_hash": 0,
                     "has_collectible": False,
                     "message": "Manifest 中未找到对应收藏品定义。",
@@ -145,8 +153,10 @@ class CollectionService:
             state_entry = (
                 character_collectibles.get(str(collectible_hash))
                 or character_collectibles.get(collectible_hash)
+                or character_collectibles.get(str(to_signed(collectible_hash)))
                 or profile_collectibles.get(str(collectible_hash))
                 or profile_collectibles.get(collectible_hash)
+                or profile_collectibles.get(str(to_signed(collectible_hash)))
                 or {}
             )
             if not isinstance(state_entry.get("state"), int):
@@ -159,7 +169,9 @@ class CollectionService:
             display = (collectible_def or {}).get("displayProperties") or {}
             items.append({
                 "item_hash": item_hash,
-                "name": candidate.get("name", self._manifest.get_item_name(item_hash)),
+                "name": candidate.get(
+                    "name", self._manifest.get_item_name(raw_item_hash)
+                ),
                 "collectible_hash": collectible_hash,
                 "collectible_name": display.get("name", ""),
                 "has_collectible": True,
@@ -267,19 +279,22 @@ class CollectionService:
                 "DestinyCollectibleDefinition",
                 int(collectible_hash),
             ) or {}
-            item_hash = definition.get("itemHash", 0)
-            item_def = self._manifest.get_item_definition(item_hash) if item_hash else None
+            raw_item_hash = int(definition.get("itemHash", 0) or 0)
+            item_hash = to_unsigned(raw_item_hash) if raw_item_hash else 0
+            item_def = (
+                self._manifest.get_item_definition(raw_item_hash) if raw_item_hash else None
+            )
             display = definition.get("displayProperties", {}) or {}
             item_display = (item_def or {}).get("displayProperties", {}) if item_def else {}
             name = (
                 item_display.get("name")
                 or display.get("name")
-                or self._manifest.get_item_name(item_hash)
-                if item_hash
+                or self._manifest.get_item_name(raw_item_hash)
+                if raw_item_hash
                 else f"Collectible({collectible_hash})"
             )
             items.append({
-                "collectible_hash": int(collectible_hash),
+                "collectible_hash": to_unsigned(int(collectible_hash)),
                 "item_hash": item_hash,
                 "name": name,
                 "acquired": acquired,

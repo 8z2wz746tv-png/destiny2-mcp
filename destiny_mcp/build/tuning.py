@@ -40,7 +40,7 @@ TUNING_PLUG_SET_HASH = 1155052024
 EMPTY_TUNING_PLUG_HASH = 2121121504
 
 # 属性名 → 中文（只用于拼兜底名字；正常情况下名字直接读 Manifest 的官方翻译）。
-_STAT_LABELS_ZH: dict[str, str] = {
+STAT_LABELS_ZH: dict[str, str] = {
     "weapons": "武器",
     "health": "生命值",
     "class_stat": "职业",
@@ -117,7 +117,7 @@ def _catalog(manifest: Any) -> tuple[TuningChoice, ...]:
         delta = [0] * len(STAT_NAMES)
         delta[STAT_INDEX[increased]] += DIRECTIONAL_TUNING_STAT_BONUS
         delta[STAT_INDEX[decreased]] -= DIRECTIONAL_TUNING_STAT_BONUS
-        fallback = f"+{_STAT_LABELS_ZH[increased]} / -{_STAT_LABELS_ZH[decreased]}"
+        fallback = f"+{STAT_LABELS_ZH[increased]} / -{STAT_LABELS_ZH[decreased]}"
         choices.append(
             TuningChoice(
                 plug_hash=_canon(plug_hash),

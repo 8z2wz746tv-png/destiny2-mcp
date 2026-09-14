@@ -20,7 +20,9 @@ async def armor_item(svc: Any, player_name: str, item_instance_id: str) -> dict:
     与列清单的分工：列表只给"这件 T 几、在哪、多少光等"，要看"现在装了什么模组、
     能量还剩多少、词条是多少、还能不能调谐"就得走这里。
     """
-    if not item_instance_id.strip():
+    # `or ""`：真 MCP 路径上 null 会被 schema 拦（string_type），但进程内直调会传进来 None，
+    # 那时 `.strip()` 会抛 AttributeError，把一句"缺参数"变成 500。
+    if not (item_instance_id or "").strip():
         raise InvalidArgumentError(
             "intent=item 需要 item_instance_id（护甲实例 ID）。"
             "先用 intent=get/search 拿到实例 ID 再传进来。"
