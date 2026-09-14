@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 70977,
+    "elapsed_ms": 72728,
     "is_error": false,
-    "payload_chars": 32630,
+    "payload_chars": 32628,
     "steps": [
       {
         "arguments": {
@@ -29,7 +29,7 @@
           "character": "hunter",
           "class_target": 100,
           "confirmed_exotic_hash": -1904495392,
-          "exotic_confirmation_token": "d2bc1.1789347766.Gqowxr05XGQfMHNr.3c111e0fb10349592e3a0a523138b816fd11865d794012214397fc2e5e5d9d20",
+          "exotic_confirmation_token": "d2bc1.1789365797.-IgHevct3QYU2CQy.1e5bf315d155e48b8e1e47e7504badc277bcba4cd3bfccce7c7ce3f4d8740249",
           "exotic_name": "快速装弹松身裤",
           "fragment_names": null,
           "grenade_target": 70,
@@ -356,7 +356,7 @@
           "aspect_hashes": [],
           "class_ability_hash": null,
           "class_type": "hunter",
-          "execution_id": "tqZwjuZYmc8b1Dz255RK0Pcg",
+          "execution_id": "gPY8GWzSusGi6qsP4V_MV5IP",
           "exotic_hash": 1793346751,
           "fragment_hashes": [],
           "grenade_hash": null,
@@ -451,7 +451,7 @@
         "completion_rate": 1.0,
         "fragment_details": [],
         "missing_requirements": [],
-        "requires_tuning": false,
+        "requires_tuning": true,
         "score": 1040.8,
         "tuning_changes": [
           {
@@ -773,7 +773,7 @@
           "aspect_hashes": [],
           "class_ability_hash": null,
           "class_type": "hunter",
-          "execution_id": "70Us7IWbrakZRgbIttvSSbK-",
+          "execution_id": "HKNljFCub7hqvtzzubjutrcs",
           "exotic_hash": 1793346751,
           "fragment_hashes": [],
           "grenade_hash": null,
@@ -868,7 +868,7 @@
         "completion_rate": 1.0,
         "fragment_details": [],
         "missing_requirements": [],
-        "requires_tuning": false,
+        "requires_tuning": true,
         "score": 1044.8,
         "tuning_changes": [
           {

@@ -2,6 +2,37 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.1.10 — 2026-09-14
+
+**按另一台机器的实机复盘（Windows / 另一个 agent）修「否定结论的表达」**。那次事故的链条是：
+模板要求「玻璃拱顶 ×4」→ 工具标 `unresolved`、调用方标「❓待自查」→ 最后却回了「这套能直接玩」，
+而同一份响应里明明写着 `execution_supported=false` / `execution_eligible=false`。
+根因不是缺数据，是**否定结论没有被推到调用方一定会看到的地方**。
+
+- **summary 现在带可执行性判定**：社区详情返回「已读取社区配装：X；**不可直接执行**（社区模板不是服务器签发的 ExecutableBuild）」，
+  并把 `execution_eligible=false` + 首要 blocker + 「要装备必须走 find → canonical_build → 确认」
+  放进**第一条 warning**。summary 是 agent 唯一一定会引用的字段，判定不能再只躺在 payload 里。
+- **活动名 → 套装名解析**：社区模板按活动称呼套装（玻璃拱顶），Manifest 与玩家物品用套装名
+  （埃希恩记忆）。已核对的映射自动解析并说明来路（`resolved_via`/`alias_from`/`resolved_name`）；
+  没登记的给 `unresolved_reason=name_not_matched_candidates_available` + `set_name_candidates`
+  相似候选，让调用方去问用户，而不是只剩「查不到」。
+- **「这套我有几件」能直接读**：套装行新增 `owned_count` / `owned_distinct_slot_count` /
+  `missing_slot_count` / `wildcard_count`（以前只有列表，没人去数——复盘里就是「❓待自查」）。
+  实机复验（同一套配装）：`玻璃拱顶 → 埃希恩记忆`，需 4 件、持有 20 件覆盖 5 个部位、缺 0。
+- **「没校验」与「没有」彻底分开**：所有 `not_account_checked` 行带 `unverifiable_reason` 枚举
+  （`mod_unlock_state_not_available` / `artifact_*` / `subclass_unlock_state_not_available` /
+  `stat_feasibility_not_checked` / `free_text_not_checkable` …）；
+  `unresolved` 行带 `unresolved_reason`；武器行补
+  `alternate_perk_options_reason=instance_socket_options_not_read`，并把警告改成明说
+  「`owned_no_current_roll_match` 是『当前选中的 Perk 不符』，**不是**『这把枪不行』」。
+- **参数说明补「哪些 intent 不读它」**：`character` 那栏列出会返回 `ignored_parameter` 的 intent；
+  `component` 那栏写明「碎片不是一类 component，要用 `intent=fragments`」
+  （复盘里这两处各浪费了一次调用）。
+
+**仍未做（写在明处）**：`alternate_perk_options_checked` 目前恒为 `false` + 说明原因 ——
+真正的「可切换但未选中」比对需要武器详情载荷带上实例可换项（组件 310），
+属于武器面的改动（有自己的基线与体积上限），留作下一步。
+
 ## 0.1.9 — 2026-09-14
 
 **干净安装冒烟（从 GitHub 装 v0.1.8 到全新 venv）抓出来的两处一致性问题。**

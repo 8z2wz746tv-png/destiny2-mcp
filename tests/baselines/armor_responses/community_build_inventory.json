@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 7054,
+    "elapsed_ms": 13286,
     "is_error": false,
-    "payload_chars": 117370,
+    "payload_chars": 123879,
     "steps": [
       {
         "arguments": {
@@ -261,10 +261,13 @@
               },
               "tier": "T0.5"
             },
-            "status": "unresolved"
+            "status": "unresolved",
+            "unresolved_reason": "name_not_matched",
+            "unverifiable_reason": "name_not_matched"
           },
           {
             "alternate_perk_options_checked": false,
+            "alternate_perk_options_reason": "instance_socket_options_not_read",
             "definitions": [
               {
                 "class_type": 3,
@@ -512,6 +515,7 @@
             ],
             "inventory_status": "candidates_available",
             "kind": "armor_set",
+            "missing_slot_count": 0,
             "name": "埃希恩记忆",
             "owned_candidates": [
               {
@@ -585,6 +589,8 @@
                 "wildcard": false
               }
             ],
+            "owned_count": 14,
+            "owned_distinct_slot_count": 5,
             "potential_distinct_slot_count": 5,
             "required_count": 4,
             "sourcing": {
@@ -603,7 +609,8 @@
                 "url": "https://starside.work/farming-sets/index.html"
               }
             },
-            "status": "resolved"
+            "status": "resolved",
+            "wildcard_count": 0
           },
           {
             "definitions": [
@@ -640,7 +647,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -677,7 +685,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -706,7 +715,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -735,7 +745,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -772,7 +783,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -801,7 +813,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -830,7 +843,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -859,7 +873,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -888,7 +903,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -917,7 +933,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -946,7 +963,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -975,7 +993,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -996,7 +1015,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1017,7 +1037,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1054,7 +1075,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1082,7 +1104,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1110,7 +1133,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1130,7 +1154,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1150,7 +1175,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1170,7 +1196,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1190,7 +1217,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1210,7 +1238,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1230,7 +1259,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "component": "super",
@@ -1259,7 +1289,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "aspects",
@@ -1288,7 +1319,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "aspects",
@@ -1317,7 +1349,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -1338,7 +1371,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -1359,7 +1393,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -1380,7 +1415,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -1401,7 +1437,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -1422,7 +1459,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "grenade",
@@ -1451,7 +1489,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "melee",
@@ -1480,7 +1519,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "class_ability",
@@ -1541,7 +1581,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           }
         ],
         "sourcing_available_kinds": [
@@ -1643,7 +1684,9 @@
               },
               "tier": "T0.5"
             },
-            "status": "unresolved"
+            "status": "unresolved",
+            "unresolved_reason": "name_not_matched",
+            "unverifiable_reason": "name_not_matched"
           },
           {
             "compatible_plan_checked": false,
@@ -1655,6 +1698,7 @@
             ],
             "inventory_status": "candidates_available",
             "kind": "armor_set",
+            "missing_slot_count": 0,
             "name": "埃希恩记忆",
             "owned_candidates": [
               {
@@ -1728,6 +1772,8 @@
                 "wildcard": false
               }
             ],
+            "owned_count": 14,
+            "owned_distinct_slot_count": 5,
             "potential_distinct_slot_count": 5,
             "required_count": 4,
             "sourcing": {
@@ -1746,7 +1792,8 @@
                 "url": "https://starside.work/farming-sets/index.html"
               }
             },
-            "status": "resolved"
+            "status": "resolved",
+            "wildcard_count": 0
           },
           {
             "definitions": [
@@ -1783,7 +1830,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1820,7 +1868,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1849,7 +1898,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1878,7 +1928,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1915,7 +1966,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1944,7 +1996,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -1973,7 +2026,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2002,7 +2056,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2031,7 +2086,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2060,7 +2116,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2089,7 +2146,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2118,7 +2176,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2139,7 +2198,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2160,7 +2220,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2197,7 +2258,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2225,7 +2287,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2253,7 +2316,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2273,7 +2337,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2293,7 +2358,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2313,7 +2379,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2333,7 +2400,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2353,7 +2421,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "definitions": [
@@ -2373,7 +2442,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "artifact_mod_unlock_state_not_available"
           },
           {
             "component": "super",
@@ -2402,7 +2472,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "aspects",
@@ -2431,7 +2502,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "aspects",
@@ -2460,7 +2532,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -2481,7 +2554,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -2502,7 +2576,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -2523,7 +2598,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -2544,7 +2620,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "fragments",
@@ -2565,7 +2642,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "grenade",
@@ -2594,7 +2672,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "melee",
@@ -2623,7 +2702,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "component": "class_ability",
@@ -2684,7 +2764,8 @@
               "available": false,
               "reason": "no_adapter"
             },
-            "status": "resolved"
+            "status": "resolved",
+            "unverifiable_reason": "subclass_unlock_state_not_available"
           },
           {
             "inventory_status": "not_account_checked",
@@ -2720,14 +2801,16 @@
                 "min": 150,
                 "raw": "150+"
               }
-            }
+            },
+            "unverifiable_reason": "stat_feasibility_not_checked"
           },
           {
             "inventory_status": "not_account_checked",
             "kind": "notes",
             "requirements": [
               "带斗牛士是为了三反 无屏障可换裁决定论 聚合+战壕perk 线织尖刺换成冰飞镖 这套配置用于高压环境而且清勇士时要贴脸输出 所以堆了很多生存的要素 缚丝分身 风寒冰粪坑常驻5层冰甲 电喷近距离打勇士时两次精准触发致盲爆发 线织尖刺的割裂debuff 捡能量球虚空护盾 玩这套要经常踢绿单所以要控好血线"
-            ]
+            ],
+            "unverifiable_reason": "free_text_not_checkable"
           },
           {
             "inventory_status": "not_account_checked",
@@ -2738,22 +2821,27 @@
               "斗牛士本质PvP枪 三勇士环境过于稀少 即使有也不应该放弃裁决定论舍本逐末 因此任何情况下都应改用裁决定论",
               "如果想产大量绿弹有无限绿弹等手段 但改用VoG套胜在生存较好 松身裤在棱镜猎本身强大的生存素体加上VoG套的加持下基本没有意义 又没有像火刀一样刷大招的需求",
               "总体过于追求生存 在需要较为精确的武器(例如追踪)做机制时切换武器会令其他方面大打折扣 因此也不适合部分终局内容"
-            ]
+            ],
+            "unverifiable_reason": "free_text_not_checkable"
           },
           {
             "inventory_status": "not_account_checked",
             "kind": "core",
-            "requirements": "混乱无序"
+            "requirements": "混乱无序",
+            "unverifiable_reason": "free_text_not_checkable"
           },
           {
             "inventory_status": "not_account_checked",
             "kind": "subclass",
-            "requirements": "棱镜"
+            "requirements": "棱镜",
+            "unverifiable_reason": "subclass_label_not_checkable"
           }
         ],
         "warnings": [
           "missing 仅表示 Manifest 已精确解析且完整库存中未达到要求；unknown/not_account_checked 不能解释为缺少。",
-          "current_roll_match 只检查当前选中的 Perk，未检查该实例可切换但未选中的 Perk。",
+          "current_roll_match 只检查当前选中的 Perk；owned_no_current_roll_match 的意思是「当前选中的 Perk 不符」，**不是**「这把枪不行」—— 可切换但未选中的 Perk 本次没有读（见 alternate_perk_options_checked / alternate_perk_options_reason）。",
+          "unresolved_reason=name_not_matched 表示名字在 Manifest 里对不上（常见于社区模板用活动名称呼套装），不是玩家缺少该装备；有 set_name_candidates 时请先跟用户确认名字。",
+          "unverifiable_reason 说明这一项**没做账号校验**的原因（例如模组解锁状态接口没有暴露），任何以它为由的「你没有」都是误读。",
           "sourcing 里的 source 来自社区清单快照，不是官方实时掉落；推荐 Perk 是同一栏位的备选，与 required_perks 不是同一回事。no_adapter 表示该类别还没有来源数据源，不能读成「没有来源」或「刷不到」。",
           "此结果不会执行任何游戏写入，也不能作为整套社区配装的一键装备凭据。"
         ]
@@ -2910,7 +2998,8 @@
               "金中藏弹",
               "换挡"
             ],
-            "status": "unresolved"
+            "status": "unresolved",
+            "unresolved_reason": "name_not_matched"
           },
           {
             "definitions": [
@@ -3891,7 +3980,8 @@
               "金中藏弹",
               "换挡"
             ],
-            "status": "unresolved"
+            "status": "unresolved",
+            "unresolved_reason": "name_not_matched"
           }
         ]
       },
@@ -3931,8 +4021,9 @@
   },
   "next_actions": [],
   "ok": true,
-  "summary": "已读取社区配装：混乱无序高压续航棱镜猎。",
+  "summary": "已读取社区配装：混乱无序高压续航棱镜猎；**不可直接执行**（社区模板不是服务器签发的 ExecutableBuild）。",
   "warnings": [
+    "工具判定：execution_supported=false、execution_eligible=false —— 这套模板**不能**作为装备凭据；首要原因：社区模板不是服务器签发的 ExecutableBuild。要装备必须先用 intent='find' 生成服务端签发的 canonical_build，再让用户确认。",
     "Starside 内容是社区资料，不代表 Bungie 官方推荐；装备前必须继续通过库存、实例和用户确认校验。"
   ]
 }

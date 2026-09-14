@@ -855,3 +855,155 @@ async def test_assistant_does_not_auto_select_when_limit_hides_more_results() ->
     assert "selected_build" not in response["data"]
     starside.get_build.assert_not_awaited()
     starside.match_build_inventory.assert_not_awaited()
+
+
+# ── 2026-09-14 复盘（另一台机器 / 另一个 agent）暴露的口径问题 ─────────────
+#
+# 那次事故：模板要求"玻璃拱顶 ×4"（活动名），Manifest/玩家物品用的是套装名
+# "埃希恩记忆" → 工具标 unresolved、调用方标"❓待自查"，最后却回了"这套能直接玩"
+# —— 而同一份响应里 execution_supported=false、execution_eligible=false。
+
+
+def _aliased_manifest(set_names: dict[int, str]) -> _Manifest:
+    class _Aliased(_Manifest):
+        def get_all_set_bonuses(self) -> dict:
+            return {**super().get_all_set_bonuses(), **{
+                h: {"set_name": n} for h, n in set_names.items()
+            }}
+
+    return _Aliased()
+
+
+def test_activity_name_resolves_to_the_real_set_name() -> None:
+    """「玻璃拱顶」是活动名，真正的套装名是「埃希恩记忆」——要解析出来并说明来路。"""
+    manifest = _aliased_manifest({741162535: "埃希恩记忆"})
+    build = parse_build(
+        BUILD.replace("套装：甲套 2 件 × 甲套 4 件 × 乙套 2 件", "套装：玻璃拱顶 4 件"),
+        build_id="a",
+        source={"title": "A"},
+    )
+
+    result = validate_build(manifest, build)
+
+    armor_set = next(row for row in result["requirements"] if row["kind"] == "armor_set")
+    assert armor_set["status"] == "resolved"
+    assert armor_set["resolved_via"] == "activity_alias"
+    assert armor_set["alias_from"] == "玻璃拱顶"
+    assert armor_set["resolved_name"] == "埃希恩记忆"
+    assert armor_set["definitions"][0]["set_name"] == "埃希恩记忆"
+
+
+def test_unknown_set_name_gives_candidates_and_a_reason() -> None:
+    """对不上名字时不能只说"查不到"：给枚举原因 + 相似候选，让调用方去问用户。"""
+    build = parse_build(
+        BUILD.replace("套装：甲套 2 件 × 甲套 4 件 × 乙套 2 件", "套装：甲套装 4 件"),
+        build_id="a",
+        source={"title": "A"},
+    )
+
+    result = validate_build(_Manifest(), build)
+
+    armor_set = next(row for row in result["requirements"] if row["kind"] == "armor_set")
+    assert armor_set["status"] == "unresolved"
+    assert armor_set["unresolved_reason"] == "name_not_matched_candidates_available"
+    assert "甲套" in armor_set["set_name_candidates"]
+
+
+async def test_unchecked_requirements_carry_an_enum_reason() -> None:
+    """`not_account_checked` 必须带 `unverifiable_reason`：它是"没校验"，不是"你没有"。"""
+    build = parse_build(BUILD, build_id="a", source={"title": "A"})
+    inventory_service = SimpleNamespace(
+        get_inventory=AsyncMock(return_value=SimpleNamespace(items=[])),
+        get_armor_snapshot=AsyncMock(return_value=None),
+    )
+
+    result = await match_inventory(
+        _Manifest(),
+        "player",
+        build,
+        inventory_service,
+        SimpleNamespace(get_weapon_details_by_type=AsyncMock()),
+    )
+
+    mod = next(row for row in result["requirements"] if row["kind"] == "armor_mod")
+    assert mod["inventory_status"] == "not_account_checked"
+    assert mod["unverifiable_reason"] == "mod_unlock_state_not_available"
+    stats = next(
+        row for row in result["unresolved_or_unchecked_requirements"]
+        if row["kind"] == "stat_targets"
+    )
+    assert stats["unverifiable_reason"] == "stat_feasibility_not_checked"
+    assert any("unverifiable_reason" in warning for warning in result["warnings"])
+
+
+async def test_roll_state_says_what_was_not_checked() -> None:
+    """`owned_no_current_roll_match` 不能被读成"这把枪不行"：要写清没查什么。"""
+    block = BUILD.replace(" × 乙套 2 件", "").replace("套装：甲套 2 件 × 甲套 4 件", "套装：甲套 4 件")
+    build = parse_build(block, build_id="a", source={"title": "A"})
+    weapon_definition = {"item_hash": 4294967295, "item_type": 3, "tier": 5}
+    inventory_service = SimpleNamespace(
+        get_inventory=AsyncMock(
+            return_value=SimpleNamespace(
+                items=[
+                    SimpleNamespace(
+                        item_instance_id="w1",
+                        item_hash=4294967295,
+                        item_type="weapon",
+                        name="测试武器",
+                        location="vault",
+                    )
+                ]
+            )
+        ),
+        get_armor_snapshot=AsyncMock(return_value=None),
+    )
+    detail_service = SimpleNamespace(
+        get_weapon_details_by_type=AsyncMock(
+            return_value=SimpleNamespace(
+                weapons=[_weapon_detail("w1", 4294967295, [(3, "别的 Perk")])]
+            )
+        )
+    )
+
+    result = await match_inventory(
+        _Manifest(), "player", build, inventory_service, detail_service
+    )
+
+    weapon = next(row for row in result["requirements"] if row["kind"] == "weapon")
+    assert weapon["inventory_status"] == "owned_no_current_roll_match"
+    assert weapon["alternate_perk_options_checked"] is False
+    assert weapon["alternate_perk_options_reason"] == "instance_socket_options_not_read"
+    assert any("这把枪不行" in warning for warning in result["warnings"])
+    assert weapon_definition["item_hash"]  # 定义 hash 走 unsigned 比较，这里只是防止空引用
+
+
+async def test_community_detail_summary_carries_the_not_executable_verdict(tmp_path) -> None:
+    """summary 必须带"不可直接执行"：复盘里调用方正是越过了 payload 里的 false。"""
+    service = StarsideService(_Manifest(), _archive(tmp_path, blocks=[BUILD]))
+    inventory = SimpleNamespace(
+        get_inventory=AsyncMock(return_value=SimpleNamespace(items=[])),
+        get_armor_snapshot=AsyncMock(return_value=None),
+    )
+    ctx = SimpleNamespace(
+        request_context=SimpleNamespace(
+            lifespan_context={
+                "starside_svc": service,
+                "inventory_svc": inventory,
+                "weapon_detail_svc": SimpleNamespace(
+                    get_weapon_details_by_type=AsyncMock()
+                ),
+            }
+        )
+    )
+
+    response = await build_assistant(
+        intent="community",
+        community_build_id="builds/a/index.html#build-1",
+        include_inventory=True,
+        ctx=ctx,
+    )
+
+    assert response["ok"] is True
+    assert "不可直接执行" in response["summary"]
+    assert "execution_eligible=false" in response["warnings"][0]
+    assert "canonical_build" in response["warnings"][0]

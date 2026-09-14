@@ -378,6 +378,9 @@
 | 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；**调谐只能在游戏内手动改**，`canonical_build` 不含调谐插件（实测 Bungie 回 `This action can only be done in-game.`） |
 | 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | 给出「从什么改成什么 + 六维变化」，`writable=false`、`written=false`，并带「只能在游戏内改」的 warning；`confirmed=true` 也不会写账号 |
 | 换一个真花能量的模组 | `intent="equip_mod"` + `confirmed=true` | 走付费插槽接口：当前应用没有 `AdvancedWriteActions` 时**如实报错**（消息里点名权限），不许把失败说成成功（0.1.8 实机修） |
+| ⭐ 社区配装能不能直接穿 | `build_assistant(intent="community", community_build_id=…, include_inventory=true)` | summary 里必须出现「**不可直接执行**」，第一条 warning 给 `execution_supported=false` + blocker + 「要走 find → canonical_build → 确认」；`execution_eligible` 是 false |
+| 社区模板说的套装我没见过 | 同上的 `armor_set` 行 | 活动名（玻璃拱顶）自动解析成套装名（埃希恩记忆）并标 `resolved_via=activity_alias`；对不上时给 `unresolved_reason` + `set_name_candidates`；行里直接有 `owned_count`/`missing_slot_count`（几件、缺几件） |
+| 这一项是「没有」还是「没查」 | 任意 requirement 行 | `not_account_checked` 必带 `unverifiable_reason` 枚举；`unresolved` 必带 `unresolved_reason`；`owned_no_current_roll_match` 只表示当前选中的 Perk 不符（附未查原因） |
 | 目标根本配不出来时怎么说 | `ladder.verdict` | `satisfiable=false`（按原始优先级实测 0 候选）+ 说明 `ceiling` 是**逐项**最大值、不等于同一套能同时达到；`solved_after_rotation` 标出"换优先级能出解"这件事 |
 | 阶梯会不会偷偷改我的目标 | `ladder.targets` + 原始请求 | `targets` 里仍是用户给的数（如 近战70/手雷70）；降级只是提议，**未经确认不许改**；`recommend` 的无解响应继续带"不得自动降低"的 warning |
 | 只给优先级、不给硬目标 | `intent="recommend"` + 只有 `priority_stats` | `completion_rate` 是 `null` + `completion_rate_note`，**不是 0.0**（0.0 会被读成"一个都没满足"） |

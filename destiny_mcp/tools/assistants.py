@@ -714,8 +714,29 @@ async def build_assistant(
             )
         if result.get("matched_count", 0) > 1 and not selected:
             warnings.append("搜索到多套配装；指定 community_build_id 后才会读取账号库存进行匹配。")
+        # 可执行性必须出现在 summary 里：实机复盘（2026-09-14）里调用方正是**越过**了
+        # payload 里的 execution_supported=false，回了"核心件都在，这套能直接玩"——
+        # 因为 summary 只说"已读取社区配装：X"，而 summary 是唯一一定会被引用的字段。
+        verdict = ""
+        if selected:
+            validation = selected.get("validation") or {}
+            match = selected.get("inventory_match") or {}
+            if validation.get("execution_supported") is False or match.get("execution_eligible") is False:
+                blockers = validation.get("execution_blockers") or []
+                verdict = "；**不可直接执行**（社区模板不是服务器签发的 ExecutableBuild）"
+                warnings.insert(
+                    0,
+                    "工具判定：execution_supported=false、execution_eligible=false —— 这套模板"
+                    "**不能**作为装备凭据"
+                    + (f"；首要原因：{blockers[0].rstrip('。')}" if blockers else "")
+                    + "。要装备必须先用 intent='find' 生成服务端签发的 canonical_build，再让用户确认。",
+                )
         return ok_response(
-            f"已读取社区配装：{selected['title']}。" if selected else f"Starside 找到 {result['matched_count']} 套配装。",
+            (
+                f"已读取社区配装：{selected['title']}{verdict}。"
+                if selected
+                else f"Starside 找到 {result['matched_count']} 套配装。"
+            ),
             payload,
             warnings=warnings,
         )

@@ -45,6 +45,11 @@ Character = Annotated[
     Field(description=(
         "角色：hunter/warlock/titan，或猎人/术士/泰坦。"
         "只在该 intent 需要指定角色时才有意义（如 vendor、collectible_node、equip）。"
+        # 实机复盘（2026-09-14）：调用方连续给 armor_mods / subclass.fragments 传了 character，
+        # 两次都拿 ignored_parameter。这里把"哪些 intent 不读它"写在参数说明里，省一轮试错。
+        "**不读它的 intent**（传了会得到 ignored_parameter）：build_assistant 的 armor_mods/set_bonus、"
+        "subclass_assistant 的 fragments/options/fragment_details/artifact/artifact_mod、"
+        "weapon_assistant 的 catalog/filter_rolls 等。"
     )),
 ]
 
@@ -388,8 +393,10 @@ Element = Annotated[
 Component = Annotated[
     str,
     Field(description=(
-        "要列哪一类：super/melee/grenade/aspect/movement（也认 超能/近战/手雷/星象/移动）。"
+        "要列哪一类：super/melee/grenade/aspect/movement/class_ability"
+        "（也认 超能/近战/手雷/星象/跳跃/移动/职业技能）。"
         '只有 intent="options" 读它，且必填。'
+        "**碎片不是一类 component**：要碎片用 subclass_assistant 的 intent=\"fragments\"（component=\"fragment\" 会被拒）。"
     )),
 ]
 

@@ -34,6 +34,30 @@ build_assistant(
 
 Report held, missing, unknown, not-read, and unverified requirements separately. A match does not authorize equipping. It also does not prove that all weapon, skill, mod, artifact, energy, slot, or stat constraints are executable.
 
+### Why a requirement is not "missing"
+
+Three different situations used to look alike. Each now carries its own field — read them before
+saying anything is absent:
+
+- `unresolved_reason=name_not_matched` — the name does not match the Manifest. Community templates
+  frequently name an armor set after its **activity** (玻璃拱顶) while the Manifest and the player's
+  items use the **set name** (埃希恩记忆). Verified aliases resolve automatically and say so
+  (`resolved_via="activity_alias"`, `alias_from`, `resolved_name`); otherwise `set_name_candidates`
+  lists similar set names — ask the user which one they mean instead of reporting a missing item.
+- `unverifiable_reason` — this check was **not performed**, with the reason
+  (`mod_unlock_state_not_available`, `artifact_*`, `subclass_unlock_state_not_available`,
+  `stat_feasibility_not_checked`, …). Never turn it into "you do not have it".
+- `owned_no_current_roll_match` — the **currently selected** perks do not match.
+  `alternate_perk_options_reason=instance_socket_options_not_read` means selectable-but-unselected
+  perks were not read in this call; say that, not "this gun is wrong".
+
+Armor-set rows also carry `required_count`, `owned_count`, `owned_distinct_slot_count`,
+`missing_slot_count` and `wildcard_count`, so "do I have the 4-piece set?" is answered directly.
+
+The community detail `summary` always states the verdict (`不可直接执行` /
+`execution_supported=false`), and the first warning repeats it with the blocking reason: a template
+is never an equipping credential.
+
 ### Requirement sourcing
 
 Every requirement row carries a `sourcing` slot. It answers "where do I get this", and it is deliberately separate from `required_perks`.

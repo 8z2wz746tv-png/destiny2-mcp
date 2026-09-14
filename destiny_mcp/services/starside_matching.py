@@ -138,34 +138,100 @@ def _exact_definitions(
     return matches
 
 
+#: 活动名 → 套装名。社区模板习惯用**活动**称呼套装（「玻璃拱顶」），而 Manifest 与玩家物品
+#: 用的是**套装名**（「埃希恩记忆」）。2026-09-14 的实机复盘里，这条差异直接导致
+#: "四件套齐不齐"根本没法核对（agent 搜活动名 0 命中 → 标"待自查" → 却回了"能直接玩"）。
+#: 这里只登记**已在 Manifest 里核对过**的映射；没登记的一律走候选提示，不猜。
+ACTIVITY_SET_ALIASES: dict[str, str] = {
+    "玻璃拱顶": "埃希恩记忆",
+    "vault of glass": "埃希恩记忆",
+}
+
+#: "这一项为什么没做账号校验"的枚举（以前只有 not_account_checked 一个词，
+#: 会被读成"没有"）。键是 requirement 的 kind。
+UNVERIFIABLE_REASONS: dict[str, str] = {
+    "armor_mod": "mod_unlock_state_not_available",
+    "artifact": "artifact_unlock_state_not_available",
+    "artifact_mod": "artifact_mod_unlock_state_not_available",
+    "subclass_component": "subclass_unlock_state_not_available",
+    "armor_set": "armor_components_not_read",
+    "stat_targets": "stat_feasibility_not_checked",
+    "unparsed": "template_text_unparsed",
+    "notes": "free_text_not_checkable",
+    "review_notes": "free_text_not_checkable",
+    "core": "free_text_not_checkable",
+    "subclass": "subclass_label_not_checkable",
+    "class": "class_not_resolved",
+}
+
+
+def _set_name_candidates(manifest: ManifestManager, name: str, *, limit: int = 3) -> list[str]:
+    """给"名字对不上"的套装名找几个相似候选，让调用方能去问用户，而不是只剩"查不到"。"""
+    from difflib import SequenceMatcher
+
+    wanted = name.strip().casefold()
+    scored = []
+    for info in manifest.get_all_set_bonuses().values():
+        set_name = str(info.get("set_name", "")).strip()
+        if not set_name:
+            continue
+        score = SequenceMatcher(None, wanted, set_name.casefold()).ratio()
+        shared = len({char for char in wanted} & {char for char in set_name.casefold()})
+        scored.append((round(score, 3), shared, set_name))
+    scored.sort(key=lambda row: (-row[0], -row[1], row[2]))
+    return [row[2] for row in scored[:limit] if row[0] > 0.2 or row[1] >= 2]
+
+
 def _resolution(kind: str, name: str, definitions: list[dict]) -> dict:
     identities = {
         item.get("name_en") or item.get("name") or item.get("set_name")
         for item in definitions
     }
-    return {
+    status = (
+        "ambiguous" if len(identities) > 1 else "resolved" if definitions else "unresolved"
+    )
+    resolution = {
         "kind": kind,
         "name": name,
-        "status": "ambiguous"
-        if len(identities) > 1
-        else "resolved"
-        if definitions
-        else "unresolved",
+        "status": status,
         "definitions": definitions,
     }
+    if status == "ambiguous":
+        resolution["unresolved_reason"] = "multiple_definitions"
+    elif status == "unresolved":
+        resolution["unresolved_reason"] = "name_not_matched"
+    return resolution
 
 
 def _set_resolution(manifest: ManifestManager, name: str) -> dict:
-    matches = []
-    for set_hash, info in manifest.get_all_set_bonuses().items():
-        if str(info.get("set_name", "")).strip().casefold() == name.strip().casefold():
-            matches.append(
-                {
-                    "set_hash": to_unsigned(int(set_hash)),
-                    "set_name": info.get("set_name", ""),
-                }
-            )
-    return _resolution("armor_set", name, matches)
+    exact = name.strip().casefold()
+    matches = [
+        {"set_hash": to_unsigned(int(set_hash)), "set_name": info.get("set_name", "")}
+        for set_hash, info in manifest.get_all_set_bonuses().items()
+        if str(info.get("set_name", "")).strip().casefold() == exact
+    ]
+    if not matches:
+        alias = ACTIVITY_SET_ALIASES.get(exact)
+        if alias:
+            matches = [
+                {"set_hash": to_unsigned(int(set_hash)), "set_name": info.get("set_name", "")}
+                for set_hash, info in manifest.get_all_set_bonuses().items()
+                if str(info.get("set_name", "")).strip().casefold() == alias.casefold()
+            ]
+            if matches:
+                resolution = _resolution("armor_set", name, matches)
+                # 说清"这个名字是活动名、真正的套装名是什么"，下游才敢按下结论核对
+                resolution["resolved_via"] = "activity_alias"
+                resolution["alias_from"] = name
+                resolution["resolved_name"] = matches[0]["set_name"]
+                return resolution
+    resolution = _resolution("armor_set", name, matches)
+    if resolution["status"] == "unresolved":
+        candidates = _set_name_candidates(manifest, name)
+        if candidates:
+            resolution["set_name_candidates"] = candidates
+            resolution["unresolved_reason"] = "name_not_matched_candidates_available"
+    return resolution
 
 
 def validate_build(manifest: ManifestManager, build: dict) -> dict:
@@ -381,6 +447,8 @@ async def match_inventory(
                 if row["status"] == "unresolved"
                 else "ambiguous_definition"
             )
+            # 没解析出定义 ≠ 玩家没有；给枚举原因，别再让调用方自己解释
+            row["unverifiable_reason"] = row.get("unresolved_reason") or "name_not_matched"
             unknown.append(row)
             ownership.append(row)
             continue
@@ -453,6 +521,8 @@ async def match_inventory(
                 row["inventory_status"] = "owned_no_current_roll_match"
             if row["required_perks"]:
                 row["alternate_perk_options_checked"] = False
+                # 明确"没查"的原因，别让 owned_no_current_roll_match 被读成"这把枪不行"
+                row["alternate_perk_options_reason"] = "instance_socket_options_not_read"
             ownership.append(row)
         elif row["kind"] == "exotic_armor":
             hashes = {definition["item_hash"] for definition in row["definitions"]}
@@ -501,6 +571,16 @@ async def match_inventory(
             row["potential_distinct_slot_count"] = (
                 len(possible_slots) if snapshot is not None else None
             )
+            # "这套我有几件、还差几件"要能直接读出来：以前只有 owned_candidates 列表，
+            # 调用方得自己数，实际结果就是没人去数（复盘里的"❓待自查"）。
+            row["owned_count"] = len(matched)
+            row["owned_distinct_slot_count"] = len(possible_slots)
+            row["missing_slot_count"] = (
+                max(0, int(row["required_count"]) - len(possible_slots))
+                if snapshot is not None
+                else None
+            )
+            row["wildcard_count"] = sum(1 for entry in matched if entry["wildcard"])
             row["inventory_status"] = (
                 "not_account_checked"
                 if snapshot is None
@@ -509,6 +589,8 @@ async def match_inventory(
                 else "candidates_available"
             )
             row["compatible_plan_checked"] = False
+            if snapshot is None:
+                row["unverifiable_reason"] = UNVERIFIABLE_REASONS["armor_set"]
             if row["inventory_status"] == "insufficient_slots":
                 known_missing.append(row)
             # Slot availability is not proof that simultaneous set/mod/exotic requirements are achievable.
@@ -516,6 +598,9 @@ async def match_inventory(
             ownership.append(row)
         else:
             row["inventory_status"] = "not_account_checked"
+            row["unverifiable_reason"] = UNVERIFIABLE_REASONS.get(
+                row["kind"], "category_not_integrated"
+            )
             unknown.append(row)
             ownership.append(row)
 
@@ -525,6 +610,7 @@ async def match_inventory(
             {
                 "kind": "stat_targets",
                 "inventory_status": "not_account_checked",
+                "unverifiable_reason": UNVERIFIABLE_REASONS["stat_targets"],
                 "requirements": build["stat_targets"],
             }
         )
@@ -533,6 +619,7 @@ async def match_inventory(
             {
                 "kind": "unparsed",
                 "inventory_status": "not_account_checked",
+                "unverifiable_reason": UNVERIFIABLE_REASONS["unparsed"],
                 "requirements": build["unparsed"],
             }
         )
@@ -542,11 +629,18 @@ async def match_inventory(
                 {
                     "kind": key,
                     "inventory_status": "not_account_checked",
+                    "unverifiable_reason": UNVERIFIABLE_REASONS[key],
                     "requirements": build[key],
                 }
             )
     if not validation["class_resolved"]:
-        unknown.append({"kind": "class", "inventory_status": "unknown_definition"})
+        unknown.append(
+            {
+                "kind": "class",
+                "inventory_status": "unknown_definition",
+                "unverifiable_reason": UNVERIFIABLE_REASONS["class"],
+            }
+        )
     attach_sourcing(ownership, lookup)
     return {
         "inventory_status": "complete",
@@ -578,7 +672,13 @@ async def match_inventory(
         "execution_eligible": False,
         "warnings": [
             "missing 仅表示 Manifest 已精确解析且完整库存中未达到要求；unknown/not_account_checked 不能解释为缺少。",
-            "current_roll_match 只检查当前选中的 Perk，未检查该实例可切换但未选中的 Perk。",
+            "current_roll_match 只检查当前选中的 Perk；owned_no_current_roll_match 的意思是"
+            "「当前选中的 Perk 不符」，**不是**「这把枪不行」—— 可切换但未选中的 Perk 本次没有读"
+            "（见 alternate_perk_options_checked / alternate_perk_options_reason）。",
+            "unresolved_reason=name_not_matched 表示名字在 Manifest 里对不上（常见于社区模板用"
+            "活动名称呼套装），不是玩家缺少该装备；有 set_name_candidates 时请先跟用户确认名字。",
+            "unverifiable_reason 说明这一项**没做账号校验**的原因（例如模组解锁状态接口没有暴露），"
+            "任何以它为由的「你没有」都是误读。",
             "sourcing 里的 source 来自社区清单快照，不是官方实时掉落；推荐 Perk 是同一栏位的备选，"
             "与 required_perks 不是同一回事。no_adapter 表示该类别还没有来源数据源，"
             "不能读成「没有来源」或「刷不到」。",
