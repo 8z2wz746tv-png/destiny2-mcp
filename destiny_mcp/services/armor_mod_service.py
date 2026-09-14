@@ -278,6 +278,17 @@ class ArmorModService(ModSocketMixin):
             "player_name": player_name,
             "item_instance_id": item_instance_id,
             "kind": "tuning" if is_tuning else "mod",
+            "writable": not is_tuning,
+            "writable_reason": (
+                # 实机实测（0.1.8）：免费插槽接口对调谐明确回
+                # "This action can only be done in-game."（ErrorCode 1663），
+                # 付费接口要 AdvancedWriteActions 权限、且同样不是给调谐用的。
+                "调谐只能**在游戏里**改：Bungie 的插槽接口实测回"
+                "「This action can only be done in-game.」（ErrorCode 1663），"
+                "第三方写不进去。这条方案告诉你要把哪一件改成什么，请进游戏手动改。"
+                if is_tuning
+                else ""
+            ),
             "note": (
                 "调谐不花能量、也不占模组槽；它是零和的："
                 "to.stat_bonus 里同时有 +5 和 −5 两项。"
@@ -331,7 +342,14 @@ class ArmorModService(ModSocketMixin):
     # ── 执行 ─────────────────────────────────────────────────────────
 
     async def apply(self, plan: dict[str, Any]) -> dict[str, Any]:
-        """按方案写入。失败时把 Bungie 的原文一并带出来（不吞错）。"""
+        """按方案写入。失败时把 Bungie 的原文一并带出来（不吞错）。
+
+        实机教训（0.1.8）：`_insert_armor_mod` 沿用"把 Bungie 的错误**当返回值**"的老约定
+        （`{"ErrorCode": 1663, "Message": ...}`），这里以前不管内容直接 `success: True` ——
+        一次真实失败被报成了成功（换调谐时 Bungie 回 "This action can only be done
+        in-game."，账号一个字节没变，工具却说换好了）。现在必须核对 `ErrorCode == 1`，
+        否则抛 TransferError 并把原文带出来。
+        """
         try:
             result = await self._insert_armor_mod(
                 plan["item_instance_id"],
@@ -346,6 +364,18 @@ class ArmorModService(ModSocketMixin):
             raise TransferError(
                 f"装模组失败：{type(exc).__name__}: {str(exc)[:200]}"
             ) from exc
+
+        code = (result or {}).get("ErrorCode", 0) if isinstance(result, dict) else 0
+        if code != 1:
+            message = str((result or {}).get("Message") or "Bungie 没有说明原因")
+            lowered = message.lower()
+            if "accessnotpermittedbyapplicationscope" in lowered or "scope" in lowered:
+                message = (
+                    "Bungie 拒绝了这次写入：当前授权的应用没有 AdvancedWriteActions 权限"
+                    "（要改模组/深层配置需要在 Bungie 应用页面开启并重新登录）。原文："
+                    + message[:200]
+                )
+            raise TransferError(f"装模组失败：{message[:300]}")
         return {
             "success": True,
             "item_instance_id": plan["item_instance_id"],

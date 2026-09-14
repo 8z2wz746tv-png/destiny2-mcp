@@ -17,7 +17,12 @@ Destiny 2 装备管理 MCP Server — 通过 AI Agent 管理武器和装备。
 - 🧭 默认暴露 8 个聚合 assistant 工具，避免 Agent 被几十个低层工具干扰
 - 开箱即用的 Starside 中文资料：Perk、武器推荐、护甲、技能、神器、机制和活动数据
 - 可选 Starside 网页归档：额外提供社区配装模板，保留出处并可匹配账号库存
-
+- 🔧 调谐（Tuning）作为求解器杠杆：差一点点的目标，求解器会真的去试「改哪几件调谐」——能补上就给出带
+  `tuning_changes`（逐件 from/to + 六维变化）的候选；补不上时如实说清是「额度不够」还是「让不出来」。
+  **调谐只能在游戏内手动改**（Bungie 的插槽接口实测回 `This action can only be done in-game.`），
+  工具给的是「要改哪几件、改成什么」的清单，`equip_build` 不会替玩家改调谐。
+- 🧾 写入失败不装懂：花能量的插槽写入需要 Bungie 应用的 `AdvancedWriteActions` 权限；没有时接口回
+  `AccessNotPermittedByApplicationScope`，工具会点名这条权限，而不是把失败说成成功。
 ## 快速开始
 
 这是个人本地版，推荐让本地 Agent 按下面流程安装。用户只需要完成一次 Bungie 登录，之后 token 会保存在本机。
@@ -246,6 +251,14 @@ VERIFY_OK=Destiny MCP is ready
 行为测试还要确认写操作先展示目标并等待确认，社区模板不会直接传给 `equip_build`，以及不完整扫描不会被回答成“账号没有”。记录实际工具、intent 和关键参数，不要记录密钥、Token 或未经脱敏的账号日志。
 
 ## 前置条件与已知限制
+
+- **写入权限**：读操作随便用；**花能量的插槽写入需要在你自己的 Bungie 应用里勾上 `AdvancedWriteActions`**
+  （没勾就回 403 `AccessNotPermittedByApplicationScope`，工具会点名这条权限，别读成「稍后重试」）。
+- **调谐只能游戏内改**：Bungie 的免费插槽接口对调谐明确回 `This action can only be done in-game.`
+  （ErrorCode 1663）。所以 `find`/`recommend` 给出的 `tuning_changes` 是**给玩家的手动清单**：
+  照着在游戏里改完，方案里的六维才成立；`equip_build` 只换护甲与模组。
+- **无解诊断可能要等一会儿**：真正配不出来时会给「六维阶梯」（逐级放松目标实采），实测 80–165 秒；
+  求解器还会先试调谐补齐。MCP 客户端超时建议设到 300 秒（DSH 的 `toolCallTimeoutMs`）。
 
 **能装之前得先知道这些**（第一次跑之前请读完这张表）：
 

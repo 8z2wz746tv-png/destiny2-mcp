@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 1256,
+    "elapsed_ms": 1420,
     "is_error": false,
-    "payload_chars": 1483,
+    "payload_chars": 1536,
     "steps": [
       {
         "arguments": {
@@ -69,7 +69,9 @@
         "stat_bonus": {
           "grenade": 10
         }
-      }
+      },
+      "writable": true,
+      "writable_reason": ""
     }
   ],
   "error": {

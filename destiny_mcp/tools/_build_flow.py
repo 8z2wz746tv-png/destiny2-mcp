@@ -109,7 +109,10 @@ def _tuning_summary(builds: Any) -> dict[str, Any] | None:
         "note": (
             "这些方案是「按原目标求解器没达标 → 放宽目标复解 → 用真实目标逐套复核」"
             "找出来的；tuning_changes 里是要改的调谐（从什么改成什么、六维怎么变）。"
-            "执行时不用手改：确认 equip_build 用的 canonical_build 里已经带上这些调谐插件。"
+            "注意：调谐**只能在游戏内手动改**（Bungie 接口实测回 "
+            "「This action can only be done in-game.」），"
+            "canonical_build 里不含调谐插件 —— 确认装备只换护甲与模组，"
+            "调谐这一步要把清单交给玩家。"
         ),
     }
 

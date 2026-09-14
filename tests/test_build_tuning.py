@@ -562,3 +562,61 @@ def test_pick_and_rescue_verifies_only_the_top_k(monkeypatch) -> None:
     assert max(residual(g) for g in picked) <= min(
         residual(g) for g in all_grenade if g not in picked
     ), "排序要按残差从小到大，复核只做最值得的前 K 套"
+
+
+def test_tuning_plan_flags_but_never_ships_plugs_as_writable_mods() -> None:
+    """两条不变量（实机语料第 ⑩ 行抓到的回归）：
+
+    1. 靠调谐才达标的方案，`requires_tuning` 必须是 True、`tuning_changes` 必须有内容
+       （以前按"有没有插件要写"算，调谐不可写之后就恒为 False）；
+    2. `canonical_build.items[].mods` **不能**夹带调谐插件 —— Bungie 只允许游戏内改，
+       写进去只会让 equip_build 失败或少做一步。
+    """
+    from destiny_mcp.build.constraints import parse as parse_constraints
+    from destiny_mcp.build.models import BuildRequest
+    from destiny_mcp.build.tuning import TuningPlan, TuningChange
+    from destiny_mcp.services.build_results import ResultContext, build_results
+
+    manifest = _manifest()
+    armors = _five(grenade=50, weapons=40)
+    snapshot = _snapshot(armors)
+    parsed = parse_constraints(
+        BuildRequest(character_class="hunter", grenade_target=55), manifest
+    )
+    armor_set = _set_from(armors)
+    plan = TuningPlan(
+        feasible=True,
+        changes=(
+            TuningChange(
+                item_instance_id="inst-helmets",
+                item_name="helmets 件",
+                slot="helmets",
+                from_plug=EMPTY_TUNING_PLUG_HASH,
+                from_name="空调整模组插槽",
+                to_plug=1922571986,
+                to_name="+手雷 / -职业",
+                delta=(0, 0, -5, 5, 0, 0),
+                increased="grenade",
+                decreased="class_stat",
+            ),
+        ),
+    )
+    context = ResultContext(
+        parsed=parsed,
+        request=BuildRequest(character_class="hunter", grenade_target=55),
+        manifest=manifest,
+        class_type="hunter",
+        snapshot_version="test",
+        bonus_vector=[0] * 6,
+        tuning={(("inst-chests", "inst-class_items", "inst-gauntlets", "inst-helmets", "inst-legs")): plan},
+    )
+
+    results = build_results([armor_set], context)
+
+    assert len(results) == 1
+    top = results[0]
+    assert top.requires_tuning is True
+    assert top.tuning_changes and top.tuning_changes[0]["to"]["name"] == "+手雷 / -职业"
+    assert "只能在游戏内" in top.tuning_note
+    mods = [mod for item in top.canonical_build.items for mod in item.mods]
+    assert 1922571986 not in mods, "调谐插件不许进 canonical_build 的 mods"

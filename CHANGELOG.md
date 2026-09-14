@@ -2,6 +2,31 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.1.8 — 2026-09-14
+
+**真机写入实测抓出来的两个发布阻断问题**（用户要求"全部实测一遍"，这次实测值回票价）。
+
+**① 写入失败被报成成功（真 bug）**
+`ArmorModService.apply()` 拿到的是老约定形状 `{"ErrorCode": …, "Message": …}` —— Bungie 把
+**错误也放在 200 响应的信封里**。以前这里不看内容直接 `success: True`：实测换调谐时账号
+**一个字节没变**，工具却回"已把槽 11 换成 +手雷 / -职业"。现在必须核对 `ErrorCode == 1`，
+否则抛 `TransferError` 并把 Bungie 原文带出来；权限类错误（`AccessNotPermittedByApplicationScope`）
+会点名 `AdvancedWriteActions`，不再被读成"稍后重试"。回归测试写进 `tests/test_equip_mod.py`
+（假客户端改成 Bungie 的真实信封形状 —— 以前回 `{"success": True}`，正好把这个 bug 遮住了）。
+
+**② 调谐根本写不进去（实测结论，改设计）**
+- 免费插槽接口（`InsertSocketPlugFree`）对调谐回 `This action can only be done in-game.`（ErrorCode 1663）；
+- 付费接口（`InsertSocketPlug`）要 Bungie 应用的 `AdvancedWriteActions` 权限，当前授权没有 → 403。
+
+所以 0.1.6/0.1.7 里"`canonical_build` 已带上调谐插件、确认即可执行"是**做不到的承诺**，这版改掉：
+`equip_mod` 对调谐直接给方案（`writable=false` / `written=false` + 「只能在游戏内改」的 warning，
+`confirmed=true` 也不写账号）；`canonical_build.items[].mods` 不再包含调谐插件；
+`tuning_changes` 明确是**给玩家的手动清单**，`tuning_note` 也照此改写。
+（这也解释了为什么"改完调谐才达标"的方案必须把清单交给玩家：六维达标以玩家手动改完为前提。）
+
+**③ 顺带**：README 补了「写入权限」「调谐只能游戏内改」「无解诊断 80–165 秒 → 客户端超时建议 300 秒」；
+语料护甲章节加了两行（调谐只给方案不写、付费写入如实报权限），共 26 行。
+
 ## 0.1.7 — 2026-09-14
 
 **池子上限这条边界（实测发现并修掉）**：求解器只保留排名前 200 套（`RETURNED_ARMOR_SETS`，

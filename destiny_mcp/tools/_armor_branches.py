@@ -255,6 +255,22 @@ async def equip_mod(
         plan["from"] = {"hash": None, "name": None, "energy_cost": 0}
     plan["summary"] = _mod_echo(plan)
 
+    # 调谐写不进去（Bungie 只允许游戏内改）：不要走"确认后写入"那套，
+    # 否则用户确认了、我们却只能失败。直接把方案交出去，并说明要游戏内改。
+    if plan.get("kind") == "tuning":
+        return ok_response(
+            f"{plan['item_name']} 的调谐建议：{plan['from'].get('name') or '（空）'} → "
+            f"{plan['to']['name']}。调谐只能在游戏内改（Bungie 接口不允许第三方写）。",
+            {"armor_mod": {**plan, "written": False}},
+            next_actions=[
+                "把上面这条改动告诉玩家，让他在游戏里手动改调谐；"
+                "不要调用 confirmed=true——那一步会被 Bungie 拒绝。",
+                f"要看这件护甲现在的状态，用 inventory_assistant(intent=\"item\", "
+                f"item_instance_id=\"{plan['item_instance_id']}\")。",
+            ],
+            warnings=[plan.get("writable_reason") or "调谐只能游戏内修改。"],
+        )
+
     if not confirmed:
         return confirmation_required_response("equip_mod", plan)
 

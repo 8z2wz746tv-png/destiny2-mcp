@@ -375,7 +375,9 @@
 | 真的配不出来时告诉我差在哪 | 同上，但把生命值推到 `health_target=200` | 0 候选 + `ladder`：`shortfall`、`ceiling`（**同一套约束下同时能达到**的上限，实采）、`trials`、`suggestion`，以及 `verdict.satisfiable=false`（按**原始优先级**实测 0 候选；并说明 ceiling 是逐项最大值、trials 里 ok=true 的档是换了优先级之后的解） |
 | 这个"上限"是什么上限 | `ladder.single_stat_ceiling` | 那是**单项**上限（把点全堆一项）；拿它当"同时能达到"会得出"你什么都够"。两个字段都在，回答时不能混 |
 | 只差几点，非降目标不可吗 | `ladder.tuning_first` + `find` 的 `tuning_changes` | 求解器**真的试过调谐**（没达标时用调谐额度复解 + 逐套精确复核）：能补的直接给带 `tuning_changes` 的候选（`requires_tuning=true`）；补不上时这一档如实分三种口径（额度够但让不出来 / 额度不够 / 只差 ≤10 看属性模组），并带 `solver_attempted` |
-| 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` + `canonical_build.items[].mods` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` 里那件护甲的 `mods` 已经带上要装的调谐插件，执行不用手改 |
+| 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；**调谐只能在游戏内手动改**，`canonical_build` 不含调谐插件（实测 Bungie 回 `This action can only be done in-game.`） |
+| 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | 给出「从什么改成什么 + 六维变化」，`writable=false`、`written=false`，并带「只能在游戏内改」的 warning；`confirmed=true` 也不会写账号 |
+| 换一个真花能量的模组 | `intent="equip_mod"` + `confirmed=true` | 走付费插槽接口：当前应用没有 `AdvancedWriteActions` 时**如实报错**（消息里点名权限），不许把失败说成成功（0.1.8 实机修） |
 | 目标根本配不出来时怎么说 | `ladder.verdict` | `satisfiable=false`（按原始优先级实测 0 候选）+ 说明 `ceiling` 是**逐项**最大值、不等于同一套能同时达到；`solved_after_rotation` 标出"换优先级能出解"这件事 |
 | 阶梯会不会偷偷改我的目标 | `ladder.targets` + 原始请求 | `targets` 里仍是用户给的数（如 近战70/手雷70）；降级只是提议，**未经确认不许改**；`recommend` 的无解响应继续带"不得自动降低"的 warning |
 | 只给优先级、不给硬目标 | `intent="recommend"` + 只有 `priority_stats` | `completion_rate` 是 `null` + `completion_rate_note`，**不是 0.0**（0.0 会被读成"一个都没满足"） |
@@ -386,6 +388,9 @@
 - 只对 **T5** 建模词条反推；T3/T4/老护甲在响应里明确说"不支持反推 + 原因"（T1/T2 本账号无样本，
   不建模、不猜）；
 - 待刷的**虚拟件**没有能量数据：`energy` 为 `null` 而不是 0，也不能据此说"装不下"；
+- 调谐**不能通过 API 写入**（免费接口实测回 `This action can only be done in-game.`，ErrorCode 1663；
+  付费接口要 `AdvancedWriteActions` 权限且并非给调谐用的）：所以 `tuning_changes` 是"给玩家的手动清单"，
+  `equip_build` 不会替玩家改调谐，达标六维里那部分要玩家自己在游戏里改完才成立。
 - 调谐救援的候选池有上限（放宽那趟留 1500 套、只精确复核最值得的前 40 套）：实测
   武器150+生命103 在池 200 时救回 0 套、池 1500 时救回 16 套；`tuning_changes` 里的方案
   一定过了真实目标的精确复核，但"没救回来"不等于"游戏里绝对做不到"，只等于"这轮没找到"。

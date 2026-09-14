@@ -143,13 +143,16 @@ class _Bungie:
     def __init__(self) -> None:
         self.inserts: list[tuple] = []
 
+    # Bungie 的真实形状：成功是 {"ErrorCode": 1, "Message": "Ok"}（失败也是这个信封，
+    # 只是 ErrorCode 不同）—— 以前这里回 {"success": True}，把"没检查 ErrorCode"的
+    # 真 bug 遮住了（0.1.8 实机才发现）。
     async def insert_socket_plug(self, *args, **kwargs):
         self.inserts.append(("paid", args))
-        return {"success": True}
+        return {"ErrorCode": 1, "Message": "Ok"}
 
     async def insert_socket_plug_free(self, *args, **kwargs):
         self.inserts.append(("free", args))
-        return {"success": True}
+        return {"ErrorCode": 1, "Message": "Ok"}
 
 
 def _service(bungie: _Bungie | None = None) -> ArmorModService:
@@ -387,17 +390,77 @@ async def test_plan_can_change_tuning_by_its_full_name() -> None:
     assert "零和" in plan["note"]
 
 
-async def test_tuning_is_written_through_the_free_endpoint() -> None:
+async def test_tuning_plan_is_marked_not_writable() -> None:
+    """调谐只能在游戏内改（实机：Bungie 回 "This action can only be done in-game."）。
+
+    所以方案要带 `writable=False` + 原因，工具层据此**不**走"确认后写入"那套。
+    """
+    plan = await _service().plan("Tester#1234", "6917", "+职业 / -手雷", "hunter")
+
+    assert plan["kind"] == "tuning"
+    assert plan["writable"] is False
+    assert "in-game" in plan["writable_reason"]
+
+
+async def test_apply_raises_when_bungie_returns_an_error_envelope() -> None:
+    """回归：Bungie 把错误放在 200 响应的信封里（ErrorCode != 1），不能报成功。
+
+    实机踩过：换调谐时账号一个字节没变，工具却回 `success: true`。
+    """
+    class _Refusing(_Bungie):
+        async def insert_socket_plug(self, *args, **kwargs):
+            self.inserts.append(("paid", args))
+            return {
+                "ErrorCode": 1663,
+                "Message": "This action can only be done in-game.",
+            }
+
+        async def insert_socket_plug_free(self, *args, **kwargs):
+            self.inserts.append(("free", args))
+            return {
+                "ErrorCode": 1663,
+                "Message": "This action can only be done in-game.",
+            }
+
+    service = _service(_Refusing())
+    plan = await service.plan("Tester#1234", "6917", "纪律模组", "hunter")
+
+    with pytest.raises(TransferError, match="in-game"):
+        await service.apply(plan)
+
+
+async def test_apply_maps_a_missing_scope_to_a_readable_message() -> None:
+    """付费插槽要 AdvancedWriteActions：403 要说清是权限问题，不是"稍后重试"。"""
+    class _NoScope(_Bungie):
+        async def insert_socket_plug(self, *args, **kwargs):
+            self.inserts.append(("paid", args))
+            return {
+                "ErrorCode": 2108,
+                "Message": "Forbidden: AccessNotPermittedByApplicationScope "
+                           "(RequiredScope: AdvancedWriteActions)",
+            }
+
+    service = _service(_NoScope())
+    plan = await service.plan("Tester#1234", "6917", "纪律模组", "hunter")
+
+    with pytest.raises(TransferError, match="AdvancedWriteActions"):
+        await service.apply(plan)
+
+
+async def test_tool_returns_the_tuning_plan_without_asking_for_confirmation() -> None:
+    """调谐写不进去：工具直接给方案 + 警告，而不是让用户确认一个做不到的写入。"""
     bungie = _Bungie()
     service = _service(bungie)
 
-    plan = await service.plan("Tester#1234", "6917", "+职业 / -手雷", "hunter")
-    result = await service.apply(plan)
+    response = await branches.equip_mod(
+        _ctx(service).request_context.lifespan_context,
+        "Tester#1234", "6917", "+职业 / -手雷", "hunter", False,
+    )
 
-    assert result["success"] is True
-    assert bungie.inserts[0][0] == "free", "能量为 0 的插件走免费插槽接口"
-    _, args = bungie.inserts[0]
-    assert args[1] == TUNING_CLASS_UP_GRENADE_DOWN and args[2] == 2
+    assert response["ok"] is True
+    assert response["data"]["armor_mod"]["written"] is False
+    assert response["warnings"], "必须说清「只能在游戏内改」"
+    assert not bungie.inserts, "一个字节都不能写"
 
 
 async def test_ambiguous_tuning_query_makes_the_caller_pick_one() -> None:

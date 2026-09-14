@@ -60,7 +60,12 @@ def set_key(items: Sequence[Any]) -> tuple[str, ...]:
 
 
 def tuning_note(plan: TuningPlan | None, item_names: dict[str, str] | None = None) -> str:
-    """把调谐改动说成人话（没有改动就返回空串）。"""
+    """把调谐改动说成人话（没有改动就返回空串）。
+
+    口径（0.1.8 实机修正）：调谐**不能在游戏外改** —— Bungie 的插槽接口实测回
+    "This action can only be done in-game."（ErrorCode 1663）。所以这句话是"要你在游戏里
+    手动改哪几件"，不是"确认后我们会替你改"。
+    """
     if plan is None or not plan.feasible or not plan.changes:
         return ""
     names = item_names or {}
@@ -70,7 +75,7 @@ def tuning_note(plan: TuningPlan | None, item_names: dict[str, str] | None = Non
         parts.append(f"{who} 改成「{change.to_name}」")
     head = (
         f"这套方案要先把 {len(plan.changes)} 件护甲的调谐改掉才能达标"
-        "（调谐免费、不占能量，也不影响模组）："
+        "（调谐免费、不占能量、不影响模组，但**只能在游戏内手动改**）："
     )
     return head + "；".join(parts) + "。"
 
@@ -108,10 +113,12 @@ def build_results(
 
         key = set_key(armor_set.armor)
         plan = context.tuning.get(key)
-        tuning_plugs = {
-            change.item_instance_id: change.to_plug
-            for change in (plan.changes if plan and plan.feasible else ())
-        }
+        # 调谐**不进** `mods`：实测 Bungie 的插槽接口对调谐回
+        # "This action can only be done in-game."（ErrorCode 1663），
+        # 写进去只会让 equip_build 失败或静默少做一步。调谐只作为"要你在游戏里改"的清单。
+        # 注意 `requires_tuning` 要按**方案**算，不能按"有没有插件要写"算 ——
+        # 后者在调谐不可写之后恒为 False（实机语料第 ⑩ 行抓到的回归）。
+        has_plan = bool(plan is not None and plan.feasible and plan.changes)
         item_names = {
             str(getattr(item, "item_instance_id", "")): str(getattr(item, "name", ""))
             for item in armor_set.armor
@@ -130,7 +137,7 @@ def build_results(
                     if plan is not None and plan.feasible
                     else []
                 ),
-                requires_tuning=bool(tuning_plugs),
+                requires_tuning=has_plan,
                 tuning_note=tuning_note(plan, item_names),
                 canonical_build=ExecutableBuild(
                     class_type=context.class_type,
@@ -206,16 +213,12 @@ def build_results(
                             name=armor.name,
                             slot=LOADOUT_SLOT_NAMES.get(armor.slot, armor.slot),
                             item_instance_id=armor.item_instance_id,
-                            mods=[
-                                *armor_set.stat_mod_assignments.get(
+                            # 只有属性模组：调谐插件不在里面（见上面 has_plan 的说明）
+                            mods=list(
+                                armor_set.stat_mod_assignments.get(
                                     armor.item_instance_id, []
-                                ),
-                                *(
-                                    [tuning_plugs[armor.item_instance_id]]
-                                    if armor.item_instance_id in tuning_plugs
-                                    else []
-                                ),
-                            ],
+                                )
+                            ),
                             source_location=getattr(armor, "source_location", ""),
                             source_character_id=getattr(armor, "source_character_id", ""),
                             was_equipped=getattr(armor, "is_equipped", False),

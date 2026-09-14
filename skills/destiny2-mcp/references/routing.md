@@ -68,7 +68,7 @@
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
-| `equip_mod` | 给一件护甲换一个模组：先返回「哪件、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写 | `item_instance_id`、`mod_name`、`character` |
+| `equip_mod` | 给一件护甲换一个模组：先返回「哪件、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写。**调谐是个例外**：Bungie 只允许游戏内改（实测 `This action can only be done in-game.`），所以调谐只给方案（`writable=false`/`written=false` + warning），`confirmed=true` 也不会写 | `item_instance_id`、`mod_name`、`character` |
 | `move` | 移动物品，可顺带装备 | `item_name`、`destination`、`equip`、`from_character`、`item_instance_id` |
 | `transfer` | 按实例 ID 转移到指定角色 | `item_instance_id`、`to_character`、`from_character` |
 | `equip` | 按实例 ID 装备到指定角色 | `item_instance_id`、`character` |
@@ -414,6 +414,8 @@ Manifest 侧（**不代表拥有**）：
 ## 六、写入：确认与红线
 
 `move`、`transfer`、`equip`、`equip_many`（`equip_items`）、`equip_mod`、`pull_postmaster`、`lock`、`track_quest`（`quest_tracking`）、`save`、`delete`、`equip_loadout`、`snapshot_official`、`update_official_identifiers`、`clear_official`、`modify`、`equip_artifact_mod`、`equip_build` 都会改变账号状态（这份清单与 `_requests.WRITE_INTENTS` 一致，由测试保证）。
+
+另外两条硬前提（实机验证过）：**花能量的插槽写入需要 Bungie 应用的 `AdvancedWriteActions` 权限**（没有就回 `AccessNotPermittedByApplicationScope`，工具会点名这条权限，不要读成「稍后重试」）；**调谐只能游戏内改**，工具只给方案不改账号。
 
 - `confirmed=false` 时返回 `confirmation_required`，**服务层不会被调用**，游戏状态不变。确认必须来自用户的明确同意，不能由 Agent 自己推断——用户说「不用问了直接执行」也不行。
 - 展示确认时要给精确目标：实例 ID、槽位号、数值，而不是笼统描述。

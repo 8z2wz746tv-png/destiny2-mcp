@@ -338,19 +338,22 @@ async def main():
         plan_tuning = await inv(intent="equip_mod", item_instance_id=legs_id,
                                 mod_name="+武器 / -生命值", character="hunter",
                                 confirmed=False)
-        pending = (plan_tuning.get("candidates") or [{}])[0]
+        pending = (plan_tuning.get("data") or {}).get("armor_mod") or {}
         bonus = (pending.get("to") or {}).get("stat_bonus") or {}
         energy = pending.get("energy") or {}
         check(
-            "㉑ 调谐可规划：equip_mod 给出「从哪个调谐改成哪个」且确认前不写账号",
-            (plan_tuning.get("error") or {}).get("code") == "confirmation_required"
+            "㉑ 调谐写不进去：equip_mod 给方案 + 明说「只能在游戏内改」，一个字节都不写",
+            plan_tuning["ok"] is True
             and pending.get("kind") == "tuning"
+            and pending.get("writable") is False
+            and pending.get("written") is False
+            and "游戏内" in str((plan_tuning.get("warnings") or [""])[0])
             and (pending.get("to") or {}).get("energy_cost") == 0
             and energy.get("after") == energy.get("used")
             and any(value < 0 for value in bonus.values()),
-            f"code={(plan_tuning.get('error') or {}).get('code')} kind={pending.get('kind')} "
-            f"socket={pending.get('socket_index')} to={(pending.get('to') or {}).get('name')!r} "
-            f"stat_bonus={bonus} energy={energy}",
+            f"ok={plan_tuning.get('ok')} kind={pending.get('kind')} "
+            f"writable={pending.get('writable')} written={pending.get('written')} "
+            f"to={(pending.get('to') or {}).get('name')!r} stat_bonus={bonus}",
         )
 
         # 16. 调谐是零和的：歧义说法（只说加哪一项）必须让调用方挑一个
@@ -389,6 +392,19 @@ async def main():
             "㉓ 差一点的目标：给出调谐方案，或明确说「这批护甲配不出来」（不沉默）",
             edge["ok"] and ok_edge,
             evidence,
+        )
+
+        # 18. 付费写入（要 AdvancedWriteActions 权限）：失败必须如实报，不能说"已装上"
+        paid = await inv(intent="equip_mod", item_instance_id=legs_id,
+                         mod_name="手雷模组", character="hunter", confirmed=True)
+        paid_msg = str((paid.get("error") or {}).get("message") or "")
+        check(
+            "㉔ 付费模组写入：权限不足时如实报错（不把失败说成成功）",
+            (paid.get("ok") is False
+             and "AdvancedWriteActions" in paid_msg
+             and "已把" not in str(paid.get("summary"))),
+            f"ok={paid.get('ok')} code={(paid.get('error') or {}).get('code')} "
+            f"msg={paid_msg[:90]!r}",
         )
 
     print("\n=== 汇总 ===")

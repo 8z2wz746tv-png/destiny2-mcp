@@ -1,6 +1,6 @@
 {
   "_case": {
-    "elapsed_ms": 2172,
+    "elapsed_ms": 2289,
     "is_error": false,
     "payload_chars": 77258,
     "steps": [
@@ -20,7 +20,7 @@
           "character": "hunter",
           "class_target": 100,
           "confirmed_exotic_hash": -1904495392,
-          "exotic_confirmation_token": "d2bc1.1789346521.UAY6bj2kzdJKuN90.ac2db5bb30894bc9593808e4bd81a222354b512b98af29fc98736e6ec95223f6",
+          "exotic_confirmation_token": "d2bc1.1789347931.s0sTnspgjgFfOtKD.6c9232e5cd4a25bb3d81bdbdcd295e94eece1d5ed22de0dde5164d1ce1ca0a7c",
           "exotic_name": "快速装弹松身裤",
           "fragment_names": null,
           "grenade_target": null,
@@ -45,7 +45,7 @@
             "aspect_hashes": [],
             "class_ability_hash": null,
             "class_type": "hunter",
-            "execution_id": "J0w6m98dlyycr1m8b1SDy6T-",
+            "execution_id": "ymEPjdtg2g3qq3vFA2e9rO0S",
             "exotic_hash": 1793346751,
             "fragment_hashes": [],
             "grenade_hash": null,
@@ -149,7 +149,7 @@
         "aspect_hashes": [],
         "class_ability_hash": null,
         "class_type": "hunter",
-        "execution_id": "J0w6m98dlyycr1m8b1SDy6T-",
+        "execution_id": "ymEPjdtg2g3qq3vFA2e9rO0S",
         "exotic_hash": 1793346751,
         "fragment_hashes": [],
         "grenade_hash": null,

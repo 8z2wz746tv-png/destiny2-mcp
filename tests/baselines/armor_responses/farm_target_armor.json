@@ -1,6 +1,6 @@
 {
   "_case": {
-    "elapsed_ms": 1383,
+    "elapsed_ms": 1296,
     "is_error": false,
     "payload_chars": 2635,
     "steps": [
@@ -24,7 +24,7 @@
           "character": "hunter",
           "class_target": 100,
           "confirmed_exotic_hash": -1904495392,
-          "exotic_confirmation_token": "d2bc1.1789346520.hAfXxj8b-jwj9nAm.9e42f609f30180c3eef17f9ae32a756aa5fe92d489b3f1613f6d0b2e1f33c6f0",
+          "exotic_confirmation_token": "d2bc1.1789347930.wLIOXSslgsei1CVR.4c8b279a6843b6cc522eecb68a823d91762e4632b40ed7bf44343d17f06e6af8",
           "exotic_name": "快速装弹松身裤",
           "fragment_names": null,
           "grenade_target": 70,
