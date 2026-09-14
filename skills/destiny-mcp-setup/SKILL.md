@@ -126,7 +126,7 @@ idempotently:
 ```
 
 The entry points at this checkout's `.venv/bin/destiny-mcp` with `DESTINY_MCP_ROOT`,
-`DESTINY_MCP_TOOL_PROFILE=normal` and `toolCallTimeoutMs: 180000` (the 60s default is too short for
+`DESTINY_MCP_TOOL_PROFILE=normal` and `toolCallTimeoutMs: 300000` (the 60s default is too short for
 the first Manifest load). Tools appear as `mcp__destiny__*` after the harness reloads. The skill
 half needs no restart: DSH discovers `~/.dsh/skills/` live.
 

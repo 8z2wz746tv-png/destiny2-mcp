@@ -330,7 +330,7 @@ def dsh_patch_block(server_root: Path, *, server_name: str = "destiny") -> str:
             f"          DESTINY_MCP_ROOT: {root}",
             "          DESTINY_MCP_TOOL_PROFILE: normal",
             "        # 首次启动要下载/加载 Manifest，60 秒的默认上限不够。",
-            "        toolCallTimeoutMs: 180000",
+            "        toolCallTimeoutMs: 300000",
             "        failOnStartupError: false",
             DSH_PATCH_END,
         ]

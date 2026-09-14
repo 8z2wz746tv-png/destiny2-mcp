@@ -213,7 +213,7 @@ def test_dsh_patch_block_is_marked_and_complete(tmp_path: Path) -> None:
     assert "serverName: destiny" in block
     assert f"command: {tmp_path.resolve() / '.venv' / 'bin' / 'destiny-mcp'}" in block
     assert f"DESTINY_MCP_ROOT: {tmp_path.resolve()}" in block
-    assert "toolCallTimeoutMs: 180000" in block
+    assert "toolCallTimeoutMs: 300000" in block
 
     import yaml
 
