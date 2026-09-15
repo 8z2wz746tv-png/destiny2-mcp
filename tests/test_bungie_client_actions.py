@@ -235,7 +235,8 @@ def test_search_collectible_nodes_formats_node_candidates() -> None:
 
     result = service.search_collectible_nodes("异域", limit=5)
 
-    assert result["success"] is True
+    # 状态归顶层信封（0.1.14 起 data 里不再有 success/message）
+    assert "success" not in result and "message" not in result
     assert result["nodes"][0]["node_hash"] == 456
     assert result["nodes"][0]["collectible_count"] == 2
 
@@ -277,7 +278,8 @@ async def test_get_collectible_item_status_reads_profile_collectible_state() -> 
 
     result = await service.get_collectible_item_status("me", "死亡使者")
 
-    assert result["success"] is True
+    assert "success" not in result and "message" not in result
+    assert result["acquired_count"] == 1
     assert result["items"][0]["collectible_hash"] == 9001
     assert result["items"][0]["acquired"] is True
     assert result["items"][0]["state_labels"] == ["已获得"]

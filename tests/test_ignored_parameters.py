@@ -137,6 +137,12 @@ class _Reply:
     def __getitem__(self, key: object) -> "_Reply":
         return _Reply()
 
+    def items(self):  # 让按映射处理的代码（_responses.data_only）也能跑
+        return []
+
+    def keys(self):
+        return []
+
     def __setitem__(self, key: object, value: object) -> None:
         pass
 

@@ -26,6 +26,7 @@ import argparse
 import asyncio
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -83,6 +84,12 @@ SLOW_INTENTS = {
     ("activity_assistant", "aggregate"),
     ("activity_assistant", "activity_aggregate"),
     ("activity_assistant", "activity_stats"),
+    # catalog 及其别名每次都是一次全库扫描（实测 27s 闲 / 100s+ 忙），--skip-slow 时跳过
+    ("weapon_assistant", "catalog"),
+    ("weapon_assistant", "search_catalog"),
+    ("weapon_assistant", "all_weapons"),
+    ("weapon_assistant", "global"),
+    ("weapon_assistant", "search_all"),
     ("player_assistant", "find"),
     ("player_assistant", "find_players"),
     ("player_assistant", "fuzzy"),
@@ -340,6 +347,46 @@ async def discover(runner: Runner) -> dict[str, Any]:
     return live
 
 
+# 信封统一（第二批）：`data` 里不许再塞第二个状态信封，键名一律 snake_case。
+# 写入类的领域结果（`data.result.success/message`）不算——那是"这次操作的结果"，不是状态信封。
+_ENVELOPE_ALLOWED_BLOCKS = {"result"}
+
+# 上游（Bungie）自己的标识符：活动统计沿用 statId（activitiesEntered / killsDeathsRatio…），
+# 武器历史的逐项 values 里也是同一套。这些不是我们取的键名，改它们要动载荷契约，
+# 单独排期（见 TESTING_CORPUS_FULL.md「信封统一」一节的待办）。
+_UPSTREAM_KEY_BLOCKS = {"values", "pve", "pvp"}
+
+
+def envelope_violations(payload: dict | None) -> list[str]:
+    """返回这个响应里的信封违规项（空列表 = 干净）。"""
+    data = (payload or {}).get("data")
+    if not isinstance(data, dict):
+        return []
+    out: list[str] = []
+    for key in ("success", "message"):
+        if key in data:
+            out.append(f"data.{key}")
+    for block, value in data.items():
+        if isinstance(value, dict) and block not in _ENVELOPE_ALLOWED_BLOCKS:
+            for key in ("success", "message"):
+                if key in value:
+                    out.append(f"data.{block}.{key}")
+
+    def walk(node: Any, path: str, upstream: bool = False) -> None:
+        if isinstance(node, dict):
+            for key, value in node.items():
+                inside_upstream = upstream or str(key) in _UPSTREAM_KEY_BLOCKS
+                if not inside_upstream and re.search(r"[a-z][A-Z]", str(key)):
+                    out.append(f"{path}.{key}")
+                walk(value, f"{path}.{key}", inside_upstream)
+        elif isinstance(node, list):
+            for index, value in enumerate(node[:3]):
+                walk(value, f"{path}[{index}]", upstream)
+
+    walk(data, "data")
+    return sorted(set(out))
+
+
 def sweep_args(tool: str, intent: str, live: dict[str, Any]) -> dict[str, Any]:
     """每个 intent 的「最简但有意义」参数。空手跑不是目的，跑出信封才是。"""
     args: dict[str, Any] = {}
@@ -508,11 +555,13 @@ async def run_sweep(runner: Runner, live: dict[str, Any], skip_slow: bool) -> No
                 write_note = f" written={marker!r}"
             state = "ok" if payload["ok"] else f"code={code}"
             extra = f" expected={expected}" if expected else ""
+            envelope_issues = envelope_violations(payload) if payload["ok"] else []
             check(
                 "sweep",
                 title,
-                True,
-                f"{state}{extra}{write_note} params={short(args, 100)}",
+                not envelope_issues,
+                f"{state}{extra}{write_note} params={short(args, 100)}"
+                + (f" ｜ 信封违规：{envelope_issues[:4]}" if envelope_issues else ""),
                 seconds=elapsed,
             )
     record(
@@ -741,6 +790,30 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         f"msg={short(((empty_id or {}).get('error') or {}).get('message'), 140)}",
         seconds=dt,
     )
+
+    # 旧六维名必须换成**存在**的模组名：韧性 → 生命值。
+    # 曾经映射成「生命」，而游戏里的模组叫「生命值模组」，真机直接报「没找到护甲模组」。
+    if live.get("armor_instance_id"):
+        legacy_mod, dt, err = await call(
+            "inventory_assistant", intent="equip_mod", mod_name="韧性模组",
+            item_instance_id=live["armor_instance_id"], character="hunter",
+        )
+        canon_mod, dt2, err2 = await call(
+            "inventory_assistant", intent="equip_mod", mod_name="生命值模组",
+            item_instance_id=live["armor_instance_id"], character="hunter",
+        )
+        legacy_code = ((legacy_mod or {}).get("error") or {}).get("code")
+        canon_code = ((canon_mod or {}).get("error") or {}).get("code")
+        check(
+            "rows",
+            "inventory：旧名「韧性模组」与规范名「生命值模组」走到同一个模组",
+            err is None and err2 is None
+            and legacy_code == canon_code == "confirmation_required",
+            f"韧性模组 → {legacy_code} ｜ 生命值模组 → {canon_code}",
+            seconds=dt,
+        )
+    else:
+        record("rows", "inventory：旧六维名映射", "SKIP", "没取到护甲实例")
 
     none_id, dt, err = await call(
         "inventory_assistant", intent="item", item_instance_id=None  # type: ignore[arg-type]
@@ -1387,16 +1460,32 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
 
     career, dt, err = await call("activity_assistant", intent="career")
     historical, dt2, err2 = await call("activity_assistant", intent="historical_stats")
+    def _stat_of(payload: dict | None, group_key: str, stat_id: str) -> dict:
+        block = ((payload or {}).get("data") or {}).get("stats") or {}
+        for group in block.get("groups") or []:
+            if group.get("key") == group_key:
+                for row in group.get("stats") or []:
+                    if row.get("stat_id") == stat_id:
+                        return row
+        return {}
+
     cstats = ((career or {}).get("data") or {}).get("stats") or {}
     hstats = ((historical or {}).get("data") or {}).get("stats") or {}
+    pve_entered = _stat_of(career, "pve", "activities_entered")
+    pvp_ratio = _stat_of(career, "pvp", "kills_deaths_ratio")
     check(
         "rows",
-        "activity：career / historical_stats 给 PvE/PvP 汇总",
-        err is None and err2 is None and {"pve", "pvp"} <= set(cstats)
-        and {"pve", "pvp"} <= set(hstats),
-        f"pve 场次={((cstats.get('pve') or {}).get('activitiesEntered'))} "
-        f"pvp 场次={((cstats.get('pvp') or {}).get('activitiesEntered'))} "
-        f"两个 intent 数据相同={cstats == hstats}（别名）",
+        "activity：career / historical_stats 给行式 PvE/PvP 统计（数值+显示值+中文名）",
+        err is None and err2 is None
+        and [g.get("key") for g in cstats.get("groups") or []] == ["pve", "pvp"]
+        and [g.get("key") for g in hstats.get("groups") or []] == ["pve", "pvp"]
+        and pve_entered.get("name") == "活动场次"
+        and isinstance(pve_entered.get("value"), int)
+        and pvp_ratio.get("display"),
+        f"pve 场次={pve_entered.get('value')}（{pve_entered.get('display')}） "
+        f"| pvp KD={pvp_ratio.get('display')} "
+        f"| 两组项数={[g.get('stat_count') for g in cstats.get('groups') or []]} "
+        f"| 别名同数据={cstats == hstats}",
         seconds=dt,
     )
 
@@ -1406,9 +1495,11 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     whdata = (weapon_hist or {}).get("data") or {}
     check(
         "rows",
-        "activity：weapon_history 给常用武器与击杀数",
+        "activity：weapon_history 给常用武器 + 行式统计（数值+显示值+中文名）",
         err is None and bool(whdata.get("weapons"))
-        and "kills" in first_row(whdata.get("weapons")),
+        and "kills" in first_row(whdata.get("weapons"))
+        and isinstance(first_row(whdata.get("weapons")).get("stats"), list)
+        and first_row(first_row(whdata.get("weapons")).get("stats") or []).get("stat_id"),
         f"记录数={whdata.get('count')} 返回={len(whdata.get('weapons') or [])} "
         f"首项={short(first_row(whdata.get('weapons')), 160)}",
         seconds=dt,
@@ -1644,6 +1735,7 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         seconds=dt,
     )
 
+    await run_alias_rows(runner, skip_slow)
     await run_cross(runner, live, skip_slow)
 
 
@@ -1784,6 +1876,60 @@ async def run_cross(runner: Runner, live: dict[str, Any], skip_slow: bool) -> No
         seconds=dt,
         info=True,
     )
+
+
+# 别名等价（真机）：同参调用同组别名，`data` 必须逐字节相同。
+# 分组与 COMPATIBILITY.md / tests/test_intent_aliases.py 一致；标 slow 的组在
+# `--skip-slow` 时跳过（catalog 那组是一次全库扫描，慢）。
+_ALIAS_GROUPS: list[tuple[str, dict[str, Any], list[str], bool]] = [
+    ("player_assistant", {"player_name": "OneTop丶Husky#6641"}, ["profile", "get_profile", "角色", "档案"], False),
+    ("player_assistant", {"name_prefix": "husky"}, ["find", "find_players", "fuzzy"], True),
+    ("inventory_assistant", {}, ["summary", "summarize", "概况"], False),
+    ("inventory_assistant", {"location": "vault", "limit": 3}, ["get", "inventory", "list"], False),
+    ("inventory_assistant", {"limit": 2}, ["duplicates", "duplicate_weapons", "find_duplicates", "重复武器"], False),
+    ("inventory_assistant", {"item_name": "无感"}, ["search", "find_item"], False),
+    ("inventory_assistant", {"type_name": "手炮"}, ["type", "search_type"], False),
+    ("inventory_assistant", {"item_name": "无感"}, ["track_quest", "quest_tracking"], False),
+    ("weapon_assistant", {"perk_name": "萤火虫"}, ["catalog", "search_catalog", "all_weapons", "global", "search_all"], True),
+    ("weapon_assistant", {"weapon_name": "无感"}, ["compare", "compare_duplicates"], False),
+    ("weapon_assistant", {"weapon_name": "遗产"}, ["perk_pool", "perks"], False),
+    ("weapon_assistant", {"weapon_name": "遗产"}, ["popularity", "selection_rates", "perk_selection", "selection", "usage_rates"], False),
+    ("subclass_assistant", {"character": "hunter"}, ["get", "subclass"], False),
+    ("activity_assistant", {"character": "hunter"}, ["stats", "career", "historical_stats"], False),
+    ("activity_assistant", {"count": 2}, ["weapon_history", "weapons", "weapon_usage", "weapon_leaderboard"], False),
+    ("loadout_assistant", {"limit": 2}, ["list", "get"], False),
+]
+
+
+async def run_alias_rows(runner: Runner, skip_slow: bool) -> None:
+    """别名必须真的等价：同参调用同组别名，`data` 逐字节相同。"""
+    print("\n=== aliases：别名等价（真机）===")
+    for tool, args, intents, slow in _ALIAS_GROUPS:
+        title = f"{tool}: {'/'.join(intents)} 同参返回相同 data"
+        if slow and skip_slow:
+            record("aliases", title, "SKIP", "按 --skip-slow 跳过（这组是一次全库扫描）")
+            continue
+        signatures: dict[str, str] = {}
+        error = None
+        for intent in intents:
+            payload, elapsed, exc = await runner.call(tool, slow=slow, intent=intent, **args)
+            if exc is not None:
+                error = f"{intent} 抛 {type(exc).__name__}: {exc}"
+                break
+            signatures[intent] = json.dumps(
+                (payload or {}).get("data"), ensure_ascii=False, sort_keys=True, default=str
+            )
+        if error:
+            check("aliases", title, False, error)
+            continue
+        distinct = {signature for signature in signatures.values()}
+        check(
+            "aliases",
+            title,
+            len(distinct) == 1,
+            f"{len(intents)} 个取值 → {len(distinct)} 种 data"
+            + ("" if len(distinct) == 1 else f"；不一致：{sorted(signatures)}"),
+        )
 
 
 async def run_mcp(live: dict[str, Any]) -> None:

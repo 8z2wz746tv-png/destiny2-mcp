@@ -14,6 +14,7 @@ from pydantic import Field, ValidationError
 
 from ..build.models import BuildRequest
 from ..build_contracts import ExecutableBuild, canonical_build_error_message
+from ..error_codes import ErrorCode, write_failed
 from ..exceptions import DestinyMCPError
 from ._registry import mcp
 from ._build_confirmation import (
@@ -40,9 +41,9 @@ from ._requests import (
 )
 from ._responses import (
     write_failure_hints,
+    missing_weapon_name,
     confirmation_required_response,
-    error_response,
-    ok_response,
+    error_response, ok_response, data_only,
 )
 
 # world_assistant 里「没传 limit」时各 intent 用的条数（vendor 除外，它按菜单/详情取默认）。
@@ -68,7 +69,7 @@ def _action_response(intent: str, summary: str, result: Any) -> dict:
     payload = _dump(result)
     if payload.get("success") is not True:
         response = error_response(
-            payload.get("code") or f"{intent}_failed",
+            payload.get("code") or write_failed(intent),
             payload.get("message") or f"{intent} 执行失败。",
             candidates=payload.get("candidates") or [],
             next_actions=write_failure_hints(payload),
@@ -126,20 +127,20 @@ async def player_assistant(
 
     if intent in {"search", "search_player"}:
         if not player_name:
-            return error_response("missing_player_name", "必须提供 player_name。")
+            return error_response(ErrorCode.MISSING_PLAYER_NAME, "必须提供 player_name。")
         result = await player_svc.search_player(player_name)
         return ok_response("已搜索玩家。", {"players": _dump(result)})
 
     if intent in {"find", "find_players", "fuzzy"}:
         if not name_prefix:
-            return error_response("missing_name_prefix", "必须提供 name_prefix。")
+            return error_response(ErrorCode.MISSING_NAME_PREFIX, "必须提供 name_prefix。")
         try:
             result = await player_svc.find_players(name_prefix)
         except DestinyMCPError as exc:
             # 上游模糊搜索不可用时必须显式失败 + 给出下一步，**不能**回空列表 ——
             # 那会被读成「没这个人」（语料第二章：不能把没查到说成不存在）。
             return error_response(
-                "a_p_i_error",
+                ErrorCode.API_ERROR,
                 str(exc),
                 next_actions=[{
                     "label": "改用完整 Bungie 名（名字#1234）精确查找",
@@ -170,7 +171,7 @@ async def player_assistant(
             warnings=warnings,
         )
 
-    return error_response("unsupported_intent", f"player_assistant 不支持 intent={intent!r}。")
+    return error_response(ErrorCode.UNSUPPORTED_INTENT, f"player_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
@@ -313,7 +314,6 @@ async def inventory_assistant(
     if intent in {"search", "find_item"}:
         result = await svc["inventory_svc"].search_items(resolved, item_name, location)
         searched = _dump(result)
-        # 0 命中要说「没找到」（文案在 _formatters，别把 assistants 撑到上限）
         hits = searched.get("items") if isinstance(searched, dict) else None
         return ok_response(inventory_search_summary(item_name, hits), {
             "result": searched,
@@ -360,7 +360,7 @@ async def inventory_assistant(
 
     if intent in {"equip_many", "equip_items"}:
         if not item_instance_ids:
-            return error_response("missing_item_instance_ids", "批量装备需要提供 item_instance_ids。")
+            return error_response(ErrorCode.MISSING_ITEM_INSTANCE_IDS, "批量装备需要提供 item_instance_ids。")
         result = await svc["transfer_svc"].equip_items(resolved, item_instance_ids, character)
         return _action_response(intent, "批量装备已执行。", result)
 
@@ -390,7 +390,7 @@ async def inventory_assistant(
         )
         return _action_response(intent, "任务追踪状态已更新。", result)
 
-    return error_response("unsupported_intent", f"inventory_assistant 不支持 intent={intent!r}。")
+    return error_response(ErrorCode.UNSUPPORTED_INTENT, f"inventory_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
@@ -470,14 +470,14 @@ async def weapon_assistant(
                 limit=limit,
             )
         except DestinyMCPError as exc:
-            return error_response("weapon_catalog_lookup_failed", str(exc))
+            return error_response(ErrorCode.WEAPON_CATALOG_LOOKUP_FAILED, str(exc))
         return weapon_branches.catalog_payload(
             svc, filtered, include_inventory=False, intent=intent
         )
 
     if intent == "analyze":
         if not weapon_name.strip():
-            return weapon_branches.missing_weapon_name("analyze")
+            return missing_weapon_name("analyze")
         result = await svc["weapon_analysis_svc"].analyze_weapon(
             weapon_name,
             player_name=resolved if include_inventory else None,
@@ -500,13 +500,13 @@ async def weapon_assistant(
 
     if intent in {"popularity", "selection_rates", "perk_selection", "selection", "usage_rates"}:
         if not weapon_name.strip():
-            return weapon_branches.missing_weapon_name("查询选取率")
+            return missing_weapon_name("查询选取率")
         # 先确认这把武器在 Manifest 里存在，否则「打错名字」会被答成「暂无录入快照」。
         svc["manifest_query_svc"].get_weapon_stats(weapon_name)
         try:
             result = svc["perk_svc"].get_weapon_popularity(weapon_name)
         except DestinyMCPError as exc:
-            return error_response("popularity_lookup_failed", str(exc))
+            return error_response(ErrorCode.POPULARITY_LOOKUP_FAILED, str(exc))
         return weapon_branches.popularity_payload(svc, result, weapon_name)
 
     if intent == "type":
@@ -561,7 +561,7 @@ async def weapon_assistant(
     if intent == "catalyst":
         return weapon_branches.catalyst_payload(svc, weapon_name)
 
-    return error_response("unsupported_intent", f"weapon_assistant 不支持 intent={intent!r}。")
+    return error_response(ErrorCode.UNSUPPORTED_INTENT, f"weapon_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
@@ -745,7 +745,7 @@ async def build_assistant(
         )
     if community_build_id:
         return error_response(
-            "community_template_not_executable",
+            ErrorCode.COMMUNITY_TEMPLATE_NOT_EXECUTABLE,
             "community_build_id 仅用于 community 查询，不能替代服务器签发的完整配装候选。",
         )
     build_arguments = {
@@ -791,7 +791,7 @@ async def build_assistant(
                 player_name=resolved,
             ):
                 return error_response(
-                    "invalid_exotic_confirmation",
+                    ErrorCode.INVALID_EXOTIC_CONFIRMATION,
                     "金装确认凭据无效、已过期或与当前配装参数不一致，"
                     "未启动配装求解。请重新搜索并让玩家确认候选。",
                 )
@@ -822,27 +822,27 @@ async def build_assistant(
                 candidates.append({
                     "selection": index,
                     "name": match.get("name"),
-                    "nameEn": match.get("nameEn"),
+                    "name_en": match.get("nameEn"),
                     "item_hash": match.get("item_hash"),
                     "icon_url": match.get("icon_url"),
                     "character": match.get("character") or character,
                     "arguments": arguments,
                 })
             return error_response(
-                "exotic_confirmation_required",
+                ErrorCode.EXOTIC_CONFIRMATION_REQUIRED,
                 f"“{exotic_name}”匹配到以下金装。请确认你指的是哪件。"
                 "确认后我会保留原来的职业、属性目标、优先级和碎片设置继续配装。",
                 candidates=candidates,
             )
         if status == "not_found":
             return error_response(
-                "exotic_not_found",
+                ErrorCode.EXOTIC_NOT_FOUND,
                 f"没有找到与“{exotic_name}”匹配的{character or '目标职业'}金装。"
                 "请换一个更短或更完整的名称后重试，原属性目标不会被降低。",
             )
         if status not in {"exact", "confirmation_required"}:
             return error_response(
-                "exotic_resolution_failed",
+                ErrorCode.EXOTIC_RESOLUTION_FAILED,
                 "金装名称解析失败，未启动配装求解。请稍后重试。",
             )
         confirmed_match = next(
@@ -855,14 +855,14 @@ async def build_assistant(
         )
         if confirmed_match is None:
             return error_response(
-                "invalid_exotic_confirmation",
+                ErrorCode.INVALID_EXOTIC_CONFIRMATION,
                 "金装确认信息无效或已与当前候选不一致，未启动配装求解。"
                 "请重新搜索并让玩家确认候选。",
             )
         exotic_name = confirmed_match.get("name") or resolution.get("canonical_name")
         if not exotic_name:
             return error_response(
-                "exotic_resolution_failed",
+                ErrorCode.EXOTIC_RESOLUTION_FAILED,
                 "金装名称解析失败，未启动配装求解。请稍后重试。",
             )
 
@@ -939,13 +939,13 @@ async def build_assistant(
     if intent == "equip_build":
         if canonical_build is None:
             return error_response(
-                "exact_build_required",
+                ErrorCode.EXACT_BUILD_REQUIRED,
                 "装备配装需要传回候选中的 canonical_build，不能使用 score。",
             )
         try:
             exact_build = ExecutableBuild.model_validate(canonical_build)
         except ValidationError as exc:
-            return error_response("invalid_canonical_build", canonical_build_error_message(exc))
+            return error_response(ErrorCode.INVALID_CANONICAL_BUILD, canonical_build_error_message(exc))
         if not confirmed:
             return _confirmation_required(
                 intent,
@@ -963,7 +963,7 @@ async def build_assistant(
         )
         if not result.get("success"):
             return error_response(
-                result.get("code", "build_equip_failed"),
+                result.get("code", write_failed("build_equip")),
                 result.get("message", "配装装备失败。"),
                 candidates=[{"result": _dump(result)}],
                 next_actions=[{
@@ -993,7 +993,7 @@ async def build_assistant(
     if intent == "set_bonus":
         return armor_branches.set_bonus(svc, set_bonus_name)
 
-    return error_response("unsupported_intent", f"build_assistant 不支持 intent={intent!r}。")
+    return error_response(ErrorCode.UNSUPPORTED_INTENT, f"build_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
@@ -1102,7 +1102,7 @@ async def loadout_assistant(
 
     if intent == "search_identifiers":
         result = svc["loadout_svc"].search_official_loadout_identifiers(kind, query)
-        return ok_response(result.get("message", "已查询官方配装标识。"), result)
+        return ok_response(result.get("message", "已查询官方配装标识。"), data_only(result))
 
     if intent == "snapshot_official":
         result = await svc["loadout_svc"].snapshot_official_loadout(
@@ -1120,7 +1120,7 @@ async def loadout_assistant(
         result = await svc["loadout_svc"].clear_official_loadout(resolved, character, slot_number)
         return _action_response(intent, "官方配装槽已清空。", result)
 
-    return error_response("unsupported_intent", f"loadout_assistant 不支持 intent={intent!r}。")
+    return error_response(ErrorCode.UNSUPPORTED_INTENT, f"loadout_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
@@ -1202,17 +1202,17 @@ async def subclass_assistant(
 
     if intent == "artifact_mod":
         if not artifact_mod_hash:
-            return error_response("missing_artifact_mod_hash", "查询神器模组需要提供 artifact_mod_hash。")
+            return error_response(ErrorCode.MISSING_ARTIFACT_MOD_HASH, "查询神器模组需要提供 artifact_mod_hash。")
         result = svc["artifact_svc"].get_artifact_mod_info(artifact_mod_hash)
         return ok_response("已读取神器模组。", {"artifact_mod": result})
 
     if intent == "equip_artifact_mod":
         if not artifact_mod_hash:
-            return error_response("missing_artifact_mod_hash", "装备神器模组需要提供 artifact_mod_hash。")
+            return error_response(ErrorCode.MISSING_ARTIFACT_MOD_HASH, "装备神器模组需要提供 artifact_mod_hash。")
         result = await svc["artifact_svc"].equip_artifact_mod(resolved, artifact_mod_hash, character)
         return _action_response(intent, "神器模组装备已执行。", result)
 
-    return error_response("unsupported_intent", f"subclass_assistant 不支持 intent={intent!r}。")
+    return error_response(ErrorCode.UNSUPPORTED_INTENT, f"subclass_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
@@ -1291,7 +1291,7 @@ async def activity_assistant(
         result = await svc["activity_svc"].get_clan_leaderboards(group_id, mode, statid, maxtop)
         return ok_response(result.get("message", "已读取公会排行榜。"), result)
 
-    return error_response("unsupported_intent", f"activity_assistant 不支持 intent={intent!r}。")
+    return error_response(ErrorCode.UNSUPPORTED_INTENT, f"activity_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
@@ -1400,4 +1400,4 @@ async def world_assistant(
         )
         return ok_response(result.get("message", "已读取收藏品状态。"), result)
 
-    return error_response("unsupported_intent", f"world_assistant 不支持 intent={intent!r}。")
+    return error_response(ErrorCode.UNSUPPORTED_INTENT, f"world_assistant 不支持 intent={intent!r}。")

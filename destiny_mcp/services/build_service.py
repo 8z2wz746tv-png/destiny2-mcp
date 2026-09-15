@@ -405,7 +405,7 @@ class BuildService:
                     )
             return {
                 "name": candidate.get("name", ""),
-                "nameEn": candidate.get("nameEn", ""),
+                "name_en": candidate.get("nameEn", ""),
                 "item_hash": candidate.get("itemHash", 0),
                 "icon_url": candidate.get("icon", ""),
                 "class_type": candidate.get("classType", -1),

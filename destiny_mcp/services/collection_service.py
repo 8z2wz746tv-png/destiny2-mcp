@@ -63,10 +63,8 @@ class CollectionService:
                 "item_count": len(children.get("records", []) or []),
             })
         return {
-            "success": True,
             "query": query,
             "nodes": results,
-            "message": f"找到 {len(results)} 个收藏品/展示节点候选。",
         }
 
     async def get_collectible_item_status(
@@ -182,10 +180,9 @@ class CollectionService:
 
         acquired_count = sum(1 for item in items if item.get("acquired"))
         return {
-            "success": True,
             "query": item_name,
             "items": items,
-            "message": f"找到 {len(items)} 个候选，其中 {acquired_count} 个显示已获得。",
+            "acquired_count": acquired_count,
         }
 
     async def get_collectible_node_status(
@@ -314,13 +311,8 @@ class CollectionService:
         )
 
         return {
-            "success": True,
             "node_hash": collectible_node_hash,
             "node_name": node_name,
             "counts": counts,
             "items": limited_items,
-            "message": (
-                f"{node_name}: 共 {counts['total']} 项，"
-                f"已获得 {counts['acquired']}，未获得 {counts['missing']}。"
-            ),
         }

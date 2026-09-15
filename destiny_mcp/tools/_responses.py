@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Any
+from ..error_codes import ErrorCode
 
 
 def ok_response(
@@ -53,7 +54,7 @@ def confirmation_required_response(
 ) -> dict[str, Any]:
     """Return the standard two-step confirmation response for account writes."""
     return error_response(
-        "confirmation_required",
+        ErrorCode.CONFIRMATION_REQUIRED,
         f"{intent} 会修改账号状态。请确认后用 confirmed=true 重新调用。",
         recoverable=True,
         candidates=[payload],
@@ -77,6 +78,22 @@ _WRITE_FAILURE_HINTS: tuple[tuple[tuple[str, ...], str], ...] = (
         "目标位置空间不足：先清出位置，或换一个目标角色/仓库。",
     ),
 )
+
+
+def data_only(payload: dict[str, Any]) -> dict[str, Any]:
+    """摘掉领域结果里的状态字段：状态归顶层信封（ok/summary），`data` 里不再来一套。"""
+    return {
+        key: value
+        for key, value in payload.items()
+        if key not in {"success", "message"}
+    }
+
+
+def missing_weapon_name(intent: str) -> dict[str, Any]:
+    """缺 `weapon_name` 的统一信封（武器分支共用，原在 `_weapon_branches`）。"""
+    return error_response(
+        ErrorCode.MISSING_WEAPON_NAME, f"{intent} 需要提供 weapon_name。"
+    )
 
 
 def write_failure_hints(payload: dict[str, Any]) -> list[str]:

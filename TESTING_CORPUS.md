@@ -236,6 +236,8 @@
 
 同一个「你参数不对」会出现在不同层，码不同、责任方也不同；按错层核对会产生假失败。
 
+码的**单一出处**是 `destiny_mcp/error_codes.py`：字面量码是 `ErrorCode` 枚举成员，异常类名派生成码（`InvalidArgumentError` → `invalid_argument_error`，类名即契约），写入失败是 `write_failed(intent)`（`{intent}_failed`）。裸字符串会被 `tests/test_error_codes.py` 拒绝。
+
 | 层 | 例子 | 码 | 谁的问题 |
 | --- | --- | --- | --- |
 | schema 层（进不了工具函数） | 拼错参数名、intent 不在枚举里、类型不对、`slot_number=21` | 协议级 `isError` + pydantic 文本（`literal_error`、`extra_forbidden`、`less_than_equal`） | 调用方写法错，不是业务失败；**有意保持**（统一信封的代价是 schema 退化） |

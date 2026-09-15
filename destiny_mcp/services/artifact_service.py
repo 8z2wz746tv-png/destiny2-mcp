@@ -34,12 +34,10 @@ class ArtifactService:
         if not artifact_name:
             artifacts = self._manifest.get_all_artifacts()
             return {
-                "success": True,
                 "artifacts": artifacts,
                 # 「我现在用哪个神器」不该要求调用方先知道神器名字：不带名字也要给当前神器
                 # （以前只有按名字查那条分支才附 current_artifact，语料实跑抓到的）。
                 "current_artifact": self._manifest.get_current_artifact(),
-                "message": f"找到 {len(artifacts)} 个赛季神器。",
             }
 
         artifact = self._manifest.get_artifact_by_name(artifact_name)
@@ -48,10 +46,8 @@ class ArtifactService:
 
         current = self._manifest.get_current_artifact()
         return {
-            "success": True,
             "artifact": artifact,
             "current_artifact": current,
-            "message": f"已读取赛季神器：{artifact['name']}。",
         }
 
     def get_artifact_mod_info(self, mod_hash: int) -> dict:
@@ -60,9 +56,7 @@ class ArtifactService:
         if not mod_info:
             raise DefinitionNotFoundError(f"hash={mod_hash}", "没有这个神器模组。")
         return {
-            "success": True,
             "artifact_mod": mod_info,
-            "message": f"已读取神器模组：{mod_info['name']}。",
         }
 
     @serialized_account_action

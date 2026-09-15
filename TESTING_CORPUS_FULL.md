@@ -200,6 +200,58 @@
 - **`missing_artifact_mod_hash`** 这个码只在这里出现（`artifact_mod_hash` 传 0 或缺省），主语料第十二章 C 的码表里没有它，按本表补。
 - **`equip_mod` 的码是服务层的 `invalid_argument_error`**（缺 `item_instance_id` 时）而不是工具层的 `invalid_arguments`：它需要先知道改哪一件，这条按「服务层实体参数」归类。
 
+## 信封统一（第二批）：`data` 里不再有第二个状态信封
+
+之前有些读取意图把 `{success, message}` 又塞在 `data` 里（顶层信封已经有 `ok`/`summary`），
+键名也混着 camelCase。0.1.14 起：
+
+- **`data` 与其子块里不再有 `success`/`message`**（写入类的领域结果 `data.result.*` 例外——
+  那是"这次操作的结果"，不是状态信封）；
+- **我们自己的键一律 snake_case**：`fragments[].name_en`、`options[].name_en`、
+  金装候选行的 `name_en`（原 `nameEn`）；
+- 清掉的位置：`artifact`/`artifact_mod`、`activity` 的 `weapon_history`/`aggregate`/`leaderboards`/
+  `clan_leaderboards`、`collectible_item`/`collectible_node`/`search_collectible_nodes`、
+  `loadout` 的 `search_identifiers`。
+
+**守卫**：`sweep` 组现在对每个 `ok=true` 的响应检查这两条（110 个 intent 全都过一遍），
+违规会直接 FAIL 并打印路径（`data.message`、`data.artifact.success`…）。
+
+**待办（已知例外）**：活动统计里的键沿用 Bungie 自己的 `statId`
+（`activitiesEntered`/`killsDeathsRatio`…），武器历史的逐项 `values` 同样——
+它们是上游标识符，不在"我们的键"范围里；要统一得单独排期（改成 `{key, name, value}` 行式）。
+规则里按路径放行（`values`/`pve`/`pvp` 块），别的 camelCase 一概不允许。
+
+## 性能诊断：`weapon_assistant(intent="catalog")` 为什么这么慢
+
+结论：**慢在"给每把武器的每个插槽选项都取了 Perk 描述"**，而不是 Manifest 本身慢。
+方法：`cProfile` 跑一次 `catalog + perk_name=萤火虫`（本机负载高，绝对秒数偏大，但占比是负载无关的）。
+
+| 观测 | 数值 |
+| --- | --- |
+| 总耗时 | 163.7s（其中 `filter_catalog` 158.7s） |
+| `_catalog_perk_details` 调用 | **2,208 次**（= 候选武器数，每把一次） |
+| `_plug_option`（选项展开） | **1,901,007 次**（约 860 个选项/把） |
+| Manifest `_query_json` | 1,910,011 次 → 92.5s |
+| `sqlite3.execute` | **7,620,483 次 → 77.3s** |
+| 其中 `get_sandbox_perk_description` | 1,901,007 次 → 89.3s（**最大头**） |
+| 实际返回 | 50 行（`matched_count=100`） |
+
+根因在 `services/weapon_roll_filter_service._catalog_perk_details`：为了让"命中的 perk 明细"
+带上描述与图标（`include_descriptions=True, include_icons=True`），它把**所有候选武器**的
+**所有插槽**（枪管/弹匣/特性 + 模组/大师杰作/纪念物/装饰…约 860 项/把）都展开了一遍，
+而筛选阶段其实**只需要 perk 名字**。
+
+修的方向（未改代码）：
+
+1. 筛选阶段只要名字：走 `socket_list(..., include_descriptions=False, include_icons=False)`，
+   并且只展开可滚栏（barrel/magazine/trait），别把模组/装饰也算进来；
+2. 命中之后再为**这一页要返回的**武器构造完整明细（50 把 × 860 项 ≈ 4.3 万次查询，秒级）；
+3. 顺带把 5 个别名（`search_catalog`/`all_weapons`/`global`/`search_all`）共用的这段路径一次修好——
+   它们现在各付一次这份开销（见 `COMPATIBILITY.md` 的待删别名）。
+
+预期：从"分钟级"回到"秒级"；改完要用 `run_corpus_weapon_rows.py` + 武器基线 diff 复核
+（响应内容必须一个字不变，只是不算那些用不到的字段）。
+
 ## 这份语料没覆盖的（别当成"测过了"）
 
 - **Agent 侧路由**（用户话术 → 该调哪个 intent）：由 `tests/agent_behavior_cases.yaml` + `test_skill_contracts.py` 守。
@@ -224,6 +276,7 @@
 | 5 | `subclass_assistant(intent="options", element="void", component="grenade")` 报错结尾是「…或中文职业名。。」 | `services/fragment_service.py:167` 传入的句子已带「。」，`exceptions.py:107` 的 `SubclassError` 又拼一个 | **P3**（0.1.13 已修：`SubclassError`/`APIError` 包装按需补句号） |
 | 6 | `inventory_assistant(intent="search", item_name="绝对不存在的物品名")` → `ok=true`、`summary="已搜索物品。"`、`result.items=[]`；语料第十二章要求「未命中说『没找到』」 | 搜索分支 summary 是固定文案，不看命中数 | **P3**（0.1.13 已修：0 命中时 summary 写「没找到叫「X」的物品。」，文案抽到 `_formatters`） |
 | 7 | 进程内 `inventory_assistant(intent="item", item_instance_id=None)` → `AttributeError: 'NoneType' object has no attribute 'strip'`（`_armor_branches.armor_item` 的 `if not item_instance_id.strip()`） | 缺 None 防御 | **P3**（0.1.13 已修：判断补 `or ""`） |
+| 8 | `inventory_assistant(intent="equip_mod", mod_name="韧性模组")` 报「没找到护甲模组 '韧性模组'」，而 `生命值模组` 正常 | 词表漂移：`armor_mod_service` 的旧名映射把「韧性」换成「生命」，而游戏里的模组叫「生命值模组」（Manifest 官方名）。同一份六维词表当时散在 9 个文件里，值已经不一致（「生命」vs「生命值」） | **P2**（本轮 ② 已修：词表收进 `destiny_mcp/vocabulary.py`，旧名映射改指 `生命值`；`tests/test_vocabulary.py` 钉住旧名必须指向存在的规范名） |
 
 > #1 的复现条件：组合规模要落在 `DESTINY_BUILD_MAX_COMBINATIONS` 阈值内，`analyze` 才会走精确分支并写出那句
 > `reason`（超阈值时走中文的 `not_computed` 分支，不作可行性断言）。修的时候顺手补一条单测：把小快照直接喂给
@@ -265,7 +318,7 @@ FAIL 5 条＝「已知问题」表的 #2/#3/#4/#5/#6；#1（analyze 自相矛盾
 
 **0.1.13 修完后的复跑（同一份语料，同一台机器）**
 
-- `--group rows --skip-slow`：**0 FAIL**（72 PASS / 5 SKIP，SKIP 是求解类与默认条数那几行）。
+- `--group rows --skip-slow`：**0 FAIL**（87 PASS / 7 SKIP，SKIP 是求解类与两处慢组；含新增的旧六维名与别名等价行）。
 - **全量三组（发布前体检）：206 行，PASS 204 + INFO 2，0 FAIL / 0 WARN / 0 SKIP，退出码 0。**
   最慢仍是 `build(analyze)` 28.9s 与 `weapon(catalog 及其四个别名)` 26–27s；最大响应仍是
   `weapon(type)` 184.2 KB、`loadout(list)` 71.4 KB、`inventory(duplicates)` 85.4 KB。
