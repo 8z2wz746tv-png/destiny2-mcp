@@ -35,3 +35,14 @@ For installation, reinstallation, OAuth login, Codex MCP registration, or setup 
 Never print or request secrets in chat. This includes `.env` contents, Bungie API keys, OAuth client secrets, authorization codes, access tokens, refresh tokens, and callback URLs containing authorization codes. Ask users to enter credentials locally in `.env`.
 
 After registering or changing the MCP server, tell the user to restart Codex or open a new task so the new server is discovered.
+
+## 提交信息格式
+
+一条提交 = **一行标题**，不写正文（细节在 CHANGELOG、计划文档与代码注释里）。
+
+    <类型>：<做了什么>
+
+- 类型用中文，现有取值：`版本号`（如 `0.2.0：…`）、`修复`、`重构`、`文档`、`语料`、`CI`、`错误码`、`词表`、`信封`、`兼容面`、`结论路径`，以及计划阶段的 `护甲 P3` / `武器 P4`。
+- 标题写"做了什么"，不写「抓出的 XXX」这类腔调；不用 emoji、结尾不加句号。
+- **一次提交只做一件事**：跨主题的改动拆成多条；发布提交也一样——内容照发，标题只留一行。
+- 破坏性变更在标题里点明（例：`活动统计改为行式（破坏性）`），影响面写进 CHANGELOG。
