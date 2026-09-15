@@ -16,7 +16,7 @@ from .inventory_service import (
     looks_like_missing_inventory_scope,
     require_complete_inventory_components,
 )
-from ..utils.item_parser import parse_items_from_profile
+from .item_parser import parse_items_from_profile
 
 logger = get_logger(__name__)
 

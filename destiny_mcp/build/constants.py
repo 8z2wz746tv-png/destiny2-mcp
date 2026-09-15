@@ -1,7 +1,7 @@
 """Build Engine constants — single source of truth for stat definitions.
 
 All stat hashes, names, and subclass bonuses live here. Every other module
-(build/models, build/solver, services/build_service, utils/item_parser)
+(build/models, build/solver, services/build_service, services/item_parser)
 imports from this file rather than defining its own copy.
 """
 

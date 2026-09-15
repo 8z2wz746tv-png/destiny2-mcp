@@ -24,7 +24,7 @@ from ..models import (
 )
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
-from ..utils.item_parser import parse_items_from_profile
+from .item_parser import parse_items_from_profile
 from .account_action_lock import account_action_lock, serialized_account_action
 from .inventory_service import (
     MISSING_INVENTORY_SCOPE_MESSAGE,

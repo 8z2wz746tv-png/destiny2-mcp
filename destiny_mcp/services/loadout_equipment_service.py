@@ -25,7 +25,7 @@ from ..models import (
 )
 from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
-from ..utils.item_parser import parse_items_from_profile
+from .item_parser import parse_items_from_profile
 from .account_action_lock import account_action_lock
 from .loadout_mod_sockets import ModSocketMixin
 from .loadout_subclass_sockets import SubclassSocketMixin

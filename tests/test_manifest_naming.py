@@ -1,6 +1,6 @@
 """Manifest 命名辅助的特征测试。
 
-`bucket_name` 与 `item_type_name` 被 `utils/item_parser.py` 当静态方法调用。
+`bucket_name` 与 `item_type_name` 被 `services/item_parser.py` 当静态方法调用。
 这里除了行为，还显式断言「可以不带实例调用」——一次拆分中这两个装饰器被误删，
 而当时没有任何测试发现，所以把调用方式本身也钉住。
 """
