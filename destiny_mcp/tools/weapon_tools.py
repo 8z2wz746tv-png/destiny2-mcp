@@ -8,6 +8,7 @@ from ..exceptions import DestinyMCPError
 from ._registry import mcp
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from ._responses import error_response, ok_response
+from ..error_codes import ErrorCode
 
 
 def _resolve_analysis_player_name(
@@ -56,7 +57,7 @@ async def analyze_weapon(
         )
     except DestinyMCPError as exc:
         return error_response(
-            "weapon_analysis_failed",
+            ErrorCode.WEAPON_ANALYSIS_FAILED,
             str(exc),
             next_actions=[
                 {

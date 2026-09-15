@@ -8,6 +8,7 @@ from typing import Annotated, Any, ClassVar, Literal, Self
 from pydantic import BaseModel, Field, StringConstraints, ValidationError, model_validator
 
 from ._responses import error_response
+from ..error_codes import ErrorCode
 
 PlayerIntent = Literal["profile", "get_profile", "角色", "档案", "search", "search_player", "find", "find_players", "fuzzy"]
 InventoryIntent = Literal[
@@ -172,7 +173,7 @@ def validate_request(model: type[IntentRequest]):
                     _readable_validation_message(error)
                     for error in exc.errors(include_input=False)
                 )
-                return error_response("invalid_arguments", messages)
+                return error_response(ErrorCode.INVALID_ARGUMENTS, messages)
             return await function(*args, **kwargs)
 
         return wrapped

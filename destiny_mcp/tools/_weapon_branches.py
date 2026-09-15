@@ -390,9 +390,6 @@ def perk_description_payload(svc: dict[str, Any], perk_name: str) -> dict[str, A
     )
 
 
-def missing_weapon_name(intent: str) -> dict[str, Any]:
-    return error_response("missing_weapon_name", f"{intent} 需要提供 weapon_name。")
-
 def inventory_type_payload(
     svc: dict[str, Any],
     result: Any,

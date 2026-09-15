@@ -8,6 +8,7 @@ from ..exceptions import DestinyMCPError
 from ._registry import mcp
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from ._responses import error_response, ok_response
+from ..error_codes import ErrorCode
 
 # Fields to strip from compressed vendor output (zero/empty after compression)
 _STRIP_PERK_FIELDS = {"plug_hash", "description", "plug_category", "god_roll_pve", "god_roll_pvp"}
@@ -62,7 +63,7 @@ async def summarize_weekly_reset(
         result = await svc['weekly_analysis_svc'].summarize_weekly_reset(limit=limit)
     except DestinyMCPError as exc:
         return error_response(
-            "weekly_summary_failed",
+            ErrorCode.WEEKLY_SUMMARY_FAILED,
             str(exc),
             next_actions=[
                 {
@@ -138,7 +139,7 @@ async def get_weekly_reset(
         result = await svc['weekly_svc'].get_weekly_reset()
     except DestinyMCPError as exc:
         return error_response(
-            "weekly_reset_unavailable",
+            ErrorCode.WEEKLY_RESET_UNAVAILABLE,
             str(exc),
             next_actions=[
                 {

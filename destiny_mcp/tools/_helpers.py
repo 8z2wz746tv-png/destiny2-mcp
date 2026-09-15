@@ -12,6 +12,7 @@ from mcp.server.fastmcp import Context
 from .. import config
 from ..exceptions import DestinyMCPError
 from ..logging_config import get_logger
+from ..error_codes import code_for_exception
 from ..service_context import ServiceContext
 from ._responses import error_response
 
@@ -61,10 +62,8 @@ def handle_tool_error(func: Callable) -> Callable:
         except DestinyMCPError as e:
             logger.warning("Tool %s error: %s", func.__name__, e)
             if func.__name__.endswith("_assistant"):
-                code = re.sub(
-                    r"(?<!^)(?=[A-Z])", "_", type(e).__name__
-                ).lower()
-                return error_response(code, str(e))
+                # 异常类名 → code 的推导只有一处（error_codes.code_for_exception）
+                return error_response(code_for_exception(e), str(e))
             return f"⚠️ {e}"
         except Exception:
             logger.exception("Tool %s unexpected error", func.__name__)

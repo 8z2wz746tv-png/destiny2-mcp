@@ -12,6 +12,7 @@ from ._registry import mcp
 from ._formatters import format_armor_mods, format_inventory, format_search_items
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from ._responses import error_response, ok_response
+from ..error_codes import ErrorCode
 
 
 @mcp.tool()
@@ -40,7 +41,7 @@ async def summarize_inventory(
     resolved_player_name = resolve_player_name(svc, player_name)
     if not resolved_player_name:
         return error_response(
-            "auth_required",
+            ErrorCode.AUTH_REQUIRED,
             "请先登录 Bungie，或显式提供 player_name。",
             next_actions=[
                 {
@@ -59,7 +60,7 @@ async def summarize_inventory(
         )
     except DestinyMCPError as exc:
         return error_response(
-            "inventory_summary_failed",
+            ErrorCode.INVENTORY_SUMMARY_FAILED,
             str(exc),
             next_actions=[
                 {
@@ -108,7 +109,7 @@ async def get_inventory(
     player_name = resolve_player_name(svc, player_name)
     if not player_name:
         return error_response(
-            "auth_required",
+            ErrorCode.AUTH_REQUIRED,
             "请先登录 Bungie，或显式提供 player_name。",
             next_actions=[{"label": "登录 Bungie 后重试", "tool": "get_inventory"}],
         )
@@ -146,7 +147,7 @@ async def search_items(
     player_name = resolve_player_name(svc, player_name)
     if not player_name:
         return error_response(
-            "auth_required",
+            ErrorCode.AUTH_REQUIRED,
             "请先登录 Bungie，或显式提供 player_name。",
             next_actions=[{"label": "登录 Bungie 后重试", "tool": "search_items"}],
         )
@@ -175,7 +176,7 @@ async def search_items_by_type(
     player_name = resolve_player_name(svc, player_name)
     if not player_name:
         return error_response(
-            "auth_required",
+            ErrorCode.AUTH_REQUIRED,
             "请先登录 Bungie，或显式提供 player_name。",
             next_actions=[
                 {"label": "登录 Bungie 后重试", "tool": "search_items_by_type"}
