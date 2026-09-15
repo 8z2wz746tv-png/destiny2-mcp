@@ -5,14 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-CLASS_ALIASES = {
-    "猎人": "hunter",
-    "hunter": "hunter",
-    "术士": "warlock",
-    "warlock": "warlock",
-    "泰坦": "titan",
-    "titan": "titan",
-}
+from ..vocabulary import CLASS_ALIASES  # 职业别名的单一出处
 STAT_KEYS = {
     "生命": "health",
     "生命值": "health",

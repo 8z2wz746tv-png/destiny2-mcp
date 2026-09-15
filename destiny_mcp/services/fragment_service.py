@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from ..exceptions import DefinitionNotFoundError, SubclassError
 from ..logging_config import get_logger
+from ..vocabulary import ELEMENT_ALIASES as _ELEMENT_MAP  # 元素别名的单一出处
 from ..manifest import ManifestManager, CHARACTER_CLASS_MAP
 
 logger = get_logger(__name__)
@@ -20,14 +21,7 @@ logger = get_logger(__name__)
 # 元素名别名表（输入 → 规范名）。
 # 中文以**游戏客户端**的叫法为准：strand=缚丝（「编织」是早期写法，保留兼容）。
 # 权威来源是 `manifest_names` 的伤害类型名称表（那边也是缚丝），这里只是输入别名。
-_ELEMENT_MAP = {
-    "void": "void", "虚空": "void",
-    "solar": "solar", "烈日": "solar",
-    "arc": "arc", "电弧": "arc",
-    "stasis": "stasis", "冰影": "stasis",
-    "strand": "strand", "缚丝": "strand", "编织": "strand",
-    "prism": "prism", "prismatic": "prism", "棱镜": "prism",
-}
+
 
 # plugCategoryIdentifier → element
 _CAT_TO_ELEMENT = {
@@ -221,7 +215,7 @@ class FragmentService:
                                         break
 
             if zh_name and "空" not in zh_name and "插槽" not in zh_name:
-                options.append({"name": zh_name, "nameEn": en_name, "description": zh_desc})
+                options.append({"name": zh_name, "name_en": en_name, "description": zh_desc})
 
         options.sort(key=lambda x: x["name"])
         return {
@@ -275,7 +269,7 @@ class FragmentService:
 
         return {
             "name": display.get("name", ""),
-            "nameEn": en_name,
+            "name_en": en_name,
             "element": element,
             "description": description,
             "stats": stats,

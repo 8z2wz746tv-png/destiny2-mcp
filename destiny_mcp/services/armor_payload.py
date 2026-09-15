@@ -19,6 +19,8 @@ from __future__ import annotations
 from typing import Any, Callable, Literal
 
 from ..utils.hash_utils import to_unsigned
+from ..vocabulary import CLASS_LABELS_ZH as CLASS_DISPLAY
+from ..vocabulary import class_key
 
 ARMOR_SCHEMA_VERSION = 1
 
@@ -70,12 +72,12 @@ DEFINITION_TIER_NOTE = (
     '用 inventory_assistant(intent="item", item_instance_id=…) 读某一件。'
 )
 
-CLASS_DISPLAY: dict[str, str] = {"titan": "泰坦", "hunter": "猎人", "warlock": "术士"}
+# 职业标签的单一出处：vocabulary.CLASS_LABELS_ZH
 
 
 def class_key_of(class_type: int | None) -> str:
     """组件里的 classType → 工具面统一的键（hunter/warlock/titan）。未登记给空串。"""
-    return {0: "titan", 1: "hunter", 2: "warlock"}.get(class_type, "")  # type: ignore[arg-type]
+    return class_key(class_type)
 
 # 插槽类别 → 短键 + 是否玩家可改
 _SOCKET_KINDS: dict[str, tuple[str, bool]] = {

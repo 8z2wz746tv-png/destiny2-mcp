@@ -16,7 +16,7 @@ from .models import (
     BuildConstraints,
     InventorySnapshot,
 )
-from .tuning import STAT_LABELS_ZH
+from ..vocabulary import STAT_LABELS_ZH
 
 logger = get_logger(__name__)
 

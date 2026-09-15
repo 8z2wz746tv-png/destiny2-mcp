@@ -12,6 +12,7 @@ from ._enrichment import community_enrichment
 from ._responses import confirmation_required_response, error_response, ok_response
 from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..services.armor_payload import armor_payload
+from ..vocabulary import STAT_LABELS_ZH as _STAT_LABELS  # 六维中文名的单一出处
 
 
 async def armor_item(svc: Any, player_name: str, item_instance_id: str) -> dict:
@@ -134,16 +135,6 @@ def set_bonus(svc: Any, set_bonus_name: str) -> dict:
 
 
 __all__ = ["armor_item", "exotic_armor", "set_bonus", "error_response"]
-
-
-_STAT_LABELS = {
-    "weapons": "武器",
-    "health": "生命",
-    "class_stat": "职业",
-    "grenade": "手雷",
-    "super_stat": "超能",
-    "melee": "近战",
-}
 
 
 def _mod_echo(plan: dict[str, Any]) -> str:

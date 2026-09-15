@@ -744,7 +744,12 @@ class TransferService:
                 for it in candidates
             ]
             # Build formatted question for the LLM to present directly
-            loc_map = {"vault": "📦 仓库", "hunter": "🏹 猎人", "warlock": "⚡ 术士", "titan": "🛡️ 泰坦"}
+            from ..vocabulary import LOCATION_LABELS_ZH  # 位置标签的单一出处
+            _EMOJI = {"vault": "📦", "hunter": "🏹", "warlock": "⚡", "titan": "🛡️"}
+            loc_map = {
+                key: f"{_EMOJI.get(key, '')} {label}".strip()
+                for key, label in LOCATION_LABELS_ZH.items()
+            }
             lines = [f"找到 {len(candidates)} 件匹配「{item_name}」的物品，你要转移哪一件？\n"]
             for i, c in enumerate(candidate_items, 1):
                 loc = loc_map.get(c.location, c.location)

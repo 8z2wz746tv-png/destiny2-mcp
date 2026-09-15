@@ -35,14 +35,7 @@ STAT_NAME_ALIASES: dict[str, list[str]] = {
 }
 
 # 职业名映射
-CLASS_ALIASES: dict[str, str] = {
-    "猎人": "hunter",
-    "术士": "warlock",
-    "泰坦": "titan",
-    "hunter": "hunter",
-    "warlock": "warlock",
-    "titan": "titan",
-}
+from ..vocabulary import CLASS_ALIASES  # 职业别名的单一出处
 
 # Fuzzy match 阈值
 _FUZZY_THRESHOLD = 0.75

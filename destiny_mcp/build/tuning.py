@@ -30,6 +30,7 @@ from .armor_rules import (
     DIRECTIONAL_TUNING_HASHES,
     DIRECTIONAL_TUNING_STAT_BONUS,
 )
+from ..vocabulary import STAT_LABELS_ZH  # 六维中文名的单一出处
 from .constants import STAT_NAMES
 
 TuningKind = Literal["directional", "balanced", "empty"]
@@ -39,15 +40,6 @@ TUNING_PLUG_SET_HASH = 1155052024
 #: 「空调整模组插槽」：装了等于没装。
 EMPTY_TUNING_PLUG_HASH = 2121121504
 
-# 属性名 → 中文（只用于拼兜底名字；正常情况下名字直接读 Manifest 的官方翻译）。
-STAT_LABELS_ZH: dict[str, str] = {
-    "weapons": "武器",
-    "health": "生命值",
-    "class_stat": "职业",
-    "grenade": "手雷",
-    "melee": "近战",
-    "super_stat": "超能",
-}
 
 STAT_INDEX: dict[str, int] = {name: index for index, name in enumerate(STAT_NAMES)}
 

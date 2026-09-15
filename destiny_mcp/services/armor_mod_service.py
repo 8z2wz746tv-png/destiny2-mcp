@@ -19,6 +19,7 @@ from typing import Any
 from ..exceptions import InvalidArgumentError, ItemNotFoundError, TransferError
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
+from ..vocabulary import LEGACY_STAT_ALIASES
 from . import profile_components
 from .loadout_mod_sockets import ModSocketMixin
 
@@ -83,14 +84,8 @@ class ArmorModService(ModSocketMixin):
     # ── 名字 → 插件 ───────────────────────────────────────────────────
 
     # 旧六维名 → Armor 3.0 的六维名（很多玩家还在用旧叫法：纪律/机动/韧性/恢复/力量/智慧）
-    _LEGACY_STAT_ALIASES = {
-        "机动": "武器",
-        "韧性": "生命",
-        "恢复": "职业",
-        "力量": "近战",
-        "纪律": "手雷",
-        "智慧": "超能",
-    }
+    # 旧六维名 -> 规范名：单一出处见 vocabulary.LEGACY_STAT_ALIASES
+    _LEGACY_STAT_ALIASES = LEGACY_STAT_ALIASES
 
     def _search_mods(self, query: str) -> list[int]:
         return [

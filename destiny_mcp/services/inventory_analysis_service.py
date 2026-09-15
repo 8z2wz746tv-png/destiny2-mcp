@@ -26,36 +26,10 @@ DUPLICATE_WEAPON_PROFILE_COMPONENTS = profile_components.INVENTORY_SOCKETS
 _WEAPON_BUCKETS = {"Kinetic Weapons", "Energy Weapons", "Power Weapons"}
 _ARMOR_BUCKETS = {"Helmet", "Gauntlets", "Chest Armor", "Leg Armor", "Class Armor"}
 _VAULT_BUCKET_HASH = 138197802
-_LOCATION_ALIASES = {
-    "": "",
-    "all": "",
-    "全部": "",
-    "vault": "vault",
-    "仓库": "vault",
-    "hunter": "hunter",
-    "猎人": "hunter",
-    "warlock": "warlock",
-    "术士": "warlock",
-    "titan": "titan",
-    "泰坦": "titan",
-}
-_ITEM_TYPE_ALIASES = {
-    "": "",
-    "all": "",
-    "全部": "",
-    "weapon": "weapon",
-    "weapons": "weapon",
-    "武器": "weapon",
-    "armor": "armor",
-    "armors": "armor",
-    "护甲": "armor",
-}
-_LOCATION_LABELS = {
-    "vault": "仓库",
-    "hunter": "猎人",
-    "warlock": "术士",
-    "titan": "泰坦",
-}
+from ..vocabulary import LOCATION_ALIASES as _LOCATION_ALIASES  # 单一出处
+
+from ..vocabulary import ITEM_TYPE_ALIASES as _ITEM_TYPE_ALIASES  # 单一出处
+from ..vocabulary import LOCATION_LABELS_ZH as _LOCATION_LABELS  # 单一出处
 
 
 class InventoryAnalysisService:

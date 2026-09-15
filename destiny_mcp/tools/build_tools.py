@@ -11,7 +11,9 @@ from pydantic import ValidationError
 
 from ..build.models import BuildRequest
 from ..build_contracts import ExecutableBuild, canonical_build_error_message
+from ..error_codes import ErrorCode
 from ..exceptions import DestinyMCPError
+from ..vocabulary import STAT_LABELS_ZH as _STAT_CN  # 六维中文名的单一出处
 from ._registry import mcp
 from ._farm_target_response import serialize_farm_target_analysis
 from ._helpers import (
@@ -28,10 +30,7 @@ from ._responses import (
 
 # ── Output formatting helpers (Rule 1: formatting is allowed in tools) ──
 
-_STAT_CN = {
-    "weapons": "武器", "health": "生命", "class_stat": "职业",
-    "grenade": "手雷", "melee": "近战", "super_stat": "超能",
-}
+
 
 
 def _mod_recommendation(bonus_stats: dict[str, int]) -> list[str]:
@@ -104,7 +103,7 @@ def _build_request(
 def _auth_required_response(tool: str) -> dict:
     """Return a stable auth error for build tools."""
     return error_response(
-        "auth_required",
+        ErrorCode.AUTH_REQUIRED,
         "请先登录 Bungie，或显式提供 player_name。",
         next_actions=[
             {
@@ -362,7 +361,7 @@ async def recommend_build(
         recommendation = await svc['build_svc'].recommend_build(player_name, request)
     except DestinyMCPError as exc:
         return error_response(
-            "build_recommendation_failed",
+            ErrorCode.BUILD_RECOMMENDATION_FAILED,
             str(exc),
             next_actions=[
                 {
@@ -521,12 +520,12 @@ async def infer_required_armor(
         return _auth_required_response("infer_required_armor")
     if baseline not in {"equipped", "inventory"}:
         return error_response(
-            "invalid_baseline",
+            ErrorCode.INVALID_BASELINE,
             "baseline 只能是 equipped 或 inventory。",
         )
     if isinstance(max_replacements, bool) or max_replacements not in {1, 2}:
         return error_response(
-            "invalid_max_replacements", "max_replacements 只能是 1 或 2。"
+            ErrorCode.INVALID_MAX_REPLACEMENTS, "max_replacements 只能是 1 或 2。"
         )
 
     request = _build_request(
@@ -615,13 +614,13 @@ async def equip_build(
 
     if canonical_build is None:
         return error_response(
-            "exact_build_required",
+            ErrorCode.EXACT_BUILD_REQUIRED,
             "必须传回 find_build 返回的 canonical_build，不能按 score 重新求解。",
         )
     try:
         exact_build = ExecutableBuild.model_validate(canonical_build)
     except ValidationError as exc:
-        return error_response("invalid_canonical_build", canonical_build_error_message(exc))
+        return error_response(ErrorCode.INVALID_CANONICAL_BUILD, canonical_build_error_message(exc))
     if not confirmed:
         return confirmation_required_response(
             "equip_build",
