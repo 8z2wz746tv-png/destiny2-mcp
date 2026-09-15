@@ -180,7 +180,7 @@ def test_running_host_is_detected_from_the_environment(monkeypatch) -> None:
     assert installer._running_host().name == "claude"
 
 
-def test_select_hosts_prefers_the_running_host(monkeypatch) -> None:
+def test_select_hosts_prefers_the_running_host(monkeypatch, tmp_path) -> None:
     """没有 --all / --host 时不能把 Codex、Claude 都铺一遍。"""
     monkeypatch.setenv("DSH_HOME", "/tmp/dsh-home")
     selected = installer._select_hosts(explicit=None, install_all=False)
@@ -195,9 +195,16 @@ def test_select_hosts_prefers_the_running_host(monkeypatch) -> None:
     # 显式指定优先于"当前宿主"
     assert [host.name for host in installer._select_hosts(explicit="codex", install_all=False)] == ["codex"]
 
-    # --all 才是"都装"（这里只断言包含 dsh，不依赖本机有哪些目录）
+    # --all 是"存在的都装"：宿主落点取 `Path.home()/.dsh` 这些目录，**目录不存在就不装**
+    # （不替用户凭空创建 Codex/Claude 目录）。所以这里把 HOME 指到临时目录自己造一个，
+    # 否则这条测试就变成"只有装过 DSH 的机器才能过"——CI 上就是这么红的。
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))  # Windows 上 Path.home() 看这个
+    assert installer._select_hosts(explicit=None, install_all=True) == []
+
+    (tmp_path / ".dsh").mkdir()
     every = [host.name for host in installer._select_hosts(explicit=None, install_all=True)]
-    assert "dsh" in every
+    assert every == ["dsh"]
 
 
 def test_unknown_host_is_rejected(monkeypatch) -> None:
