@@ -1,0 +1,38 @@
+# 每次 push / PR 跑一遍**不需要账号**的守门：单元测试 + 契约测试 + 分层守门
+# （后两者都在 pytest 里：test_skill_contracts / test_architecture_layers 等）。
+#
+# 真机脚本不进 CI：`skills/destiny-mcp-setup/scripts/verify_mcp.py`、
+# `scripts/run_corpus_*.py`、`capture_weapon_baseline.py` 都需要 `.env`、OAuth token、
+# 本地 Manifest 与真账号，只能在本机按 TESTING_CORPUS.md 的流程手动跑。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: 安装（含 dev 依赖）
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: 单元测试 + 契约/分层守门
+        run: python -m pytest -q
+      - name: 没有凭据也能构造工具面（干净克隆冒烟）
+        env:
+          BUNGIE_API_KEY: ci-placeholder
+          BUNGIE_CLIENT_ID: "1"
+          BUNGIE_CLIENT_SECRET: ci-placeholder
+        run: |
+          python -c "from destiny_mcp.server import create_server; create_server('normal'); print('create_server ok')"
