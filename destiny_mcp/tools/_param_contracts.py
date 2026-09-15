@@ -46,6 +46,8 @@ from ._requests import (
     WorldIntent,
 )
 from ._responses import error_response
+from ..error_codes import ErrorCode
+from ..logging_config import get_logger
 
 _MISSING = object()
 
@@ -697,7 +699,7 @@ def check_parameter_ownership(
         if contract.suggestion is not None
     ]
     return error_response(
-        "ignored_parameter",
+        ErrorCode.IGNORED_PARAMETER,
         f'{tool}(intent="{intent}") 不读 {names}，传进来的值会被忽略，不会被当成查询条件。{details}',
         next_actions=suggestions,
     )
@@ -707,11 +709,18 @@ def declared_intents(function: Callable) -> frozenset[str]:
     """从签名上的 Literal 注解读出这个工具声明支持的 intent。
 
     注解是字符串（模块有 `from __future__ import annotations`），所以要走
-    eval_str；取不到就返回空集合，表示"不校验 intent 名单"。
+    eval_str；取不到就返回空集合，表示"不校验 intent 名单"——但**必须吵**：
+    这条路径一断，参数归属校验就少一层，静默失效是以前踩过的坑
+    （`tests/test_conclusion_paths.py` 钉住"八个工具的名单都读得出来"）。
     """
     try:
         annotation = signature(function, eval_str=True).parameters["intent"].annotation
-    except Exception:  # 注解解析不了就不拦，交给原有的 unsupported_intent 分支
+    except Exception as exc:  # 读不出来 = 这层守卫降级，留 ERROR 日志
+        logger.error(
+            "读不出 %s 的 intent 名单（%s）：本次启动的参数归属校验会失效，请检查函数签名注解",
+            getattr(function, "__name__", function),
+            exc,
+        )
         return frozenset()
     if hasattr(annotation, "__metadata__"):  # Annotated[Literal[...], Field(...)]
         annotation = annotation.__origin__
@@ -741,8 +750,17 @@ def check_intent_parameters(function: Callable) -> Callable:
         if intent is None and "intent" in parameters.parameters:
             intent = parameters.parameters["intent"].default
         intent = str(intent or "").strip().lower()
+        if not intents:
+            # 名单读不出来：这次仍然做归属校验，但要在响应里说清"这层不完整"，
+            # 免得调用方把"没报 ignored_parameter"读成"参数肯定被读了"。
+            response = await function(*args, **kwargs)
+            if isinstance(response, dict):
+                response.setdefault("warnings", []).append(
+                    "参数归属校验不完整：没能读出这个工具的 intent 名单（看服务端日志）。"
+                )
+            return response
         # intent 不在声明名单里时不插嘴：那种情况原有的 unsupported_intent 说得更准
-        if intent and (not intents or intent in intents):
+        if intent and intent in intents:
             supplied = {
                 name: value
                 for name, value in bound.arguments.items()
@@ -757,6 +775,8 @@ def check_intent_parameters(function: Callable) -> Callable:
 
 
 # ── skill 文档里的参数表由这里生成 ──────────────────────────────────────────
+
+logger = get_logger(__name__)
 
 TOOL_INTENTS: dict[str, frozenset[str]] = {
     "player_assistant": _all(PlayerIntent),

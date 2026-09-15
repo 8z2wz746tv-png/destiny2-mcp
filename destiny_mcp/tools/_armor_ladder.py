@@ -18,15 +18,11 @@ from __future__ import annotations
 
 from typing import Any, Sequence
 
-# 六维键 → 中文（与 build 侧 priority_stats 的英文键同一套）
-STAT_LABELS: dict[str, str] = {
-    "weapons": "武器",
-    "health": "生命",
-    "class_stat": "职业",
-    "grenade": "手雷",
-    "melee": "近战",
-    "super_stat": "超能",
-}
+from ..logging_config import get_logger
+
+logger = get_logger(__name__)
+
+from ..vocabulary import STAT_LABELS_ZH as STAT_LABELS  # 单一出处：vocabulary.py
 STAT_ORDER: tuple[str, ...] = tuple(STAT_LABELS)
 
 TARGET_FIELDS: dict[str, str] = {
@@ -155,6 +151,7 @@ def build_ladder(
     reason: str = "",
     samples: Sequence[dict[str, int]] = (),
     tuning: dict[str, Any] | None = None,
+    tuning_unavailable_reason: str = "",
 ) -> dict[str, Any]:
     """把上限、差距与台阶摊平成一张表（只提议，不改目标）。"""
     targets = _targets(request)
@@ -298,12 +295,14 @@ def build_ladder(
             else (
                 "这一档是**人工可用的杠杆提示**：本次没有拿到调谐额度数据，"
                 "不能当作已经算进 ceiling 的方案。"
+                + (f"（原因：{tuning_unavailable_reason}）" if tuning_unavailable_reason else "")
                 if tuning_first
                 else ""
             )
         ),
         "tuning_headroom": per_stat_gain,
         "tuning_attempted": attempted,
+        "tuning_unavailable_reason": tuning_unavailable_reason or None,
         "suggestion": suggestion,
         "note": (
             "ceiling = 同一套约束下、按某种优先级**同时**能达到的值（实采，逐项取最大）；"
@@ -320,23 +319,26 @@ async def _tuning_evidence(
     player_name: str,
     request: Any,
 ) -> dict[str, Any] | None:
-    """调谐额度证据（能用就用，拿不到就不装作有）。
+    """调谐额度证据 → `(证据, 不可用原因)`。
 
-    走的是同一个库存快照接口；失败（角色名不对、组件缺失）不能让无解诊断跟着崩。
+    走的是同一个库存快照接口；失败（角色名不对、组件缺失）不能让无解诊断跟着崩，
+    但**必须留下原因**：这张阶梯是结论性输出，降级可以，静默降级不行
+    （`tests/test_conclusion_paths.py` 会扫这个文件）。
     """
     inventory = svc.get("inventory_svc")
     manifest = svc.get("manifest")
     if inventory is None or manifest is None:
-        return None
+        return None, "这次调用没拿到库存快照或 Manifest 服务"
     try:
         from ..services.build_tuning import headroom_payload
 
         snapshot = await inventory.get_armor_snapshot(
             player_name, getattr(request, "character_class", "") or ""
         )
-        return headroom_payload(snapshot, manifest)
-    except Exception:  # noqa: BLE001 - 证据拿不到就退回"杠杆提示"口径
-        return None
+        return headroom_payload(snapshot, manifest), ""
+    except Exception as exc:  # noqa: BLE001 - 降级可以，静默不行：原因随载荷返回
+        logger.warning("调谐额度证据读取失败（阶梯会退回杠杆提示口径）：%s", exc)
+        return None, f"{type(exc).__name__}: {exc}"
 
 
 async def no_solution_ladder(
@@ -370,11 +372,14 @@ async def no_solution_ladder(
     samples: list[dict[str, int]] = []
     for probe in relaxation_probes(request, max_probes=max_probes):
         relaxed = apply_drops(request, probe["drop"])
+        probe_error = ""
         for order in sample_orders(relaxed, max_orders=2):
             candidate = relaxed.model_copy(update={"priority_stats": order})
             try:
                 results = await svc["build_svc"].find_build(player_name, candidate)
-            except Exception:  # noqa: BLE001 - 探测失败不该把无解诊断也带崩
+            except Exception as exc:  # noqa: BLE001 - 探测失败要留痕，不能算"试过没成"
+                probe_error = f"{type(exc).__name__}: {exc}"
+                logger.warning("阶梯探测 %s 失败：%s", probe["label"], exc)
                 continue
             if results:
                 stats = _stats_of(results[0])
@@ -388,25 +393,42 @@ async def no_solution_ladder(
                 })
                 break
         else:
-            trials.append({
-                "label": probe["label"],
-                "dropped": list(probe["drop"]),
-                "priority": None,
-                "reached": {},
-                "ok": False,
-            })
+            if probe_error:
+                # 一次都没探成：**不能**记成"试过没有解"，那会把没测过的档说成否定结论。
+                trials.append({
+                    "label": probe["label"],
+                    "dropped": list(probe["drop"]),
+                    "priority": None,
+                    "reached": {},
+                    "ok": None,
+                    "not_probed": True,
+                    "reason": probe_error,
+                })
+            else:
+                trials.append({
+                    "label": probe["label"],
+                    "dropped": list(probe["drop"]),
+                    "priority": None,
+                    "reached": {},
+                    "ok": False,
+                })
 
     ceiling = ceiling_from_samples(samples)
     precision = "sampled" if samples else "not_computed"
+    tuning_evidence, tuning_unavailable = await _tuning_evidence(svc, player_name, request)
     table = build_ladder(
         request,
         ceiling=ceiling,
         precision=precision,
         reason=reason,
         samples=samples,
-        tuning=await _tuning_evidence(svc, player_name, request),
+        tuning=tuning_evidence,
+        tuning_unavailable_reason=tuning_unavailable,
     )
     table["trials"] = trials
+    not_probed = [trial["label"] for trial in trials if trial.get("ok") is None]
+    if not_probed:
+        table["probe_failures"] = not_probed
     # 「原样」那一档实测没解 = 这批护甲不可能同时满足原始目标。
     # 说清楚 ceiling 是**逐项**取最大（来自不同探测），免得读成"其实都能满足"。
     # 这张阶梯**只在工具按原始请求 0 候选时**才会生成，所以 satisfiable 一定是 false；
@@ -417,7 +439,8 @@ async def no_solution_ladder(
         "evidence": "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）",
         "note": (
             "ceiling 是各次探测**逐项**取的最大值，不等于同一套护甲能同时达到；"
-            "trials 里 ok=true 的档是**换了优先级顺序或放下目标**之后的解，原始请求一个字没改。"
+            "trials 里 ok=true 的档是**换了优先级顺序或放下目标**之后的解，原始请求一个字没改；"
+            "ok=null 的档是**这次没探成**（带 reason），不能读成「试过、没有解」。"
         ),
         "solved_after_rotation": bool(trials and trials[0]["ok"]),
     }
