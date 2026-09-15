@@ -7,6 +7,7 @@ Post-Game Carnage Report endpoints with automatic name resolution.
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
+from .. import activity_stats
 from ..exceptions import InvalidArgumentError, APIError, CharacterNotFoundError, ConfigError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
@@ -336,35 +337,16 @@ class ActivityService:
 
         response = result.get("Response", result)
 
-        def _extract_stats(section: dict, keys: list[str]) -> dict[str, str]:
-            out = {}
-            for key in keys:
-                val = section.get(key)
-                if val:
-                    out[val.get("statId", key)] = val.get("basic", {}).get("displayValue", "")
-            return out
+        def _all_time(group: str) -> dict:
+            section = response.get(group) or {}
+            if not isinstance(section, dict):
+                return {}
+            all_time = section.get("allTime", section)
+            return all_time if isinstance(all_time, dict) else {}
 
-        pve_keys = ["activitiesEntered", "activitiesWon", "kills", "deaths", "assists",
-                     "suicides", "precisionkills", "secondsPlayed"]
-        pvp_keys = pve_keys + ["killsDeathsRatio"]
-
-        pve_section = response.get("allPvE", {})
-        pvp_section = response.get("allPvP", {})
-        pve_all_time = (
-            pve_section.get("allTime", pve_section)
-            if isinstance(pve_section, dict)
-            else {}
-        )
-        pvp_all_time = (
-            pvp_section.get("allTime", pvp_section)
-            if isinstance(pvp_section, dict)
-            else {}
-        )
-
-        pve = _extract_stats(pve_all_time, pve_keys)
-        pvp = _extract_stats(pvp_all_time, pvp_keys)
-
-        return {"pve": pve, "pvp": pvp}
+        # 全量 + 行式（之前手写 8 个键、只取 displayValue，还写错了 precisionKills）：
+        # 形状与映射表都在 activity_stats，那边有拼写/覆盖/数值的守卫测试。
+        return activity_stats.stat_groups({"pve": _all_time("allPvE"), "pvp": _all_time("allPvP")})
 
     async def get_unique_weapon_history(
         self,
@@ -404,17 +386,15 @@ class ActivityService:
                 "kills_display": kills["display"],
                 "precision_kills": precision["value"],
                 "precision_kills_display": precision["display"],
-                "values": values,
+                "stats": activity_stats.stat_rows(values),
             })
 
         weapons.sort(key=lambda item: item.get("kills", 0), reverse=True)
         limited = weapons[: max(1, min(limit, 250))]
         return {
-            "success": True,
             "character_id": char_id,
             "count": len(weapons),
             "weapons": limited,
-            "message": f"找到 {len(weapons)} 把有历史记录的武器。",
         }
 
     async def get_aggregate_activity_stats(
@@ -448,7 +428,7 @@ class ActivityService:
                 "kills_display": kills["display"],
                 "seconds_played": seconds["value"],
                 "seconds_played_display": seconds["display"],
-                "values": values,
+                "stats": activity_stats.stat_rows(values),
             })
 
         activities.sort(
@@ -457,11 +437,9 @@ class ActivityService:
         )
         limited = activities[: max(1, min(limit, 250))]
         return {
-            "success": True,
             "character_id": char_id,
             "count": len(activities),
             "activities": limited,
-            "message": f"找到 {len(activities)} 条活动聚合统计。",
         }
 
     async def get_leaderboards(
@@ -506,11 +484,25 @@ class ActivityService:
             )
         response = _unwrap_bungie_response(result, "查询排行榜")
         return {
-            "success": True,
             "character_id": char_id,
-            "leaderboards": response,
+            "leaderboards": {
+                "entry_count": len(response.get("entries", []) or []),
+                "entries": [
+                    {
+                        "rank": entry.get("rank"),
+                        "player_name": (
+                            (entry.get("player", {}) or {})
+                            .get("destinyUserInfo", {})
+                            .get("displayName", "Unknown")
+                        ),
+                        "class": (entry.get("player", {}) or {}).get("characterClass", ""),
+                        "light_level": (entry.get("player", {}) or {}).get("lightLevel", 0),
+                        "stats": activity_stats.stat_rows(entry.get("values", {})),
+                    }
+                    for entry in response.get("entries", []) or []
+                ],
+            },
             "preview": self._leaderboard_preview(response),
-            "message": "已读取排行榜数据。",
         }
 
     async def get_clan_leaderboards(
@@ -535,11 +527,9 @@ class ActivityService:
             raise APIError("查询公会排行榜", "响应格式异常")
         response = _unwrap_bungie_response(result, "查询公会排行榜")
         return {
-            "success": True,
             "group_id": group_id,
             "leaderboards": response,
             "preview": self._leaderboard_preview(response),
-            "message": "已读取公会排行榜数据。",
         }
 
     @staticmethod

@@ -313,6 +313,8 @@ destiny_mcp/
 
 ## Starside 本地资料
 
+> **数据来源与致谢**：本项目的社区资料（`share/` 下的 Markdown 文档、`data/starside/` 的网页归档、社区配装模板）来自 **Starside**（<https://starside.work/index.html>），经网站作者许可随附与再分发。这些是**参考数据、不是 Bungie 官方数据**，版权归原作者与上游来源；工具在响应里保留 `source_ref`（`url` / `updated_at` / `trust=untrusted_reference`）以便逐条溯源。社区配装不能一键执行，社区评分不等于官方推荐。细节见 [COMMUNITY_DATA_NOTICE.md](COMMUNITY_DATA_NOTICE.md)。
+
 Starside 是现有工具的本地资料层，不新增第九个工具，也不把账号凭据发送给网站。武器分析、Perk 描述、碎片详情、异域护甲及套装详情会附带 `community_references`。社区内容与 Bungie/Manifest 结果分开，缺少或损坏资料不会阻止原有官方查询。
 
 仓库随附作者授权的 22 份 Markdown 文档，覆盖 Perk、武器框架与推荐、异域装备、护甲套装、子职业、神器、Boss 数据及游戏机制。克隆仓库或通过 wheel 安装后会自动发现，不需要解压 ZIP、抓取网站或手动导入。可用 `STARSIDE_SHARE_PATH` 指向更新后的文档目录。

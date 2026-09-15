@@ -28,11 +28,14 @@ SOURCE_ROOT = PACKAGE_ROOT / "destiny_mcp"
 _LAYERS: dict[str, int] = {
     # 0 纯基础：不依赖项目里任何东西（除了彼此）
     "config": 0,
+    "error_codes": 0,
     "exceptions": 0,
     "logging_config": 0,
     "models": 0,
     "utils": 0,
+    "vocabulary": 0,
     # 1 基础设施：Manifest / Bungie 客户端 / 账号解析 / 类型容器
+    "activity_stats": 1,
     "audit": 1,
     "build_contracts": 1,
     "bungie_client": 1,

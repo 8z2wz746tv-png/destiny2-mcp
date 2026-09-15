@@ -1,6 +1,6 @@
 # Community data notice
 
-The Markdown documents in `share/` are a Starside community knowledge export provided to this project's maintainer and redistributed with the website author's permission.
+The Markdown documents in `share/` are a **Starside** community knowledge export — Starside: <https://starside.work/index.html> — provided to this project's maintainer and redistributed with the website author's permission. The site author and the upstream sources credited inside those documents retain all rights; the project's MIT license does not relicense them.
 
 `data/starside/` additionally contains the portion of the same author's site archive that the MCP reads at runtime — the index, the per-page records, and the two public exports — also redistributed with the author's permission. The raw crawled HTML (`pages/`) and the site's icons and front-end assets (`assets/`) are deliberately not redistributed, and are re-fetched by `scripts/fetch_starside.py` when needed.
 

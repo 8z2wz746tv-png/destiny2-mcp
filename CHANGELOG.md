@@ -2,6 +2,50 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.2.0 — 2026-09-15
+
+**破坏性变更**：活动统计改成行式（见下）。另外这一版收了上一批架构与守门工作。
+
+### 活动统计改为行式（破坏性）
+
+旧实现手写 8 个键、只取 `displayValue`：真机抓下来上游 `allPvE` 有 **65 项**（`allPvP` 66 项），
+实际只拿到 6 项，而且 `precisionkills` 拼错（上游是 `precisionKills`）导致「精准击杀」静默消失，
+原始数值与场均（`pga`）全被丢掉——想做"PvE 折合多少小时"这类计算只能去解析 `"42d 11h"`。
+
+- 新增 `destiny_mcp/activity_stats.py`：上游 `statId` → 行式统计
+  `{stat_id, upstream_id, name, group, value, display, unit?, per_game?}`，
+  与武器属性 `{stat_hash, name, value, display}` 同一套写法；
+- **全量给项**：65/66 项一项不丢，没登记中文名的也出行（`name` 留空、`group="other"`）；
+- **数值回归**：`value` 给原始数（整数还原 int）、`display` 给人读串、时长标 `unit: "seconds"`、
+  场均（`pga`）有就给、没有就不给字段（**不编 0**）；
+- **中文名 + 分组**：66 个键全部有中文名，按 `core/activities/objectives/averages/weapons/other` 排序；
+- 接线：`stats`/`career`/`historical_stats`、`weapon_history`、`aggregate`、
+  `leaderboards`/`clan_leaderboards`（排行榜不再透传上游原始载荷，改自有条目形状）；
+- **旧键一个不留**（不双写、不别名）：`data.stats.pve.activitiesEntered` 这类写法在 0.2.0 起不存在；
+- 守卫：`tests/baselines/activity_stat_keys.json` 存真机抓的上游键清单，
+  `tests/test_activity_stats.py` 据此断言「每个键都有中文名」「行数等于键数」「缺值给 None」——
+  上游新增统计项会让测试红，逼着做决定，不再静默少项。
+
+### 架构与守门（本版同批）
+
+- **CI**：`.github/workflows/ci.yml`（Python 3.12/3.13：`pytest` + 无凭据构造工具面冒烟）；
+- **错误码单一出处**：新增 `destiny_mcp/error_codes.py`（`ErrorCode` 枚举 +
+  `code_for_exception()` + `write_failed()`），43 处裸字符串全部替换；
+  `tests/test_error_codes.py` 禁止裸字符串、并钉住"异常类名即契约"；
+- **词表归一**：新增 `destiny_mcp/vocabulary.py`（六维/职业/位置/元素/旧属性名），
+  此前同一份词表散在 9 个文件、值已经漂了——顺带修掉真 bug：
+  旧名「韧性模组」被映射成不存在的「生命模组」（游戏里叫「生命值模组」），真机报「没找到护甲模组」；
+- **结论路径不许静默降级**：护甲阶梯的探测失败不再被记成"试过没有解"（改 `ok: null` + `not_probed` +
+  `reason`），调谐额度拿不到会带 `tuning_unavailable_reason`，参数归属名单读不出会 ERROR 日志 + warning；
+  `tests/test_conclusion_paths.py` 扫描结论模块的 `except` 必须留痕；
+- **信封统一第二批**：`data` 及其子块不再有 `success`/`message`（写入领域结果除外），
+  自有键一律 snake_case（`fragments[].name_en`、金装候选 `name_en`）；`sweep` 组新增两条守卫，
+  110 个 intent 全量检查；
+- **兼容面定规矩**：`COMPATIBILITY.md` 登记 21 组**实测等价**的别名与 69 个历史工具的去留，
+  `tests/test_intent_aliases.py` 防"别名偷偷跑偏"；
+- **分层守门**：`tests/test_architecture_layers.py`（依赖只能向下、禁止环、`svc` key 必须在
+  `ServiceContext` 里声明）+ `utils/item_parser.py` 挪到 `services/`。
+
 ## 0.1.13 — 2026-09-15
 
 新增一份全面语料：`TESTING_CORPUS_FULL.md` + `scripts/run_corpus_all_rows.py`，把八个工具面

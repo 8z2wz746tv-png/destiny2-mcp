@@ -102,11 +102,11 @@ async def test_historical_stats_reads_real_all_time_sections(dependencies) -> No
                 "allTime": {
                     "kills": {
                         "statId": "kills",
-                        "basic": {"displayValue": "88,000"},
+                        "basic": {"value": 88000, "displayValue": "88,000"},
                     },
                     "secondsPlayed": {
                         "statId": "secondsPlayed",
-                        "basic": {"displayValue": "32d 4h"},
+                        "basic": {"value": 2779200, "displayValue": "32d 4h"},
                     },
                 }
             },
@@ -114,7 +114,7 @@ async def test_historical_stats_reads_real_all_time_sections(dependencies) -> No
                 "allTime": {
                     "killsDeathsRatio": {
                         "statId": "killsDeathsRatio",
-                        "basic": {"displayValue": "1.42"},
+                        "basic": {"value": 1.42, "displayValue": "1.42"},
                     }
                 }
             },
@@ -124,10 +124,18 @@ async def test_historical_stats_reads_real_all_time_sections(dependencies) -> No
 
     result = await service.get_historical_stats(PLAYER_NAME, character="hunter")
 
-    assert result == {
-        "pve": {"kills": "88,000", "secondsPlayed": "32d 4h"},
-        "pvp": {"killsDeathsRatio": "1.42"},
-    }
+    # 0.2.0 起是行式：全量给项、带原始数值与中文名（旧版是手写键 + 只有 displayValue 的字典）
+    assert result["schema_version"] == 1
+    groups = {group["key"]: group for group in result["groups"]}
+    assert set(groups) == {"pve", "pvp"}
+    pve = {row["stat_id"]: row for row in groups["pve"]["stats"]}
+    assert pve["kills"]["value"] == 88000
+    assert pve["kills"]["display"] == "88,000"
+    assert pve["kills"]["name"] == "击杀"
+    assert pve["seconds_played"]["unit"] == "seconds"
+    assert groups["pve"]["stat_count"] == 2
+    pvp = {row["stat_id"]: row for row in groups["pvp"]["stats"]}
+    assert pvp["kills_deaths_ratio"]["display"] == "1.42"
 
 
 @pytest.mark.asyncio
