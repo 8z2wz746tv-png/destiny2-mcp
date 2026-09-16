@@ -203,14 +203,16 @@ async def test_apply_inserts_into_the_planned_socket() -> None:
     result = await service.apply(plan)
 
     assert result["success"] is True
-    assert bungie.inserts and bungie.inserts[0][0] == "paid", "有能量消耗的模组走付费端点"
+    assert bungie.inserts and bungie.inserts[0][0] == "free", (
+        "护甲模组走 free 端点（Bungie 的 free 指没有材料消耗，官方文档明确覆盖 Armor Mods）"
+    )
     kind, args = bungie.inserts[0]
     assert args[0] == "6917" and args[1] == MOD_HASH and args[2] == 0
 
 
 async def test_apply_wraps_upstream_failure() -> None:
     class _Broken(_Bungie):
-        async def insert_socket_plug(self, *args, **kwargs):
+        async def insert_socket_plug_free(self, *args, **kwargs):
             raise RuntimeError("Bungie 说不行")
 
     service = _service(_Broken())
@@ -432,8 +434,18 @@ async def test_apply_raises_when_bungie_returns_an_error_envelope() -> None:
 async def test_apply_maps_a_missing_scope_to_a_readable_message() -> None:
     """付费插槽要 AdvancedWriteActions：403 要说清是权限问题，不是"稍后重试"。"""
     class _NoScope(_Bungie):
+        # 两种端点都要覆盖：真机上令牌缺 scope 时 **free 接口也照样 403**
+        # （`AccessNotPermittedByApplicationScope`），不是"free 就能绕过去"。
         async def insert_socket_plug(self, *args, **kwargs):
             self.inserts.append(("paid", args))
+            return {
+                "ErrorCode": 2108,
+                "Message": "Forbidden: AccessNotPermittedByApplicationScope "
+                           "(RequiredScope: AdvancedWriteActions)",
+            }
+
+        async def insert_socket_plug_free(self, *args, **kwargs):
+            self.inserts.append(("free", args))
             return {
                 "ErrorCode": 2108,
                 "Message": "Forbidden: AccessNotPermittedByApplicationScope "

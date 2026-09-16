@@ -165,11 +165,20 @@ def _redirect_uri(args: argparse.Namespace, config) -> str:
     return DEFAULT_REDIRECT_URI
 
 
+# 要在授权时申请的 scope。**必须显式申请**，否则令牌就没有它，写入会被上游拒成
+# 403 `Access not permitted by application scope`（真机踩过：装护甲模组时）。
+# `AdvancedWriteActions` 是"带消耗/不可逆"的写入才需要的（例如付费插槽接口
+# `InsertSocketPlug`）；免费的 `InsertSocketPlugFree`（护甲模组、perk、着色器）不需要它，
+# 所以这条 scope 缺席时大部分写入仍可用，只有付费那条路会 403。
+_OAUTH_SCOPES = "AdvancedWriteActions"
+
+
 def _auth_url(client_id: str, redirect_uri: str, state: str) -> str:
     return (
         f"{AUTHORIZE_ENDPOINT}"
         f"?client_id={quote(str(client_id), safe='')}"
         "&response_type=code"
+        f"&scope={quote(_OAUTH_SCOPES, safe='')}"
         f"&state={quote(state, safe='')}"
         f"&redirect_uri={quote(redirect_uri, safe='')}"
     )

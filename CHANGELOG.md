@@ -2,6 +2,28 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.4.6 — 2026-09-16
+
+**用户指出"DIM 能操作模组"，一查果然是我们错了。** 两处：
+
+1. **接口选错了**：`_insert_armor_mod` 按"能量消耗 > 0"去选付费接口 `InsertSocketPlug`，
+   但 Bungie 的 "free" 指的是**没有材料消耗** —— 官方文档明确 `InsertSocketPlugFree` 覆盖
+   "Perks, **Armor Mods**, Shaders, Ornaments"（<https://bungie-net.github.io/>）。
+   护甲模组消耗的是能量、不是材料，本来就该走 free。现在**先走 free**，只有上游回
+   1663 `DestinyItemActionForbidden`「只能游戏内做」时才退回付费接口；
+   403「scope 不够」不再盲目重试（那不是"这个 plug 不免费"）。
+2. **OAuth 从来没申请 scope**：授权 URL 只有 `client_id`/`response_type`/`state`/`redirect_uri`，
+   一个 `scope` 都没带 —— 所以令牌里没有 `AdvancedWriteActions`，写入被拒成
+   403 `AccessNotPermittedByApplicationScope`（DIM 能做，正是因为 DIM 申请了这个 scope）。
+   现在授权 URL 带上 `scope=AdvancedWriteActions`；**生效需要用户重新登录一次**
+   （`.venv/bin/destiny-mcp-oauth --no-open --timeout 900`），并且 Bungie 开发者后台里
+   这个应用要允许该 scope。
+
+守门测试按新决定重写：free 优先、只有 1663 才退回付费、403 不重试付费接口。
+
+真机进度不变：**五件护甲已全部换上**（武器 106 / 生命 30 / 职业 40 / 手雷 165 / 近战 44 / 超能 125，
+差的正是那 5 颗属性模组）；重新登录拿到 scope 后再跑一次，模组应当能通过 free 接口装上。
+
 ## 0.4.5 — 2026-09-16
 
 真机配装测试打通到"装备全部换上"这一步，靠的是把上游原因如实带出来。

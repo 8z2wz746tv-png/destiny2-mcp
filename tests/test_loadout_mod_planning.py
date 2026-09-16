@@ -195,21 +195,55 @@ async def test_find_mod_socket_honours_excluded_sockets() -> None:
 # ── _insert_armor_mod ────────────────────────────────────────────────
 
 
-async def test_insert_armor_mod_picks_paid_or_free_endpoint_by_cost() -> None:
-    service = _service(_Manifest({
-        600: _mod(GENERAL_MOD_CATEGORY, 2),
-        601: _mod(GENERAL_MOD_CATEGORY, 0),
-    }))
-    service._bungie.insert_socket_plug = AsyncMock(return_value={"paid": True})
-    service._bungie.insert_socket_plug_free = AsyncMock(return_value={"free": True})
+async def test_insert_armor_mod_prefers_the_free_endpoint() -> None:
+    """护甲模组走 **free** 接口，哪怕它消耗能量。
 
-    paid = await service._insert_armor_mod("item-1", 600, 3, "char", 3)
-    free = await service._insert_armor_mod("item-1", 601, 4, "char", 3)
+    以前按"能量消耗 > 0"选接口是错的：Bungie 的 free 指**没有材料消耗**，官方文档明确
+    `InsertSocketPlugFree` 覆盖 "Perks, **Armor Mods**, Shaders, Ornaments"；付费接口
+    `InsertSocketPlug` 要 `AdvancedWriteActions` scope，于是真机上装属性模组一直 403
+    `Access not permitted by application scope`（DIM 能做正是因为 DIM 用 free 接口）。
+    """
+    service = _service(_Manifest({600: _mod(GENERAL_MOD_CATEGORY, 2)}))
+    service._bungie.insert_socket_plug_free = AsyncMock(return_value={"ErrorCode": 1})
+    service._bungie.insert_socket_plug = AsyncMock(return_value={"ErrorCode": 1})
 
-    assert paid == {"paid": True}
-    assert free == {"free": True}
+    result = await service._insert_armor_mod("item-1", 600, 3, "char", 3)
+
+    assert result == {"ErrorCode": 1}
+    service._bungie.insert_socket_plug_free.assert_awaited_once_with(
+        "item-1", 600, 3, 0, "char", 3
+    )
+    service._bungie.insert_socket_plug.assert_not_awaited()
+
+
+async def test_insert_armor_mod_falls_back_to_paid_only_for_non_free_plugs() -> None:
+    """free 接口回 1663「只能游戏内做」= 这个 plug 不是"免费可逆"的 → 才退回付费接口。"""
+    service = _service(_Manifest({600: _mod(GENERAL_MOD_CATEGORY, 2)}))
+    service._bungie.insert_socket_plug_free = AsyncMock(return_value={
+        "ErrorCode": 1663,
+        "ErrorStatus": "DestinyItemActionForbidden",
+        "Message": "This action can only be done in-game. I know, we're working on it.",
+    })
+    service._bungie.insert_socket_plug = AsyncMock(return_value={"ErrorCode": 1})
+
+    result = await service._insert_armor_mod("item-1", 600, 3, "char", 3)
+
+    assert result == {"ErrorCode": 1}
     service._bungie.insert_socket_plug.assert_awaited_once_with("item-1", 600, 3, 0, "char", 3)
-    service._bungie.insert_socket_plug_free.assert_awaited_once_with("item-1", 601, 4, 0, "char", 3)
+
+
+async def test_insert_armor_mod_does_not_fall_back_on_scope_errors() -> None:
+    """403「scope 不够」不是"这个 plug 不免费"，别拿付费接口再撞一次。"""
+    service = _service(_Manifest({600: _mod(GENERAL_MOD_CATEGORY, 2)}))
+    forbidden = {
+        "ErrorCode": 403,
+        "Message": "Access not permitted by application scope",
+    }
+    service._bungie.insert_socket_plug_free = AsyncMock(return_value=forbidden)
+    service._bungie.insert_socket_plug = AsyncMock(return_value={"ErrorCode": 1})
+
+    assert await service._insert_armor_mod("item-1", 600, 3, "char", 3) == forbidden
+    service._bungie.insert_socket_plug.assert_not_awaited()
 
 
 # ── _prepare_mod_operations ──────────────────────────────────────────

@@ -374,14 +374,30 @@ class ModSocketMixin(PlugLookupMixin):
         character_id: str,
         membership_type: int,
     ) -> dict:
-        """Use Bungie's paid or free socket endpoint from manifest energy cost."""
-        energy_cost = self._plug_energy_cost(mod_hash) or 0
-        insert = (
-            self._bungie.insert_socket_plug
-            if energy_cost > 0
-            else self._bungie.insert_socket_plug_free
+        """插模组：**先走 free 接口**，只有上游说这个插槽不免费时才退回付费接口。
+
+        以前按"能量消耗 > 0"选接口，那是错的：Bungie 的 free 指的是**没有材料消耗**，
+        官方文档明确 `InsertSocketPlugFree` 就覆盖 "Perks, **Armor Mods**, Shaders, Ornaments"
+        （https://bungie-net.github.io/）。护甲模组消耗的是能量、不是材料，所以它本来就该走 free；
+        走付费接口需要 `AdvancedWriteActions` scope，于是真机上装属性模组一直 403
+        `Access not permitted by application scope`（DIM 能做正是因为 DIM 用 free 接口）。
+        free 接口对"非免费可逆"的 plug（强化/调谐类）会回 1663 `DestinyItemActionForbidden`
+        "This action can only be done in-game."，那种才需要退回付费接口（并要求 scope）。
+        """
+        result = await self._bungie.insert_socket_plug_free(
+            item_instance_id,
+            mod_hash,
+            socket_index,
+            0,
+            character_id,
+            membership_type,
         )
-        return await insert(
+        if result.get("ErrorCode", 0) == 1:
+            return result
+        text = f"{result.get('Message', '')} {result.get('ErrorStatus', '')}"
+        if not ("in-game" in text or "DestinyItemActionForbidden" in text):
+            return result
+        return await self._bungie.insert_socket_plug(
             item_instance_id,
             mod_hash,
             socket_index,
