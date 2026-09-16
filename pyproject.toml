@@ -42,7 +42,7 @@ destiny_mcp = ["data/*.yaml", "data/weapon_popularity.json"]
 "destiny_mcp.build_import" = ["*.yaml"]
 
 [tool.setuptools.data-files]
-"share/destiny-mcp" = ["COMMUNITY_DATA_NOTICE.md"]
+"share/destiny-mcp" = ["docs/community/COMMUNITY_DATA_NOTICE.md"]
 "share/destiny-mcp/prompts" = ["prompts/*.md"]
 "share/destiny-mcp/skills" = ["skills/*.md"]
 "share/destiny-mcp/skills/destiny2-mcp" = ["skills/destiny2-mcp/SKILL.md"]

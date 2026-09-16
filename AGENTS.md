@@ -65,7 +65,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 ### 禁止兼容、不做补丁
 
 - 改响应形状**旧键一个不留**（不双写、不留过渡分支）：0.2.0 活动统计从手写 8 键改行式，`activitiesEntered` 直接消失。
-- 别名要么是**永久**（中文说法，如 `概况`/`重复武器`），要么**登记待删**（英文近义）；一律写进 `COMPATIBILITY.md`，并保证同组别名走同一段分派。
+- 别名要么是**永久**（中文说法，如 `概况`/`重复武器`），要么**登记待删**（英文近义）；一律写进 `docs/COMPATIBILITY.md`，并保证同组别名走同一段分派。
 - 旧实现整段删掉，不保留"失败就退回旧路径"的分支。
 
 ### 分层与体量
@@ -76,7 +76,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 
 ### 失败、写入与证据
 
-- **失败必须是失败**：`ok=false` + `error.code` + 中文说明"缺什么/下一步"；裸抛异常算 bug（schema 层拒收是例外，见 `TESTING_CORPUS.md` 第十二章）。
+- **失败必须是失败**：`ok=false` + `error.code` + 中文说明"缺什么/下一步"；裸抛异常算 bug（schema 层拒收是例外，见 `docs/testing/TESTING_CORPUS.md` 第十二章）。
 - **改账号的操作**：服务端签发候选 + 用户明确 `confirmed=true` 才写；写完回读核对。
 - **数据分三档不许混**：Manifest 定义 / 你的账号 / 社区资料（不可信参考，带 `source_ref` 与更新时间；出处与致谢见 README 的 Starside 段）。
 - 上游故障如实说是上游，不编、不循环重试。
@@ -85,7 +85,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 
 - 每个新守门都要**注入一次违规、确认变红、再恢复**——不验证就不知道它会不会咬人。
 - 改响应形状：跑 `pytest` + 对应语料 runner + 基线 diff。
-- 单测用替身、任何机器能跑（干净 `HOME` 下也要过）；真机脚本单独放，分工见 `TESTING_CORPUS.md` 第一张表。
+- 单测用替身、任何机器能跑（干净 `HOME` 下也要过）；真机脚本单独放，分工见 `docs/testing/TESTING_CORPUS.md` 第一张表。
 - **声称之前先量**：性能改动给前后对比，文档里的数字必须来自实跑。
 
 ### 注释、文档与提交

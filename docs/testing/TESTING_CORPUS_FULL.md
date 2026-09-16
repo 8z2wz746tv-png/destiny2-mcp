@@ -1,6 +1,6 @@
 # 全面语料（八工具面 · 逐 intent 与字段级）
 
-这是 `TESTING_CORPUS.md` 的**补充**，不替代它：主语料写「该看到什么」，这份把其中
+这是 `docs/testing/TESTING_CORPUS.md` 的**补充**，不替代它：主语料写「该看到什么」，这份把其中
 「发布前把所有 intent 跑一遍」那条变成**可执行的全量回归**，并补上其余六个工具面的字段级断言。
 武器与护甲章节的字段级断言仍由 `run_corpus_weapon_rows.py` / `run_corpus_armor_rows.py` 管，这里不重复。
 
@@ -247,7 +247,7 @@
    并且只展开可滚栏（barrel/magazine/trait），别把模组/装饰也算进来；
 2. 命中之后再为**这一页要返回的**武器构造完整明细（50 把 × 860 项 ≈ 4.3 万次查询，秒级）；
 3. 顺带把 5 个别名（`search_catalog`/`all_weapons`/`global`/`search_all`）共用的这段路径一次修好——
-   它们现在各付一次这份开销（见 `COMPATIBILITY.md` 的待删别名）。
+   它们现在各付一次这份开销（见 `docs/COMPATIBILITY.md` 的待删别名）。
 
 预期：从"分钟级"回到"秒级"；改完要用 `run_corpus_weapon_rows.py` + 武器基线 diff 复核
 （响应内容必须一个字不变，只是不算那些用不到的字段）。
@@ -286,11 +286,11 @@
 
 | 位置 | 原来写的 | 实测 |
 | --- | --- | --- |
-| `TESTING_CORPUS.md` 第十二章 A「默认条数」 | 「subclass 10」 | `subclass_assistant` **只有 `community` 读 `limit`**；`fragments`/`options` 传 `limit` 直接 `ignored_parameter`，void 碎片返回全量 19 条（已更正） |
-| `TESTING_CORPUS.md` 已知问题「leaderboards」 | 恒 `ok=false` | **间歇**：本轮 sweep 里成功过 1 次，随后连测 3 次都失败（已更正为"常失败"） |
-| `TESTING_CORPUS.md` 第四章实测耗时 | `analyze` 泰坦 ~15s | hunter `analyze`（health 100）29.8s、`recommend` 20.3s（同一台机器、热缓存） |
-| `TESTING_CORPUS.md` 第五章 loadout「每套 ≈ 11 KB」 | 5 套 ≈ 55 KB | 实测默认 5 套 = **71.4 KB**（约 14.3 KB/套） |
-| `TESTING_CORPUS.md` 第十二章 C「工具层前置校验 → `invalid_arguments`」 | 未列 `item` | `item` 缺 `item_instance_id` 走服务层 → `invalid_argument_error`（消息清楚，属正常分层，补进表即可） |
+| `docs/testing/TESTING_CORPUS.md` 第十二章 A「默认条数」 | 「subclass 10」 | `subclass_assistant` **只有 `community` 读 `limit`**；`fragments`/`options` 传 `limit` 直接 `ignored_parameter`，void 碎片返回全量 19 条（已更正） |
+| `docs/testing/TESTING_CORPUS.md` 已知问题「leaderboards」 | 恒 `ok=false` | **间歇**：本轮 sweep 里成功过 1 次，随后连测 3 次都失败（已更正为"常失败"） |
+| `docs/testing/TESTING_CORPUS.md` 第四章实测耗时 | `analyze` 泰坦 ~15s | hunter `analyze`（health 100）29.8s、`recommend` 20.3s（同一台机器、热缓存） |
+| `docs/testing/TESTING_CORPUS.md` 第五章 loadout「每套 ≈ 11 KB」 | 5 套 ≈ 55 KB | 实测默认 5 套 = **71.4 KB**（约 14.3 KB/套） |
+| `docs/testing/TESTING_CORPUS.md` 第十二章 C「工具层前置校验 → `invalid_arguments`」 | 未列 `item` | `item` 缺 `item_instance_id` 走服务层 → `invalid_argument_error`（消息清楚，属正常分层，补进表即可） |
 
 ## 本轮实跑记录
 

@@ -1,4 +1,4 @@
-"""全面语料实跑抓到的 7 条问题的回归锁（见 `TESTING_CORPUS_FULL.md` 的「已知问题」）。
+"""全面语料实跑抓到的 7 条问题的回归锁（见 `docs/testing/TESTING_CORPUS_FULL.md` 的「已知问题」）。
 
 这些行为以前一条测试都没有，所以才能悄悄漂移：
 `analyze` 用一句英文断言"配不出来"、`exotic_armor` 自己一套 camelCase 键、

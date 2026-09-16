@@ -12,7 +12,7 @@
 2. **列表类用精简身份块**（`lean_identity`），完整模板只给单把武器或对比。
 3. 结构随 `WEAPON_SCHEMA_VERSION` 走；键集合有快照测试盯着（`tests/test_weapon_keys_snapshot.py`）。
 
-历史键名对照（old → new）见 `TESTING_CORPUS.md` 武器章节附录。
+历史键名对照（old → new）见 `docs/testing/TESTING_CORPUS.md` 武器章节附录。
 """
 
 from __future__ import annotations

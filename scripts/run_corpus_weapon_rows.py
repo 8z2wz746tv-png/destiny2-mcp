@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-"""语料武器章节的**逐行实跑**：把 `TESTING_CORPUS.md` 里每一行的"验收点"变成可执行断言。
+"""语料武器章节的**逐行实跑**：把 `docs/testing/TESTING_CORPUS.md` 里每一行的"验收点"变成可执行断言。
 
 和单元测试的分工：单元测试用替身、任何机器都能跑；这个脚本走**真机**（需要 OAuth 与
 本地 Manifest、社区资料），回答的是"文档里写的那些话，现在真的还成立吗"。
-它覆盖的是 `TESTING_CORPUS.md` 武器章节里**没有标 ⭐ 的那些字段级断言**（每轮冒烟只有 20 条，
+它覆盖的是 `docs/testing/TESTING_CORPUS.md` 武器章节里**没有标 ⭐ 的那些字段级断言**（每轮冒烟只有 20 条，
 其余都靠这里 + `pytest` 兜住）。改了武器响应形状、口径或话术之后，除了跑 `pytest`，也要跑它：
 
     .venv/bin/python scripts/run_corpus_weapon_rows.py

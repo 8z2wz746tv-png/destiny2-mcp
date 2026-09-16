@@ -95,7 +95,7 @@
 | `weapon.community` | 最多 3 条社区条目（含 snippet） | 全量社区命中 |
 
 `perk_pool` 体积现状：紧凑 JSON 约 25 KB（P0 同口径 45.4 KB），其中可滚选项 14 KB、采样非 roll 栏 3.7 KB、
-`weapon` 块 5.6 KB。**没做到计划里的 10 KB 量级**，取舍理由见 `WEAPON_FORMAT_PLAN.md` P6 记录。
+`weapon` 块 5.6 KB。**没做到计划里的 10 KB 量级**，取舍理由见 `docs/plans/WEAPON_FORMAT_PLAN.md` P6 记录。
 
 ### P4 键映射表（old → new）
 
@@ -442,7 +442,7 @@
 | 武器形状/键集合/插槽/实例/本地资料/体积口径 | `test_weapon_keys_snapshot.py`、`test_weapon_profile.py`、`test_weapon_sockets.py`、`test_weapon_instance.py`、`test_weapon_local_data.py` |
 | 武器基线差异（字段无声消失） | `tests/test_weapon_baseline.py` + `scripts/capture|diff_weapon_baseline.py` |
 | 武器章节的端到端断言（真机） | `scripts/run_corpus_weapon_rows.py`（16 行） |
-| 八工具面全 intent 体检 + 其余六面字段级 + 协议层（真机） | `scripts/run_corpus_all_rows.py`（见 `TESTING_CORPUS_FULL.md`） |
+| 八工具面全 intent 体检 + 其余六面字段级 + 协议层（真机） | `scripts/run_corpus_all_rows.py`（见 `docs/testing/TESTING_CORPUS_FULL.md`） |
 | 错误码与信封 | `test_failure_envelope_regressions.py`、`test_upstream_error_mapping.py`、`test_service_error_contract.py` |
 | 大响应限流与翻页 | `test_large_response_limits.py` |
 | 组件集合收拢 | `test_profile_components.py` |

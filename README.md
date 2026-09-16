@@ -257,7 +257,7 @@ VERIFY_OK=Destiny MCP is ready
 | Docker | 不支持。早期那份 `Dockerfile` 引用了不存在的 `src/` 目录，已删除 |
 | 数据落在哪 | Token 在 `~/.destiny_mcp/tokens.json`（0600）。每次工具调用的审计日志写在 `~/.destiny_mcp/audit/YYYYMMDD/`，含调用参数与最多 5 万字符的结果摘要，明文保存、不加密、不上传；不想要就删该目录。没有遥测，也不向本项目之外的服务器上报任何内容 |
 
-已知功能限制（细节与复现话术见 [TESTING_CORPUS.md](TESTING_CORPUS.md) 的「已知问题」）：
+已知功能限制（细节与复现话术见 [TESTING_CORPUS.md](docs/testing/TESTING_CORPUS.md) 的「已知问题」）：
 
 - 单进程、单用户；不要同时开两个实例操作同一账号，跨进程互斥不在设计范围内。
 - 社区资料是本地快照：哈希只能证明快照来源，不能证明数值适用于当前游戏版本。
@@ -313,13 +313,13 @@ destiny_mcp/
 
 ## Starside 本地资料
 
-> **数据来源与致谢**：本项目的社区资料（`share/` 下的 Markdown 文档、`data/starside/` 的网页归档、社区配装模板）来自 **Starside**（<https://starside.work/index.html>），经网站作者许可随附与再分发。这些是**参考数据、不是 Bungie 官方数据**，版权归原作者与上游来源；工具在响应里保留 `source_ref`（`url` / `updated_at` / `trust=untrusted_reference`）以便逐条溯源。社区配装不能一键执行，社区评分不等于官方推荐。细节见 [COMMUNITY_DATA_NOTICE.md](COMMUNITY_DATA_NOTICE.md)。
+> **数据来源与致谢**：本项目的社区资料（`share/` 下的 Markdown 文档、`data/starside/` 的网页归档、社区配装模板）来自 **Starside**（<https://starside.work/index.html>），经网站作者许可随附与再分发。这些是**参考数据、不是 Bungie 官方数据**，版权归原作者与上游来源；工具在响应里保留 `source_ref`（`url` / `updated_at` / `trust=untrusted_reference`）以便逐条溯源。社区配装不能一键执行，社区评分不等于官方推荐。细节见 [COMMUNITY_DATA_NOTICE.md](docs/community/COMMUNITY_DATA_NOTICE.md)。
 
 Starside 是现有工具的本地资料层，不新增第九个工具，也不把账号凭据发送给网站。武器分析、Perk 描述、碎片详情、异域护甲及套装详情会附带 `community_references`。社区内容与 Bungie/Manifest 结果分开，缺少或损坏资料不会阻止原有官方查询。
 
 仓库随附作者授权的 22 份 Markdown 文档，覆盖 Perk、武器框架与推荐、异域装备、护甲套装、子职业、神器、Boss 数据及游戏机制。克隆仓库或通过 wheel 安装后会自动发现，不需要解压 ZIP、抓取网站或手动导入。可用 `STARSIDE_SHARE_PATH` 指向更新后的文档目录。
 
-此前的 schema v2 网页归档仍受支持，并可与 Markdown 合并查询；它额外包含 108 个社区配装块。仓库已随附该归档中运行所需的部分，但原始抓取页与素材不入库，详见下文「本地数据与更新」。Markdown 数据包不含完整角色配装模板，不能根据武器推荐表自行拼成「热门配装」。具体许可与来源边界见 [`COMMUNITY_DATA_NOTICE.md`](COMMUNITY_DATA_NOTICE.md)。
+此前的 schema v2 网页归档仍受支持，并可与 Markdown 合并查询；它额外包含 108 个社区配装块。仓库已随附该归档中运行所需的部分，但原始抓取页与素材不入库，详见下文「本地数据与更新」。Markdown 数据包不含完整角色配装模板，不能根据武器推荐表自行拼成「热门配装」。具体许可与来源边界见 [`COMMUNITY_DATA_NOTICE.md`](docs/community/COMMUNITY_DATA_NOTICE.md)。
 
 ### 查询与匹配
 
@@ -361,10 +361,10 @@ Starside 是现有工具的本地资料层，不新增第九个工具，也不�
 .venv/bin/python scripts/verify_starside.py --inventory
 ```
 
-自然语言测试话术、期望路由与验收标准统一放在 [TESTING_CORPUS.md](TESTING_CORPUS.md)（含 8 个工具与 108 个 intent 的语料、环境与流程、已知问题）；八个工具面全部 intent 的可执行体检与字段级契约在 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)，一条命令跑完：`.venv/bin/python scripts/run_corpus_all_rows.py`。代码或文档更新后，重启 Agent 宿主或新开一个任务，避免继续使用旧的服务进程。
+自然语言测试话术、期望路由与验收标准统一放在 [TESTING_CORPUS.md](docs/testing/TESTING_CORPUS.md)（含 8 个工具与 108 个 intent 的语料、环境与流程、已知问题）；八个工具面全部 intent 的可执行体检与字段级契约在 [TESTING_CORPUS_FULL.md](docs/testing/TESTING_CORPUS_FULL.md)，一条命令跑完：`.venv/bin/python scripts/run_corpus_all_rows.py`。代码或文档更新后，重启 Agent 宿主或新开一个任务，避免继续使用旧的服务进程。
 
 ## License
 
 MIT，全文见 [LICENSE](LICENSE)。
 
-这个许可只覆盖本仓库的软件。随附的社区资料（`share/` 下的 Starside Markdown、`data/starside/` 里的归档）是按网站作者的许可再分发的，不因为 MIT 而改变归属；运行时才下载的 Bungie Manifest、DIM 愿单等第三方数据同理。细节见 [COMMUNITY_DATA_NOTICE.md](COMMUNITY_DATA_NOTICE.md)。仅供个人非商业使用，本项目与 Bungie 无关、也未获其背书。
+这个许可只覆盖本仓库的软件。随附的社区资料（`share/` 下的 Starside Markdown、`data/starside/` 里的归档）是按网站作者的许可再分发的，不因为 MIT 而改变归属；运行时才下载的 Bungie Manifest、DIM 愿单等第三方数据同理。细节见 [COMMUNITY_DATA_NOTICE.md](docs/community/COMMUNITY_DATA_NOTICE.md)。仅供个人非商业使用，本项目与 Bungie 无关、也未获其背书。

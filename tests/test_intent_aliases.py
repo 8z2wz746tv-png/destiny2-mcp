@@ -1,4 +1,4 @@
-"""别名不能"偷偷跑偏"：`COMPATIBILITY.md` 里登记的每一组别名，必须真的走同一段分派。
+"""别名不能"偷偷跑偏"：`docs/COMPATIBILITY.md` 里登记的每一组别名，必须真的走同一段分派。
 
 风险很具体：有人在 `assistants.py` 里给某个别名加了单独分支，于是"同一个意思"的两条路
 返回不同结果——`move` 和 `transfer` 就是历史上踩过的坑（名字像，参数不一样）。
@@ -25,7 +25,7 @@ from destiny_mcp.tools import _requests as R
 SOURCE_ROOT = Path(__file__).resolve().parents[1]
 _ASSISTANTS = SOURCE_ROOT / "destiny_mcp" / "tools" / "assistants.py"
 
-# canonical → 别名（与 COMPATIBILITY.md 的表一一对应）
+# canonical → 别名（与 docs/COMPATIBILITY.md 的表一一对应）
 ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
     "PlayerIntent": {
         "profile": ("get_profile", "角色", "档案"),
@@ -134,7 +134,7 @@ def test_every_intent_value_is_registered() -> None:
             orphans[literal] = {"未登记": unregistered, "登记了但不存在": stale}
 
     assert not orphans, (
-        "intent 清单与登记表对不上（新增/删除后请更新 COMPATIBILITY.md 与这张表）："
+        "intent 清单与登记表对不上（新增/删除后请更新 docs/COMPATIBILITY.md 与这张表）："
         f"{orphans}"
     )
 

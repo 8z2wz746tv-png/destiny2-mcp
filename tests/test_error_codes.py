@@ -85,7 +85,7 @@ def test_literal_codes_are_complete_and_snake_case() -> None:
     values = [member.value for member in ErrorCode]
 
     assert set(values) == _EXPECTED_LITERAL_CODES, (
-        "字面量码清单变了：新增/删除码要同时更新这里与 TESTING_CORPUS.md 的码表"
+        "字面量码清单变了：新增/删除码要同时更新这里与 docs/testing/TESTING_CORPUS.md 的码表"
     )
     assert len(set(values)) == len(values), "错误码值必须唯一"
     assert all(re.fullmatch(r"[a-z][a-z0-9_]*", value) for value in values)

@@ -102,7 +102,7 @@ EXPECT_CODE = {
     ("activity_assistant", "leaderboard"): "a_p_i_error",
 }
 
-# 已登记待修的问题（根因与修复建议见 TESTING_CORPUS_FULL.md 的「已知问题」）。
+# 已登记待修的问题（根因与修复建议见 docs/testing/TESTING_CORPUS_FULL.md 的「已知问题」）。
 # 默认仍然算 FAIL（严格口径）；加 --known 跑时降级成 WARN，用来当回归闸门：
 # 只有**新**问题才会让退出码非 0。
 KNOWN_OPEN = {
@@ -353,7 +353,7 @@ _ENVELOPE_ALLOWED_BLOCKS = {"result"}
 
 # 上游（Bungie）自己的标识符：活动统计沿用 statId（activitiesEntered / killsDeathsRatio…），
 # 武器历史的逐项 values 里也是同一套。这些不是我们取的键名，改它们要动载荷契约，
-# 单独排期（见 TESTING_CORPUS_FULL.md「信封统一」一节的待办）。
+# 单独排期（见 docs/testing/TESTING_CORPUS_FULL.md「信封统一」一节的待办）。
 _UPSTREAM_KEY_BLOCKS = {"values", "pve", "pvp"}
 
 
@@ -1879,7 +1879,7 @@ async def run_cross(runner: Runner, live: dict[str, Any], skip_slow: bool) -> No
 
 
 # 别名等价（真机）：同参调用同组别名，`data` 必须逐字节相同。
-# 分组与 COMPATIBILITY.md / tests/test_intent_aliases.py 一致；标 slow 的组在
+# 分组与 docs/COMPATIBILITY.md / tests/test_intent_aliases.py 一致；标 slow 的组在
 # `--skip-slow` 时跳过（catalog 那组是一次全库扫描，慢）。
 _ALIAS_GROUPS: list[tuple[str, dict[str, Any], list[str], bool]] = [
     ("player_assistant", {"player_name": "OneTop丶Husky#6641"}, ["profile", "get_profile", "角色", "档案"], False),

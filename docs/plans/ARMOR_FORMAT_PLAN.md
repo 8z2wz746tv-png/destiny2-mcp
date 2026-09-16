@@ -1,7 +1,7 @@
 # 护甲格式统一与能力补齐 · 开发计划 v2（数据勘测版）
 
 日期：2026-09-13　状态：**已完成（P0–P6 全部落地，见文末「完成记录」）**
-方法沿用 `WEAPON_FORMAT_PLAN.md`；本版把 v1 里"凭印象"的部分全部换成实测。
+方法沿用 `docs/plans/WEAPON_FORMAT_PLAN.md`；本版把 v1 里"凭印象"的部分全部换成实测。
 
 ---
 
@@ -316,7 +316,7 @@ P0 基线 → P1 形状 → P2 详情 → P4 换模组 → P3 统一 → P5 阶�
 | 模块体积闸门 | `assistants.py` 已在 1407/1407 | 新分支 | 必须先把分支搬到新模块（建议 `tools/_armor_branches.py` + `services/armor_payload.py`），**不许抬上限** |
 | 武器基线闸门 | `tests/baselines/weapon_responses/` + allowlist | 不涉及 | 不受影响；护甲另开 `armor_responses/` 独立目录与 allowlist |
 | `verify_mcp.py` | 8 工具 + `PARAMETER_GUARD` 自检 | 不加工具、不加参数别名 | 不受影响（仍 8 工具） |
-| 文档 | `routing.md` 护甲章节、`TESTING_CORPUS.md` 护甲章节、README、CHANGELOG | 要更新 | P6 统一做；语料加护甲 ⭐ 冒烟行 |
+| 文档 | `routing.md` 护甲章节、`docs/testing/TESTING_CORPUS.md` 护甲章节、README、CHANGELOG | 要更新 | P6 统一做；语料加护甲 ⭐ 冒烟行 |
 
 **三条硬约束**（写进实现纪律）：
 

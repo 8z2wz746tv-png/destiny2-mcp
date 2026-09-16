@@ -1,4 +1,4 @@
-# 自然语言用例的机器可读子集；完整语料见 TESTING_CORPUS.md。
+# 自然语言用例的机器可读子集；完整语料见 docs/testing/TESTING_CORPUS.md。
 # 格式由 tests/test_skill_contracts.py 校验：id / prompt / expected_tool / expected_intent。
 # expected_intent 必须是 _requests.py 里声明过的 intent。
 

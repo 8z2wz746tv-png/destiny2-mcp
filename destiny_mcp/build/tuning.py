@@ -1,6 +1,6 @@
 """护甲调谐（Tuning）：把 ±5 的调谐槽变成求解器真能用的一根杠杆。
 
-实测口径（Manifest + 实机 inventory，2026-07 数据，见 ARMOR_FORMAT_PLAN.md P7）：
+实测口径（Manifest + 实机 inventory，2026-07 数据，见 docs/plans/ARMOR_FORMAT_PLAN.md P7）：
 
 - 调谐槽的 plug set 是 `1155052024`，里面正好 32 个插件：30 个方向型
   （+5 某一项 / −5 另一项，六维的 30 个有序组合一个不少）、1 个「平衡调整」

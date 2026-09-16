@@ -1,6 +1,6 @@
 """护甲载荷工厂：把 Bungie 的三份组件数据收成一个形状。
 
-设计依据（全部来自实机勘测，见 ARMOR_FORMAT_PLAN.md §1）：
+设计依据（全部来自实机勘测，见 docs/plans/ARMOR_FORMAT_PLAN.md §1）：
 
 - **两族**：`armor_3`（有 T 级，12 槽）与 `legacy`（无 T 级，15 槽）。legacy 没有的概念
   （词条原型、调谐、词条反推）**不出现**，而不是给一排 `null`。

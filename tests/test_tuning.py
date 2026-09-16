@@ -1,6 +1,6 @@
 """调谐（Tuning）纯计算层的特征测试。
 
-口径来自实机 + Manifest（ARMOR_FORMAT_PLAN.md P7）：
+口径来自实机 + Manifest（docs/plans/ARMOR_FORMAT_PLAN.md P7）：
 30 个方向型（+5/−5，零和）+ 平衡调整（六维 +1）+ 空插件；有调谐槽的护甲
 件件都能装这 31 个非空插件。这里钉住四件事：
 

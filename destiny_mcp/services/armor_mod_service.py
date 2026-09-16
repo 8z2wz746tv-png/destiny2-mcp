@@ -5,7 +5,7 @@
 `ModSocketMixin` 的插槽读取与写入能力（它只依赖 `_manifest` / `_bungie` / `_resolver`），
 不碰整套配装的执行流程。
 
-设计口径（ARMOR_FORMAT_PLAN.md P4）：
+设计口径（docs/plans/ARMOR_FORMAT_PLAN.md P4）：
 - **方案 = 可核对的中文回显**：哪件护甲、哪个槽、从什么换成什么、能量怎么变；
 - **校验**：实例必须属于目标角色（在仓库里就让调用方先搬）、模组必须在该槽 plug set 里、
   能量预算够（`已用 − 旧 + 新 ≤ 容量`）；

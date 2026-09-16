@@ -41,14 +41,14 @@
 - **信封统一第二批**：`data` 及其子块不再有 `success`/`message`（写入领域结果除外），
   自有键一律 snake_case（`fragments[].name_en`、金装候选 `name_en`）；`sweep` 组新增两条守卫，
   110 个 intent 全量检查；
-- **兼容面定规矩**：`COMPATIBILITY.md` 登记 21 组**实测等价**的别名与 69 个历史工具的去留，
+- **兼容面定规矩**：`docs/COMPATIBILITY.md` 登记 21 组**实测等价**的别名与 69 个历史工具的去留，
   `tests/test_intent_aliases.py` 防"别名偷偷跑偏"；
 - **分层守门**：`tests/test_architecture_layers.py`（依赖只能向下、禁止环、`svc` key 必须在
   `ServiceContext` 里声明）+ `utils/item_parser.py` 挪到 `services/`。
 
 ## 0.1.13 — 2026-09-15
 
-新增一份全面语料：`TESTING_CORPUS_FULL.md` + `scripts/run_corpus_all_rows.py`，把八个工具面
+新增一份全面语料：`docs/testing/TESTING_CORPUS_FULL.md` + `scripts/run_corpus_all_rows.py`，把八个工具面
 **全部 110 个 intent** 的信封体检、其余六个工具面的字段级契约和 MCP 协议层都变成可执行断言。
 第一轮真机跑（205 行）抓出 7 个问题，这次一并修掉：
 
@@ -274,7 +274,7 @@ schema 层拒绝、社区资料不可信提示、护甲四条新行。
 护甲部分统一格式、支持更换单个模组、无解时给出六维阶梯。
 
 此前护甲在六个地方出现且字段各不相同，也无法更换单个模组（默认工具面没有写入入口，
-legacy `apply_mod` 又不经确认直接改账号）。本版按 `ARMOR_FORMAT_PLAN.md` 的 P0–P6 完成：
+legacy `apply_mod` 又不经确认直接改账号）。本版按 `docs/plans/ARMOR_FORMAT_PLAN.md` 的 P0–P6 完成：
 
 - 统一载荷 `ArmorPayload`：`identity`（`slot`/`slot_display`/`gear_tier`/`archetype`/套装）加
   `instance`（光等、位置、能量、大师、调谐）加三层属性 `roll`/`base`/`final` 加插槽清单。
@@ -291,7 +291,7 @@ legacy `apply_mod` 又不经确认直接改账号）。本版按 `ARMOR_FORMAT_P
 - 实机勘测修掉两个问题：老护甲也带 `gearTier: 0`（按字段分族会误判为 3.0）；异域护甲的固定属性
   分布在 `intrinsics` 里（不算进 `roll` 会把大师等级算成 30）。
 - 文档：`routing.md` 补护甲统一键口径与 `find`/`recommend` 分工（要装备走 `find`）、`ladder` 读法；
-  `TESTING_CORPUS.md` 新增「十六、护甲」章与逐行脚本 `scripts/run_corpus_armor_rows.py`（12 行）；
+  `docs/testing/TESTING_CORPUS.md` 新增「十六、护甲」章与逐行脚本 `scripts/run_corpus_armor_rows.py`（12 行）；
   护甲基线 19 例（`--surface armor`）。
 
 ## 0.1.2 — 2026-09-13
@@ -368,4 +368,4 @@ legacy `apply_mod` 又不经确认直接改账号）。本版按 `ARMOR_FORMAT_P
 - 删除长期失效的 `Dockerfile`（引用了不存在的 `src/`）；补 `tests/conftest.py`，
   干净克隆（没有 `.env`）也能跑全量测试。
 
-已知限制见 README「前置条件与已知限制」与 `TESTING_CORPUS.md` 的「已知问题」。
+已知限制见 README「前置条件与已知限制」与 `docs/testing/TESTING_CORPUS.md` 的「已知问题」。

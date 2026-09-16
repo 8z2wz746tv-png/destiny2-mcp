@@ -93,8 +93,8 @@ for (const socket of artifact.sockets.allSockets) {
 
 - 参数契约：`tools/_param_contracts.py` 登记新键的归属；`changes` 的合法键加入校验；
 - 文档：`skills/destiny2-mcp/references/routing.md`（契约测试会校验）、README 的能力表；
-- 语料：`TESTING_CORPUS_FULL.md` 加两行；`run_corpus_all_rows.py` 的 rows 组加断言；
-- `COMPATIBILITY.md`：新键是**新能力**（不是别名），登记一句；旧行为（"子职业不一致就失败"）直接删除，
+- 语料：`docs/testing/TESTING_CORPUS_FULL.md` 加两行；`run_corpus_all_rows.py` 的 rows 组加断言；
+- `docs/COMPATIBILITY.md`：新键是**新能力**（不是别名），登记一句；旧行为（"子职业不一致就失败"）直接删除，
   不留兼容；
 - 版本：0.3.0（新增能力 + 行为变更），CHANGELOG 一段。
 

@@ -221,7 +221,7 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
 2. 契约测试：`tests/test_weapon_keys_snapshot.py`（每个 intent 的键集合）、`tests/test_weapon_socket_contract.py`（`kind`/`scope`/`roll_kind` 枚举、定义级/实例级不混、列表类必须有 `total/returned/truncated`）。
 3. 体积闸：定义级 `options` 默认不带 `description`（只给愿单/清单标中的），实例级给全；契约测试卡每 intent 上限（现状 `perk_pool` 32 KB → 目标 10 KB 量级）。
 4. `weapon_schema_version`（响应顶层）+ `manifest/fingerprint.json`。
-5. 文档三处同源：本计划、`TESTING_CORPUS.md` 武器章节、skill `routing.md` 武器章节；测试加"武器 intent 覆盖"断言。
+5. 文档三处同源：本计划、`docs/testing/TESTING_CORPUS.md` 武器章节、skill `routing.md` 武器章节；测试加"武器 intent 覆盖"断言。
 6. 旧键一次性删除（消费方只有本仓库语料/测试/skill）。
 
 ### 3.8 体验保障与迁移
@@ -322,7 +322,7 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
   社区富集搬到 `tools/_enrichment.py`。
 - `stats` 改数据驱动：顺序与"是否按数字展示"来自 `DestinyStatGroupDefinition`，名字查 `DestinyStatDefinition`，
   `is_primary` 取 `primaryBaseStatHash`（遗产 12 项，含以前硬编码表里没有的后坐方向/弹药生成）。
-- 键映射表（old → new）写进 `TESTING_CORPUS.md` 武器章节附录；119 处消失字段逐条登记进基线 allowlist。
+- 键映射表（old → new）写进 `docs/testing/TESTING_CORPUS.md` 武器章节附录；119 处消失字段逐条登记进基线 allowlist。
 - **对计划表的一处修正（有实测依据）**：原表写 `type` = "完整武器模板（定义级 sockets + 实例级 options）"，
   实测 5 把武器 **597 KB**（每把约 120 KB，50 把就是 6 MB）。列表要回答的是"我这把能换什么"，
   完整池子是单把武器的问题，故改成：`type`/`compare` 用 `column_list()`（列计数 + `equipped`）
@@ -350,7 +350,7 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
 - 固定/随机分支（计划 §3.5）：`god_roll` 固定武器给固有+固定特性（P2 已做）、
   `popularity` 固定武器加"选取率不反映哪套 roll 更值得刷"、`perk_pool` 加"仅部件可选"、
   `filter_rolls` 命中固定武器时加"没有 roll 可变"。
-- 文档：`TESTING_CORPUS.md` 武器章节补本地资料口径与形状说明；`skills/.../routing.md`
+- 文档：`docs/testing/TESTING_CORPUS.md` 武器章节补本地资料口径与形状说明；`skills/.../routing.md`
   武器章节重写（新增 `sockets` 字段语义与"能不能换成某 Perk 看哪两处"），并跑 `install_skill.py` 同步。
 - 验收：`tests/test_weapon_local_data.py`（12 条）+ 键集合快照仍绿；真机 `perk_pool` 遗产实测
   清单 T1/来源/`cross_check` 齐全、24 个选项带 `recommended`；基线 diff 无「无理由消失」
@@ -374,7 +374,7 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
   每项约 177 B）、采样后的非 roll 栏 3.7 KB、`weapon` 块 5.6 KB（其中社区条目 3.5 KB）。
   要压到 10 KB 只能砍掉 `stat_effects`（perk 到底加什么数值，agent 选 perk 的依据）
   或砍掉未抽中的栏位计数 —— 那是拿信息换数字，不做。**结论：目标改为"perk_pool 不超过 P0 的
-  45 KB，且每个 perk 都在"**，并在 `TESTING_CORPUS.md` 写明"池子不带描述/图标"的口径。
+  45 KB，且每个 perk 都在"**，并在 `docs/testing/TESTING_CORPUS.md` 写明"池子不带描述/图标"的口径。
 
 ---
 

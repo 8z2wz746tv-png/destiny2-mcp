@@ -3,7 +3,7 @@
 #
 # 真机脚本不进 CI：`skills/destiny-mcp-setup/scripts/verify_mcp.py`、
 # `scripts/run_corpus_*.py`、`capture_weapon_baseline.py` 都需要 `.env`、OAuth token、
-# 本地 Manifest 与真账号，只能在本机按 TESTING_CORPUS.md 的流程手动跑。
+# 本地 Manifest 与真账号，只能在本机按 docs/testing/TESTING_CORPUS.md 的流程手动跑。
 name: CI
 
 on:
