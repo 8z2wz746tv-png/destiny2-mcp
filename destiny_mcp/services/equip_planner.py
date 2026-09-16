@@ -29,19 +29,21 @@ from typing import Any, Protocol
 
 from ..models import EquipPlan, EquipPlanBlock, EquipPlanStep, InventoryItem
 from ..vocabulary import LOCATION_LABELS_ZH  # 位置中文标签的单一出处
+from ..build.constants import ARMOR_SLOT_MAP
 from . import profile_components
-from .armor_payload import slot_key_from_display
+from .armor_payload import slot_key_from_display, slot_key_from_solver
 from .item_parser import parse_items_from_profile
 
 # 装备部位 → 背包 bucket（无符号 32 位，profile 的 buckets 组件用的就是这个）。
 # 与 item_parser._ARMOR_BUCKETS 是同一批数字：那边按 bucket 判"是不是护甲"，
 # 这边按部位取容量；两处都写死过一次，改动时一起看。
-_ARMOR_BUCKET_BY_SLOT: dict[str, int] = {
-    "helmet": 3448274439,
-    "gauntlets": 3551918588,
-    "chest": 14239492,
-    "legs": 20886954,
-    "class_item": 1585787867,
+# 桶→槽位：从**单一出处**派生（`build/constants.ARMOR_SLOT_MAP` 是正主，认 signed/unsigned；
+# 它的槽名是复数 "chests"，这里用 slot_key_from_solver 归一成 "chest"）。
+# 以前这里是手抄的一份，和 loadout_service 那份、item_parser 用的那份是同一事实的三份拷贝。
+ARMOR_BUCKET_BY_SLOT: dict[str, int] = {
+    slot_key_from_solver(slot): bucket_hash
+    for bucket_hash, slot in ARMOR_SLOT_MAP.items()
+    if bucket_hash > 0
 }
 
 _TIER_TYPE_EXOTIC = 6
@@ -117,7 +119,7 @@ class EquipPlanRequest:
 
 # 公开别名：装配请求（transfer_service）要按**同一张表**数该类目有几件、容量多少，
 # 再抄一份就会漂。
-ARMOR_BUCKET_BY_SLOT: dict[str, int] = _ARMOR_BUCKET_BY_SLOT
+ARMOR_BUCKET_BY_SLOT: dict[str, int] = ARMOR_BUCKET_BY_SLOT
 
 
 def _slot_from_definition(manifest: EquipItemInfo, item_hash: int) -> str:
@@ -443,7 +445,7 @@ def _bucket_capacity(
             worn[item.slot] = worn.get(item.slot, 0) + 1
 
     capacity: dict[str, BucketCapacity] = {}
-    for slot, bucket_hash in _ARMOR_BUCKET_BY_SLOT.items():
+    for slot, bucket_hash in ARMOR_BUCKET_BY_SLOT.items():
         definition = manifest.get_bucket_definition(bucket_hash) or {}
         total = int(definition.get("itemCount") or 0)
         if not total:

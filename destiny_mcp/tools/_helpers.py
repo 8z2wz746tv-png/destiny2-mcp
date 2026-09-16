@@ -14,6 +14,7 @@ from ..exceptions import DestinyMCPError
 from ..logging_config import get_logger
 from ..error_codes import code_for_exception
 from ..service_context import ServiceContext
+from ..error_codes import ErrorCode
 from ._responses import error_response
 
 logger = get_logger(__name__)
@@ -65,6 +66,15 @@ def handle_tool_error(func: Callable) -> Callable:
                 # 异常类名 → code 的推导只有一处（error_codes.code_for_exception）
                 return error_response(code_for_exception(e), str(e))
             return f"⚠️ {e}"
+        except TimeoutError as e:
+            # aiohttp/asyncio 的超时在 3.11+ 就是内置 TimeoutError，而且**没有 message**：
+            # 以前它直接冒到框架层，调用方只看到一句 `Error executing tool …: `（空的），
+            # 分不清是网络慢、上游挂了、还是自己参数写错（真机配装时踩到）。
+            logger.warning("Tool %s 超时: %s", func.__name__, e)
+            return error_response(
+                ErrorCode.API_ERROR,
+                "访问 Bungie 超时（网络慢或上游没响应），这不是参数问题：稍后重试即可。",
+            )
         except Exception:
             logger.exception("Tool %s unexpected error", func.__name__)
             raise

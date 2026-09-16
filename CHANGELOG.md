@@ -2,6 +2,37 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.4.3 — 2026-09-16
+
+真机做了一次完整配装测试（术士 / 星火协议 / 180 手雷 + 100 超能 + 100 武器），
+这一版修的是那次测试暴露出来的东西。
+
+### 修复（真机复现 → 已修）
+
+- **`equip_build` 直接崩**：`LoadoutEquipmentService` 用了不存在的 `self._ARMOR_SLOTS`
+  （那只是 `loadout_service` 的模块级常量，而这个类并不继承它）→
+  `AttributeError: 'LoadoutEquipmentService' object has no attribute '_ARMOR_SLOTS'`，
+  调用方只看到一句空错误。现在改用**单一出处** `build/constants.ARMOR_SLOT_MAP`
+  （经 `item_parser.armor_slot_from_bucket` 归一），这条路径以前没有任何测试覆盖；
+- **上游超时被吞成空消息**：Bungie 请求超时时 `TimeoutError()` 没有 message，
+  `handle_tool_error` 直接重抛，客户端只看到 `Error executing tool …: `（空的）——
+  分不清"网络慢"和"参数错"。现在统一翻译成 `a_p_i_error` +
+  "访问 Bungie 超时（网络慢或上游没响应），这不是参数问题：稍后重试即可"，并加了守门测试；
+- **三份"桶 hash → 护甲槽位"表收口成一份**：`loadout_service._ARMOR_SLOTS`、
+  `equip_planner.ARMOR_BUCKET_BY_SLOT`、`item_parser` 里那段两步查找原本是同一个事实的三份拷贝
+  （这次崩溃就是其中一份漂了），现在都从 `build/constants.ARMOR_SLOT_MAP` 派生。
+
+### 尚未修复（已知，真机复现）
+
+**护甲模组插槽预检失败**：`equip_build` 执行到"装模组"这一步时，
+对多件护甲报 `找不到模组 <hash> 在 '<装备名>' 上的唯一兼容插槽`，
+回滚时同样装不回原模组，于是整条配装以
+`配装 '已确认的精确配装' 执行失败，且自动恢复不完整` 结束。
+实测影响：**账号最终状态与执行前一致**（逐件核对五件护甲的属性与位置都没变），
+所以是"没装成"，不是"装坏了"。修复方向与神器模组同源：
+按**该件定义里的插槽与 plug set**（配合组件 310 的 `reusablePlugs`）找候选，
+不要假定槽位/plug set 的固定结构。
+
 ## 0.4.2 — 2026-09-16
 
 装备编排的三处收口（0.4.0/0.4.1 之后自查出来的）：

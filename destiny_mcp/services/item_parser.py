@@ -39,6 +39,16 @@ def _parse_armor_stats(stats_data: dict, inst_id: str) -> ArmorStats | None:
     return ArmorStats(**kwargs)
 
 
+def armor_slot_from_bucket(bucket_hash: int) -> str:
+    """桶 hash → 护甲槽位键（`chest`/`gauntlets`/…）；不是护甲桶给空串。
+
+    桶→槽位的正主是 `build/constants.ARMOR_SLOT_MAP`（它认 signed/unsigned 两种写法，
+    槽名是复数 "chests"），这里统一做一次归一 —— 装备编排、配装快照、物品解析都用这一处，
+    免得同一个事实散成三份（历史上散过，还因此崩过一次）。
+    """
+    return slot_key_from_solver(ARMOR_SLOT_MAP.get(bucket_hash, ""))
+
+
 def parse_items_from_profile(
     profile: dict,
     manifest: ManifestManager,
@@ -93,10 +103,7 @@ def parse_items_from_profile(
         gear_tier_note = None
         armor_system = ""
         if bucket_hash in _ARMOR_BUCKETS:
-            raw_slot = ARMOR_SLOT_MAP.get(bucket_hash) or ARMOR_SLOT_MAP.get(
-                bucket_hash & 0xFFFFFFFF, ""
-            )
-            slot_key = slot_key_from_solver(raw_slot or "")
+            slot_key = armor_slot_from_bucket(bucket_hash)
             slot_display = SLOT_DISPLAY.get(slot_key, "")
             armor_system = armor_system_of(instance) if instance else "legacy"
             gear_tier, gear_tier_note = gear_tier_of(instance) if instance else (None, None)

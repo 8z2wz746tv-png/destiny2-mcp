@@ -123,3 +123,24 @@ def test_write_failure_hints_ignore_unrelated_failures() -> None:
 
     assert write_failure_hints({"code": "transfer_failed", "message": "网络超时"}) == []
     assert write_failure_hints({"message": "Cannot perform this action on an equipped item."})
+
+
+async def test_timeout_becomes_an_envelope_instead_of_an_empty_message() -> None:
+    """上游超时要给 `a_p_i_error` + 中文说明。
+
+    真机踩过：配装时 Bungie 请求超时，`TimeoutError()` 没有 message，直接冒到框架层，
+    调用方只看到 `Error executing tool build_assistant: `（空的）——分不清是网络慢、
+    上游挂了、还是自己参数写错。
+    """
+    from destiny_mcp.tools._helpers import handle_tool_error
+
+    @handle_tool_error
+    async def inventory_assistant(**kwargs):
+        raise TimeoutError
+
+    response = await inventory_assistant(intent="equip")
+
+    assert response["ok"] is False
+    assert response["error"]["code"] == "a_p_i_error"
+    assert response["error"]["message"].strip(), "不许是空消息"
+    assert "超时" in response["error"]["message"]

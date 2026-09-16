@@ -25,7 +25,7 @@ from ..models import (
 )
 from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
-from .item_parser import parse_items_from_profile
+from .item_parser import armor_slot_from_bucket, parse_items_from_profile
 from .account_action_lock import account_action_lock
 from .loadout_mod_sockets import ModSocketMixin
 from .loadout_subclass_sockets import SubclassSocketMixin
@@ -409,7 +409,7 @@ class LoadoutEquipmentService(ModSocketMixin, SubclassSocketMixin):
         for raw in equipped_raw:
             item_hash = raw.get("itemHash", 0)
             instance_id = str(raw.get("itemInstanceId", ""))
-            slot = self._ARMOR_SLOTS.get(raw.get("bucketHash", 0))
+            slot = armor_slot_from_bucket(raw.get("bucketHash", 0))
             if slot:
                 mod_sockets = self.read_armor_mod_sockets(
                     instance_id, item_hash, sockets_data

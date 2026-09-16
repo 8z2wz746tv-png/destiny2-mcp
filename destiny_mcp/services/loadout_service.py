@@ -23,7 +23,9 @@ import aiobungie
 from ..bungie_client import BungieClient
 from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..logging_config import get_logger
+from ..build.constants import ARMOR_SLOT_MAP
 from . import profile_components
+from .armor_payload import slot_key_from_solver
 from ..manifest import BUNGIE_BASE_URL, ManifestManager, class_type_name, resolve_character_name
 from ..models import (
     Loadout,
@@ -42,12 +44,11 @@ logger = get_logger(__name__)
 _DEFAULT_LOADOUT_PATH = Path.home() / ".destiny_mcp" / "loadouts.json"
 
 # Bucket hashes for armor slots (unsigned 32-bit)
+# 桶 hash → 槽位键（从单一出处派生：build/constants.ARMOR_SLOT_MAP 是正主）
 _ARMOR_SLOTS = {
-    3448274439: "helmet",
-    3551918588: "gauntlets",
-    14239492: "chest",
-    20886954: "legs",
-    1585787867: "class_item",
+    bucket_hash: slot_key_from_solver(slot)
+    for bucket_hash, slot in ARMOR_SLOT_MAP.items()
+    if bucket_hash > 0
 }
 
 
