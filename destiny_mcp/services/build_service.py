@@ -192,7 +192,7 @@ class BuildService:
         mtype = p["membership_type"]
 
         # Fetch equipment + socket data for all characters
-        profile = await self._resolver.get_profile(mid, mtype, [200, 205, 305])
+        profile = await self._resolver.get_profile(mid, mtype, profile_components.INVENTORY_SOCKETS)
         chars = profile.get("characters", {}).get("data", {})
         equip = profile.get("characterEquipment", {}).get("data", {})
         sockets_map = profile.get("itemComponents", {}).get("sockets", {}).get("data", {})

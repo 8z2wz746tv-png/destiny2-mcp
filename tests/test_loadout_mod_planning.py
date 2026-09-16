@@ -722,3 +722,32 @@ async def test_apply_subclass_config_turns_http_errors_into_failed_steps() -> No
     assert steps[0].action == "error"
     assert steps[0].detail.startswith("plug 900 应用失败:")
     assert steps[0].success is False
+
+
+async def test_empty_socket_cache_is_reread_instead_of_failing_the_preflight() -> None:
+    """缓存里是一条**空列表**时要现读一次，而不是每件都报"找不到唯一兼容插槽"。
+
+    真机复现：`equip_build` 先把仓库里那件护甲搬过来，随后逐件报
+    `找不到模组 <hash> 在 '<装备名>' 上的唯一兼容插槽` —— 因为搬过来那件在旧快照里
+    没有插槽数据（缓存里是 []），而旧代码只判"键在不在缓存里"，于是每个槽都被
+    `index >= len(sockets_data)` 跳过。
+    """
+    general = 2487827355  # enhancements.v2_general（属性模组）
+    mod = 4183296050
+    manifest = _Manifest(
+        definitions={
+            50: {"sockets": {"socketEntries": [{"reusablePlugSetHash": 111}]}},
+            mod: _mod(general, 3),
+        },
+        plug_sets={111: {"reusablePlugItems": [{"plugItemHash": mod}]}},
+    )
+    service = _service(manifest)
+    service._resolver.get_profile = AsyncMock(return_value={
+        "itemComponents": {"sockets": {"data": {"sub-1": {"sockets": [{"plugHash": 0}]}}}}
+    })
+
+    index = await service._find_mod_socket(
+        "sub-1", 50, mod, "player", 3, sockets_cache={"sub-1": []}
+    )
+
+    assert index == 0, "空缓存要触发重读，而不是当成没有插槽"

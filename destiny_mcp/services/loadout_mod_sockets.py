@@ -9,6 +9,7 @@ from __future__ import annotations
 from ..exceptions import TransferError
 from ..manifest import ManifestManager
 from ..models import LoadoutItem
+from . import profile_components, write_readback
 from .loadout_plug_lookup import PlugLookupMixin
 
 
@@ -91,6 +92,40 @@ class ModSocketMixin(PlugLookupMixin):
         except (TypeError, ValueError):
             return None
 
+    async def _read_sockets(
+        self,
+        item_instance_id: str,
+        membership_id: str,
+        membership_type: int,
+        *,
+        attempts: int | None = None,
+        delay: float | None = None,
+    ) -> list[dict]:
+        """读某件实例的插槽，**带同步窗口重试**。
+
+        真机踩过：`equip_build` 刚把仓库里那件搬过来就立刻读，上游 profile 还没带上它的插槽
+        （与写入后回读同一个同步窗口，3～10 秒），于是拿到的是一串空数据，接着每件都报
+        "找不到唯一兼容插槽"。这里用 `write_readback` 重试到拿到非空插槽为止。
+        """
+
+        async def read() -> list[dict]:
+            # 组件必须带上"清单类"那几个：只请求 305 时上游**一个插槽都不返回**
+            # （真机实测：只要 305 → 0 件带插槽；带 102/200/201/205/300 → 1627 件）。
+            profile = await self._resolver.get_profile(
+                membership_id, membership_type, profile_components.INVENTORY_SOCKETS
+            )
+            return (
+                profile.get("itemComponents", {})
+                .get("sockets", {})
+                .get("data", {})
+                .get(item_instance_id, {})
+                .get("sockets", [])
+            )
+
+        return await write_readback.read_until(
+            read, bool, attempts=attempts, delay=delay
+        )
+
     async def _prepare_mod_operations(
         self,
         item: LoadoutItem,
@@ -100,7 +135,20 @@ class ModSocketMixin(PlugLookupMixin):
         instances_data: dict,
     ) -> list[tuple[str, int, int]]:
         """Order minimal energy-clearing writes before requested mod writes."""
-        sockets = sockets_cache.get(item.item_instance_id, [])
+        sockets = sockets_cache.get(item.item_instance_id) or []
+        if not sockets:
+            # 插槽缺失/为空 → 现场新读（含同步窗口重试），写回 cache 供后面的能量预检与写入用。
+            sockets = await self._read_sockets(
+                item.item_instance_id, membership_id, membership_type
+            )
+            sockets_cache[item.item_instance_id] = sockets
+            if not sockets:
+                window = int(write_readback.ATTEMPTS * write_readback.DELAY_SECONDS)
+                raise TransferError(
+                    "模组预检",
+                    f"等 {window} 秒仍读不到 '{item.name}' 的插槽数据"
+                    "（上游 profile 没同步），这次没改任何模组；稍后重试即可。",
+                )
         requested = (
             [
                 (mod_hash, socket_index)
@@ -254,18 +302,15 @@ class ModSocketMixin(PlugLookupMixin):
     ) -> int | None:
         """Find the socket index where a mod should be inserted."""
         excluded_socket_indices = excluded_socket_indices or set()
-        if sockets_cache is not None and item_instance_id in sockets_cache:
+        # 注意 `or {}`：缓存里可能是**一条空列表**（装备刚被搬过来，快照里还没有它的插槽），
+        # 那不是"这件的插槽是空的"。以前只判"键在不在"，于是整件装备的每个槽都被
+        # `index >= len(sockets_data)` 跳过，最后报"找不到唯一兼容插槽"（真机复现：
+        # equip_build 搬完仓库里那件之后，逐件都报这句）。
+        if sockets_cache is not None and sockets_cache.get(item_instance_id):
             sockets_data = sockets_cache[item_instance_id]
         else:
-            profile = await self._resolver.get_profile(
-                membership_id, membership_type, [305]
-            )
-            sockets_data = (
-                profile.get("itemComponents", {})
-                .get("sockets", {})
-                .get("data", {})
-                .get(item_instance_id, {})
-                .get("sockets", [])
+            sockets_data = await self._read_sockets(
+                item_instance_id, membership_id, membership_type
             )
             if sockets_cache is not None:
                 sockets_cache[item_instance_id] = sockets_data

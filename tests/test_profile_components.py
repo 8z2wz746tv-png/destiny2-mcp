@@ -18,6 +18,7 @@ from destiny_mcp.services import (
     inventory_analysis_service,
     inventory_service,
     loadout_equipment_service,
+    loadout_recovery,
     loadout_service,
     loadout_subclass_sockets,
     profile_cache,
@@ -95,9 +96,10 @@ def _source(module) -> str:
         (loadout_subclass_sockets, "SUBCLASS", 2),  # 换之前读一次、换完重读插槽
         (loadout_service, "LOADOUT_SLOTS", 1),
         (loadout_service, "ARMOR_SNAPSHOT", 1),
-        (loadout_equipment_service, "ARMOR_SNAPSHOT", 1),
+        # 抓取执行前状态的那段已抽到 loadout_recovery.py
+        (loadout_recovery, "ARMOR_SNAPSHOT", 1),
         (loadout_equipment_service, "INVENTORY_MINIMAL", 1),
-        (loadout_equipment_service, "INVENTORY_SOCKETS", 1),
+        (loadout_equipment_service, "INVENTORY_SOCKETS", 3),  # 子职业/模组/装备回读三处都要插槽
     ],
 )
 def test_call_sites_keep_their_historical_set(module, named_set, count):
@@ -134,4 +136,34 @@ def test_no_service_writes_a_raw_component_list_any_more():
 def test_describe_makes_logs_readable():
     assert profile_components.describe(profile_components.INVENTORY_MINIMAL) == (
         "102,200,201,205,300"
+    )
+
+
+def test_socket_reads_always_carry_an_inventory_component() -> None:
+    """要 305（插槽）就必须同时带上"清单类"组件，否则上游**一个插槽都不返回**。
+
+    真机实测：`get_profile(..., [305])` → 0 件带插槽；带上 102/200/201/205/300 → 1627 件。
+    模组插槽读取以前正是只写了 `[305]`，于是"找不到兼容插槽"报了一整晚，
+    真正的原因是那次请求根本没拿到数据（静默读空）。
+    """
+    import re
+    from pathlib import Path as _Path
+
+    root = _Path(__file__).resolve().parents[1] / "destiny_mcp"
+    inventory = ("102", "200", "201", "205")
+    offenders = []
+    for path in sorted(root.rglob("*.py")):
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if "get_profile(" not in line or "305" not in line:
+                continue
+            if "profile_components" in line:  # 命名集合（含清单类组件）放行
+                continue
+            if not re.search(r"\[\s*\d", line):
+                continue
+            if any(token in line for token in inventory):
+                continue
+            offenders.append(f"{path.relative_to(root.parent)}:{number}: {line.strip()}")
+    assert offenders == [], (
+        "要 305 就得带清单类组件（102/200/201/205），否则插槽读回来是空的：\n"
+        + "\n".join(offenders)
     )

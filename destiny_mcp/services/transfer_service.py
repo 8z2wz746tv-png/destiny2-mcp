@@ -606,7 +606,23 @@ class TransferService:
         target_location = class_type_name(target_class).lower()
         char_id = await self._resolver.resolve_character_id(mid, mtype, character)
 
-        all_items = await self._fetch_all_items(mid, mtype)
+        # 刚转移完的物品，上游 profile 可能还没反映到目标角色身上（同步窗口，真机实测
+        # 3～10 秒）。以前读一次就判"没在目标角色背包里"，于是 `equip_build` 搬完立刻批量装备
+        # 必失败（报"请先用 move_item 转移后再批量装备"，可转移明明刚刚成功）。
+        wanted = set(item_instance_ids)
+
+        def _all_present(items: list) -> bool:
+            return all(
+                any(
+                    it.item_instance_id == item_id and it.location == target_location
+                    for it in items
+                )
+                for item_id in wanted
+            )
+
+        all_items = await write_readback.read_until(
+            lambda: self._fetch_all_items(mid, mtype), _all_present
+        )
         by_id = {it.item_instance_id: it for it in all_items}
         missing = [item_id for item_id in item_instance_ids if item_id not in by_id]
         wrong_location = [
