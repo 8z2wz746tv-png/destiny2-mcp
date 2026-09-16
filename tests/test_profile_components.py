@@ -86,7 +86,7 @@ def _source(module) -> str:
         # P4：对比也要 310（"这一件能换什么"），所以从 INVENTORY_SOCKETS 升到 WEAPON_DETAIL
         (weapon_compare_service, "WEAPON_DETAIL", 2),
         (weapon_detail_service, "WEAPON_DETAIL", 2),
-        (artifact_service, "ARTIFACT", 1),
+        (artifact_service, "ARTIFACT", 2),  # 装完模组要回读核对，所以取两次
         (loadout_service, "LOADOUT_SLOTS", 1),
         (loadout_service, "ARMOR_SNAPSHOT", 1),
         (loadout_equipment_service, "ARMOR_SNAPSHOT", 1),

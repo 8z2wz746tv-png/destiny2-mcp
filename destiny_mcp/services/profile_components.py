@@ -13,12 +13,16 @@ Bungie 的 profile 接口按"组件号"取数据，某个服务要哪几个组�
 - 300 itemInstances（光等、`gearTier`、itemLevel、quality）
 - 302 itemPerks（Bungie 算好的展示 perk）
 - 304 itemStats（当前属性值）
-- 305 itemSockets（已装 plug）
+- 305 itemSockets（已装 plug；写入后的回读也读它）
 - 308 itemPlugObjectives（催化剂/击杀进度）
 - 310 itemReusablePlugs（**这一件副本**能换的 plug —— T 级决定的那个数）
 """
 
 from __future__ import annotations
+
+# 装备插槽：读「这件东西现在装着什么」——模组、perk、子职业碎片、神器模组都靠它。
+# 写入之后要回读核对，用的也是它（写进去的 plug 只有这里能看到）。
+ITEM_SOCKETS: list[int] = [305]
 
 # 物品 + 光等/属性：库存概况、移动、精算等只读基础查询
 INVENTORY: list[int] = [102, 200, 201, 205, 300, 304]
@@ -27,13 +31,13 @@ INVENTORY: list[int] = [102, 200, 201, 205, 300, 304]
 INVENTORY_MINIMAL: list[int] = [102, 200, 201, 205, 300]
 
 # 要插槽但不要 304 —— 注意这和 ARMOR_SNAPSHOT 不是一个集合，别互相替换
-INVENTORY_SOCKETS: list[int] = [102, 200, 201, 205, 300, 305]
+INVENTORY_SOCKETS: list[int] = [102, 200, 201, 205, 300, *ITEM_SOCKETS]
 
 # 护甲快照：属性值 + 插槽（模组要写进插槽，所以两个都要）
-ARMOR_SNAPSHOT: list[int] = [102, 200, 201, 205, 300, 304, 305]
+ARMOR_SNAPSHOT: list[int] = [102, 200, 201, 205, 300, 304, *ITEM_SOCKETS]
 
 # 武器详情/按类型列武器：已装 plug + 能换的 plug + Bungie 的展示 perk + 催化剂进度
-WEAPON_DETAIL: list[int] = INVENTORY + [305, 302, 310, 308]
+WEAPON_DETAIL: list[int] = INVENTORY + [*ITEM_SOCKETS, 302, 310, 308]
 
 # 官方配装槽位的最小集合（loadout_service 只需要槽位定义）
 LOADOUT_SLOTS: list[int] = [102, 200, 201, 205, 206]
@@ -44,7 +48,7 @@ ARTIFACT: list[int] = [100, 102, 200, 201, 205, 300, 302]
 # 缓存里一次取全：读多写少的场景共用（profile_cache）。
 # 必须覆盖所有调用方要的组件（含 308 催化剂进度），否则后台刷新会把并集降级、
 # 下一次调用又要重新拉一遍 10 MB 的 profile。
-FULL: list[int] = [102, 200, 201, 205, 300, 302, 304, 305, 308, 310]
+FULL: list[int] = [102, 200, 201, 205, 300, 302, 304, *ITEM_SOCKETS, 308, 310]
 
 
 def describe(components: list[int]) -> str:
