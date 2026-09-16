@@ -2,6 +2,43 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.4.5 — 2026-09-16
+
+真机配装测试打通到"装备全部换上"这一步，靠的是把上游原因如实带出来。
+
+### 关键发现：护甲模组**没法通过 API 装**（Bungie 策略，不是我们的 bug）
+
+把模组步骤失败时的上游原文带出来之后，真因一目了然：
+
+| 操作 | 上游返回 |
+| --- | --- |
+| 装属性模组（`InsertSocketPlugFree`） | **403** `Access not permitted by application scope`（装护甲模组要 `AdvancedWriteActions` scope，本应用没有） |
+| 为腾能量卸掉一颗模组 | **500** `This action can only be done in-game.`（卸/换模组只能在游戏内做） |
+
+以前这两句都被丢掉，只写"模组 4183296050 → '铁能面罩'"，于是看上去像我们的插槽查找又错了。
+
+### 修复
+
+- `_equip_local_unlocked` 的模组步骤失败时带上游原文；识别上面两种"策略限制"后
+  **不再当成硬失败**：记下来、继续走完剩下的写入，最后返回
+  `mod_in_game` 步骤 + 明确话术（"装备已经换上；这几颗模组请在游戏里手动装"）；
+- `_apply_exact_with_recovery` 见到 `mod_in_game` 时**不回滚装备** —— 装备是好的，
+  回滚等于把用户要的东西又脱下来；
+- `_capture_recovery_state` / `_restore_exact_state` / `_verify_restored_items`
+  全部搬进 `services/loadout_recovery.py`（`RecoveryStateMixin`）：
+  `loadout_equipment_service.py` 795 → **508 行**，`tests/test_module_size_ratchet.py`
+  的上限随之下调到 **520**（上限只降不升）；`tests/test_profile_components.py`
+  的调用点钉桩跟着搬家。
+
+### 真机结果（术士 / 星火协议 / 180 手雷 + 100 超能 + 100 武器）
+
+- 求解 ✅ → 转移 ✅ → **批量装备 ✅ 五件全部换上（且不再回滚）**；
+- 五件装备的 `final` 六维求和（**未含计划里的属性模组**）：
+  武器 **106** / 生命 30 / 职业 40 / 手雷 **165** / 近战 44 / 超能 **125**；
+- 求解器预测（**含**属性模组）：武器 106 / 生命 30 / 职业 30 / 手雷 180 / 超能 125 ——
+  差的正是 5 颗属性模组（2× 武器 +10、3× 手雷 +10），**需要用户在游戏里手动装**（Bungie 策略）；
+- 全量测试 **1526 passed**。
+
 ## 0.4.4 — 2026-09-16
 
 接着真机配装测试往下打：这一版把"模组装不上"的真正原因挖出来了，是**组件请求**的问题。

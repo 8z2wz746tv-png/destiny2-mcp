@@ -18,14 +18,11 @@ from . import profile_components
 from ..manifest import ManifestManager
 from ..models import (
     Loadout,
-    LoadoutItem,
     LoadoutOperationResult,
-    LoadoutSubclassConfig,
     MoveItemStep,
 )
 from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
-from .item_parser import armor_slot_from_bucket, parse_items_from_profile
 from .account_action_lock import account_action_lock
 from .loadout_mod_sockets import ModSocketMixin
 from .loadout_recovery import RecoveryStateMixin
@@ -34,6 +31,25 @@ from .loadout_subclass_sockets import SubclassSocketMixin
 logger = get_logger(__name__)
 
 _CANCEL_ROLLBACK_TIMEOUT_SECONDS = 60
+
+def _mod_write_needs_in_game(result: dict) -> bool:
+    """模组写入是不是被 Bungie 的策略挡了（而不是我们写错）。
+
+    真机实测两种：
+    - 403 `Access not permitted by application scope`：装护甲模组要 `AdvancedWriteActions`，
+      本应用没有这个 scope；
+    - 500 `This action can only be done in-game.`：卸/换模组只能在游戏里做。
+
+    这两种都不是"重试能成"的错误，也不该把已经换好的装备回滚掉 —— 如实告诉用户
+    "这几颗模组请在游戏里装"才是对的。
+    """
+    text = f"{result.get('Message', '')} {result.get('ErrorStatus', '')}"
+    return (
+        "Access not permitted by application scope" in text
+        or "can only be done in-game" in text
+        or result.get("ErrorCode") in (403, 500) and "in-game" in text
+    )
+
 
 class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocketMixin):
     """Apply loadout equipment: transfer, equip, mods, subclass config."""
@@ -208,6 +224,7 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                 steps=steps,
             )
 
+        manual_mods: list[tuple[str, int, int]] = []
         for lo_item in loadout.items:
             for operation, mod_hash, socket_idx in mod_operations.get(
                 lo_item.item_instance_id, []
@@ -221,16 +238,23 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                         mtype,
                     )
                     ok = mod_result.get("ErrorCode", 0) == 1
+                    upstream = str(mod_result.get("Message") or "").strip()
                     steps.append(MoveItemStep(
                         action="mod_clear" if operation == "clear" else "mod",
                         detail=(
                             f"为属性模组腾出能量：'{lo_item.name}' 插槽 {socket_idx}"
                             if operation == "clear"
                             else f"模组 {mod_hash} → '{lo_item.name}'"
-                        ),
+                        )
+                        # 失败要带上游原文（以前只写"为…腾出能量"，真因看不到）
+                        + ("" if ok else f" 失败：{upstream or '上游没给原因'}"),
                         success=ok,
                     ))
                     if not ok:
+                        if _mod_write_needs_in_game(mod_result):
+                            # 策略限制：记下来，继续走完剩下的模组，最后如实汇报。
+                            manual_mods.append((lo_item.name, mod_hash, socket_idx))
+                            continue
                         all_ok = False
                         break
                 except (aiobungie.HTTPError, TransferError) as e:
@@ -241,6 +265,25 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                     ))
                     all_ok = False
                     break
+
+        if manual_mods and all_ok:
+            names = "、".join(f"'{name}' 上的模组 {mod_hash}" for name, mod_hash, _ in manual_mods)
+            steps.append(MoveItemStep(
+                action="mod_in_game",
+                detail=(
+                    f"这些模组 Bungie 不允许通过 API 装（403/仅游戏内），请在游戏里手动装：{names}"
+                ),
+                success=False,
+            ))
+            return LoadoutOperationResult(
+                success=False,
+                loadout_name=loadout.name,
+                message=(
+                    f"配装 '{loadout.name}' 的装备已经换上；但 {len(manual_mods)} 颗模组需要你"
+                    "在游戏里手动装（Bungie 不允许 API 改护甲模组），装完六维就是求解器给的那套。"
+                ),
+                steps=steps,
+            )
 
         if not all_ok:
             return LoadoutOperationResult(
@@ -344,7 +387,10 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                 success=verified,
             ))
 
-        if applied.success and verified:
+        # 模组被上游策略挡住时 equipment 是好的：不回滚，交给上层如实汇报。
+        if applied.success and verified or any(
+            st.action == "mod_in_game" for st in applied.steps
+        ):
             return applied
 
         rollback_steps: list[MoveItemStep] = []
@@ -460,212 +506,3 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                 return False
 
         return True
-
-    async def _restore_exact_state(
-        self,
-        player_name: str,
-        attempted: Loadout,
-        recovery: dict,
-        steps: list[MoveItemStep],
-    ) -> bool:
-        """Best-effort rollback of sockets, equipped gear, and item locations."""
-        all_ok = True
-        target_states: dict[str, LoadoutItem] = recovery["target_states"]
-        char_id = recovery["character_id"]
-        mid = recovery["membership_id"]
-        mtype = recovery["membership_type"]
-
-        current_profile = await self._resolver.get_profile(
-            mid, mtype, profile_components.INVENTORY_MINIMAL
-        )
-        current_items = {
-            item.item_instance_id: item
-            for item in parse_items_from_profile(current_profile, self._manifest)
-        }
-
-        sockets_cache: dict = {}
-        for original in target_states.values():
-            current = current_items.get(original.item_instance_id)
-            if (
-                current is not None
-                and current.location != attempted.character
-                and original.source_location != attempted.character
-            ):
-                continue
-            operations = (
-                [(mod_hash, socket_index) for socket_index, mod_hash in sorted(original.mod_sockets.items())]
-                if original.mod_sockets
-                else [(mod_hash, None) for mod_hash in original.mods]
-            )
-            for mod_hash, exact_socket_index in operations:
-                try:
-                    socket_idx = (
-                        exact_socket_index
-                        if exact_socket_index is not None
-                        else await self._find_mod_socket(
-                            original.item_instance_id,
-                            original.item_hash,
-                            mod_hash,
-                            mid,
-                            mtype,
-                            sockets_cache,
-                        )
-                    )
-                    if socket_idx is None:
-                        raise TransferError("恢复模组", f"找不到模组 {mod_hash} 的插槽。")
-                    response = await self._insert_armor_mod(
-                        original.item_instance_id,
-                        mod_hash,
-                        socket_idx,
-                        char_id,
-                        mtype,
-                    )
-                    ok = response.get("ErrorCode", 0) == 1
-                    steps.append(MoveItemStep(
-                        action="rollback_mod",
-                        detail=f"恢复 '{original.name}' 的模组 {mod_hash}",
-                        success=ok,
-                    ))
-                    all_ok = all_ok and ok
-                except (aiobungie.HTTPError, ItemNotFoundError, TransferError) as exc:
-                    logger.error("Failed to restore mod %s on %s: %s", mod_hash, original.name, exc)
-                    steps.append(MoveItemStep(
-                        action="rollback_mod", detail=str(exc), success=False
-                    ))
-                    all_ok = False
-
-        previous: Loadout = recovery["previous_loadout"]
-        try:
-            previous_result = await self._equip_local_unlocked(player_name, previous)
-        except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:
-            logger.error("Failed to restore previous loadout: %s", exc)
-            previous_result = LoadoutOperationResult(
-                success=False,
-                loadout_name=previous.name,
-                message=str(exc),
-                steps=[MoveItemStep(
-                    action="error", detail=f"恢复执行前配装失败：{exc}", success=False
-                )],
-            )
-        steps.extend(
-            MoveItemStep(
-                action=f"rollback_{step.action}",
-                detail=step.detail,
-                success=step.success,
-            )
-            for step in previous_result.steps
-        )
-        all_ok = all_ok and previous_result.success
-
-        for original in target_states.values():
-            destination = original.source_location
-            if destination not in {"vault", "hunter", "warlock", "titan"}:
-                steps.append(MoveItemStep(
-                    action="rollback_location",
-                    detail=f"无法确定 '{original.name}' 的原始位置。",
-                    success=False,
-                ))
-                all_ok = False
-                continue
-            if destination == attempted.character:
-                continue
-            try:
-                moved = await self._transfer.transfer_item(
-                    player_name,
-                    original.item_instance_id,
-                    destination,
-                    to_character_id=(
-                        original.source_character_id or None
-                    ),
-                )
-                steps.append(MoveItemStep(
-                    action="rollback_location",
-                    detail=f"恢复 '{original.name}' 到 {destination}",
-                    success=moved.success,
-                ))
-                all_ok = all_ok and moved.success
-                if moved.success and original.was_equipped and destination != "vault":
-                    if original.source_character_id:
-                        response = await self._bungie.equip_item(
-                            original.item_instance_id,
-                            original.source_character_id,
-                            mtype,
-                        )
-                        equipped_ok = response.get("ErrorCode", 0) == 1
-                    else:
-                        equipped = await self._transfer.equip_item(
-                            player_name,
-                            original.item_instance_id,
-                            destination,
-                        )
-                        equipped_ok = equipped.success
-                    steps.append(MoveItemStep(
-                        action="rollback_equip",
-                        detail=f"重新装备 '{original.name}' 到 {destination}",
-                        success=equipped_ok,
-                    ))
-                    all_ok = all_ok and equipped_ok
-            except (ItemNotFoundError, TransferError) as exc:
-                logger.error("Failed to restore location for %s: %s", original.name, exc)
-                steps.append(MoveItemStep(
-                    action="rollback_location", detail=str(exc), success=False
-                ))
-                all_ok = False
-
-        if all_ok:
-            previous_ok = await self._verify_loadout(player_name, previous)
-            target_items_ok = await self._verify_restored_items(
-                player_name, target_states
-            )
-            all_ok = previous_ok and target_items_ok
-        steps.append(MoveItemStep(
-            action="rollback_verify",
-            detail="执行前状态恢复验证完成。" if all_ok else "执行前状态恢复验证失败。",
-            success=all_ok,
-        ))
-        return all_ok
-
-    async def _verify_restored_items(
-        self,
-        player_name: str,
-        target_states: dict[str, LoadoutItem],
-    ) -> bool:
-        """Verify candidate items returned to their original locations and sockets."""
-        p = await self._resolver.resolve_player(player_name)
-        mid, mtype = p["membership_id"], p["membership_type"]
-        profile = await self._resolver.get_profile(
-            mid, mtype, profile_components.INVENTORY_SOCKETS
-        )
-        current_items = {
-            item.item_instance_id: item
-            for item in parse_items_from_profile(profile, self._manifest)
-        }
-        equipped_ids = {
-            str(raw.get("itemInstanceId", ""))
-            for equipment in (
-                profile.get("characterEquipment", {}).get("data", {}).values()
-            )
-            for raw in equipment.get("items", [])
-        }
-        sockets_data = (
-            profile.get("itemComponents", {}).get("sockets", {}).get("data", {})
-        )
-        for original in target_states.values():
-            current = current_items.get(original.item_instance_id)
-            if current is None or current.location != original.source_location:
-                return False
-            if original.was_equipped and original.item_instance_id not in equipped_ids:
-                return False
-            actual_sockets = sockets_data.get(original.item_instance_id, {}).get(
-                "sockets", []
-            )
-            if any(
-                socket_index >= len(actual_sockets)
-                or actual_sockets[socket_index].get("plugHash", 0) != plug_hash
-                for socket_index, plug_hash in original.mod_sockets.items()
-            ):
-                return False
-        return True
-
-    # ── Private helpers ──────────────────────────────────────────────
-

@@ -98,8 +98,9 @@ def _source(module) -> str:
         (loadout_service, "ARMOR_SNAPSHOT", 1),
         # 抓取执行前状态的那段已抽到 loadout_recovery.py
         (loadout_recovery, "ARMOR_SNAPSHOT", 1),
-        (loadout_equipment_service, "INVENTORY_MINIMAL", 1),
-        (loadout_equipment_service, "INVENTORY_SOCKETS", 3),  # 子职业/模组/装备回读三处都要插槽
+        # 抓取/恢复那两段已抽到 loadout_recovery.py，钉桩跟着搬家
+        (loadout_recovery, "INVENTORY_MINIMAL", 1),
+        (loadout_equipment_service, "INVENTORY_SOCKETS", 2),  # 子职业 + 模组插槽
     ],
 )
 def test_call_sites_keep_their_historical_set(module, named_set, count):

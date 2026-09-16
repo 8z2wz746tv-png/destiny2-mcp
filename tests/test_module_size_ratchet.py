@@ -47,7 +47,7 @@ CEILINGS = {
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升
-    "destiny_mcp/services/loadout_equipment_service.py": 680,
+    "destiny_mcp/services/loadout_equipment_service.py": 520,
     "destiny_mcp/services/starside_service.py": 769,
     # P4 新增：武器分支载荷与形状工厂。定在上限处是为了让"再加一个 intent"
     # 必须先回答"是搬出去还是抬上限"，而不是悄悄长胖。
