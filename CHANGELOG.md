@@ -2,6 +2,18 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.4.7 — 2026-09-16
+
+**登录不再被 scope 卡死**：`AdvancedWriteActions` 是 Bungie **按应用审批**的 scope，
+应用没被授予时授权页直接回 `invalid_scope` —— 真机上连登录都做不成（0.4.6 刚把这条 scope
+写进授权 URL，就撞上了）。现在：
+
+- `_auth_url(..., scope=...)` 支持不带 scope；`main()` 先按"带 scope"试一次，
+  授权页回 `invalid_scope` 时**打印说明并自动退回"不带 scope"再登一次**，
+  功能上只少了「带消耗/不可逆的插槽写入」那几条路；
+- 说明里直接给出申请入口（<https://www.bungie.net/en/Application>）：
+  想要 API 也能装护甲模组，就得给应用申请 `AdvancedWriteActions`，批准后重新登录。
+
 ## 0.4.6 — 2026-09-16
 
 **用户指出"DIM 能操作模组"，一查果然是我们错了。** 两处：

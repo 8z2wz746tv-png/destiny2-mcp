@@ -165,23 +165,26 @@ def _redirect_uri(args: argparse.Namespace, config) -> str:
     return DEFAULT_REDIRECT_URI
 
 
-# 要在授权时申请的 scope。**必须显式申请**，否则令牌就没有它，写入会被上游拒成
-# 403 `Access not permitted by application scope`（真机踩过：装护甲模组时）。
-# `AdvancedWriteActions` 是"带消耗/不可逆"的写入才需要的（例如付费插槽接口
-# `InsertSocketPlug`）；免费的 `InsertSocketPlugFree`（护甲模组、perk、着色器）不需要它，
-# 所以这条 scope 缺席时大部分写入仍可用，只有付费那条路会 403。
-_OAUTH_SCOPES = "AdvancedWriteActions"
+# 想申请的 scope。**必须显式申请**，否则令牌里就没有它。
+# `AdvancedWriteActions` 覆盖"带消耗/不可逆"的写入（例如付费插槽接口 `InsertSocketPlug`）。
+# **注意：这个 scope 是按应用审批的** —— 应用没被授予时，Bungie 的授权页会直接回
+# `invalid_scope`，连登录都做不成（真机踩过）。所以它只是"想要"，不是"必须有"：
+# 授权失败于 invalid_scope 时自动退回不带 scope 登录，功能上只有那几条路不可用。
+_WANTED_SCOPES = "AdvancedWriteActions"
 
 
-def _auth_url(client_id: str, redirect_uri: str, state: str) -> str:
-    return (
-        f"{AUTHORIZE_ENDPOINT}"
-        f"?client_id={quote(str(client_id), safe='')}"
-        "&response_type=code"
-        f"&scope={quote(_OAUTH_SCOPES, safe='')}"
-        f"&state={quote(state, safe='')}"
-        f"&redirect_uri={quote(redirect_uri, safe='')}"
-    )
+def _auth_url(
+    client_id: str, redirect_uri: str, state: str, *, scope: str = _WANTED_SCOPES
+) -> str:
+    parts = [
+        f"{AUTHORIZE_ENDPOINT}?client_id={quote(str(client_id), safe='')}",
+        "response_type=code",
+    ]
+    if scope:
+        parts.append(f"scope={quote(scope, safe='')}")
+    parts.append(f"state={quote(state, safe='')}")
+    parts.append(f"redirect_uri={quote(redirect_uri, safe='')}")
+    return "&".join(parts)
 
 
 def _generate_self_signed_cert(cert_dir: Path) -> tuple[Path, Path]:
@@ -347,7 +350,29 @@ def main(argv: list[str] | None = None) -> None:
         sys.stdout.flush()
         if not args.no_open:
             webbrowser.open(login_url)
-        code = _serve_for_code(redirect_uri, args.timeout, state)
+        try:
+            code = _serve_for_code(redirect_uri, args.timeout, state)
+        except SystemExit as exc:
+            # `AdvancedWriteActions` 是**按应用审批**的 scope：应用没被授予时，Bungie 的授权页
+            # 直接回 `invalid_scope`，连登录都做不成（真机踩过）。这里退回"不带 scope"再登一次 ——
+            # 功能上只少了"付费/不可逆写入"那几条路，其余照常。
+            if "invalid_scope" not in str(exc):
+                raise
+            print(
+                "\n⚠️ 这个应用没有被授予 AdvancedWriteActions（Bungie 回 invalid_scope）。\n"
+                "   不影响登录与绝大部分功能；只有「带消耗/不可逆的插槽写入」需要在游戏里做。\n"
+                "   想让 API 也能做：到 https://www.bungie.net/en/Application 给这个应用申请\n"
+                "   AdvancedWriteActions，批准后重新登录。\n"
+                "   现在按不带 scope 的方式重新登录一次：\n"
+            )
+            state = secrets.token_urlsafe(18)
+            login_url = _auth_url(config.BUNGIE_CLIENT_ID, redirect_uri, state, scope="")
+            print(login_url)
+            print()
+            sys.stdout.flush()
+            if not args.no_open:
+                webbrowser.open(login_url)
+            code = _serve_for_code(redirect_uri, args.timeout, state)
 
     print("正在交换并保存 token...")
     token_data = _exchange_code(config, code, redirect_uri)
