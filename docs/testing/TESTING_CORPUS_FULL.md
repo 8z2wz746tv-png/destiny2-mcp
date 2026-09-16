@@ -125,6 +125,16 @@
 | equip_loadout 子职业不一致 | 先换上保存的子职业再配槽（0.3.0 起；以前直接失败） |
 | community | 走本地技能资料 |
 
+### inventory_assistant 的装备编排（0.4.0）
+
+| 行 | 断言 |
+| --- | --- |
+| equip 不带确认 | `confirmation_required`，`candidates[0].steps` 里是「先顶下、再装」两步，**零写入** |
+| equip 带确认 | `ok:true` + `verified:true` + `equipped_now` 说清受影响部位现在装着什么 |
+| equip 撞金装冲突 | `equip_blocked`，消息说清全身只能一件异域 + 下一步（不是 `equip_failed`） |
+| equip 已在身上 | `ok:true`，无事可做、不写 |
+
+
 ### activity_assistant
 
 | 行 | 断言 |

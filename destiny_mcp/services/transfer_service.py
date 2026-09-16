@@ -14,7 +14,9 @@ from ..exceptions import AuthenticationError, ItemNotFoundError, TransferError
 from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
+from ..vocabulary import class_key
 from ..models import (
+    EquipPlan,
     EquipResult,
     InventoryItem,
     ItemCandidate,
@@ -26,6 +28,13 @@ from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
 from .item_parser import parse_items_from_profile
 from .account_action_lock import account_action_lock, serialized_account_action
+from . import write_readback
+from .equip_planner import (
+    ARMOR_BUCKET_BY_SLOT,
+    BucketCapacity,
+    EquipPlanRequest,
+    plan_equip,
+)
 from .inventory_service import (
     MISSING_INVENTORY_SCOPE_MESSAGE,
     looks_like_missing_inventory_scope,
@@ -349,6 +358,179 @@ class TransferService:
             to_location=dest_name,
             message=f"'{item_name}' is already at {dest_name}.",
         )
+
+    # ── 装备编排：预检 + 计划（只读）与执行（写入 + 回读）──────────────
+    #
+    # 用户 2026-09-15 报的那条链子（穿星火协议花了 10 轮）之所以要 10 轮，是因为这里
+    # 只暴露了 move/equip 两个原语：仓库里的物品直接 404、全身只能一件金装直接 500。
+    # 编排把"先顶下、再装"算清楚，让人只确认一次。
+
+    def _equipped_keys(self, profile: dict, character_id: str) -> set[str]:
+        """该角色正装备的实例 id。
+
+        权威字段是组件 300 的 `instances.data[实例].isEquipped`（`parse_items_from_profile`
+        就是按它填 `is_equipped` 的）；`characterEquipment`/`characterInventories` 的条目
+        **没有**这个字段，所以不能直接读条目。
+        """
+        return {
+            item.item_instance_id
+            for item in parse_items_from_profile(profile, self._manifest)
+            if item.character_id == character_id and item.is_equipped
+        }
+
+    def _character_armor(self, profile: dict, character_id: str, class_type: int):
+        """该角色装备位 + 背包合并后的物品（护甲类目在内），交给规划器。"""
+        return [
+            item
+            for item in parse_items_from_profile(
+                profile, self._manifest, target_class_type=class_type
+            )
+            if item.character_id == character_id
+        ]
+
+    def _bucket_capacity(self, items, equipped_keys) -> dict[str, BucketCapacity]:
+        """各类目容量：容量只信桶定义，件数从这个角色的物品数出来。
+
+        桶定义查不到（capacity=0）就**不放进来** —— 宁可"不知道"，也不要编一个 0
+        让规划器把"能装"误判成"满了"。
+        """
+        capacities: dict[str, BucketCapacity] = {}
+        for slot, bucket_hash in ARMOR_BUCKET_BY_SLOT.items():
+            definition = self._manifest.get_bucket_definition(bucket_hash) or {}
+            capacity = int(definition.get("itemCount") or 0)
+            if not capacity:
+                continue
+            in_slot = [i for i in items if i.slot == slot]
+            worn = [i for i in in_slot if i.item_instance_id in equipped_keys]
+            # `used` **含正装备那件**（与 DIM 同一口径：桶里装着的那件也占一格）。
+            # 两个方向的风险不对称：多算 → 顶多让用户白清一格；少算 → 会去撞上游的
+            # NoRoomInDestination。宁可保守。
+            capacities[slot] = BucketCapacity(
+                capacity=capacity,
+                used=len(in_slot),
+                equipped=len(worn),
+            )
+        return capacities
+
+    async def plan_equip_item(
+        self, player_name: str, item_instance_id: str, character: str
+    ) -> EquipPlan:
+        """预检 + 出计划。**只读**：一个字都不写账号（写要等调用方 confirmed=true）。"""
+        p = await self._resolver.resolve_player(player_name)
+        mid, mtype = p["membership_id"], p["membership_type"]
+        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
+        class_type = resolve_character_name(character)
+
+        profile = await self._resolver.get_profile(
+            mid, mtype, profile_components.ARMOR_SNAPSHOT
+        )
+        items = self._character_armor(profile, char_id, class_type)
+        target = next(
+            (i for i in items if i.item_instance_id == str(item_instance_id)), None
+        )
+        if target is None:
+            raise ItemNotFoundError(item_instance_id)
+
+        equipped_keys = self._equipped_keys(profile, char_id)
+        return plan_equip(
+            EquipPlanRequest(
+                character=class_key(character) or character,
+                character_id=char_id,
+                target=target,
+                equipped_keys=frozenset(equipped_keys),
+                character_inventory=items,
+                bucket_capacity=self._bucket_capacity(items, equipped_keys),
+            ),
+            self._manifest,
+        )
+
+    @serialized_account_action
+    async def execute_equip_plan(
+        self, player_name: str, plan: EquipPlan, character: str
+    ) -> dict:
+        """按计划执行「先顶下、再装目标」，写完回读核对。
+
+        纪律：任何一步失败都要说清**停在第几步、账号现在是什么状态**，
+        不许部分成功报成功；回读走 `write_readback`（上游 profile 有同步窗口，
+        真机实测 3～10 秒才可见）。
+        """
+        p = await self._resolver.resolve_player(player_name)
+        mid, mtype = p["membership_id"], p["membership_type"]
+        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
+        affected = {
+            step.to_location
+            for step in plan.steps
+            if step.to_location and step.to_location != "vault"
+        }
+        slots = {plan.target_slot} if plan.target_slot else set()
+
+        done: list[dict] = []
+        for index, step in enumerate(plan.steps, 1):
+            result = await self._bungie.equip_item(
+                item_instance_id=step.item_instance_id,
+                character_id=char_id,
+                membership_type=mtype,
+            )
+            if result.get("ErrorCode", 0) != 1:
+                return {
+                    "success": False,
+                    "verified": False,
+                    "stopped_at": index,
+                    "steps_done": done,
+                    "steps": [s.model_dump() for s in plan.steps],
+                    "message": (
+                        f"第 {index} 步「{step.item}」没做成："
+                        f"{result.get('Message', '上游没给原因')}；"
+                        f"账号现在：{await self._describe_worn(mid, mtype, char_id, class_type=resolve_character_name(character), slots=slots)}"
+                    ),
+                }
+            done.append({"action": step.action, "item": step.item, "success": True})
+
+        fresh = await write_readback.read_until(
+            lambda: self._resolver.get_profile(
+                mid, mtype, profile_components.ARMOR_SNAPSHOT
+            ),
+            lambda profile: plan.target_item_instance_id
+            in self._equipped_keys(profile, char_id),
+        )
+        verified = plan.target_item_instance_id in self._equipped_keys(fresh, char_id)
+        return {
+            "success": verified,
+            "verified": verified,
+            "unverified": not verified,
+            "steps_done": done,
+            "steps": [s.model_dump() for s in plan.steps],
+            "equipped_now": await self._describe_worn(
+                mid, mtype, char_id,
+                class_type=resolve_character_name(character), slots=slots,
+            ),
+            "message": (
+                f"已按计划装上「{plan.target_item}」（{len(done)} 步，回读一致）。"
+                if verified
+                else (
+                    f"「{plan.target_item}」的写入上游返回成功，但回读没确认到它已装备"
+                    "（上游 profile 同步有延迟）；别重复写，先重新读一次看看到底换没换。"
+                )
+            ),
+        }
+
+    async def _describe_worn(
+        self, mid: str, mtype: int, char_id: str, class_type: int, slots: set[str]
+    ) -> str:
+        """"账号现在是什么状态"：把受影响的部位现在装着什么读出来，给失败话术用。"""
+        profile = await self._resolver.get_profile(
+            mid, mtype, profile_components.ARMOR_SNAPSHOT
+        )
+        equipped_keys = self._equipped_keys(profile, char_id)
+        items = self._character_armor(profile, char_id, class_type)
+        worn = {
+            item.slot: item.name
+            for item in items
+            if item.item_instance_id in equipped_keys and item.slot in slots
+        }
+        if not worn:
+            return "相关部位没读到装备（上游可能还在同步）"
+        return "、".join(f"{slot}={name}" for slot, name in sorted(worn.items()))
 
     # ── Equip ────────────────────────────────────────────────────────
 

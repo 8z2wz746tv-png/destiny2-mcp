@@ -18,7 +18,6 @@ from destiny_mcp.tools.assistants import (
 _ACTIONS = [
     (inventory_assistant, "transfer_svc", "move", "move_item", {"item_name": "Test", "destination": "hunter"}),
     (inventory_assistant, "transfer_svc", "transfer", "transfer_item", {"item_instance_id": "1", "to_character": "hunter"}),
-    (inventory_assistant, "transfer_svc", "equip", "equip_item", {"item_instance_id": "1", "character": "hunter"}),
     (inventory_assistant, "transfer_svc", "equip_many", "equip_items", {"item_instance_ids": ["1"], "character": "hunter"}),
     (inventory_assistant, "transfer_svc", "equip_items", "equip_items", {"item_instance_ids": ["1"], "character": "hunter"}),
     (inventory_assistant, "transfer_svc", "pull_postmaster", "pull_from_postmaster", {"item_instance_id": "1"}),

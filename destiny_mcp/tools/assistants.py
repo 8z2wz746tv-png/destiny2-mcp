@@ -26,6 +26,7 @@ from ._formatters import inventory_search_summary
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
+from . import _equip_branches as equip_branches
 from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
 from ._enrichment import community_enrichment, community_read
@@ -95,7 +96,8 @@ def _perk_filter_terms(required_perks: list[str] | str | None, perk_name: str) -
 # 这些写入由工具自己校验，不走通用确认入口：equip_build 必须先验证服务端签发的一次性
 # 候选，确认时必须原样回传该候选。它们仍然在 WRITE_INTENTS 里，契约测试会检查两条路径
 # 合起来覆盖全部写入 intent，避免出现无人守卫的写入。
-SELF_GUARDED_WRITE_INTENTS: frozenset[str] = frozenset({"equip_build", "equip_mod"})
+# equip 也在这里：它要先出计划、再由调用方 confirmed=true 才写（见 _equip_branches）。
+SELF_GUARDED_WRITE_INTENTS: frozenset[str] = frozenset({"equip", "equip_build", "equip_mod"})
 
 
 def _requires_confirmation(intent: str) -> bool:
@@ -356,8 +358,11 @@ async def inventory_assistant(
         return _action_response(intent, "转移已执行。", result)
 
     if intent == "equip":
-        result = await svc["transfer_svc"].equip_item(resolved, item_instance_id, character)
-        return _action_response(intent, "装备已执行。", result)
+        equipped = await equip_branches.equip_branch(
+            svc, resolved, item_instance_id, character, confirmed, _action_response
+        )
+        if equipped is not None:
+            return equipped
 
     if intent in {"equip_many", "equip_items"}:
         if not item_instance_ids:

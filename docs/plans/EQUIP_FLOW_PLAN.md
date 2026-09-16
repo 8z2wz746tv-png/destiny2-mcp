@@ -1,6 +1,7 @@
 # 计划：装备编排（把"DIM 那套自动换"补上）
 
-状态：**待评审**（未开工）。目标版本：0.3.0（与换子职业/神器同批）。
+状态：**已落地**（用户 2026-09-16 批准开工，当天完成并真机验证）。
+版本：换子职业/神器那两件已随 0.3.0 发布，本项顺延到下一个版本。
 
 ## 一、这份计划从哪来
 
@@ -60,3 +61,84 @@
 - **不改游戏规则**：上游禁止的事（同时两件金装、移动已装备物品）我们只是**编排**，不是绕过；
 - **不替用户决定顶掉哪件**：中间件从"非异域"里挑，且计划要用户确认；
 - 不碰武器/护甲的插槽写入路径（那是另一件事）。
+
+---
+
+## 六、落地记录（进行中，2026-09-16）
+
+### 已落地
+
+1. **形状**：`destiny_mcp/models/equip_plan.py` —— `EquipPlanStep`（`action/item/from_location/to_location/why/replaces`）、
+   `EquipPlanBlock`（原因码 + 中文说明 + `slot` + `numbers`，给不出数字就空着不编 0）、`EquipPlan`
+   （`status` 只取 `ready/blocked/already_equipped`；`verified: bool | None`，**没核对就是 None**，
+   另带 `unverified_reason`）。
+2. **预检 + 计划**：`destiny_mcp/services/equip_planner.py`（纯函数、只读输入、不 import bungie），
+   四种预检 = `item_equipped`（要 move 的实例正装备着）/ `exotic_conflict`（另一个槽的异域挡住，
+   且背包里挑不到非异域顶下）/ `inventory_full` / `item_missing`；
+   入参语义写死在 `EquipPlanRequest` 的 docstring 里：`character_inventory` = **该角色装备位 + 背包合并**，
+   谁是装备着的以 `equipped_keys` 为准 —— 真机上 `characterEquipment`/`characterInventories` 的条目
+   **没有 `isEquipped`**，那个字段只在组件 300 的 `instances.data[实例]` 上。
+3. **失败话术**：`tools/_responses.py` 的 `_WRITE_FAILURE_HINTS` 补两条 ——
+   `UniqueEquipRestricted` → "全身只能一件异域，先穿一件非异域的同部位顶下它再装目标"；
+   `ItemNotFound`/"not found in the character's inventory" → "`EquipItem` 只接受在该角色身上的实例，
+   先 move 过来或换用他背包里那件"；`NoRoomInDestination` 并入"空间不足"。
+4. **单测**：`tests/test_equip_planner.py` 14 条全绿（四种预检、计划顺序、挑不到中间件的如实失败、
+   仓库物品要先搬、空 `slot_display` 不留空括号）。
+
+### 真机核对（只读，未写账号）
+
+拿真账号数据直喂 `plan_equip`（warlock 正穿着星火协议、背包里有异域臂铠「逃逸艺术家」）：
+
+```
+status = ready
+步骤1 [downgrade] 圣贤保护者法袍  warlock → equipped   顶下=星火协议
+步骤2 [equip]     逃逸艺术家      warlock → equipped
+```
+
+即那条**当时花了 10 轮**的链子，现在被规划成两步；`equipped_keys` 按组件 300 填的语义在真数据上成立。
+
+### 第二刀要用到的实采事实（省得再查）
+
+- **背包容量**取 Manifest 的 `DestinyInventoryBucketDefinition.itemCount`，且必须 `to_signed()` 之后查 `id`
+  才命中（uint32 直查时头盔/臂铠两个桶查不到）：Helmet/Gauntlets/Chest/Legs/Class 各 **10**、Artifacts **7**；
+- `ManifestManager` **原先没有**取桶定义的方法，第二刀补一个（单一出处，不许在 service 里开 sqlite）；
+  `used` 从 profile 数、`capacity` 从桶定义取，给不出就留空。
+
+### 第二刀（已落地）
+
+- **真数据装配**：`services/transfer_service.plan_equip_item`（只读）读 `profile_components.ARMOR_SNAPSHOT`，
+  用现成的 `item_parser.parse_items_from_profile` 拼物品（`is_equipped` 就是组件 300 那套），
+  `equipped_keys` 只认这个角色身上的实例；容量走新加的 `ManifestManager.get_bucket_definition`
+  （`DestinyInventoryBucketDefinition.itemCount`，`to_signed()` 回退）；
+- **容量口径**：`used` **含正装备那件**（与 DIM 一致）。两个方向风险不对称：多算顶多让用户白清一格，
+  少算会去撞上游 `NoRoomInDestination` —— 真机上 chest/gauntlets/helmet 都是 10/10，旧口径会假报"还能放一件"；
+- **确认门槛**：`equip` 进了 `SELF_GUARDED_WRITE_INTENTS`，分派搬到 `tools/_equip_branches.py`：
+  无 `confirmed` → `confirmation_required` + `candidates[0].steps[]`（零写入）；`confirmed=true` → 才执行；
+  `status=blocked` → `equip_blocked`（如实说清缺什么，不是"写入失败"）；已在身上 → `ok` + 无事可做；
+- **执行与回读**：`execute_equip_plan` 逐步 `EquipItem`（先顶下、再装目标），失败返回
+  `stopped_at` + `steps_done` + `equip_blocked`… 之外还带 **`equipped_now`**（受影响部位现在装着什么）；
+  回读走 `services/write_readback.py`，超窗报 `unverified`。
+
+### 真机验证（2026-09-16，用户已批准写入，账号已完全还原）
+
+| 调用 | 结果 |
+| --- | --- |
+| `equip` 逃逸艺术家（不带确认） | `confirmation_required`，`steps` = ①顶下星火协议（穿圣贤保护者法袍）②装逃逸艺术家；**零写入** |
+| 同上次 + `confirmed=true` | `ok:true`、`verified:true`、`equipped_now: gauntlets=逃逸艺术家`（"2 步，回读一致"） |
+| 换回星火协议（确认） | `ok:true`、`verified:true`、`equipped_now: chest=星火协议` |
+| 换回原手套（确认） | `ok:true`、`verified:true`、`equipped_now: gauntlets=光芒领主手套` |
+| 最终五部位回读 | 面具/手套/星火协议/护腿/职业物品 —— 与操作前**完全一致，账号已还原** |
+
+**这条就是当时花了 10 轮的链子**：现在 1 次计划 + 1 次确认 = 2 步。
+
+### 与计划原文的一处偏差（有意）
+
+计划里写"复用 `loadout_equipment_service` 的多步写入 + 回滚"。实际实现是**直接用 `EquipItem` 逐步写**
+（`transfer_service.execute_equip_plan`）：这条链只有"先顶下、再装"两步，回滚语义是"不继续、如实报停点"，
+而 `loadout_equipment_service` 那套是给移动/穿整套配装用的（`MoveItemStep` + 取消恢复），拉进来反而多一层。
+若以后要支持"一次装多件"再回头复用。
+
+### 还没做
+
+- `move` 的 `equip=true` 还没走这条编排（只接在 `equip` 上）；
+- 语料 runner 里还没有 equip 的两段式行（`docs/testing/TESTING_CORPUS_FULL.md` 只登记了断言）。

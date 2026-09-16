@@ -5,6 +5,14 @@ Import from this module or from specific sub-modules as needed.
 """
 
 from .base import ArmorStats, MoveItemStep, PerkInfo
+from .equip_plan import (
+    EquipBlockReason,
+    EquipPlan,
+    EquipPlanBlock,
+    EquipPlanStatus,
+    EquipPlanStep,
+    EquipStepAction,
+)
 from .inventory import InventoryItem, InventoryResponse, SearchItemsResponse
 from .loadout import Loadout, LoadoutItem, LoadoutListResponse, LoadoutOperationResult, LoadoutSubclassConfig
 from .player import CharacterInfo, PlayerInfo, ProfileResponse
@@ -54,6 +62,13 @@ __all__ = [
     "EquipResult",
     "ItemCandidate",
     "MoveItemResult",
+    # equip plan（装备编排）
+    "EquipBlockReason",
+    "EquipPlan",
+    "EquipPlanBlock",
+    "EquipPlanStatus",
+    "EquipPlanStep",
+    "EquipStepAction",
     # subclass
     "PlugOption",
     "SubclassPlug",

@@ -30,6 +30,7 @@ class ItemDefinitionMixin:
         "DestinyActivityTypeDefinition",
         "DestinyPlugSetDefinition",
         "DestinyInventoryItemDefinition",
+        "DestinyInventoryBucketDefinition",
         "DestinySandboxPerkDefinition",
         "DestinyStatDefinition",
         "DestinyEquipmentSlotDefinition",
@@ -130,3 +131,11 @@ class ItemDefinitionMixin:
             return None
         item_hash = results[0]["itemHash"]
         return self.get_item_definition(item_hash)
+
+    def get_bucket_definition(self, bucket_hash: int) -> dict | None:
+        """库存桶定义（`DestinyInventoryBucketDefinition`）：**容量 `itemCount` 只在这里**。
+
+        装备编排要判断"这类背包还能不能再放一件"，唯一权威来源就是它；桶 hash 是 uint32，
+        头盔/臂铠那两个超过 int32 上限，`_query_json` 内部已做 `to_signed()` 回退（真机验证过）。
+        """
+        return self._query_json("DestinyInventoryBucketDefinition", bucket_hash)

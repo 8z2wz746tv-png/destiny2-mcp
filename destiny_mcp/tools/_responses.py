@@ -66,15 +66,23 @@ def confirmation_required_response(
 # 只能自己想到「先换下来再搬」。
 _WRITE_FAILURE_HINTS: tuple[tuple[tuple[str, ...], str], ...] = (
     (
+        ("UniqueEquipRestricted", "只能装备一件", "一件异域"),
+        "全身只能穿一件异域护甲（金装），目标槽与已经穿着的那件冲突：先从该角色背包里挑一件"
+        "**非异域**的同部位护甲穿上去顶下它，再装目标"
+        '（`inventory_assistant` 的 `intent="get", armor_slot=…` 能列出他有哪些候选）。',
+    ),
+    (
         ("equipped item", "CannotPerformActionOnEquippedItem", "已装备"),
         "目标正装备在身上：先用 intent=\"equip\" 把同槽位的另一件换上（或 equip 到别的角色），再对它执行 transfer/move。",
     ),
     (
-        ("not found in the character's inventory", "ItemNotFound"),
-        "先在账号里确认这件物品的实例 ID 与当前位置（inventory_assistant 的 search/get），再重试。",
+        ("not found in the character's inventory", "ItemNotFound", "不在该角色身上"),
+        "`EquipItem` 只接受**在该角色身上**的实例：仓库或别的角色身上的要先搬过来"
+        '（`intent="move"`，destination 传角色名；他背包满了会撞 NoRoomInDestination），'
+        "或者直接换用他背包里已有的那件。",
     ),
     (
-        ("No space", "空间不足", "InventoryFull"),
+        ("No space", "空间不足", "InventoryFull", "NoRoomInDestination"),
         "目标位置空间不足：先清出位置，或换一个目标角色/仓库。",
     ),
 )

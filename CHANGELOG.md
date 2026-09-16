@@ -2,6 +2,54 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.4.0 — 2026-09-16
+
+`equip` 从"直通原语"变成**冲突感知编排**：以前装一件金装会撞 `DestinyItemUniqueEquipRestricted` 500、
+装仓库里的会撞 404，用户当时摸索了 10 轮才把星火协议穿上；现在同样的链子是**1 次计划 + 1 次确认**。
+
+### `equip` 两段式（行为变更）
+
+- 不带 `confirmed` → `confirmation_required`，`candidates[0]` 里带 `steps[]`
+  （每步 `action/item/from_location/to_location/why/replaces`）与 `blockers[]`，**零写入**；
+- `confirmed=true` → 才执行「先顶下、再装目标」，逐步 `EquipItem`，写完**回读核对**
+  （`verified`/`unverified`；上游 profile 有同步窗口，走 `services/write_readback.py` 重试）；
+- 失败说清**停在第几步**（`stopped_at`/`steps_done`）与**账号现在什么状态**（`equipped_now`），
+  不允许部分成功报成功；
+- `equip` 因此进了 `SELF_GUARDED_WRITE_INTENTS`，分派在 `tools/_equip_branches.py`。
+
+### 四种预检（只读，先做）
+
+`services/equip_planner.py`（纯函数）+ `models/equip_plan.py`：
+`item_missing`（实例不在账号上）/ `item_equipped`（正装备着，上游禁 move）/
+`exotic_conflict`（另一个槽的异域挡住，且背包里挑不到非异域顶下）/ `inventory_full`（给数字）；
+另有"仓库里的物品要先搬"作为计划里的 `move` 步骤。
+`EquipPlanRequest` 的入参语义写死在 docstring：装备位 + 背包**合并**列表，`equipped_keys` 按
+组件 300 的 `instances.data[实例].isEquipped` 填（205 的条目没有这个字段）。
+
+### 修复
+
+- 新增 `ManifestManager.get_bucket_definition`（`DestinyInventoryBucketDefinition`）：
+  背包容量 `itemCount` 的**唯一出处**，内部 `to_signed()` 回退（头盔/臂铠的桶 hash 超过 int32，直查查不到）；
+- 容量 `used` **含正装备那件**（与 DIM 同口径）。真机上 warlock 的头盔/臂铠/胸甲都是 10/10，
+  旧口径会假报"还能放一件"，然后去撞上游 `NoRoomInDestination`；
+- 写入失败话术补两条：`UniqueEquipRestricted` → "全身只能一件异域，先穿一件非异域的同部位顶下它"；
+  `ItemNotFound`/"not found in the character's inventory" → "`EquipItem` 只接受在该角色身上的实例"。
+
+### 新增错误码
+
+`equip_blocked`（上游铁律挡住预检：金装冲突/背包满/正装备着/实例不在账号上，**不是写入失败**）。
+
+### 守门
+
+- `tests/test_equip_planner.py`（14 条：四种预检、计划顺序、挑不到中间件、空 `slot_display` 不留空括号）；
+- `tests/test_equip_plan_path.py`（5 条：无确认零写入且带计划、确认后按序执行、blocked 走 `equip_blocked`、
+  已在身上不写、执行失败保留停点）。
+
+### 真机验证（账号已完全还原）
+
+`equip` 逃逸艺术家 → 计划两步（顶下星火协议、装逃逸艺术家）→ 确认执行 `verified:true` →
+换回星火协议与光芒领主手套 → 最终五部位与操作前**完全一致**。
+
 ## 0.3.0 — 2026-09-16
 
 补上两个"想做但做不到"的能力：**换子职业元素**与**换神器**；顺带修掉神器模组的槽位假设。
