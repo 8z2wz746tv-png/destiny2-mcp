@@ -8,7 +8,14 @@ from .base import ArmorStats, MoveItemStep, PerkInfo
 from .inventory import InventoryItem, InventoryResponse, SearchItemsResponse
 from .loadout import Loadout, LoadoutItem, LoadoutListResponse, LoadoutOperationResult, LoadoutSubclassConfig
 from .player import CharacterInfo, PlayerInfo, ProfileResponse
-from .subclass import ModifySubclassPlug, ModifySubclassResult, PlugOption, SubclassConfig, SubclassPlug
+from .subclass import (
+    ModifySubclassPlug,
+    ModifySubclassResult,
+    PlugOption,
+    SubclassConfig,
+    SubclassPlug,
+    SubclassSwitch,
+)
 from .transfer import EquipResult, ItemCandidate, MoveItemResult, TransferResult
 from .vendor import (
     VendorCategory,
@@ -53,6 +60,7 @@ __all__ = [
     "SubclassConfig",
     "ModifySubclassPlug",
     "ModifySubclassResult",
+    "SubclassSwitch",
     # weapon
     "WeaponPerkSlot",
     "WeaponPerkPool",

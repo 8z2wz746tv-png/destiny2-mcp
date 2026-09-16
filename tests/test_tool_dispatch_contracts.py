@@ -12,7 +12,10 @@ from destiny_mcp.tools.assistants import (
     _requires_confirmation,
 )
 
-ASSISTANTS = Path(__file__).parents[1] / "destiny_mcp" / "tools" / "assistants.py"
+TOOLS_DIR = Path(__file__).parents[1] / "destiny_mcp" / "tools"
+# 分派层 = 主文件 + 抽出去的 *_branches 模块（武器/护甲/子职业神器都这么拆的）；
+# 只扫主文件的话，一次"抽代码降体量"的重构会把声明着的 intent 判成没有分支。
+DISPATCH_FILES = [TOOLS_DIR / "assistants.py", *sorted(TOOLS_DIR.glob("_*_branches.py"))]
 
 INTENT_TYPES = (
     R.PlayerIntent,
@@ -32,7 +35,14 @@ def _declared_intents() -> set[str]:
 
 def _dispatch_literals() -> set[str]:
     """assistants.py 里出现在集合、元组或比较里的字符串字面量。"""
-    tree = ast.parse(ASSISTANTS.read_text(encoding="utf-8"))
+    found: set[str] = set()
+    for path in DISPATCH_FILES:
+        found |= _literals_in(path)
+    return found
+
+
+def _literals_in(path: Path) -> set[str]:
+    tree = ast.parse(path.read_text(encoding="utf-8"))
     found: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, (ast.Set, ast.Tuple, ast.List)):

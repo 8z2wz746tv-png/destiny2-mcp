@@ -562,10 +562,11 @@ async def test_apply_subclass_config_reports_a_missing_equipped_subclass() -> No
     assert [step.detail for step in steps] == ["找不到已装备的子职业"]
 
 
-async def test_apply_subclass_config_refuses_a_different_subclass() -> None:
-    """保存/确认的子职业与当前装备不一致时必须停手，不能改到别的子职业上。"""
+async def test_apply_subclass_config_stops_when_the_target_subclass_is_not_in_the_bag() -> None:
+    """保存的子职业不在这个角色背包里：如实失败，不许改到别的子职业上。"""
     service = _subclass_service()
     await _resolve(service, _profile_with_subclass())
+    service._bungie.equip_item = AsyncMock(return_value={"ErrorCode": 1})
     steps: list = []
 
     ok = await service._apply_subclass_config(
@@ -577,8 +578,45 @@ async def test_apply_subclass_config_refuses_a_different_subclass() -> None:
     )
 
     assert ok is False
-    assert steps[0].detail == "当前子职业与保存/确认的子职业不一致。"
+    assert "不在这个角色的背包里" in steps[0].detail
+    service._bungie.equip_item.assert_not_awaited()
     service._bungie.insert_socket_plug_free.assert_not_awaited()
+
+
+async def test_apply_subclass_config_switches_first_then_writes_the_new_item() -> None:
+    """不一致时**先换上再配**，而且插槽要写在新物品上（旧实例的槽索引对新物品没意义）。"""
+    service = _subclass_service()
+    before = _profile_with_subclass()
+    before["characterInventories"] = {"data": {"char": {"items": [
+        {"itemHash": 999, "itemInstanceId": "sub-2"}
+    ]}}}
+    switched = _profile_with_subclass("sub-2")
+    service._resolver.resolve_player = AsyncMock(
+        return_value={"membership_id": "player", "membership_type": 3}
+    )
+    # 第一次读看到旧物品 + 背包里的目标；换完那次读看到新物品
+    service._resolver.get_profile = AsyncMock(side_effect=[before, switched])
+    service._bungie.equip_item = AsyncMock(return_value={"ErrorCode": 1})
+    steps: list = []
+
+    ok = await service._apply_subclass_config(
+        "player",
+        _subclass_loadout(
+            LoadoutSubclassConfig(
+                subclass_item_hash=999, subclass_instance_id="sub-2", plug_sockets={0: 900}
+            )
+        ),
+        "char",
+        3,
+        steps,
+    )
+
+    assert ok is True
+    service._bungie.equip_item.assert_awaited_once_with(
+        item_instance_id="sub-2", character_id="char", membership_type=3
+    )
+    assert steps[0].detail == "已换上保存的子职业（实例 sub-2）"
+    assert service._bungie.insert_socket_plug_free.await_args.args[0] == "sub-2"
 
 
 async def test_apply_subclass_config_uses_exact_socket_map_when_present() -> None:

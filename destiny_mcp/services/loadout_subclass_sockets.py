@@ -8,6 +8,7 @@ from __future__ import annotations
 import aiobungie
 
 from ..models import Loadout, LoadoutSubclassConfig, MoveItemStep
+from . import profile_components, write_readback
 from .loadout_plug_lookup import PlugLookupMixin
 from .subclass_service import identify_socket_type
 
@@ -116,7 +117,7 @@ class SubclassSocketMixin(PlugLookupMixin):
 
         p = await self._resolver.resolve_player(player_name)
         profile = await self._resolver.get_profile(
-            p["membership_id"], membership_type, [205, 305]
+            p["membership_id"], membership_type, profile_components.SUBCLASS
         )
         equip_data = (
             profile.get("characterEquipment", {})
@@ -128,6 +129,12 @@ class SubclassSocketMixin(PlugLookupMixin):
             profile.get("itemComponents", {})
             .get("sockets", {})
             .get("data", {})
+        )
+        inv_data = (
+            profile.get("characterInventories", {})
+            .get("data", {})
+            .get(char_id, {})
+            .get("items", [])
         )
 
         subclass_inst_id = None
@@ -153,12 +160,76 @@ class SubclassSocketMixin(PlugLookupMixin):
             subclass.subclass_instance_id
             and subclass.subclass_instance_id != subclass_inst_id
         ):
+            # 子职业不一致：**先换上再配**（用户拍板：equip_loadout 顺手换）。
+            # 以前这里直接判失败，于是"配装带着另一个子职业"永远装不上，只能靠人手动换。
+            target = next(
+                (
+                    item
+                    for item in inv_data
+                    if (
+                        subclass.subclass_instance_id
+                        and str(item.get("itemInstanceId", ""))
+                        == subclass.subclass_instance_id
+                    )
+                    or (
+                        subclass.subclass_item_hash
+                        and item.get("itemHash") == subclass.subclass_item_hash
+                    )
+                ),
+                None,
+            )
+            if target is None:
+                steps.append(MoveItemStep(
+                    action="subclass",
+                    detail=(
+                        "要装的子职业不在这个角色的背包里（子职业不能从仓库装）："
+                        f"hash={subclass.subclass_item_hash} "
+                        f"实例={subclass.subclass_instance_id or '任意'}"
+                    ),
+                    success=False,
+                ))
+                return False
+            target_inst = str(target.get("itemInstanceId", ""))
+            result = await self._bungie.equip_item(
+                item_instance_id=target_inst,
+                character_id=char_id,
+                membership_type=membership_type,
+            )
+            if result.get("ErrorCode", 0) != 1:
+                steps.append(MoveItemStep(
+                    action="subclass",
+                    detail=f"换上保存的子职业失败：{result.get('Message', '上游没给原因')}",
+                    success=False,
+                ))
+                return False
             steps.append(MoveItemStep(
                 action="subclass",
-                detail="当前子职业与保存/确认的子职业不一致。",
-                success=False,
+                detail=f"已换上保存的子职业（实例 {target_inst}）",
+                success=True,
             ))
-            return False
+            # 插槽数据必须按**新物品**重读：上面那份 profile 里没有它的 sockets。
+            # 刚换完可能还读到旧值（上游 profile 同步窗口，真机实采约 3 秒），所以重试到
+            # 新实例的插槽出现为止——否则下面找兼容插槽会以"找不到"收场。
+            def _has_sockets(candidate: dict) -> bool:
+                return bool(
+                    candidate.get("itemComponents", {})
+                    .get("sockets", {})
+                    .get("data", {})
+                    .get(target_inst, {})
+                    .get("sockets")
+                )
+
+            profile = await write_readback.read_until(
+                lambda: self._resolver.get_profile(
+                    p["membership_id"], membership_type, profile_components.SUBCLASS
+                ),
+                _has_sockets,
+            )
+            sockets_map = (
+                profile.get("itemComponents", {}).get("sockets", {}).get("data", {})
+            )
+            subclass_inst_id = target_inst
+            subclass_item_hash = int(target.get("itemHash", 0))
 
         all_plugs: list[tuple[str, int, int | None]] = []
         if subclass.plug_sockets:

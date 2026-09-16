@@ -455,12 +455,21 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ),
     # ══ subclass_assistant ═════════════════════════════════════════════════
     ("subclass_assistant", "player_name"): _contract(
-        _only("get", "subclass", "modify", "equip_artifact_mod"),
-        hint="看当前配置、改技能、装神器模组才需要玩家名；选项/碎片/神器定义都是全量数据。",
+        _only("get", "subclass", "modify", "equip_artifact_mod", "equip_artifact"),
+        hint=(
+            "看当前配置、改技能、装神器模组/换神器才需要玩家名；"
+            "选项/碎片/神器定义都是全量数据。"
+        ),
     ),
     ("subclass_assistant", "character"): _contract(
-        _only("get", "subclass", "modify", "options", "equip_artifact_mod", "community"),
-        hint="技能与碎片的定义列表按角色过滤；modify/equip_artifact_mod 需要它作为写入目标。",
+        _only(
+            "get", "subclass", "modify", "options", "artifact",
+            "equip_artifact_mod", "equip_artifact", "community",
+        ),
+        hint=(
+            "技能与碎片的定义列表按角色过滤；"
+            "modify/equip_artifact_mod/equip_artifact 需要它作为写入目标。"
+        ),
     ),
     ("subclass_assistant", "element"): _contract(
         _only("options", "fragments", "community"),
@@ -477,8 +486,8 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("subclass_assistant", "fragment_details"),
     ),
     ("subclass_assistant", "artifact_name"): _contract(
-        _only("artifact", "community"),
-        hint='查赛季神器用 intent="artifact"；查模组要传 artifact_mod_hash。',
+        _only("artifact", "equip_artifact", "community"),
+        hint='查赛季神器用 intent="artifact"；换神器用 intent="equip_artifact"；查模组要传 artifact_mod_hash。',
         suggestion=("subclass_assistant", "artifact"),
     ),
     ("subclass_assistant", "artifact_mod_hash"): _contract(

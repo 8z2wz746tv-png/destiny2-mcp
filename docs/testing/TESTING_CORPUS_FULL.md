@@ -117,8 +117,12 @@
 | fragments 元素写法 | `void/虚空`、`strand/缚丝/编织` 五种写法条数一致 |
 | fragment_details 不存在 | `definition_not_found_error`，不编效果 |
 | artifact | 能回答「我现在用哪个神器」：`current_artifact.name` + `tiers[].mods` |
+| artifact 带 `character` | 多出 `character_artifact`：`equipped` 是**身上那件**、`available` 是背包里能换的（实采：三角色分别装 s26/s21/s25，与目录里的 s27 不同） |
 | artifact_mod | 用 artifact 给的正数 hash 能查到详情 |
 | equip_artifact_mod | 不给确认 → `confirmation_required` |
+| equip_artifact | 不给名字 → `missing_artifact_name`；名字不在这个角色身上 → `invalid_argument_error` 并列出他身上有几件；不给确认 → `confirmation_required` |
+| modify 换子职业 | `changes={"subclass":"烈日"}`（或 `火术`／官方名 `破晓`）→ 真机换上另一件子职业物品后回读一致；已是目标则不动；猎人说「火术」→ 报错不硬切 |
+| equip_loadout 子职业不一致 | 先换上保存的子职业再配槽（0.3.0 起；以前直接失败） |
 | community | 走本地技能资料 |
 
 ### activity_assistant
@@ -190,6 +194,7 @@
 | `invalid_argument_error`（服务层） | 1 | `inventory:equip_mod`（缺 `item_instance_id`，要先指定哪一件） |
 | `invalid_canonical_build` | 1 | `build:equip_build`（手拼候选会被拒） |
 | `missing_artifact_mod_hash` | 1 | `subclass:artifact_mod`（`artifact_mod_hash` 传 0/缺省时） |
+| `missing_artifact_name` | 1 | `subclass:equip_artifact`（没给 `artifact_name` 时） |
 | `ignored_parameter` | 3 | `activity:{aggregate,activity_aggregate,activity_stats}`（`mode` 不是它们读的参数） |
 | `a_p_i_error` | 2 | `activity:{leaderboards,leaderboard}`（上游故障，见已知问题） |
 | `upstream_not_found_error` | 1 | `activity:clan_leaderboards`（伪 group_id） |

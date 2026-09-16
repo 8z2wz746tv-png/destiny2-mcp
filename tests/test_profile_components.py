@@ -19,8 +19,10 @@ from destiny_mcp.services import (
     inventory_service,
     loadout_equipment_service,
     loadout_service,
+    loadout_subclass_sockets,
     profile_cache,
     profile_components,
+    subclass_service,
     transfer_service,
     weapon_compare_service,
     weapon_detail_service,
@@ -55,9 +57,11 @@ def test_cache_union_covers_every_cached_caller():
         assert set(profile_components.FULL) >= set(components), components
 
 
-def test_loadout_and_artifact_sets_unchanged():
+def test_loadout_artifact_and_subclass_sets_unchanged():
     assert profile_components.LOADOUT_SLOTS == [102, 200, 201, 205, 206]
     assert profile_components.ARTIFACT == [100, 102, 200, 201, 205, 300, 302]
+    # 换子职业必须看得见角色背包(201)里的其它子职业物品，305 读插槽
+    assert profile_components.SUBCLASS == [200, 201, 205, 305]
 
 
 @pytest.mark.parametrize(
@@ -86,7 +90,9 @@ def _source(module) -> str:
         # P4：对比也要 310（"这一件能换什么"），所以从 INVENTORY_SOCKETS 升到 WEAPON_DETAIL
         (weapon_compare_service, "WEAPON_DETAIL", 2),
         (weapon_detail_service, "WEAPON_DETAIL", 2),
-        (artifact_service, "ARTIFACT", 2),  # 装完模组要回读核对，所以取两次
+        (artifact_service, "ARTIFACT", 5),  # 装模组读+回读、读神器状态、换神器读+回读
+        (subclass_service, "SUBCLASS", 3),  # 读当前配置 + 换之前找候选 + 换完回读核对
+        (loadout_subclass_sockets, "SUBCLASS", 2),  # 换之前读一次、换完重读插槽
         (loadout_service, "LOADOUT_SLOTS", 1),
         (loadout_service, "ARMOR_SNAPSHOT", 1),
         (loadout_equipment_service, "ARMOR_SNAPSHOT", 1),
@@ -108,7 +114,9 @@ def test_no_service_writes_a_raw_component_list_any_more():
         inventory_service,
         loadout_equipment_service,
         loadout_service,
+        loadout_subclass_sockets,
         profile_cache,
+        subclass_service,
         transfer_service,
         weapon_compare_service,
         weapon_detail_service,

@@ -6,10 +6,12 @@ business logic.
 
 from __future__ import annotations
 
+import unicodedata
+
 from ..bungie_client import BungieClient
 from ..exceptions import DefinitionNotFoundError, InvalidArgumentError
 from ..logging_config import get_logger
-from . import profile_components
+from . import profile_components, write_readback
 from ..manifest import ManifestManager, resolve_character_name
 from ..utils.hash_utils import to_unsigned
 from ..player_resolver import PlayerResolver
@@ -59,6 +61,209 @@ class ArtifactService:
             raise DefinitionNotFoundError(f"hash={mod_hash}", "没有这个神器模组。")
         return {
             "artifact_mod": mod_info,
+        }
+
+    # ── 角色身上的神器（换神器要用）────────────────────────────────────
+    #
+    # 读的是**账号实例**，不是 Manifest 目录。实采证明两者不是一回事：
+    # 目录里的「当前神器」（`DestinyArtifactDefinition` 全表只有 1 行，报的是 s27 好奇之器）
+    # 与角色身上那件可以完全不同（同一时刻三角色分别装着 s26/s21/s25）；而且同名不同 hash
+    # （好奇之器：目录 -1600062152、玩家实例 23349941）。所以"我现在用哪个、能不能换"
+    # 只能读实例，目录只配用来查模组池。
+
+    def _character_artifacts(
+        self, profile: dict, character_id: str
+    ) -> list[tuple[str, int]]:
+        """这个角色身上（装备位 + 背包）的神器：(实例 id, 定义 hash)，按桶顺序去重。
+
+        神器**不可转移**（实采 `transferStatus`：背包里=2、装备位=3，与子职业物品同类），
+        所以"能换的"只能是同一个角色背包里那几件；仓库与邮政长里一件都没有（实采 0 件）。
+        """
+        found: list[tuple[str, int]] = []
+        seen: set[str] = set()
+        for bucket in ("characterEquipment", "characterInventories"):
+            for item in (
+                profile.get(bucket, {})
+                .get("data", {})
+                .get(character_id, {})
+                .get("items", [])
+            ):
+                if item.get("bucketHash") != _ARTIFACT_BUCKET_HASH:
+                    continue
+                instance_id = str(item.get("itemInstanceId", ""))
+                if not instance_id or instance_id in seen:
+                    continue
+                seen.add(instance_id)
+                found.append((instance_id, to_unsigned(int(item.get("itemHash", 0) or 0))))
+        return found
+
+    def _artifact_instances(self, profile: dict, character_id: str) -> list[dict]:
+        """同上，但带上给人看的东西（官方名 + 是否正装着）。"""
+        equipped_id = self._equipped_artifact_instance(profile, character_id)
+        return [
+            {
+                "name": self._manifest.get_item_name(item_hash) or f"#{item_hash}",
+                "hash": item_hash,
+                "instance_id": instance_id,
+                "is_equipped": instance_id == equipped_id,
+            }
+            for instance_id, item_hash in self._character_artifacts(profile, character_id)
+        ]
+
+    def _equipped_artifact_instance(self, profile: dict, character_id: str) -> str:
+        """这个角色正装着哪件神器（实例 id）。
+
+        「装没装」只有一个权威字段：组件 300 的 `itemComponents.instances.data[实例].isEquipped`。
+        实采踩过两件事，都写在这里免得再踩：
+
+        1. 205 的条目里**没有** `isEquipped`（原始字段只有
+           `itemHash/itemInstanceId/location/bucketHash/transferStatus/lockable/state`），
+           照 item 上的字段读永远读成"没装备"；
+        2. `isEquipped` 对**所有**装备都为真（武器、护甲、子职业全是 true），
+           所以必须先在"神器桶里的实例"里挑，不能只按"属于这个角色"过滤 ——
+           否则挑中的是第一件装备的武器（真机调试就是这么错的）。
+
+        组件缺失（调用方没要 300）时退回"装备位里有哪件神器"，免得把正装着的那件当候选。
+        """
+        instances = (
+            profile.get("itemComponents", {})
+            .get("instances", {})
+            .get("data", {})
+        )
+        if instances:
+            for instance_id, _hash in self._character_artifacts(profile, character_id):
+                if (instances.get(instance_id) or {}).get("isEquipped"):
+                    return instance_id
+            return ""
+        return self._artifact_in_equipment_bucket(profile, character_id)
+
+    @staticmethod
+    def _artifact_in_equipment_bucket(profile: dict, character_id: str) -> str:
+        for item in (
+            profile.get("characterEquipment", {})
+            .get("data", {})
+            .get(character_id, {})
+            .get("items", [])
+        ):
+            if item.get("bucketHash") == _ARTIFACT_BUCKET_HASH:
+                return str(item.get("itemInstanceId", ""))
+        return ""
+
+    async def _identity(self, player_name: str, character: str) -> tuple[str, int, str]:
+        p = await self._resolver.resolve_player(player_name)
+        mid, mtype = p["membership_id"], p["membership_type"]
+        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
+        return mid, mtype, char_id
+
+    async def artifact_state(self, player_name: str, character: str) -> dict:
+        """这个角色神器的真实状态：正装备的那件 + 背包里能换的那几件。"""
+        mid, mtype, char_id = await self._identity(player_name, character)
+        profile = await self._resolver.get_profile(mid, mtype, profile_components.ARTIFACT)
+        instances = self._artifact_instances(profile, char_id)
+        return {
+            "equipped": next((i for i in instances if i["is_equipped"]), None),
+            "available": [i for i in instances if not i["is_equipped"]],
+        }
+
+    @serialized_account_action
+    async def switch_artifact(
+        self,
+        player_name: str,
+        character: str,
+        artifact_name: str,
+    ) -> dict:
+        """换神器：按官方名在这个角色的实例里找 → equip → 回读核对。
+
+        名字**精确匹配**（NFKC + 大小写归一）实例定义里的 `displayProperties.name`，
+        不模糊匹配：猜错神器比报错更坑。找不到就说清这个角色现在有哪几件。
+        """
+        if not artifact_name.strip():
+            raise InvalidArgumentError("换神器要给出神器名字，例如 artifact_name=\"好奇之器\"。")
+
+        mid, mtype, char_id = await self._identity(player_name, character)
+        profile = await self._resolver.get_profile(mid, mtype, profile_components.ARTIFACT)
+        instances = self._artifact_instances(profile, char_id)
+        equipped = next((i for i in instances if i["is_equipped"]), None)
+
+        def _norm(value: str) -> str:
+            return unicodedata.normalize("NFKC", value).strip().casefold()
+
+        wanted = _norm(artifact_name)
+        target = next((i for i in instances if _norm(i["name"]) == wanted), None)
+        if target is None:
+            holding = "、".join(i["name"] for i in instances) or "一件都没有"
+            raise InvalidArgumentError(
+                f"「{artifact_name}」不在这个角色身上：神器不能跨角色/仓库转移"
+                f"（实采 transferStatus=2），只能换他背包里有的。他现在有：{holding}。"
+            )
+
+        from_payload = {
+            "name": (equipped or {}).get("name", ""),
+            "hash": (equipped or {}).get("hash", 0),
+            "instance_id": (equipped or {}).get("instance_id", ""),
+        }
+        to_payload = {
+            "name": target["name"],
+            "hash": target["hash"],
+            "instance_id": target["instance_id"],
+        }
+
+        if target["is_equipped"]:
+            return {
+                "success": True,
+                "from": from_payload,
+                "to": to_payload,
+                "available": [i for i in instances if not i["is_equipped"]],
+                "message": f"现在装的就是「{target['name']}」，不用换。",
+            }
+
+        result = await self._bungie.equip_item(
+            item_instance_id=target["instance_id"],
+            character_id=char_id,
+            membership_type=mtype,
+        )
+        if result.get("ErrorCode", 0) != 1:
+            return {
+                "success": False,
+                "from": from_payload,
+                "to": to_payload,
+                "message": (
+                    f"换上「{target['name']}」失败：{result.get('Message', '上游没给原因')}"
+                ),
+            }
+
+        # 回读核对：装备位换成目标实例才算成功（假成功比失败更糟）。
+        # 上游 profile 有"刚写完还读到旧值"的窗口（真机实采约 3 秒），所以要重试几次再下结论。
+        fresh = await write_readback.read_until(
+            lambda: self._resolver.get_profile(mid, mtype, profile_components.ARTIFACT),
+            lambda profile: self._equipped_artifact_instance(profile, char_id)
+            == target["instance_id"],
+        )
+        equipped_now = self._equipped_artifact_instance(fresh, char_id)
+        if equipped_now != target["instance_id"]:
+            window = int(write_readback.ATTEMPTS * write_readback.DELAY_SECONDS)
+            return {
+                "success": False,
+                "unverified": True,
+                "from": from_payload,
+                "to": to_payload,
+                "message": (
+                    f"「{target['name']}」的写入上游返回成功，但 {window} 秒内回读装备位仍是 "
+                    f"{equipped_now or '空'}（目标 {target['instance_id']}）；"
+                    "上游 profile 同步有延迟，这次**没确认**，"
+                    '别重复写，先用 intent="artifact" 带上 character 重新读一次。'
+                ),
+            }
+
+        return {
+            "success": True,
+            "from": from_payload,
+            "to": to_payload,
+            "available": [i for i in instances if i["instance_id"] != target["instance_id"]],
+            "message": (
+                f"已换上「{target['name']}」"
+                + (f"，原为「{from_payload['name']}」。" if from_payload["name"] else "。")
+            ),
         }
 
     @serialized_account_action

@@ -7,6 +7,7 @@ via Bungie's InsertSocketPlugFree API endpoint.
 from __future__ import annotations
 
 import re
+import unicodedata
 
 from ..bungie_client import BungieClient
 from ..exceptions import SubclassError
@@ -18,9 +19,18 @@ from ..models import (
     PlugOption,
     SubclassConfig,
     SubclassPlug,
+    SubclassSwitch,
 )
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_signed, to_unsigned
+from ..vocabulary import (
+    CLASS_LABELS_ZH,
+    ELEMENT_ALIASES,
+    ELEMENT_LABELS_ZH,
+    class_key,
+    subclass_element_key,
+)
+from . import profile_components, write_readback
 from .account_action_lock import account_action_lock, serialized_account_action
 
 logger = get_logger(__name__)
@@ -32,6 +42,12 @@ SUBCLASS_BUCKET_HASH = 3284755031
 # Examples: "hunter.solar.supers", "shared.void.grenades", "warlock.arc.aspects"
 _CATEGORY_PATTERN = re.compile(
     r"^(?:hunter|warlock|titan|shared)\.\w+\.(.+)$"
+)
+
+# 同一个标识串里的**元素**是第二段：`warlock.solar.supers` → solar。
+# 上面的 _CATEGORY_PATTERN 抓的是第三段（槽类型），别拿它当元素用。
+_ELEMENT_PATTERN = re.compile(
+    r"^(?:hunter|warlock|titan|shared)\.(\w+)\."
 )
 
 # Map from the regex capture group to our friendly socket type names
@@ -93,6 +109,200 @@ class SubclassService:
             if item.get("bucketHash") == SUBCLASS_BUCKET_HASH:
                 return item
         return None
+
+    @staticmethod
+    def _subclass_items(profile: dict, character_id: str) -> list[dict]:
+        """该角色身上的子职业物品（装备位 + 背包，按实例去重）。
+
+        实采：一个角色背包里躺着该职业的**全部**子职业，bucketTypeHash=3284755031、itemType=16，
+        正装备的那件同时出现在 205 里 —— 所以 201(角色背包) 是"换子职业"的必要组件，
+        只看 205 永远只有一个候选。
+        """
+        items: list[dict] = []
+        seen: set[str] = set()
+        for bucket in ("characterEquipment", "characterInventories"):
+            for item in (
+                profile.get(bucket, {})
+                .get("data", {})
+                .get(character_id, {})
+                .get("items", [])
+            ):
+                if item.get("bucketHash") != SUBCLASS_BUCKET_HASH:
+                    continue
+                instance = str(item.get("itemInstanceId", ""))
+                if instance in seen:
+                    continue
+                seen.add(instance)
+                items.append(item)
+        return items
+
+    def _element_of(self, profile: dict, instance_id: str) -> str:
+        """从已装 plug 的分类标识读元素（`warlock.solar.supers` → `solar`）。
+
+        子职业物品的**定义里没有元素**：实采 18 件子职业物品，`defaultDamageType` 全是 0、
+        没有 element 字段、`socketEntries[].plugCategoryIdentifier` 也是空的。
+        元素只写在 plug 自己的 `plugCategoryIdentifier` 上，所以"按定义猜元素"的写法一律不成立。
+        """
+        sockets = (
+            profile.get("itemComponents", {})
+            .get("sockets", {})
+            .get("data", {})
+            .get(instance_id, {})
+            .get("sockets", [])
+        )
+        for socket in sockets:
+            plug_hash = socket.get("plugHash")
+            if not plug_hash:
+                continue
+            category = (
+                self._manifest.get_plug_category_identifier(to_signed(plug_hash)) or ""
+            )
+            match = _ELEMENT_PATTERN.match(category)
+            if not match:
+                continue
+            key = ELEMENT_ALIASES.get(match.group(1), "")
+            if key:
+                return key
+        return ""
+
+    def _subclass_name(self, item_hash: int) -> str:
+        definition = self._manifest.get_item_definition(item_hash) or {}
+        return (definition.get("displayProperties") or {}).get("name") or (
+            self._manifest.get_item_name(item_hash) or f"#{item_hash}"
+        )
+
+    async def _switch_subclass(
+        self,
+        requested: str,
+        current: SubclassConfig,
+        membership_id: str,
+        membership_type: int,
+        character_id: str,
+        class_type: str,
+    ) -> SubclassSwitch:
+        """换子职业物品：解析叫法 → 在这个角色身上找目标物品 → 装备 → 回读核对。
+
+        **只做换物品这一件事**。插槽变更由调用方在本方法成功之后重读配置再做 ——
+        槽索引属于具体那件物品，拿旧物品的索引去写新物品是错的。
+        """
+        element_key, declared_class = subclass_element_key(requested)
+        record = SubclassSwitch(requested=requested, from_name=current.subclass_name)
+        # class_type 是 `resolve_character_name` 给的英文展示名（"Warlock"），比之前先归一到键，
+        # 话术用中文（用户看的是中文，不是 "Hunter"）
+        class_hint = class_key(class_type)
+        class_label = CLASS_LABELS_ZH.get(class_hint, class_type_name(class_type))
+
+        profile = await self._resolver.get_profile(
+            membership_id, membership_type, profile_components.SUBCLASS
+        )
+        items = self._subclass_items(profile, character_id)
+        by_instance = {str(i.get("itemInstanceId", "")): i for i in items}
+        names = {
+            instance: self._subclass_name(int(item.get("itemHash", 0)))
+            for instance, item in by_instance.items()
+        }
+        elements = {instance: self._element_of(profile, instance) for instance in by_instance}
+        record.from_element = elements.get(current.item_instance_id, "")
+
+        # 「火术」是术士的叫法：目标角色不是术士时**报错**，不能悄悄切了别的职业的子职业
+        if declared_class and class_hint and declared_class != class_hint:
+            record.message = (
+                f"「{requested}」是{CLASS_LABELS_ZH[declared_class]}的叫法，"
+                f"这个角色是{class_label}。"
+                "可以直接说元素（"
+                + "/".join(ELEMENT_LABELS_ZH.values())
+                + "），或者说该角色子职业的官方名。"
+            )
+            return record
+
+        target_instance = ""
+        if element_key:
+            target_instance = next(
+                (i for i, element in elements.items() if element == element_key), ""
+            )
+        else:
+            # 官方名（破晓/枪手/炎阳……）：名字的权威来源是 Manifest，只在**这个角色自己的**
+            # 子职业里精确匹配；不做模糊匹配、不查拼音 —— 猜错比报错更坑
+            wanted = unicodedata.normalize("NFKC", requested).strip().casefold()
+            target_instance = next(
+                (
+                    i
+                    for i, name in names.items()
+                    if unicodedata.normalize("NFKC", name).strip().casefold() == wanted
+                ),
+                "",
+            )
+
+        if not target_instance:
+            available = "、".join(
+                f"{names[i]}（{ELEMENT_LABELS_ZH.get(elements[i], '元素未知')}）"
+                for i in by_instance
+            )
+            record.message = (
+                f"在{class_label}身上找不到「{requested}」对应的子职业。"
+                f"这个角色现在有：{available}。"
+            )
+            return record
+
+        target_hash = int(by_instance[target_instance].get("itemHash", 0))
+        record.item_hash = target_hash
+        record.item_instance_id = target_instance
+        record.to_name = names[target_instance]
+        record.to_element = elements[target_instance]
+
+        # 幂等：已经是目标子职业就一件都不写（白写一次 equip 会让插槽数据白白失效）
+        if target_instance == current.item_instance_id:
+            record.success = True
+            record.message = (
+                f"当前就是{record.to_name}"
+                f"（{ELEMENT_LABELS_ZH.get(record.to_element, '')}），不用换。"
+            )
+            return record
+
+        result = await self._bungie.equip_item(
+            item_instance_id=target_instance,
+            character_id=character_id,
+            membership_type=membership_type,
+        )
+        if result.get("ErrorCode", 0) != 1:
+            record.message = (
+                f"换上「{record.to_name}」失败：{result.get('Message', '上游没给原因')}"
+            )
+            return record
+
+        # 回读核对：装备位换到目标实例才算成功（假成功比失败更糟）。
+        # 上游 profile 有"刚写完还读到旧值"的窗口（真机实采约 3 秒），所以要重试几次再下结论。
+        def _equipped_instance(profile: dict) -> str:
+            return str(
+                (self._find_subclass_in_equipment(profile, character_id) or {}).get(
+                    "itemInstanceId", ""
+                )
+            )
+
+        fresh = await write_readback.read_until(
+            lambda: self._resolver.get_profile(
+                membership_id, membership_type, profile_components.SUBCLASS
+            ),
+            lambda profile: _equipped_instance(profile) == target_instance,
+        )
+        if _equipped_instance(fresh) != target_instance:
+            equipped = self._find_subclass_in_equipment(fresh, character_id) or {}
+            window = int(write_readback.ATTEMPTS * write_readback.DELAY_SECONDS)
+            record.unverified = True
+            record.message = (
+                f"「{record.to_name}」的写入上游返回成功，但 {window} 秒内回读装备位仍是 "
+                f"#{equipped.get('itemHash', 0)}（实例 {equipped.get('itemInstanceId', '空')}）；"
+                "上游 profile 同步有延迟，这次**没确认**，"
+                '别重复写，先用 intent="get" 重新读一次看看到底换没换。'
+            )
+            return record
+
+        record.success = True
+        record.message = (
+            f"已换上{record.to_name}"
+            f"（{ELEMENT_LABELS_ZH.get(record.to_element, '')}），原为{record.from_name}。"
+        )
+        return record
 
     def _get_plug_info(self, plug_hash: int) -> dict:
         """Get plug item info from manifest, handling unsigned hash conversion."""
@@ -172,9 +382,10 @@ class SubclassService:
         class_type = resolve_character_name(character)
 
         # Fetch profile with equipment + socket data
-        # 200=Characters, 205=CharacterEquipment, 305=ItemSockets
+        # 200=Characters, 205=CharacterEquipment, 305=ItemSockets；201 只有"换子职业"用得上，
+        # 但读和写共用同一个集合 —— 不给"差不多但不一样"的第二份组件表留口子（改一处就够）
         profile = await self._resolver.get_profile(
-            mid, mtype, [200, 205, 305]
+            mid, mtype, profile_components.SUBCLASS
         )
 
         # Find equipped subclass
@@ -291,6 +502,29 @@ class SubclassService:
         # First, read current subclass config
         config = await self.get_subclass(player_name, character)
 
+        # 换子职业（`changes={"subclass": "烈日"}`）：**先换物品、回读，再改槽**——
+        # 槽索引属于具体那件物品，拿旧物品的索引去写新物品是错的（计划文档 P2 的顺序要求）。
+        switch_request = next(
+            (value for key, value in changes.items() if key.strip().casefold() == "subclass"),
+            None,
+        )
+        switch_record: SubclassSwitch | None = None
+        if switch_request is not None:
+            switch_record = await self._switch_subclass(
+                switch_request, config, mid, mtype, char_id, class_type
+            )
+            if not switch_record.success:
+                # 换不过去就不要接着改槽：那份 changes 是按换之前的子职业算出来的
+                return ModifySubclassResult(
+                    success=False,
+                    character=class_type_name(class_type),
+                    subclass_name=config.subclass_name,
+                    subclass_switch=switch_record,
+                    message=switch_record.message,
+                )
+            if switch_record.item_instance_id != config.item_instance_id:
+                config = await self.get_subclass(player_name, character)
+
         # Build maps for socket lookup:
         # - single sockets: type → plug (super, melee, grenade, class_ability, movement)
         # - multi sockets: type → [plug, ...] (aspects, fragments)
@@ -308,6 +542,8 @@ class SubclassService:
 
         for target_key, target_name in changes.items():
             normalized_key = target_key.strip().lower()
+            if normalized_key == "subclass":
+                continue  # 已在上面换过物品，它不是插槽
 
             # Parse the target: "super" → type=super, index=0
             # "aspect_2" → type=aspect, index=1 (0-based)
@@ -443,14 +679,18 @@ class SubclassService:
                 )
 
         all_ok = all(r.success for r in plug_results)
+        message = (
+            f"All changes applied to {config.subclass_name}."
+            if all_ok
+            else f"Some changes failed on {config.subclass_name}."
+        )
+        if switch_record:
+            message = f"{switch_record.message} {message}"
         return ModifySubclassResult(
             success=all_ok,
             character=class_type_name(class_type),
             subclass_name=config.subclass_name,
+            subclass_switch=switch_record,
             changes=plug_results,
-            message=(
-                f"All changes applied to {config.subclass_name}."
-                if all_ok
-                else f"Some changes failed on {config.subclass_name}."
-            ),
+            message=message,
         )

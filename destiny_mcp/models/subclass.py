@@ -48,11 +48,36 @@ class ModifySubclassPlug(BaseModel):
     message: str = Field(default="")
 
 
+class SubclassSwitch(BaseModel):
+    """换子职业物品的结果。
+
+    单独一条、不塞进 `changes`：换的是**哪件物品**，插槽变更改的是这件物品上的**槽**，
+    两件事的失败原因和回读方式都不一样（一个看装备位，一个看 305），混在一起就没法核对。
+    """
+
+    requested: str = Field(default="", description="调用方给的叫法，原样回显")
+    from_name: str = Field(default="", description="换之前装备的子职业名")
+    from_element: str = Field(default="", description="换之前的元素规范键")
+    to_name: str = Field(default="", description="回读到的、换之后的子职业名")
+    to_element: str = Field(default="", description="换之后的元素规范键")
+    item_hash: int = Field(default=0, description="换上的子职业物品定义 hash")
+    item_instance_id: str = Field(default="", description="换上的子职业物品实例 ID")
+    success: bool = Field(default=False)
+    unverified: bool = Field(
+        default=False,
+        description="上游说写入成功、但回读窗口内没看到变化（同步延迟）——没确认，别重复写",
+    )
+    message: str = Field(default="")
+
+
 class ModifySubclassResult(BaseModel):
     """modify_subclass tool response."""
 
     success: bool
     character: str = Field(default="")
-    subclass_name: str = Field(default="")
+    subclass_name: str = Field(default="", description="改完（含换子职业）之后实际装备的子职业名")
+    subclass_switch: SubclassSwitch | None = Field(
+        default=None, description="请求里带了 subclass 时才有：换子职业物品的结果"
+    )
     changes: list[ModifySubclassPlug] = Field(default_factory=list)
     message: str = Field(default="")

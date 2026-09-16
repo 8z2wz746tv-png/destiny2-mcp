@@ -318,3 +318,62 @@ socket entry 数 → 每组 plug set → 候选模组。**代码里不许出现�
 - [ ] 试一次 `EquipItem` 到 Seasonal Artifact bucket 的**可行性**（先不动账号：只查上游文档/SDK 支持，
       必要时在真机验证阶段征得同意后实测一次，可逆）
 - [ ] 记录不同神器的槽结构差异（再取一件旧神器定义对比 socket 数与 plug set 组数）
+
+---
+
+## 十一、P0-b 勘探结果与真机验证（2026-09-16，已完成）
+
+### 11.1 神器：21 个实例、3 角色 × 7 件、不可转移
+
+- 全部 `bucketHash=1506418338`；每角色 **1 件在 205（装备位）+ 6 件在 201（背包）**；
+  **仓库 0 件、邮政长 0 件**。每角色各持独立实例，共 7 个不同 `itemHash`
+  （`1504442987` NPA斥力调节器 s21、`3518286241` 女王兰香炉 s23、`2180638678` 猎人日志 s24、
+  `1770364095` 杀手公爵药剂师背包 s25、`3821685388` 废墟石板 s26、`23349941` 好奇之器 s27、
+  `1014202826` 加密数据盘 s28）。
+- 定义侧全部 `equippable:true`、`equippingBlock.equipmentSlotTypeHash=1506418338`
+  （`DestinyEquipmentSlotDefinition` 里是一等装备槽 "Artifacts"）；实例侧 `canEquip:true`、
+  `cannotEquipReason:0`。
+- `transferStatus`：背包神器=2、装备位=3 → **神器不可转移**，所以"能换的"只可能是同一角色背包里那几件。
+
+### 11.2 神器有三个 hash 家族（实现时的头号坑）
+
+| 家族 | 例子（好奇之器） | 说明 |
+| --- | --- | --- |
+| 玩家实例族 | `23349941` | `itemType:0`，`stackUniqueLabel=...reprise.season27.artifact0`，**角色身上携带的就是这一族** |
+| 赛季定义族 | `-1600062152` | `itemType:28`，`seasons.season27.artifact.legendary.artifact0`；`DestinySeasonDefinition.artifactItemHash` 全指向这一族 |
+| `DestinyArtifactDefinition` | `-1400744370` | 全表**仅 1 行**，`intent="artifact"` 报的"当前神器"来自这里（报的是 s27） |
+
+结论：**写入只能用实例的 `itemHash`/`itemInstanceId`**，用目录 hash 一定错。
+目录里的"当前神器"按赛季算，与角色身上那件可以完全不同（实采三角色分别装着 s26/s21/s25）。
+
+### 11.3 真机验证（用户已批准写入，全部可逆并已还原）
+
+| 能力 | 操作 | 结果 |
+| --- | --- | --- |
+| 换子职业 | warlock 破晓 → 棱镜（`changes={"subclass":"棱镜"}` + `confirmed`） | `success:true`，回读 `棱镜术士` |
+| 换子职业 | warlock 棱镜 → 烈日（`changes={"subclass":"烈日"}`，**用户报的那条路**） | `success:true`，回读 `破晓`，实例与操作前一致（已还原） |
+| 换神器 | titan 杀手公爵药剂师背包 → 好奇之器（`intent="equip_artifact"`） | `success:true`，`EquipItem` **接受神器实例**（社区"只能装最新赛季"的说法被实测推翻） |
+| 换神器 | titan 换回杀手公爵药剂师背包 | `success:true`，账号已还原到原实例 |
+
+### 11.4 真机抓到的三个新事实（都已修进代码）
+
+1. **写入后 profile 有同步窗口**：`EquipItem` 返回 `ErrorCode=1`，立刻回读仍是旧值，
+   实测一次约 3 秒可见、另一次 10 秒内仍是旧值。所以回读必须**重试**（`services/write_readback.py`，
+   8 次 × 1.5 秒）；超出窗口时**只能报"没确认"（`unverified`）**，不能说"没换成"——
+   上游已经返回成功了，那是两件事。
+2. **`isEquipped` 只在组件 300 的 `itemComponents.instances.data[实例]` 上**，
+   205 的条目里根本没有这个字段；而且它对**所有**装备都为真（武器/护甲/子职业全是 true），
+   必须先在"神器桶实例"里挑。照 item 字段读会永远"没装备"；只按角色过滤会挑中第一件武器。
+3. **元素不在子职业物品的定义里**（18 件实采：`defaultDamageType` 全 0、无 element 字段、
+   `socketEntries[].plugCategoryIdentifier` 为空），元素只写在 plug 的
+   `plugCategoryIdentifier` 第二段（`warlock.solar.supers`）。注意 `_CATEGORY_PATTERN` 抓的是
+   **第三段（槽类型）**，别拿它当元素用（这个是写代码时真实搞错过一次、被单测逮住的）。
+
+### 11.5 落地清单（本次）
+
+- `subclass_assistant(intent="modify", changes={"subclass": …})`：元素别名（`火术/火猎/火泰坦/火/…`）
+  → 该角色子职业物品按元素或 Manifest 官方名精确匹配 → equip → 重试回读 → 再改插槽；
+  已是目标则幂等跳过；职业叫法冲突（猎人却说"火术"）**报错不硬来**。
+- `subclass_assistant(intent="equip_artifact", character, artifact_name, confirmed)`：换神器。
+- `subclass_assistant(intent="artifact", character=…)`：附带**他身上那件**与背包里能换的。
+- `equip_loadout` 的子职业不一致从"直接失败"改成**先换上再配**（用户 2026-09-15 拍板）。

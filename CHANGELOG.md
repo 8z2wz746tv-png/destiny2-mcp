@@ -2,6 +2,54 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.3.0 — 2026-09-16
+
+补上两个"想做但做不到"的能力：**换子职业元素**与**换神器**；顺带修掉神器模组的槽位假设。
+
+### 换子职业（新能力）
+
+用户报的原始故障：术士从棱镜切烈日，`modify` 只在**当前**子职业上插 plug，
+`loadout_subclass_sockets` 又"子职业不一致就拒绝"，于是怎么都换不过去。
+
+- `subclass_assistant(intent="modify")` 新增变更键 `changes={"subclass": …}`：
+  先按别名表解析（`烈日/火/火术/棱镜术士/solar/…`）→ 在该角色的子职业物品里按元素或
+  **Manifest 官方名**（破晓/枪手/炎阳…）精确匹配 → `EquipItem` → 回读核对 → **然后**才改插槽
+  （槽索引属于具体那件物品，顺序反了就是错的）；
+- 已经是目标子职业时**不写**（幂等）；找不到就列出这个角色实际有哪些（官方名 + 元素）；
+  职业叫法冲突（猎人说"火术"）**报错不硬来**；不模糊匹配、不查拼音；
+- 元素别名进 `destiny_mcp/vocabulary.py`（口语词根 `火/电/冰` + 职业尾缀表），
+  官方名不写进表 —— 名字的权威来源是 Manifest；
+- `equip_loadout` 的子职业不一致由"直接失败"改为**先换上再配**（用户拍板：顺手换）。
+
+### 换神器（新能力）
+
+- `subclass_assistant(intent="equip_artifact")`（写入，走确认信封）：把该角色背包里的另一件
+  神器换上，名字精确匹配，回读核对；
+- `subclass_assistant(intent="artifact", character=…)` 附带**角色身上那件**与背包里能换的
+  （目录里的"当前神器"按赛季算，与身上那件可以完全不同）；
+- 事实校正：神器**不可转移**（`transferStatus` 背包=2、装备位=3），所以只能换同角色背包里的；
+  神器有三个 hash 家族（玩家实例族 / 赛季定义族 / `DestinyArtifactDefinition`），
+  **写入只能用实例的 hash**；真机实测 `EquipItem` 接受神器实例（推翻"只能装最新赛季"的旧说法）。
+
+### 修复
+
+- **写入后回读要重试**：真机实测 `EquipItem` 返回成功、立刻回读仍是旧值（一次约 3 秒可见、
+  另一次 10 秒内仍旧）。新增 `services/write_readback.py`（8 次 × 1.5 秒），
+  超出窗口时报 `unverified`（**没确认**）而不是"没换成" —— 上游已经返回成功了，那是两件事；
+- **神器的"装没装"只在组件 300 的 `instances.data[实例].isEquipped` 上**（205 的条目没有这个
+  字段），而且它对所有装备都为真，必须先在神器桶实例里挑；
+- **元素不在子职业物品定义里**，只写在 plug 的 `plugCategoryIdentifier` 第二段；
+  `_CATEGORY_PATTERN` 抓的是第三段（槽类型），两者不能混用。
+
+### 守门
+
+- `tests/test_subclass_switch.py`（9 条）、`tests/test_artifact_switch.py`（9 条）、
+  `tests/test_write_readback.py`（3 条）；
+- 组件表新增 `profile_components.SUBCLASS`（含 201：看不见背包就换不了子职业），
+  `tests/test_profile_components.py` 钉住集合与调用点数量；
+- 分派契约允许分派层拆到 `tools/_*_branches.py`（这次神器一族搬进 `_subclass_branches.py`，
+  顺手把 `assistants.py` 压回体量上限内）。
+
 ## 0.2.0 — 2026-09-15
 
 **破坏性变更**：活动统计改成行式（见下）。另外这一版收了上一批架构与守门工作。

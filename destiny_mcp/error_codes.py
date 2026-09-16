@@ -40,6 +40,7 @@ class ErrorCode(StrEnum):
     INVALID_MAX_REPLACEMENTS = "invalid_max_replacements"
     INVENTORY_SUMMARY_FAILED = "inventory_summary_failed"
     MISSING_ARTIFACT_MOD_HASH = "missing_artifact_mod_hash"
+    MISSING_ARTIFACT_NAME = "missing_artifact_name"
     MISSING_ITEM_INSTANCE_IDS = "missing_item_instance_ids"
     MISSING_NAME_PREFIX = "missing_name_prefix"
     MISSING_PLAYER_NAME = "missing_player_name"

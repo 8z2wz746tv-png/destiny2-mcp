@@ -219,10 +219,11 @@ Manifest 侧（**不代表拥有**）：
 | `options` | 有哪些可选 | `character`、`element`、`component` |
 | `fragments` | 碎片列表及效果 | `element` |
 | `fragment_details` | 单个碎片的数值与条件 | `fragment_name` |
-| `artifact` | 赛季神器与层级 | `artifact_name` |
+| `artifact` | 赛季神器与层级；给 `character` 时附带**他身上那件**与背包里能换的 | `artifact_name`、`character` |
 | `artifact_mod` | 神器模组详情 | `artifact_mod_hash`（必填） |
 | `modify` | 改技能（写入） | `character`、`changes` |
 | `equip_artifact_mod` | 装神器模组（写入） | `character`、`artifact_mod_hash`（必须为正） |
+| `equip_artifact` | 换神器：装这个角色背包里的另一件（写入） | `character`、`artifact_name`（官方名，必填） |
 | `community` | 社区职业资料，**只在 `subclass` 分类里搜** | `query` 或 `fragment_name`／`element`、`knowledge_id`、`community_section`、`limit`、`offset` |
 
 `options` 必须同时给 `element` 和 `component`，`fragments` 必须给 `element`；缺了会返回 `subclass_error`，消息里列出合法取值（`void/solar/arc/stasis/strand/prism`、`super/melee/grenade/aspect/movement`，中文别名也认）。不要凭 0 条结果推断"没有可选项"。
@@ -285,12 +286,12 @@ Manifest 侧（**不代表拥有**）：
 | `any_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
 | `armor_slot` | `inventory_assistant`：`get`、`inventory`、`list` |
 | `artifact_mod_hash` | `subclass_assistant`：`artifact_mod`、`equip_artifact_mod` |
-| `artifact_name` | `subclass_assistant`：`artifact`、`community` |
+| `artifact_name` | `subclass_assistant`：`artifact`、`community`、`equip_artifact` |
 | `baseline` | `build_assistant`：`farm_target` |
 | `canonical_build` | `build_assistant`：`equip_build` |
 | `category` | `build_assistant`：`community`、`community_build`、`starside` |
 | `changes` | `subclass_assistant`：`modify` |
-| `character` | `activity_assistant`：除 `clan_leaderboards`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`set_bonus` 外全部；`inventory_assistant`：`equip`、`equip_items`、`equip_many`、`equip_mod`、`lock`、`pull_postmaster`、`quest_tracking`、`track_quest`；`loadout_assistant`：`clear_official`、`get`、`list`、`save`、`snapshot_official`、`update_official_identifiers`；`subclass_assistant`：`community`、`equip_artifact_mod`、`get`、`modify`、`options`、`subclass`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`vendor` |
+| `character` | `activity_assistant`：除 `clan_leaderboards`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`set_bonus` 外全部；`inventory_assistant`：`equip`、`equip_items`、`equip_many`、`equip_mod`、`lock`、`pull_postmaster`、`quest_tracking`、`track_quest`；`loadout_assistant`：`clear_official`、`get`、`list`、`save`、`snapshot_official`、`update_official_identifiers`；`subclass_assistant`：除 `artifact_mod`、`fragment_details`、`fragments` 外全部；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`vendor` |
 | `class_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `collectible_node_hash` | `world_assistant`：`collectible_node` |
 | `color_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
@@ -336,7 +337,7 @@ Manifest 侧（**不代表拥有**）：
 | `notes` | `loadout_assistant`：`save` |
 | `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
 | `perk_name` | `weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`perk_description`、`search_all`、`search_catalog` |
-| `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`filter_rolls`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`vendor` |
+| `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact`、`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`filter_rolls`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`vendor` |
 | `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |
 | `priority_stats` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `query` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |
@@ -418,7 +419,7 @@ Manifest 侧（**不代表拥有**）：
 
 ## 六、写入：确认与红线
 
-`move`、`transfer`、`equip`、`equip_many`（`equip_items`）、`equip_mod`、`pull_postmaster`、`lock`、`track_quest`（`quest_tracking`）、`save`、`delete`、`equip_loadout`、`snapshot_official`、`update_official_identifiers`、`clear_official`、`modify`、`equip_artifact_mod`、`equip_build` 都会改变账号状态（这份清单与 `_requests.WRITE_INTENTS` 一致，由测试保证）。
+`move`、`transfer`、`equip`、`equip_many`（`equip_items`）、`equip_mod`、`pull_postmaster`、`lock`、`track_quest`（`quest_tracking`）、`save`、`delete`、`equip_loadout`、`snapshot_official`、`update_official_identifiers`、`clear_official`、`modify`、`equip_artifact_mod`、`equip_artifact`、`equip_build` 都会改变账号状态（这份清单与 `_requests.WRITE_INTENTS` 一致，由测试保证）。
 
 另外两条硬前提（实机验证过）：**花能量的插槽写入需要 Bungie 应用的 `AdvancedWriteActions` 权限**（没有就回 `AccessNotPermittedByApplicationScope`，工具会点名这条权限，不要读成「稍后重试」）；**调谐只能游戏内改**，工具只给方案不改账号。
 

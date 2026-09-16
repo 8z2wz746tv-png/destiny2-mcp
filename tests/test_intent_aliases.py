@@ -74,7 +74,7 @@ STANDALONE: dict[str, tuple[str, ...]] = {
     ),
     "SubclassIntent": (
         "modify", "options", "fragments", "fragment_details", "artifact",
-        "artifact_mod", "equip_artifact_mod", "community",
+        "artifact_mod", "equip_artifact_mod", "equip_artifact", "community",
     ),
     "ActivityIntent": ("history", "pgcr", "clan_leaderboards", "community"),
     "BuildIntent": (

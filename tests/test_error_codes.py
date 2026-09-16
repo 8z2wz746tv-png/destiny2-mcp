@@ -60,6 +60,7 @@ _EXPECTED_LITERAL_CODES = {
     "invalid_max_replacements",
     "inventory_summary_failed",
     "missing_artifact_mod_hash",
+    "missing_artifact_name",
     "missing_item_instance_ids",
     "missing_name_prefix",
     "missing_player_name",

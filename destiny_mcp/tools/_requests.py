@@ -24,7 +24,10 @@ WeaponIntent = Literal[
 ]
 BuildIntent = Literal["recommend", "find", "analyze", "farm_target", "equip_build", "armor_mods", "exotic_armor", "set_bonus", "community", "community_build", "starside"]
 LoadoutIntent = Literal["list", "get", "save", "delete", "equip_loadout", "search_identifiers", "snapshot_official", "update_official_identifiers", "clear_official"]
-SubclassIntent = Literal["get", "subclass", "modify", "options", "fragments", "fragment_details", "artifact", "artifact_mod", "equip_artifact_mod", "community"]
+SubclassIntent = Literal[
+    "get", "subclass", "modify", "options", "fragments", "fragment_details",
+    "artifact", "artifact_mod", "equip_artifact_mod", "equip_artifact", "community",
+]
 ActivityIntent = Literal["history", "pgcr", "stats", "career", "historical_stats", "weapon_history", "weapons", "weapon_usage", "weapon_leaderboard", "aggregate", "activity_aggregate", "activity_stats", "leaderboards", "leaderboard", "clan_leaderboards", "community"]
 WorldIntent = Literal["weekly", "weekly_full", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item", "community"]
 
@@ -41,7 +44,7 @@ WRITE_INTENTS: frozenset[str] = frozenset(
         "save", "delete", "equip_loadout", "snapshot_official",
         "update_official_identifiers", "clear_official",
         # subclass_assistant
-        "modify", "equip_artifact_mod",
+        "modify", "equip_artifact_mod", "equip_artifact",
         # build_assistant
         "equip_build",
     }

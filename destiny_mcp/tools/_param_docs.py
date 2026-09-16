@@ -203,8 +203,9 @@ SubclassIntentField = Annotated[
     Field(description=(
         "子职业意图。get=当前配置；options=某元素的某类可选项（需要 element + component）；"
         "fragments=碎片列表（需要 element）；fragment_details=单个碎片效果；"
-        "artifact=赛季神器；artifact_mod=神器模组详情（需要 artifact_mod_hash）；"
-        "modify/equip_artifact_mod=写入。"
+        "artifact=赛季神器（给 character 时附带他身上那件与背包里能换的）；"
+        "artifact_mod=神器模组详情（需要 artifact_mod_hash）；"
+        "modify/equip_artifact_mod/equip_artifact=写入。"
     )),
 ]
 
@@ -407,14 +408,18 @@ FragmentName = Annotated[
 
 ArtifactName = Annotated[
     str,
-    Field(description='赛季神器名。留空则列全部神器。只有 intent="artifact" 读它。'),
+    Field(description=(
+        '赛季神器名（官方名，如"好奇之器"）。留空则列全部神器。'
+        'intent="artifact" 用它查目录，intent="equip_artifact" 拿它当换的目标（必填）。'
+    )),
 ]
 
 Changes = Annotated[
     dict[str, str] | None,
     Field(description=(
         "要改的组件 → 目标名称，例如 {\"super\": \"金色枪\"}。"
-        "键可用 super/melee/grenade/class_ability/movement/aspect/fragment，值中英文皆可。"
+        "键可用 super/melee/grenade/class_ability/movement/aspect/fragment，"
+        "另外 subclass 用来换整套子职业（如 {\"subclass\": \"烈日\"}，也认\"火术\"或官方名破晓），值中英文皆可。"
         '只有 intent="modify" 读它，且必填。'
     )),
 ]

@@ -26,6 +26,7 @@ from ._formatters import inventory_search_summary
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
+from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
 from ._enrichment import community_enrichment, community_read
 from ._farming import farming_reference as _farming_reference
@@ -1196,21 +1197,11 @@ async def subclass_assistant(
             ),
         })
 
-    if intent == "artifact":
-        result = svc["artifact_svc"].get_seasonal_artifact(artifact_name)
-        return ok_response("已读取赛季神器。", {"artifact": result})
-
-    if intent == "artifact_mod":
-        if not artifact_mod_hash:
-            return error_response(ErrorCode.MISSING_ARTIFACT_MOD_HASH, "查询神器模组需要提供 artifact_mod_hash。")
-        result = svc["artifact_svc"].get_artifact_mod_info(artifact_mod_hash)
-        return ok_response("已读取神器模组。", {"artifact_mod": result})
-
-    if intent == "equip_artifact_mod":
-        if not artifact_mod_hash:
-            return error_response(ErrorCode.MISSING_ARTIFACT_MOD_HASH, "装备神器模组需要提供 artifact_mod_hash。")
-        result = await svc["artifact_svc"].equip_artifact_mod(resolved, artifact_mod_hash, character)
-        return _action_response(intent, "神器模组装备已执行。", result)
+    artifact_result = await subclass_branches.artifact_branch(
+        svc, intent, resolved, character, artifact_name, artifact_mod_hash, _action_response
+    )
+    if artifact_result is not None:
+        return artifact_result
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"subclass_assistant 不支持 intent={intent!r}。")
 

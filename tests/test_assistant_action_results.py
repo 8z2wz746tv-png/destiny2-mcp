@@ -33,6 +33,7 @@ _ACTIONS = [
     (loadout_assistant, "loadout_svc", "clear_official", "clear_official_loadout", {"character": "hunter"}),
     (subclass_assistant, "subclass_svc", "modify", "modify_subclass", {"character": "hunter", "changes": {"super": "Test"}}),
     (subclass_assistant, "artifact_svc", "equip_artifact_mod", "equip_artifact_mod", {"artifact_mod_hash": 1, "character": "hunter"}),
+    (subclass_assistant, "artifact_svc", "equip_artifact", "switch_artifact", {"artifact_name": "好奇之器", "character": "hunter"}),
 ]
 
 

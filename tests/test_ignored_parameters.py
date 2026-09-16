@@ -96,6 +96,7 @@ BASELINE: dict[tuple[str, str], dict[str, Any]] = {
     ("loadout_assistant", "clear_official"): {"character": "hunter"},
     ("subclass_assistant", "modify"): {"character": "hunter", "changes": {"超能": "新超能"}},
     ("subclass_assistant", "equip_artifact_mod"): {"character": "hunter", "artifact_mod_hash": 1},
+    ("subclass_assistant", "equip_artifact"): {"character": "hunter", "artifact_name": "好奇之器"},
     ("subclass_assistant", "artifact_mod"): {"artifact_mod_hash": 1},
     ("activity_assistant", "pgcr"): {"activity_id": "12345"},
     ("activity_assistant", "clan_leaderboards"): {"group_id": "12345"},

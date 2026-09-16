@@ -17,6 +17,8 @@
 
 from __future__ import annotations
 
+import unicodedata
+
 # ── 六维（Armor 3.0 的叫法；官方中文来自 DestinyStatDefinition）────────────
 
 STAT_KEYS: tuple[str, ...] = (
@@ -132,15 +134,22 @@ ELEMENT_LABELS_ZH: dict[str, str] = {
 
 # 中文以**游戏客户端**的叫法为准：strand=缚丝（「编织」是早期写法，保留兼容）。
 # 权威来源是 `manifest_names` 的伤害类型名称表（那边也是缚丝），这里只是输入别名。
+#
+# 后面三个（火/电/冰）是玩家口语的**元素词根**：中文玩家把元素和职业拼着说——"火术/电猎/冰泰坦"。
+# 只收词根，职业尾缀交给 `subclass_element_key` 去拆：6 个元素 × 3 个职业写成 18 条表既长又漏
+# （"火术士"这种写法就会漏掉）。
 ELEMENT_ALIASES: dict[str, str] = {
     "void": "void",
     "虚空": "void",
     "solar": "solar",
     "烈日": "solar",
+    "火": "solar",
     "arc": "arc",
     "电弧": "arc",
+    "电": "arc",
     "stasis": "stasis",
     "冰影": "stasis",
+    "冰": "stasis",
     "strand": "strand",
     "缚丝": "strand",
     "编织": "strand",
@@ -148,3 +157,39 @@ ELEMENT_ALIASES: dict[str, str] = {
     "prismatic": "prism",
     "棱镜": "prism",
 }
+
+# 子职业叫法里的**职业尾缀**：中文玩家按职业把元素念成"火术/电猎/冰泰坦"。
+# 它只用来校验职业（目标角色是猎人、却说了"火术"→ 报错，不硬切），不参与元素解析，
+# 所以和 ELEMENT_ALIASES 是两张表、不是一张。
+SUBCLASS_CLASS_SUFFIXES: dict[str, str] = {
+    "术士": "warlock",
+    "术": "warlock",
+    "猎人": "hunter",
+    "猎": "hunter",
+    "泰坦": "titan",
+    "泰": "titan",
+}
+
+
+def subclass_element_key(value: str | None) -> tuple[str, str]:
+    """把「换子职业」的输入拆成 `(元素规范键, 输入里声明的职业)`。
+
+    只做两件事：归一化（NFKC 半角化、去空格、小写）后查元素表；查不到再拆一次职业尾缀。
+    拆不出来给 `("", "")`——由调用方决定怎么报错，这里不猜、不模糊匹配、不查拼音。
+
+    注意**官方子职业名不在这张表里**（破晓/枪手/炎阳……）：名字的权威来源是 Manifest，
+    由服务去该角色的子职业物品里按 `displayProperties.name` 精确匹配。
+    """
+    if not isinstance(value, str):
+        return "", ""
+    text = unicodedata.normalize("NFKC", value).strip().casefold()
+    if not text:
+        return "", ""
+    key = ELEMENT_ALIASES.get(text, "")
+    if key:
+        return key, ""
+    for suffix, klass in SUBCLASS_CLASS_SUFFIXES.items():
+        if len(text) > len(suffix) and text.endswith(suffix):
+            key = ELEMENT_ALIASES.get(text[: -len(suffix)], "")
+            return (key, klass) if key else ("", "")
+    return "", ""

@@ -13,6 +13,20 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（69 个旧工具） | `get_inventory`、`search_items` … | 只在 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**且** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 时暴露；不进主路径文档、不保证契约、不单独修 bug |
 
+## 0.3.0 的新能力与删除的行为
+
+新能力**不是别名**，登记在这里是为了让"以前做不到、现在能做了"有据可查：
+
+| 能力 | 入口 | 说明 |
+| --- | --- | --- |
+| 换子职业元素 | `subclass_assistant(intent="modify", changes={"subclass": …})` | 新的变更键（旧键一个没动）；元素别名进 `vocabulary.ELEMENT_ALIASES` + 职业尾缀表 |
+| 换神器 | `subclass_assistant(intent="equip_artifact")` | 新 intent（写入，走确认信封）；名字精确匹配，不模糊 |
+| 角色身上的神器 | `subclass_assistant(intent="artifact", character=…)` | `artifact` 原来的返回一个键没少，多附 `character_artifact` |
+
+**删除的行为（不留兼容分支）**：`equip_loadout` 遇到"保存的子职业与当前不一致"以前直接失败并返回
+「当前子职业与保存/确认的子职业不一致。」；0.3.0 起改成**先换上再配**（用户 2026-09-15 拍板），
+那句话术不再出现。旧行为没有开关、没有回退路径。
+
 ## 别名总表（实测等价）
 
 | 工具 | canonical | 别名 |
