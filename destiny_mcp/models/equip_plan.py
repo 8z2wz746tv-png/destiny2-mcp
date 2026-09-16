@@ -53,6 +53,9 @@ class EquipPlanStep(BaseModel):
         description="去向：vault/hunter/warlock/titan/equipped；顶下与装备都是 equipped",
     )
     why: str = Field(default="", description="这一步为什么必须存在（中文，可直接展示）")
+    slot: str = Field(
+        default="", description="这一步动的部位键（helmet/gauntlets/chest/legs/class_item）；装备编排里回滚靠它"
+    )
     source_location: str = Field(
         default="", description="被顶下的那件东西原本在哪（顶下步骤才有）"
     )

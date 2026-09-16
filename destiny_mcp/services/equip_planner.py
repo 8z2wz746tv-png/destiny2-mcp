@@ -274,6 +274,7 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
                     action="downgrade",
                     item=chosen.name,
                     item_instance_id=chosen.item_instance_id,
+                    slot=conflict_item.slot,
                     from_location=request.character,
                     to_location="equipped",
                     replaces=conflict_item.name,

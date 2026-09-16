@@ -457,12 +457,12 @@ class TransferService:
         p = await self._resolver.resolve_player(player_name)
         mid, mtype = p["membership_id"], p["membership_type"]
         char_id = await self._resolver.resolve_character_id(mid, mtype, character)
-        affected = {
-            step.to_location
-            for step in plan.steps
-            if step.to_location and step.to_location != "vault"
-        }
-        slots = {plan.target_slot} if plan.target_slot else set()
+        class_type = resolve_character_name(character)
+        slots = {step.slot for step in plan.steps if step.slot}
+        if plan.target_slot:
+            slots.add(plan.target_slot)
+        # 回滚用：动手之前，先记下这些部位原本装着哪件实例
+        before = await self._worn_by_slot(mid, mtype, char_id, class_type, slots)
 
         done: list[dict] = []
         for index, step in enumerate(plan.steps, 1):
@@ -472,16 +472,23 @@ class TransferService:
                 membership_type=mtype,
             )
             if result.get("ErrorCode", 0) != 1:
+                # 失败就**把已经做过的步骤换回去**（回滚），再如实报"停在哪、账号现在什么样"。
+                # 回滚本身也可能失败，那就照实说 rolled_back=False，不许假装干净。
+                rolled_back, rollback_note = await self._rollback_worn(
+                    mid, mtype, char_id, before, class_type
+                )
                 return {
                     "success": False,
                     "verified": False,
+                    "rolled_back": rolled_back,
                     "stopped_at": index,
                     "steps_done": done,
                     "steps": [s.model_dump() for s in plan.steps],
                     "message": (
                         f"第 {index} 步「{step.item}」没做成："
                         f"{result.get('Message', '上游没给原因')}；"
-                        f"账号现在：{await self._describe_worn(mid, mtype, char_id, class_type=resolve_character_name(character), slots=slots)}"
+                        f"{rollback_note}；"
+                        f"账号现在：{await self._describe_worn(mid, mtype, char_id, class_type=class_type, slots=slots)}"
                     ),
                 }
             done.append({"action": step.action, "item": step.item, "success": True})
@@ -500,9 +507,9 @@ class TransferService:
             "unverified": not verified,
             "steps_done": done,
             "steps": [s.model_dump() for s in plan.steps],
+            "rolled_back": False,
             "equipped_now": await self._describe_worn(
-                mid, mtype, char_id,
-                class_type=resolve_character_name(character), slots=slots,
+                mid, mtype, char_id, class_type=class_type, slots=slots,
             ),
             "message": (
                 f"已按计划装上「{plan.target_item}」（{len(done)} 步，回读一致）。"
@@ -513,6 +520,47 @@ class TransferService:
                 )
             ),
         }
+
+    async def _worn_by_slot(
+        self, mid: str, mtype: int, char_id: str, class_type: int, slots: set[str]
+    ) -> dict[str, str]:
+        """动手之前：这些部位现在装着哪件实例（回滚要按这个换回去）。"""
+        profile = await self._resolver.get_profile(
+            mid, mtype, profile_components.ARMOR_SNAPSHOT
+        )
+        equipped_keys = self._equipped_keys(profile, char_id)
+        return {
+            item.slot: item.item_instance_id
+            for item in self._character_armor(profile, char_id, class_type)
+            if item.item_instance_id in equipped_keys and item.slot in slots
+        }
+
+    async def _rollback_worn(
+        self, mid: str, mtype: int, char_id: str, before: dict[str, str], class_type: int
+    ) -> tuple[bool, str]:
+        """把**真正变过**的部位换回动手前那件；返回（是否全部换回，给用户看的一句话）。
+
+        只回滚变过的：失败那一步往往没落地，把它也算进去会多写一次无意义的 EquipItem
+        （真机上每次写入都要等同步窗口，不该白写）。
+        """
+        if not before:
+            return True, "没有已执行的步骤需要回滚"
+        now = await self._worn_by_slot(mid, mtype, char_id, class_type, set(before))
+        changed = {slot: iid for slot, iid in before.items() if now.get(slot) != iid}
+        if not changed:
+            return True, "账号没有变化，不需要回滚"
+        failed: list[str] = []
+        for slot, instance_id in changed.items():
+            result = await self._bungie.equip_item(
+                item_instance_id=instance_id,
+                character_id=char_id,
+                membership_type=mtype,
+            )
+            if result.get("ErrorCode", 0) != 1:
+                failed.append(f"{slot}（{result.get('Message', '上游没给原因')}）")
+        if failed:
+            return False, "回滚没做全：" + "、".join(failed)
+        return True, f"已回滚 {len(changed)} 个部位到动手前那件"
 
     async def _describe_worn(
         self, mid: str, mtype: int, char_id: str, class_type: int, slots: set[str]

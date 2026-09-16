@@ -134,9 +134,12 @@ status = ready
 ### 与计划原文的一处偏差（有意）
 
 计划里写"复用 `loadout_equipment_service` 的多步写入 + 回滚"。实际实现是**直接用 `EquipItem` 逐步写**
-（`transfer_service.execute_equip_plan`）：这条链只有"先顶下、再装"两步，回滚语义是"不继续、如实报停点"，
+（`transfer_service.execute_equip_plan`）：这条链只有"先顶下、再装"两步，回滚就是"把变过的部位换回去"，
 而 `loadout_equipment_service` 那套是给移动/穿整套配装用的（`MoveItemStep` + 取消恢复），拉进来反而多一层。
 若以后要支持"一次装多件"再回头复用。
+
+**回滚已实现**（0.4.1）：第 N 步失败 → 把**真正变过**的部位换回动手前那件（只动变过的，避免白写），
+回滚失败照实报 `rolled_back: false`。计划步骤为此加了结构化 `slot`。
 
 ### 还没做
 
