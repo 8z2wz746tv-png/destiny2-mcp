@@ -29,12 +29,7 @@ from ..utils.hash_utils import to_unsigned
 from .item_parser import parse_items_from_profile
 from .account_action_lock import account_action_lock, serialized_account_action
 from . import write_readback
-from .equip_planner import (
-    ARMOR_BUCKET_BY_SLOT,
-    BucketCapacity,
-    EquipPlanRequest,
-    plan_equip,
-)
+from .equip_planner import load_plan_request, plan_equip
 from .inventory_service import (
     MISSING_INVENTORY_SCOPE_MESSAGE,
     looks_like_missing_inventory_scope,
@@ -388,61 +383,22 @@ class TransferService:
             if item.character_id == character_id
         ]
 
-    def _bucket_capacity(self, items, equipped_keys) -> dict[str, BucketCapacity]:
-        """各类目容量：容量只信桶定义，件数从这个角色的物品数出来。
-
-        桶定义查不到（capacity=0）就**不放进来** —— 宁可"不知道"，也不要编一个 0
-        让规划器把"能装"误判成"满了"。
-        """
-        capacities: dict[str, BucketCapacity] = {}
-        for slot, bucket_hash in ARMOR_BUCKET_BY_SLOT.items():
-            definition = self._manifest.get_bucket_definition(bucket_hash) or {}
-            capacity = int(definition.get("itemCount") or 0)
-            if not capacity:
-                continue
-            in_slot = [i for i in items if i.slot == slot]
-            worn = [i for i in in_slot if i.item_instance_id in equipped_keys]
-            # `used` **含正装备那件**（与 DIM 同一口径：桶里装着的那件也占一格）。
-            # 两个方向的风险不对称：多算 → 顶多让用户白清一格；少算 → 会去撞上游的
-            # NoRoomInDestination。宁可保守。
-            capacities[slot] = BucketCapacity(
-                capacity=capacity,
-                used=len(in_slot),
-                equipped=len(worn),
-            )
-        return capacities
-
     async def plan_equip_item(
         self, player_name: str, item_instance_id: str, character: str
     ) -> EquipPlan:
-        """预检 + 出计划。**只读**：一个字都不写账号（写要等调用方 confirmed=true）。"""
-        p = await self._resolver.resolve_player(player_name)
-        mid, mtype = p["membership_id"], p["membership_type"]
-        char_id = await self._resolver.resolve_character_id(mid, mtype, character)
-        class_type = resolve_character_name(character)
+        """预检 + 出计划。**只读**：一个字都不写账号（写要等调用方 confirmed=true）。
 
-        profile = await self._resolver.get_profile(
-            mid, mtype, profile_components.ARMOR_SNAPSHOT
+        装配交给 `equip_planner.load_plan_request`（单一出处：读哪些组件、容量怎么算、
+        `equipped_keys` 怎么来，都在那边一处说清），这里只负责把计划和执行串起来。
+        """
+        request = await load_plan_request(
+            player_name,
+            str(item_instance_id),
+            character,
+            manifest=self._manifest,
+            resolver=self._resolver,
         )
-        items = self._character_armor(profile, char_id, class_type)
-        target = next(
-            (i for i in items if i.item_instance_id == str(item_instance_id)), None
-        )
-        if target is None:
-            raise ItemNotFoundError(item_instance_id)
-
-        equipped_keys = self._equipped_keys(profile, char_id)
-        return plan_equip(
-            EquipPlanRequest(
-                character=class_key(character) or character,
-                character_id=char_id,
-                target=target,
-                equipped_keys=frozenset(equipped_keys),
-                character_inventory=items,
-                bucket_capacity=self._bucket_capacity(items, equipped_keys),
-            ),
-            self._manifest,
-        )
+        return plan_equip(request, self._manifest)
 
     @serialized_account_action
     async def execute_equip_plan(

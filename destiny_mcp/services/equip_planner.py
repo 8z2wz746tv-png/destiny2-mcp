@@ -30,6 +30,7 @@ from typing import Any, Protocol
 from ..models import EquipPlan, EquipPlanBlock, EquipPlanStep, InventoryItem
 from ..vocabulary import LOCATION_LABELS_ZH  # 位置中文标签的单一出处
 from . import profile_components
+from .armor_payload import slot_key_from_display
 from .item_parser import parse_items_from_profile
 
 # 装备部位 → 背包 bucket（无符号 32 位，profile 的 buckets 组件用的就是这个）。
@@ -59,6 +60,8 @@ class EquipItemInfo(Protocol):
     def get_item_definition(self, item_hash: int) -> dict | None: ...
 
     def get_item_name(self, item_hash: int) -> str: ...
+
+    def get_bucket_definition(self, bucket_hash: int) -> dict | None: ...
 
 
 @dataclass(frozen=True)
@@ -115,6 +118,18 @@ class EquipPlanRequest:
 # 公开别名：装配请求（transfer_service）要按**同一张表**数该类目有几件、容量多少，
 # 再抄一份就会漂。
 ARMOR_BUCKET_BY_SLOT: dict[str, int] = _ARMOR_BUCKET_BY_SLOT
+
+
+def _slot_from_definition(manifest: EquipItemInfo, item_hash: int) -> str:
+    """定义级的护甲槽位：`itemTypeDisplayName`（"胸部护甲" → `chest`）。
+
+    为什么需要它：`InventoryItem.slot` 是按 **bucketHash** 认的，而**仓库里的护甲**
+    bucketHash 是仓库格、认不出部位（`slot` 为空）。装一件仓库里的护甲正是最需要编排的场景，
+    所以这里退回定义里的显示名；认不出来给空串（不猜）。
+    """
+    definition = manifest.get_item_definition(item_hash) or {}
+    display = str(definition.get("itemTypeDisplayName") or "")
+    return slot_key_from_display(display) if display else ""
 
 
 def _is_exotic(manifest: EquipItemInfo, item_hash: int) -> bool | None:
@@ -211,13 +226,14 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
     `blockers` 给出数字与出路）、`ready`（`steps` 可执行，顺序是「先搬/先顶下、再装目标」）。
     """
     target = request.target
+    target_slot = target.slot or _slot_from_definition(manifest, target.item_hash)
     plan = EquipPlan(
         status="ready",
         character=request.character,
         character_id=request.character_id,
         target_item=target.name,
         target_item_instance_id=target.item_instance_id,
-        target_slot=target.slot,
+        target_slot=target_slot,
     )
 
     if "equipped" in _locations(target, request.character_id):
@@ -313,6 +329,7 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
             action="move",
             item=target.name,
             item_instance_id=target.item_instance_id,
+            slot=target_slot,
             from_location=target.location,
             to_location=request.character,
             why=(
@@ -327,6 +344,7 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
         action="equip",
         item=target.name,
         item_instance_id=target.item_instance_id,
+        slot=target_slot,
         from_location=request.character,
         to_location="equipped",
         why=f"目标：把「{target.name}」装备到 {request.character} 身上。",
@@ -377,7 +395,7 @@ async def load_plan_request(
     p = await resolver.resolve_player(player_name)
     mid, mtype = p["membership_id"], p["membership_type"]
     char_id = await resolver.resolve_character_id(mid, mtype, character)
-    profile = await resolver.get_profile(mid, mtype, profile_components.INVENTORY)
+    profile = await resolver.get_profile(mid, mtype, profile_components.ARMOR_SNAPSHOT)
 
     items = parse_items_from_profile(profile, manifest)
     target = next(
@@ -399,36 +417,40 @@ async def load_plan_request(
             item.item_instance_id for item in on_character if item.is_equipped
         ),
         character_inventory=on_character,
-        bucket_capacity=_bucket_capacity(profile, char_id, items),
+        bucket_capacity=_bucket_capacity(manifest, char_id, items),
     )
 
 
 def _bucket_capacity(
-    profile: dict, char_id: str, items: list[InventoryItem]
+    manifest: EquipItemInfo, char_id: str, items: list[InventoryItem]
 ) -> dict[str, BucketCapacity]:
-    """护甲类目容量：容量取 buckets 组件，已用/已装备按本次 profile 实点。
+    """护甲类目容量：容量取 **Manifest 的桶定义**（`DestinyInventoryBucketDefinition.itemCount`），
+    已用/已装备按本次 profile 实点。
 
-    组件里缺某个 bucket（老账号或上游裁剪）就先不给这一类目下结论 ——
-    `plan_equip` 会跳过"背包满"这条预检，让上游去判，而不是拿默认值编一个满/不满。
+    旧实现读 `itemComponents.buckets.data` —— 真机上**根本没有这个组件**（实采：读出来是空的，
+    于是"背包满"这条预检静默失效，等于没有）。容量只有一个权威来源：桶定义。
+    `used` **含正装备那件**（与 DIM 同口径）：真机上 warlock 的头盔/臂铠/胸甲都是 10/10，
+    少算一件就会假报"还能放一件"，然后去撞上游 `NoRoomInDestination`。
+    查不到容量（桶定义缺失）就不给这一类目下结论，让上游去判，别编一个满/不满。
     """
-    buckets = (
-        profile.get("itemComponents", {})
-        .get("buckets", {})
-        .get("data", {})
-    )
-    equipped_counts: dict[str, int] = {}
+    totals: dict[str, int] = {}
+    worn: dict[str, int] = {}
     for item in items:
-        if item.character_id == char_id and item.is_equipped and item.slot:
-            equipped_counts[item.slot] = equipped_counts.get(item.slot, 0) + 1
+        if item.character_id != char_id or not item.slot:
+            continue
+        totals[item.slot] = totals.get(item.slot, 0) + 1
+        if item.is_equipped:
+            worn[item.slot] = worn.get(item.slot, 0) + 1
 
     capacity: dict[str, BucketCapacity] = {}
     for slot, bucket_hash in _ARMOR_BUCKET_BY_SLOT.items():
-        entry = buckets.get(bucket_hash) or buckets.get(str(bucket_hash))
-        if not isinstance(entry, dict) or "capacity" not in entry:
+        definition = manifest.get_bucket_definition(bucket_hash) or {}
+        total = int(definition.get("itemCount") or 0)
+        if not total:
             continue
         capacity[slot] = BucketCapacity(
-            capacity=int(entry.get("capacity") or 0),
-            used=int(entry.get("count") or entry.get("usage") or 0),
-            equipped=equipped_counts.get(slot, 0),
+            capacity=total,
+            used=totals.get(slot, 0),
+            equipped=worn.get(slot, 0),
         )
     return capacity

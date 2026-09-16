@@ -2,6 +2,27 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.4.2 — 2026-09-16
+
+装备编排的三处收口（0.4.0/0.4.1 之后自查出来的）：
+
+- **容量来源统一到 Manifest 桶定义**：规划器原先读 `itemComponents.buckets.data` —— 真机上
+  **没有这个组件**，读出来永远是空，"背包满"这条预检等于静默失效。现在两处（规划器的
+  `load_plan_request` 与执行侧）都只认 `DestinyInventoryBucketDefinition.itemCount`，
+  `used` 含正装备那件；
+- **装配收成一处**：`transfer_service.plan_equip_item` 改为委托 `equip_planner.load_plan_request`
+  （读哪些组件、容量怎么算、`equipped_keys` 怎么来，只在那边说一次），删掉重复实现；
+- **槽位在仓库物品上也有值了**：`InventoryItem.slot` 按 bucketHash 认，而**仓库里的护甲**
+  bucket 是仓库格、认不出部位（`slot` 为空）—— 装仓库里的护甲正是最需要编排的场景。
+  现在缺失时退回定义的 `itemTypeDisplayName`（`armor_payload.slot_key_from_display`），
+  回滚因此知道动了哪个部位；
+- 守门：新增"每一步都必须带 `slot`"与"桶定义缺失就不下结论"两条；容量那条测试按新口径重写
+  （旧测试断言的是不存在的组件）。
+
+真机核对（只读）：`load_plan_request` + `plan_equip` 在真账号上给出
+`[downgrade chest=圣贤保护者法袍 顶下星火协议, equip gauntlets=逃逸艺术家]`，
+容量 chest/gauntlets/helmet = 10/10、legs/class_item = 9/10。
+
 ## 0.4.1 — 2026-09-16
 
 0.4.0 的装备编排补上**失败回滚**：执行到第 N 步失败时，把**已经改动过**的部位换回动手前那件，

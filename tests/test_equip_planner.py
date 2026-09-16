@@ -325,6 +325,14 @@ class _ProfileManifest:
     # 部位只能从定义读，所以这里必须按 hash 分开答）
     _DISPLAY = {2000: "臂铠", 3000: "臂铠", 4000: "胸部护甲"}
 
+    # 容量从桶定义读（真机口径：Manifest 的 DestinyInventoryBucketDefinition.itemCount）。
+    # 这里把臂铠类目给成 2 —— 与夹具里"该角色 2 件臂铠（1 穿 1 备）"对齐，free=0。
+    _BUCKET_CAPACITY = {3551918588: 2, 14239492: 2}
+
+    def get_bucket_definition(self, bucket_hash: int) -> dict | None:
+        total = self._BUCKET_CAPACITY.get(bucket_hash)
+        return {"itemCount": total} if total else None
+
     def get_item_info(self, item_hash: int) -> dict:
         return {
             "itemType": 20,
@@ -347,7 +355,11 @@ class _ProfileManifest:
         return "Gauntlets"
 
     def get_item_definition(self, item_hash: int) -> dict | None:
-        return {"inventory": {"tierType": 6 if item_hash in {2000, 4000} else 5}}
+        return {
+            "inventory": {"tierType": 6 if item_hash in {2000, 4000} else 5},
+            # 仓库里的护甲认不出 bucket，只能靠这个显示名回退（真机也是这条路）
+            "itemTypeDisplayName": self._DISPLAY.get(item_hash, "胸部护甲"),
+        }
 
 
 def _profile() -> dict:
@@ -373,17 +385,57 @@ def _profile() -> dict:
     }
 
 
-def test_bucket_capacity_uses_the_profile_numbers() -> None:
+async def test_every_step_carries_its_slot() -> None:
+    """每一步都要带 `slot`：装备编排靠它回滚（真机上漏过 equip 那步，回滚就不知道动哪个部位）。"""
+    manifest = _ProfileManifest()
+
+    class Resolver:
+        async def resolve_player(self, player_name: str) -> dict:
+            return {"membership_id": "46116860", "membership_type": 3}
+
+        async def resolve_character_id(self, mid, mtype, character) -> str:
+            return "char-warlock"
+
+        async def get_profile(self, mid, mtype, components):
+            return _profile()
+
+    request = await load_plan_request(
+        "Tester#1234", "i-target", "warlock", manifest=manifest, resolver=Resolver()
+    )
+    plan = plan_equip(request, manifest)
+
+    assert plan.steps, "这个夹具本来就该出计划"
+    assert all(step.slot for step in plan.steps), [s.action for s in plan.steps if not s.slot]
+
+
+def test_bucket_capacity_comes_from_the_manifest_bucket_definition() -> None:
+    """容量只有一个权威来源：Manifest 的 `DestinyInventoryBucketDefinition.itemCount`。
+
+    以前这里读 `itemComponents.buckets.data` —— 真机上**没有那个组件**，读出来永远是空，
+    "背包满"这条预检于是静默失效（实采：warlock 的头盔/臂铠/胸甲都是 10/10，一个都没报出来）。
+    """
+    manifest = _ProfileManifest()
     profile = _profile()
-    items = parse_items_from_profile(profile, _ProfileManifest())
+    items = parse_items_from_profile(profile, manifest)
 
-    capacity = _bucket_capacity(profile, "char-warlock", items)
+    capacity = _bucket_capacity(manifest, "char-warlock", items)
 
-    assert capacity["gauntlets"].capacity == 176
-    assert capacity["gauntlets"].used == 176
+    assert capacity["gauntlets"].capacity == 2, "容量来自假 manifest 的桶定义"
+    assert capacity["gauntlets"].used == 2, "used **含正装备那件**（与 DIM 同口径）"
     assert capacity["gauntlets"].free == 0
-    assert capacity["gauntlets"].equipped == 1  # 已装备的单独数，不在容量里重复扣
-    assert capacity["chest"].capacity == 176
+    assert capacity["gauntlets"].equipped == 1, "已装备的单独数一份，便于话术里说清"
+
+
+def test_bucket_capacity_skips_buckets_the_manifest_does_not_know() -> None:
+    """桶定义查不到就**不给这一类目下结论**：让上游去判，别编一个满/不满。"""
+    class _NoBuckets(_ProfileManifest):
+        def get_bucket_definition(self, bucket_hash: int) -> dict | None:
+            return None
+
+    manifest = _NoBuckets()
+    items = parse_items_from_profile(_profile(), manifest)
+
+    assert _bucket_capacity(manifest, "char-warlock", items) == {}
 
 
 async def test_plan_for_player_reads_once_and_plans_the_conflict() -> None:
