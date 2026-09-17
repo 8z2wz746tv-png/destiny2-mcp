@@ -13,7 +13,7 @@ class BuildRecipe(BaseModel):
     """系统内部标准配装表示。全部使用 Hash。
 
     所有名称已通过 Normalizer 归一化为 Bungie Definition Hash。
-    参见 ADR-007: Canonical Build Strategy。
+    参见 ADR-001: Canonical Build Strategy。
     """
 
     class_type: str = Field(

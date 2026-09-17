@@ -2,7 +2,7 @@
 
 编排 Extractor → Normalizer → Validator 的完整流程。
 
-参见 ADR-007: Canonical Build Strategy。
+参见 ADR-001: Canonical Build Strategy。
 """
 
 from __future__ import annotations

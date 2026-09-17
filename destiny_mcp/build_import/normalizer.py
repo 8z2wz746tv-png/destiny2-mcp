@@ -6,7 +6,7 @@
 3. Fuzzy Match（编辑距离匹配）
 4. Failure（标记失败，禁止猜测）
 
-参见 ADR-007: Canonical Build Strategy。
+参见 ADR-001: Canonical Build Strategy。
 """
 
 from __future__ import annotations

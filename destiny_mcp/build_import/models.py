@@ -3,7 +3,7 @@
 BuildDraft: LLM 输出结构（全 Name）
 CanonicalBuild: 系统内部标准表示（全 Hash）
 
-参见 ADR-007: Canonical Build Strategy。
+参见 ADR-001: Canonical Build Strategy。
 """
 
 from __future__ import annotations

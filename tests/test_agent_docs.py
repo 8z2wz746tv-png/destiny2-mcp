@@ -156,7 +156,7 @@ def test_adr_numbering_and_metadata() -> None:
     entries = _adr_entries()
     assert entries, "docs/adr/ 下一条 ADR 都没有"
     numbers = sorted(entries)
-    # 现存编号不要求从 001 起（正文是从 ADR-007 开始落盘的），要求的是**不留缺口**：
+    # 现存编号不要求从 001 起（正文是从 ADR-001 开始落盘的），要求的是**不留缺口**：
     # 7 → 下一个必须是 8。删文件留空号、抄错号都会在这里红。
     assert numbers == list(range(numbers[0], numbers[0] + len(numbers))), (
         f"ADR 编号必须连续、不复用（推翻旧决定也留文件标 superseded；现存：{numbers}）"
@@ -181,3 +181,29 @@ def test_adr_readme_matches_actual_files() -> None:
     actual = {path.name for path in _adr_entries().values()}
     assert not actual - mentioned, f"这些 ADR 没进 docs/adr/README.md 的索引：{sorted(actual - mentioned)}"
     assert not mentioned - actual, f"README 索引指向不存在的 ADR 文件：{sorted(mentioned - actual)}"
+
+
+def test_adr_references_point_at_real_files() -> None:
+    """代码/文档里写 `ADR-NNN` 就必须真有那一篇。
+
+    踩过的坑：`models/loadout.py` 与 `build/models.py` 长期引用着 `ADR-005`/`ADR-008`，
+    而正文从未落盘（那是前身项目的编号）—— 读者顺着引用找不到任何东西。现在编号从
+    `docs/adr/` 里真实存在的文件推出来，引用不在其中就红。
+    """
+    adr_dir = ROOT / "docs" / "adr"
+    existing = {path.name[:3] for path in adr_dir.glob("ADR-*.md")}
+    existing |= {path.name[:3] for path in adr_dir.glob("[0-9][0-9][0-9]-*.md")}
+
+    pattern = re.compile(r"ADR-(\d{3})")
+    offenders: list[str] = []
+    for path in sorted(ROOT.rglob("*")):
+        rel = path.relative_to(ROOT).as_posix()
+        if path.suffix not in (".py", ".md") or rel.startswith(("build/", ".git/")):
+            continue
+        if "__pycache__" in rel or rel == "tests/test_agent_docs.py":
+            continue
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            for match in pattern.finditer(line):
+                if match.group(1) not in existing:
+                    offenders.append(f"{rel}:{number}: {match.group(0)}")
+    assert offenders == [], "这些引用指向不存在的 ADR：\n" + "\n".join(offenders)

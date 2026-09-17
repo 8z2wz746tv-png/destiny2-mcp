@@ -8,7 +8,7 @@
 关键：Validator 只验证"解析是否成功"，不验证"信息是否完整"。
 没提金装 ≠ 解析失败。
 
-参见 ADR-007: Canonical Build Strategy。
+参见 ADR-001: Canonical Build Strategy。
 """
 
 from __future__ import annotations

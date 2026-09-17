@@ -1,4 +1,4 @@
-# ADR-007: Canonical build strategy
+# ADR-001: Canonical build strategy
 
 - Status: accepted
 - Date: 2026-09-11

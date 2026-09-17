@@ -9,15 +9,16 @@
 
 | 编号 | 标题 | 状态 |
 | --- | --- | --- |
-| [ADR-007](007-canonical-build-strategy.md) | Canonical build strategy：配装分三层类型，只有 `ExecutableBuild` 能执行 | accepted |
+| [ADR-001](001-canonical-build-strategy.md) | Canonical build strategy：配装分三层类型，只有 `ExecutableBuild` 能执行 | accepted |
 
 ## 编号规矩
 
 - 文件名 `NNN-kebab-title.md`（现状即此形），标题行写 `# ADR-NNN: 标题`；`NNN` 是三位零填充。
 - 编号**连续、不复用**：新决定取当前最大号 +1；旧决定被推翻时**保留原文件**并把 `Status` 改成
   `superseded by ADR-NNN`，不要删文件、不要留空号。
-- 现存正文从 `ADR-007` 起：代码里还引用着更早的 `ADR-005`、`ADR-008`，但那些决定的正文从未落盘
-  —— 这是历史欠账，**不补写、不复用编号**，新决定一律往后排。
+- **本项目从 `ADR-001` 重新计数**：前身项目的编号（005/007/008…）不带过来，这里的编号只属于本仓库；
+  代码与文档里写 `ADR-NNN` 就必须真有那一篇 —— `tests/test_agent_docs.py` 会扫，指向不存在的 ADR 直接红
+  （以前 `models/loadout.py`、`build/models.py` 引用过从未落盘的编号，就是靠这条规矩清掉的）。
 - 一条 ADR 只做一个决定。两件事写两条，互相在正文里引用。
 
 ## 什么时候必须写一条

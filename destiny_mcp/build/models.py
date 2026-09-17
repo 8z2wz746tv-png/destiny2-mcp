@@ -2,7 +2,7 @@
 
 Defines Armor, InventorySnapshot, BuildRequest, BuildResult, and related
 models for the build solver. Separate from src/destiny_mcp/models.py to
-keep the Build Engine domain isolated (per ADR-005 design principle #2).
+keep the Build Engine domain isolated (see docs/adr/001-canonical-build-strategy.md).
 """
 
 from __future__ import annotations

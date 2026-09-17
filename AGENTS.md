@@ -188,7 +188,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | `destiny_mcp/vocabulary.py` | 中文词表唯一出处（六维/职业/位置/元素/旧名）。 |
 | `destiny_mcp/activity_stats.py` | 活动统计形状唯一样式：上游 `statId` → 行式；改口径先看 `tests/test_activity_stats.py`。 |
 | `destiny_mcp/audit.py` | 每次 MCP 工具调用落盘审计，调用日志只在这里写。 |
-| `destiny_mcp/build_contracts.py` | 配装契约类型（`BuildRecipe`/`CanonicalBuild`/`ExecutableBuild`），见 ADR-007；只有最后一个能执行。 |
+| `destiny_mcp/build_contracts.py` | 配装契约类型（`BuildRecipe`/`CanonicalBuild`/`ExecutableBuild`），见 ADR-001；只有最后一个能执行。 |
 | `destiny_mcp/bungie_client.py` | Bungie API 客户端：token 生命周期 + HTTP 错误映射；**贴着 1263 上限**，新调用先想放别处。 |
 | `destiny_mcp/manifest.py` | Manifest 管理器门面（查名/搜索），其余按域拆到 `manifest_*.py`；贴着 262 上限，只做聚合。 |
 | `destiny_mcp/manifest_armor.py` | 护甲模组与套装加成域。 |

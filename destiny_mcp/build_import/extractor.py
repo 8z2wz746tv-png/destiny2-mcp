@@ -4,7 +4,7 @@ Phase 1: ScreenshotExtractor — Claude Vision 截图提取。
 Phase 2: ArticleExtractor — URL → 正文提取 → LLM 解析 → BuildDraft。
 Phase 3: VideoExtractor — 视频 → 字幕 + 关键帧 → BuildDraft。
 
-LLM 只输出 Name，禁止输出 Hash。参见 ADR-007。
+LLM 只输出 Name，禁止输出 Hash。参见 ADR-001。
 """
 
 from __future__ import annotations

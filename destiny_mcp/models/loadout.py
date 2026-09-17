@@ -39,7 +39,7 @@ class LoadoutItem(BaseModel):
 class LoadoutSubclassConfig(BaseModel):
     """Subclass configuration saved in a loadout.
 
-    System-wide single source of truth for subclass configuration (ADR-008).
+    System-wide single source of truth for subclass configuration.
     All equip logic (Build Import, DIM import, voice, overlay) consumes this model.
     """
 
