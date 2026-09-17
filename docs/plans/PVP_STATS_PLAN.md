@@ -58,10 +58,55 @@ stats.account:  [{source: "GetHistoricalStatsForAccount", scope: "account", exis
 
 并在 `warnings` 里说明差异原因（计数器从 S1 起累计，含统计接口已不再列举的旧角色）。
 
-### P3 赛季口径 + 武器榜
+### P3 按模式与周期统计（试炼 / 铁旗 / 竞技 / 智谋 / 熔炉；生涯 vs 赛季）
 
-- 赛季：stats 接口的 periodType（或对应 metric）→ 给"本赛季 KDA / 击败 / 竞技等级"；
-- `weapon_history` 加 `scope: "all_modes"` + 话术直说"不是 PvP 榜"；
+**问题**：用户要"按模式分开看"，而三条口径不同的计数器**同名叫「已击败对手」**
+（生涯 124,495 / 试炼 10,696 / 赛季 3,522），光看名字分不出来。
+
+**已实采的两条分类依据**：
+
+| 依据 | 能分什么 | 分不了什么 |
+| --- | --- | --- |
+| Manifest 层级链（`DestinyMetricDefinition.parentNodeHashes` → `DestinyPresentationNodeDefinition`） | 模式**家族**：熔炉竞技场 / 奥斯里斯试炼 / 智谋 各自成链 | 生涯 vs 赛季（两者同挂"熔炉竞技场"）；铁旗、竞技等级等子模式（也挂在"熔炉竞技场"下） |
+| 计数器自己的**名字 + 描述** | 子模式与周期：「已击败铁旗对手数」直接点名；生涯那条描述写 "Tracks from Season 1 onward" | 靠人读，必须落成表 |
+
+**做法（三步，每步可独立验收）**：
+
+1. **建对照表（单一出处）**：`destiny_mcp/data/pvp_counters.py`（或同类低层模块）
+   `{metric_hash: {mode, period, label_zh}}`，`mode ∈ {crucible, trials, iron_banner,
+   competitive, gambit, …}`、`period ∈ {career, season, act}`；**只收录我们要暴露的那批**
+   （先 20–40 条：熔炉生涯/赛季、试炼、铁旗、竞技等级、智谋、突袭…），每条都带实测证据
+   （hash + 名字 + 描述 + 采集日期）；
+   - 守门 `tests/test_pvp_counters_table.py`：① 每个 hash 的 `mode/period` 唯一且取值在枚举内；
+     ② 表与 `counters` 输出的标签一致；③ **注入一次重复 hash / 非法 mode → 红**。
+2. **`counters` 输出带标签**：每条加 `mode` / `period`（表里没有的给 `mode: "other"`,
+   `period: null`，**不猜**）；支持按 `mode` 过滤（`counters(mode="trials")`）；
+   - 真机验收：`mode="trials"` 只返回试炼那批，且「已击败对手」= 10,696；
+   - `mode="iron_banner"` → 「已击败铁旗对手数」= 1,737。
+3. **细节数据走 stats 接口的 `modes` + `periodType`**（计数器只有"累计值"，没有 K/D、胜率）：
+   - 我们的 `get_historical_stats` 目前**这两个参数都没传**，所以只拿到 `allPvP` 一坨；
+   - **第一步先核实参数取值**（`activityModeType` 的 Trials/IronBanner/Competitive 数值、
+     `periodType` 的 AllTime/Season 枚举）——用官方文档 + 一次真机调用对照，写进
+     `docs/reference/bungie_api.md`，**不许照印象填**；
+   - 实现后 `stats` 支持 `mode=` 与 `period=`，payload 带 `mode`/`period` 标签；
+   - 真机验收：试炼本赛季的 K/D 与游戏内（或机器人）显示一致；拿不到就报 `unavailable`。
+
+**用户可见（P3 完成后）**：
+
+| 问法 | 看到 |
+| --- | --- |
+| "我试炼打得怎么样" | 试炼生涯击败 10,696（计数器）+ 试炼 K/D / 胜率（stats，标 `mode=trials, period=season`） |
+| "铁旗呢" | 「已击败铁旗对手数」1,737、铁旗等级 949（计数器，`mode=iron_banner`） |
+| "我这赛季熔炉" | 赛季击败 3,522（`period=season`）+ 赛季 KDA（stats） |
+| "智谋呢" | 储存萤光 11,264、击败入侵者 608、胜场 423（`mode=gambit`） |
+
+**风险**：① 401 条里绝大多数是 PvE 计数器，**默认只给 PvP 那批**（表里没有的不猜模式）；
+② `periodType`/`modes` 的取值必须先核实，猜错会静默拿错数据（违反"不许静默降级"）；
+③ 上游可能新增/改名计数器 → 由守门测试发现而不是靠人巡检。
+
+### P3b 武器榜的口径标注
+
+- `weapon_history` 加 `scope: "all_modes"` + 话术直说"这不是 PvP 榜"；
 - 真要做 **PvP 武器榜**：用 PGCR 逐场聚合最近 N 场（**明确标"最近 N 场"**，不是生涯）。
 
 ### P4 收口
