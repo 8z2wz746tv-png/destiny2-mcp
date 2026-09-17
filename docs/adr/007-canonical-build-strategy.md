@@ -1,6 +1,7 @@
 # ADR-007: Canonical build strategy
 
 - Status: accepted
+- Date: 2026-09-11
 - Scope: `destiny_mcp/build_contracts.py`, `services/build_service.py`, `tools/_build_confirmation.py`
 
 This decision was implemented before it was written down; the code references it from
