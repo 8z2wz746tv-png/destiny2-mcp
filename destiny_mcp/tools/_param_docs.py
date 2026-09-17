@@ -249,7 +249,11 @@ ModName = Annotated[
 
 Query = Annotated[
     str,
-    Field(description="关键词。搜社区资料、搜收藏品节点、搜官方配装标识时用它，具体搜哪里取决于 intent。"),
+    Field(description=(
+        "关键词。搜社区资料、搜收藏品节点、搜官方配装标识时用它；"
+        "activity_assistant 的 counters 用它按名称/描述筛计数器（如 \"crucible\"、\"trials\"）；"
+        "具体搜哪里取决于 intent。"
+    )),
 ]
 
 Confirmed = Annotated[
@@ -441,7 +445,7 @@ MaxTop = Annotated[
 
 Count = Annotated[
     int | None,
-    Field(description="要多少条记录；null=没指定（按 20 处理）。history、武器历史、聚合统计和社区资料读它；生涯统计不分条数。"),
+    Field(description="要多少条记录；null=没指定（按 20 处理）。history、武器历史、聚合统计、计数器（counters）和社区资料读它；生涯统计不分条数。"),
 ]
 
 VendorName = Annotated[

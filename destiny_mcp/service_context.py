@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from .services.weekly_analysis_service import WeeklyAnalysisService
     from .services.profile_cache import ProfileCache
     from .services.activity_service import ActivityService
+    from .services.activity_counters_service import ActivityCountersService
     from .services.manifest_query_service import ManifestQueryService
     from .services.fragment_service import FragmentService
     from .services.artifact_service import ArtifactService
@@ -60,6 +61,7 @@ class ServiceContext(TypedDict):
     loadout_svc: LoadoutService
     build_import_svc: BuildImportService
     activity_svc: ActivityService
+    activity_counters_svc: ActivityCountersService
     manifest_query_svc: ManifestQueryService
     fragment_svc: FragmentService
     artifact_svc: ArtifactService

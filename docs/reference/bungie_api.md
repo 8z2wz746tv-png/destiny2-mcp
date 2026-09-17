@@ -235,6 +235,7 @@
 | 事实 | 唯一出处 |
 | --- | --- |
 | 组件号集合 | `destiny_mcp/services/profile_components.py` |
+| 游戏内生涯计数器（组件 1100）与统计接口的分工 | `destiny_mcp/services/activity_counters_service.py`（见本文第十一节） |
 | 写入回读重试 | `destiny_mcp/services/write_readback.py` |
 | 模组/插槽写入与 free→付费回退 | `destiny_mcp/services/loadout_mod_sockets.py` |
 | 装备编排与预检 | `destiny_mcp/services/equip_planner.py`、`services/transfer_service.py` |
@@ -242,3 +243,64 @@
 | OAuth scope | `destiny_mcp/oauth_setup.py`（`_WANTED_SCOPES`） |
 | 神器三个 hash 家族 | `destiny_mcp/services/artifact_service.py`、`manifest_artifacts.py` |
 | 子职业元素第二段 | `destiny_mcp/services/subclass_service.py`（`_ELEMENT_PATTERN`） |
+
+## 十一、Metrics（组件 1100）vs Stats：两个生涯数字，各有各的出处
+
+**口径声明**：这一节里的数字全部来自本机真账号实测（2026-09-17，只读，未做任何写入）。
+同一个"生涯击败"，**游戏内显示 124,495，统计接口账号级 107,106** —— 这不是谁算错了，
+是两个数据源的口径不同。谁问哪一路，就给哪一路，并且把出处一起给出去。
+
+### 组件 1100 的响应形状
+
+- **事实**：形状是 `Response.metrics.data.metrics = {metricHash: {invisible,
+  objectiveProgress: {objectiveHash, progress, completionValue, complete, visible}}}` ——
+  **名字和描述不在里面**，只有 hash 和数字。
+- **出处**：<https://bungie-net.github.io/> → `DestinyComponentType.Metrics`（文档 2.21.8，
+  2026-09-17 查阅）；计数器定义在 Manifest 表 `DestinyMetricDefinition` 的
+  `displayProperties.name/description`。
+- **实测**：本账号该组件共 **402 条**计数器（原始响应约 66 KB）。其中
+  `811894228` = `Opponents Defeated`，描述原文 *"The total number of opponents defeated in
+  Crucible matches. Tracks from Season 1 onward."*，`progress = 124495` ——
+  **与游戏内、第三方机器人显示的数字一字不差**；数值最大的一条是 PvE 累计 `79,712,994`。
+- **结论**：问"游戏里显示的那个数"必须读组件 1100；组件号进
+  `services/profile_components.py` 的 `METRICS`，读实现在
+  `services/activity_counters_service.py`（`activity_assistant(intent="counters")`）。
+  查定义要 `to_signed()` 回退（与 `get_bucket_definition` 同套路：uint32 hash 直查 `id` 可能不中）。
+
+### 读取不稳定：会出现整块 metrics 缺失
+
+- **事实**：**同一个 URL 连续请求**，会返回**整块 `metrics` 缺失**（0 条）的响应，
+  重试后恢复 402 条。
+- **实测**：2026-09-17 真机连续请求复现多次；缺失是**整个 `data.metrics` 为空**，
+  不是个别条目丢字段。
+- **结论**：读 1100 **必须重试**（判据 = 拿到非空 metrics，用
+  `services/write_readback.read_until`）；重试后仍为空时只能如实报"不可用"，
+  **绝不能把空当 0** —— "空"和"这个账号一条计数都没有"是两件事。
+  这是本项目「缺值给 None，不编 0」在组件读取上的具体落点。
+
+### 与统计接口（`GetHistoricalStats`）的关系
+
+- **事实**：统计接口的生涯数字**分三档**，且**不含**上面那个计数器口径。
+- **实测**：账号级 `mergedAllCharacters.results.allPvP.allTime.opponentsDefeated = 78,864`
+  （= 现存 3 角色 `50,622` + 已删 5 角色 `28,242`）；`mergedDeletedCharacters = 28,242`；
+  单角色最高那是第一个角色（`…5779`）的 `17,703 kills / 12,496 deaths`。
+- **结论**：**计数器从 S1 起累计，含统计接口已不再列举的旧角色**，所以它比统计接口大。
+  两个数都给、各自带 `source`（`profile.metrics` vs `GetHistoricalStats`），
+  不要互相覆盖，也不要用其中一个去"纠正"另一个。
+
+---
+
+## 玩家名：游戏内 ID 与平台名是两个字段（2026-09-17 实采）
+
+- **事实**：玩家结构里 `bungieGlobalDisplayName` + `bungieGlobalDisplayNameCode` 是**游戏内 ID**
+  （`名字#1234`），同一账号在**所有平台完全一致**；`displayName` 是**平台 persona**
+  （Steam / Xbox / PSN / Epic 各自的昵称），**每个平台都不一样**。
+- **出处**：<https://bungie-net.github.io/> 的 `DestinyProfileUserInfoCard` /
+  `UserInfoCard`（2026-09-17 查阅，文档 2.21.8）；`User/GetMembershipsById`。
+- **实测**：本账号游戏内 ID = `OneTop丶Husky#6641`；四平台 `displayName` 分别是
+  `OneTop丶Husky`（Steam）/ `SecHusky`（Xbox）/ `early_moccasin0`（PSN）/
+  `此人以嫖到广东`（Epic）。社区反馈的"显示成 Steam 名而不是游戏内 ID"由此而来。
+- **结论**：展示玩家名一律走 `destiny_mcp/utils/player_names.bungie_display_name()`
+  （游戏内 ID 优先，平台名只作兜底），`tests/test_player_display_name.py` 会扫**裸用
+  `displayName` 拼名字**的代码并判红。
+

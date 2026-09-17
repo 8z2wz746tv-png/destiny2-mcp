@@ -2,6 +2,24 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 未发布（2026-09-17）
+
+**PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，
+游戏里显示的那个数我们根本没读过。这一版把组件 1100 接上，并把它和统计接口**分成两个来源**
+（口径与实测见 `docs/reference/bungie_api.md` 第十一节）：
+
+- `profile_components.METRICS = [1100]`（组件号的单一出处）；
+- Manifest 白名单加 `DestinyMetricDefinition`，`get_metric_definition(hash)` 解析名称/描述
+  （查不到降级成 `#hash`，不编名字）；
+- `services/activity_counters_service.py` 读计数器：**带重试**（真机实测会整块缺失），
+  重试后仍为空就返回 `unavailable`，**不把空当 0**；数值降序、`query` 可按名称/描述筛、
+  `count` 限条数，每行自带 `source: "profile.metrics"`；
+- 新入口 `activity_assistant(intent="counters")`（参数 `player_name`、`query`、`count`；
+  `character` 对它无意义 —— 计数器是账号级的，传了会被 `ignored_parameter` 拒绝）。
+
+真机核对：`811894228 = Opponents Defeated` 的 `progress = 124495`，与游戏内显示一致
+（同一组件本账号共 402 条计数器）；统计接口账号级同项是 107,106 —— 两个数都给、各自标来源。
+
 ## 0.4.7 — 2026-09-16
 
 **登录不再被 scope 卡死**：`AdvancedWriteActions` 是 Bungie **按应用审批**的 scope，

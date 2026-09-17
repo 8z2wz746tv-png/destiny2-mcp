@@ -40,6 +40,7 @@ class ItemDefinitionMixin:
         "DestinyLoadoutColorDefinition",
         "DestinyLoadoutIconDefinition",
         "DestinyLoadoutNameDefinition",
+        "DestinyMetricDefinition",
     })
 
     def get_item_info(self, item_hash: int) -> dict | None:
@@ -139,3 +140,13 @@ class ItemDefinitionMixin:
         头盔/臂铠那两个超过 int32 上限，`_query_json` 内部已做 `to_signed()` 回退（真机验证过）。
         """
         return self._query_json("DestinyInventoryBucketDefinition", bucket_hash)
+
+    def get_metric_definition(self, metric_hash: int) -> dict | None:
+        """计数器定义（`DestinyMetricDefinition`）：名称与描述只在这里。
+
+        profile 组件 1100 只给 `metricHash` + 进度数字，**不给名字**；"熔炉生涯击败"
+        这句话要从 `displayProperties.name/description` 取。和桶定义一样，计数器 hash
+        是 uint32，`_query_json` 已做 `to_signed()` 回退；查不到返回 None（调用方降级成
+        `#hash`，不许编一个名字）。
+        """
+        return self._query_json("DestinyMetricDefinition", metric_hash)

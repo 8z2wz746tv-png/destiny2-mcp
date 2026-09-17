@@ -16,6 +16,7 @@ Bungie 的 profile 接口按"组件号"取数据，某个服务要哪几个组�
 - 305 itemSockets（已装 plug；写入后的回读也读它）
 - 308 itemPlugObjectives（催化剂/击杀进度）
 - 310 itemReusablePlugs（**这一件副本**能换的 plug —— T 级决定的那个数）
+- 1100 metrics（游戏内生涯计数器，如"熔炉生涯击败"；**不在 item 家族里**）
 """
 
 from __future__ import annotations
@@ -49,6 +50,19 @@ ARTIFACT: list[int] = [100, 102, 200, 201, 205, 300, 302]
 # **换子职业**必须有 201（实采：一个角色背包里躺着该职业全部子职业，bucketTypeHash=3284755031、
 # itemType=16）；只看 205 的话永远只看得见正装着的那一个，换不了。
 SUBCLASS: list[int] = [200, 201, 205, *ITEM_SOCKETS]
+
+# 游戏内生涯计数器（1100 = profileMetrics）：读的是
+# `Response.metrics.data.metrics[metricHash].objectiveProgress`，形状是「每个 statId 一个条目」，
+# 和装备组件毫无关系，所以**不要**把它并进 INVENTORY/WEAPON_DETAIL 那几套里
+# （多取一个组件 = 响应更大、更慢，而计数器只有生涯计数一个用途）。
+#
+# 谁需要它：activity_counters_service（`activity_assistant(intent="counters")`）——
+# 用户问"我在游戏里显示的 PvP 击败是多少"时，只有这里给得出游戏内那个数
+# （统计接口给的是另一套口径，见 docs/reference/bungie_api.md「Metrics vs Stats」）。
+#
+# 注意：真机实测这个组件会**整块缺失**（同一 URL 连续请求会返回 0 条，重试后恢复），
+# 所以读取方必须重试，拿不到要如实报不可用，绝不能把"空"当成 0。
+METRICS: list[int] = [1100]
 
 # 缓存里一次取全：读多写少的场景共用（profile_cache）。
 # 必须覆盖所有调用方要的组件（含 308 催化剂进度），否则后台刷新会把并集降级、

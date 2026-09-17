@@ -209,8 +209,8 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | `destiny_mcp/build/` | 配装求解引擎（护甲优化）：纯计算、不碰账号；`farm_target.py` 贴着 1296 上限。 |
 | `destiny_mcp/build_import/` | 从文章/截图导入配装；产出只是配方，不能直接拿去 `equip_build`。 |
 | `destiny_mcp/rag/` | 本地社区资料检索（Phase 3）。 |
-| `destiny_mcp/services/` | 服务层：账号读写、外部数据、形状工厂；判断逻辑落这里，别落工具层。 |
-| `destiny_mcp/tools/` | 工具层：只做分派、参数守卫与话术；intent 取值/参数归属/响应信封三张契约表都在这层。 |
+| `destiny_mcp/services/` | 服务层：账号读写、外部数据、形状工厂；判断逻辑落这里，别落工具层。**游戏内生涯计数器**（profile 组件 1100）在 `services/activity_counters_service.py`：它与统计接口是两个来源，读抖动要重试、空要报 `unavailable`（不许当 0）；口径见 `docs/reference/bungie_api.md`。 |
+| `destiny_mcp/tools/` | 工具层：只做分派、参数守卫与话术；intent 取值/参数归属/响应信封三张契约表都在这层。分支响应按域放 `_*_branches.py`（如 `_counters_branches.py` = `activity_assistant(intent="counters")`）。 |
 | `destiny_mcp/__main__.py` | `python -m destiny_mcp` 入口；写法要 spawn 安全（构建求解 worker 会重跑它）。 |
 | `destiny_mcp/server.py` | MCP 门面装配：注册工具与握手；别塞业务逻辑。 |
 

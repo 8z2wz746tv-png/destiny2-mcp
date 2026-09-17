@@ -76,7 +76,7 @@ STANDALONE: dict[str, tuple[str, ...]] = {
         "modify", "options", "fragments", "fragment_details", "artifact",
         "artifact_mod", "equip_artifact_mod", "equip_artifact", "community",
     ),
-    "ActivityIntent": ("history", "pgcr", "clan_leaderboards", "community"),
+    "ActivityIntent": ("history", "pgcr", "counters", "clan_leaderboards", "community"),
     "BuildIntent": (
         "recommend", "find", "analyze", "farm_target", "equip_build",
         "armor_mods", "exotic_armor", "set_bonus", "community_build",

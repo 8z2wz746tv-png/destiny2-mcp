@@ -524,9 +524,10 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         _only(*(i for i in _all(ActivityIntent) if i not in {"pgcr", "clan_leaderboards", "community"})),
         hint="单场结算只看活动 ID，公会榜只看 group_id，社区资料与账号无关。",
     ),
+    # counters 是账号级组件（游戏内生涯计数器没有按角色的口径），所以 character 对它无意义。
     ("activity_assistant", "character"): _contract(
-        _only(*(i for i in _all(ActivityIntent) if i not in {"pgcr", "clan_leaderboards"})),
-        hint="单场结算和公会榜不按角色过滤。",
+        _only(*(i for i in _all(ActivityIntent) if i not in {"pgcr", "clan_leaderboards", "counters"})),
+        hint="单场结算和公会榜不按角色过滤；counters 是账号级计数器（不按角色拆）。",
     ),
     ("activity_assistant", "mode"): _contract(
         _only("history", *_A_LEADERBOARD, "clan_leaderboards", "community"),
@@ -554,12 +555,14 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("activity_assistant", "leaderboards"),
     ),
     ("activity_assistant", "count"): _contract(
-        _only("history", *_A_WEAPON_HISTORY, *_A_AGGREGATE, "community"),
-        hint='要几场/几条只被 history、武器历史、聚合统计和社区资料读；生涯统计不分条数。',
+        _only("history", *_A_WEAPON_HISTORY, *_A_AGGREGATE, "counters", "community"),
+        hint='要几场/几条只被 history、武器历史、聚合统计、计数器（counters）和社区资料读；'
+             "生涯统计不分条数。",
         suggestion=("activity_assistant", "history"),
     ),
     ("activity_assistant", "query"): _contract(
-        _only("community"), hint='关键词搜索只在社区活动资料 intent="community" 上用。',
+        _only("counters", "community"),
+        hint='关键词搜索在 intent="counters"（筛计数器名称/描述）和社区活动资料 intent="community" 上用。',
         suggestion=("activity_assistant", "community"),
     ),
     ("activity_assistant", "knowledge_id"): _contract(

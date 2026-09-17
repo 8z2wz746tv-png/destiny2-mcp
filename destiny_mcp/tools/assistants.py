@@ -26,6 +26,7 @@ from ._formatters import inventory_search_summary
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
 from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
+from . import _counters_branches as counters_branches
 from . import _equip_branches as equip_branches
 from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
@@ -1219,7 +1220,7 @@ async def activity_assistant(
         "战绩查询意图。history=最近活动；pgcr=指定单场结算；"
         "stats=生涯 PvE/PvP 统计；weapon_history=武器使用排行；"
         "aggregate=活动累计排行；leaderboards=玩家排行榜；"
-        "clan_leaderboards=公会排行榜。"
+        "clan_leaderboards=公会排行榜；counters=游戏内计数器（profile 组件 1100）。"
     ))] = "history",
     player_name: fields.PlayerName = None,
     character: fields.CharacterOptional = None,
@@ -1235,7 +1236,7 @@ async def activity_assistant(
     offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
-    """活动/战绩聚合入口：历史、PGCR、生涯统计、武器使用、排行榜。
+    """活动/战绩聚合入口：历史、PGCR、生涯统计（stats=统计接口）、游戏内计数器（counters=组件 1100，与 stats 口径不同）、武器使用、排行榜。
 
     “最近 N 场”只调用 history；只有指定单场详情才调用 pgcr。
     community 用 query 搜索本地副本/活动资料；knowledge_id 读取详情，
@@ -1270,6 +1271,9 @@ async def activity_assistant(
     if intent in {"stats", "career", "historical_stats"}:
         result = await svc["activity_svc"].get_historical_stats(resolved, character)
         return ok_response("已读取生涯统计。", {"stats": result})
+
+    if intent == "counters":
+        return await counters_branches.counters_response(svc, resolved, query, count)
 
     if intent in {"weapon_history", "weapons", "weapon_usage", "weapon_leaderboard"}:
         result = await svc["activity_svc"].get_unique_weapon_history(resolved, character, limit=count)
