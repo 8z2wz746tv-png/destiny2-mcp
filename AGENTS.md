@@ -225,6 +225,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/community/小黑盒_功能总览.md` — 面向中文玩家的八工具功能总览；写对外说明或话术时对齐口径。
 - `docs/plans/ARMOR_FORMAT_PLAN.md` — 动护甲载荷格式（体积口径、字段取舍）之前看实机证据与取舍。
 - `docs/plans/EQUIP_FLOW_PLAN.md` — 动装备流程（候选签发 → `confirmed` → 回读）之前看它为什么长这样。
+- `docs/plans/PVP_STATS_PLAN.md` — 动生涯/赛季战绩（计数器 vs 统计接口、模式与角色范围标注）之前看它为什么分三档。
 - `docs/plans/SUBCLASS_ARTIFACT_PLAN.md` — 动子职业/神器读写之前看计划与取舍。
 - `docs/plans/WEAPON_FORMAT_PLAN.md` — 动武器载荷格式之前看计划与实机证据。
 - `docs/reference/bungie_api.md` — 遇到 Bungie API 问题（scope、端点、AWA、组件号、上游错误码）时的实测事实清单；与官方文档冲突时以它为准。
