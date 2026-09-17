@@ -331,12 +331,13 @@ Manifest 侧（**不代表拥有**）：
 | `maxtop` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
 | `melee_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `mod_name` | `inventory_assistant`：`equip_mod` |
-| `mode` | `activity_assistant`：`clan_leaderboards`、`community`、`history`、`leaderboard`、`leaderboards` |
+| `mode` | `activity_assistant`：`clan_leaderboards`、`community`、`counters`、`history`、`leaderboard`、`leaderboards` |
 | `name` | `loadout_assistant`：`save` |
 | `name_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
 | `name_prefix` | `player_assistant`：`find`、`find_players`、`fuzzy` |
 | `notes` | `loadout_assistant`：`save` |
 | `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
+| `period` | `activity_assistant`：`counters` |
 | `perk_name` | `weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`perk_description`、`search_all`、`search_catalog` |
 | `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact`、`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`filter_rolls`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`vendor` |
 | `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |

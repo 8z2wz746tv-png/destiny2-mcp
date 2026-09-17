@@ -34,11 +34,14 @@ _LAYERS: dict[str, int] = {
     "models": 0,
     "utils": 0,
     "vocabulary": 0,
-    # 1 基础设施：Manifest / Bungie 客户端 / 账号解析 / 类型容器
+    # 1 基础设施：Manifest / Bungie 客户端 / 账号解析 / 类型容器 / 实测事实表
     "activity_stats": 1,
     "audit": 1,
     "build_contracts": 1,
     "bungie_client": 1,
+    # 随包分发的**事实表**（计数器 hash → 模式/周期、选取率快照…）：没有逻辑、要被各层共用，
+    # 所以放这一层。`data/` 里只许放"实测出来的对照关系"，有判断的仍然归 services/。
+    "data": 1,
     "manifest": 1,  # manifest*.py 全部按前缀归到这一层
     "oauth_setup": 1,
     "player_resolver": 1,

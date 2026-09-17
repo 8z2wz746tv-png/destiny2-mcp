@@ -16,6 +16,13 @@
    重试后恢复 402 条 → 必须重试；重试后仍为空就如实报 `unavailable`，**不许把空当 0**。
 2. 名称/描述不在 profile 响应里，只能查 Manifest 的 `DestinyMetricDefinition`；
    查不到就降级成 `#hash`（`name_resolved: false`），不编、也不崩。
+
+模式/周期（P3）：三条口径不同的计数器**同名叫「已击败对手」**（熔炉生涯 124,495 /
+试炼生涯 10,696 / 熔炉本赛季 3,522），Manifest 的父节点链只能分模式家族、分不出生涯与赛季。
+所以每一行额外带 `mode`/`period`/`label_zh`，**来自 `data/pvp_counters.py` 那张人工确认过的
+对照表**：表里没有的给 `mode="other"` / `period=None` / `label_zh=""` —— 不猜。
+`mode=` / `period=` 过滤按同一张表判定：词表外的取值直接报错，不返回空清单当答案
+（"筛出来是空"和"你筛的词我不认识"是两件事）。
 """
 
 from __future__ import annotations
@@ -23,6 +30,8 @@ from __future__ import annotations
 from typing import Any
 
 from ..bungie_client import BungieClient
+from ..data import pvp_counters
+from ..exceptions import InvalidArgumentError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
@@ -62,6 +71,9 @@ def parse_counters(raw_metrics: Any, manifest: ManifestManager) -> list[dict]:
 
     每行固定带 `source: "profile.metrics"`：同一个生涯数字在统计接口那边**还有另一个值**，
     调用方必须能看出这个数是从哪来的。
+
+    模式/周期三件套（`mode`/`period`/`mode_label`/`period_label`/`label_zh`）来自
+    `data/pvp_counters.py`：表里没有的 hash 得到 `other` / `None` / `""`，**不猜**。
     """
     if not isinstance(raw_metrics, dict):
         return []
@@ -82,6 +94,9 @@ def parse_counters(raw_metrics: Any, manifest: ManifestManager) -> list[dict]:
         name = display.get("name")
         description = display.get("description")
 
+        classification = pvp_counters.classify(metric_hash)
+        mode = classification["mode"]
+        period = classification["period"]
         counters.append({
             "metric_hash": metric_hash,
             "name": name if isinstance(name, str) and name.strip() else f"#{metric_hash}",
@@ -90,19 +105,52 @@ def parse_counters(raw_metrics: Any, manifest: ManifestManager) -> list[dict]:
             "completion_value": _int_or_none(progress_section.get("completionValue")),
             "source": "profile.metrics",
             "name_resolved": bool(isinstance(name, str) and name.strip()),
+            "mode": mode,
+            "mode_label": pvp_counters.MODE_LABELS_ZH[mode],
+            "period": period,
+            "period_label": pvp_counters.PERIOD_LABELS_ZH.get(period, "") if period else "",
+            # 表里的中文标签（与 Manifest 的 name 分开：一个是我们的口径，一个是上游文本；
+            # 表里没有就是 ""，此时 name 才是唯一可用的名字）。
+            "label_zh": classification["label_zh"],
         })
     return counters
 
 
-def filter_counters(counters: list[dict], query: str) -> list[dict]:
-    """按 `query`（名称或描述的子串，大小写不敏感）过滤；空串表示不过滤。"""
+def filter_counters(
+    counters: list[dict],
+    query: str,
+    mode: str = "",
+    period: str = "",
+) -> list[dict]:
+    """按 `query`（名称或描述子串）/`mode`/`period` 过滤；空串表示不过滤。
+
+    `mode`/`period` 的词表外取值在这里**报错**而不是返回空：用户说 `mode="日落"` 时
+    "一条都没有"是错答案（日落本来就没有计入对照表），要说清"这张表认哪些词"。
+    """
     keyword = query.strip().lower()
-    if not keyword:
-        return counters
-    return [
-        counter for counter in counters
-        if keyword in counter["name"].lower() or keyword in counter["description"].lower()
-    ]
+    wanted_mode = mode.strip().lower()
+    wanted_period = period.strip().lower()
+    if wanted_mode and wanted_mode not in pvp_counters.filter_modes():
+        raise InvalidArgumentError(
+            f"counters 不支持 mode={mode!r}；这张对照表只收录 "
+            f"{'、'.join(pvp_counters.filter_modes())}。"
+        )
+    if wanted_period and wanted_period not in pvp_counters.PERIODS:
+        raise InvalidArgumentError(
+            f"counters 不支持 period={period!r}；可取 "
+            f"{'、'.join(pvp_counters.PERIODS)}。"
+        )
+
+    def keep(counter: dict) -> bool:
+        if keyword and keyword not in counter["name"].lower() and keyword not in counter["description"].lower():
+            return False
+        if wanted_mode and counter["mode"] != wanted_mode:
+            return False
+        if wanted_period and counter["period"] != wanted_period:
+            return False
+        return True
+
+    return [counter for counter in counters if keep(counter)]
 
 
 def _sort_key(counter: dict) -> tuple[int, int]:
@@ -117,6 +165,8 @@ def payload(
     limit: int,
     unavailable: str = "",
     query: str = "",
+    mode: str = "",
+    period: str = "",
 ) -> dict:
     """行式返回：`counters` + `total`/`returned`/`truncated` + `unavailable`。
 
@@ -132,7 +182,12 @@ def payload(
         "truncated": len(returned) < len(ordered),
         "unavailable": unavailable,
         # 每个数字都要能自证范围：这是筛过之后的清单，还是全量。
-        "filter": {"query": query, "limit": limit},
+        "filter": {"query": query, "mode": mode, "period": period, "limit": limit},
+        # 词表给出去，调用方（与读响应的人）才知道 mode/period 的取值从哪来、各有几个。
+        "labels": {
+            "modes": pvp_counters.MODE_LABELS_ZH,
+            "periods": pvp_counters.PERIOD_LABELS_ZH,
+        },
         # 组件号进日志的同一份说明也进返回值：排查"这次为什么没拿到 1100"时不用猜。
         "components": profile_components.describe(profile_components.METRICS),
     }
@@ -179,6 +234,8 @@ class ActivityCountersService:
         player_name: str,
         query: str = "",
         limit: int = 20,
+        mode: str = "",
+        period: str = "",
     ) -> dict:
         """游戏内生涯计数器：默认全量候选按数值降序，最多 20 条。
 
@@ -191,10 +248,14 @@ class ActivityCountersService:
                 只要 PvP 相关的就传 `"crucible"`（试炼/铁旗/智谋都在 Crucible 描述下），
                 要试炼就传 `"trials"`。
             limit: 最多返回几条，默认 20；`total`/`truncated` 说明一共筛出多少。
+            mode: 按对照表的模式家族筛（crucible/trials/iron_banner/competitive/gambit/raid）。
+                三条件计数器的名字会重名，靠它区分；词表外的取值报 `invalid_argument_error`。
+            period: 按周期筛（career/season/act）。`season` 是"本赛季"那批 ——
+                统计接口没有赛季周期，赛季数字只能从这里拿。
 
         Returns:
             `{"counters": [...], "total", "returned", "truncated", "unavailable", "filter",
-            "components"}`；读不到时 `counters=[]` 且 `unavailable` 写清原因，**不报成功**。
+            "labels", "components"}`；读不到时 `counters=[]` 且 `unavailable` 写清原因，**不报成功**。
         """
         player = await self._resolver.resolve_player(player_name)
         membership_id = str(player["membership_id"])
@@ -213,16 +274,18 @@ class ActivityCountersService:
                 "这不代表你没有任何计数（空不是 0），请稍后重试。"
             )
             logger.warning("生涯计数器不可用：player=%s", player_name)
-            empty = payload([], limit=limit, unavailable=reason, query=query)
+            empty = payload([], limit=limit, unavailable=reason, query=query, mode=mode, period=period)
             empty["warnings"] = []
             return empty
 
-        counters = filter_counters(parse_counters(raw_metrics, self._manifest), query)
-        logger.info(
-            "生涯计数器：player=%s 原始=%d 过滤后=%d query=%r",
-            player_name, len(raw_metrics), len(counters), query,
+        counters = filter_counters(
+            parse_counters(raw_metrics, self._manifest), query, mode, period
         )
-        result = payload(counters, limit=limit, query=query)
+        logger.info(
+            "生涯计数器：player=%s 原始=%d 过滤后=%d query=%r mode=%r period=%r",
+            player_name, len(raw_metrics), len(counters), query, mode, period,
+        )
+        result = payload(counters, limit=limit, query=query, mode=mode, period=period)
         # 可选数据的降级（名字查不到、进度缺失）只写进 warnings，不改 `counters` 的形状：
         # 每一行始终是同一组键，缺的是值，不是结构。
         result["warnings"] = self._degradation_warnings(counters)
@@ -241,5 +304,13 @@ class ActivityCountersService:
         if missing_progress:
             warnings.append(
                 f"{missing_progress} 条计数器没有 progress 字段（给的是 null，不是 0）。"
+            )
+        # 没分类不等于 PvE：对照表只收了常被问的那批，剩下的如实标 other/None，
+        # 免得读的人把 mode="other" 当成"没有模式"。
+        unclassified = sum(1 for counter in counters if counter["mode"] == "other")
+        if unclassified:
+            warnings.append(
+                f"{unclassified} 条计数器不在模式对照表里（mode=\"other\"、period=null）："
+                "这是**没有收录**，不是「没有模式」；要看它们就按 name/description 读。"
             )
         return warnings

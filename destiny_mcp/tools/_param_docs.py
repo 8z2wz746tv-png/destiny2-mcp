@@ -430,7 +430,19 @@ Changes = Annotated[
 
 Mode = Annotated[
     str | None,
-    Field(description="活动模式过滤（如 raid/dungeon/allpvp）。history、排行榜和社区资料读它。"),
+    Field(description=(
+        "模式过滤（如 raid/dungeon/crucible/trials/iron_banner/competitive/gambit）。history、排行榜和"
+        "社区资料读它；counters 用它按对照表筛计数器家族，stats 把它翻译成统计接口的 modes=。"
+    )),
+]
+
+StatPeriod = Annotated[
+    Literal["career", "season", "act"] | None,
+    Field(description=(
+        "统计周期：career=生涯（统计接口的 AllTime）、season=本赛季、act=本篇章。null=没指定（按 career）。"
+        "只有 counters 与 stats 读它；注意统计接口**没有赛季周期**（实测 periodType 只有 Daily/AllTime/Activity），"
+        'period="season" 的统计只能由 counters 给，stats 会如实报拿不到。'
+    )),
 ]
 
 StatId = Annotated[

@@ -137,11 +137,12 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - `destiny_mcp/models/`
 - `destiny_mcp/utils/`
 - `destiny_mcp/vocabulary.py`
-**第 1 层：基础设施：Manifest / Bungie 客户端 / 账号解析 / 类型容器**
+**第 1 层：基础设施：Manifest / Bungie 客户端 / 账号解析 / 类型容器 / 实测事实表**
 - `destiny_mcp/activity_stats.py`
 - `destiny_mcp/audit.py`
 - `destiny_mcp/build_contracts.py`
 - `destiny_mcp/bungie_client.py`
+- `destiny_mcp/data/`
 - `destiny_mcp/manifest.py`
 - `destiny_mcp/manifest_armor.py`
 - `destiny_mcp/manifest_artifacts.py`
@@ -206,6 +207,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | `destiny_mcp/player_resolver.py` | 玩家/角色解析共享逻辑（BungieName → membership）。 |
 | `destiny_mcp/service_context.py` | 服务容器；`svc["…_svc"]` 的 key 必须在这里声明。 |
 | `destiny_mcp/wishlist_data.py` | DIM 愿单数据获取（个人安装用）。 |
+| `destiny_mcp/data/` | 纯数据表（静态常量/映射）：如 `pvp_counters.py` 的「计数器 → 模式/周期」对照表；每条带实测证据，改表先看 `tests/test_pvp_counters_table.py`。 |
 | `destiny_mcp/build/` | 配装求解引擎（护甲优化）：纯计算、不碰账号；`farm_target.py` 贴着 1296 上限。 |
 | `destiny_mcp/build_import/` | 从文章/截图导入配装；产出只是配方，不能直接拿去 `equip_build`。 |
 | `destiny_mcp/rag/` | 本地社区资料检索（Phase 3）。 |

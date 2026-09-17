@@ -18,6 +18,9 @@ from __future__ import annotations
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+
+from destiny_mcp.exceptions import InvalidArgumentError
 from destiny_mcp.services import activity_counters_service as counters_module
 from destiny_mcp.services.activity_counters_service import ActivityCountersService
 from destiny_mcp.services import profile_components
@@ -30,6 +33,9 @@ MEMBERSHIP_TYPE = 3
 OPPONENTS_DEFEATED = 811894228
 KILLS = 811894229
 DELETED_CHARACTER_STAT = 811894230
+TRIALS_OPPONENTS_DEFEATED = 2082314848
+SEASON_OPPONENTS_DEFEATED = 2935221077
+IRON_BANNER_OPPONENTS = 2161492053
 
 
 def metric_entry(progress: Any = None, completion_value: Any = None, **extra: Any) -> dict:
@@ -198,7 +204,57 @@ async def test_query_filters_and_count_truncates(monkeypatch) -> None:
     assert [counter["metric_hash"] for counter in only_kills["counters"]] == [KILLS]
     assert limited["returned"] == 1
     assert limited["truncated"] is True
-    assert limited["filter"] == {"query": "", "limit": 1}
+    assert limited["filter"] == {"query": "", "mode": "", "period": "", "limit": 1}
+
+
+async def test_mode_and_period_filter_by_the_table(monkeypatch) -> None:
+    """`mode=`/`period=` 是这张对照表的用途本身：三条重名的「已击败对手」要能分开。"""
+    monkeypatch.setattr(counters_module, "DELAY_SECONDS", 0)
+    service = make_service([profile_with({
+        str(OPPONENTS_DEFEATED): metric_entry(124495, 100),        # 熔炉 / 生涯
+        str(TRIALS_OPPONENTS_DEFEATED): metric_entry(10696, 100),  # 试炼 / 生涯
+        str(SEASON_OPPONENTS_DEFEATED): metric_entry(3522, 100),   # 熔炉 / 本赛季
+        str(IRON_BANNER_OPPONENTS): metric_entry(1737, 100),       # 铁旗 / 本赛季
+    })])
+    manifest_names = {
+        OPPONENTS_DEFEATED: "已击败对手",
+        TRIALS_OPPONENTS_DEFEATED: "已击败对手",
+        SEASON_OPPONENTS_DEFEATED: "已击败对手",
+        IRON_BANNER_OPPONENTS: "已击败铁旗对手数",
+    }
+    service._manifest.get_metric_definition.side_effect = lambda h: (
+        {"displayProperties": {"name": manifest_names[h], "description": ""}}
+        if h in manifest_names else None
+    )
+
+    trials = await service.get_career_counters(PLAYER_NAME, mode="trials")
+    banner = await service.get_career_counters(PLAYER_NAME, mode="iron_banner")
+    season = await service.get_career_counters(PLAYER_NAME, period="season")
+
+    assert [(row["metric_hash"], row["progress"]) for row in trials["counters"]] == [
+        (TRIALS_OPPONENTS_DEFEATED, 10696)
+    ]
+    assert [(row["metric_hash"], row["progress"]) for row in banner["counters"]] == [
+        (IRON_BANNER_OPPONENTS, 1737)
+    ]
+    assert {row["metric_hash"] for row in season["counters"]} == {
+        SEASON_OPPONENTS_DEFEATED, IRON_BANNER_OPPONENTS,
+    }
+    # 过滤条件与词表都进返回值：调用方要能自证"筛的是哪一批"。
+    assert trials["filter"]["mode"] == "trials"
+    assert trials["labels"]["modes"]["trials"] == "奥斯里斯试炼"
+    assert all(row["mode_label"] and row["label_zh"] for row in trials["counters"])
+
+
+async def test_mode_filter_rejects_unknown_words(monkeypatch) -> None:
+    """词表外的 mode 报错（不是"0 条"）：日落本来就不在对照表里，说清词表比给空清单有用。"""
+    monkeypatch.setattr(counters_module, "DELAY_SECONDS", 0)
+    service = make_service([profile_with({str(OPPONENTS_DEFEATED): metric_entry(1, 100)})])
+
+    with pytest.raises(InvalidArgumentError) as excinfo:
+        await service.get_career_counters(PLAYER_NAME, mode="日落")
+
+    assert "crucible" in str(excinfo.value)
 
 
 async def test_every_payload_row_carries_its_source() -> None:

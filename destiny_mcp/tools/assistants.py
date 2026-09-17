@@ -1225,6 +1225,7 @@ async def activity_assistant(
     player_name: fields.PlayerName = None,
     character: fields.CharacterOptional = None,
     mode: fields.Mode = None,
+    period: fields.StatPeriod = None,
     activity_id: fields.ActivityId = "",
     group_id: fields.GroupId = "",
     statid: fields.StatId = None,
@@ -1236,9 +1237,11 @@ async def activity_assistant(
     offset: fields.Offset = 0,
     ctx: Context = None,
 ) -> dict:
-    """活动/战绩聚合入口：历史、PGCR、生涯统计（stats=统计接口）、游戏内计数器（counters=组件 1100，与 stats 口径不同）、武器使用、排行榜。
+    """活动/战绩聚合入口：历史、PGCR、生涯统计（stats=统计接口，账号级三档）、游戏内计数器（counters=组件 1100，与 stats 口径不同）、武器使用、排行榜。
 
     “最近 N 场”只调用 history；只有指定单场详情才调用 pgcr。
+    mode/period 是"口径"参数：counters 按对照表筛模式与周期，stats 传给统计接口的
+        modes/periodType（统计接口**没有赛季周期**，period=season 只能走 counters）。
     community 用 query 搜索本地副本/活动资料；knowledge_id 读取详情，
         community_section=text/tables/links，按 next_offset 继续。外链不代表已有攻略正文。
     """
@@ -1261,27 +1264,24 @@ async def activity_assistant(
         ])
 
     if intent == "history":
-        result = await svc["activity_svc"].get_activity_history(resolved, character, mode, count)
-        return ok_response("已读取活动历史。", {"activities": result})
+        return ok_response("已读取活动历史。", {"activities": await svc["activity_svc"].get_activity_history(resolved, character, mode, count)})
 
     if intent == "pgcr":
-        result = await svc["activity_svc"].get_pgcr(activity_id)
-        return ok_response("已读取活动结算。", {"pgcr": result})
+        return ok_response("已读取活动结算。", {"pgcr": await svc["activity_svc"].get_pgcr(activity_id)})
 
     if intent in {"stats", "career", "historical_stats"}:
         result = await svc["activity_svc"].get_historical_stats(resolved, character)
         return ok_response("已读取生涯统计。", {"stats": result})
 
     if intent == "counters":
-        return await counters_branches.counters_response(svc, resolved, query, count)
+        return await counters_branches.counters_response(svc, resolved, query, count, mode or "", period or "")
 
     if intent in {"weapon_history", "weapons", "weapon_usage", "weapon_leaderboard"}:
         result = await svc["activity_svc"].get_unique_weapon_history(resolved, character, limit=count)
         return ok_response(result.get("message", "已读取武器历史。"), result)
 
     if intent in {"aggregate", "activity_aggregate", "activity_stats"}:
-        result = await svc["activity_svc"].get_aggregate_activity_stats(resolved, character, limit=count)
-        return ok_response(result.get("message", "已读取活动聚合统计。"), result)
+        return ok_response("已读取活动聚合统计。", await svc["activity_svc"].get_aggregate_activity_stats(resolved, character, limit=count))
 
     if intent in {"leaderboards", "leaderboard"}:
         result = await svc["activity_svc"].get_leaderboards(resolved, character, mode, statid, maxtop)

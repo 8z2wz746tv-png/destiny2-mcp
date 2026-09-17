@@ -530,9 +530,23 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint="单场结算和公会榜不按角色过滤；counters 是账号级计数器（不按角色拆）。",
     ),
     ("activity_assistant", "mode"): _contract(
-        _only("history", *_A_LEADERBOARD, "clan_leaderboards", "community"),
-        hint="模式过滤被 history、排行榜和社区资料读；生涯统计和武器历史不分模式。",
+        _only("history", "counters", *_A_LEADERBOARD, "clan_leaderboards", "community"),
+        hint=(
+            "模式过滤被 history、排行榜和社区资料读；counters 用它按对照表筛计数器家族"
+            "（crucible/trials/iron_banner/competitive/gambit/raid）；武器历史不分模式。"
+        ),
         suggestion=("activity_assistant", "history"),
+    ),
+    # period 只对"口径"有意义：counters 按对照表的周期筛；stats 把它翻成上游的 periodType
+    # （career → AllTime；season/act 上游没有，会如实报拿不到）——stats 落地时再写进名单，
+    # 因为这张表的判据是"行为上真读了"（test_ignored_parameters 会验）。
+    ("activity_assistant", "period"): _contract(
+        _only("counters"),
+        hint=(
+            '周期过滤只有 intent="counters"（按对照表）读；'
+            "历史、武器使用、排行榜都不分周期。"
+        ),
+        suggestion=("activity_assistant", "counters"),
     ),
     ("activity_assistant", "activity_id"): _contract(
         _only("pgcr"),
