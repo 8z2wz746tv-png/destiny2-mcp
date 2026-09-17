@@ -2,6 +2,37 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 未发布（2026-09-18）
+
+**PVP 战绩 P1/P2/P3b/P3-2：生涯数字分三档、两个来源并列、按模式与周期说话**（口径决定见
+`docs/adr/005-career-numbers-follow-in-game-counters.md`，实测证据见
+`docs/reference/bungie_api.md` 第十一/十二节，真机验收 `scripts/verify_career_stats.py` 8/8）：
+
+- **`stats`/`career` 默认改成账号级三档**（破坏性）：每一行给 `existing`（现存角色）/
+  `deleted`（已删角色明细）/ `account_total`（账号级合计，**已含已删角色**）—— 真机
+  50,622 / 28,242 / **78,864**。账号级行**没有** `value`，单角色只在显式传 `character=` 时给
+  并标 `scope="character"` + 角色名。此前默认给的是"第一个角色"的 17,703，既不是生涯也没标注。
+- **纠错**：`mergedAllCharacters` 已含已删角色，`account_total` = `existing + deleted`；
+  早期文档里的 107,106 是把 `mergedDeletedCharacters` 又加了一遍，已在本 CHANGELOG 与
+  `docs/reference/bungie_api.md` 一并改正。
+- **合并语义逐项声明**：`aggregate ∈ {sum, max, min, derived, none}`（本次真机核对抓出
+  `remainingTimeAfterQuitSeconds` 是**可加**的，不是"取最小"）；比值类按公式重算，
+  比不出的给 `null`。`killsDeathsAssists` 的中文名从"击杀+助攻"改成 **KDA**（它是
+  `(击杀+助攻/2)/死亡` 的指数，不是那个和）。
+- **两个来源并列（P2）**：`stats` 的 `data.game_counters` 给游戏内计数器
+  （`811894228` = **124,495**，`source=profile.metrics`），warnings 写出与统计接口账号级
+  （78,864）的差 **45,631** 及"拆不出来"的原因；计数器读不到只降级（`counters_unavailable`
+  + warning），不影响统计结果。
+- **`weapon_history` 标 `scope="all_modes"`（P3b）**：话术直说"这是全模式 PvE+PvP 武器击杀，
+  不是 PvP 榜"。
+- **`stats` 支持 `mode=`/`period=`（P3-2）**：模式数值取自 Manifest 的 `modeType`
+  （`modes=` **只在按角色端点上生效**，账号级 + 模式 = 逐角色取 + 自己合，标
+  `aggregation="computed"`；交叉验证：`mode=crucible` 自行合并的 60 项与上游账号级 `allPvP`
+  逐项一致）；`period=season/act` 上游没有 → 如实报 `unavailable` 并指向 `counters`，
+  不降级成生涯、不试会 500 的 `periodType=3`。
+- **抽代码**：上游 HTTP 错误映射整段搬到 `bungie_errors.py`，活动统计端点搬到
+  `bungie_stats.py`（`bungie_client` 上限 1263 → 1200 以下，只降不升）。
+
 ## 未发布（2026-09-17）
 
 **PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，
@@ -18,7 +49,9 @@
   `character` 对它无意义 —— 计数器是账号级的，传了会被 `ignored_parameter` 拒绝）。
 
 真机核对：`811894228 = Opponents Defeated` 的 `progress = 124495`，与游戏内显示一致
-（同一组件本账号共 402 条计数器）；统计接口账号级同项是 107,106 —— 两个数都给、各自标来源。
+（同一组件本账号共 402 条计数器）；统计接口账号级同项当时记为 107,106 —— **P1 复核后
+更正为 78,864**（107,106 是把已删角色算了两遍，见上面的「未发布（2026-09-18）」）。
+两个数都给、各自标来源。
 
 ## 0.4.7 — 2026-09-16
 

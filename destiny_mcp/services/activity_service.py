@@ -6,8 +6,12 @@ Post-Game Carnage Report endpoints with automatic name resolution.
 
 from __future__ import annotations
 
+import asyncio
+from typing import Any
+
 from ..bungie_client import BungieClient
 from .. import activity_stats
+from ..data import pvp_counters
 from ..exceptions import InvalidArgumentError, APIError, CharacterNotFoundError, ConfigError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
@@ -76,6 +80,85 @@ def _unwrap_bungie_response(result: dict, operation: str) -> dict:
     return result.get("Response", result)
 
 
+def _stats_response(result: Any, operation: str = "查询生涯统计") -> dict:
+    """统计接口的响应：挡掉非 dict 与 ErrorCode≠1（其余地方沿用 `_unwrap_bungie_response`）。"""
+    if not isinstance(result, dict):
+        raise APIError(operation, "响应格式异常")
+    return _unwrap_bungie_response(result, operation)
+
+
+
+# 账号级统计只给这两组（真机实测：`mergedAllCharacters.results` 就是 allPvE/allPvP），
+# 上游键 → 我们的分组键。单角色那边同一套键也在，所以两边能共用一条映射。
+ACCOUNT_GROUPS: dict[str, str] = {"allPvE": "pve", "allPvP": "pvp"}
+
+
+def _all_time(section: Any) -> dict:
+    """`{"allTime": {...}}` → `{...}`；形状不对就是空（缺值不编）。"""
+    if not isinstance(section, dict):
+        return {}
+    all_time = section.get("allTime", section)
+    return all_time if isinstance(all_time, dict) else {}
+
+
+def _results_of(node: Any) -> dict:
+    """`mergedAllCharacters` / 单条角色 → 里面的 `results`（分组统计）字典。"""
+    results = node.get("results") if isinstance(node, dict) else None
+    return results if isinstance(results, dict) else {}
+
+
+
+def _first_group_key(response: Any) -> str:
+    """按模式请求的响应：第一个真正的分组键（如 `trials_of_osiris`），没有就是空串。
+
+    带 `modes=` 时上游返回的组名就是模式名，且一次只给一个（多模式会多几个键，
+    我们一次只问一个模式）；空对象 = 这个角色在这个模式下没有可统计的对局。
+    """
+    if not isinstance(response, dict):
+        return ""
+    return next((key for key, value in response.items() if isinstance(value, dict)), "")
+
+
+def resolve_stats_mode(mode: str) -> tuple[str, int, str]:
+    """模式词 → `(key, 上游 modes 数值, 中文标签)`。
+
+    词表与数值的唯一出处是 `data/pvp_counters.py`（取自本地 Manifest 的
+    `DestinyActivityModeDefinition.modeType`）。**别用 `ACTIVITY_MODES`**：那里
+    `allpvp=9` 是错的，实测 `modes=9` 直接 500。中文标签也认（`铁旗` → iron_banner）。
+    """
+    word = (mode or "").strip()
+    lowered = word.lower()
+    key = lowered if lowered in pvp_counters.MODE_ACTIVITY_TYPES else ""
+    if not key:
+        key = next(
+            (k for k, label in pvp_counters.MODE_LABELS_ZH.items() if label == word), ""
+        )
+    if not key:
+        words = "、".join(pvp_counters.MODE_ACTIVITY_TYPES)
+        labels = "、".join(
+            pvp_counters.MODE_LABELS_ZH[k] for k in pvp_counters.MODE_ACTIVITY_TYPES
+        )
+        raise InvalidArgumentError(
+            f"stats 不支持 mode={mode!r}；可取 {words}（或中文标签 {labels}）。"
+            '不按模式查就留空；赛季数字用 intent="counters" + period="season"。'
+        )
+    return key, pvp_counters.MODE_ACTIVITY_TYPES[key], pvp_counters.MODE_LABELS_ZH[key]
+
+
+def _stats_period_type(period: str) -> int:
+    """周期词 → 上游 `periodType`。上游没有的周期**报错**，不许猜成"生涯"。"""
+    key = (period or "career").strip().lower()
+    if key in activity_stats.STATS_PERIOD_TYPES:
+        return activity_stats.STATS_PERIOD_TYPES[key]
+    reason = activity_stats.UNSUPPORTED_PERIOD_REASONS.get(
+        key, f"统计接口没有 period={period!r} 这一档"
+    )
+    raise InvalidArgumentError(
+        f"{reason}；统计接口只回答 career（生涯）。"
+        '赛季/篇章数字只能由游戏内计数器回答：intent="counters" + period="season"/"act"。'
+    )
+
+
 def _stat_entry(values: dict, stat_id: str) -> dict:
     value = values.get(stat_id, {})
     basic = value.get("basic", {}) if isinstance(value, dict) else {}
@@ -100,12 +183,22 @@ class ActivityService:
         self._manifest = manifest
         self._resolver = resolver
 
-    async def _get_character_id(self, player_name: str, character: str | None = None) -> tuple[str, str, int]:
-        """Resolve player + character to (membership_id, character_id, membership_type)."""
-        p = await self._resolver.resolve_player(player_name)
-        mid = p["membership_id"]
-        mtype = p["membership_type"]
+    async def _resolve_membership(self, player_name: str) -> tuple[str, int]:
+        """玩家 → (membership_id, membership_type)。账号级查询不需要角色。"""
+        player = await self._resolver.resolve_player(player_name)
+        return str(player["membership_id"]), int(player["membership_type"])
 
+    async def _resolve_character(
+        self, player_name: str, character: str | None = None
+    ) -> tuple[str, str, int, str]:
+        """(membership_id, character_id, membership_type, 角色名)。
+
+        角色名要一起带出来：生涯统计得能标"这个数是哪个角色的"，光有 ID 说不清。
+        `character=None` 时取第一个角色（与其它 intent 一致）。
+        """
+        from ..manifest import class_type_name, resolve_character_name
+
+        mid, mtype = await self._resolve_membership(player_name)
         profile = await self._resolver.get_profile(mid, mtype, [200])
         chars = profile.get("characters", {}).get("data", {})
 
@@ -113,17 +206,284 @@ class ActivityService:
             raise CharacterNotFoundError(character or "any", [])
 
         if character:
-            from ..manifest import class_type_name, resolve_character_name
             target_type = resolve_character_name(character)
             for char_id, char_info in chars.items():
                 if char_info.get("classType") == target_type:
-                    return str(mid), char_id, mtype
+                    return mid, char_id, mtype, class_type_name(target_type)
             available = [class_type_name(info.get("classType", -1)) for info in chars.values()]
             raise CharacterNotFoundError(character, available)
 
-        # Return first character
         char_id = next(iter(chars))
-        return str(mid), char_id, mtype
+        return mid, char_id, mtype, class_type_name(chars[char_id].get("classType", -1))
+
+    async def _get_character_id(self, player_name: str, character: str | None = None) -> tuple[str, str, int]:
+        """Resolve player + character to (membership_id, character_id, membership_type)."""
+        mid, char_id, mtype, _ = await self._resolve_character(player_name, character)
+        return mid, char_id, mtype
+
+    async def get_historical_stats(
+        self,
+        player_name: str,
+        character: str | None = None,
+        mode: str = "",
+        period: str = "",
+    ) -> dict:
+        """Fetch lifetime PvE/PvP statistics.
+
+        **默认是账号级**（P1 起）：不传 `character`/`mode` 时走 `GetHistoricalStatsForAccount`，
+        每一行给三档 —— `existing`（现存角色）/ `deleted`（已删角色明细）/ `account_total`
+        （账号级合计，**已含已删角色**）。真机实测（2026-09-17）熔炉生涯击败三档是
+        50,622 / 28,242 / 78,864，其中 `account_total` 就是 `existing + deleted`：
+        `mergedDeletedCharacters` 是那个和的加数之一，**不能再加一遍**（早期计划里的
+        107,106 就是这么错的）。
+
+        显式传 `character=` 才走单角色接口：payload 标 `scope="character"` 并带角色名，
+        行里只有 `value`（这个角色自己的数）—— 单角色数字不再冒充生涯。
+
+        `mode=` 走按角色的接口（`GetHistoricalStats`）：**`modes` 只在按角色端点上生效**
+        （账号级端点会静默忽略，真机实测），所以账号级 + 模式要逐角色取、自己合，payload
+        标 `aggregation="computed"`。`period=` 目前只认 `career`（=上游 `periodType=2`）：
+        上游**没有赛季/篇章周期**，那两个词会报错并指向 `counters`（见
+        `activity_stats.UNSUPPORTED_PERIOD_REASONS`），不猜、也不退化成生涯。
+
+        跨角色怎么合并写在 `activity_stats.aggregate_kind`：可加的按 sum、最多的按 max、
+        最快的按 min、比值类按公式重算（derived）、比不出的给 null（none，**不编**）。
+
+        Args:
+            player_name: Bungie name.
+            character: 显式指定才要单角色（hunter/warlock/titan 或中文）。
+            mode: 模式词（crucible/trials/iron_banner/competitive/gambit/raid 或中文标签）。
+            period: 周期词（只认 career；season/act 上游没有）。
+
+        Returns:
+            Dict with `source`/`scope`/`mode`/`period` 标签与 `groups`（行式统计）。
+
+        Raises:
+            APIError: If the API returns an error or unexpected response.
+            InvalidArgumentError: 模式词不在对照表里，或周期词上游没有。
+            CharacterNotFoundError: 指定的角色不在这个账号上。
+        """
+        if period:
+            _stats_period_type(period)  # 上游没有的周期直接报错，不退化成生涯
+        if character:
+            return await self._character_stats(player_name, character, mode, period)
+        if mode:
+            return await self._mode_stats(player_name, mode, period)
+        return await self._account_stats(player_name)
+
+    async def _account_stats(self, player_name: str) -> dict:
+        """账号级三档统计（`GetHistoricalStatsForAccount`）。"""
+        mid, mtype = await self._resolve_membership(player_name)
+        logger.info("Fetching account-level historical stats: player=%s", player_name)
+
+        result = await self._bungie.get_historical_stats_for_account(mtype, mid)
+        response = _stats_response(result)
+
+        merged = _results_of(response.get("mergedAllCharacters"))
+        deleted = _results_of(response.get("mergedDeletedCharacters"))
+        characters = [c for c in (response.get("characters") or []) if isinstance(c, dict)]
+
+        # 现存角色那一档上游不直接给，只能自己合：按 aggregate_kind 的语义逐项合并。
+        existing = {
+            group: activity_stats.merge_sections(
+                [
+                    _all_time(_results_of(char).get(upstream))
+                    for char in characters
+                    if not char.get("deleted")
+                ]
+            )
+            for upstream, group in ACCOUNT_GROUPS.items()
+        }
+        tiers = {
+            group: (_all_time(merged.get(upstream)), _all_time(deleted.get(upstream)), existing[group])
+            for upstream, group in ACCOUNT_GROUPS.items()
+        }
+        payload = activity_stats.tiered_groups(tiers)
+        payload.update({
+            "source": activity_stats.SOURCE_ACCOUNT,
+            "scope": activity_stats.SCOPE_ACCOUNT,
+            # 三档里 account_total/deleted 是上游自己合并的（比值、均值它都算好了），
+            # existing 是我们按公式重算的 —— 这个区别写在 payload 里，别让读的人以为
+            # 三个数的算法一样。
+            "aggregation": "upstream_merged",
+            "tiers": activity_stats.TIER_LABELS_ZH,
+            "mode": None,
+            "period": activity_stats.period_label("career"),
+            "characters": {
+                "existing": sum(1 for char in characters if not char.get("deleted")),
+                "deleted": sum(1 for char in characters if char.get("deleted")),
+                "total": len(characters),
+            },
+        })
+        logger.info(
+            "账号级统计：player=%s 角色=%d（现存 %d / 已删 %d）",
+            player_name, len(characters), payload["characters"]["existing"],
+            payload["characters"]["deleted"],
+        )
+        return payload
+
+    async def _character_stats(
+        self,
+        player_name: str,
+        character: str,
+        mode: str = "",
+        period: str = "",
+    ) -> dict:
+        """单角色统计（`GetHistoricalStats`）：标了角色名，就不再是"生涯"。
+
+        给了 `mode` 就带上 `modes=`（这个参数只在按角色的端点上生效，见 `bungie_stats`）：
+        上游返回的组名是模式名（如 `trials_of_osiris`），标签用我们对照表里的中文名。
+        """
+        period_type = _stats_period_type(period)
+        mid, char_id, mtype, class_name = await self._resolve_character(player_name, character)
+        logger.info(
+            "Fetching character historical stats: player=%s char=%s(%s) mode=%s period=%s",
+            player_name, char_id, class_name, mode or "all", period or "career",
+        )
+
+        mode_key = mode_type = mode_name = ""
+        if mode:
+            mode_key, mode_type, mode_name = resolve_stats_mode(mode)
+            result = await self._bungie.get_historical_stats(
+                mtype, mid, char_id, modes=mode_type, period_type=period_type
+            )
+            response = _stats_response(result)
+            upstream_key = _first_group_key(response)
+            sections = {mode_key: _all_time(response.get(upstream_key))} if upstream_key else {}
+            payload = activity_stats.stat_groups(sections, labels={mode_key: mode_name})
+        else:
+            result = await self._bungie.get_historical_stats(mtype, mid, char_id)
+            response = _stats_response(result)
+            payload = activity_stats.stat_groups({
+                "pve": _all_time(response.get("allPvE")),
+                "pvp": _all_time(response.get("allPvP")),
+            })
+            upstream_key = ""
+
+        payload.update({
+            "source": activity_stats.SOURCE_CHARACTER,
+            "scope": activity_stats.SCOPE_CHARACTER,
+            "character": {"name": class_name, "character_id": char_id},
+            "mode": (
+                {"key": mode_key, "label": mode_name, "upstream_modes": mode_type,
+                 "upstream_group": upstream_key}
+                if mode else None
+            ),
+            "period": activity_stats.period_label(period or "career", period_type),
+        })
+        return payload
+
+    async def _mode_stats(self, player_name: str, mode: str, period: str = "") -> dict:
+        """账号级 + 按模式：逐角色取、自己合（账号级端点会**静默忽略** `modes`）。
+
+        为什么要逐角色：真机实测（2026-09-18）`.../Account/{id}/Stats/?modes=84` 与不传
+        `modes` 的响应一字不差（都是 allPvE/allPvP 合并视图）—— 想按模式拿数只有按角色这条路。
+        角色清单取自账号级响应（含已删角色，它们的按角色统计同样取得到），并发请求。
+
+        合并语义与 P1 三档同一套（`activity_stats.aggregate_kind`）：可加的相加、最多的取最大、
+        比值按公式重算、比不出的给 null；**没有上游合并值可抄**（这个模式上游不给合并视图），
+        所以 payload 标 `aggregation="computed"`。
+        """
+        period_type = _stats_period_type(period)
+        mode_key, mode_type, mode_name = resolve_stats_mode(mode)
+        mid, mtype = await self._resolve_membership(player_name)
+        logger.info(
+            "Fetching mode stats: player=%s mode=%s(%s) period=%s",
+            player_name, mode_key, mode_type, period or "career",
+        )
+
+        account = await self._bungie.get_historical_stats_for_account(mtype, mid)
+        characters = [
+            c for c in (_stats_response(account).get("characters") or []) if isinstance(c, dict)
+        ]
+        if not characters:
+            raise CharacterNotFoundError(mode_key, [])
+
+        # 并发取每个角色这个模式的一段。个别角色读不到不该弄坏整份统计：
+        # 记下来、写进 warnings，全失败才当失败（见下面的 raise）。
+        fetched = await asyncio.gather(*[
+            self._fetch_mode_section(mtype, mid, str(char.get("characterId", "")), mode_type, period_type)
+            for char in characters
+        ])
+        sections: dict[str, list[dict]] = {"all": [], "existing": [], "deleted": []}
+        failures: list[str] = []
+        upstream_keys: list[str] = []
+        for char, (section, upstream_key, error) in zip(characters, fetched):
+            if error:
+                failures.append(f"{char.get('characterId')}: {error}")
+                continue
+            if not section:
+                continue  # 这个角色在这个模式下没有可统计的对局：不是 0，也不该编一行
+            sections["all"].append(section)
+            sections["deleted" if char.get("deleted") else "existing"].append(section)
+            if upstream_key:
+                upstream_keys.append(upstream_key)
+
+        if not sections["all"]:
+            if failures:
+                raise APIError("查询按模式的生涯统计", "；".join(failures[:3]))
+            return activity_stats.empty_mode_payload(mode_key, mode_name, mode_type, period, period_type)
+
+        tiers = {
+            mode_key: (
+                activity_stats.merge_sections(sections["all"]),
+                activity_stats.merge_sections(sections["deleted"]),
+                activity_stats.merge_sections(sections["existing"]),
+            )
+        }
+        payload = activity_stats.tiered_groups(tiers, labels={mode_key: mode_name})
+        payload.update({
+            "source": activity_stats.SOURCE_CHARACTER,
+            "scope": activity_stats.SCOPE_ACCOUNT,
+            # 与账号级不同：这个模式上游没有合并视图，三个档位全是我们按公式合的。
+            "aggregation": "computed",
+            "tiers": activity_stats.TIER_LABELS_ZH,
+            "mode": {
+                "key": mode_key, "label": mode_name, "upstream_modes": mode_type,
+                "upstream_group": upstream_keys[0] if upstream_keys else "",
+            },
+            "period": activity_stats.period_label(period or "career", period_type),
+            "characters": {
+                "existing": sum(1 for c in characters if not c.get("deleted")),
+                "deleted": sum(1 for c in characters if c.get("deleted")),
+                "total": len(characters),
+                "returned": len(sections["all"]),
+            },
+        })
+        if failures:
+            payload["unavailable"] = (
+                f"{len(failures)} 个角色的这个模式统计没读到（已用其余 {len(sections['all'])} 个角色合并）："
+                + "；".join(failures[:3])
+            )
+        return payload
+
+    async def _fetch_mode_section(
+        self,
+        membership_type: int,
+        membership_id: str,
+        character_id: str,
+        mode_type: int,
+        period_type: int,
+    ) -> tuple[dict, str, str]:
+        """取一个角色在某模式下的一段统计；失败**不抛**，把原因带回去（单个角色不许弄坏整份）。
+
+        返回 `(这个模式的一段, 上游组名, 错误原因)`；调用方按角色清单 `zip` 回去拿
+        `deleted` 标志（三档要分现存/已删）。
+        """
+        if not character_id:
+            return {}, "", "角色 ID 缺失"
+        try:
+            result = await self._bungie.get_historical_stats(
+                membership_type, membership_id, character_id,
+                modes=mode_type, period_type=period_type,
+            )
+        except APIError as exc:
+            logger.warning("按模式取统计失败：char=%s mode=%s：%s", character_id, mode_type, exc)
+            return {}, "", str(exc)
+        response = _stats_response(result)
+        upstream_key = _first_group_key(response)
+        section = _all_time(response.get(upstream_key)) if upstream_key else {}
+        return section, upstream_key, ""
 
     async def get_activity_history(
         self,
@@ -306,55 +666,19 @@ class ActivityService:
             "entries": entries,
         }
 
-    async def get_historical_stats(
-        self,
-        player_name: str,
-        character: str | None = None,
-    ) -> dict:
-        """Fetch lifetime PvE/PvP statistics for a player.
-
-        Args:
-            player_name: Bungie name.
-            character: Target class (hunter/warlock/titan). If None, uses first character.
-
-        Returns:
-            Dict with 'pve' and 'pvp' stat sections.
-
-        Raises:
-            APIError: If the API returns an error or unexpected response.
-        """
-        mid, char_id, mtype = await self._get_character_id(player_name, character)
-        logger.info("Fetching historical stats: player=%s char=%s", player_name, char_id)
-
-        result = await self._bungie.get_historical_stats(mtype, mid, char_id)
-
-        if not isinstance(result, dict):
-            raise APIError("查询生涯统计", "响应格式异常")
-
-        error_code = result.get("ErrorCode")
-        if error_code is not None and error_code != 1:
-            raise APIError("查询生涯统计", result.get("Message", ""))
-
-        response = result.get("Response", result)
-
-        def _all_time(group: str) -> dict:
-            section = response.get(group) or {}
-            if not isinstance(section, dict):
-                return {}
-            all_time = section.get("allTime", section)
-            return all_time if isinstance(all_time, dict) else {}
-
-        # 全量 + 行式（之前手写 8 个键、只取 displayValue，还写错了 precisionKills）：
-        # 形状与映射表都在 activity_stats，那边有拼写/覆盖/数值的守卫测试。
-        return activity_stats.stat_groups({"pve": _all_time("allPvE"), "pvp": _all_time("allPvP")})
-
     async def get_unique_weapon_history(
         self,
         player_name: str,
         character: str | None = None,
         limit: int = 25,
     ) -> dict:
-        """Fetch and summarize per-weapon historical usage for one character."""
+        """Fetch and summarize per-weapon historical usage for one character.
+
+        **口径是"这个角色的全模式（PvE+PvP）武器击杀"**（P3b）：上游
+        `GetUniqueWeaponHistory` 没有模式参数，榜首通常是刷本用的枪 ——
+        所以 payload 必带 `scope="all_modes"` 与 `source`，话术直说"这不是 PvP 榜"。
+        真要 PvP 武器榜只能拿 PGCR 逐场聚合最近 N 场（另做，且必须标"最近 N 场"）。
+        """
         mid, char_id, mtype = await self._get_character_id(player_name, character)
         logger.info("Fetching unique weapon history: player=%s char=%s", player_name, char_id)
 
@@ -392,6 +716,12 @@ class ActivityService:
         weapons.sort(key=lambda item: item.get("kills", 0), reverse=True)
         limited = weapons[: max(1, min(limit, 250))]
         return {
+            "scope": "all_modes",
+            "source": "GetUniqueWeaponHistory",
+            "message": (
+                "已读取武器使用排行（scope=all_modes：**全模式** PvE+PvP 合计的武器击杀，"
+                "不是 PvP 榜 —— 榜首多半是刷本用的枪）。"
+            ),
             "character_id": char_id,
             "count": len(weapons),
             "weapons": limited,

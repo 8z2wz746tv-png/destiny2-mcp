@@ -39,7 +39,9 @@ CEILINGS = {
     "destiny_mcp/tools/assistants.py": 1403,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
-    "destiny_mcp/bungie_client.py": 1263,
+    # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留
+    # 门面方法）→ 1263 → 1164，上限跟着收紧：腾出来的位置已经用掉了（账号级 + 按模式统计）。
+    "destiny_mcp/bungie_client.py": 1164,
     # P7：结果翻译层（ProcessArmorSet → BuildResult/canonical_build + 目标统计）
     # 整个搬到 services/build_results.py，1114 → 906，上限跟着收紧 ——
     # 调谐（tuning）的对外字段也落在那边的翻译层里，不再往这里堆。

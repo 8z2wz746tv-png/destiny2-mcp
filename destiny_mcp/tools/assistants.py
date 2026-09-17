@@ -28,6 +28,7 @@ from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
 from . import _counters_branches as counters_branches
 from . import _equip_branches as equip_branches
+from . import _stats_branches as stats_branches
 from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
 from ._enrichment import community_enrichment, community_read
@@ -1270,8 +1271,7 @@ async def activity_assistant(
         return ok_response("已读取活动结算。", {"pgcr": await svc["activity_svc"].get_pgcr(activity_id)})
 
     if intent in {"stats", "career", "historical_stats"}:
-        result = await svc["activity_svc"].get_historical_stats(resolved, character)
-        return ok_response("已读取生涯统计。", {"stats": result})
+        return await stats_branches.stats_response(svc, resolved, character, mode or "", period or "")
 
     if intent == "counters":
         return await counters_branches.counters_response(svc, resolved, query, count, mode or "", period or "")

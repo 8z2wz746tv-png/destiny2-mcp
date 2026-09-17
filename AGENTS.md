@@ -130,6 +130,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 <!-- code-map:begin -->
 **第 0 层：纯基础：不依赖项目里任何东西（除了彼此）**
 - `destiny_mcp/__init__.py`
+- `destiny_mcp/bungie_errors.py`
 - `destiny_mcp/config.py`
 - `destiny_mcp/error_codes.py`
 - `destiny_mcp/exceptions.py`
@@ -142,6 +143,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - `destiny_mcp/audit.py`
 - `destiny_mcp/build_contracts.py`
 - `destiny_mcp/bungie_client.py`
+- `destiny_mcp/bungie_stats.py`
 - `destiny_mcp/data/`
 - `destiny_mcp/manifest.py`
 - `destiny_mcp/manifest_armor.py`
@@ -190,7 +192,9 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | `destiny_mcp/activity_stats.py` | 活动统计形状唯一样式：上游 `statId` → 行式；改口径先看 `tests/test_activity_stats.py`。 |
 | `destiny_mcp/audit.py` | 每次 MCP 工具调用落盘审计，调用日志只在这里写。 |
 | `destiny_mcp/build_contracts.py` | 配装契约类型（`BuildRecipe`/`CanonicalBuild`/`ExecutableBuild`），见 ADR-001；只有最后一个能执行。 |
-| `destiny_mcp/bungie_client.py` | Bungie API 客户端：token 生命周期 + HTTP 错误映射；**贴着 1263 上限**，新调用先想放别处。 |
+| `destiny_mcp/bungie_errors.py` | 上游 HTTP 错误 → 领域错误的唯一翻译层（404 单独成码、503 归上游不可用）；客户端与取数模块共用，禁止在别处再写一套 except。 |
+| `destiny_mcp/bungie_client.py` | Bungie API 客户端门面：token 生命周期 + 各端点；活动统计端点已拆到 `bungie_stats.py`，错误映射在 `bungie_errors.py`。 |
+| `destiny_mcp/bungie_stats.py` | 活动/战绩取数域：历史统计的按角色/账号级两条路；`modes` 只在按角色端点上生效、`periodType` 没有 Season（实测）。 |
 | `destiny_mcp/manifest.py` | Manifest 管理器门面（查名/搜索），其余按域拆到 `manifest_*.py`；贴着 262 上限，只做聚合。 |
 | `destiny_mcp/manifest_armor.py` | 护甲模组与套装加成域。 |
 | `destiny_mcp/manifest_artifacts.py` | 赛季神器：列表、按名/按 hash 查询、层级与模组解析。 |

@@ -13,6 +13,23 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（69 个旧工具） | `get_inventory`、`search_items` … | 只在 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**且** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 时暴露；不进主路径文档、不保证契约、不单独修 bug |
 
+## 未发布：`stats` 的口径与行形状（破坏性，见 ADR-005）
+
+`activity_assistant(intent="stats"/"career"/"historical_stats")` 的三个别名仍走同一段分派，
+但**默认口径与行形状变了**，旧键一个不留：
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 默认范围 | 第一个角色（`GetHistoricalStats`） | **账号级**（`GetHistoricalStatsForAccount`），`scope="account"` |
+| 行里的数字 | `value` + `display`（单角色） | 账号级行给 `existing` / `deleted` / `account_total` 三档（**没有 `value`**）；单角色行照旧给 `value`，但要显式传 `character=` |
+| 口径标签 | 无 | `source` / `scope` / `mode`（null 或块）/ `period` / `aggregation` / `tiers` |
+| 合并语义 | 无 | 每行 `aggregate ∈ {sum, max, min, derived, none}`（比值类不许相加） |
+| `mode=` / `period=` | 传给 `stats` 会被 `ignored_parameter` 拒绝 | `stats` 认它们：`mode` 用对照表词表（crucible/trials/iron_banner/competitive/gambit/raid 或官方中文标签），`period` 只认 `career`；`season`/`act` 上游没有 → `a_p_i_error` + `unavailable` 并指向 `counters` |
+| `weapon_history` 载荷 | 无范围声明 | 必带 `scope="all_modes"`（全模式 PvE+PvP，**不是 PvP 榜**） |
+
+调用方要改的只有一件事：**想要单角色数字就显式传 `character=`**；想要账号生涯直接用默认即可。
+别名表不变（`career`/`historical_stats` 仍是 `stats` 的永久别名）。
+
 ## 0.3.0 的新能力与删除的行为
 
 新能力**不是别名**，登记在这里是为了让"以前做不到、现在能做了"有据可查：

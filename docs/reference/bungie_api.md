@@ -236,6 +236,9 @@
 | --- | --- |
 | 组件号集合 | `destiny_mcp/services/profile_components.py` |
 | 游戏内生涯计数器（组件 1100）与统计接口的分工 | `destiny_mcp/services/activity_counters_service.py`（见本文第十一节） |
+| 三档口径与合并语义（sum/max/min/derived/none） | `destiny_mcp/activity_stats.py`（「三档并存」段） |
+| 统计接口两条路（按角色 / 账号级）与 `modes`/`periodType` | `destiny_mcp/bungie_stats.py`（见本文第十二节） |
+| 生涯口径的真机验收 | `scripts/verify_career_stats.py`（8 条断言）、`scripts/verify_career_counters.py` |
 | 写入回读重试 | `destiny_mcp/services/write_readback.py` |
 | 模组/插槽写入与 free→付费回退 | `destiny_mcp/services/loadout_mod_sockets.py` |
 | 装备编排与预检 | `destiny_mcp/services/equip_planner.py`、`services/transfer_service.py` |
@@ -244,11 +247,19 @@
 | 神器三个 hash 家族 | `destiny_mcp/services/artifact_service.py`、`manifest_artifacts.py` |
 | 子职业元素第二段 | `destiny_mcp/services/subclass_service.py`（`_ELEMENT_PATTERN`） |
 
-## 十一、Metrics（组件 1100）vs Stats：两个生涯数字，各有各的出处
+## 十一、Metrics（组件 1100）vs Stats：三个生涯数字，各有各的出处
 
-**口径声明**：这一节里的数字全部来自本机真账号实测（2026-09-17，只读，未做任何写入）。
-同一个"生涯击败"，**游戏内显示 124,495，统计接口账号级 107,106** —— 这不是谁算错了，
-是两个数据源的口径不同。谁问哪一路，就给哪一路，并且把出处一起给出去。
+**口径声明**：这一节里的数字全部来自本机真账号实测（2026-09-17 采集、2026-09-18 复核，只读，
+未做任何写入）。同一个"熔炉生涯击败"有三个数：
+
+| 来源 | 数字 | 范围 |
+| --- | --- | --- |
+| `profile.metrics`（组件 1100，`811894228`） | **124,495** | 游戏内那个计数器：自 S1 起累计、含已删角色 |
+| `GetHistoricalStatsForAccount` 的 `mergedAllCharacters` | **78,864** | 上游还列举得出的角色（现存 50,622 + 已删 28,242） |
+| `GetHistoricalStats`（按角色） | 17,703 / 22,279 / 8,864 | 单个角色自己的数 |
+
+这不是谁算错了，是三个口径。**谁问哪一路就给哪一路，并且把出处一起给出去**；三个数不许相加、
+也不许互相"纠正"。口径决定见 ADR-005，验收脚本 `scripts/verify_career_stats.py`。
 
 ### 组件 1100 的响应形状
 
@@ -267,6 +278,41 @@
   `services/activity_counters_service.py`（`activity_assistant(intent="counters")`）。
   查定义要 `to_signed()` 回退（与 `get_bucket_definition` 同套路：uint32 hash 直查 `id` 可能不中）。
 
+### 统计接口的三块：`mergedAllCharacters` 已含已删角色
+
+- **事实**：账号级 `GetHistoricalStatsForAccount` 返回三块 —— `mergedAllCharacters`
+  （`results.<group>.allTime` 与 `merged`）、`mergedDeletedCharacters`、`characters[]`
+  （每条带 `deleted` 标志与自己的 `results`）。
+- **实测**（2026-09-18 逐条核对）：本账号 8 条角色（现存 3 / 已删 5），
+  `allPvP.allTime.opponentsDefeated` 逐角色为 22,279 / 19,479 / 8,864（现存）
+  与 14,457 / 5,004 / 105 / 8,225 / 451（已删）：
+  - **8 条之和 = 78,864 = `mergedAllCharacters`**；
+  - 已删 5 条之和 = **28,242 = `mergedDeletedCharacters`**（是明细，不是加数）；
+  - 现存 3 条之和 = **50,622**（上游不直接给，要自己合）。
+- **结论**：`account_total = 78,864`，**不是** `mergedAllCharacters + mergedDeletedCharacters`
+  （那是 107,106，把已删角色算了两遍）。三档的名字与来源随 payload 给出去
+  （`activity_stats.TIER_LABELS_ZH`），谁也别再自己加。
+
+### 合并语义逐项声明（跨角色怎么合）
+
+- **事实**：上游合并视图对每一类统计的合并方式不同。实测核对（现存/已删两块与账号级的关系）：
+  - **可加**（kills/deaths/opponentsDefeated/activitiesEntered/score/weaponKills…）：账号级 = 现存 + 已删；
+  - **取最大**（`longestKillSpree`/`bestSingleGameKills`/`mostPrecisionKills`/`longestSingleLife`/
+    `highestLightLevel`/`longestKillDistance`…）：账号级 = 8 条里的最大值（21 / 80 / 25 / 395 / 1450 / 106）；
+  - **取最小**（`fastestCompletionMs`）：账号级 38,300 = min（max 是 720,200）；
+  - **比值**（`killsDeathsRatio`/`efficiency`/`winLossRatio`/`killsDeathsAssists`/`averageScorePerKill`）：
+    账号级 = 按分量重算 —— 实测 1.3372127723067742 == 62,734/46,914；1.6810333802276507 ==
+    (62,734+16,130)/46,914；0.9868823786620026 == 2,257/(4,544−2,257)；1.5091230762672123 ==
+    (62,734+16,130/2)/46,914；1.9001817196416617 == 119,206/62,734；
+  - **比不出**（`averageLifespan`/`averageKillDistance`/`averageScorePerLife`/`combatRating`/
+    `weaponBestType`）：没有可用的合并语义 → 现存那一档给 `null`（`aggregate="none"`）。
+- **陷阱**：`killsDeathsAssists` **不是**"击杀+助攻"的合计（那个和是 78,864，一眼就会误读），
+  它是 KDA 指数；`remainingTimeAfterQuitSeconds` 名字像"最短"、实测是**可加**的（5,372,422 =
+  814,505 + 已删），一开始按名字猜成取最小被真机断言当场抓出来。
+- **结论**：合并语义写进 `activity_stats.aggregate_kind()`（单一出处），且由
+  `scripts/verify_career_stats.py` 拿真机数据逐项复核（②③两条断言）。
+
+
 ### 读取不稳定：会出现整块 metrics 缺失
 
 - **事实**：**同一个 URL 连续请求**，会返回**整块 `metrics` 缺失**（0 条）的响应，
@@ -284,9 +330,46 @@
 - **实测**：账号级 `mergedAllCharacters.results.allPvP.allTime.opponentsDefeated = 78,864`
   （= 现存 3 角色 `50,622` + 已删 5 角色 `28,242`）；`mergedDeletedCharacters = 28,242`；
   单角色最高那是第一个角色（`…5779`）的 `17,703 kills / 12,496 deaths`。
-- **结论**：**计数器从 S1 起累计，含统计接口已不再列举的旧角色**，所以它比统计接口大。
-  两个数都给、各自带 `source`（`profile.metrics` vs `GetHistoricalStats`），
+- **结论**：**计数器从 S1 起累计，含统计接口已不再列举的旧角色**，所以它比统计接口大
+  （124,495 − 78,864 = **45,631**，这个差不是我们能拆出来的部分）。
+  两个数都给、各自带 `source`（`profile.metrics` vs `GetHistoricalStatsForAccount`），
   不要互相覆盖，也不要用其中一个去"纠正"另一个。
+
+---
+
+## 十二、统计接口的 `modes` 与 `periodType`（2026-09-18 实测）
+
+**口径声明**：这一节全部是本机真账号上的真机调用（只读），不是照官方文档抄的取值表。
+
+### `periodType` 没有 Season，且只有四个取值
+
+- **事实**：`DestinyStatsPeriodType` 实测只有 `None=0` / `Daily=1` / `AllTime=2` / `Activity=3`。
+- **实测**：按角色端点带 `periodType=3` **直接 500**（`InternalServerError`）；
+  `periodType=2` 与**不传**的响应都只有 `allTime` 一个块。
+- **结论**：**统计接口回答不了"本赛季"** —— 赛季数字只能由游戏内计数器回答
+  （`activity_assistant(intent="counters", period="season")`）。
+  `stats(period="season")` 如实报 `unavailable`：不去试会 500 的 `periodType=3`，
+  也不退化成生涯（拿生涯冒充赛季比如实说"取不到"更糟）。
+
+### `modes` 只在按角色的端点上生效
+
+- **事实**：`modes=` 传的是 `DestinyActivityModeType` 数值；**账号级端点会静默忽略它**。
+- **实测**：账号级 `.../Account/{id}/Stats/` 传 `modes=84`、`periodType=2`、`groups=1`
+  与**什么都不传**的响应一字不差（都是 `mergedAllCharacters` 的 allPvE/allPvP 合并视图）；
+  按角色端点传 `modes=84` 才真的按模式返回，响应**只有**那个模式的组。
+- **按角色端点返回的组名**（实测，一次一个模式）：熔炉 `5` → `allPvP`、铁旗 `19` →
+  `ironBanner`、竞技 `69` → `pvpCompetitive`、智谋 `63` → `pvecomp_gambit`、
+  试炼 `84` → `trials_of_osiris`、突袭 `4` → `raid`。多模式（`modes=19,84`）会返回多个组。
+- **`modes=9` 会 500**：`services/activity_service.ACTIVITY_MODES` 里那个 `allpvp=9`
+  是从旧的按场次过滤沿用下来的，`GetHistoricalStats` 不接受；模式数值只从
+  `data/pvp_counters.MODE_ACTIVITY_TYPES`（本地 Manifest 的
+  `DestinyActivityModeDefinition.modeType`）取。
+- **已删角色照样能按角色取**：`characters[].deleted=true` 的 ID 拿去请求同样返回数据 ——
+  所以"按模式的账号级合计"**能**把已删角色算进去（与三档口径一致）。
+- **结论**：账号级 + 按模式 = **逐角色取 + 自己合**（可加相加 / 最多取最大 / 比值按公式重算，
+  见第十一节），payload 标 `aggregation="computed"`。真机交叉验证：
+  `mode="crucible"`（`modes=5` → 上游就是 `allPvP`）自行合并出来的 60 项，
+  与账号级 `mergedAllCharacters.allPvP` 逐项一致（1e-3 内）。
 
 ---
 

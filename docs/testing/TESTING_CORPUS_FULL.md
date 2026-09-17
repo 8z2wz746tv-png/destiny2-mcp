@@ -144,8 +144,11 @@
 | pgcr 真 ID | 给结算内容，不是空壳 |
 | pgcr 缺 ID / 非数字 | `invalid_argument_error`（不是裸抛 404） |
 | pgcr 数字但不存在 | `upstream_not_found_error` 信封 |
-| career / historical_stats | 都给 `stats.pve`/`stats.pvp` |
-| weapon_history | 给常用武器与击杀数 |
+| career / historical_stats | 账号级三档（`scope=account`、`source=GetHistoricalStatsForAccount`）；pvp 熔炉生涯击败 `existing`/`deleted`/`account_total` = 50,622 / 28,242 / **78,864**，且 `account_total == existing + deleted`（已删角色不许算两遍） |
+| career 与游戏内数字核对 | **生涯数字与游戏内一致**：`data.game_counters` 里 `811894228` 的 `progress = 124,495`（`source=profile.metrics`），warnings 里写出与统计接口账号级（78,864）的差 **45,631** 及"拆不出来"的原因 |
+| stats 传 `character=hunter` | `scope=character` + 角色名，行里**没有** `account_total`（单角色不许冒充生涯） |
+| stats 传 `mode=trials` / `period=season` | 试炼按模式给得出（`aggregation=computed`、`upstream_modes=84`、`upstream_group=trials_of_osiris`，K/D 有值）；`period=season` → `a_p_i_error` + "unavailable"（上游没有赛季周期，不降级成生涯） |
+| weapon_history | 给常用武器与击杀数；必带 `scope=all_modes`（**不是 PvP 榜**，话术直说） |
 | aggregate | 给账号累计排行；`mode` **不是**它读的参数（按模式问它会拿到 `ignored_parameter`） |
 | clan_leaderboards | 缺 `group_id` → `invalid_argument_error`；伪 ID → `upstream_not_found_error` |
 | leaderboards | 记现状（上游故障），INFO 不判失败；不许编排名 |

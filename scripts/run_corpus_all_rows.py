@@ -1460,6 +1460,7 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
 
     career, dt, err = await call("activity_assistant", intent="career")
     historical, dt2, err2 = await call("activity_assistant", intent="historical_stats")
+    single, dt3, err3 = await call("activity_assistant", intent="stats", character="hunter")
     def _stat_of(payload: dict | None, group_key: str, stat_id: str) -> dict:
         block = ((payload or {}).get("data") or {}).get("stats") or {}
         for group in block.get("groups") or []:
@@ -1471,22 +1472,90 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
 
     cstats = ((career or {}).get("data") or {}).get("stats") or {}
     hstats = ((historical or {}).get("data") or {}).get("stats") or {}
+    cdata = (career or {}).get("data") or {}
     pve_entered = _stat_of(career, "pve", "activities_entered")
     pvp_ratio = _stat_of(career, "pvp", "kills_deaths_ratio")
+    pvp_defeated = _stat_of(career, "pvp", "opponents_defeated")
+    counters = cdata.get("game_counters") or []
+    counter_progress = next(
+        (row.get("progress") for row in counters if row.get("metric_hash") == 811894228), None
+    )
+    warnings_text = " ".join((career or {}).get("warnings") or [])
     check(
         "rows",
-        "activity：career / historical_stats 给行式 PvE/PvP 统计（数值+显示值+中文名）",
+        "activity：career / historical_stats 给账号级三档（existing/deleted/account_total，"
+        "account_total 已含已删角色）",
         err is None and err2 is None
         and [g.get("key") for g in cstats.get("groups") or []] == ["pve", "pvp"]
         and [g.get("key") for g in hstats.get("groups") or []] == ["pve", "pvp"]
-        and pve_entered.get("name") == "活动场次"
-        and isinstance(pve_entered.get("value"), int)
-        and pvp_ratio.get("display"),
-        f"pve 场次={pve_entered.get('value')}（{pve_entered.get('display')}） "
-        f"| pvp KD={pvp_ratio.get('display')} "
-        f"| 两组项数={[g.get('stat_count') for g in cstats.get('groups') or []]} "
-        f"| 别名同数据={cstats == hstats}",
+        and cstats.get("scope") == "account"
+        and cstats.get("source") == "GetHistoricalStatsForAccount"
+        and isinstance(pve_entered.get("account_total"), int)
+        and isinstance(pve_entered.get("existing"), int)
+        and isinstance(pvp_defeated.get("deleted"), int)
+        and pvp_ratio.get("aggregate") in {"sum", "max", "min", "derived", "none"}
+        and "value" not in pve_entered, "账号级行不给 value，免得被当成生涯"
+        and cstats == hstats,
+        f"账号级 {cstats.get('scope')} 角色={cstats.get('characters')} "
+        f"| 熔炉击败={short(pvp_defeated, 200)} "
+        f"| pve 场次={short(pve_entered, 200)} "
+        f"| 两组项数={[g.get('stat_count') for g in cstats.get('groups') or []]}",
         seconds=dt,
+    )
+
+    single_stats = ((single or {}).get("data") or {}).get("stats") or {}
+    check(
+        "rows",
+        "activity：stats 传 character → 单角色口径（scope=character + 角色名），不再冒充生涯",
+        err3 is None
+        and single_stats.get("scope") == "character"
+        and single_stats.get("source") == "GetHistoricalStats"
+        and (single_stats.get("character") or {}).get("name") == "Hunter"
+        and all("account_total" not in row for g in single_stats.get("groups") or [] for row in g.get("stats") or []),
+        f"scope={single_stats.get('scope')} character={single_stats.get('character')} "
+        f"组={[g.get('key') for g in single_stats.get('groups') or []]}",
+        seconds=dt3,
+    )
+
+    check(
+        "rows",
+        "activity：两个来源并列（profile.metrics 计数器 + 统计接口），差值写进 warnings",
+        err is None
+        and isinstance(counter_progress, int)
+        and counter_progress > pvp_defeated.get("account_total", 0)
+        and str(counter_progress - pvp_defeated.get("account_total", 0)) in warnings_text
+        and all(row.get("source") == "profile.metrics" for row in counters),
+        f"计数器 {counter_progress}（{len(counters)} 条，source="
+        f"{[row.get('source') for row in counters]}） vs 统计接口 {pvp_defeated.get('account_total')}"
+        f" | 差={counter_progress - pvp_defeated.get('account_total', 0) if isinstance(counter_progress, int) else '?'}"
+        f" | warnings={' / '.join((career or {}).get('warnings') or [])[:220]}",
+        seconds=dt,
+    )
+
+    trials_mode, dt4, err4 = await call(
+        "activity_assistant", intent="stats", mode="trials", slow=True
+    )
+    tstats = ((trials_mode or {}).get("data") or {}).get("stats") or {}
+    trials_kd = _stat_of(trials_mode, "trials", "kills_deaths_ratio")
+    season, dt5, err5 = await call(
+        "activity_assistant", intent="stats", mode="trials", period="season"
+    )
+    check(
+        "rows",
+        "activity：stats 支持 mode/period —— 试炼按模式给得出；season 上游没有 → unavailable",
+        err4 is None and err5 is None
+        and tstats.get("aggregation") == "computed"
+        and (tstats.get("mode") or {}).get("upstream_modes") == 84
+        and (tstats.get("mode") or {}).get("upstream_group") == "trials_of_osiris"
+        and trials_kd.get("account_total") is not None
+        and (tstats.get("period") or {}).get("key") == "career"
+        and season.get("ok") is False
+        and "unavailable" in season.get("error", {}).get("message", ""),
+        f"试炼 mode={tstats.get('mode')} K/D={trials_kd.get('account_total')}"
+        f"（{trials_kd.get('display')}）角色={tstats.get('characters')} "
+        f"| season ok={season.get('ok')} code={season.get('error', {}).get('code')} "
+        f"msg={short(season.get('error', {}).get('message'), 120)}",
+        seconds=dt4,
     )
 
     weapon_hist, dt, err = await call(
@@ -1499,9 +1568,11 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         err is None and bool(whdata.get("weapons"))
         and "kills" in first_row(whdata.get("weapons"))
         and isinstance(first_row(whdata.get("weapons")).get("stats"), list)
-        and first_row(first_row(whdata.get("weapons")).get("stats") or []).get("stat_id"),
+        and first_row(first_row(whdata.get("weapons")).get("stats") or []).get("stat_id")
+        and whdata.get("scope") == "all_modes"
+        and "不是 PvP 榜" in str(whdata.get("message") or ""),
         f"记录数={whdata.get('count')} 返回={len(whdata.get('weapons') or [])} "
-        f"首项={short(first_row(whdata.get('weapons')), 160)}",
+        f"scope={whdata.get('scope')} 首项={short(first_row(whdata.get('weapons')), 160)}",
         seconds=dt,
     )
 

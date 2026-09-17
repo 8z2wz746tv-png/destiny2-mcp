@@ -13,6 +13,7 @@
 | [ADR-002](002-armor-mods-require-in-game.md) | 护甲模组只能游戏内装：工具只列清单，且不因此回滚已换上的装备 | accepted |
 | [ADR-003](003-measurement-beats-docs.md) | 实测优先于文档：冲突以真机结果为准并留痕，官方快照不进仓库 | accepted |
 | [ADR-004](004-component-numbers-are-named.md) | 组件号只能来自 `profile_components.py`；读 305 必须带清单类组件 | accepted |
+| [ADR-005](005-career-numbers-follow-in-game-counters.md) | 生涯数字以游戏内计数器为准、统计接口只作明细；三档三来源不许混 | accepted |
 
 ## 编号规矩
 

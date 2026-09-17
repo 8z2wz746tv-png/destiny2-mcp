@@ -38,7 +38,13 @@ _LAYERS: dict[str, int] = {
     "activity_stats": 1,
     "audit": 1,
     "build_contracts": 1,
+    # 上游 HTTP 错误 → 领域错误的唯一翻译层：只依赖 exceptions/logging_config，被
+    # bungie_client 与将来的取数模块共用，所以放在客户端**下面**一层，避免互相 import。
+    "bungie_errors": 0,
     "bungie_client": 1,
+    # 活动/战绩端点的取数域（历史统计的按角色/账号级两条路）：与 manifest.py + manifest_*.py
+    # 同一套拆法 —— 客户端留门面方法，域实现单独放，避免客户端继续长胖。
+    "bungie_stats": 1,
     # 随包分发的**事实表**（计数器 hash → 模式/周期、选取率快照…）：没有逻辑、要被各层共用，
     # 所以放这一层。`data/` 里只许放"实测出来的对照关系"，有判断的仍然归 services/。
     "data": 1,

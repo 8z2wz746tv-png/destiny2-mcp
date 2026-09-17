@@ -1,6 +1,8 @@
 # 计划：生涯/赛季战绩的分档与标注（PvP 数据摸透后的开发计划）
 
-状态：**待评审**（未开工）。起因：用户拿游戏内/机器人数字与我们的输出对照，发现"生涯击败"差了几万。
+状态：**已落地**（P0/P1/P2/P3-1/P3b/P3-2/P4 全部完成，真机验收 `scripts/verify_career_stats.py` 8/8、
+`scripts/verify_career_counters.py` 6/6）。起因：用户拿游戏内/机器人数字与我们的输出对照，发现"生涯击败"差了几万。
+口径决定见 `docs/adr/005-career-numbers-follow-in-game-counters.md`；本文只留实采证据与逐次取舍。
 
 ## 一、实采证据（2026-09-17，本机真机，只读）
 
@@ -126,7 +128,7 @@ stats.account:  [{source: "GetHistoricalStatsForAccount", scope: "account", exis
 
 | 用户这么问 | 现在会看到（问题） | 改完后看到 |
 | --- | --- | --- |
-| "总结我的 PvP 数据" | 单角色数字（17,703 击败） | **游戏计数器：熔炉生涯击败 124,495（来源：profile.metrics，S1 起累计）**；并附统计接口口径：账号级 107,106（现存 50,622 + 已删 28,242） |
+| "总结我的 PvP 数据" | 单角色数字（17,703 击败） | **游戏计数器：熔炉生涯击败 124,495（来源：profile.metrics，S1 起累计）**；并附统计接口口径：账号级 78,864（现存 50,622 + 已删 28,242，**已删角色只算一次**） |
 | "我什么枪比较猛" | PvE 数据冒充 PvP（挽歌 1 万杀） | **明确标注**："这是**全模式**（PvE+PvP）武器使用，不是 PvP 榜"；若要 PvP 榜则给"最近 N 场 PGCR 聚合"并标明范围 |
 | "我这赛季 PvP 打得怎么样" | 无（或给生涯） | 本赛季 KDA / 击败 / 竞技等级，标 `period: "season"` |
 | "我术士的生涯战绩" | 可能给成第一个角色 | 术士单角色 + `scope: "character"` + 角色名，且**同时**给账号级作对照 |
@@ -139,3 +141,22 @@ stats.account:  [{source: "GetHistoricalStatsForAccount", scope: "account", exis
 - **计数器定义从 S1 起累计**：与我们能拆解的明细**天然不等**，文档与话术都要写死这一点；
 - **402 条计数器全给会很长**：默认只给 PvP/玩家常问的那几条，全量按需；
 - **PGCR 深度有限**：Bungie 只保留最近若干场，PvP 武器榜只能是"最近 N 场"。
+
+## 七、落地记录（2026-09-18）
+
+| 步 | 做了什么 | 真机证据 / 守门 |
+| --- | --- | --- |
+| P1 | `stats`/`career` 默认账号级三档（`existing`/`deleted`/`account_total`），单角色要显式 `character=` | 熔炉生涯击败 **50,622 / 28,242 / 78,864**，且逐项满足 `account_total == existing + deleted`；`tests/test_activity_stats_tiers.py` + 验收脚本 ①② |
+| P2 | 计数器与统计接口并列，差值写进 warnings | 计数器 124,495（`profile.metrics`）vs 统计接口 78,864，差 **45,631**；计数器读不到只降级；验收 ④⑤ |
+| P3b | `weapon_history` 标 `scope="all_modes"` + 话术"不是 PvP 榜" | 榜首"挽歌 10,055 杀"（刷本数据）；`tests/test_activity_service_parity.py` |
+| P3-2 | `stats` 支持 `mode=`/`period=` | `modes=` 只在按角色端点上生效 → 账号级按模式逐角色取+自己合；交叉验证 `mode=crucible` 的 60 项与上游账号级 `allPvP` 逐项一致；`period=season` 如实报 unavailable；验收 ⑦⑧ |
+| P4 | ADR-005 + `bungie_api.md` 第十一/十二节 + 语料核对行 + CHANGELOG | `tests/test_agent_docs.py`、`docs/testing/TESTING_CORPUS_FULL.md` |
+
+**实采纠错（本次真机断言抓出来的两条，都已写进代码注释）**：
+
+- `remainingTimeAfterQuitSeconds` 名字像"取最早"、实际**可加**（账号级 5,372,422 = 现存 814,505 + 已删）；
+- `modes=9`（`ACTIVITY_MODES` 里那个旧的 `allpvp=9`）会 **500** —— 模式数值只从
+  `data/pvp_counters.MODE_ACTIVITY_TYPES`（Manifest 的 `modeType`）取。
+
+**仍未做**：PvP 武器榜（要 PGCR 逐场聚合最近 N 场，必须标"最近 N 场"）；赛季 K/D 这一类
+"赛季 × 统计明细"的组合上游给不了（计数器只有累计值），用户问到时按 P3-2 的 unavailable 话术回答。

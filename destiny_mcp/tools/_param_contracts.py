@@ -97,6 +97,7 @@ _B_COMMUNITY = ("community", "community_build", "starside")
 # ── activity_assistant ──────────────────────────────────────────────────────
 _A_WEAPON_HISTORY = ("weapon_history", "weapons", "weapon_usage", "weapon_leaderboard")
 _A_AGGREGATE = ("aggregate", "activity_aggregate", "activity_stats")
+_A_STATS = ("stats", "career", "historical_stats")
 _A_LEADERBOARD = ("leaderboards", "leaderboard")
 
 
@@ -530,21 +531,21 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint="单场结算和公会榜不按角色过滤；counters 是账号级计数器（不按角色拆）。",
     ),
     ("activity_assistant", "mode"): _contract(
-        _only("history", "counters", *_A_LEADERBOARD, "clan_leaderboards", "community"),
+        _only("history", *_A_STATS, "counters", *_A_LEADERBOARD, "clan_leaderboards", "community"),
         hint=(
             "模式过滤被 history、排行榜和社区资料读；counters 用它按对照表筛计数器家族"
-            "（crucible/trials/iron_banner/competitive/gambit/raid）；武器历史不分模式。"
+            "（crucible/trials/iron_banner/competitive/gambit/raid）；stats 把它翻成统计接口的"
+            "modes= 数值（同一个词表，数值取自 Manifest 的 modeType）；武器历史不分模式。"
         ),
         suggestion=("activity_assistant", "history"),
     ),
     # period 只对"口径"有意义：counters 按对照表的周期筛；stats 把它翻成上游的 periodType
-    # （career → AllTime；season/act 上游没有，会如实报拿不到）——stats 落地时再写进名单，
-    # 因为这张表的判据是"行为上真读了"（test_ignored_parameters 会验）。
+    # （career → AllTime；season/act 上游没有，会如实报 unavailable 并指向 counters）。
     ("activity_assistant", "period"): _contract(
-        _only("counters"),
+        _only("counters", *_A_STATS),
         hint=(
-            '周期过滤只有 intent="counters"（按对照表）读；'
-            "历史、武器使用、排行榜都不分周期。"
+            '周期过滤被 intent="counters"（按对照表）与 intent="stats"（翻成 periodType 的 '
+            "AllTime）读；历史、武器使用、排行榜都不分周期。"
         ),
         suggestion=("activity_assistant", "counters"),
     ),

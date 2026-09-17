@@ -5,10 +5,11 @@
 你自己看到的那个数字，两者口径不同、谁也替代不了谁：
 
 - 组件 1100 的 `Opponents Defeated`：**从 S1 起累计**，含已删角色 → 真机 124,495；
-- 统计接口账号级 `allPvP.allTime.opponentsDefeated`：只算它还列举得出的角色 → 107,106。
+- 统计接口账号级 `allPvP.allTime.opponentsDefeated`（`mergedAllCharacters`，**也含已删角色**）
+  → 真机 78,864 = 现存 50,622 + 已删 28,242；两者差 45,631，拆不出来。
 
 所以本模块只回答"游戏内计数器是多少"，**不碰**统计接口，也不替调用方合并两个数
-（合并口径与差异说明属于 P2，见 docs/plans/PVP_STATS_PLAN.md）。
+（合并口径与差异说明在 `tools/_stats_branches.py`，见 ADR-005）。
 
 两条真机结论直接决定这里的写法：
 

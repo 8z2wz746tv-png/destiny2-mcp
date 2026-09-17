@@ -234,15 +234,17 @@ Manifest 侧（**不代表拥有**）：
 | --- | --- | --- |
 | `history` | 最近几场活动记录 | `character`、`mode`、`count` |
 | `pgcr` | 单场结算详情 | `activity_id` |
-| `stats`（`career`、`historical_stats`） | 生涯统计汇总（Bungie 统计接口，按现存角色） | `character` |
+| `stats`（`career`、`historical_stats`） | 生涯统计汇总（Bungie 统计接口）。**默认账号级三档**（每行 `existing` 现存 / `deleted` 已删明细 / `account_total` 账号合计，**已含已删角色**）；显式传 `character` 才给单角色并标 `scope=character` | `character`、`mode`、`period` |
 | `counters` | **游戏内生涯计数器**（profile 组件 1100；S1 起累计、含已删角色，与 `stats` 口径不同，数字可能不一样） | `query`（按名称/描述筛，如 `crucible`、`trials`）、`count` |
-| `weapon_history`（`weapons`、`weapon_usage`、`weapon_leaderboard`） | 武器使用历史排行 | `character`、`count` |
+| `weapon_history`（`weapons`、`weapon_usage`、`weapon_leaderboard`） | 武器使用历史排行（**全模式** PvE+PvP，`scope=all_modes`，**不是 PvP 榜**） | `character`、`count` |
 | `aggregate`（`activity_aggregate`、`activity_stats`） | 按活动类型聚合 | `character`、`count` |
 | `leaderboards`（`leaderboard`） | 我在榜单上的位置 | `character`、`mode`、`statid`、`maxtop` |
 | `clan_leaderboards` | 公会排行榜 | `group_id`（必填）、`mode`、`statid`、`maxtop` |
 | `community` | 社区活动／DPS 资料，**只在 `activities` 分类里搜** | `query` 或 `mode`、`knowledge_id`、`community_section`、`count`、`offset` |
 
-「最近 N 场」只走 `history`；只有问单场详情才走 `pgcr`。问"游戏里显示的那个数"用 `counters`（组件 1100），问统计接口口径用 `stats` —— 两个数不一样是正常的，别互相覆盖。
+「最近 N 场」只走 `history`；只有问单场详情才走 `pgcr`。问"游戏里显示的那个数"用 `counters`（组件 1100，生涯数字以它为准），问统计接口口径用 `stats` —— 两个数不一样是正常的（真机：熔炉生涯击败 124,495 vs 账号级 78,864，差 45,631 拆不出来），别互相覆盖、也别相加（口径见 ADR-005）。
+
+`stats` 的 `mode` 认 `crucible`/`trials`/`iron_banner`/`competitive`/`gambit`/`raid`（或官方中文标签）；`period` 只认 `career` —— 统计接口**没有赛季周期**，`period="season"` 会如实报取不到并指向 `counters`。
 
 ### `world_assistant` —— 周常、商人、收藏品
 
@@ -331,13 +333,13 @@ Manifest 侧（**不代表拥有**）：
 | `maxtop` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
 | `melee_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `mod_name` | `inventory_assistant`：`equip_mod` |
-| `mode` | `activity_assistant`：`clan_leaderboards`、`community`、`counters`、`history`、`leaderboard`、`leaderboards` |
+| `mode` | `activity_assistant`：`career`、`clan_leaderboards`、`community`、`counters`、`historical_stats`、`history`、`leaderboard`、`leaderboards`、`stats` |
 | `name` | `loadout_assistant`：`save` |
 | `name_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
 | `name_prefix` | `player_assistant`：`find`、`find_players`、`fuzzy` |
 | `notes` | `loadout_assistant`：`save` |
 | `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
-| `period` | `activity_assistant`：`counters` |
+| `period` | `activity_assistant`：`career`、`counters`、`historical_stats`、`stats` |
 | `perk_name` | `weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`perk_description`、`search_all`、`search_catalog` |
 | `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact`、`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`filter_rolls`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`vendor` |
 | `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |

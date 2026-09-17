@@ -171,7 +171,9 @@
 | 看看我的 `<职业>` 最近几场活动记录（可加 `mode`） | `history` | 时间与活动可核对；**没有记录不要补写**；条数用 `count`（传 `maxtop` 会 `ignored_parameter`）。 |
 | ⭐ 看下 `<活动ID>` 这一场的结算 | `pgcr` + `activity_id` | 缺 ID 或非数字 → `invalid_argument_error`（**不是**裸抛 404）；**数字但不存在** → `upstream_not_found_error` 信封 + Bungie 原文；真实 ID 正常返回。 |
 | 我们公会 `<group_id>` 的排行榜 | `clan_leaderboards` | 缺 `group_id` → `invalid_argument_error`（要数字公会 ID）；数字但不存在 → `upstream_not_found_error`。 |
-| 我的生涯 PvE／PvP 统计、最常用哪把武器 | `stats`／`weapon_history` | 与 `history` 区分：这是汇总不是列表；聚合用 `aggregate`。 |
+| 我的生涯 PvE／PvP 统计（可加 `mode`／`period`） | `stats` | 默认**账号级三档**（`existing`/`deleted`/`account_total`，熔炉生涯击败真机 50,622 / 28,242 / **78,864**）；单角色要显式 `character=`；`period=season` 上游没有 → `unavailable`（见 ADR-005）。 |
+| 我最常用哪把武器 | `weapon_history` | 与 `history` 区分：这是汇总不是列表；必带 `scope=all_modes`（全模式 PvE+PvP，**不是 PvP 榜**）。 |
+| 我这赛季 PvP 打得怎么样 | `counters`（`period=season`） | 统计接口没有赛季周期：赛季数字只能走游戏内计数器；「赛季 × 明细」（如赛季 K/D）上游给不了，如实报取不到。 |
 | 排行榜上我在什么位置 | `leaderboards` | ⚠️ 上游返回 `ErrorCode:3 UnhandledException`（见已知问题）：得到 `ok=false` + `a_p_i_error`。验收点是说明**这是上游问题、不是账号问题**，不要编排名。 |
 
 ## 八、`world_assistant` 🔐

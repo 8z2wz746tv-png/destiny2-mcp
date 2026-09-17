@@ -10,21 +10,29 @@ import time
 import zipfile
 from collections.abc import Mapping
 from pathlib import Path
-from typing import NoReturn
 
 import httpx
 
 import aiobungie
 
 from . import config
+from . import bungie_stats
 from .exceptions import (
     APIError,
     AuthenticationError,
     BungieServiceUnavailableError,
     ManifestError,
-    UpstreamNotFoundError,
 )
 from .logging_config import get_logger
+from .bungie_errors import (
+    _bungie_unavailable_result,
+    _http_error_code,
+    _http_status_of,
+    _is_bungie_service_unavailable,
+    _is_insufficient_privileges,
+    _raise_bungie_error,
+    _raise_bungie_unavailable,
+)
 from .utils.player_names import bungie_display_name
 
 logger = get_logger(__name__)
@@ -32,103 +40,6 @@ logger = get_logger(__name__)
 _VENDOR_COMPONENTS_FULL = [400, 401, 402, 300, 301, 302, 304, 305, 306, 307, 308, 309, 310]
 _VENDOR_COMPONENTS_BASIC = [400, 402]
 _VENDOR_ITEM_COMPONENTS = [305, 310]
-
-
-def _is_insufficient_privileges(exc: aiobungie.HTTPError) -> bool:
-    """Return whether Bungie rejected a request due to missing OAuth scope."""
-    error_status = str(getattr(exc, "error_status", "") or "")
-    if error_status == "InsufficientPrivileges":
-        return True
-    return "InsufficientPrivileges" in str(exc)
-
-
-def _is_bungie_service_unavailable(exc: aiobungie.HTTPError) -> bool:
-    """Return whether Bungie is temporarily unavailable or under maintenance."""
-    http_status = getattr(exc, "http_status", None)
-    try:
-        if int(http_status) == 503:
-            return True
-    except (TypeError, ValueError):
-        pass
-
-    status_parts = [
-        str(getattr(exc, "error_status", "") or ""),
-        str(getattr(exc, "message", "") or ""),
-        str(exc),
-    ]
-    return any(
-        marker in part
-        for part in status_parts
-        for marker in ("SystemDisabled", "ServiceUnavailable", "Serviceunavailable")
-    )
-
-
-def _raise_bungie_unavailable(exc: aiobungie.HTTPError, operation: str) -> None:
-    """只在「Bungie 暂时不可用」时抛；其余情况返回，交给调用方决定（例如回退到基础组件）。"""
-    if _is_bungie_service_unavailable(exc):
-        logger.warning("Bungie unavailable during %s: %s", operation, exc)
-        raise BungieServiceUnavailableError(operation) from exc
-
-
-def _raise_bungie_error(exc: aiobungie.HTTPError, operation: str) -> NoReturn:
-    """把上游 HTTP 错误**统一**翻译成领域错误 —— 绝不让裸异常冒到 MCP 客户端。
-
-    以前只有 503 会被翻译，其它 4xx 直接 `raise`：客户端拿到的是
-    `Error executing tool …: Notfound: (http_status: 404, error_status: DestinyPGCRNotFound…)`，
-    没有 `ok`/`error.code`，因此分不清「这个 ID 查不到」和「服务坏了」（真机复现：
-    `pgcr` 传一个数字但不存在的活动 ID；`clan_leaderboards` 传不存在的 group_id）。
-
-    404 单独映射为 `UpstreamNotFoundError`（码 `upstream_not_found_error`），
-    其余状态码归 `APIError`（码 `a_p_i_error`）并在消息里带上 HTTP 状态与 Bungie 原文。
-    """
-    _raise_bungie_unavailable(exc, operation)
-    status = _http_status_of(exc)
-    error_code = _http_error_code(exc)
-    error_status = str(getattr(exc, "error_status", "") or "")
-    message = str(getattr(exc, "message", "") or exc).strip()
-    if status == 404:
-        logger.warning("Upstream 404 during %s: %s", operation, exc)
-        detail = f"Bungie 原文：{message}" if message else ""
-        if error_status:
-            detail = f"{detail}（{error_status}）" if detail else f"（{error_status}）"
-        raise UpstreamNotFoundError(operation, detail) from exc
-    logger.warning("Upstream HTTP %s (code=%s) during %s: %s", status, error_code, operation, exc)
-    raise APIError(
-        operation,
-        f"Bungie 返回 HTTP {status or '未知状态'}"
-        + (f"（{error_status}，code={error_code}）" if error_status or error_code else "")
-        + (f"：{message}" if message else "。")
-        + "这不是你的账号问题；若是临时故障可稍后重试，若是参数问题请检查 ID。",
-    ) from exc
-
-
-def _http_status_of(exc: aiobungie.HTTPError) -> int:
-    """真正的 HTTP 状态码。
-
-    不能拿 `error_code` 顶替：Bungie 的 `error_code` 是**业务错误码**
-    （例如 1653 = DestinyPGCRNotFound），`aiobungie.error.NotFound` 的 error_code
-    是 1653 而 http_status 才是 404 —— 按 error_code 判断会把 404 漏掉。
-    """
-    status = getattr(exc, "http_status", 0)
-    return int(getattr(status, "value", status) or 0)
-
-
-def _http_error_code(exc: aiobungie.HTTPError) -> int:
-    code = getattr(exc, "error_code", None)
-    if code:
-        return int(code)
-    status = getattr(exc, "http_status", 0)
-    return int(getattr(status, "value", status) or 0)
-
-
-def _bungie_unavailable_result(exc: aiobungie.HTTPError, operation: str) -> dict | None:
-    if not _is_bungie_service_unavailable(exc):
-        return None
-    logger.warning("Bungie unavailable during %s: %s", operation, exc)
-    return {
-        "ErrorCode": 503,
-        "Message": "Bungie 官方接口暂时不可用，可能正在维护或限流。请稍后重试。",
-    }
 
 
 class BungieClient:
@@ -1033,30 +944,23 @@ class BungieClient:
         membership_type: int,
         membership_id: str,
         character_id: str,
+        modes: int | None = None,
+        period_type: int | None = None,
     ) -> dict:
-        """Fetch lifetime PvE/PvP statistics for a character.
+        """按角色的历史统计；实现与实测结论在 `bungie_stats`（本类只做门面）。"""
+        return await bungie_stats.get_character_stats(
+            self, membership_type, membership_id, character_id,
+            modes=modes, period_type=period_type,
+        )
 
-        Bungie API: GET /Destiny2/{membershipType}/Account/{destinyMembershipId}/Character/{characterId}/Stats/
+    async def get_historical_stats_for_account(
+        self,
+        membership_type: int,
+        membership_id: str,
+    ) -> dict:
+        """账号级历史统计（mergedAllCharacters 已含已删角色）；实现见 `bungie_stats`。"""
+        return await bungie_stats.get_account_stats(self, membership_type, membership_id)
 
-        Args:
-            membership_type: Platform membership type.
-            membership_id: Destiny membership ID.
-            character_id: Character ID.
-
-        Returns:
-            Raw Bungie API response dict with allPvE, allPvP sections.
-        """
-        logger.debug("API call: GetHistoricalStats(mid=%s, char=%s)",
-                     membership_id, character_id)
-        try:
-            result = await self.rest.static_request(
-                "GET",
-                f"Destiny2/{membership_type}/Account/{membership_id}/Character/{character_id}/Stats/",
-            )
-        except aiobungie.HTTPError as exc:
-            _raise_bungie_error(exc, "读取历史统计")
-        logger.debug("GetHistoricalStats returned")
-        return result
 
     async def get_collectible_node_details(
         self,
