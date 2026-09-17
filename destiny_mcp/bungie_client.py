@@ -25,6 +25,7 @@ from .exceptions import (
     UpstreamNotFoundError,
 )
 from .logging_config import get_logger
+from .utils.player_names import bungie_display_name
 
 logger = get_logger(__name__)
 
@@ -343,9 +344,8 @@ class BungieClient:
             ),
             memberships[0],
         )
-        name = active.get("displayName") or active.get("bungieGlobalDisplayName") or ""
-        code = active.get("displayNameCode") or active.get("bungieGlobalDisplayNameCode") or ""
-        display_name = f"{name}#{code}" if name and code else name
+        # 显示名走单一出处：**游戏内 ID 优先**（平台名会让用户看到 Steam 名，见 player_names 的注释）
+        display_name = bungie_display_name(active)
         return {
             "display_name": display_name,
             "membership_id": active["membershipId"],

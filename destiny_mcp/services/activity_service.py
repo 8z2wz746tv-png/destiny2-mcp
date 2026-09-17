@@ -283,7 +283,7 @@ class ActivityService:
             stats = entry.get("values", {})
 
             entries.append({
-                "player_name": char_info.get("displayName", "Unknown"),
+                "player_name": bungie_display_name(char_info) or "Unknown",
                 "platform": char_info.get("membershipType", 0),
                 "class": player_info.get("characterClass", "Unknown"),
                 "light_level": player_info.get("lightLevel", 0),
@@ -490,11 +490,10 @@ class ActivityService:
                 "entries": [
                     {
                         "rank": entry.get("rank"),
-                        "player_name": (
-                            (entry.get("player", {}) or {})
-                            .get("destinyUserInfo", {})
-                            .get("displayName", "Unknown")
-                        ),
+                        "player_name": bungie_display_name_of_player(
+                            entry.get("player")
+                        )
+                        or "Unknown",
                         "class": (entry.get("player", {}) or {}).get("characterClass", ""),
                         "light_level": (entry.get("player", {}) or {}).get("lightLevel", 0),
                         "stats": activity_stats.stat_rows(entry.get("values", {})),
@@ -552,7 +551,7 @@ class ActivityService:
                     basic = value.get("basic", {}) or {}
                     entries.append({
                         "rank": entry.get("rank"),
-                        "player": destiny_user.get("displayName", ""),
+                        "player": bungie_display_name(destiny_user),
                         "character_id": str(entry.get("characterId", "")),
                         "value": basic.get("value", 0),
                         "display": basic.get("displayValue", ""),
