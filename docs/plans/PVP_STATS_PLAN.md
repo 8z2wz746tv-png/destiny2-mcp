@@ -43,20 +43,26 @@
 ### P1 stats 三档并存 + 标注
 
 - `stats`/`career` 默认改为**账号级**（`mergedAllCharacters.results.<group>.allTime`），
-  payload 分三块：`stats.existing`（现存角色）/ `stats.deleted`（已删角色）/ `stats.total`（账号级）；
+  payload 分 `stats.existing`（现存角色）/ `stats.deleted`（已删角色明细）/ `stats.account_total`
+  （账号级合计）三块；
+  - **实测纠错（2026-09-17，P3-1 阶段发现）**：`mergedAllCharacters`（78,864）
+    **已经包含**已删角色 —— 8 条 `characters[]` 之和 = 78,864 = 现存 3 角色 50,622
+    + 已删 5 角色 28,242，而 `mergedDeletedCharacters`（28,242）是**其中那 5 条的明细**。
+    所以 **`account_total` = 78,864，不是 78,864 + 28,242**（那样会把已删角色算两遍，
+    本计划早期版本写的 107,106 就是这个错，已在 payload 公式与 warnings 里写死避免再犯）；
 - 显式传 `character=` 才给单角色，且必须标 `scope: "character"` + 角色名；
 - 求和类字段与取最大值类字段（`longestKillSpree`/`bestSingleGameKills`）分开处理，标 `aggregate: "sum" | "max"`。
 
 ### P2 游戏计数器与统计接口的关系写进契约
 
-同一件事会出现两个数（124,495 vs 107,106），**两个都给，各自带来源**：
+同一件事会出现两个数（游戏计数器 124,495 vs 账号级统计 78,864），**两个都给，各自带来源**；
 
 ```
 game_counters:  [{source: "profile.metrics", metric_hash: 811894228, name: "Opponents Defeated", progress: 124495}]
-stats.account:  [{source: "GetHistoricalStatsForAccount", scope: "account", existing: 50622, deleted: 28242, total: 107106}]
+stats.account:  [{source: "GetHistoricalStatsForAccount", scope: "account", existing: 50622, deleted: 28242, account_total: 78864}]
 ```
 
-并在 `warnings` 里说明差异原因（计数器从 S1 起累计，含统计接口已不再列举的旧角色）。
+并在 `warnings` 里说明差异原因（计数器从 S1 起累计，含统计接口已不再列举的旧角色；两者差 45,631，不是我们能拆出来的部分）。
 
 ### P3 按模式与周期统计（试炼 / 铁旗 / 竞技 / 智谋 / 熔炉；生涯 vs 赛季）
 
