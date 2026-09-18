@@ -65,6 +65,28 @@
   `stats` 认的模式词从 6 个扩到全部；`counters` 的 `labels.modes` 给官方中文名。
   影响面见 `docs/COMPATIBILITY.md`。
 
+**纯 PvP 武器榜（新 intent `pvp_weapons`）：逐场结算聚合"最近 N 场"**（口径与实测见
+`docs/plans/PVP_WEAPON_BOARD_PLAN.md`，决定与被否掉的方案见 ADR-006）：
+
+- **上游给不了生涯口径的 PvP 武器榜**：`GetUniqueWeaponHistory` 没有模式参数、
+  统计接口的武器聚合没有模式维度、计数器没有按武器拆 —— 三条路都实测排除，
+  所以答案是"最近 N 场 PGCR 聚合"，`scope="pvp_recent"`、`source="pgcr_aggregation"`。
+- `activity_assistant(intent="pvp_weapons")`：`mode` 取 `pvp`（默认，熔炉伞形 5）/
+  `trials` / `iron_banner` / `competitive` / `gambit`；`count` 是**分析多少场**
+  （默认 10、上限 100）；`character` 可只算一个角色。
+- **窗口与角色必须自证**：`window{newest,oldest,matches_requested,matches_analyzed,matches_failed}`、
+  `mode_tally`（每场回报的子模式 + 官方中文名）、`characters`。真机上"最近 250 场"对某些角色
+  跨两年多，只说"最近 N 场"会被读成"最近几周"。子模式名来自 Manifest（伞形过滤、回报具体模式）。
+- **只统计自己那一行**：PGCR 的 `extended.weapons` 按玩家分行，必须按 `characterId`
+  精确匹配（取 `entries[0]` 会把别人的枪算到你头上 —— 真机探针踩过，守门测试钉住）。
+- **失败如实**：单场失败进 `failed_matches` + warning 并继续；一场都没取到**报错**，
+  不返回空榜单；历史失败只丢那个角色。
+- **PGCR 落盘缓存**（`~/.destiny_mcp/cache/pgcr/<instanceId>.json`，结算不可变）：
+  真机 10 场冷启 35.2 秒 → 命中缓存 14.2 秒（含约 10–12 秒进程启动 + Manifest 加载）。
+  缓存不算账号写入，不需要 `confirmed`。
+- 顺带：`assistants.py` 把榜单三兄弟与武器两个口径分别搬进 `_leaderboard_branches.py`、
+  `_weapon_usage_branches.py`，体量上限 1403 → 1401（只降不升）。
+
 ## 未发布（2026-09-17）
 
 **PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，

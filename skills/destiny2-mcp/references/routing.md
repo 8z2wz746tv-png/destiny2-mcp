@@ -237,6 +237,7 @@ Manifest 侧（**不代表拥有**）：
 | `stats`（`career`、`historical_stats`） | 生涯统计汇总（Bungie 统计接口）。**默认账号级三档**（每行 `existing` 现存 / `deleted` 已删明细 / `account_total` 账号合计，**已含已删角色**）；显式传 `character` 才给单角色并标 `scope=character` | `character`、`mode`、`period` |
 | `counters` | **游戏内生涯计数器**（profile 组件 1100；S1 起累计、含已删角色，与 `stats` 口径不同，数字可能不一样） | `query`（按名称/描述筛，如 `crucible`、`trials`）、`count` |
 | `weapon_history`（`weapons`、`weapon_usage`、`weapon_leaderboard`） | 武器使用历史排行（**全模式** PvE+PvP，`scope=all_modes`，**不是 PvP 榜**） | `character`、`count` |
+| `pvp_weapons` | **纯 PvP 武器榜**：逐场结算（PGCR）聚合"最近 N 场"的武器击杀，`scope=pvp_recent`、`source=pgcr_aggregation`。上游没有生涯口径的 PvP 武器榜，所以**必须看 `window`**（起止时间），别当成生涯 | `character`、`mode`（`pvp` 默认／`trials`／`iron_banner`／`competitive`／`gambit`）、`count`（分析多少场，默认 10、上限 100） |
 | `aggregate`（`activity_aggregate`、`activity_stats`） | 按活动类型聚合 | `character`、`count` |
 | `leaderboards`（`leaderboard`） | 我在榜单上的位置 | `character`、`mode`、`statid`、`maxtop` |
 | `clan_leaderboards` | 公会排行榜 | `group_id`（必填）、`mode`、`statid`、`maxtop` |
@@ -302,7 +303,7 @@ Manifest 侧（**不代表拥有**）：
 | `community_section` | `activity_assistant`：`community`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
 | `component` | `subclass_assistant`：`options` |
 | `confirmed_exotic_hash` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
-| `count` | `activity_assistant`：`activity_aggregate`、`activity_stats`、`aggregate`、`community`、`counters`、`history`、`weapon_history`、`weapon_leaderboard`、`weapon_usage`、`weapons` |
+| `count` | `activity_assistant`：`activity_aggregate`、`activity_stats`、`aggregate`、`community`、`counters`、`history`、`pvp_weapons`、`weapon_history`、`weapon_leaderboard`、`weapon_usage`、`weapons` |
 | `destination` | `inventory_assistant`：`move` |
 | `element` | `subclass_assistant`：`community`、`fragments`、`options` |
 | `equip` | `inventory_assistant`：`move` |
@@ -333,7 +334,7 @@ Manifest 侧（**不代表拥有**）：
 | `maxtop` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
 | `melee_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `mod_name` | `inventory_assistant`：`equip_mod` |
-| `mode` | `activity_assistant`：`career`、`clan_leaderboards`、`community`、`counters`、`historical_stats`、`history`、`leaderboard`、`leaderboards`、`stats` |
+| `mode` | `activity_assistant`：`career`、`clan_leaderboards`、`community`、`counters`、`historical_stats`、`history`、`leaderboard`、`leaderboards`、`pvp_weapons`、`stats` |
 | `name` | `loadout_assistant`：`save` |
 | `name_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
 | `name_prefix` | `player_assistant`：`find`、`find_players`、`fuzzy` |

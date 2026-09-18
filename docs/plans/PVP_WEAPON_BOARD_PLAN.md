@@ -146,7 +146,21 @@ warnings            "这是最近 N 场、不是生涯"；窗口跨年时直说�
 ADR：`docs/adr/006-pvp-weapon-board-is-a-window.md` —— 记录"生涯 PvP 武器榜上游不可能，
 只能给窗口口径"，连同被否掉的三个方案（统计接口、计数器、给 `GetUniqueWeaponHistory` 加参数）。
 
-## 六、要你拍板的两点
+## 六、拍板与实现结果（2026-09-18 完成）
 
-1. **入口**：`intent="weapon_history"` 加 `mode=`（本计划）还是新开 `intent="pvp_weapons"`？
-2. **默认场次**：25 场（约 25–30 秒，首跑）够不够，还是默认更小（10 场 ≈ 10 秒）+ 让用户说"再多分析点"？
+**用户拍板**：新开 `intent="pvp_weapons"`；默认 **10 场**（要更多自己加 `count`，上限 100）。
+
+实现与真机验收：
+
+- 入口：`activity_assistant(intent="pvp_weapons", mode="pvp"|"trials"|"iron_banner"|"competitive"|"gambit", count=10)`
+  （`mode` 走新合一的 `data/activity_modes.py`）；
+- 服务：`services/pvp_weapon_service.py`（并发 3、`characterId` 精确匹配自己那一行、
+  PGCR 落盘缓存 `~/.destiny_mcp/cache/pgcr/`）；
+- 真机（账号真数据）：默认 10 场 → `weapon_count=9`、`total_weapon_kills=109`、
+  `window` 2026-08-26T16:22 → 18:06、`mode_tally` 全是"铁旗占领模式"；
+- 真机耗时：**冷启 35.2 秒 / 命中缓存 14.2 秒**（后者里约 10–12 秒是进程启动 + Manifest 加载，
+  所以 PGCR 那部分从约 23 秒降到约 2 秒）。计划里"10 场 ≈ 10 秒"是只算 PGCR 网络的理论值，
+  实际首跑要把启动开销算进去 —— 这里更正。
+- 守门：`tests/test_pvp_weapons.py`（8 条，含"只统计自己那一行"与"缓存命中不再打上游"）
+  + `tests/test_activity_modes.py`（7 条，含"复数 `modes=` 被静默忽略"的防呆）；
+- ADR：`docs/adr/006-pvp-weapon-board-is-a-window.md`（记三个被否掉的方案与成本）。

@@ -23,7 +23,10 @@ from typing import get_args
 from destiny_mcp.tools import _requests as R
 
 SOURCE_ROOT = Path(__file__).resolve().parents[1]
-_ASSISTANTS = SOURCE_ROOT / "destiny_mcp" / "tools" / "assistants.py"
+_TOOLS = SOURCE_ROOT / "destiny_mcp" / "tools"
+# 分派处有两类：工具门面本身，以及按域拆出去的 `_*_branches.py`（仓库既定分工，
+# 例如 `_weapon_usage_branches.py` 里 `weapon_history` 与 `pvp_weapons` 两个口径）。
+_DISPATCH_FILES = [_TOOLS / "assistants.py", *sorted(_TOOLS.glob("_*_branches.py"))]
 
 # canonical → 别名（与 docs/COMPATIBILITY.md 的表一一对应）
 ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
@@ -76,7 +79,11 @@ STANDALONE: dict[str, tuple[str, ...]] = {
         "modify", "options", "fragments", "fragment_details", "artifact",
         "artifact_mod", "equip_artifact_mod", "equip_artifact", "community",
     ),
-    "ActivityIntent": ("history", "pgcr", "counters", "clan_leaderboards", "community"),
+    "ActivityIntent": (
+        "history", "pgcr", "counters", "clan_leaderboards", "community",
+        # 独立口径：PvP 武器榜（逐场 PGCR 聚合"最近 N 场"，不是 weapon_history 的别名）
+        "pvp_weapons",
+    ),
     "BuildIntent": (
         "recommend", "find", "analyze", "farm_target", "equip_build",
         "armor_mods", "exotic_armor", "set_bonus", "community_build",
@@ -89,8 +96,15 @@ STANDALONE: dict[str, tuple[str, ...]] = {
 
 
 def _dispatch_groups() -> list[set[str]]:
-    """`assistants.py` 里所有"一组 intent 一起处理"的地方（集合字面量 + 相等比较 + 模块常量）。"""
-    tree = ast.parse(_ASSISTANTS.read_text(encoding="utf-8"))
+    """所有分派文件里"一组 intent 一起处理"的地方（集合字面量 + 相等比较 + 模块常量）。"""
+    groups: list[set[str]] = []
+    for path in _DISPATCH_FILES:
+        groups.extend(_groups_in(path))
+    return groups
+
+
+def _groups_in(path: Path) -> list[set[str]]:
+    tree = ast.parse(path.read_text(encoding="utf-8"))
     groups: list[set[str]] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Set):

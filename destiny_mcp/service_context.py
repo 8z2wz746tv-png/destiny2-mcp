@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from .services.profile_cache import ProfileCache
     from .services.activity_service import ActivityService
     from .services.activity_counters_service import ActivityCountersService
+    from .services.pvp_weapon_service import PvpWeaponService
     from .services.manifest_query_service import ManifestQueryService
     from .services.fragment_service import FragmentService
     from .services.artifact_service import ArtifactService
@@ -62,6 +63,7 @@ class ServiceContext(TypedDict):
     build_import_svc: BuildImportService
     activity_svc: ActivityService
     activity_counters_svc: ActivityCountersService
+    pvp_weapon_svc: PvpWeaponService
     manifest_query_svc: ManifestQueryService
     fragment_svc: FragmentService
     artifact_svc: ArtifactService

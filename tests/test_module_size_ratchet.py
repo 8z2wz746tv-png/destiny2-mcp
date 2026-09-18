@@ -36,7 +36,10 @@ CEILINGS = {
     # +7：find 分支恢复可用 + 按类型列武器的默认上限 20。
     # +6：armor_mods 分支改取 get_armor_mods_filtered 并把 match/warning 带出去
     # （判断逻辑在 services/manifest_armor.py，这里只是多接一层返回值）。
-    "destiny_mcp/tools/assistants.py": 1403,
+    # PvP 武器榜：榜单三兄弟搬去 `_leaderboard_branches.py`、武器两个口径搬去
+    # `_weapon_usage_branches.py`（分支响应按域放 `_*_branches.py` 是既定分工），
+    # 这里净减 2 行 → 上限跟着收紧，旧上限不再是"可以慢慢长回去"的许可。
+    "destiny_mcp/tools/assistants.py": 1401,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留

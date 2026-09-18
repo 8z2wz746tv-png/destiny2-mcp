@@ -66,6 +66,7 @@ from .services.weekly_analysis_service import WeeklyAnalysisService
 from .services.profile_cache import ProfileCache
 from .services.activity_service import ActivityService
 from .services.activity_counters_service import ActivityCountersService
+from .services.pvp_weapon_service import PvpWeaponService
 from .services.manifest_query_service import ManifestQueryService
 from .services.fragment_service import FragmentService
 from .services.artifact_service import ArtifactService
@@ -122,6 +123,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
         build_import_svc = BuildImportService(manifest)
         activity_svc = ActivityService(bungie, manifest, resolver)
         activity_counters_svc = ActivityCountersService(bungie, manifest, resolver)
+        pvp_weapon_svc = PvpWeaponService(bungie, manifest, resolver)
         fragment_svc = FragmentService(manifest)
         artifact_svc = ArtifactService(bungie, manifest, resolver)
         set_bonus_svc = SetBonusService(manifest)
@@ -155,6 +157,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
             "build_import_svc": build_import_svc,
             "activity_svc": activity_svc,
             "activity_counters_svc": activity_counters_svc,
+            "pvp_weapon_svc": pvp_weapon_svc,
             "manifest_query_svc": manifest_query_svc,
             "fragment_svc": fragment_svc,
             "artifact_svc": artifact_svc,

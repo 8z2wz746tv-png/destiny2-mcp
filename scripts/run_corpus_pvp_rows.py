@@ -248,6 +248,47 @@ def main() -> int:
             detail = f"上游为空 → code={code}"
         check("排行榜空响应如实上报（不编排名）", good, detail)
 
+        # 15 纯 PvP 武器榜：窗口 + 口径 + 只统计自己那一行（真机默认 10 场）
+        r = srv.call("activity_assistant", {"intent": "pvp_weapons", "count": 5})
+        board = ((r.get("data") or {}).get("pvp_weapons") or {})
+        window = board.get("window") or {}
+        rows = board.get("weapons") or []
+        check(
+            "pvp_weapons 给窗口与口径（不是生涯）",
+            r.get("ok") is True
+            and board.get("scope") == "pvp_recent"
+            and board.get("source") == "pgcr_aggregation"
+            and board.get("mode_group", {}).get("is_pvp_only") is True
+            and window.get("matches_analyzed", 0) >= 1
+            and bool(window.get("oldest")) and bool(window.get("newest"))
+            and all("kills" in w and "item_hash" in w for w in rows),
+            f"analyzed={window.get('matches_analyzed')}/{window.get('matches_requested')} "
+            f"窗={window.get('oldest', '')[:10]}→{window.get('newest', '')[:10]} "
+            f"武器={len(rows)} 模式={[t.get('name') for t in (board.get('mode_tally') or [])][:3]}",
+        )
+
+        # 16 试炼榜：模式过滤真的生效（子模式都该是试炼家族）
+        r = srv.call("activity_assistant", {"intent": "pvp_weapons", "mode": "trials", "count": 3})
+        board = ((r.get("data") or {}).get("pvp_weapons") or {})
+        tally = board.get("mode_tally") or []
+        check(
+            "pvp_weapons mode=trials 只出试炼场次",
+            r.get("ok") is True and board.get("mode_group", {}).get("key") == "trials"
+            and all(t.get("mode") == 84 for t in tally),
+            f"mode_group={board.get('mode_group', {}).get('key')} "
+            f"子模式={[t.get('mode') for t in tally]}",
+        )
+
+        # 17 智谋是 PvPvE：不能被当成"纯 PvP"（category=3 如实标出来）
+        r = srv.call("activity_assistant", {"intent": "pvp_weapons", "mode": "gambit", "count": 3})
+        board = ((r.get("data") or {}).get("pvp_weapons") or {})
+        check(
+            "pvp_weapons mode=gambit 标 is_pvp_only=false",
+            r.get("ok") is True and board.get("mode_group", {}).get("is_pvp_only") is False,
+            f"is_pvp_only={board.get('mode_group', {}).get('is_pvp_only')} "
+            f"analyzed={(board.get('window') or {}).get('matches_analyzed')}",
+        )
+
     finally:
         srv.close()
 

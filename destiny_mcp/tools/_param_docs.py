@@ -432,7 +432,8 @@ Mode = Annotated[
     str | None,
     Field(description=(
         "模式过滤（如 raid/dungeon/crucible/trials/iron_banner/competitive/gambit）。history、排行榜和"
-        "社区资料读它；counters 用它按对照表筛计数器家族，stats 把它翻译成统计接口的 modes=。"
+        "社区资料读它；counters 用它按对照表筛计数器家族，stats 把它翻译成统计接口的 modes=；"
+        "pvp_weapons 用它选 PvP 家族（pvp=默认，含铁旗/试炼/竞技；gambit 是 PvPvE，要单独说）。"
     )),
 ]
 
@@ -457,7 +458,9 @@ MaxTop = Annotated[
 
 Count = Annotated[
     int | None,
-    Field(description="要多少条记录；null=没指定（按 20 处理）。history、武器历史、聚合统计、计数器（counters）和社区资料读它；生涯统计不分条数。"),
+    Field(description="要多少条记录；null=没指定（按 20 处理，pvp_weapons 按 10 场）。history、"
+                     "武器历史、PvP 武器榜（pvp_weapons：分析多少场，上限 100）、聚合统计、"
+                     "计数器（counters）和社区资料读它；生涯统计不分条数。"),
 ]
 
 VendorName = Annotated[

@@ -28,7 +28,7 @@ SubclassIntent = Literal[
     "get", "subclass", "modify", "options", "fragments", "fragment_details",
     "artifact", "artifact_mod", "equip_artifact_mod", "equip_artifact", "community",
 ]
-ActivityIntent = Literal["history", "pgcr", "stats", "career", "historical_stats", "counters", "weapon_history", "weapons", "weapon_usage", "weapon_leaderboard", "aggregate", "activity_aggregate", "activity_stats", "leaderboards", "leaderboard", "clan_leaderboards", "community"]
+ActivityIntent = Literal["history", "pgcr", "stats", "career", "historical_stats", "counters", "weapon_history", "weapons", "weapon_usage", "weapon_leaderboard", "pvp_weapons", "aggregate", "activity_aggregate", "activity_stats", "leaderboards", "leaderboard", "clan_leaderboards", "community"]
 WorldIntent = Literal["weekly", "weekly_full", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item", "community"]
 
 NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]

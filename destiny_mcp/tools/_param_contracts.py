@@ -531,11 +531,12 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint="单场结算和公会榜不按角色过滤；counters 是账号级计数器（不按角色拆）。",
     ),
     ("activity_assistant", "mode"): _contract(
-        _only("history", *_A_STATS, "counters", *_A_LEADERBOARD, "clan_leaderboards", "community"),
+        _only("history", *_A_STATS, "counters", "pvp_weapons", *_A_LEADERBOARD, "clan_leaderboards", "community"),
         hint=(
             "模式过滤被 history、排行榜和社区资料读；counters 用它按对照表筛计数器家族"
             "（crucible/trials/iron_banner/competitive/gambit/raid）；stats 把它翻成统计接口的"
-            "modes= 数值（同一个词表，数值取自 Manifest 的 modeType）；武器历史不分模式。"
+            "modes= 数值（同一个词表，数值取自 Manifest 的 modeType）；pvp_weapons 用它选 PvP 家族"
+            "（pvp/trials/iron_banner/competitive/gambit）；武器历史（全模式那条）不分模式。"
         ),
         suggestion=("activity_assistant", "history"),
     ),
@@ -570,8 +571,9 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("activity_assistant", "leaderboards"),
     ),
     ("activity_assistant", "count"): _contract(
-        _only("history", *_A_WEAPON_HISTORY, *_A_AGGREGATE, "counters", "community"),
-        hint='要几场/几条只被 history、武器历史、聚合统计、计数器（counters）和社区资料读；'
+        _only("history", *_A_WEAPON_HISTORY, "pvp_weapons", *_A_AGGREGATE, "counters", "community"),
+        hint='要几场/几条只被 history、武器历史、PvP 武器榜（pvp_weapons，这里指\"分析多少场\"）、'
+             '聚合统计、计数器（counters）和社区资料读；'
              "生涯统计不分条数。",
         suggestion=("activity_assistant", "history"),
     ),

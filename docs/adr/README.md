@@ -14,6 +14,7 @@
 | [ADR-003](003-measurement-beats-docs.md) | 实测优先于文档：冲突以真机结果为准并留痕，官方快照不进仓库 | accepted |
 | [ADR-004](004-component-numbers-are-named.md) | 组件号只能来自 `profile_components.py`；读 305 必须带清单类组件 | accepted |
 | [ADR-005](005-career-numbers-follow-in-game-counters.md) | 生涯数字以游戏内计数器为准、统计接口只作明细；三档三来源不许混 | accepted |
+| [ADR-006](006-pvp-weapon-board-is-a-window.md) | PvP 武器榜只能是"最近 N 场"：上游没有生涯口径，只能逐场 PGCR 聚合，窗口与"只统计自己那一行"必须自证 | accepted |
 
 ## 编号规矩
 

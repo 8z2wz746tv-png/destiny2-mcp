@@ -81,6 +81,7 @@ SLOW_INTENTS = {
     ("build_assistant", "community"),
     ("build_assistant", "community_build"),
     ("build_assistant", "starside"),
+    ("activity_assistant", "pvp_weapons"),
     ("activity_assistant", "aggregate"),
     ("activity_assistant", "activity_aggregate"),
     ("activity_assistant", "activity_stats"),
@@ -481,6 +482,10 @@ def sweep_args(tool: str, intent: str, live: dict[str, Any]) -> dict[str, Any]:
         if intent in {"pgcr"}:
             args["activity_id"] = live.get("activity_id") or ""
         elif intent in {"history"}:
+            args["count"] = 2
+        elif intent == "pvp_weapons":
+            # 体检只取 2 场：默认 10 场要真的打 10 次 PGCR（冷启约 1 场/秒），
+            # 信封体检不需要那么多场次。
             args["count"] = 2
         elif intent == "clan_leaderboards":
             args["group_id"] = "4611686018490000000"

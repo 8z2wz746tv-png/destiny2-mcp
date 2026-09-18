@@ -56,6 +56,7 @@
 | --- | --- | --- |
 | 换子职业元素 | `subclass_assistant(intent="modify", changes={"subclass": …})` | 新的变更键（旧键一个没动）；元素别名进 `vocabulary.ELEMENT_ALIASES` + 职业尾缀表 |
 | 换神器 | `subclass_assistant(intent="equip_artifact")` | 新 intent（写入，走确认信封）；名字精确匹配，不模糊 |
+| 纯 PvP 武器榜 | `activity_assistant(intent="pvp_weapons")` | 新 intent（`scope="pvp_recent"`、`source="pgcr_aggregation"`，逐场 PGCR 聚合最近 N 场）；**不是** `weapon_history` 的别名，两者口径不同、并存 |
 | 角色身上的神器 | `subclass_assistant(intent="artifact", character=…)` | `artifact` 原来的返回一个键没少，多附 `character_artifact` |
 
 **删除的行为（不留兼容分支）**：`equip_loadout` 遇到"保存的子职业与当前不一致"以前直接失败并返回

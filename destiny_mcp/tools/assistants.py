@@ -31,6 +31,8 @@ from . import _equip_branches as equip_branches
 from . import _stats_branches as stats_branches
 from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
+from . import _leaderboard_branches as leaderboard_branches
+from . import _weapon_usage_branches as weapon_usage_branches
 from ._enrichment import community_enrichment, community_read
 from ._farming import farming_reference as _farming_reference
 from ._farming import harvest_names as _harvest_names
@@ -1219,7 +1221,8 @@ async def subclass_assistant(
 async def activity_assistant(
     intent: Annotated[ActivityIntent, Field(description=(
         "战绩查询意图。history=最近活动；pgcr=指定单场结算；"
-        "stats=生涯 PvE/PvP 统计；weapon_history=武器使用排行；"
+        "stats=生涯 PvE/PvP 统计；weapon_history=武器使用排行（全模式）；"
+        "pvp_weapons=纯 PvP 武器榜（最近 N 场结算聚合，不是生涯）；"
         "aggregate=活动累计排行；leaderboards=玩家排行榜；"
         "clan_leaderboards=公会排行榜；counters=游戏内计数器（profile 组件 1100）。"
     ))] = "history",
@@ -1250,7 +1253,9 @@ async def activity_assistant(
     intent = cast(ActivityIntent, (intent or "history").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
     maxtop = 10 if maxtop is None else maxtop
-    count = 20 if count is None else count
+    # pvp_weapons 的 count 是"分析多少场"：逐场 PGCR 约 1 场/秒（实测），
+    # 所以它的默认值是 10 而不是别处的 20 条。
+    count = (10 if intent == "pvp_weapons" else 20) if count is None else count
     community_section = community_section or "text"
     resolved = resolve_player_name(player_name)
 
@@ -1276,20 +1281,13 @@ async def activity_assistant(
     if intent == "counters":
         return await counters_branches.counters_response(svc, resolved, query, count, mode or "", period or "")
 
-    if intent in {"weapon_history", "weapons", "weapon_usage", "weapon_leaderboard"}:
-        result = await svc["activity_svc"].get_unique_weapon_history(resolved, character, limit=count)
-        return ok_response(result.get("message", "已读取武器历史。"), result)
+    if intent in weapon_usage_branches.INTENTS:
+        return await weapon_usage_branches.weapon_usage_response(
+            svc, intent, resolved, character, mode or "", count)
 
-    if intent in {"aggregate", "activity_aggregate", "activity_stats"}:
-        return ok_response("已读取活动聚合统计。", await svc["activity_svc"].get_aggregate_activity_stats(resolved, character, limit=count))
-
-    if intent in {"leaderboards", "leaderboard"}:
-        result = await svc["activity_svc"].get_leaderboards(resolved, character, mode, statid, maxtop)
-        return ok_response(result.get("message", "已读取排行榜。"), result)
-
-    if intent == "clan_leaderboards":
-        result = await svc["activity_svc"].get_clan_leaderboards(group_id, mode, statid, maxtop)
-        return ok_response(result.get("message", "已读取公会排行榜。"), result)
+    if intent in leaderboard_branches.INTENTS:
+        return await leaderboard_branches.leaderboard_response(
+            svc, intent, resolved, character, mode or "", statid, maxtop, group_id, count)
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"activity_assistant 不支持 intent={intent!r}。")
 
