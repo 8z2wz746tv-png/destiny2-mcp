@@ -158,6 +158,33 @@
   已修，并新增 `tests/test_corpus_script_health.py`：AST 扫每个 `run_corpus_*.py` 的
   `check()` 位置参数个数 + 语法可解析（守门自己也验证过会咬人）。
 
+**回归报告复核后修的五个问题（同日补）** —— 都是"报告打了 ✅、其实是错答"的那几条：
+
+- **搜索结果的玩家名少了编码**（`OneTop丶Husky#`）：真凶是 `bungie_client.search_player`
+  自己拼 `f"{p['displayName']}#{p.get('displayNameCode', '')}"` —— `displayName` 是**平台名**，
+  而 `displayNameCode` 这个字段**根本不存在**（真名 `bungieGlobalDisplayNameCode`），
+  于是每个候选都带一个尾随空 `#`、四个平台分不出谁是谁。同类写法在
+  `player_service._identity_of` 还有一处（空 code 会拼出 `名字#`）—— 两处都改走唯一出处
+  `utils/player_names.bungie_display_name`。守门三条：空 code 的行为断言、禁止自己拼 `名字#code`、
+  平台名扫描扩到 `["displayName"]` 与"和 `#` 同时出现的 `displayNameCode`"（请求体里的同名字段不算）。
+- **「玉兔」按名找不到武器**（`perk_pool`/`info`/`analyze` 全报 `manifest_error`）：
+  `search("玉兔")` 命中 **54 条**，前 53 条是同名的 `itemType=20` 条目，真武器排第 7 位，
+  而按名找武器只在**前 5 / 前 10 条**里挑 `itemType==3`。现在 `search()` 支持 `item_type`
+  过滤（切片之前筛），`weapon_profile.find_weapon` 用它；`perk_service` 里那份重复实现删掉。
+- **counters 的 `query` 英文词静默返回 0**：`query` 是名称/描述的**子串**匹配，真机
+  `query="crucible"` → 0 条、`query="熔炉"` → 13 条。现在 0 命中会带一条提示
+  （"这是子串匹配，按模式用 mode=、按周期用 period="），文档同步纠正 ——
+  那份报告把它读成了"query 参数不被支持"。
+- **按模式的生涯统计不附游戏内计数器**：`stats(mode="trials")` 给击败 1,474 / 胜场 105，
+  游戏内计数器是 **10,696 / 826**（差 7 倍），而按模式调用以前既不附计数器也没有提示，
+  用户只会看到那个小数（报告还把它当成"试炼生涯"报了出去）。现在配对表按模式展开
+  （crucible + trials），按模式调用会附同模式的生涯计数器 + 一条"两个来源都真实、别相加"的
+  warning；读不到只降级（`counters_unavailable` + warning）。
+- **收藏品节点拿 0 当"没有"**：`search_collectible_nodes` 说「动能武器（50 件物品）」，
+  `collectible_node` 却回 `counts 全 0`、items 空 —— 那 50 条是 `records`（条目），
+  组件 800 里没有它们的收藏状态。现在响应带 `declared{records,collectibles,presentation_nodes}`、
+  `child_nodes`（可继续下钻）与 `empty_reason`（说清 0 只能读成"这个口径下没有可查的收藏品"）。
+
 ## 未发布（2026-09-17）
 
 **PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，

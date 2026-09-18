@@ -300,3 +300,28 @@ async def test_tool_branch_returns_rows_with_source_and_scope_warning() -> None:
     assert response["data"]["counters"][0]["progress"] == 124495
     assert response["data"]["counters"][0]["source"] == "profile.metrics"
     assert any("stats" in warning for warning in response["warnings"])
+
+
+@pytest.mark.asyncio
+async def test_english_query_that_matches_nothing_gets_a_language_hint() -> None:
+    """英文词匹配不到中文计数器时，必须说清是"匹配不到"而不是"没有这条计数"。
+
+    真机（2026-09-18）：`counters(query="crucible")` → 0 条，而熔炉那批计数器明明在
+    （`query="熔炉"` → 13 条）。当时的报告把这个 0 读成了"query 参数不被支持"。
+    """
+    service = make_service([profile_with({
+        str(OPPONENTS_DEFEATED): metric_entry(124495, 100),
+        str(KILLS): metric_entry(78768, 100),
+    })])
+
+    # 替身里的名称是英文（真机是中文），所以这里挑一个两种语言都匹配不到的词来验提示：
+    # 提示本身不许声称"计数器一定是中文"，只能说"这是子串匹配 + 建议用 mode=/period="。
+    miss = await service.get_career_counters(PLAYER_NAME, query="熔炉")
+
+    assert miss["total"] == 0
+    assert any("没有匹配到任何计数器" in warning for warning in miss["warnings"])
+    assert any("mode=" in warning and "period=" in warning for warning in miss["warnings"])
+
+    hit = await service.get_career_counters(PLAYER_NAME, query="Opponents")
+    assert hit["total"] == 1
+    assert not any("没有匹配到任何计数器" in warning for warning in hit["warnings"])

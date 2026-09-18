@@ -119,7 +119,7 @@ def test_slot_and_class_helpers_fall_back_to_empty_string() -> None:
 
 
 class _ExoticManifest:
-    def search(self, name: str, limit: int = 5):
+    def search(self, name: str, limit: int = 5, item_type: int | None = None):
         return [{"itemHash": to_signed(2782999717), "name": "星火协议", "tier": 6, "itemType": 2}]
 
     def get_item_definition(self, item_hash: int):
@@ -147,7 +147,7 @@ def test_exotic_armor_details_use_the_unified_identity_block() -> None:
 
 
 class _CollectionManifest:
-    def search(self, name: str, limit: int = 10):
+    def search(self, name: str, limit: int = 10, item_type: int | None = None):
         return [{"itemHash": to_signed(2230338236), "name": "无感"}]
 
     def get_item_definition(self, item_hash: int):

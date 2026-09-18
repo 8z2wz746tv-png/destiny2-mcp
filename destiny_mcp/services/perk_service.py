@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..exceptions import ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..manifest_names import names_for
@@ -103,21 +102,10 @@ class PerkService:
         Raises:
             ManifestError: 武器在 Manifest 里不存在（与 analyze/info/catalyst 一致）。
         """
-        results = self._manifest.search(weapon_name, limit=10)
-        weapon = None
-        for r in results:
-            if r.get("itemType") == 3:
-                weapon = r
-                break
-
-        if not weapon:
-            # 「武器不存在」和「武器存在但本地愿单没收录」是两件事：
-            # 前者走错误信封（与 analyze/info/catalyst 一致），后者才是成功的说明。
-            raise ManifestError(f"找不到武器: {weapon_name}")
-
-        item_hash = weapon["itemHash"]
-        display_name = weapon["name"]
-        definition = self._manifest.get_item_definition(item_hash) or {}
+        # 走唯一出处（`weapon_profile.find_weapon`）：它按 itemType 过滤搜索，
+        # 这里以前自己"扫前 10 条挑 itemType==3"，同名条目一多就挑不到（同「玉兔」那个坑）。
+        item_hash, definition = weapon_profile.find_weapon(self._manifest, weapon_name)
+        display_name = (definition.get("displayProperties") or {}).get("name") or weapon_name
         names = names_for(self._manifest)
 
         base: dict[str, Any] = {

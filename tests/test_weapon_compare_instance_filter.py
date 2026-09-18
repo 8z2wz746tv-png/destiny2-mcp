@@ -17,7 +17,7 @@ POOL_HASH = 700
 
 
 class _ManifestStub:
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         assert query == "测试武器"
         assert limit == 0
         return [

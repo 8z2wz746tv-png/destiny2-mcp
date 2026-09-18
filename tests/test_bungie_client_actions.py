@@ -262,7 +262,7 @@ async def test_get_collectible_item_status_reads_profile_collectible_state() -> 
             }
 
     class FakeManifest:
-        def search(self, query, *, limit):
+        def search(self, query, *, limit, item_type: int | None = None):
             return [{"itemHash": 111, "name": "死亡使者"}]
 
         def get_item_definition(self, item_hash):

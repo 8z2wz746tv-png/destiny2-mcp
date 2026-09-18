@@ -63,7 +63,7 @@ class _Manifest:
     def get_plug_set_plugs(self, plug_set_hash: int):
         return []
 
-    def search(self, name: str, limit: int = 10):
+    def search(self, name: str, limit: int = 10, item_type: int | None = None):
         return []
 
 

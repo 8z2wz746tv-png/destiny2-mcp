@@ -15,6 +15,7 @@ from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name
 from ..models import CharacterInfo, PlayerInfo, ProfileResponse
 from ..player_resolver import CURRENT_OAUTH_PLAYER, PlayerResolver
+from ..utils.player_names import bungie_display_name
 
 logger = get_logger(__name__)
 
@@ -255,9 +256,10 @@ def _identity_of(candidate: dict) -> tuple[str, int, str]:
       否则取第一条）
     返回空 membership_id 表示这条候选没有可查的 Destiny 账号。
     """
-    name = str(candidate.get("bungieGlobalDisplayName") or "")
-    code = candidate.get("bungieGlobalDisplayNameCode")
-    display_name = f"{name}#{code}" if name and code is not None else name
+    # 显示名走唯一出处（`utils/player_names`）：真机实测 Bungie 搜索接口对部分账号把
+    # `bungieGlobalDisplayNameCode` 返回成**空字符串**，这里以前自己拼 `f"{name}#{code}"`
+    # 于是得到 `名字#`（尾随一个空 #）—— 四个候选全看不出来是谁。别在这里再拼一次。
+    display_name = bungie_display_name(candidate)
 
     memberships = [m for m in (candidate.get("destinyMemberships") or []) if isinstance(m, dict)]
     if not memberships:

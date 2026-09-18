@@ -51,7 +51,7 @@ class _Manifest:
             902: {"name": "萤火虫", "icon": "/p2.png"},
         }
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [{"itemHash": WEAPON_HASH, "name": "测试武器", "itemType": 3}]
 
     def list_weapon_catalog(self, weapon_type: str = "", *, weapon_name: str = "") -> list[dict]:

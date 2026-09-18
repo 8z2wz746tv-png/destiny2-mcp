@@ -27,7 +27,7 @@ from destiny_mcp.tools.assistants import loadout_assistant, weapon_assistant
 class _ManifestWithWeapon:
     """随机 roll 武器（有随机池）—— 这样才会去查愿单，而不是走"固定 perk"分支。"""
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [{"itemHash": 100, "name": "测试武器", "itemType": 3}]
 
     def get_item_definition(self, item_hash: int) -> dict:
@@ -64,7 +64,7 @@ class _ManifestWithWeapon:
 
 
 class _ManifestWithoutWeapon:
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return []
 
     def get_item_definition(self, item_hash: int) -> dict:
@@ -141,7 +141,7 @@ class _CompareManifest:
     def get_item_description(self, item_hash: int) -> str:
         return ""
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [{"itemHash": 100, "name": "测试武器", "itemType": 3, "icon": "/w.png"}]
 
     def get_item_definition(self, item_hash: int) -> dict:
@@ -262,11 +262,15 @@ class _AmbiguousManifest:
     def get_item_definition_by_name(self, item_name: str) -> dict:
         return {"hash": 900, "itemType": 19, "displayProperties": {"name": item_name}}
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
-        return [
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
+        rows = [
             {"itemHash": 900, "name": query, "itemType": 19},
             {"itemHash": 901, "name": query, "itemType": 3},
         ]
+        # 照真实 `ManifestManager.search` 的行为：按 itemType 过滤发生在切片之前。
+        if item_type is not None:
+            rows = [row for row in rows if row["itemType"] == item_type]
+        return rows if limit <= 0 else rows[:limit]
 
     def get_item_definition(self, item_hash: int) -> dict:
         return {

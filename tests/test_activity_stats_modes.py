@@ -33,9 +33,11 @@ TRIALS_GROUP = "trials_of_osiris"
 
 # 真机试炼（allTime）实测：现存猎人与一条已删角色
 EXISTING = {"kills": 473, "deaths": 562, "assists": 155, "activitiesEntered": 114,
-            "activitiesWon": 50, "score": 350, "longestKillSpree": 7, "bestSingleGameKills": 14}
+            "activitiesWon": 50, "opponentsDefeated": 900, "score": 350,
+            "longestKillSpree": 7, "bestSingleGameKills": 14}
 DELETED = {"kills": 423, "deaths": 508, "assists": 124, "activitiesEntered": 101,
-           "activitiesWon": 35, "score": 294, "longestKillSpree": 8, "bestSingleGameKills": 12}
+           "activitiesWon": 35, "opponentsDefeated": 574, "score": 294,
+           "longestKillSpree": 8, "bestSingleGameKills": 12}
 
 
 def _entry(value: float) -> dict:
@@ -262,3 +264,54 @@ async def test_stats_period_type_only_knows_career() -> None:
     for bad in ("season", "act", "daily"):
         with pytest.raises(InvalidArgumentError, match="counters"):
             _stats_period_type(bad)
+
+
+@pytest.mark.asyncio
+async def test_per_mode_stats_carry_the_in_game_counters(service: ActivityService) -> None:
+    """按模式的生涯统计必须并列同模式的游戏内计数器（ADR-005 落到 mode 上）。
+
+    真机（2026-09-18）：`stats(mode="trials")` 给击败 1,474 / 胜场 105，而游戏内计数器是
+    10,696 / 826 —— 差 7 倍。以前按模式的调用**不附计数器、也没有任何提示**，
+    用户只会看到那个小数；同一份报告还把它当成"试炼生涯"报了出去。
+    """
+    from destiny_mcp.tools import _stats_branches as branches
+
+    counters_svc = AsyncMock()
+    counters_svc.get_career_counters.return_value = {
+        "counters": [
+            {"metric_hash": 2082314848, "name": "已击败对手", "progress": 10696},
+            {"metric_hash": 1365664208, "name": "胜场", "progress": 826},
+            {"metric_hash": 999, "name": "无关计数器", "progress": 1},   # 不在配对表里，不许进载荷
+        ],
+        "unavailable": "",
+    }
+    svc = {"activity_svc": service, "activity_counters_svc": counters_svc}
+
+    response = await branches.stats_response(svc, PLAYER_NAME, None, "trials", "career")
+
+    assert response["ok"] is True
+    assert [row["metric_hash"] for row in response["data"]["game_counters"]] == [2082314848, 1365664208]
+    paired = [w for w in response["warnings"] if "不一样是正常的" in w]
+    assert paired, response["warnings"]
+    # 并排给两个数：游戏内 10,696 vs 统计接口 1,474（夹具值 900+574）
+    assert "10696" in paired[0] and "1474" in paired[0], paired[0]
+    # 读的就是 trials + career 那格
+    kwargs = counters_svc.get_career_counters.await_args.args
+    assert kwargs[3] == "trials" and kwargs[4] == "career"
+
+
+@pytest.mark.asyncio
+async def test_per_mode_stats_degrade_when_counters_are_unavailable(service: ActivityService) -> None:
+    """计数器读不到只降级：统计结果照给，并把原因写出来（不许把主结果弄坏）。"""
+    from destiny_mcp.tools import _stats_branches as branches
+
+    counters_svc = AsyncMock()
+    counters_svc.get_career_counters.side_effect = RuntimeError("上游抖动")
+    svc = {"activity_svc": service, "activity_counters_svc": counters_svc}
+
+    response = await branches.stats_response(svc, PLAYER_NAME, None, "trials", "career")
+
+    assert response["ok"] is True
+    assert "game_counters" not in response["data"]
+    assert "上游抖动" in response["data"]["counters_unavailable"]
+    assert any("没读到" in w for w in response["warnings"])

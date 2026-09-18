@@ -101,7 +101,7 @@ class _Manifest:
     def get_definition(self, table: str, key: int):
         return PLUG_SETS.get(key)
 
-    def search(self, query: str, limit: int = 0):
+    def search(self, query: str, limit: int = 0, item_type: int | None = None):
         if "纪律" in query:
             return [{"itemHash": MOD_HASH, "itemType": 19}]
         if query.replace(" ", "") == "+职业/-手雷":
@@ -279,7 +279,7 @@ async def test_prefers_the_variant_that_actually_grants_stats() -> None:
                         "investmentStats": [{"statTypeHash": STAT_GRENADE, "value": 10}]}
             return super().get_item_definition(item_hash)
 
-        def search(self, query: str, limit: int = 0):
+        def search(self, query: str, limit: int = 0, item_type: int | None = None):
             return [{"itemHash": weak, "itemType": 19}, {"itemHash": strong, "itemType": 19}]
 
         def get_definition(self, table: str, key: int):
@@ -355,7 +355,7 @@ async def test_alternatives_use_readable_six_stat_keys() -> None:
                         "investmentStats": [{"statTypeHash": STAT_GRENADE, "value": 10}]}
             return super().get_item_definition(item_hash)
 
-        def search(self, query: str, limit: int = 0):
+        def search(self, query: str, limit: int = 0, item_type: int | None = None):
             return [{"itemHash": weak, "itemType": 19}, {"itemHash": strong, "itemType": 19}]
 
         def get_definition(self, table: str, key: int):

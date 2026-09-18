@@ -221,7 +221,9 @@ class BungieClient:
         logger.debug("SearchDestinyPlayer returned %d result(s)", len(players))
         return [
             {
-                "display_name": f"{p['displayName']}#{p.get('displayNameCode', '')}",
+                # 唯一出处：游戏内 ID 优先。曾自己拼 `displayName` + 不存在的 `displayNameCode`
+                # → `名字#`（尾随空 #，真机 2026-09-18 复现）。
+                "display_name": bungie_display_name(p),
                 "membership_id": p["membershipId"],
                 "membership_type": p["membershipType"],
                 "cross_save_platform": p.get("crossSaveOverride", 0),

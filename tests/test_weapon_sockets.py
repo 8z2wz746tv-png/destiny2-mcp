@@ -40,7 +40,7 @@ class _StubManifest:
             1: {"name": "射程", "icon": ""},
         }
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [{"itemHash": 100, "name": "测试武器", "itemType": 3}]
 
     def get_item_definition(self, item_hash: int) -> dict:
@@ -259,7 +259,7 @@ async def test_god_roll_fixed_branch_lists_fixed_perks() -> None:
 
 
 class _MissingStubManifest(_StubManifest):
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return []
 
 

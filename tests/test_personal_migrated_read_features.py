@@ -189,7 +189,7 @@ class _PopularityManifest:
         201: {"itemHash": 201, "name": "集体爆破", "icon": "/collective-action.png"},
     }
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [self._items[100]] if query == "测试火箭筒" else []
 
     def get_item_definition(self, item_hash: int) -> dict:

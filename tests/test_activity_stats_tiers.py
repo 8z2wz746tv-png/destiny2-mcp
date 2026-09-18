@@ -237,3 +237,35 @@ def test_every_fixture_stat_key_is_classified_on_purpose() -> None:
         "averageDeathDistance", "averageKillDistance", "averageLifespan",
         "averageScorePerLife", "combatRating", "weaponBestType",
     }, "`none` 是逐项决定的，不是「剩下的都算 none」；改动要在这里显式体现"
+
+
+@pytest.mark.asyncio
+async def test_account_stats_pair_the_in_game_counter_and_explain_the_gap(
+    service: ActivityService,
+) -> None:
+    """账号级那条路也要并列游戏内计数器，并写清差多少（真机 124,495 vs 78,864，差 45,631）。
+
+    这条补的是**覆盖盲区**：`_paired_warnings` 里的配对表遍历以前从没被跑到过
+    （测试替身里没有 counters service → 走"读不到"的早退分支），于是 2026-09-18 把
+    配对表按模式分层时，账号级这条路直接抛 `ValueError: not enough values to unpack`
+    —— 全量单测没红，是真机语料抓出来的。
+    """
+    from destiny_mcp.tools import _stats_branches as branches
+
+    service._bungie.get_historical_stats_for_account.return_value = _real_account_fixture()
+    counters_svc = AsyncMock()
+    counters_svc.get_career_counters.return_value = {
+        "counters": [
+            {"metric_hash": 811894228, "name": "已击败对手", "progress": 124495},
+            {"metric_hash": 3157801630, "name": "金色勋章", "progress": 241},   # 不在配对表里
+        ],
+        "unavailable": "",
+    }
+    svc = {"activity_svc": service, "activity_counters_svc": counters_svc}
+
+    response = await branches.stats_response(svc, PLAYER_NAME, None, "", "career")
+
+    assert response["ok"] is True
+    assert [row["metric_hash"] for row in response["data"]["game_counters"]] == [811894228]
+    gap = [w for w in response["warnings"] if "差" in w]
+    assert gap and "124495" in gap[0] and "78864" in gap[0] and "45631" in gap[0], gap

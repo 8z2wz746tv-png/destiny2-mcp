@@ -43,7 +43,7 @@ class _Manifest:
             903: {"name": "战术模组", "icon": "/mod.png"},
         }
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         if query == "快速命中":
             return [{"itemHash": 901, "name": "快速命中", "itemType": 19, "icon": "/p1.png"}]
         return [{"itemHash": WEAPON_HASH, "name": "测试武器", "itemType": 3, "icon": "/w.png"}]

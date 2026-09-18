@@ -387,3 +387,13 @@
   （游戏内 ID 优先，平台名只作兜底），`tests/test_player_display_name.py` 会扫**裸用
   `displayName` 拼名字**的代码并判红。
 
+## 十三、玩家名 / 武器名 / 计数器查询的实测坑（2026-09-18）
+
+| 现象 | 实测 | 结论 |
+| --- | --- | --- |
+| 搜索结果里名字是 `名字#`（尾随空 `#`） | `SearchDestinyPlayerByBungieName` 对部分账号把 `bungieGlobalDisplayNameCode` 返回成**空字符串**（不是缺字段） | 拼名字必须走 `utils/player_names`（它把 `None/""/0` 都当"没有编码"）；自己拼 `f"{name}#{code}"` 会漏 |
+| 按名找武器报"找不到武器" | `搜索"玉兔"` 命中 **54 条**：53 条 `itemType=20`（`itemTypeDisplayName` 仍是"斥候步枪·异域"）+ 1 条 `itemType=3` 真武器，真武器在**第 7 位** | 同名条目会占满搜索窗口：按类型过滤要在**切片之前**做（`search(item_type=3)`），不能"扫前 N 条再挑" |
+| 同一条武器的 hash 两种写法 | 武器榜（PGCR `referenceId`）给无符号 `3844694310`；Manifest 名字索引里是**有符号** `-450272986`（`to_signed` 的结果） | 比较 hash 前先归一（`to_signed`/`to_unsigned`） |
+| `counters(query="crucible")` 返回 0 条 | 同一账号 `query="熔炉"` → 13 条；`query="已击败对手"` → 6 条 | `query` 是**名称/描述子串**匹配，而计数器名称来自中文 Manifest；英文模式词匹配不到（按模式用 `mode=`） |
+| 统计接口按模式的数字远小于游戏内计数器 | `stats(mode="trials")`：击败 1,474 / 胜场 105；计数器：**10,696 / 826** | 按模式的生涯数字同样要并列计数器（ADR-005）；统计接口没有"这个模式的合并视图" |
+| 收藏品节点 `counts` 全 0，但搜索说这个节点有 50 件 | 那 50 条是 `children.records`（条目），组件 800 里**没有**它们的收藏状态（`children.collectibles=0`） | `records` 与 `collectibles` 是两种数据：节点详情必须说明"0 只是这个口径下没有可查的收藏品" |

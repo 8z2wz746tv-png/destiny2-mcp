@@ -16,7 +16,7 @@ class _PopularityStub:
 
 
 class _ManifestStub:
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [
             {
                 "itemHash": 100,

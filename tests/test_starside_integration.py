@@ -305,7 +305,7 @@ class _Manifest:
         ],
     }
 
-    def search(self, name: str, *, limit: int = 0) -> list[dict]:
+    def search(self, name: str, *, limit: int = 0, item_type: int | None = None) -> list[dict]:
         return self.entries.get(name, [])
 
     def get_all_set_bonuses(self) -> dict:

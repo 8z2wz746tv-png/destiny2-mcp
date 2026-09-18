@@ -94,18 +94,28 @@ SLOT_LABELS: dict[str, str] = {
 }
 
 
+# DestinyItemType.Weapon。按名找武器必须靠它过滤，别靠"扫前几条碰运气"。
+ITEM_TYPE_WEAPON = 3
+
+
 def find_weapon(manifest: "ManifestManager", weapon_name: str) -> tuple[int, dict]:
     """按名字找武器定义：返回 (item_hash, definition)。
 
     只取 `itemType == 3` 的条目 —— 存在与武器同名的非武器条目（例如「遗产」），
     按精确名取会拿到那一条，然后误报「不是武器」。
+
+    **过滤交给搜索引擎做**（`search(..., item_type=3)`），不要在这里"扫前 N 条再挑"：
+    真机实测「玉兔」命中 54 条，前 53 条是同名的 `itemType=20` 条目，真武器排在第 7 位 ——
+    以前 `limit=5` 永远挑不到，用户看到的是"Manifest 里没有这把枪"，而它明明在。
     """
     from ..exceptions import ManifestError
 
-    for item in manifest.search(weapon_name, limit=5):
-        item_hash = item.get("itemHash") or item.get("hash") or 0
-        if item.get("itemType") != 3:
+    for item in manifest.search(weapon_name, limit=0, item_type=ITEM_TYPE_WEAPON):
+        # 搜索已经按类型过滤过了；这里再判一次是**自证契约**（"只取 weapon"这句话在本函数里
+        # 必须成立），顺带挡住"将来 search 的过滤被改松"这种回归。
+        if item.get("itemType") != ITEM_TYPE_WEAPON:
             continue
+        item_hash = item.get("itemHash") or item.get("hash") or 0
         definition = manifest.get_item_definition(item_hash)
         if definition:
             return int(item_hash), definition
