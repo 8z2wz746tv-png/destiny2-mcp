@@ -28,7 +28,10 @@ destiny-mcp-oauth = "destiny_mcp.oauth_setup:main"
 destiny-mcp-fetch-wishlists = "destiny_mcp.wishlist_data:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-asyncio>=0.24", "pytest-cov>=5", "mypy>=1.10", "ruff>=0.5"]
+# ruff 钉范围：它的**默认规则集随版本变**（0.16 起把 UP/SIM/FURB/TRY… 都算默认），
+# 不钉就会出现"本地绿、CI 红"——2026-09-18 真踩过：CI 装到 0.16.8，一次报 333 条。
+# 规则集本身在 [tool.ruff.lint] 里写死；要收更多规则就同时改这两处（有意为之，不静默漂移）。
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "pytest-cov>=5", "mypy>=1.10", "ruff>=0.15,<0.16"]
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -65,3 +68,11 @@ check_untyped_defs = true
 warn_return_any = true
 warn_unused_configs = true
 exclude = ["scripts/", "tests/"]
+
+[tool.ruff.lint]
+# 规则集写死成仓库一直干净的那四个家族：E4/E7/E9（导入与语句）+ F（pyflakes）。
+# F 里的 F821「未定义的 name」是真抓过 bug 的：build_service 用了没导入的
+# `profile_components`（build 取账号护甲那条路直接 NameError）、activity_service 缺
+# `player_names` 导入 —— 这类问题单测不一定跑得到，静态检查一眼就有。
+# 想收更多规则（UP/SIM/FURB/I…）就显式加进来并一次修完，别靠"跟着 ruff 的默认集漂移"。
+select = ["E4", "E7", "E9", "F"]

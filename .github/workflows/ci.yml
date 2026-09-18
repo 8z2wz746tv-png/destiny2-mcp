@@ -28,6 +28,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
       # 静态检查放最前面：它抓的是「未定义的 name / 未使用的 import」这一类，比测试更早更便宜。
+      # 规则集在 pyproject 的 [tool.ruff.lint] 里**写死**、版本也钉了范围：
+      # ruff 的默认集随版本变（0.16 起把 UP/SIM/FURB/TRY… 都算默认），不钉就出现
+      # 「本地绿、CI 红」——2026-09-18 连挂三次 CI，全是这一步报 333 条。
       # 真机上就靠它抓到过 `profile_components` 用了没导入（build 取账号护甲那条路 NameError）
       # 与 activity_service 缺 player_names 导入。
       - name: 静态检查（ruff）

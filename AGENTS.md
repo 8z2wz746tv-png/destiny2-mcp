@@ -99,6 +99,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - 每个新守门都要**注入一次违规、确认变红、再恢复**——不验证就不知道它会不会咬人。
 - 改响应形状：跑 `pytest` + 对应语料 runner + 基线 diff。
 - 单测用替身、任何机器能跑（干净 `HOME` 下也要过）；真机脚本单独放，分工见 `docs/testing/TESTING_CORPUS.md` 第一张表。
+- **CI 跑 ruff 的规则集是写死的**（`pyproject.toml` 的 `[tool.ruff.lint] select`，版本钉在 `ruff>=0.15,<0.16`）：ruff 的默认集随版本变（0.16 把 UP/SIM/FURB 都算默认），不写死就是「本地绿、CI 红」。想收规则要显式加进 select 并一次修完。
 - **CI 现在跑 ruff**（`python -m ruff check`，紧挨在 pytest 前面）：它抓「未定义的 name / 未使用的 import」这类，比测试更早——真机上它抓到过 `profile_components` 用了没导入（build 取账号护甲那条路直接 NameError）。mypy 存量 411 个错，**不进 CI**；路线是「新代码先干净」：先把某个模块修到 mypy 干净，再加进 ci.yml 里那行注释的文件列表。
 - **声称之前先量**：性能改动给前后对比，文档里的数字必须来自实跑。
 
