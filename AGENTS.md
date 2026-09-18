@@ -239,6 +239,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/reference/bungie_api.md` — 遇到 Bungie API 问题（scope、端点、AWA、组件号、上游错误码）时的实测事实清单；与官方文档冲突时以它为准。
 - `docs/testing/TESTING_CORPUS.md` — 改响应形状、加 intent、发版之前必读：测试分层与语料总纲。
 - `docs/testing/TESTING_CORPUS_FULL.md` — 要跑逐 intent 的全量回归、或查某个字段该长什么样时看它。
+- `docs/testing/TESTING_PHRASES.md` — 要**手动**试功能（照着念的口语清单：一句话一个功能、组合句、必须拒绝的句子）时看它；和代码行的语料分工不同。
 
 ## 决策记录（ADR）
 
