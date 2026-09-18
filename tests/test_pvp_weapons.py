@@ -24,7 +24,8 @@ from destiny_mcp.exceptions import APIError, InvalidArgumentError
 from destiny_mcp.data import activity_modes
 from destiny_mcp.exceptions import CharacterNotFoundError
 from destiny_mcp.services import pvp_weapon_service as app
-from destiny_mcp.services.pvp_weapon_service import PgcrCache, PvpWeaponService
+from destiny_mcp.services.pgcr_cache import PgcrCache
+from destiny_mcp.services.pvp_weapon_service import PvpWeaponService
 
 PLAYER = "TestGuardian#1234"
 MID = "4611686018000000001"
@@ -170,7 +171,9 @@ async def test_failed_match_is_counted_not_hidden(service: PvpWeaponService) -> 
 
     assert result["window"]["matches_analyzed"] == 1
     assert result["window"]["matches_failed"] == 1
-    assert result["failed_matches"][0]["instance_id"] == "1001"
+    failed = result["failed_matches"]
+    assert failed["total"] == 1 and failed["returned"] == 1 and failed["truncated"] is False
+    assert failed["items"][0]["instance_id"] == "1001"
     assert any("没取到" in warning for warning in result["warnings"])
     assert result["weapons"][0]["kills"] == 3
 
@@ -342,7 +345,7 @@ async def test_characters_and_class_names_are_labelled(service: PvpWeaponService
 
     assert result["characters"] == [{
         "character_id": WARLOCK_ID, "class": "Warlock",
-        "history_count": 2, "has_more_history": False,
+        "history_count": 2, "page_full": False,
     }]
     assert result["weapons"][0]["characters"] == ["Warlock"]
 
@@ -372,3 +375,30 @@ async def test_cache_rotation_keeps_the_newest(service: PvpWeaponService) -> Non
 
     assert cache.prune(keep=2) == 3
     assert len(list(cache.directory.glob("*.json"))) == 2
+
+
+@pytest.mark.asyncio
+async def test_failed_matches_self_reports_completeness(service: PvpWeaponService) -> None:
+    """失败场次详情按仓库惯例自证全量：`len(items)` 不是总数，`total` 才是。
+
+    13 场里 12 场失败、1 场成功 —— 样本截到 10 条，但 `total` 必须说 12。
+    """
+    activities = [_history(f"20{index:02d}", f"2026-08-2{index % 9}T10:00:00Z") for index in range(13)]
+    service._bungie.get_activity_history.return_value = {
+        "ErrorCode": 1, "Response": {"activities": activities},
+    }
+
+    def pgcr(instance_id: str) -> dict:
+        if instance_id != "2000":
+            raise APIError("读取对局结算", "上游 500")
+        return _pgcr([_entry(WARLOCK_ID, [(MY_WEAPON, 5, 2)])])
+
+    service._bungie.get_pgcr.side_effect = pgcr
+
+    result = await service.get_pvp_weapon_board(PLAYER, mode="pvp", matches=13)
+
+    failed = result["failed_matches"]
+    assert failed["total"] == 12 and failed["returned"] == 10 and failed["truncated"] is True
+    assert len(failed["items"]) == 10 == failed["returned"]
+    assert failed["total"] == result["window"]["matches_failed"]
+    assert result["window"]["matches_analyzed"] == 1

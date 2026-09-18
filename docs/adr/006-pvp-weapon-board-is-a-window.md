@@ -44,6 +44,9 @@
 2. **口径必须在载荷里自证**：`scope="pvp_recent"`、`source="pgcr_aggregation"`、
    `window{newest,oldest,matches_requested,matches_planned,matches_analyzed,matches_failed,
    matches_without_your_row,history_page_size_per_character}`、
+   `failed_matches{total,returned,truncated,items}`（自证全量：`len(items)` 不是失败总数）、
+   `characters[].page_full`（一页 250 场是否被填满 —— **不叫** `has_more_history`，
+   填满不等于确实还有）、
    `mode_tally`（每场回报的子模式 + 官方中文名）、`characters`。
    时间窗**不许省**：真机上"最近 250 场"对某些角色跨两年多。
    `matches_requested` 是调用方要的值（**原样**），`matches_planned` 才是实际用的
@@ -55,7 +58,7 @@
    真机踩过：没有这道守卫时突袭结算会被贴上 `scope="pvp_recent"` 的标签（392 杀的突袭枪登顶）。
 5. 失败如实：单场失败进 `failed_matches` + warning 并继续；一场都没取到**报错**，
    不返回空榜单（"没打成"和"没打过"是两件事）；历史失败只丢那个角色。
-6. PGCR 落盘缓存（`DESTINY_CACHE_PATH/pgcr/<instanceId>.json`，默认
+6. PGCR 落盘缓存实现在 `services/pgcr_cache.py`（`DESTINY_CACHE_PATH/pgcr/<instanceId>.json`，默认
    `~/.destiny_mcp/cache/pgcr`，结算不可变）：不算账号写入，不需要 `confirmed`；
    缓存坏掉只等于没缓存。**保留策略**：无 TTL，按条数轮换（`MAX_CACHE_FILES = 2000`，
    一条约 50 KB ≈ 100 MB 上限），每进程只在第一轮扫一次目录、删最旧。

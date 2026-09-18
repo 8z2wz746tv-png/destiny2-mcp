@@ -30,9 +30,7 @@
 from __future__ import annotations
 
 import asyncio
-import json
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
 from ..bungie_client import BungieClient
@@ -42,6 +40,7 @@ from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name
 from ..player_resolver import PlayerResolver
 from .activity_service import _unwrap_bungie_response
+from .pgcr_cache import PgcrCache
 
 logger = get_logger(__name__)
 
@@ -58,23 +57,8 @@ PGCR_CONCURRENCY = 3
 # 那就是把 PvE 数据贴上 PvP 标签 —— 比报错糟得多。
 BOARD_KEYS: tuple[str, ...] = (*activity_modes.pvp_keys(), "gambit")
 
-# 缓存目录：`DESTINY_CACHE_PATH/pgcr/`（默认 `~/.destiny_mcp/cache/pgcr`）。
-# PGCR 不可变，缓存命中即等价于上游结果。
-CACHE_SUBDIR = "pgcr"
-
-# 缓存轮换上限：一条 PGCR 约 50 KB，2000 条 ≈ 100 MB。超出按 mtime 删最旧。
-MAX_CACHE_FILES = 2000
-
-
-def _cache_dir() -> Path:
-    """缓存目录：`DESTINY_CACHE_PATH/pgcr`。
-
-    以前借用 `DESTINY_TOKEN_PATH`（令牌目录）—— 名字会误导"删令牌就清了缓存"，
-    而且用户没法单独把缓存挪到大盘上。
-    """
-    from .. import config
-
-    return Path(config.DESTINY_CACHE_PATH, CACHE_SUBDIR)
+# 失败场次的样本上限（全量数字在 `failed_matches.total` 与 `window.matches_failed`）。
+FAILED_SAMPLE = 10
 
 
 def _stat_value(values: dict, *keys: str) -> float | None:
@@ -91,67 +75,6 @@ def _stat_value(values: dict, *keys: str) -> float | None:
 
 def _as_int(value: float | None) -> int | None:
     return None if value is None else int(round(value))
-
-
-class PgcrCache:
-    """PGCR 落盘缓存（`instanceId → 原始响应`）。
-
-    只读上游、只写自己的缓存目录，不涉及账号写入，所以不需要 `confirmed`。
-    缓存坏掉/写不进去都不许影响主结果：读不到就当没缓存，写失败只记日志
-    （磁盘满、只读挂载都不该让一次查询失败）。
-    """
-
-    def __init__(self, directory: Path | None = None) -> None:
-        self.directory = directory or _cache_dir()
-
-    def path_for(self, instance_id: str) -> Path:
-        return self.directory / f"{instance_id}.json"
-
-    def get(self, instance_id: str) -> dict | None:
-        path = self.path_for(instance_id)
-        try:
-            with path.open("r", encoding="utf-8") as handle:
-                payload = json.load(handle)
-        except (OSError, json.JSONDecodeError):
-            return None
-        return payload if isinstance(payload, dict) else None
-
-    def prune(self, keep: int = MAX_CACHE_FILES) -> int:
-        """按 mtime 只留最新 `keep` 条，返回删除条数。
-
-        无上限的缓存会一直长（100 场 ≈ 5 MB，长期跑就是一路涨）。这里不做 TTL：
-        PGCR 不可变，旧条目只是"用不上"，删掉不损失正确性 —— 留着是为了省上游请求，
-        所以按"最近用过"轮换就够。整轮只做一次（由服务层保证），不在每场之后扫目录。
-        """
-        try:
-            files = sorted(
-                self.directory.glob("*.json"),
-                key=lambda path: path.stat().st_mtime,
-                reverse=True,
-            )
-        except OSError as exc:
-            logger.debug("PGCR 缓存轮换跳过：%s", exc)
-            return 0
-        removed = 0
-        for path in files[keep:]:
-            try:
-                path.unlink()
-                removed += 1
-            except OSError:
-                continue
-        if removed:
-            logger.info("PGCR 缓存轮换：删除 %d 个最旧条目（保留 %d）", removed, keep)
-        return removed
-
-    def put(self, instance_id: str, payload: dict) -> None:
-        try:
-            self.directory.mkdir(parents=True, exist_ok=True)
-            tmp = self.path_for(instance_id).with_suffix(".json.tmp")
-            with tmp.open("w", encoding="utf-8") as handle:
-                json.dump(payload, handle, ensure_ascii=False)
-            tmp.replace(self.path_for(instance_id))
-        except OSError as exc:
-            logger.debug("PGCR 缓存写入失败 %s: %s", instance_id, exc)
 
 
 class PvpWeaponService:
@@ -308,7 +231,9 @@ class PvpWeaponService:
                 "character_id": char_id,
                 "class": class_name,
                 "history_count": len(activities),
-                "has_more_history": len(activities) >= HISTORY_PAGE_SIZE,
+                # 字段名就说它知道的事：一页 250 场被填满了。**不叫** `has_more_history`
+                # —— 恰好 250 场只说明"可能还有"，不说明"确实还有"（少承诺一点）。
+                "page_full": len(activities) >= HISTORY_PAGE_SIZE,
             })
             for act in activities:
                 details = act.get("activityDetails") or {}
@@ -506,7 +431,14 @@ class PvpWeaponService:
             "weapon_count": len(weapons),
             "total_weapon_kills": total_kills,
             "weapons": weapons,
-            "failed_matches": failed[:10],
+            # 失败的场次详情按仓库惯例自证全量：`len(items)` 不是失败总数，`total` 才是
+            # （以前只给 `failed[:10]`，与 `window.matches_failed` 数字对不上也没说明）。
+            "failed_matches": {
+                "total": len(failed),
+                "returned": len(failed[:FAILED_SAMPLE]),
+                "truncated": len(failed) > FAILED_SAMPLE,
+                "items": failed[:FAILED_SAMPLE],
+            },
             "warnings": warnings,
         }
 

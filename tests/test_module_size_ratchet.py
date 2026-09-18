@@ -54,6 +54,12 @@ CEILINGS = {
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升
     "destiny_mcp/services/loadout_equipment_service.py": 520,
     "destiny_mcp/services/starside_service.py": 769,
+    # 新增登记（PvP 武器榜）：不登记就等于没有闸 —— 仓库的规矩是"要在这里加代码
+    # 得先做一次有意识的决定"，而不是等它长成下一个上帝模块。当前 529 行即上限。
+    # 拆分后登记：PGCR 缓存整段抽去 `services/pgcr_cache.py`（541 → 461），
+    # 上限按拆分后的长度收紧 —— 缓存与聚合本来就是两个问题。
+    "destiny_mcp/services/pvp_weapon_service.py": 461,
+    "destiny_mcp/services/pgcr_cache.py": 106,
     # P4 新增：武器分支载荷与形状工厂。定在上限处是为了让"再加一个 intent"
     # 必须先回答"是搬出去还是抬上限"，而不是悄悄长胖。
     # P5：本地资料挂载 + 固定/随机话术 + 覆盖表，各分支都要交代自己带哪些块（444 → 454）。

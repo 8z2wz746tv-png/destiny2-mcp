@@ -109,6 +109,19 @@
 - 补守门：工具层默认值（不传 `count` → 10 场，这条路径此前从没被走过）、信封形状、
   职业名标注、`character=` 过滤、榜单分支等价性、模式名真 sqlite 行为。
 
+**PvP 武器榜载荷收口（同日补，趁未发版改干净）**：
+
+- `has_more_history` → **`page_full`**：`>= 250` 只能说明"这一页被填满了"，不保证"确实还有更多"
+  （原字段名承诺了它不知道的事）。
+- `failed_matches` 从截断列表改成自证全量的对象：`{total, returned, truncated, items}`
+  —— 以前 `len(failed_matches)` 最多 10，与 `window.matches_failed` 数字对不上也没说明。
+- `PGCR 缓存整段抽去 `services/pgcr_cache.py``（541 → 461 行），两个新文件都登记进体积闸
+  （`pvp_weapon_service.py` 461、`pgcr_cache.py` 106，只降不升）；缓存行为不变，
+  目录仍是 `~/.destiny_mcp/cache/pgcr`。
+- 补守门：模式词表扫描改成 AST 版并覆盖 `tests/`、`scripts/`，另加"中文模式标签不许硬编码"
+  粗筛（第一版只认行首赋值语句，换个写法就漏）；`assistants.py` 到分支的**位置传参顺序**
+  由工具层测试钉死（CI 不跑 mypy/ruff，签名错位以前没有任何网）。
+
 ## 未发布（2026-09-17）
 
 **PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，
