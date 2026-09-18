@@ -17,9 +17,10 @@
 3. **已删角色也能按角色取**：`characters[].deleted=true` 的 ID 拿去请求照样返回数据，
    所以按模式的账号级合计**能**把已删角色算进去（与 P1 三档口径一致）。
 
-只有这一种模式取值来源：`data/pvp_counters.MODE_ACTIVITY_TYPES`（取自本地 Manifest 的
+只有这一种模式取值来源：`data/activity_modes`（模式词与数值的唯一出处，取自本地 Manifest 的
 `DestinyActivityModeDefinition.modeType`：熔炉 5 / 铁旗 19 / 竞技 69 / 智谋 63 / 试炼 84 /
-突袭 4）。**别照 `ACTIVITY_MODES` 里那个 allpvp=9 填** —— 实测 `modes=9` 会 500。
+突袭 4）。**别再自己写一张表** —— 手抄过的两张（`ACTIVITY_MODES` 的 allpvp=9、
+`onslaught/猛攻`=69）都是错的，实测 `modes=9` 会 500、69 是多人竞技PvP。
 """
 
 from __future__ import annotations
@@ -49,7 +50,7 @@ async def get_character_stats(
     """按角色的历史统计（可选按 `modes` / `periodType` 过滤）。
 
     `modes` 传的是 `DestinyActivityModeType` 数值（见模块 docstring），一次一个模式；
-    传 `modes=9`（`ACTIVITY_MODES` 里那个错误的 allpvp）会 500，别用。
+    传 `modes=9`（旧手写表里的 allpvp）会 500；词与数值只从 `data/activity_modes` 取。
     `period_type` 只该传 `AllTime`（2）：别的取值要么没有意义（0）、要么是按天/按场
     （1/3，后者实测 500）。周期词 → 数值的映射在 `activity_stats.STATS_PERIOD_TYPES`。
 

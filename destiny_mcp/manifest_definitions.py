@@ -150,3 +150,44 @@ class ItemDefinitionMixin:
         `#hash`，不许编一个名字）。
         """
         return self._query_json("DestinyMetricDefinition", metric_hash)
+
+    def get_activity_mode_name(self, mode_type: int) -> str:
+        """模式类型的官方中文名（zh Manifest 的 `DestinyActivityModeDefinition`）。
+
+        名字是上游字段（`displayProperties.name`），**别在我们这边再抄一张标签表**：
+        抄过的那张 `MODE_NAMES[69] = "猛攻"` 真机对照是错的（69 = 多人竞技PvP），
+        而且只有 8 条，真机跑出来的子模式（43/44/73/89/91…）全不在里面。
+
+        索引按 `modeType` 建（实测 75 个模式类型、无重复），第一问时懒加载一次；
+        `zh` 先建、`en` 只补缺。查不到返回 `""` —— 调用方降级成 `模式<modeType>`，
+        不编名字（"没查到"和"没有"是两件事）。
+
+        属性在方法里懒初始化，不写进 `ManifestManager.__init__`：入口那个文件贴着体量上限，
+        谁都不许再往里加行（`tests/test_module_size_ratchet.py`）。
+        """
+        if getattr(self, "_mode_names", None) is None:
+            names: dict[int, str] = {}
+            for conn in (self._zh_conn, self._conn):
+                if not conn:
+                    continue
+                try:
+                    rows = conn.execute(
+                        "SELECT json FROM DestinyActivityModeDefinition"
+                    ).fetchall()
+                except sqlite3.Error as e:
+                    logger.debug("Scan DestinyActivityModeDefinition failed: %s", e)
+                    continue
+                for row in rows:
+                    try:
+                        definition = json.loads(row["json"])
+                    except (json.JSONDecodeError, TypeError):
+                        continue
+                    raw_type = definition.get("modeType")
+                    display = definition.get("displayProperties") or {}
+                    name = display.get("name")
+                    if isinstance(raw_type, bool) or not isinstance(raw_type, int):
+                        continue
+                    if isinstance(name, str) and name.strip():
+                        names.setdefault(raw_type, name.strip())
+            self._mode_names = names
+        return self._mode_names.get(mode_type, "")

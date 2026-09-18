@@ -86,6 +86,10 @@ def make_service(profiles: list[dict]) -> ActivityCountersService:
 
     manifest = MagicMock()
     manifest.get_metric_definition.side_effect = lambda h: definitions().get(h)
+    # 模式中文名从 Manifest 取（标签表已删），替身按 modeType 给官方名。
+    manifest.get_activity_mode_name.side_effect = lambda mode_type: {
+        5: "熔炉竞技场", 19: "铁旗", 63: "智谋", 69: "多人竞技PvP", 84: "奥斯里斯试炼",
+    }.get(mode_type, "")
     return ActivityCountersService(AsyncMock(), manifest, resolver)
 
 

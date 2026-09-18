@@ -31,7 +31,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..bungie_client import BungieClient
-from ..data import pvp_counters
+from ..data import activity_modes, pvp_counters
 from ..exceptions import InvalidArgumentError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
@@ -65,6 +65,22 @@ def _int_or_none(value: Any) -> int | None:
         except ValueError:
             return None
     return None
+
+
+def mode_label(mode: str, manifest: ManifestManager) -> str:
+    """计数器家族 → 官方中文模式名（Manifest，zh 优先）。
+
+    `mode="other"`（表里没收录的计数器）不是模式词，给一句人话；其余查不到就退回词本身
+    —— 不编中文名。标签不再存第二份：`pvp_counters.MODE_LABELS_ZH` 已整表删除。
+    放模块级而不是方法里：`parse_counters` 也是模块级函数（它只多要一个 manifest）。
+    """
+    if mode == "other":
+        return "未分类"
+    mode_type = activity_modes.MODE_TYPE.get(mode)
+    if mode_type is None:
+        return mode
+    label = manifest.get_activity_mode_name(mode_type)
+    return label if isinstance(label, str) and label.strip() else mode
 
 
 def parse_counters(raw_metrics: Any, manifest: ManifestManager) -> list[dict]:
@@ -107,7 +123,9 @@ def parse_counters(raw_metrics: Any, manifest: ManifestManager) -> list[dict]:
             "source": "profile.metrics",
             "name_resolved": bool(isinstance(name, str) and name.strip()),
             "mode": mode,
-            "mode_label": pvp_counters.MODE_LABELS_ZH[mode],
+            # 中文名来自 Manifest（zh 优先）：这里以前读 pvp_counters 的标签表，
+            # 而那张表与 activity_service.MODE_NAMES 是两份会各自烂掉的副本。
+            "mode_label": mode_label(mode, manifest),
             "period": period,
             "period_label": pvp_counters.PERIOD_LABELS_ZH.get(period, "") if period else "",
             # 表里的中文标签（与 Manifest 的 name 分开：一个是我们的口径，一个是上游文本；
@@ -162,6 +180,7 @@ def _sort_key(counter: dict) -> tuple[int, int]:
 
 def payload(
     counters: list[dict],
+    manifest: ManifestManager,
     *,
     limit: int,
     unavailable: str = "",
@@ -186,7 +205,10 @@ def payload(
         "filter": {"query": query, "mode": mode, "period": period, "limit": limit},
         # 词表给出去，调用方（与读响应的人）才知道 mode/period 的取值从哪来、各有几个。
         "labels": {
-            "modes": pvp_counters.MODE_LABELS_ZH,
+            "modes": {
+                family: mode_label(family, manifest)
+                for family in pvp_counters.filter_modes()
+            },
             "periods": pvp_counters.PERIOD_LABELS_ZH,
         },
         # 组件号进日志的同一份说明也进返回值：排查"这次为什么没拿到 1100"时不用猜。
@@ -275,7 +297,7 @@ class ActivityCountersService:
                 "这不代表你没有任何计数（空不是 0），请稍后重试。"
             )
             logger.warning("生涯计数器不可用：player=%s", player_name)
-            empty = payload([], limit=limit, unavailable=reason, query=query, mode=mode, period=period)
+            empty = payload([], self._manifest, limit=limit, unavailable=reason, query=query, mode=mode, period=period)
             empty["warnings"] = []
             return empty
 
@@ -286,7 +308,7 @@ class ActivityCountersService:
             "生涯计数器：player=%s 原始=%d 过滤后=%d query=%r mode=%r period=%r",
             player_name, len(raw_metrics), len(counters), query, mode, period,
         )
-        result = payload(counters, limit=limit, query=query, mode=mode, period=period)
+        result = payload(counters, self._manifest, limit=limit, query=query, mode=mode, period=period)
         # 可选数据的降级（名字查不到、进度缺失）只写进 warnings，不改 `counters` 的形状：
         # 每一行始终是同一组键，缺的是值，不是结构。
         result["warnings"] = self._degradation_warnings(counters)

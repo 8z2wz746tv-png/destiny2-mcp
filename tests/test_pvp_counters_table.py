@@ -21,7 +21,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from destiny_mcp.data import pvp_counters
+from destiny_mcp.data import activity_modes, pvp_counters
 from destiny_mcp.services import activity_counters_service as counters_module
 from destiny_mcp.services.activity_counters_service import parse_counters
 
@@ -95,14 +95,18 @@ def test_filter_modes_excludes_other() -> None:
 
 
 class _Manifest:
-    """`get_metric_definition` 只用得到 displayProperties，替身不需要连接。"""
+    """只实现用到的两个查询：计数器名（displayProperties）与模式名（modeType → 官方名）。"""
 
-    def __init__(self, names: dict[int, str]) -> None:
+    def __init__(self, names: dict[int, str], mode_names: dict[int, str] | None = None) -> None:
         self._names = names
+        self._mode_names = mode_names or {}
 
     def get_metric_definition(self, metric_hash: int) -> dict | None:
         name = self._names.get(metric_hash)
         return {"displayProperties": {"name": name, "description": ""}} if name else None
+
+    def get_activity_mode_name(self, mode_type: int) -> str:
+        return self._mode_names.get(mode_type, "")
 
 
 def test_counter_rows_carry_the_table_labels() -> None:
@@ -111,13 +115,17 @@ def test_counter_rows_carry_the_table_labels() -> None:
         "811894228": {"objectiveProgress": {"progress": 124495, "completionValue": 20000}},
         "12345678": {"objectiveProgress": {"progress": 5, "completionValue": 10}},
     }
-    manifest = _Manifest({811894228: "已击败对手", 12345678: "某条没收录的计数"})
+    manifest = _Manifest(
+        {811894228: "已击败对手", 12345678: "某条没收录的计数"},
+        {activity_modes.MODE_TYPE["crucible"]: "熔炉竞技场"},
+    )
 
     rows = {row["metric_hash"]: row for row in parse_counters(raw, manifest)}
 
     for key in ("mode", "period", "label_zh"):
         assert rows[811894228][key] == pvp_counters.COUNTERS[811894228][key], key
-    assert rows[811894228]["mode_label"] == pvp_counters.MODE_LABELS_ZH["crucible"]
+    # 模式中文名来自 Manifest（这里以前读 pvp_counters.MODE_LABELS_ZH，那张表已删）。
+    assert rows[811894228]["mode_label"] == "熔炉竞技场"
     assert rows[811894228]["period_label"] == pvp_counters.PERIOD_LABELS_ZH["career"]
     # 表里没有的：other/None/""，而 Manifest 的名字照旧给出来（缺的是我们的口径，不是上游文本）。
     assert rows[12345678]["mode"] == "other"

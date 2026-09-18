@@ -30,6 +30,24 @@
 调用方要改的只有一件事：**想要单角色数字就显式传 `character=`**；想要账号生涯直接用默认即可。
 别名表不变（`career`/`historical_stats` 仍是 `stats` 的永久别名）。
 
+## 未发布：活动模式词表合一（`mode=` 的词与数值，破坏性）
+
+`history` / `stats` / `counters` 三处的模式词以前来自**两张各自手写的表**，其中若干取值实测是错的。
+现在只有一处出处：`destiny_mcp/data/activity_modes.py`（数值取自 Manifest 的 `modeType`，
+中文名运行时从 zh Manifest 取）。**改的是词表本身，不是别名待遇**：
+
+| 词 | 以前 | 现在 |
+| --- | --- | --- |
+| `allpvp` | 9（`modes=9` 直接 HTTP 500） | **5**（熔炉竞技场伞形，覆盖铁旗/试炼/竞技/占领/死斗…） |
+| `猛攻` / `onslaught` | 69 = 多人竞技PvP（**错答**：返回一堆竞技场次） | **不认识**，报 `config_error` 并列出可用词 |
+| `大师日落` / `grandmaster` | 46（计分日落） | **47**（计分巅峰日落） |
+| `stats` 认的模式词 | 只有 6 个 PvP/突袭词 | 全部模式词（story/strike/raid/crucible/patrol/allpve/iron_banner/nightfall/grandmaster/gambit/competitive/dungeon/trials/lostsector） |
+| 历史列表的 `mode_name` | 手写 8 条表，43/44/73/89/91 显示"模式43" | Manifest 官方中文名（"铁旗占领模式"） |
+| `counters` 的 `mode_label` 与 `labels.modes` | 手写标签表 | 同上，Manifest 官方名 |
+
+智谋（`gambit`，63）的 `activityModeCategory=3`（**PvPvE**）：它不属于"纯 PvP"，
+筛 PvP 时不会被带上（真机实测 `mode=5` 拉到的场次里没有智谋）。
+
 ## 0.3.0 的新能力与删除的行为
 
 新能力**不是别名**，登记在这里是为了让"以前做不到、现在能做了"有据可查：

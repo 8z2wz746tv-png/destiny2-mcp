@@ -47,6 +47,24 @@
   会直接 `NameError`（真机 PGCR 复现）。真机复核：PGCR 六个参与者全部是 `名字#code` 形式；
   排行榜接口对该账号上游返回空，按上游故障如实报（不编排名）。
 
+**活动模式词表合一（破坏性）：三处手写表并成一处，模式名改从 Manifest 取** ——
+同一个"模式"概念以前在 `activity_service.ACTIVITY_MODES`、`activity_service.MODE_NAMES`、
+`pvp_counters.MODE_ACTIVITY_TYPES` 三处各写一遍，其中两张实测是错的：
+
+- `allpvp = 9`（伞形其实是 **5**；`modes=9` 直接 HTTP 500）；`猛攻/onslaught = 69`
+  （69 是**多人竞技PvP**，问"猛攻"会拿到一堆竞技场次）；`grandmaster = 46`（46 是计分日落，
+  47 才是计分巅峰日落）；`MODE_NAMES` 只有 8 条，真机跑出来的子模式 43/44/73/89/91
+  全不在里面，输出"模式43"。
+- 现在唯一出处是 `data/activity_modes.py`（词 → `modeType` + `activityModeCategory`），
+  **中文名不落地**：运行时从 zh Manifest 的 `DestinyActivityModeDefinition` 取
+  （新方法 `ManifestManager.get_activity_mode_name`，懒加载索引，查不到退回 `模式<号>`）。
+- 顺带的分工修正：**智谋（63）的 category=3（PvPvE），不是纯 PvP** —— 真机实测
+  `mode=5` 拉的 250 场里没有一场智谋；"猛攻"直接删掉别名（Manifest 里没有这个模式，
+  86 只叫 `Offensive`/攻势，确认不了就不猜）。
+- 行为变化：真机 `history(mode="pvp")` 现在返回 PvP 场次且标"铁旗占领模式"；
+  `stats` 认的模式词从 6 个扩到全部；`counters` 的 `labels.modes` 给官方中文名。
+  影响面见 `docs/COMPATIBILITY.md`。
+
 ## 未发布（2026-09-17）
 
 **PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，

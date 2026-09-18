@@ -22,8 +22,9 @@
 - 描述里写"**本周**"的那批**故意不收**：`period` 的取值只有 career/season/act，
   硬塞一个不存在的周期就是猜（它们的模式很明确，但周期只能靠人读成"周常"）。
 
-`mode` 的取值同时是 `counters(mode=…)` 的合法词表，且与
-`services/activity_service.ACTIVITY_MODES` 里的模式词一致 —— 见 `MODE_ACTIVITY_TYPES`。
+`mode` 的取值同时是 `counters(mode=…)` 的合法词表，且**就是 `data/activity_modes` 里的词**
+（模式词、`modeType` 数值与中文名的唯一出处都在那边；这里只维护"计数器 → 家族/周期"）。
+每条家族词都必须是 `activity_modes.MODES` 的 key —— `tests/test_activity_modes.py` 钉住。
 """
 
 from __future__ import annotations
@@ -44,34 +45,10 @@ MODES: tuple[str, ...] = (
 # 周期。`None`（表里的缺失值）表示"描述没说清周期"，不是"没有周期"。
 PERIODS: tuple[str, ...] = ("career", "season", "act")
 
-MODE_LABELS_ZH: dict[str, str] = {
-    "crucible": "熔炉竞技场",
-    "trials": "奥斯里斯试炼",
-    "iron_banner": "铁旗",
-    "competitive": "多人竞技",
-    "gambit": "智谋",
-    "raid": "突袭",
-    "other": "未分类",
-}
-
 PERIOD_LABELS_ZH: dict[str, str] = {
     "career": "生涯",
     "season": "本赛季",
     "act": "本篇章",
-}
-
-# 模式 → Bungie 的 `DestinyActivityModeType` 数值。
-# 出处：本地 Manifest 表 `DestinyActivityModeDefinition` 的 `modeType`（2026-09-17 实测）：
-# Crucible=5、Iron Banner=19、Trials of Osiris=84、Competitive PvP=69、Gambit=63、Raid=4。
-# 统计接口的 `modes=` 参数要的就是这组数字，所以它必须与 `ACTIVITY_MODES` 同源：
-# 后者认的那些模式词，取值直接引用这里，不另抄一份。
-MODE_ACTIVITY_TYPES: dict[str, int] = {
-    "crucible": 5,
-    "trials": 84,
-    "iron_banner": 19,
-    "competitive": 69,
-    "gambit": 63,
-    "raid": 4,
 }
 
 

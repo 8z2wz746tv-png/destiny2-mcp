@@ -8,7 +8,7 @@
 2. `periodType` 没有 Season（只有 None/Daily/AllTime/Activity），传 3 会 500 →
    `period="season"/"act"` 如实报 unavailable，**不降级成生涯**、也不去试会 500 的参数。
 3. `modes=9`（`ACTIVITY_MODES` 里那个错的 allpvp）会 500 —— 模式数值只从
-   `data/pvp_counters.MODE_ACTIVITY_TYPES` 取。
+   `data/activity_modes.MODE_TYPE` 取（模式词与数值的唯一出处）。
 
 这一组数字用的是真机试炼那两个角色的实测值（现存猎人 473/562/155、已删角色 423/508/124），
 所以"合并之后等于几"是可核对的，而不是随便编的。
@@ -20,7 +20,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from destiny_mcp.data import pvp_counters
+from destiny_mcp.data import activity_modes
 from destiny_mcp.exceptions import InvalidArgumentError
 from destiny_mcp.services.activity_service import ActivityService
 from destiny_mcp.tools import _stats_branches
@@ -54,6 +54,10 @@ def _character(character_id: str, deleted: bool) -> dict:
 def service() -> ActivityService:
     bungie = AsyncMock()
     manifest = MagicMock()
+    # 模式中文名走 Manifest（zh 优先）：替身按 modeType 给官方名。
+    manifest.get_activity_mode_name.side_effect = lambda mode_type: {
+        5: "熔炉竞技场", 19: "铁旗", 69: "多人竞技PvP", 84: "奥斯里斯试炼",
+    }.get(mode_type, "")
     resolver = AsyncMock()
     resolver.resolve_player.return_value = {"membership_id": "4611686018000000001", "membership_type": 3}
     bungie.get_historical_stats_for_account.return_value = {
@@ -125,14 +129,19 @@ async def test_mode_word_accepts_the_chinese_label(service: ActivityService) -> 
     result = await service.get_historical_stats(PLAYER_NAME, mode="奥斯里斯试炼")
 
     assert result["mode"]["key"] == "trials"
-    assert result["mode"]["upstream_modes"] == pvp_counters.MODE_ACTIVITY_TYPES["trials"]
+    assert result["mode"]["upstream_modes"] == activity_modes.MODE_TYPE["trials"]
 
 
 @pytest.mark.asyncio
 async def test_unknown_mode_word_is_an_error_not_an_empty_answer(service: ActivityService) -> None:
-    """词表外的模式报错（"筛出来是空"和"你筛的词我不认识"是两件事）。"""
-    with pytest.raises(InvalidArgumentError, match="stats 不支持 mode") as info:
-        await service.get_historical_stats(PLAYER_NAME, mode="日落")
+    """词表外的模式报错（"筛出来是空"和"你筛的词我不认识"是两件事）。
+
+    用"猛攻"当例子：这个词**故意不在**词表里 —— Manifest 里没有 Onslaught 这个模式
+    （86 叫 Offensive/攻势，无法确认就是猛攻），旧代码把它当 69（多人竞技PvP）返回，
+    是错答。宁可报"不认识"。
+    """
+    with pytest.raises(InvalidArgumentError, match="不支持活动模式") as info:
+        await service.get_historical_stats(PLAYER_NAME, mode="猛攻")
 
     assert "crucible" in str(info.value) and "trials" in str(info.value)
     service._bungie.get_historical_stats.assert_not_awaited()

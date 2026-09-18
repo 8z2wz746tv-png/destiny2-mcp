@@ -38,7 +38,8 @@ async def get_activity_history(
         player_name: Bungie 名称。不填则使用默认玩家。
         character: 角色名 (hunter/warlock/titan, 或中文)。不填则查询所有角色。
         mode: 活动模式。支持: 突袭/raid, 熔炉/crucible, 日落/nightfall, 试炼, 地牢/dungeon,
-              智谋/gambit, 巡逻/patrol, 猛攻/onslaught。不填则返回所有模式。
+              智谋/gambit, 巡逻/patrol。不填则返回所有模式；
+              词表唯一出处是 `data/activity_modes`（"猛攻"不在其中：Manifest 里没有这个模式）。
         count: 返回数量，默认 50，最大 250。
 
     Examples:

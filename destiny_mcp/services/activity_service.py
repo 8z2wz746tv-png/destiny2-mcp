@@ -11,7 +11,7 @@ from typing import Any
 
 from ..bungie_client import BungieClient
 from .. import activity_stats
-from ..data import pvp_counters
+from ..data import activity_modes
 from ..exceptions import InvalidArgumentError, APIError, CharacterNotFoundError, ConfigError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
@@ -21,51 +21,6 @@ from ..utils.player_names import bungie_display_name, bungie_display_name_of_pla
 logger = get_logger(__name__)
 
 # Destiny 2 activity mode hashes
-ACTIVITY_MODES: dict[str, int] = {
-    "故事": 2,
-    "strike": 3,
-    "突袭": 4,
-    "raid": 4,
-    "熔炉": 5,
-    "crucible": 5,
-    "allpve": 7,
-    "allpvp": 9,
-    "patrol": 6,
-    "巡逻": 6,
-    "nightfall": 46,
-    "日落": 46,
-    "trialsofosiris": 84,
-    "试炼": 84,
-    "dungeon": 82,
-    "地牢": 82,
-    "gambit": 63,
-    "智谋": 63,
-    "grandmaster": 46,
-    "大师日落": 46,
-    "lostsector": 87,
-    "失落区域": 87,
-    "onslaught": 69,
-    "猛攻": 69,
-}
-
-# 模式哈希 → 中文名（用于显示）
-MODE_NAMES: dict[int, str] = {
-    2: "故事",
-    3: "打击",
-    4: "突袭",
-    5: "熔炉",
-    6: "巡逻",
-    7: "全PvE",
-    9: "全PvP",
-    46: "日落",
-    63: "智谋",
-    69: "猛攻",
-    82: "地牢",
-    84: "试炼",
-    87: "失落区域",
-}
-
-
 def _unwrap_bungie_response(result: dict, operation: str) -> dict:
     error_code = result.get("ErrorCode")
     if error_code is not None and error_code != 1:
@@ -120,30 +75,23 @@ def _first_group_key(response: Any) -> str:
     return next((key for key, value in response.items() if isinstance(value, dict)), "")
 
 
-def resolve_stats_mode(mode: str) -> tuple[str, int, str]:
-    """模式词 → `(key, 上游 modes 数值, 中文标签)`。
+def resolve_stats_mode(mode: str, labels: dict[str, str] | None = None) -> str:
+    """模式词 → 规范 key（不认识就报错，**不猜**一个默认模式）。
 
-    词表与数值的唯一出处是 `data/pvp_counters.py`（取自本地 Manifest 的
-    `DestinyActivityModeDefinition.modeType`）。**别用 `ACTIVITY_MODES`**：那里
-    `allpvp=9` 是错的，实测 `modes=9` 直接 500。中文标签也认（`铁旗` → iron_banner）。
+    词表与数值的唯一出处是 `data/activity_modes`（数值取自本地 Manifest 的
+    `DestinyActivityModeDefinition.modeType`）。**本文件里那两张手写表已整表删除**：
+    `ACTIVITY_MODES` 的 `allpvp=9`、`onslaught=69` 与 `MODE_NAMES` 的 `69="猛攻"`
+    都是真机对照出来的错值（实测 `modes=9` 直接 500、69 是多人竞技PvP）。
+    中文标签也认（`铁旗` → `iron_banner`）；标签本身由调用方从 Manifest 取进来
+    （`labels`），这里只维护"词 → key"。
     """
-    word = (mode or "").strip()
-    lowered = word.lower()
-    key = lowered if lowered in pvp_counters.MODE_ACTIVITY_TYPES else ""
-    if not key:
-        key = next(
-            (k for k, label in pvp_counters.MODE_LABELS_ZH.items() if label == word), ""
-        )
-    if not key:
-        words = "、".join(pvp_counters.MODE_ACTIVITY_TYPES)
-        labels = "、".join(
-            pvp_counters.MODE_LABELS_ZH[k] for k in pvp_counters.MODE_ACTIVITY_TYPES
-        )
+    key = activity_modes.resolve(mode)
+    if key is None:
         raise InvalidArgumentError(
-            f"stats 不支持 mode={mode!r}；可取 {words}（或中文标签 {labels}）。"
+            f"不支持活动模式 {mode!r}；可取 {activity_modes.words_with_labels(labels)}。"
             '不按模式查就留空；赛季数字用 intent="counters" + period="season"。'
         )
-    return key, pvp_counters.MODE_ACTIVITY_TYPES[key], pvp_counters.MODE_LABELS_ZH[key]
+    return key
 
 
 def _stats_period_type(period: str) -> int:
@@ -183,6 +131,18 @@ class ActivityService:
         self._bungie = bungie
         self._manifest = manifest
         self._resolver = resolver
+
+    def _mode_labels(self) -> dict[str, str]:
+        """模式词 → 官方中文名（Manifest，zh 优先）。
+
+        以前是两张手写表（`ACTIVITY_MODES` / `MODE_NAMES`）；现在名字只在 Manifest 里，
+        取不到就退回词本身，不编一个中文名。
+        """
+        labels: dict[str, str] = {}
+        for key, mode_type in activity_modes.MODE_TYPE.items():
+            label = self._manifest.get_activity_mode_name(mode_type)
+            labels[key] = label.strip() if isinstance(label, str) and label.strip() else key
+        return labels
 
     async def _resolve_membership(self, player_name: str) -> tuple[str, int]:
         """玩家 → (membership_id, membership_type)。账号级查询不需要角色。"""
@@ -344,7 +304,10 @@ class ActivityService:
 
         mode_key = mode_type = mode_name = ""
         if mode:
-            mode_key, mode_type, mode_name = resolve_stats_mode(mode)
+            labels = self._mode_labels()
+            mode_key = resolve_stats_mode(mode, labels)
+            mode_type = activity_modes.MODE_TYPE[mode_key]
+            mode_name = labels[mode_key]
             result = await self._bungie.get_historical_stats(
                 mtype, mid, char_id, modes=mode_type, period_type=period_type
             )
@@ -386,7 +349,10 @@ class ActivityService:
         所以 payload 标 `aggregation="computed"`。
         """
         period_type = _stats_period_type(period)
-        mode_key, mode_type, mode_name = resolve_stats_mode(mode)
+        labels = self._mode_labels()
+        mode_key = resolve_stats_mode(mode, labels)
+        mode_type = activity_modes.MODE_TYPE[mode_key]
+        mode_name = labels[mode_key]
         mid, mtype = await self._resolve_membership(player_name)
         logger.info(
             "Fetching mode stats: player=%s mode=%s(%s) period=%s",
@@ -532,15 +498,22 @@ class ActivityService:
                 char_ids.append((char_id, class_type_name(char_info.get("classType", -1))))
 
         # Resolve mode
+        # 词表唯一出处是 `data/activity_modes`（数值 = Manifest 的 modeType）：
+        # 这里以前用本文件手写的 `ACTIVITY_MODES`，其中 `allpvp=9`、`onslaught=69` 都是错的
+        # （实测 9 是 Reserved9、69 是多人竞技PvP），已整表删除。
+        # 数字直传仍然允许：`mode` 也能是上游的 modeType 值。
         mode_hash = None
         if mode:
-            mode_hash = ACTIVITY_MODES.get(mode.lower(), None)
-            if mode_hash is None:
+            key = activity_modes.resolve(mode)
+            if key is not None:
+                mode_hash = activity_modes.MODE_TYPE[key]
+            else:
                 try:
                     mode_hash = int(mode)
                 except ValueError:
                     raise ConfigError(
-                        f"不支持活动模式 {mode!r}；请使用已知中英文模式名称或数字模式 ID。"
+                        f"不支持活动模式 {mode!r}；请使用已知中英文模式名称（"
+                        f"{'、'.join(activity_modes.keys())}）或数字模式 ID。"
                     ) from None
 
         result_count = max(1, min(int(count), 250))
@@ -588,7 +561,10 @@ class ActivityService:
                     "character": class_name,
                     "instance_id": details.get("instanceId", ""),
                     "mode": activity_mode,
-                    "mode_name": MODE_NAMES.get(activity_mode, f"模式{activity_mode}"),
+                    # 模式名从 Manifest 取（官方中文名），查不到降级成"模式<号>"——
+                    # 手写表 `MODE_NAMES` 已删（它只有 8 条且 69 标成了"猛攻"）。
+                    "mode_name": self._manifest.get_activity_mode_name(activity_mode)
+                    or f"模式{activity_mode}",
                     "is_completed": act.get("values", {}).get("completed", {}).get("basic", {}).get("displayValue", "") == "Yes",
                     "kills": act.get("values", {}).get("kills", {}).get("basic", {}).get("value", 0),
                     "deaths": act.get("values", {}).get("deaths", {}).get("basic", {}).get("value", 0),

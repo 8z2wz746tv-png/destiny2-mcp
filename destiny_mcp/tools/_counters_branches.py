@@ -20,11 +20,12 @@ from ..error_codes import ErrorCode
 from ._responses import data_only, error_response, ok_response
 
 
-def _scope_label(mode: str, period: str) -> str:
+def _scope_label(mode: str, period: str, labels: dict[str, str]) -> str:
     """把过滤条件写成人话（没给就是不写，不编"全部"这种结论）。"""
     parts = []
     if mode:
-        parts.append(f"模式={pvp_counters.MODE_LABELS_ZH.get(mode.strip().lower(), mode)}")
+        # 标签从 labels 里取（服务给的 Manifest 官方名），工具层不存中文名。
+        parts.append(f"模式={labels.get(mode.strip().lower(), mode)}")
     if period:
         parts.append(f"周期={pvp_counters.PERIOD_LABELS_ZH.get(period.strip().lower(), period)}")
     return "，".join(parts)
@@ -51,7 +52,7 @@ async def counters_response(
     )
     if result["unavailable"]:
         return error_response(ErrorCode.API_ERROR, result["unavailable"])
-    scope = _scope_label(mode, period)
+    scope = _scope_label(mode, period, result.get("labels", {}).get("modes", {}))
     return ok_response(
         f"已读取游戏内生涯计数器 {result['returned']}/{result['total']} 条"
         f"（来源 profile.metrics{('，' + scope) if scope else ''}）。",
