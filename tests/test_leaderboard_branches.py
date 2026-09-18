@@ -12,7 +12,9 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+from destiny_mcp.player_resolver import CURRENT_OAUTH_PLAYER
 from destiny_mcp.tools import _leaderboard_branches as branches
+from destiny_mcp.tools.assistants import activity_assistant
 
 
 def _svc() -> dict:
@@ -61,3 +63,57 @@ async def test_aggregate_uses_count_as_limit() -> None:
 
     assert response["ok"] is True
     assert svc["activity_svc"].get_aggregate_activity_stats.await_args.kwargs == {"limit": 7}
+
+
+def _tool_context(activity: AsyncMock) -> object:
+    return type("C", (), {
+        "request_context": type("R", (), {"lifespan_context": {"activity_svc": activity}}),
+    })()
+
+
+@pytest.mark.asyncio
+async def test_tool_call_site_maps_every_argument_to_the_right_parameter() -> None:
+    """工具层的**位置传参顺序**必须与分支签名一致。
+
+    CI 只跑 pytest（不跑 mypy/ruff），所以"签名一改、参数错位"没有类型网兜底 ——
+    以前 `statid` 收到 `maxtop` 这类错误会一路静默到"排行榜返回空"。
+    这条测试把 5 个相邻参数（character/mode/statid/maxtop）的映射钉死。
+    """
+    activity = AsyncMock()
+    activity.get_leaderboards.return_value = {"message": "已读取排行榜。"}
+
+    await activity_assistant(
+        intent="leaderboards", character="hunter", mode="allpvp",
+        statid="activitiesCleared", maxtop=7, ctx=_tool_context(activity),
+    )
+
+    assert activity.get_leaderboards.await_args.args == (
+        # 没传 player_name → 用"当前 OAuth 玩家"哨兵（真名在服务层才解析）。
+        CURRENT_OAUTH_PLAYER, "hunter", "allpvp", "activitiesCleared", 7,
+    )
+
+
+@pytest.mark.asyncio
+async def test_clan_leaderboard_call_site_passes_group_id_and_defaults() -> None:
+    activity = AsyncMock()
+    activity.get_clan_leaderboards.return_value = {"message": "已读取公会排行榜。"}
+
+    await activity_assistant(
+        intent="clan_leaderboards", group_id="4611686018490000000", ctx=_tool_context(activity),
+    )
+
+    # maxtop 没传 → 工具层补 10；mode/statid 没传 → 不带上游参数。
+    assert activity.get_clan_leaderboards.await_args.args == (
+        "4611686018490000000", None, None, 10,
+    )
+
+
+@pytest.mark.asyncio
+async def test_aggregate_call_site_passes_count_as_limit() -> None:
+    activity = AsyncMock()
+    activity.get_aggregate_activity_stats.return_value = {"activities": []}
+
+    await activity_assistant(intent="aggregate", count=5, ctx=_tool_context(activity))
+
+    assert activity.get_aggregate_activity_stats.await_args.args == (CURRENT_OAUTH_PLAYER, None)
+    assert activity.get_aggregate_activity_stats.await_args.kwargs == {"limit": 5}

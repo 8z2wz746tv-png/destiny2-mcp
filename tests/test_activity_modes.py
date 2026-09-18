@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
@@ -80,22 +81,69 @@ def test_onslaught_is_not_silently_mapped_to_competitive() -> None:
 
 
 def test_no_second_mode_table_reappears() -> None:
-    """模式词/数值/中文名都只有一处：不许再抄一张表（抄过的那两张都烂了）。"""
-    root = Path(__file__).resolve().parents[1] / "destiny_mcp"
-    banned = ("ACTIVITY_MODES", "MODE_NAMES", "MODE_LABELS_ZH", "MODE_ACTIVITY_TYPES")
-    offenders = []
-    for path in sorted(root.rglob("*.py")):
-        if "__pycache__" in path.as_posix():
+    """模式词/数值/中文名都只有一处：不许再抄一张表（抄过的那两张都烂了）。
+
+    比第一版严在三处（第一版只认"行首就是被禁名 + 有 `=`"，换个写法就漏）：
+
+    1. 用 AST 找**任何**形式的被禁名绑定（赋值、类型注解、字典键都算）；
+    2. 扫描范围含 `tests/` 与 `scripts/` —— 在那里再抄一份表同样会烂；
+    3. 另加一条中文标签的粗筛：PvP 模式名的**标签**不许出现在 `destiny_mcp/`
+       （`data/activity_modes.py` 只放别名，标签一律去 Manifest 取）。
+    """
+    root = Path(__file__).resolve().parents[1]
+    banned = {"ACTIVITY_MODES", "MODE_NAMES", "MODE_LABELS_ZH", "MODE_ACTIVITY_TYPES"}
+    self_path = Path(__file__).resolve()
+    offenders: list[str] = []
+
+    for path in sorted([*root.glob("destiny_mcp/**/*.py"), *root.glob("tests/**/*.py"),
+                        *root.glob("scripts/**/*.py")]):
+        if "__pycache__" in path.as_posix() or path == self_path:
             continue
-        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            stripped = line.strip()
-            if any(stripped.startswith(f"{name}") and "=" in stripped and "==" not in stripped
-                   for name in banned):
-                offenders.append(f"{path.relative_to(root.parent)}:{number}: {stripped}")
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            names: list[str] = []
+            if isinstance(node, ast.Assign):
+                names = [_target_name(target) for target in node.targets]
+            elif isinstance(node, ast.AnnAssign):
+                names = [_target_name(node.target)]
+            elif isinstance(node, ast.Dict):
+                names = [
+                    key.value for key in node.keys
+                    if isinstance(key, ast.Constant) and isinstance(key.value, str)
+                ]
+            for name in names:
+                if name in banned:
+                    offenders.append(f"{path.relative_to(root)}:{node.lineno}: 绑定 {name}")
+
+    # 中文标签粗筛：这些是"标签"（不是别名），只该来自 Manifest。
+    # 只认**值正好等于标签**的字符串常量 —— 注释与 docstring 里引用这些名字是证据、
+    # 不是表（第一版按子串扫，把注释里的"69 = 多人竞技PvP"也判红了）。
+    labels = {"铁旗占领模式", "占领模式：快速游戏", "多人竞技PvP", "铁旗区域占领"}
+    for path in sorted(root.glob("destiny_mcp/**/*.py")):
+        if "__pycache__" in path.as_posix() or path.name == "activity_modes.py":
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and node.value in labels:
+                offenders.append(
+                    f"{path.relative_to(root)}:{node.lineno}: 硬编码模式标签 {node.value!r}"
+                )
+
     assert offenders == [], (
-        "模式词表只能有 data/activity_modes.py 一处；中文名去 Manifest 取：\n"
+        "模式词/标签只能有 data/activity_modes.py + Manifest 两处出处：\n"
         + "\n".join(offenders)
     )
+
+
+def _target_name(node: ast.expr) -> str:
+    """赋值目标的名字：`X = ...` / `X: T = ...` / `obj.X = ...` 都取出末段名字。"""
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return node.attr
+    if isinstance(node, ast.Subscript):
+        return _target_name(node.value)
+    return ""
 
 
 def test_counter_families_are_mode_words() -> None:
