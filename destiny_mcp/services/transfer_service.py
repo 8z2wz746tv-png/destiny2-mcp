@@ -14,7 +14,6 @@ from ..exceptions import AuthenticationError, ItemNotFoundError, TransferError
 from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
-from ..vocabulary import class_key
 from ..models import (
     EquipPlan,
     EquipResult,

@@ -48,6 +48,6 @@ class ValidationError(BuildImportError):
 
     def __init__(self, detail: str = "") -> None:
         super().__init__(
-            f"配装校验失败。"
+            "配装校验失败。"
             + (f" {detail}" if detail else "")
         )

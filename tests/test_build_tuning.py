@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import json
 from types import SimpleNamespace
 import sqlite3
@@ -504,9 +506,7 @@ def test_solver_returned_sets_parameter_caps_the_pool() -> None:
     """`returned_sets` 是加出来的口子：不传就是老行为（200），传了就按它留。"""
     from destiny_mcp.build import solver as solver_mod
     from destiny_mcp.build.models import BuildConstraints
-    from destiny_mcp.build.tuning import piece_tuning
 
-    manifest = _manifest()
     # 每个部位两件 → 2^5 = 32 套组合，够看出上限差别
     armors: list[Armor] = []
     for slot in ("helmets", "gauntlets", "chests", "legs", "class_items"):
@@ -579,7 +579,6 @@ def test_tuning_plan_flags_but_never_ships_plugs_as_writable_mods() -> None:
 
     manifest = _manifest()
     armors = _five(grenade=50, weapons=40)
-    snapshot = _snapshot(armors)
     parsed = parse_constraints(
         BuildRequest(character_class="hunter", grenade_target=55), manifest
     )

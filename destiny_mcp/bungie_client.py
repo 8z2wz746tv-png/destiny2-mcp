@@ -27,8 +27,6 @@ from .logging_config import get_logger
 from .bungie_errors import (
     _bungie_unavailable_result,
     _http_error_code,
-    _http_status_of,
-    _is_bungie_service_unavailable,
     _is_insufficient_privileges,
     _raise_bungie_error,
     _raise_bungie_unavailable,

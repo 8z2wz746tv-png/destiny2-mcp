@@ -6,6 +6,9 @@ from typing import Any
 
 from ..exceptions import AuthenticationError, ConfigError
 from ..logging_config import get_logger
+from ..vocabulary import ITEM_TYPE_ALIASES as _ITEM_TYPE_ALIASES  # 单一出处
+from ..vocabulary import LOCATION_ALIASES as _LOCATION_ALIASES  # 单一出处
+from ..vocabulary import LOCATION_LABELS_ZH as _LOCATION_LABELS  # 单一出处
 from . import profile_components
 from ..manifest import ManifestManager
 from ..models import InventoryItem
@@ -26,11 +29,6 @@ DUPLICATE_WEAPON_PROFILE_COMPONENTS = profile_components.INVENTORY_SOCKETS
 _WEAPON_BUCKETS = {"Kinetic Weapons", "Energy Weapons", "Power Weapons"}
 _ARMOR_BUCKETS = {"Helmet", "Gauntlets", "Chest Armor", "Leg Armor", "Class Armor"}
 _VAULT_BUCKET_HASH = 138197802
-from ..vocabulary import LOCATION_ALIASES as _LOCATION_ALIASES  # 单一出处
-
-from ..vocabulary import ITEM_TYPE_ALIASES as _ITEM_TYPE_ALIASES  # 单一出处
-from ..vocabulary import LOCATION_LABELS_ZH as _LOCATION_LABELS  # 单一出处
-
 
 class InventoryAnalysisService:
     """Build compact structured summaries for inventory overview questions."""

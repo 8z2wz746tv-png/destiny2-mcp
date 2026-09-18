@@ -19,10 +19,10 @@ from __future__ import annotations
 from typing import Any, Sequence
 
 from ..logging_config import get_logger
+from ..vocabulary import STAT_LABELS_ZH as STAT_LABELS  # 单一出处：vocabulary.py
 
 logger = get_logger(__name__)
 
-from ..vocabulary import STAT_LABELS_ZH as STAT_LABELS  # 单一出处：vocabulary.py
 STAT_ORDER: tuple[str, ...] = tuple(STAT_LABELS)
 
 TARGET_FIELDS: dict[str, str] = {

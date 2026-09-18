@@ -17,9 +17,7 @@ from .auto_mod_utils import (
 )
 from .process_types import (
     ARTIFICE_STAT_BOOST,
-    MAJOR_STAT_BOOST,
     MAX_STAT,
-    MINOR_STAT_BOOST,
     AutoModData,
     ModsPick,
     ProcessItem,
@@ -224,7 +222,6 @@ def pick_and_assign_slot_independent_mods(
             if sockets_count < tag_count:
                 return None
 
-    assigned_at_least_once = False
 
     for perm in info.activity_mod_permutations:
         # Check if activity mods fit
@@ -250,8 +247,6 @@ def pick_and_assign_slot_independent_mods(
 
         if not valid:
             continue
-
-        assigned_at_least_once = True
 
         if needed_stats:
             result = choose_auto_mods(

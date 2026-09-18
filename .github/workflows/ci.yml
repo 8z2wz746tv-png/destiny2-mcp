@@ -27,6 +27,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
+      # 静态检查放最前面：它抓的是「未定义的 name / 未使用的 import」这一类，比测试更早更便宜。
+      # 真机上就靠它抓到过 `profile_components` 用了没导入（build 取账号护甲那条路 NameError）
+      # 与 activity_service 缺 player_names 导入。
+      - name: 静态检查（ruff）
+        run: python -m ruff check
+      # mypy 暂不进 CI：存量 411 个错（70 个文件），一次修不完。路线是「新代码先干净」——
+      # 想纳入某个模块，先把它修到 mypy 干净，再加进下面这行的文件列表；
+      # 列表覆盖够了再换成全仓。现在它是本地工具，不是门槛。
+      # - name: 类型检查（mypy，逐步纳入）
+      #   run: python -m mypy destiny_mcp/services/pvp_weapon_service.py destiny_mcp/services/pgcr_cache.py
       - name: 单元测试 + 契约/分层守门
         run: python -m pytest -q
       - name: 没有凭据也能构造工具面（干净克隆冒烟）

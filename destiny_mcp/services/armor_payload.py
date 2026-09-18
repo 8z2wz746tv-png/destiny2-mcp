@@ -269,7 +269,6 @@ def armor_payload(
     roll: dict[str, int] = {}
     tuning_plug_stats: dict[str, int] | None = None
     masterwork_stats: dict[str, int] = {}
-    masterwork_level = 0
     tuning: dict[str, Any] | None = None
     tuning_delta: dict[str, int] = {}
     mod_stats: dict[str, int] = {}

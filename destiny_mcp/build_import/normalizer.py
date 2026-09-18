@@ -11,6 +11,9 @@
 
 from __future__ import annotations
 
+# 职业名映射：别名表的单一出处是 vocabulary.py。
+from ..vocabulary import CLASS_ALIASES
+
 from difflib import SequenceMatcher
 from pathlib import Path
 
@@ -33,9 +36,6 @@ STAT_NAME_ALIASES: dict[str, list[str]] = {
     "melee": ["melee", "近战", "力量", "strength"],
     "super_stat": ["super_stat", "super", "超能", "智慧", "intellect"],
 }
-
-# 职业名映射
-from ..vocabulary import CLASS_ALIASES  # 职业别名的单一出处
 
 # Fuzzy match 阈值
 _FUZZY_THRESHOLD = 0.75

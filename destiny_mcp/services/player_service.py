@@ -6,14 +6,13 @@ Extracted from server.py per Rule 1: tools should not contain business logic.
 from __future__ import annotations
 
 import math
-import time
 
 import aiobungie
 
 from ..bungie_client import BungieClient
 from ..exceptions import APIError, PlayerNotFoundError
 from ..logging_config import get_logger
-from ..manifest import ManifestManager, class_type_name, resolve_character_name
+from ..manifest import ManifestManager, class_type_name
 from ..models import CharacterInfo, PlayerInfo, ProfileResponse
 from ..player_resolver import CURRENT_OAUTH_PLAYER, PlayerResolver
 

@@ -33,6 +33,7 @@ from ..build.models import (
 )
 from ..bungie_client import BungieClient
 from ..build_contracts import CanonicalBuild, ExecutableBuild
+from . import profile_components
 from ..exceptions import BuildValidationError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
@@ -185,8 +186,6 @@ class BuildService:
 
         Returns stat vectors plus the exact equipped subclass configuration.
         """
-        from ..manifest import resolve_character_name, class_type_name
-
         p = await self._resolver.resolve_player(player_name)
         mid = p["membership_id"]
         mtype = p["membership_type"]

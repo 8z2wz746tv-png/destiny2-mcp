@@ -25,7 +25,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
-import os
 import re
 import sys
 import time
@@ -1151,7 +1150,6 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
             slow=True,
         )
         fdata3 = (farm or {}).get("data") or {}
-        farm_blob = json.dumps(fdata3, ensure_ascii=False)
         no_solution = "无法满足" in str((farm or {}).get("summary"))
         check(
             "rows",

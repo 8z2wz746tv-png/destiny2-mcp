@@ -18,7 +18,7 @@ from ..services import weapon_local_data, weapon_payload, weapon_profile
 from ..services.weapon_payload import schema_block
 from ._enrichment import community_enrichment
 from ._farming import farming_reference, harvest_names
-from ._responses import error_response, ok_response
+from ._responses import ok_response
 
 
 def _collect_notes(items: list[dict[str, Any]]) -> list[str]:

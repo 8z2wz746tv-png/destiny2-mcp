@@ -16,7 +16,7 @@ class NoSolutionError(BuildEngineError):
 
     def __init__(self, reason: str = "") -> None:
         self.reason = reason
-        super().__init__(f"No build satisfies constraints." + (f" {reason}" if reason else ""))
+        super().__init__("No build satisfies constraints." + (f" {reason}" if reason else ""))
 
 
 class InvalidConstraintsError(BuildEngineError):
@@ -24,4 +24,4 @@ class InvalidConstraintsError(BuildEngineError):
 
     def __init__(self, detail: str = "") -> None:
         self.detail = detail
-        super().__init__(f"Invalid build constraints." + (f" {detail}" if detail else ""))
+        super().__init__("Invalid build constraints." + (f" {detail}" if detail else ""))

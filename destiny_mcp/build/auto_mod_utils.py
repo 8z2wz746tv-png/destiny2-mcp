@@ -7,16 +7,13 @@ finding mod assignments that satisfy stat targets.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 
 from .process_types import (
     ARTIFICE_STAT_BOOST,
     MAJOR_STAT_BOOST,
     MINOR_STAT_BOOST,
     AutoModData,
-    ModDef,
     ModsPick,
-    StatMods,
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
