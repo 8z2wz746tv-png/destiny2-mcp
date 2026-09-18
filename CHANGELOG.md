@@ -145,6 +145,19 @@
   先把某个模块修到干净，再加进那行注释里的文件列表，覆盖够了再换全仓；现在它是本地工具，
   不是门槛。
 
+**全量语料实跑抓出的两处问题（同日补）**：
+
+- **`data` 里不许再带 `message`**：`weapon_history` 四个别名与新的 `pvp_weapons` 都把
+  `message` 留在了 data 里，信封规则（`envelope_violations`）判违规 —— 全量语料里
+  5 条 FAIL 全是这一个根因（老路径一直带着它，没人跑到过）。现在工具层统一把
+  `message`/`warnings` 拆到信封（`_split_envelope`），data 只留数据；语料里那行原本
+  断言的是 `data.message`（等于把违规形状钉死了），改成查顶层 `summary`。
+- **全量语料 runner 自己写坏了一行**：`run_corpus_all_rows.py` 的 career 三档那一行，
+  布尔条件中间混进一个字符串，把 `check()` 的位置参数从 4 个撑成 5 个 —— 表现是
+  **跑到第 40 行才 `TypeError` 崩掉**，前面几十行结果全废（这一行从来没被跑到过）。
+  已修，并新增 `tests/test_corpus_script_health.py`：AST 扫每个 `run_corpus_*.py` 的
+  `check()` 位置参数个数 + 语法可解析（守门自己也验证过会咬人）。
+
 ## 未发布（2026-09-17）
 
 **PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，

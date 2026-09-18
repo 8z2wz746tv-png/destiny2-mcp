@@ -77,6 +77,8 @@ async def test_envelope_carries_warnings_and_data_holds_the_board() -> None:
     board = response["data"]["pvp_weapons"]
     assert board["scope"] == "pvp_recent" and board["source"] == "pgcr_aggregation"
     assert "warnings" not in board, "warnings 只该在信封里"
+    # `message` 同理：data 里带 message/success 是信封违规（全量语料抓过 5 条）。
+    assert "message" not in board, "message 只该做顶层 summary"
     assert response["warnings"] and "不是生涯" in response["warnings"][0]
     assert response["summary"].startswith("已分析最近")
 

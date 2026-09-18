@@ -1497,7 +1497,8 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         and isinstance(pve_entered.get("existing"), int)
         and isinstance(pvp_defeated.get("deleted"), int)
         and pvp_ratio.get("aggregate") in {"sum", "max", "min", "derived", "none"}
-        and "value" not in pve_entered, "账号级行不给 value，免得被当成生涯"
+        # 账号级行不给 value，免得被当成生涯。
+        and "value" not in pve_entered
         and cstats == hstats,
         f"账号级 {cstats.get('scope')} 角色={cstats.get('characters')} "
         f"| 熔炉击败={short(pvp_defeated, 200)} "
@@ -1573,7 +1574,8 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         and isinstance(first_row(whdata.get("weapons")).get("stats"), list)
         and first_row(first_row(whdata.get("weapons")).get("stats") or []).get("stat_id")
         and whdata.get("scope") == "all_modes"
-        and "不是 PvP 榜" in str(whdata.get("message") or ""),
+        # 话术在**信封**的 summary 里（`data.message` 是信封违规，全量语料自己会判红）。
+        and "不是 PvP 榜" in str((weapon_hist or {}).get("summary") or ""),
         f"记录数={whdata.get('count')} 返回={len(whdata.get('weapons') or [])} "
         f"scope={whdata.get('scope')} 首项={short(first_row(whdata.get('weapons')), 160)}",
         seconds=dt,
