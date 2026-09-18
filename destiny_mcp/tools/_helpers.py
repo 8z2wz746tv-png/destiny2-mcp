@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import functools
-import re
 from collections.abc import Callable
 from typing import Any, cast
 
@@ -79,3 +78,17 @@ def handle_tool_error(func: Callable) -> Callable:
             logger.exception("Tool %s unexpected error", func.__name__)
             raise
     return wrapper
+
+
+def positive_or_default(value: int | None, default: int) -> int:
+    """条数类参数的哨兵规则：`None` 或 **≤0** 都算"没指定" → 该入口的默认值。
+
+    为什么把 0 与负数也算"没指定"：`_param_docs.Limit` 一直这么承诺
+    （"传 0 或负数等于没指定"），但代码只判 `None` —— 传 0 会一路走到服务层的
+    `max(1, min(...))`，静默变成"要 1 条/1 场"。这类"文档承诺了、代码没做"的差距
+    正是这个仓库最不能留的东西，所以 count/limit/maxtop/top_n/max_replacements/
+    slot_number 全部走这一个函数：规则只有一处，改也只改这里。
+    """
+    if value is None or value <= 0:
+        return default
+    return value

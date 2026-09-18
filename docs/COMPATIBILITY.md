@@ -48,6 +48,19 @@
 智谋（`gambit`，63）的 `activityModeCategory=3`（**PvPvE**）：它不属于"纯 PvP"，
 筛 PvP 时不会被带上（真机实测 `mode=5` 拉到的场次里没有智谋）。
 
+## 未发布：`count` / `limit` / `maxtop` 传 0 或负数的行为
+
+以前只有文档承诺"传 0 或负数等于没指定"，代码只判 `None`，于是 0 会被服务层的
+`max(1, …)` 变成 **1**（要 1 条/1 场）。现在 0 与负数**确实**等同"没指定"，按该入口的默认值走：
+
+| 入口 | 传 `0` 以前 | 传 `0` 现在 |
+| --- | --- | --- |
+| `activity_assistant` 的 `count`（history/counters/community…） | 1 条 | 该 intent 的默认条数（20） |
+| `activity_assistant(intent="pvp_weapons")` 的 `count` | 1 场 | 10 场（本 intent 默认） |
+| `activity_assistant` 的 `maxtop`（排行榜） | 0（上游收到 0） | 10 |
+| 各工具的 `limit` | 部分入口 1 条、部分入口走默认 | 一律走该入口默认 |
+| `top_n` / `slot_number` / `max_replacements` | schema 直接拒收（`ge=1`） | 不变（仍然拒收） |
+
 ## 0.3.0 的新能力与删除的行为
 
 新能力**不是别名**，登记在这里是为了让"以前做不到、现在能做了"有据可查：

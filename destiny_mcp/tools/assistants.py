@@ -23,7 +23,7 @@ from ._build_confirmation import (
 )
 from ._farm_target_response import serialize_farm_target_analysis
 from ._formatters import inventory_search_summary
-from ._helpers import get_ctx, handle_tool_error, resolve_player_name
+from ._helpers import get_ctx, handle_tool_error, positive_or_default, resolve_player_name
 from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
 from . import _counters_branches as counters_branches
@@ -220,8 +220,7 @@ async def inventory_assistant(
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
     # 列清单（get/list）给 100 件的默认上限：它以前一次倒出整个仓库（1260 件 ≈ 511 KB），
     # 现在按上限返回并带 total/truncated/next_offset，想全看就翻页。
-    if limit is None:
-        limit = _INVENTORY_DEFAULT_LIMIT if intent in _INVENTORY_PAGE_INTENTS else 10
+    limit = positive_or_default(limit, _INVENTORY_DEFAULT_LIMIT if intent in _INVENTORY_PAGE_INTENTS else 10)
     locked = True if locked is None else locked
     tracked = True if tracked is None else tracked
     resolved = resolve_player_name(player_name)
@@ -287,7 +286,7 @@ async def inventory_assistant(
 
     if intent in {"get", "inventory", "list"}:
         # 传 0/负数 = 没指定 → 回到默认上限（项目统一约定），要更多用 offset 翻页。
-        page_limit = limit if limit and limit > 0 else _INVENTORY_DEFAULT_LIMIT
+        page_limit = positive_or_default(limit, _INVENTORY_DEFAULT_LIMIT)
         result = await svc["inventory_svc"].get_inventory(
             resolved,
             location,
@@ -448,8 +447,7 @@ async def weapon_assistant(
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
     # 按类型列武器默认 20 件：每件带完整模板（真机约 9.7 KB 紧凑 JSON），50 件 ≈ 452 KB
     # ≈ 13 万 tokens，一次就能把调用方上下文吃掉大半；目录/筛选仍是 50（行很轻）。
-    if limit is None:
-        limit = _WEAPON_TYPE_DEFAULT_LIMIT if intent == "type" else 50
+    limit = positive_or_default(limit, _WEAPON_TYPE_DEFAULT_LIMIT if intent == "type" else 50)
     include_inventory = True if include_inventory is None else include_inventory
     community_section = community_section or "text"
     catalog_intents = {"catalog", "search_catalog", "all_weapons", "global", "search_all"}
@@ -1058,7 +1056,7 @@ async def loadout_assistant(
     if intent in {"list", "get"}:
         # 每套配装带完整 build_template（约 11 KB），整套账号 20 套 ≈ 227 KB：
         # 默认只给 5 套（切片在服务层做，工具层只负责把"被截断"讲清楚）。
-        page_limit = limit if limit and limit > 0 else _LOADOUT_DEFAULT_LIMIT
+        page_limit = positive_or_default(limit, _LOADOUT_DEFAULT_LIMIT)
         _ = page_limit
         result = await svc["loadout_svc"].get_loadouts(
             resolved, character or None, page_limit, offset
@@ -1163,7 +1161,7 @@ async def subclass_assistant(
     svc = get_ctx(ctx)
     intent = cast(SubclassIntent, (intent or "get").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
-    limit = 10 if limit is None else limit
+    limit = positive_or_default(limit, 10)
     community_section = community_section or "text"
     resolved = resolve_player_name(player_name)
 
@@ -1252,10 +1250,10 @@ async def activity_assistant(
     svc = get_ctx(ctx)
     intent = cast(ActivityIntent, (intent or "history").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
-    maxtop = 10 if maxtop is None else maxtop
+    maxtop = positive_or_default(maxtop, 10)
     # pvp_weapons 的 count 是"分析多少场"：逐场 PGCR 约 1 场/秒（实测），
-    # 所以它的默认值是 10 而不是别处的 20 条。
-    count = (10 if intent == "pvp_weapons" else 20) if count is None else count
+    # 所以它的默认值是 10 而不是别处的 20 条。`None`/0/负数都算"没指定"。
+    count = positive_or_default(count, 10 if intent == "pvp_weapons" else 20)
     community_section = community_section or "text"
     resolved = resolve_player_name(player_name)
 
@@ -1326,8 +1324,8 @@ async def world_assistant(
     # 那样显式传 12 会被静默吞掉（11 生效、12 变默认、13 又生效），宿主按 schema 默认值
     # 自动填参时也分不清"传了 12"和"没传"。vendor 自己按菜单/详情分别取默认，留给它 None。
     community_section = community_section or "text"
-    if limit is None and intent != "vendor":
-        limit = _WORLD_LIMIT_DEFAULT
+    # vendor 自己按菜单/详情分别取默认，所以只有它保留 None（见上面那段注释）。
+    limit = limit if intent == "vendor" else positive_or_default(limit, _WORLD_LIMIT_DEFAULT)
 
     if intent == "community":
         result = _community_read(

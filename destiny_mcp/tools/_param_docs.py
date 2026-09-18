@@ -453,12 +453,13 @@ StatId = Annotated[
 
 MaxTop = Annotated[
     int | None,
-    Field(description="榜单取前多少名；null=没指定（按 10 处理）。只有排行榜类 intent 读它。"),
+    Field(description="榜单取前多少名；null=没指定（按 10 处理）。传 0 或负数等于没指定"
+                     "（与 limit/count 同一条规则）。只有排行榜类 intent 读它。"),
 ]
 
 Count = Annotated[
     int | None,
-    Field(description="要多少条记录；null=没指定（按 20 处理，pvp_weapons 按 10 场）。history、"
+    Field(description="要多少条记录；null=没指定（按 20 处理，pvp_weapons 按 10 场）。传 0 或负数等于没指定。history、"
                      "武器历史、PvP 武器榜（pvp_weapons：分析多少场，上限 100）、聚合统计、"
                      "计数器（counters）和社区资料读它；生涯统计不分条数。"),
 ]

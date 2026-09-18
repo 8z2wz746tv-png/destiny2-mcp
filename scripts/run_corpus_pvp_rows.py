@@ -13,7 +13,6 @@ from __future__ import annotations
 import json
 import re
 import subprocess
-import sys
 import threading
 from pathlib import Path
 
@@ -300,16 +299,20 @@ def main() -> int:
             f"code={(r.get('error') or {}).get('code')} 话术={message[:60]}…",
         )
 
-        # 19 count 不许被静默改写：requested 原样保留 + planned 才是实际用的
-        r = srv.call("activity_assistant", {"intent": "pvp_weapons", "count": 0})
-        window = ((r.get("data") or {}).get("pvp_weapons") or {}).get("window") or {}
+        # 19 count=0 与"不传"等价（文档承诺：0 或负数 = 没指定），且不许出现"已按 1 场"这种旧行为
+        zero = srv.call("activity_assistant", {"intent": "pvp_weapons", "count": 0})
+        zero_window = ((zero.get("data") or {}).get("pvp_weapons") or {}).get("window") or {}
+        default = srv.call("activity_assistant", {"intent": "pvp_weapons"})
+        default_window = ((default.get("data") or {}).get("pvp_weapons") or {}).get("window") or {}
         check(
-            "pvp_weapons count=0 如实改写并留痕",
-            r.get("ok") is True and window.get("matches_requested") == 0
-            and window.get("matches_planned") == 1
-            and any("matches_planned" in w for w in (r.get("warnings") or [])),
-            f"requested={window.get('matches_requested')} planned={window.get('matches_planned')} "
-            f"analyzed={window.get('matches_analyzed')}",
+            "pvp_weapons count=0 等同于没传（都是默认 10 场）",
+            zero.get("ok") is True
+            and zero_window.get("matches_requested") == default_window.get("matches_requested") == 10
+            and zero_window.get("matches_planned") == 10
+            and not any("已按 1 场" in w for w in (zero.get("warnings") or [])),
+            f"count=0 → requested={zero_window.get('matches_requested')} "
+            f"planned={zero_window.get('matches_planned')} analyzed={zero_window.get('matches_analyzed')}；"
+            f"不传 → requested={default_window.get('matches_requested')}",
         )
 
     finally:

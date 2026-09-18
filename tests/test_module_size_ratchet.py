@@ -39,7 +39,9 @@ CEILINGS = {
     # PvP 武器榜：榜单三兄弟搬去 `_leaderboard_branches.py`、武器两个口径搬去
     # `_weapon_usage_branches.py`（分支响应按域放 `_*_branches.py` 是既定分工），
     # 这里净减 2 行 → 上限跟着收紧，旧上限不再是"可以慢慢长回去"的许可。
-    "destiny_mcp/tools/assistants.py": 1401,
+    # 条数类参数的哨兵规则收敛到 `_helpers.positive_or_default`：`if limit is None:`
+    # 的壳去掉后 1401 → 1399（那些壳本身就让 0 走不进规则里）。
+    "destiny_mcp/tools/assistants.py": 1399,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留
@@ -48,7 +50,9 @@ CEILINGS = {
     # P7：结果翻译层（ProcessArmorSet → BuildResult/canonical_build + 目标统计）
     # 整个搬到 services/build_results.py，1114 → 906，上限跟着收紧 ——
     # 调谐（tuning）的对外字段也落在那边的翻译层里，不再往这里堆。
-    "destiny_mcp/services/build_service.py": 902,
+    # 902 → 901：函数内那行冗余的 `from ..manifest import …`（顶层已经导入了同样两个
+    # 名字）换成组件号单一出处 `from . import profile_components` —— 修 F821 的同时不涨行数。
+    "destiny_mcp/services/build_service.py": 901,
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升
