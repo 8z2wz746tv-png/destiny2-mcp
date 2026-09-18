@@ -42,16 +42,24 @@
    `mode`（`pvp` 默认｜`trials`｜`iron_banner`｜`competitive`｜`gambit`）/ `count`（分析多少场，
    默认 10、上限 100）。
 2. **口径必须在载荷里自证**：`scope="pvp_recent"`、`source="pgcr_aggregation"`、
-   `window{newest,oldest,matches_requested,matches_analyzed,matches_failed}`、
+   `window{newest,oldest,matches_requested,matches_planned,matches_analyzed,matches_failed,
+   matches_without_your_row,history_page_size_per_character}`、
    `mode_tally`（每场回报的子模式 + 官方中文名）、`characters`。
    时间窗**不许省**：真机上"最近 250 场"对某些角色跨两年多。
-3. **只统计自己那一行**：按 `characterId` 精确匹配 PGCR 的 entry，匹配不到就跳过该场
-   （宁少一场，也不猜）。
-4. 失败如实：单场失败进 `failed_matches` + warning 并继续；一场都没取到**报错**，
+   `matches_requested` 是调用方要的值（**原样**），`matches_planned` 才是实际用的
+   （`count` 上限 100），两者不同要带 warning —— 不许把调用方要的数字改写成钳制后的值。
+3. **只统计自己那一行**：先按 `characterId` 精确匹配 PGCR 的 entry；上游偶尔不给
+   `characterId`，退一步按 `player.destinyUserInfo.membershipId` 找；两条都不中就把这场
+   记进 `matches_without_your_row` 并带 warning（**不许**当成"这场没杀到人"）。
+4. **模式词只认 PvP 家族（category=2）+ 智谋**：`mode="raid"` 这类 PvE 词**报错**。
+   真机踩过：没有这道守卫时突袭结算会被贴上 `scope="pvp_recent"` 的标签（392 杀的突袭枪登顶）。
+5. 失败如实：单场失败进 `failed_matches` + warning 并继续；一场都没取到**报错**，
    不返回空榜单（"没打成"和"没打过"是两件事）；历史失败只丢那个角色。
-5. PGCR 落盘缓存（`~/.destiny_mcp/cache/pgcr/<instanceId>.json`，结算不可变）：
-   不算账号写入，不需要 `confirmed`；缓存坏掉只等于没缓存。
-6. `pvp_weapons` 与 `weapon_history` **并存、各自标口径**：前者是窗口、后者是全模式，
+6. PGCR 落盘缓存（`DESTINY_CACHE_PATH/pgcr/<instanceId>.json`，默认
+   `~/.destiny_mcp/cache/pgcr`，结算不可变）：不算账号写入，不需要 `confirmed`；
+   缓存坏掉只等于没缓存。**保留策略**：无 TTL，按条数轮换（`MAX_CACHE_FILES = 2000`，
+   一条约 50 KB ≈ 100 MB 上限），每进程只在第一轮扫一次目录、删最旧。
+7. `pvp_weapons` 与 `weapon_history` **并存、各自标口径**：前者是窗口、后者是全模式，
    两个来源不互相覆盖（`scope` 不同，调用方一眼能分）。
 
 ## Consequences
@@ -64,4 +72,9 @@
   `tests/test_activity_modes.py`）、`services/pvp_weapon_service.py`（守门
   `tests/test_pvp_weapons.py`）、`tools/_weapon_usage_branches.py`（两个口径的分派）。
 - 子模式名依赖 Manifest 的 `DestinyActivityModeDefinition`：Manifest 更新后若出现新模式，
-  榜单会显示它的官方名（查不到才降级成 `模式<号>`），不需要改代码。
+  榜单会显示它的官方名（查不到才降级成 `模式<号>`），不需要改代码。**取不到名字时要有痕迹**：
+  索引为空会 `logger.warning`，榜单词条里也带一条 warning（否则表现是"界面突然全是模式43"，
+  而日志与响应里什么都没有 —— 这条是补记：模式名最初改从 Manifest 取时漏了留痕，
+  且当时 1596 条测试全绿也没咬住）。
+- 缓存目录用独立的 `DESTINY_CACHE_PATH`（不借用 `DESTINY_TOKEN_PATH`：那个名字会让人
+  以为"删令牌就清了缓存"，也没法单独把缓存挪到大盘）。

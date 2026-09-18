@@ -175,19 +175,32 @@ class ItemDefinitionMixin:
                         "SELECT json FROM DestinyActivityModeDefinition"
                     ).fetchall()
                 except sqlite3.Error as e:
-                    logger.debug("Scan DestinyActivityModeDefinition failed: %s", e)
+                    logger.warning("读取 DestinyActivityModeDefinition 失败：%s", e)
                     continue
                 for row in rows:
                     try:
                         definition = json.loads(row["json"])
-                    except (json.JSONDecodeError, TypeError):
+                    except (json.JSONDecodeError, TypeError, KeyError):
+                        # `KeyError`：连接没设 `row_factory` 时 `row["json"]` 会抛这个，
+                        # 而不是 sqlite3.Error —— 少了它整张索引会静默变空。
+                        continue
+                    if not isinstance(definition, dict):
+                        # 合法 JSON 但不是 dict（数组/字符串）：以前 `.get()` 会抛
+                        # AttributeError 冒到调用方，把整条 history/stats/counters 带崩。
                         continue
                     raw_type = definition.get("modeType")
                     display = definition.get("displayProperties") or {}
-                    name = display.get("name")
+                    name = display.get("name") if isinstance(display, dict) else None
                     if isinstance(raw_type, bool) or not isinstance(raw_type, int):
                         continue
                     if isinstance(name, str) and name.strip():
                         names.setdefault(raw_type, name.strip())
+            if not names:
+                # 索引为空 = 全站模式名会退化成"模式<号>"。这条必须能看见（以前只有 debug），
+                # 否则表现是"界面突然全是模式43"，而日志里什么都没有。
+                logger.warning(
+                    "模式名索引为空：模式名将退化成 模式<modeType>。"
+                    "检查 Manifest 的 DestinyActivityModeDefinition 表与连接 row_factory。"
+                )
             self._mode_names = names
         return self._mode_names.get(mode_type, "")

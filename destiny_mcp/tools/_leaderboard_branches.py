@@ -38,11 +38,14 @@ async def leaderboard_response(
             ),
         )
 
+    # `mode or None`：空串会被客户端当成"要发这个参数"（`if value is not None` 才过滤），
+    # 于是 URL 上多一个空的 `modes=` —— 搬运前传的就是 None，纯搬运不许改请求。
+    modes = mode or None
     if intent in {"leaderboards", "leaderboard"}:
         result = await svc["activity_svc"].get_leaderboards(
-            player_name, character, mode, statid, maxtop
+            player_name, character, modes, statid, maxtop
         )
         return ok_response(result.get("message", "已读取排行榜。"), result)
 
-    result = await svc["activity_svc"].get_clan_leaderboards(group_id, mode, statid, maxtop)
+    result = await svc["activity_svc"].get_clan_leaderboards(group_id, modes, statid, maxtop)
     return ok_response(result.get("message", "已读取公会排行榜。"), result)

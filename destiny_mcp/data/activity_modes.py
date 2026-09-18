@@ -120,14 +120,17 @@ def pvp_keys() -> tuple[str, ...]:
     return tuple(key for key in MODES if is_pvp(key))
 
 
-def words_with_labels(labels: dict[str, str] | None = None) -> str:
+def words_with_labels(
+    labels: dict[str, str] | None = None, keys: tuple[str, ...] | None = None
+) -> str:
     """错误话术用："crucible（熔炉竞技场）、trials（奥斯里斯试炼）…"。
 
-    `labels` 是调用方从 Manifest 取的中文名（取不到就不带括号），
-    这样话术不会因为这里没有标签表而退化。
+    `labels` 是调用方从 Manifest 取的中文名（取不到就不带括号），这样话术不会因为这里
+    没有标签表而退化；`keys` 用来只列**这个入口真正接受**的词（例如 PvP 武器榜只认
+    PvP 家族 + 智谋），缺省才是全部模式词。
     """
     parts = []
-    for key in MODES:
+    for key in keys or tuple(MODES):
         label = (labels or {}).get(key, "")
         parts.append(f"{key}（{label}）" if label else key)
     return "、".join(parts)

@@ -289,6 +289,29 @@ def main() -> int:
             f"analyzed={(board.get('window') or {}).get('matches_analyzed')}",
         )
 
+        # 18 PvE 模式词必须报错（真机踩过：mode="raid" 被贴上 PvP 榜标签）
+        r = srv.call("activity_assistant", {"intent": "pvp_weapons", "mode": "raid", "count": 1})
+        message = (r.get("error") or {}).get("message", "")
+        check(
+            "pvp_weapons 拒绝 PvE 模式词",
+            (r.get("error") or {}).get("code") == "invalid_argument_error"
+            and "crucible" in message and "weapon_history" in message
+            and "raid（" not in message,
+            f"code={(r.get('error') or {}).get('code')} 话术={message[:60]}…",
+        )
+
+        # 19 count 不许被静默改写：requested 原样保留 + planned 才是实际用的
+        r = srv.call("activity_assistant", {"intent": "pvp_weapons", "count": 0})
+        window = ((r.get("data") or {}).get("pvp_weapons") or {}).get("window") or {}
+        check(
+            "pvp_weapons count=0 如实改写并留痕",
+            r.get("ok") is True and window.get("matches_requested") == 0
+            and window.get("matches_planned") == 1
+            and any("matches_planned" in w for w in (r.get("warnings") or [])),
+            f"requested={window.get('matches_requested')} planned={window.get('matches_planned')} "
+            f"analyzed={window.get('matches_analyzed')}",
+        )
+
     finally:
         srv.close()
 

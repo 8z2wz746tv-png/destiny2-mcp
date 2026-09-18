@@ -53,14 +53,28 @@ MAX_MATCHES = 100
 # 并发固定 3：实测吞吐的甜点（并发 6 反而降到 0.89 场/秒，像撞上游限流）。
 PGCR_CONCURRENCY = 3
 
-# 缓存目录：`~/.destiny_mcp/cache/pgcr/`。PGCR 不可变，缓存命中即等价于上游结果。
-CACHE_SUBDIR = ("cache", "pgcr")
+# 武器榜只认 **PvP 家族（category=2）+ 智谋**。别放全部模式词进来：真机踩过
+# `mode="raid"` 被接受、回包却自称 `scope="pvp_recent"`（392 杀的突袭枪登顶），
+# 那就是把 PvE 数据贴上 PvP 标签 —— 比报错糟得多。
+BOARD_KEYS: tuple[str, ...] = (*activity_modes.pvp_keys(), "gambit")
+
+# 缓存目录：`DESTINY_CACHE_PATH/pgcr/`（默认 `~/.destiny_mcp/cache/pgcr`）。
+# PGCR 不可变，缓存命中即等价于上游结果。
+CACHE_SUBDIR = "pgcr"
+
+# 缓存轮换上限：一条 PGCR 约 50 KB，2000 条 ≈ 100 MB。超出按 mtime 删最旧。
+MAX_CACHE_FILES = 2000
 
 
 def _cache_dir() -> Path:
+    """缓存目录：`DESTINY_CACHE_PATH/pgcr`。
+
+    以前借用 `DESTINY_TOKEN_PATH`（令牌目录）—— 名字会误导"删令牌就清了缓存"，
+    而且用户没法单独把缓存挪到大盘上。
+    """
     from .. import config
 
-    return Path(config.DESTINY_TOKEN_PATH, *CACHE_SUBDIR)
+    return Path(config.DESTINY_CACHE_PATH, CACHE_SUBDIR)
 
 
 def _stat_value(values: dict, *keys: str) -> float | None:
@@ -102,6 +116,33 @@ class PgcrCache:
             return None
         return payload if isinstance(payload, dict) else None
 
+    def prune(self, keep: int = MAX_CACHE_FILES) -> int:
+        """按 mtime 只留最新 `keep` 条，返回删除条数。
+
+        无上限的缓存会一直长（100 场 ≈ 5 MB，长期跑就是一路涨）。这里不做 TTL：
+        PGCR 不可变，旧条目只是"用不上"，删掉不损失正确性 —— 留着是为了省上游请求，
+        所以按"最近用过"轮换就够。整轮只做一次（由服务层保证），不在每场之后扫目录。
+        """
+        try:
+            files = sorted(
+                self.directory.glob("*.json"),
+                key=lambda path: path.stat().st_mtime,
+                reverse=True,
+            )
+        except OSError as exc:
+            logger.debug("PGCR 缓存轮换跳过：%s", exc)
+            return 0
+        removed = 0
+        for path in files[keep:]:
+            try:
+                path.unlink()
+                removed += 1
+            except OSError:
+                continue
+        if removed:
+            logger.info("PGCR 缓存轮换：删除 %d 个最旧条目（保留 %d）", removed, keep)
+        return removed
+
     def put(self, instance_id: str, payload: dict) -> None:
         try:
             self.directory.mkdir(parents=True, exist_ok=True)
@@ -127,11 +168,27 @@ class PvpWeaponService:
         self._manifest = manifest
         self._resolver = resolver
         self._cache = cache or PgcrCache()
+        # 缓存轮换每进程只做一次：目录几千个文件时 listdir 不贵，但没必要每轮都扫。
+        self._pruned = False
+
+    def _mode_labels(self) -> dict[str, str]:
+        """本榜认的模式词 → 官方中文名（Manifest，zh 优先）。
+
+        只在 `BOARD_KEYS` 上取：载荷与报错话术都用这一份，不再各算一遍
+        （以前成功路径算全部 14 个词、报错路径再算一遍）。
+        """
+        labels: dict[str, str] = {}
+        for word in BOARD_KEYS:
+            label = self._manifest.get_activity_mode_name(activity_modes.MODE_TYPE[word])
+            labels[word] = label if isinstance(label, str) and label.strip() else word
+        return labels
 
     # ── 取数 ────────────────────────────────────────────────────────────────
 
-    async def _characters(self, player_name: str, character: str | None) -> tuple[str, int, dict, list[tuple[str, str]]]:
-        """返回 `(membership_id, membership_type, characters, [(char_id, 职业名)])`。"""
+    async def _characters(
+        self, player_name: str, character: str | None
+    ) -> tuple[str, int, list[tuple[str, str]]]:
+        """返回 `(membership_id, membership_type, [(char_id, 职业名)])`。"""
         player = await self._resolver.resolve_player(player_name)
         mid = str(player["membership_id"])
         mtype = int(player["membership_type"])
@@ -154,7 +211,7 @@ class PvpWeaponService:
         else:
             for char_id, info in chars.items():
                 targets.append((char_id, class_type_name(info.get("classType", -1))))
-        return mid, mtype, chars, targets
+        return mid, mtype, targets
 
     async def _pvp_matches(
         self, mid: str, mtype: int, char_id: str, mode_type: int
@@ -181,22 +238,29 @@ class PvpWeaponService:
         return payload
 
     @staticmethod
-    def _own_weapons(pgcr: dict, char_id: str) -> list[dict]:
-        """从 PGCR 里取**自己那一行**的武器。
+    def _weapons_of(entry: dict) -> list[dict]:
+        weapons = (entry.get("extended") or {}).get("weapons") or []
+        return [weapon for weapon in weapons if isinstance(weapon, dict)]
+
+    @classmethod
+    def _own_weapons(cls, pgcr: dict, char_id: str, membership_id: str) -> list[dict] | None:
+        """从 PGCR 里取**自己那一行**的武器；这一场里没有你的行就返回 `None`。
 
         `extended.weapons` 是按玩家分行的：拿 `entries[0]` 就是拿别人（或队友）的枪。
-        上游在有些场次里 `characterId` 缺失，那就退一步按 membership 找，仍找不到就
-        返回空清单（**不猜**：宁少一场，也不把别人的武器算进来）。
+        先按 `characterId` 精确匹配；上游偶尔不给 `characterId`，那就退一步按
+        `player.destinyUserInfo.membershipId` 找（本方法一直这么承诺，实现以前漏了这段，
+        结果是"整场击杀静默消失、响应还 ok=true"）。
+        两条都找不到返回 `None` —— 调用方必须如实报出来，不许当成"这场没杀到人"。
         """
-        for entry in pgcr.get("entries") or []:
-            if not isinstance(entry, dict):
-                continue
-            if str(entry.get("characterId", "")) != str(char_id):
-                continue
-            extended = entry.get("extended") or {}
-            weapons = extended.get("weapons") or []
-            return [w for w in weapons if isinstance(w, dict)]
-        return []
+        entries = [entry for entry in (pgcr.get("entries") or []) if isinstance(entry, dict)]
+        for entry in entries:
+            if str(entry.get("characterId", "")) == str(char_id):
+                return cls._weapons_of(entry)
+        for entry in entries:
+            user = (entry.get("player") or {}).get("destinyUserInfo") or {}
+            if str(user.get("membershipId", "")) == str(membership_id):
+                return cls._weapons_of(entry)
+        return None
 
     async def get_pvp_weapon_board(
         self,
@@ -206,21 +270,28 @@ class PvpWeaponService:
         matches: int = DEFAULT_MATCHES,
     ) -> dict[str, Any]:
         """最近 N 场 PvP 的武器击杀榜（**不是生涯**，window 必看）。"""
+        labels = self._mode_labels()
         key = activity_modes.resolve(mode or "pvp")
-        if key is None:
-            labels = {
-                word: self._manifest.get_activity_mode_name(activity_modes.MODE_TYPE[word])
-                for word in activity_modes.MODES
-            }
+        if key is None or key not in BOARD_KEYS:
+            # PvE 模式词在这里必须报错：以前它会被接受并贴上 scope="pvp_recent" 的标签
+            # （真机：mode="raid" 把 392 杀的突袭枪列成"PvP 武器榜"）。
             raise InvalidArgumentError(
                 f"pvp_weapons 不支持 mode={mode!r}；可取 "
-                f"{activity_modes.words_with_labels(labels)}。"
+                f"{activity_modes.words_with_labels(labels, BOARD_KEYS)}。"
+                "（这是 PvP 榜：要全模式的武器击杀用 intent=\"weapon_history\"）"
             )
         mode_type = activity_modes.MODE_TYPE[key]
-        mode_label = self._manifest.get_activity_mode_name(mode_type) or key
+        mode_label = labels.get(key) or key
 
-        wanted = max(1, min(int(matches), MAX_MATCHES))
-        mid, mtype, _chars, targets = await self._characters(player_name, character)
+        # `matches` 只钳制"实际分析多少场"，**不改写调用方要的值**：
+        # 以前 `window.matches_requested` 报的是钳制后的数字，问 500 场会看到"你要了 100 场"。
+        requested = int(matches)
+        wanted = max(1, min(requested, MAX_MATCHES))
+
+        if not self._pruned:
+            self._pruned = True
+            self._cache.prune()
+        mid, mtype, targets = await self._characters(player_name, character)
 
         warnings: list[str] = []
         history_failures: list[str] = []
@@ -281,13 +352,19 @@ class PvpWeaponService:
         mode_tally: dict[int, int] = {}
         analyzed: list[dict] = []
         failed: list[dict] = []
+        missing_rows = 0
         for match, pgcr, reason in loaded:
             if pgcr is None:
                 failed.append({"instance_id": match["instance_id"], "reason": reason})
                 continue
             analyzed.append(match)
             mode_tally[match["activity_mode"]] = mode_tally.get(match["activity_mode"], 0) + 1
-            for weapon in self._own_weapons(pgcr, match["character_id"]):
+            own = self._own_weapons(pgcr, match["character_id"], mid)
+            if own is None:
+                # 这一场有结算、但没有你的行：如实计数，不许当成"这场没杀到人"。
+                missing_rows += 1
+                continue
+            for weapon in own:
                 item_hash = weapon.get("referenceId")
                 if not isinstance(item_hash, int):
                     continue
@@ -347,27 +424,48 @@ class PvpWeaponService:
         window = {
             "newest": max(periods) if periods else "",
             "oldest": min(periods) if periods else "",
-            "matches_requested": wanted,
+            # `matches_requested` 是调用方要的值（**原样**），`matches_planned` 才是本次
+            # 实际打算分析多少场（`count` 上限 100）。两者不同时会带 warning。
+            "matches_requested": requested,
+            "matches_planned": wanted,
             "matches_analyzed": len(analyzed),
             "matches_failed": len(failed),
+            "matches_without_your_row": missing_rows,
+            # 每个角色只取最近这一页历史：窗口是"这一页里最近的 N 场"。
+            "history_page_size_per_character": HISTORY_PAGE_SIZE,
         }
-        tally = [
-            {
-                "mode": mode_id,
-                "name": self._manifest.get_activity_mode_name(mode_id) or f"模式{mode_id}",
-                "matches": count,
-            }
-            for mode_id, count in sorted(mode_tally.items(), key=lambda kv: (-kv[1], kv[0]))
-        ]
+        tally = []
+        unnamed_modes: list[int] = []
+        for mode_id, count in sorted(mode_tally.items(), key=lambda kv: (-kv[1], kv[0])):
+            name = self._manifest.get_activity_mode_name(mode_id)
+            if not name:
+                unnamed_modes.append(mode_id)
+            tally.append({"mode": mode_id, "name": name or f"模式{mode_id}", "matches": count})
 
-        labels_all = {
-            word: self._manifest.get_activity_mode_name(activity_modes.MODE_TYPE[word])
-            for word in activity_modes.MODES
-        }
         warnings.append(
             "这是**最近 N 场**的 PvP 武器击杀，不是生涯累计："
             f"本次分析 {len(analyzed)} 场，时间窗 {window['oldest'][:10]} → {window['newest'][:10]}。"
         )
+        if requested != wanted:
+            warnings.append(
+                f"count={requested} 已按 {wanted} 场分析"
+                + ("（上限 100 场）" if requested > MAX_MATCHES else "（最少 1 场）")
+                + "；window.matches_requested 保留你要的值，matches_planned 是实际用的。"
+            )
+        if len(ordered) < wanted:
+            warnings.append(
+                f"这个模式的可用场次只有 {len(ordered)} 场（你要 {wanted} 场），榜单基于这些场次。"
+            )
+        if missing_rows:
+            warnings.append(
+                f"有 {missing_rows} 场结算里找不到你的那一行"
+                "（上游既没给 characterId 也没给 membershipId），这些场次没有计入武器击杀。"
+            )
+        if unnamed_modes:
+            warnings.append(
+                f"有 {len(unnamed_modes)} 个子模式在 Manifest 里取不到名字（显示为 模式<号>），"
+                "模式标签可能不完整；这通常是 Manifest 未就绪，不是没有这个模式。"
+            )
         if len(analyzed) < len(ordered):
             warnings.append(
                 f"有 {len(ordered) - len(analyzed)} 场结算没取到（上游失败），"
@@ -400,7 +498,7 @@ class PvpWeaponService:
                 "mode_type": mode_type,
                 "category": activity_modes.MODES[key]["category"],
                 "is_pvp_only": activity_modes.is_pvp(key),
-                "available_modes": labels_all,
+                "available_modes": labels,
             },
             "window": window,
             "mode_tally": tally,

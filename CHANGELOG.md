@@ -87,6 +87,28 @@
 - 顺带：`assistants.py` 把榜单三兄弟与武器两个口径分别搬进 `_leaderboard_branches.py`、
   `_weapon_usage_branches.py`，体量上限 1403 → 1401（只降不升）。
 
+**PvP 武器榜审查修正（同日补，都是自查与独立审查抓出来的）**：
+
+- **PvE 模式词必须报错**：`pvp_weapons` 原来认全部 14 个模式词，`mode="raid"` 会被接受、
+  回包却自称 `scope="pvp_recent"`（真机：392 杀的突袭枪登顶"PvP 武器榜"）。现在只认
+  PvP 家族（category=2）+ 智谋，`mode_group.available_modes` 与报错话术都从同一个常量派生。
+- **"找不到你那一行"不再静默**：`_own_weapons` 的 membership 回退以前只写在 docstring 里、
+  实现没有 —— 上游不给 `characterId` 时整场击杀消失而响应仍 `ok=true`。现在补齐回退，
+  两条路都不中则记 `window.matches_without_your_row` + warning。
+- **`count` 不再被静默改写**：`window.matches_requested` 保留调用方要的值（原样），
+  实际用多少场另给 `matches_planned`，两者不同带 warning（以前问 500 场会看到"你要了 100 场"）。
+- **榜单分支搬运不许改请求**：搬 `leaderboards`/`clan_leaderboards` 时 `mode` 从 `None`
+  变成 `""`，客户端只过滤 `None`，于是 URL 多了一个空的 `modes=`（httpx 实测会发出去）。
+  已还原成 `None`，并加守门测试钉住"没给 mode 就不许出现这个参数"。
+- **Manifest 模式名两处加固**：坏行（合法 JSON 但不是 dict / 没设 `row_factory`）以前会
+  抛 `AttributeError`/`KeyError` 把整条 history 带崩，现在只跳过该行；索引为空时由 `debug`
+  升到 `logger.warning`，榜单词条也带 warning（新增真 sqlite 测试 7 条，此前全仓没有一条
+  测试真的调用过 `get_activity_mode_name`）。
+- **PGCR 缓存有了保留策略**：`MAX_CACHE_FILES = 2000`（≈100 MB）按 mtime 轮换，
+  目录改由独立的 `DESTINY_CACHE_PATH` 指定（默认 `~/.destiny_mcp/cache`）。
+- 补守门：工具层默认值（不传 `count` → 10 场，这条路径此前从没被走过）、信封形状、
+  职业名标注、`character=` 过滤、榜单分支等价性、模式名真 sqlite 行为。
+
 ## 未发布（2026-09-17）
 
 **PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，

@@ -21,6 +21,9 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from destiny_mcp.exceptions import APIError, InvalidArgumentError
+from destiny_mcp.data import activity_modes
+from destiny_mcp.exceptions import CharacterNotFoundError
+from destiny_mcp.services import pvp_weapon_service as app
 from destiny_mcp.services.pvp_weapon_service import PgcrCache, PvpWeaponService
 
 PLAYER = "TestGuardian#1234"
@@ -206,7 +209,10 @@ async def test_matches_is_clamped_and_history_uses_the_singular_mode_parameter(
 
     result = await service.get_pvp_weapon_board(PLAYER, mode="gambit", matches=999)
 
-    assert result["window"]["matches_requested"] == 100
+    # 调用方要的值原样保留，实际用多少场另有一个字段，并且带 warning（以前 requested 被改写）。
+    assert result["window"]["matches_requested"] == 999
+    assert result["window"]["matches_planned"] == 100
+    assert any("上限 100 场" in warning for warning in result["warnings"])
     params = service._bungie.get_activity_history.await_args.kwargs["params"]
     assert params["mode"] == "63" and "modes" not in params
     # 智谋是 PvPvE（category=3）：榜单要如实标出来，不能冒充纯 PvP。
@@ -222,3 +228,147 @@ def test_cache_ignores_corrupt_files(tmp_path: Path) -> None:
     cache.put("1002", {"entries": []})
     assert cache.get("1002") == {"entries": []}
     assert json.loads(cache.path_for("1002").read_text(encoding="utf-8")) == {"entries": []}
+
+
+@pytest.mark.asyncio
+async def test_pve_mode_word_is_rejected(service: PvpWeaponService) -> None:
+    """PvE 模式词必须报错。
+
+    真机踩过：`mode="raid"` 被接受，回包却自称 `scope="pvp_recent"`，
+    把一场 392 杀的突袭列成"纯 PvP 武器榜" —— 贴错标签比报错糟得多。
+    """
+    with pytest.raises(InvalidArgumentError) as info:
+        await service.get_pvp_weapon_board(PLAYER, mode="raid")
+
+    message = str(info.value)
+    assert "crucible" in message and "trials" in message
+    assert "raid" not in message.split("可取")[1], "PvE 模式词不该出现在可用词表里"
+    service._bungie.get_activity_history.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_gambit_is_allowed_but_marked_pvpve(service: PvpWeaponService) -> None:
+    """智谋是 PvPvE：可以查，但要如实标 `is_pvp_only=false`。"""
+    service._bungie.get_pgcr.side_effect = lambda instance_id: _pgcr([
+        _entry(WARLOCK_ID, [(MY_WEAPON, 4, 1)]),
+    ])
+
+    result = await service.get_pvp_weapon_board(PLAYER, mode="gambit", matches=2)
+
+    assert result["mode_group"]["key"] == "gambit"
+    assert result["mode_group"]["is_pvp_only"] is False
+    assert set(result["mode_group"]["available_modes"]) == {
+        "crucible", "iron_banner", "competitive", "trials", "gambit",
+    }
+
+
+@pytest.mark.asyncio
+async def test_available_modes_matches_what_is_accepted(service: PvpWeaponService) -> None:
+    """载荷里列出的可用词必须就是真正认的词（文档承诺 5 个，代码曾认 14 个）。"""
+    service._bungie.get_pgcr.side_effect = lambda instance_id: _pgcr([
+        _entry(WARLOCK_ID, [(MY_WEAPON, 1, 0)]),
+    ])
+
+    result = await service.get_pvp_weapon_board(PLAYER, mode="pvp", matches=1)
+
+    accepted = set(result["mode_group"]["available_modes"])
+    for word in accepted:
+        assert activity_modes.resolve(word) is not None, word
+    assert accepted == set(app.BOARD_KEYS)
+
+
+@pytest.mark.asyncio
+async def test_row_without_character_id_falls_back_to_membership(
+    service: PvpWeaponService,
+) -> None:
+    """上游偶尔不给 `characterId`：退一步按 membershipId 找，不能整场丢击杀。"""
+    service._bungie.get_pgcr.side_effect = lambda instance_id: _pgcr([
+        {   # 没有 characterId，只有 membership
+            "player": {"destinyUserInfo": {"membershipId": MID}},
+            "extended": {"weapons": [{
+                "referenceId": MY_WEAPON,
+                "values": {"uniqueWeaponKills": {"basic": {"value": 6.0}}},
+            }]},
+        },
+    ])
+
+    result = await service.get_pvp_weapon_board(PLAYER, mode="pvp", matches=2)
+
+    assert result["weapons"][0]["kills"] == 12          # 两场 × 6
+    assert result["window"]["matches_without_your_row"] == 0
+    assert not any("找不到你的那一行" in warning for warning in result["warnings"])
+
+
+@pytest.mark.asyncio
+async def test_match_without_your_row_is_reported_not_silent(
+    service: PvpWeaponService,
+) -> None:
+    """两条路都找不到你那一行：如实计数 + warning，不许呈现成"这场没杀到人"。"""
+    service._bungie.get_pgcr.side_effect = lambda instance_id: _pgcr([
+        {"player": {"destinyUserInfo": {"membershipId": "9999999999999999999"}},
+         "extended": {"weapons": [{"referenceId": OTHER_WEAPON,
+                                   "values": {"uniqueWeaponKills": {"basic": {"value": 9.0}}}}]}},
+    ])
+
+    result = await service.get_pvp_weapon_board(PLAYER, mode="pvp", matches=2)
+
+    assert result["window"]["matches_without_your_row"] == 2
+    assert result["weapons"] == []
+    assert any("找不到你的那一行" in warning for warning in result["warnings"])
+
+
+@pytest.mark.asyncio
+async def test_missing_mode_names_are_reported(service: PvpWeaponService) -> None:
+    """Manifest 取不到模式名时：降级成"模式<号>"但必须留痕（否则界面突然全是模式43）。"""
+    service._manifest.get_activity_mode_name.side_effect = lambda mode_type: ""
+    service._bungie.get_pgcr.side_effect = lambda instance_id: _pgcr([
+        _entry(WARLOCK_ID, [(MY_WEAPON, 2, 0)]),
+    ])
+
+    result = await service.get_pvp_weapon_board(PLAYER, mode="pvp", matches=1)
+
+    assert result["mode_tally"][0]["name"] == "模式73"
+    assert any("取不到名字" in warning for warning in result["warnings"])
+
+
+@pytest.mark.asyncio
+async def test_characters_and_class_names_are_labelled(service: PvpWeaponService) -> None:
+    """职业名与角色归属要落在载荷里（classType 2 = Warlock）。"""
+    service._bungie.get_pgcr.side_effect = lambda instance_id: _pgcr([
+        _entry(WARLOCK_ID, [(MY_WEAPON, 3, 1)]),
+    ])
+
+    result = await service.get_pvp_weapon_board(PLAYER, mode="pvp", matches=2)
+
+    assert result["characters"] == [{
+        "character_id": WARLOCK_ID, "class": "Warlock",
+        "history_count": 2, "has_more_history": False,
+    }]
+    assert result["weapons"][0]["characters"] == ["Warlock"]
+
+
+@pytest.mark.asyncio
+async def test_character_filter_narrows_and_reports_missing_class(
+    service: PvpWeaponService,
+) -> None:
+    """`character=` 只查那个角色；账号里没有这个职业要报错（不是静默查全部）。"""
+    service._bungie.get_pgcr.side_effect = lambda instance_id: _pgcr([
+        _entry(WARLOCK_ID, [(MY_WEAPON, 1, 0)]),
+    ])
+
+    result = await service.get_pvp_weapon_board(PLAYER, character="warlock", mode="pvp", matches=1)
+    assert [row["class"] for row in result["characters"]] == ["Warlock"]
+
+    with pytest.raises(CharacterNotFoundError):
+        await service.get_pvp_weapon_board(PLAYER, character="titan", mode="pvp", matches=1)
+
+
+@pytest.mark.asyncio
+async def test_cache_rotation_keeps_the_newest(service: PvpWeaponService) -> None:
+    """缓存按条数轮换：只保留最新 N 条（默认 2000，这里缩小验证机制）。"""
+    cache = service._cache
+    for index in range(5):
+        cache.put(f"90{index}", {"entries": []})
+
+    assert cache.prune(keep=2) == 3
+    assert len(list(cache.directory.glob("*.json"))) == 2

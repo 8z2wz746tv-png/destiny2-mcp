@@ -71,6 +71,11 @@ DESTINY_OAUTH_REDIRECT_URI: str | None = os.getenv("DESTINY_OAUTH_REDIRECT_URI")
 DESTINY_TOKEN_PATH: Path = Path(
     os.path.expanduser(os.getenv("DESTINY_TOKEN_PATH", "~/.destiny_mcp"))
 )
+# 缓存目录（PGCR 结算等不可变上游数据）。单独一个变量而不是借用 DESTINY_TOKEN_PATH：
+# 那个名字说的是令牌，缓存写在那里会让人以为"删了令牌就清了缓存"。
+DESTINY_CACHE_PATH: Path = Path(
+    os.path.expanduser(os.getenv("DESTINY_CACHE_PATH", "~/.destiny_mcp/cache"))
+)
 DESTINY_MANIFEST_PATH: Path = Path(
     os.path.expanduser(os.getenv("DESTINY_MANIFEST_PATH", str(_project_root / "manifest")))
 )
