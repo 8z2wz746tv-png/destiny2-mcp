@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import threading
@@ -25,6 +26,11 @@ TRIALS_CAREER_DEFEATS = 10696
 TRIALS_CAREER_WINS = 826
 IRON_BANNER_DEFEATS = 1737
 CRUCIBLE_SEASON_DEFEATS = 3522
+# 2026-08-31 的一场突袭（结算不可变，可当固定样本）
+PGCR_SAMPLE_ACTIVITY = "17161198628"
+# 游戏内 ID 形如 `名字#1234`；平台名（Steam/Xbox/PSN/Epic）没有 #code
+IN_GAME_ID = re.compile(r"^.+#\d{3,4}$")
+SELF_IN_GAME_ID = "OneTop丶Husky#6641"
 
 
 class Server:
@@ -211,6 +217,37 @@ def main() -> int:
             (r.get("error") or {}).get("code") == "confirmation_required" and len(steps) >= 1,
             f"steps={[s.get('action') for s in steps]}",
         )
+        # 13 玩家名口径：PGCR 里所有参与者都是游戏内 ID（带 #数字），不是平台名
+        #    （社区反馈：旧代码显示 Steam 名。真机样本：2026-08-31「永恒沙漠: 标准」）
+        r = srv.call("activity_assistant", {"intent": "pgcr", "activity_id": PGCR_SAMPLE_ACTIVITY})
+        data = r.get("data") or {}
+        pgcr = data.get("pgcr") if isinstance(data.get("pgcr"), dict) else data
+        players = [e.get("player_name", "") for e in (pgcr.get("entries") or [])]
+        in_game = [n for n in players if IN_GAME_ID.match(n or "")]
+        check(
+            "PGCR 参与者显示游戏内 ID（带 #code）",
+            r.get("ok") is True and bool(players) and len(in_game) == len(players)
+            and SELF_IN_GAME_ID in players,
+            f"players={players[:3]}… 合规 {len(in_game)}/{len(players)}",
+        )
+
+        # 14 排行榜：上游对该账号返回空（实测 2026-09-18）——要么给出合规榜单，
+        #    要么如实报上游为空，绝不能凭记忆编排名。
+        r = srv.call("activity_assistant", {"intent": "leaderboards", "statid": "activitiesCleared"})
+        if r.get("ok") is True:
+            names = [
+                e.get("player", "")
+                for m in ((r.get("data") or {}).get("preview") or [])
+                for e in (m.get("entries") or [])
+            ]
+            good = bool(names) and all(IN_GAME_ID.match(n or "") for n in names)
+            detail = f"有榜单，名字合规 {len(names)} 条"
+        else:
+            code = (r.get("error") or {}).get("code")
+            good = code == "a_p_i_error"
+            detail = f"上游为空 → code={code}"
+        check("排行榜空响应如实上报（不编排名）", good, detail)
+
     finally:
         srv.close()
 
