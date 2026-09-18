@@ -33,6 +33,20 @@
 - **抽代码**：上游 HTTP 错误映射整段搬到 `bungie_errors.py`，活动统计端点搬到
   `bungie_stats.py`（`bungie_client` 上限 1263 → 1200 以下，只降不升）。
 
+**玩家名改回游戏内 ID，并补上活动服务漏掉的导入**（社区反馈："显示的是我的 Steam 名"）：
+
+- **口径**：`displayName` 是**平台名**（同一账号四个平台各不相同：`OneTop丶Husky` /
+  `SecHusky` / `early_moccasin0` / `此人以嫖到广东`），游戏内 ID 是
+  `bungieGlobalDisplayName` + `#code`（`OneTop丶Husky#6641`，四个平台一致）。旧代码写成
+  `displayName or bungieGlobalDisplayName`，顺序反了。
+- **单一出处**：新增 `utils/player_names.py`（`bungie_display_name` 走游戏内 ID、
+  `bungie_display_name_of_player` 拆 PGCR 的 `destinyUserInfo`），profile / history / PGCR /
+  排行榜四条路径统一走它；`tests/test_player_display_name.py` 除行为用例外还**扫描全仓**，
+  禁止再出现 `get("displayName"` 拼玩家名。
+- **修复**：`activity_service` 漏了 `player_names` 的导入 —— 名字改了，PGCR 与排行榜两条路径
+  会直接 `NameError`（真机 PGCR 复现）。真机复核：PGCR 六个参与者全部是 `名字#code` 形式；
+  排行榜接口对该账号上游返回空，按上游故障如实报（不编排名）。
+
 ## 未发布（2026-09-17）
 
 **PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，

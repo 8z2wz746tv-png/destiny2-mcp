@@ -62,3 +62,38 @@ def test_no_module_builds_player_names_from_the_platform_field() -> None:
         "玩家名要走 utils/player_names.bungie_display_name（displayName 是平台名）：\n"
         + "\n".join(offenders)
     )
+
+
+def test_leaderboard_preview_shows_the_in_game_id() -> None:
+    """排行榜那条路径（`_leaderboard_preview`）也必须用游戏内 ID。
+
+    真机实测（2026-09-18）：账号级排行榜上游返回空，没法用真机钉住这条；
+    它是纯函数，这里用上游形状的假数据把口径固定下来。
+    """
+    from destiny_mcp.services.activity_service import ActivityService
+
+    response = {
+        "focusMembershipId": "4611686018492803873",
+        "allPvP": {
+            "allTime": {
+                "statId": "allTime",
+                "entries": [
+                    {
+                        "rank": 1,
+                        "characterId": "2305843009",
+                        "value": {"basic": {"value": 78864, "displayValue": "78864"}},
+                        "player": {
+                            "destinyUserInfo": {
+                                "displayName": "SecHusky",              # Xbox 平台名
+                                "bungieGlobalDisplayName": "OneTop丶Husky",
+                                "bungieGlobalDisplayNameCode": 6641,
+                            }
+                        },
+                    }
+                ],
+            }
+        },
+    }
+
+    preview = ActivityService._leaderboard_preview(response, max_entries=5)
+    assert preview[0]["entries"][0]["player"] == "OneTop丶Husky#6641"

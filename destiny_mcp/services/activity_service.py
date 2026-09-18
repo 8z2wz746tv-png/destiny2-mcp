@@ -16,6 +16,7 @@ from ..exceptions import InvalidArgumentError, APIError, CharacterNotFoundError,
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
+from ..utils.player_names import bungie_display_name, bungie_display_name_of_player
 
 logger = get_logger(__name__)
 
