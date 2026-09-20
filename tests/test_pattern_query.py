@@ -19,7 +19,7 @@ from typing import Any, get_args
 
 import pytest
 
-from destiny_mcp.exceptions import APIError
+from destiny_mcp.exceptions import APIError, InvalidArgumentError
 from destiny_mcp.services import profile_components
 from destiny_mcp.services.pattern_service import (
     STATUS_IN_PROGRESS,
@@ -49,13 +49,13 @@ SUFFERANCE = 1003           # 不可锻造的异域（有记录也没用）
 INHERITANCE = 1004          # 可锻造：传说，要 3 次
 UNRELATED_RECORD = 999      # 记录组件里的无关记录（证明"组件非空"）
 
-ITEM_FATEBRINGER = {"hash": FATEBRINGER, "inventory": {"recipeItemHash": 9001, "tierTypeName": "传说"},
+ITEM_FATEBRINGER = {"hash": FATEBRINGER, "inventory": {"recipeItemHash": 9001, "tierTypeName": "传说", "tierType": 5},
                     "displayProperties": {"name": "惩戒措施"}}
-ITEM_RETROFIT = {"hash": RETROFIT, "inventory": {"recipeItemHash": 9002, "tierTypeName": "异域"},
+ITEM_RETROFIT = {"hash": RETROFIT, "inventory": {"recipeItemHash": 9002, "tierTypeName": "异域", "tierType": 6},
                  "displayProperties": {"name": "糖果生意"}}
 ITEM_SUFFERANCE = {"hash": SUFFERANCE, "inventory": {"tierTypeName": "异域"},
                    "displayProperties": {"name": "苦痛"}}
-ITEM_INHERITANCE = {"hash": INHERITANCE, "inventory": {"recipeItemHash": 9003, "tierTypeName": "传说"},
+ITEM_INHERITANCE = {"hash": INHERITANCE, "inventory": {"recipeItemHash": 9003, "tierTypeName": "传说", "tierType": 5},
                     "displayProperties": {"name": "继承"}}
 
 # 变体（失时）：可锻造、但塑形配置只覆盖 3 个栏位，插槽里也没有深视插槽。
@@ -63,7 +63,7 @@ ITEM_INHERITANCE = {"hash": INHERITANCE, "inventory": {"recipeItemHash": 9003, "
 VARIANT = 1005
 ITEM_VARIANT = {
     "hash": VARIANT,
-    "inventory": {"recipeItemHash": 9004, "tierTypeName": "传说"},
+    "inventory": {"recipeItemHash": 9004, "tierTypeName": "传说", "tierType": 5},
     "displayProperties": {"name": "惩戒措施（失时）"},
     "sockets": {"socketEntries": [{"socketTypeHash": 4251072212}]},
 }
@@ -356,7 +356,7 @@ def character_records_override() -> dict[int, dict]:
 
 ITEMS[CHARACTER_WEAPON] = {
     "hash": CHARACTER_WEAPON,
-    "inventory": {"recipeItemHash": 9006, "tierTypeName": "传说"},
+    "inventory": {"recipeItemHash": 9006, "tierTypeName": "传说", "tierType": 5},
     "displayProperties": {"name": "面纱威胁"},
 }
 ITEMS[9006] = {"hash": 9006, "crafting": {"requiredSocketTypeHashes": [
@@ -469,6 +469,32 @@ async def test_counts_and_groups_follow_the_filter() -> None:
     assert result["catalog_total"] == 3
     assert result["by_group"][0]["group"] == "主武器模式"
     assert result["by_group"][0]["by_type"] == [{"weapon_type": "手炮", "total": 3, "unlocked": 1}]
+
+
+async def test_rarity_filter_returns_only_that_tier_and_counts_by_tier() -> None:
+    """「我的金枪图样」必须一次拿全：默认一页只有 20 条，靠翻页数金枪会漏（真机发生过）。"""
+    svc, _ = service(profile_with({}), starside=FakeStarside())
+
+    exotic = await svc.patterns(PLAYER, rarity="异域", limit=50)
+    legendary = await svc.patterns(PLAYER, rarity="传说", limit=50)
+    all_rows = await svc.patterns(PLAYER, limit=50)
+
+    assert [row["name"] for row in exotic["rows"]] == ["糖果生意"]
+    assert exotic["counts"]["total"] == 1 and exotic["filtered"] is True
+    assert exotic["by_tier"] == {"异域": 1}
+    assert legendary["by_tier"] == {"传说": 2}
+    assert all_rows["by_tier"] == {"传说": 2, "异域": 1}, "汇总按稀有度分开，别只给总数"
+
+
+async def test_rarity_accepts_player_words_and_rejects_nonsense() -> None:
+    svc, _ = service(profile_with({}), starside=FakeStarside())
+
+    for word in ("金枪", "金装", "exotic", "异域"):
+        result = await svc.patterns(PLAYER, rarity=word)
+        assert [row["name"] for row in result["rows"]] == ["糖果生意"], word
+
+    with pytest.raises(InvalidArgumentError):
+        await svc.patterns(PLAYER, rarity="金光闪闪")
 
 
 async def test_type_filter_that_matches_nothing_still_reports_the_types_available() -> None:

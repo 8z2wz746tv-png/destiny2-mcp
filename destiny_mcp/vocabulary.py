@@ -193,3 +193,24 @@ def subclass_element_key(value: str | None) -> tuple[str, str]:
             key = ELEMENT_ALIASES.get(text[: -len(suffix)], "")
             return (key, klass) if key else ("", "")
     return "", ""
+
+# ── 稀有度（`tierType`）──────────────────────────────────────────────────
+# 输入别名 → Manifest 的 `inventory.tierType`。以前只有 `inventory_service` 私藏一份，
+# 于是"按稀有度筛库存"认中文、"按稀有度筛模式"没得用；现在两边共用这一张表。
+# 玩家把异域叫「金枪/金装」、把传说叫「紫枪/紫装」，一并收进来。
+RARITY_ALIASES: dict[str, int] = {
+    "exotic": 6, "异域": 6, "金枪": 6, "金装": 6,
+    "legendary": 5, "传说": 5, "紫枪": 5, "紫装": 5,
+    "rare": 4, "稀有": 4,
+}
+RARITY_LABELS_ZH: dict[int, str] = {6: "异域", 5: "传说", 4: "稀有"}
+
+
+def rarity_key(value: str | None) -> int | None:
+    """稀有度输入 → `tierType`；认不出来给 None（由调用方决定怎么报错，不猜）。"""
+    if not isinstance(value, str):
+        return None
+    key = unicodedata.normalize("NFKC", value).strip().casefold()
+    if key in ("", "all", "全部"):
+        return None
+    return RARITY_ALIASES.get(key)

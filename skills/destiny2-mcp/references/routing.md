@@ -144,7 +144,7 @@ Manifest 侧（**不代表拥有**）：
 | `analyze` | 定义＋我持有的副本（`weapon`/`sockets`/`stats`/`god_roll`/`inventory`） | `weapon_name`、`include_inventory` |
 | `compare`（`compare_duplicates`） | 对比同名副本，给留哪把的建议（每个副本 = `{weapon, sockets, options, stats}`） | `weapon_name`、`item_instance_id` |
 | `popularity`（`selection_rates`、`perk_selection`、`selection`、`usage_rates`） | Perk 选取率快照（快照当时的数据，与当前 Manifest 数值分开标注） | `weapon_name` |
-| `patterns`（`pattern`、`craft`、`锻造`、`锻造武器`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`） | **锻造武器模式**：图鉴「模式和催化」里武器模式那一页（共 183 条可锻造武器），给每条的**进度**（游戏里那条「模式进度 4/5」）、还差几个红框萃取、需求次数与掉落来源。玩家说的「红框」= 深视共振武器（在它上面萃取涨的就是这里的进度）；游戏官方中文叫「模式」，第三方工具常译作「图样」。`counts` 是账号口径（组件 900），`sources` 是社区资料（带页面与更新时间）；**默认 20 条** + `next_offset`。`未开始` = 账号里没有这条记录（不是 0/5）。**只答进度**：不查「包里有哪些红框」，也不管异域催化 | `weapon_name`、`weapon_type`、`limit`、`offset` |
+| `patterns`（`pattern`、`craft`、`锻造`、`锻造武器`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`） | **锻造武器模式**：图鉴「模式和催化」里武器模式那一页（共 183 条可锻造武器），给每条的**进度**（游戏里那条「模式进度 4/5」）、还差几个红框萃取、需求次数与掉落来源。玩家说的「红框」= 深视共振武器（在它上面萃取涨的就是这里的进度）；游戏官方中文叫「模式」，第三方工具常译作「图样」。`counts` 是账号口径（组件 900），`sources` 是社区资料（带页面与更新时间）；**默认 20 条** + `next_offset`。`未开始` = 账号里没有这条记录（不是 0/5）。`by_tier` 给稀有度汇总，**别把第一页（默认 20 条）里看到的金枪数当成总数**——金枪一共十几把，要「全部金枪图样」就传 `rarity="异域"`（一次拿全）。**只答进度**：不查「包里有哪些红框」，也不管异域催化 | `weapon_name`、`weapon_type`、`rarity`、`limit`、`offset` |
 
 社区：
 
@@ -348,7 +348,7 @@ Manifest 侧（**不代表拥有**）：
 | `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |
 | `priority_stats` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `query` | `activity_assistant`：`career`、`community`、`counters`、`historical_stats`、`stats`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |
-| `rarity` | `inventory_assistant`：`get`、`inventory`、`list` |
+| `rarity` | `inventory_assistant`：`get`、`inventory`、`list`；`weapon_assistant`：`craft`、`pattern`、`patterns`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器` |
 | `replacement_slot` | `build_assistant`：`farm_target` |
 | `required_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
 | `scenario` | `build_assistant`：`community`、`community_build`、`starside` |

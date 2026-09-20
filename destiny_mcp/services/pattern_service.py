@@ -27,11 +27,12 @@ import time
 from typing import Any, Iterator
 
 from ..bungie_client import BungieClient
-from ..exceptions import APIError
+from ..exceptions import APIError, InvalidArgumentError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
+from .. import vocabulary
 from . import profile_components
 from .starside_crafting_sources import CraftingSources
 
@@ -186,6 +187,7 @@ class PatternService:
                 if isinstance(objective_hash, int)
                 else None
             ) or {}
+            inventory = item.get("inventory") or {}
             entries.append({
                 "name": name,
                 "record_hash": to_unsigned(record_hash),
@@ -193,7 +195,9 @@ class PatternService:
                 "item_hash": to_unsigned(int(item.get("hash") or 0)),
                 "weapon_type": weapon_type,
                 "group": slot,
-                "tier": (item.get("inventory") or {}).get("tierTypeName") or "",
+                # 稀有度：标签给用户看，tierType 给筛选用（词表在 vocabulary.rarity_key）
+                "tier": inventory.get("tierTypeName") or "",
+                "tier_type": inventory.get("tierType"),
             })
         self._catalog_cache = entries
         return entries
@@ -259,6 +263,7 @@ class PatternService:
             "weapon_type": entry["weapon_type"],
             "group": entry["group"],
             "tier": entry["tier"],
+            "tier_type": entry["tier_type"],
             "need": need,
             "progress": progress,
             "remaining": remaining,
@@ -339,6 +344,7 @@ class PatternService:
         *,
         weapon_name: str = "",
         weapon_type: str = "",
+        rarity: str = "",
         limit: int = 20,
         offset: int = 0,
     ) -> dict[str, Any]:
@@ -359,6 +365,14 @@ class PatternService:
         available_types = sorted({row["weapon_type"] for row in rows if row["weapon_type"]})
         if weapon_type.strip():
             rows = self._by_type(rows, weapon_type.strip())
+        if rarity.strip():
+            target_tier = vocabulary.rarity_key(rarity)
+            if target_tier is None:
+                raise InvalidArgumentError(
+                    f"rarity={rarity!r} 不受支持。可用：exotic/异域/金枪、legendary/传说、rare/稀有；"
+                    "不传或传 all = 不筛。"
+                )
+            rows = [row for row in rows if row.get("tier_type") == target_tier]
 
         rows.sort(key=lambda row: (_STATUS_ORDER.get(row["status"], 9),))
         sources = self._sources([row["name"] for row in rows])
@@ -379,7 +393,8 @@ class PatternService:
             "returned": len(page),
             "offset": offset,
             "next_offset": next_offset,
-            "filtered": bool(weapon_name.strip() or weapon_type.strip()),
+            "by_tier": self._by_tier(rows),
+            "filtered": bool(weapon_name.strip() or weapon_type.strip() or rarity.strip()),
             "variant_of": variant_of,
             "variant": variant_info,
             "candidates": candidates,
@@ -416,6 +431,16 @@ class PatternService:
     def _by_type(rows: list[dict[str, Any]], weapon_type: str) -> list[dict[str, Any]]:
         key = name_key(weapon_type)
         return [row for row in rows if key and key in name_key(row["weapon_type"])]
+
+    @staticmethod
+    def _by_tier(rows: list[dict[str, Any]]) -> dict[str, int]:
+        """按稀有度汇总（异域/传说…）：默认一页只有 20 条，没有这个汇总，调用方会把
+        "第一页里看到 2 把金枪" 当成"一共 2 把"（真机发生过）。"""
+        counts: dict[str, int] = {}
+        for row in rows:
+            label = row.get("tier") or "未知"
+            counts[label] = counts.get(label, 0) + 1
+        return counts
 
     @staticmethod
     def _counts(rows: list[dict[str, Any]]) -> dict[str, int]:

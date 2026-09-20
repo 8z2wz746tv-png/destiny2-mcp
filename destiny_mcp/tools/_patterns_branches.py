@@ -42,6 +42,7 @@ async def patterns_branch(
     player_name: str,
     weapon_name: str,
     weapon_type: str,
+    rarity: str,
     limit: int,
     offset: int,
 ) -> dict[str, Any]:
@@ -50,6 +51,7 @@ async def patterns_branch(
         player_name,
         weapon_name=weapon_name,
         weapon_type=weapon_type,
+        rarity=rarity,
         limit=limit,
         offset=offset,
     )
@@ -168,6 +170,8 @@ def patterns_payload(result: dict[str, Any]) -> dict[str, Any]:
     ]
     data: dict[str, Any] = {
         "counts": counts,
+        # 稀有度汇总：没有它，"第一页里看到 2 把金枪"会被读成"一共 2 把"（真机发生过）
+        "by_tier": result["by_tier"],
         "catalog_total": result["catalog_total"],
         "by_group": result["by_group"],
         "patterns": {

@@ -960,6 +960,26 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         f"matched={psources.get('matched')}/{psources.get('total')} page={short(psources.get('page'), 160)}",
     )
 
+    exotics, dt, err = await call("weapon_assistant", intent="patterns", rarity="异域", limit=50)
+    edata = (exotics or {}).get("data") or {}
+    erows = (edata.get("patterns") or {}).get("items") or []
+    check(
+        "rows",
+        "patterns：rarity=异域 一次拿全金枪（16 把），不受默认一页 20 条影响",
+        err is None and len(erows) == 16 and all(r.get("tier") == "异域" for r in erows)
+        and (edata.get("by_tier") or {}) == {"异域": 16},
+        f"返回={len(erows)} by_tier={edata.get('by_tier')} "
+        f"名单={[r.get('name') for r in erows]}",
+        seconds=dt,
+    )
+
+    check(
+        "rows",
+        "patterns：by_tier 汇总跟着筛选走（不筛时异域 16 + 传说 167 = 183）",
+        (pdata.get("by_tier") or {}) == {"异域": 16, "传说": 167},
+        f"by_tier={pdata.get('by_tier')}",
+    )
+
     variant, dt, err = await call("weapon_assistant", intent="patterns", weapon_name="惩戒措施（失时）")
     vdata = (variant or {}).get("data") or {}
     vrow = first_row((vdata.get("patterns") or {}).get("items") or [])

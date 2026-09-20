@@ -84,6 +84,7 @@
 | 角色级抽查 | 面纱威胁 / 至善 = 已解锁（这两把的记录是角色级；只读档案级会报成未开始） |
 | 未开始 ≠ 0 | `status="未开始"` 的行 `progress` 与 `remaining` 都是 `null`（账号里没有这条记录，不是 0/5） |
 | 术语对照 | `terms` 三键（红框 / 模式 / 塑形）随响应给出去，摘要用玩家口径 |
+| 金枪一次拿全 | `rarity="异域"` 返回 **16 把**（全部 `tier=异域`），`by_tier=={"异域":16}`；不筛时 `by_tier=={"异域":16,"传说":167}`。**默认一页 20 条，靠翻页数金枪会漏**（真机把 16 报成 2） |
 | 来源带出处 | `sources.available=true`、`page.updated_at` 有值、`page.trust="untrusted_reference"` |
 | 变体的塑形配置 | 问「惩戒措施（失时）」：指回基础版，且 `variant.shapeable_columns==["框架","枪管","弹夹"]`、`base_shapeable_columns` 5 个、`traits_fixed=true`、`has_deepsight_socket=false` |
 | 名字对不上 | 摘要说清"图鉴共 183 条"，`patterns.items` 为空，不编"没有来源" |

@@ -96,14 +96,16 @@ CEILINGS = {
     # 锻造图样查询新增登记（登记即上限）：目录（展示树 + 记录 + 目标需求）+ 账号进度
     # （组件 900 的**档案级与角色级两份**）+ 来源装配 + 变体的塑形配置都在这里。
     # 463 = 427 + 角色级记录合并（真机事故：32 条角色级记录被漏读）+ read 块收敛。
+    # 488 = 463 + 稀有度筛选与 by_tier 汇总（真机事故：只读第一页把 16 把金枪报成 2 把）。
     # 再往里加就该拆"目录/账号状态"，而不是抬上限。
-    "destiny_mcp/services/pattern_service.py": 463,
+    "destiny_mcp/services/pattern_service.py": 488,
     # 同上：Starside「锻造武器来源」的名字索引（归一化 / 表格 / 正文兜底 / 出处）。
     # 名字归一化只此一处，别再抄到 pattern_service 或工具层。
     "destiny_mcp/services/starside_crafting_sources.py": 186,
     # 同上：`intent="patterns"` 的载荷与话术（总览 / 单把 / 变体 / 术语对照 /「未开始」措辞）。
-    # 211 是加上"玩家说红框、游戏说模式"的术语块与变体话术（含强化插槽）之后的长度。
-    "destiny_mcp/tools/_patterns_branches.py": 211,
+    # 211 是加上"玩家说红框、游戏说模式"的术语块与变体话术（含强化插槽）之后的长度；
+    # 215 = 211 + 载荷里的 by_tier 汇总。
+    "destiny_mcp/tools/_patterns_branches.py": 215,
 }
 
 

@@ -299,7 +299,11 @@ ArmorSlot = Annotated[
 
 Rarity = Annotated[
     str,
-    Field(description="稀有度过滤（如 传说/异域、legendary/exotic）。只有列出清单的 intent 读它。"),
+    Field(description=(
+        "稀有度过滤（传说/异域/稀有，也认 legendary/exotic/rare 与玩家说的 金枪/金装/紫枪/紫装）。"
+        '筛"我的金枪图样"用 weapon_assistant(intent="patterns", rarity="异域")；'
+        "筛账号库存用 inventory_assistant(intent=\"get\")；其他 intent 传了会被拒。"
+    )),
 ]
 
 ToCharacter = Annotated[

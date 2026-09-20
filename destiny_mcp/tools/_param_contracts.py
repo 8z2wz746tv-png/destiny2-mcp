@@ -230,6 +230,12 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         _only(*(i for i in _all(WeaponIntent) if i not in {"type", "perk_description"})),
         hint='按武器类型查要传 weapon_type（intent="type"，不是 weapon_name）；查单个 Perk 用 perk_name（intent="perk_description"）。',
     ),
+    ("weapon_assistant", "rarity"): _contract(
+        _only(*_W_PATTERNS),
+        hint='只有 intent="patterns" 读它（异域/金枪、传说、稀有）；筛账号库存的稀有度用 '
+             'inventory_assistant(intent="get", rarity=...)。',
+        suggestion=("inventory_assistant", "get"),
+    ),
     ("weapon_assistant", "weapon_type"): _contract(
         _only(*_W_ROLL_FILTERS, "type", *_W_PATTERNS),
         hint='按类型列举用 intent="type"；按类型在全量定义里筛用 intent="catalog"。',

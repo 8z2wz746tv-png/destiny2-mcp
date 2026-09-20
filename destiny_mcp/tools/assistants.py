@@ -389,6 +389,7 @@ async def weapon_assistant(
     weapon_type: Annotated[
         str, Field(description="武器类型；filter_rolls 留空扫描全部持有武器，patterns 用它筛图样。")
     ] = "",
+    rarity: fields.Rarity = "",
     perk_name: Annotated[
         str, Field(description="单个 Perk 名称（中英文）；未传 required_perks 时作为必需 Perk。")
     ] = "",
@@ -432,7 +433,7 @@ async def weapon_assistant(
 
     if intent in WEAPON_PATTERN_INTENTS:
         return await patterns_branches.patterns_branch(
-            svc, resolved, weapon_name, weapon_type, limit, offset)
+            svc, resolved, weapon_name, weapon_type, rarity, limit, offset)
 
     if intent == "community":
         result = _community_read(

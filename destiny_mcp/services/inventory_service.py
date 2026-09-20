@@ -6,6 +6,7 @@ Extracted from server.py per Rule 1: tools should not contain business logic.
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
+from .. import vocabulary
 from ..exceptions import (
     AuthenticationError,
     ConfigError,
@@ -33,15 +34,6 @@ MISSING_INVENTORY_SCOPE_MESSAGE = (
 )
 
 # 稀有度：英文键 → Manifest 的 tierType（6 异域 / 5 传说 / 4 稀有）
-_RARITY_ALIASES: dict[str, int] = {
-    "exotic": 6,
-    "异域": 6,
-    "legendary": 5,
-    "传说": 5,
-    "rare": 4,
-    "稀有": 4,
-}
-
 _INVENTORY_ITEM_TYPE_ALIASES = {
     "": None,
     "all": "all",
@@ -198,7 +190,7 @@ class InventoryService:
         # 调用方会以为筛过了，把传说件当异域答。
         if rarity and rarity.strip().lower() not in ("all", "", "全部"):
             key = rarity.strip().lower()
-            target_tier = _RARITY_ALIASES.get(key)
+            target_tier = vocabulary.rarity_key(key)
             if target_tier is None:
                 raise InvalidArgumentError(
                     f"rarity={rarity!r} 不受支持。可用：exotic/legendary/rare"
