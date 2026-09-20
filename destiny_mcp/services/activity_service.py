@@ -521,18 +521,19 @@ class ActivityService:
         if mode_hash is not None:
             params["mode"] = str(mode_hash)
 
-        # Query each character
+        # 三个角色**同时**拉：角色之间彼此独立，而串行要等 3 次上游往返
+        # （真机实测 history 3.5s → 约 1.5s）。拼装时仍按角色原顺序，
+        # 保证输出与串行时逐字段一致（只让等待变短，不让内容变化）。
         all_activities: list[dict] = []
-        for char_id, class_name in char_ids:
+
+        async def fetch_history(char_id: str, class_name: str) -> list[dict]:
             logger.info(
                 "Fetching activity history: player=%s char=%s(%s) mode=%s",
                 player_name, char_id, class_name, mode or "all",
             )
-
             result = await self._bungie.get_activity_history(
                 mtype, mid, char_id, params=params,
             )
-
             if not isinstance(result, dict):
                 raise APIError(
                     "读取活动历史",
@@ -542,7 +543,13 @@ class ActivityService:
                 result,
                 f"读取 {class_name} 活动历史",
             )
-            activities = response.get("activities", [])
+            return response.get("activities", [])
+
+        per_character = await asyncio.gather(
+            *(fetch_history(char_id, class_name) for char_id, class_name in char_ids)
+        )
+
+        for (char_id, class_name), activities in zip(char_ids, per_character):
 
             for act in activities:
                 details = act.get("activityDetails", {})

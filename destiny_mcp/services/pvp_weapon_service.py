@@ -220,13 +220,20 @@ class PvpWeaponService:
         history_failures: list[str] = []
         candidates: dict[str, dict] = {}
         per_character: list[dict] = []
-        for char_id, class_name in targets:
-            try:
-                activities = await self._pvp_matches(mid, mtype, char_id, mode_type)
-            except Exception as exc:  # 单角色失败只丢这个角色，其余照算（带 warnings）
-                logger.warning("PvP 历史拉取失败 char=%s: %s", char_id, exc)
-                history_failures.append(f"{class_name}：{exc}")
+        # 三个角色**同时**拉（与 `activity_service.get_activity_history` 同一取舍）：
+        # 角色之间独立，串行要等 3 次往返。用 return_exceptions 保住原来的降级语义 ——
+        # 单个角色失败只丢那个角色，其余照算并写进 warnings。
+        fetched = await asyncio.gather(
+            *(self._pvp_matches(mid, mtype, char_id, mode_type) for char_id, _ in targets),
+            return_exceptions=True,
+        )
+
+        for (char_id, class_name), outcome in zip(targets, fetched):
+            if isinstance(outcome, BaseException):
+                logger.warning("PvP 历史拉取失败 char=%s: %s", char_id, outcome)
+                history_failures.append(f"{class_name}：{outcome}")
                 continue
+            activities = outcome
             per_character.append({
                 "character_id": char_id,
                 "class": class_name,

@@ -255,3 +255,39 @@ async def test_aggregate_activity_stats_reads_bungie_activity_stat_keys(
     assert result["activities"][0]["kills_display"] == "9,000"
     assert result["activities"][0]["seconds_played"] == 7380
     assert result["activities"][0]["seconds_played_display"] == "2h 3m"
+
+
+@pytest.mark.asyncio
+async def test_history_fetches_all_characters_in_parallel(dependencies) -> None:
+    """三个角色的历史**同时**拉（真机 3.5s → 约 1.5s），拼装顺序不变。
+
+    每个角色的调用故意睡 0.15 秒：串行 ≈ 0.45s，并发 ≈ 0.15s；断言 < 0.3s。
+    同时钉住"顺序不变"：返回仍按角色的原顺序拼接。
+    """
+    import asyncio
+    import time
+
+    bungie, manifest, resolver = dependencies
+    resolver.get_profile.return_value = {
+        "characters": {"data": {
+            "c1": {"classType": 1}, "c2": {"classType": 2}, "c3": {"classType": 0},
+        }}
+    }
+
+    async def slow_history(mtype, mid, char_id, params=None):
+        await asyncio.sleep(0.15)
+        return {"ErrorCode": 1, "Response": {"activities": [{
+            "period": "2026-09-01T00:00:00Z",
+            "activityDetails": {"instanceId": f"i-{char_id}", "mode": 4, "referenceId": 1},
+            "values": {},
+        }]}}
+
+    bungie.get_activity_history.side_effect = slow_history
+    service = ActivityService(bungie, manifest, resolver)
+
+    started = time.monotonic()
+    rows = await service.get_activity_history(PLAYER_NAME, count=5)
+    elapsed = time.monotonic() - started
+
+    assert elapsed < 0.3, f"看起来是串行：3 个各 0.15s 的请求花了 {elapsed:.2f}s"
+    assert [row["instance_id"] for row in rows] == ["i-c1", "i-c2", "i-c3"]
