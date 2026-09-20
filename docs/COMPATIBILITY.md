@@ -92,6 +92,7 @@
 | 换神器 | `subclass_assistant(intent="equip_artifact")` | 新 intent（写入，走确认信封）；名字精确匹配，不模糊 |
 | 纯 PvP 武器榜 | `activity_assistant(intent="pvp_weapons")` | 新 intent（`scope="pvp_recent"`、`source="pgcr_aggregation"`，逐场 PGCR 聚合最近 N 场）；**不是** `weapon_history` 的别名，两者口径不同、并存。**只认 PvP 家族 + 智谋**：`mode="raid"` 这类 PvE 词报 `invalid_argument_error`（要全模式武器击杀用 `weapon_history`） |
 | 角色身上的神器 | `subclass_assistant(intent="artifact", character=…)` | `artifact` 原来的返回一个键没少，多附 `character_artifact` |
+| 锻造图样查询 | `weapon_assistant(intent="patterns")` | 新 intent（只读）：图鉴「模式和催化」183 条武器图样的进度（组件 900，就是游戏里那条「4/5」）、需求次数、掉落来源。**新能力，非破坏性**：没动任何既有 intent 的键；两个"可锻造"口径并存（图样 183 条 vs `is_craftable` 219 件，后者含 36 件专家/失时变体），见 ADR-009 |
 
 **删除的行为（不留兼容分支）**：`equip_loadout` 遇到"保存的子职业与当前不一致"以前直接失败并返回
 「当前子职业与保存/确认的子职业不一致。」；0.3.0 起改成**先换上再配**（用户 2026-09-15 拍板），
@@ -115,6 +116,7 @@
 | | `compare` | `compare_duplicates` |
 | | `perk_pool` | `perks` |
 | | `popularity` | `selection_rates`、`perk_selection`、`selection`、`usage_rates` |
+| | `patterns` | `pattern`、`craft`、`锻造`、`图样`、`图样进度`（图样/图样进度/锻造是永久中文说法；`pattern`/`craft` 是英文近义，只登记不宣传） |
 | `loadout_assistant` | `list` | `get` |
 | `subclass_assistant` | `get` | `subclass` |
 | `activity_assistant` | `stats` | `career`、`historical_stats` |

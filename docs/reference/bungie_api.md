@@ -235,6 +235,7 @@
 | 事实 | 唯一出处 |
 | --- | --- |
 | 组件号集合 | `destiny_mcp/services/profile_components.py` |
+| 锻造图样进度只在组件 900 | `destiny_mcp/services/pattern_service.py`（见本文第十四节、ADR-009） |
 | 游戏内生涯计数器（组件 1100）与统计接口的分工 | `destiny_mcp/services/activity_counters_service.py`（见本文第十一节） |
 | 三档口径与合并语义（sum/max/min/derived/none） | `destiny_mcp/activity_stats.py`（「三档并存」段） |
 | 统计接口两条路（按角色 / 账号级）与 `modes`/`periodType` | `destiny_mcp/bungie_stats.py`（见本文第十二节） |
@@ -397,3 +398,27 @@
 | `counters(query="crucible")` 返回 0 条 | 同一账号 `query="熔炉"` → 13 条；`query="已击败对手"` → 6 条 | `query` 是**名称/描述子串**匹配，而计数器名称来自中文 Manifest；英文模式词匹配不到（按模式用 `mode=`） |
 | 统计接口按模式的数字远小于游戏内计数器 | `stats(mode="trials")`：击败 1,474 / 胜场 105；计数器：**10,696 / 826** | 按模式的生涯数字同样要并列计数器（ADR-005）；统计接口没有"这个模式的合并视图" |
 | 收藏品节点 `counts` 全 0，但搜索说这个节点有 50 件 | 那 50 条是 `children.records`（条目），组件 800 里**没有**它们的收藏状态（`children.collectibles=0`） | `records` 与 `collectibles` 是两种数据：节点详情必须说明"0 只是这个口径下没有可查的收藏品" |
+
+## 十四、锻造图样（武器模式）：进度只在组件 900（2026-09-20 实测）
+
+**事实**：游戏里「收藏品 → 模式和催化」那一页的武器图样是**记录**结构（不是收藏品）：
+根展示节点 `2642502414` → 分组容器 `3442838224` → 主武器模式 `127506319` /
+特殊武器模式 `3289524180` / 重武器模式 `1464475380`（+ 异域催化 `2744330515`）→ 武器类型节点 →
+183 条 `DestinyRecordDefinition`。每条记录的名字与武器同名，`objectives[0]` 的
+`progressDescription` =「模式进度」、`completionValue` = 需要萃取几次
+（实测：5 次 148 把 / 3 次 7 把 / 2 次 4 把 / 1 次 24 把，其中金枪 16 把）。
+
+| 组件 | 里面有图样进度吗 | 实测 |
+| --- | --- | --- |
+| 900 `profileRecords` | **有**：`records[记录hash].objectives[0].progress / completionValue` 就是游戏里那条「图样进度 4/5」 | 1.44 MB / 约 2.5 s；本账号 151 条图样记录返回（149 完成、2 进行中） |
+| 800 `profileCollectibles` | 没有 | 拿 `2642502414`/`3442838224` 查 `collectible_node` 回 `total=0`（"条目的解锁状态不在这个组件里"） |
+| 1300 `craftables` | 没有 | `characterCraftables.<角色>.craftables` 219 条、`visible` **全为 true**、2.93 MB / 0.90 s；它回答"能塑形哪些 perk"（`sockets[].plugs[].failedRequirementIndexes`） |
+
+**结论**：图样进度只走 900；不进组件 800/1300。口径与取舍见 ADR-009，
+实测过程与成本见 `docs/plans/PATTERN_QUERY_PLAN.md`，代码在
+`destiny_mcp/services/pattern_service.py`（目录 + 进度）与
+`destiny_mcp/services/starside_crafting_sources.py`（社区来源）。
+
+**另一个坑**：`is_craftable`（`inventory.recipeItemHash` 非空）是 **219 件**，比图鉴多 36 件
+`（专家）/（失时）/（痛苦）`变体，它们不单列图样（图样记录挂在基础版上）。
+"图样数"只能说 183，别拿 219 顶替。

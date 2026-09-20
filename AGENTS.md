@@ -218,7 +218,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | `destiny_mcp/data/` | 纯数据表（静态常量/映射）：`activity_modes.py` 是**模式词与 `modeType` 的唯一出处**（中文名去 Manifest 取，别再抄标签表）；`pvp_counters.py` 是「计数器 → 模式/周期」对照表。每条带实测证据，改表先看 `tests/test_activity_modes.py` / `tests/test_pvp_counters_table.py`。 |
 | `destiny_mcp/build/` | 配装求解引擎（护甲优化）：纯计算、不碰账号；`farm_target.py` 贴着 1296 上限。 |
 | `destiny_mcp/rag/` | 本地社区资料检索（Phase 3）。 |
-| `destiny_mcp/services/` | 服务层：账号读写、外部数据、形状工厂；判断逻辑落这里，别落工具层。**PvP 武器榜**（逐场 PGCR 聚合）在 `services/pvp_weapon_service.py`，它的结算缓存单独在 `services/pgcr_cache.py`（两者都登记了体积上限）；**游戏内生涯计数器**（profile 组件 1100）在 `services/activity_counters_service.py`：它与统计接口是两个来源，读抖动要重试、空要报 `unavailable`（不许当 0）；口径见 `docs/reference/bungie_api.md`。 |
+| `destiny_mcp/services/` | 服务层：账号读写、外部数据、形状工厂；判断逻辑落这里，别落工具层。**PvP 武器榜**（逐场 PGCR 聚合）在 `services/pvp_weapon_service.py`，它的结算缓存单独在 `services/pgcr_cache.py`（两者都登记了体积上限）；**游戏内生涯计数器**（profile 组件 1100）在 `services/activity_counters_service.py`：它与统计接口是两个来源，读抖动要重试、空要报 `unavailable`（不许当 0）；**锻造图样**（图鉴「模式和催化」，进度在 profile 组件 900）在 `services/pattern_service.py`，社区来源的按名索引在 `services/starside_crafting_sources.py`（见 ADR-009）；口径见 `docs/reference/bungie_api.md`。 |
 | `destiny_mcp/tools/` | 工具层：只做分派、参数守卫与话术；intent 取值/参数归属/响应信封三张契约表都在这层。分支响应按域放 `_*_branches.py`（如 `_counters_branches.py` = `activity_assistant(intent="counters")`）。 |
 | `destiny_mcp/__main__.py` | `python -m destiny_mcp` 入口；写法要 spawn 安全（构建求解 worker 会重跑它）。 |
 | `destiny_mcp/server.py` | MCP 门面装配：注册工具与握手；别塞业务逻辑。 |
@@ -237,6 +237,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/plans/EQUIP_FLOW_PLAN.md` — 动装备流程（候选签发 → `confirmed` → 回读）之前看它为什么长这样。
 - `docs/plans/PVP_STATS_PLAN.md` — 动生涯/赛季战绩（计数器 vs 统计接口、模式与角色范围标注）之前看它为什么分三档。
 - `docs/plans/LEGACY_SURFACE_REMOVAL_PLAN.md` — 要动历史工具面（`full`/`expert` profile、`ENABLE_LEGACY_TOOLS`）或配装导入入口之前看它：删什么、导入怎么搬、怎么验都在里面。
+- `docs/plans/PATTERN_QUERY_PLAN.md` — 要做锻造图样（「模式和催化」那一页、游戏里的「图样进度 4/5」）查询之前看它：进度只在组件 900、183 vs 219 两个口径的实测证据都在里面。
 - `docs/plans/PERFORMANCE_PLAN.md` — 要动性能（搜索 N+1、武器目录全量展开、载荷体积、启动、并发与缓存）之前看它：六项的实测基线与验收口径都在里面。
 - `docs/plans/PVP_WEAPON_BOARD_PLAN.md` — 动 PvP 武器榜（PGCR 窗口聚合、成本与并发实测、模式名出处）之前看它为什么只能给"最近 N 场"。
 - `docs/plans/SUBCLASS_ARTIFACT_PLAN.md` — 动子职业/神器读写之前看计划与取舍。
