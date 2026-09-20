@@ -2,34 +2,23 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
-## 未发布（2026-09-20）
+## 0.5.0 — 2026-09-20
 
-**历史工具面整块剥离（破坏性，见 ADR-008）**
+**这是一次破坏性发布**：工具面固定为 8 个聚合工具（历史工具面剥离到 `legacy/`）、
+`weapon_assistant(intent="type")` 改列表行（默认 10 件 + 翻页）、`activity_assistant(intent="stats")`
+改账号级三档、活动模式词表合一。升级前请对照 `docs/COMPATIBILITY.md`。
 
-- 16 个模块、67 个低层工具（`get_inventory`、`search_weapons_by_type` …）与**配装导入整块**
-  （`build_import/` 领域包 + 服务 + 工具 + 两个提示词 + 它的测试）已移到仓库根目录 `legacy/`：
-  **不进包、不参与测试与 lint**，只作查阅（`legacy/README.md` 写了为什么不维护、怎么复活）。
-- `full`/`expert` profile 与 `DESTINY_MCP_ENABLE_LEGACY_TOOLS` 开关一起删除：
-  工具面现在固定是 **8 个聚合工具**，`create_server()` 不再收参数，`/health` 不再报 `tool_profile`。
-  语料 `mcp` 组加了反向断言：把旧的 profile/开关塞进环境变量也只该有 8 个工具。
+**历史工具面整块剥离（见 ADR-008）** —— 67 个低层工具（`get_inventory`、`search_weapons_by_type` …）
+与**配装导入整块**（`build_import/` 领域包 + 服务 + 工具 + 两个提示词 + 它的测试）移到仓库根目录 `legacy/`：
+不进包、不参与测试与 lint，只作查阅（`legacy/README.md` 写了为什么不维护、怎么复活）。
+
+- `full`/`expert` profile 与 `DESTINY_MCP_ENABLE_LEGACY_TOOLS` 开关一起删除：`create_server()` 不再收参数，
+  `/health` 不再报 `tool_profile`；语料 `mcp` 组加了反向断言（把旧的 profile/开关塞进去也只该有 8 个工具）。
 - **配装导入功能不再提供**（决定不要，不做"搬成新 intent"的迁移）：README 功能列表与技能文档里的
-  相关宣传同步删掉。58 处引用（测试、语料、安装脚本、技能、DSH 配置）已清理。
+  相关宣传同步删掉；58 处引用（测试、语料、安装脚本、技能、DSH 配置）已清理。
 - 为什么这么做：那 67 个工具的既定口径是"默认屏蔽、不保证契约、不单独修 bug"，复核时已经有两个
   烂在里面（`analyze_weapon` 裸抛 `KeyError`、`get_historical_stats` 有数据说成"未找到"）；
   而 62/67 在 8 个聚合工具里都有对应，留着它们只是每次改公共层都要替一堆没守卫的工具做决定。
-
-
-
-- **修复（本轮改动造成的回归）：历史工具 `find_players` 会裸抛 `KeyError`**。
-  它的输出契约是"按置信度排序"（要读 `confidence`/`playtime_hours`），而"模糊搜人默认不读别人档案"
-  之后这些键不再存在。修法是让它**显式要评分**（`enrich=True`），行为与原来一致。
-- **删除两个早就坏掉、且与聚合入口重复的历史工具**：`analyze_weapon`（读 P4/P6 之前的
-  `result["perk_pool"]`，一直裸抛 KeyError）与 `get_historical_stats`（读 0.2.0 之前的 `{pve, pvp}`
-  手写八键，把有数据说成"未找到统计数据"）。历史工具面本就"屏蔽不管、不单独修 bug"，
-  留着两把半死的工具不如删掉 —— 同样的能力在 `weapon_assistant(intent="analyze")` 与
-  `activity_assistant(intent="stats")` 里都有。full profile 的工具数 77 → 75。
-
-## 未发布（2026-09-19）
 
 **性能六项（按 `docs/plans/PERFORMANCE_PLAN.md` 的顺序落地）**：
 
@@ -76,8 +65,6 @@
   档案读取 0 次）；要按"游玩时长/最近游玩/凯旋分"排序时传 `include_profile=true`，
   这时**一次扇出**并发拉（实测并发 10 → 2.8–4.2s，而并发 5 出现 4.3–14.5s 的抖动：
   分批等于把"某个人档案慢"的风险翻倍）。并发值写死在 `_ENRICH_CONCURRENCY` 并附实测。
-
-## 未发布（2026-09-18）
 
 **PVP 战绩 P1/P2/P3b/P3-2：生涯数字分三档、两个来源并列、按模式与周期说话**（口径决定见
 `docs/adr/005-career-numbers-follow-in-game-counters.md`，实测证据见
@@ -259,8 +246,6 @@
   `collectible_node` 却回 `counts 全 0`、items 空 —— 那 50 条是 `records`（条目），
   组件 800 里没有它们的收藏状态。现在响应带 `declared{records,collectibles,presentation_nodes}`、
   `child_nodes`（可继续下钻）与 `empty_reason`（说清 0 只能读成"这个口径下没有可查的收藏品"）。
-
-## 未发布（2026-09-17）
 
 **PVP 战绩 P0：接上"游戏内计数器"（profile 组件 1100）** —— 以前我们报的生涯数字全部来自统计接口，
 游戏里显示的那个数我们根本没读过。这一版把组件 1100 接上，并把它和统计接口**分成两个来源**
