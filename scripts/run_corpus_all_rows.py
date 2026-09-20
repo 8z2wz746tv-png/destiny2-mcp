@@ -621,14 +621,36 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     row = first_row(candidates)
     check(
         "rows",
-        "player：find 前缀模糊给人选 + 置信度 + has_more",
+        "player：find 前缀模糊给人选 + has_more，默认**不读别人档案**（不算置信度）",
         err is None and (find or {}).get("ok") is True and bool(candidates)
-        and {"confidence", "last_played", "membership_id", "playtime_hours"} <= set(row)
-        and "has_more" in fdata,
-        f"候选={len(candidates)} 首项={short({k: row.get(k) for k in ('display_name','confidence','playtime_hours')}, 120)} "
-        f"has_more={fdata.get('has_more')}",
+        and {"membership_id", "display_name"} <= set(row)
+        # 没读的字段**不给键**（给 null 会被读成"读了但没有"），并说明怎么才能拿到
+        and not {"confidence", "playtime_hours", "last_played"} & set(row)
+        and "has_more" in fdata
+        and any("include_profile" in str(w) for w in (find or {}).get("warnings") or []),
+        f"候选={len(candidates)} "
+        f"首项={short({k: row.get(k) for k in ('display_name','confidence','playtime_hours')}, 120)} "
+        f"has_more={fdata.get('has_more')} 用时={dt:.1f}s",
         seconds=dt,
-        warn=dt > 20,
+        warn=dt > 5,
+    )
+
+    enriched, dt_e, err_e = await call(
+        "player_assistant", intent="find", name_prefix=(live.get("player_name") or "husky")[:5],
+        include_profile=True, slow=True,
+    )
+    edata = (enriched or {}).get("data") or {}
+    erow = first_row(edata.get("players") or [])
+    check(
+        "rows",
+        "player：find + include_profile=true 才去读档案、给置信度与游玩时长",
+        err_e is None and (enriched or {}).get("ok") is True
+        and {"confidence", "last_played", "playtime_hours", "triumph_score"} <= set(erow)
+        and not any("include_profile" in str(w) for w in (enriched or {}).get("warnings") or []),
+        f"首项={short({k: erow.get(k) for k in ('display_name','confidence','playtime_hours')}, 120)} "
+        f"用时={dt_e:.1f}s",
+        seconds=dt_e,
+        warn=dt_e > 12,
     )
 
     gibberish, dt, err = await call(
