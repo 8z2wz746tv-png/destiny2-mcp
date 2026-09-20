@@ -75,6 +75,18 @@
 | `↑` 与 `name_plain` | 逐副本：带 `↑` 的已装 perk 同时给 `name_plain`；本账号当前没有已选中的强化 perk 时记 INFO（不假失败） |
 | `filter_rolls` 认规范名 | 用不带箭头的名字能筛到带 `↑` 的副本 |
 
+### weapon_assistant（`intent="patterns"`：锻造图样）
+
+| 行 | 断言 |
+| --- | --- |
+| 计数自洽 | `counts` 四档相加 == `total` == 183，且 `catalog_total` == 183（图鉴「模式和催化」的条数） |
+| 未开始 ≠ 0 | `status="未开始"` 的行 `progress` 必须是 `null`（账号里没有这条记录，不是 0/5） |
+| 来源带出处 | `sources.available=true`、`page.updated_at` 有值、`page.trust="untrusted_reference"` |
+| 变体指回基础版 | 问「惩戒措施（失时）」返回基础版「惩戒措施」的图样，摘要里写明"变体" |
+| 名字对不上 | 摘要说清"图鉴共 183 条"，`patterns.items` 为空，不编"没有来源" |
+| 别名等价 | `patterns`/`pattern`/`craft`/`锻造`/`图样`/`图样进度` 同参返回逐字节相同的 `data`（`aliases` 组） |
+| 默认条数 | 不传 `limit` 返回 20 条（`cross` 组的默认条数体检） |
+
 ### build_assistant
 
 | 行 | 断言 |
@@ -196,22 +208,25 @@
 | 真握手读账号 | `player_assistant(intent="profile")` 得到 `ok=true` |
 | 旧工具面已剥离 | 连旧的 `DESTINY_MCP_TOOL_PROFILE=full` + `ENABLE_LEGACY_TOOLS=1` 一起塞进去，也只该有 8 个工具、且没有 `get_inventory` |
 
-## `sweep` 实测基线（110 个 intent，最简参）
+## `sweep` 实测基线（119 个 intent，最简参）
 
-最近一次全跑：**110 条 PASS + 1 条汇总 INFO，0 FAIL / 0 WARN**。85 个 intent 用最简参就返回 `ok=true`；
-25 个返回**干净的错误码**（这本身就是对的：缺参/越界要在工具层或服务层说清，不许裸抛）：
+最近一次全跑（2026-09-20，0.5.0 + 锻造图样）：**119 条 PASS + 1 条汇总 INFO，0 FAIL / 0 WARN**。
+92 个 intent 用最简参就返回 `ok=true`；27 个返回**干净的错误码**（这本身就是对的：缺参/越界要在工具层
+或服务层说清，不许裸抛）：
 
 | 返回码 | 个数 | 哪些 intent（最简参下） |
 | --- | --- | --- |
-| `confirmation_required` | 4 | `inventory:move`、`loadout:delete`、`loadout:equip_loadout`、`subclass:modify` |
-| `invalid_arguments`（工具层） | 13 | `inventory:{transfer,equip,equip_many,equip_items,pull_postmaster,lock,track_quest,quest_tracking}`、`loadout:{save,snapshot_official,update_official_identifiers,clear_official}`、`subclass:equip_artifact_mod` |
-| `invalid_argument_error`（服务层） | 1 | `inventory:equip_mod`（缺 `item_instance_id`，要先指定哪一件） |
+| `confirmation_required` | 6 | `inventory:move`、`loadout:{delete,equip_loadout}`、`subclass:{modify,equip_artifact_mod,equip_artifact}` |
+| `invalid_arguments`（工具层） | 12 | `inventory:{transfer,equip,equip_many,equip_items,pull_postmaster,lock,track_quest,quest_tracking}`、`loadout:{save,snapshot_official,update_official_identifiers,clear_official}` |
+| `invalid_argument_error`（服务层） | 2 | `inventory:item`（空实例 ID）、`inventory:equip_mod`（缺 `item_instance_id`，要先指定哪一件） |
 | `invalid_canonical_build` | 1 | `build:equip_build`（手拼候选会被拒） |
-| `missing_artifact_mod_hash` | 1 | `subclass:artifact_mod`（`artifact_mod_hash` 传 0/缺省时） |
-| `missing_artifact_name` | 1 | `subclass:equip_artifact`（没给 `artifact_name` 时） |
 | `ignored_parameter` | 3 | `activity:{aggregate,activity_aggregate,activity_stats}`（`mode` 不是它们读的参数） |
 | `a_p_i_error` | 2 | `activity:{leaderboards,leaderboard}`（上游故障，见已知问题） |
 | `upstream_not_found_error` | 1 | `activity:clan_leaderboards`（伪 group_id） |
+
+（`missing_artifact_mod_hash` / `missing_artifact_name` 两条在旧基线里出现过：那时 `sweep` 给
+`artifact_mod` / `equip_artifact` 传的是 0 / 空名字。现在这两个 intent 会带上真机取到的
+神器名与模组 hash，于是走到写入确认那一步，返回 `confirmation_required`。）
 
 三条容易踩的：
 
@@ -351,6 +366,29 @@ FAIL 5 条＝「已知问题」表的 #2/#3/#4/#5/#6；#1（analyze 自相矛盾
   `scripts/diff_weapon_baseline.py` 对改前快照 **0 个无理由消失**；其余用例耗时与体积照旧。
 - 口径提醒：本文件里的 KB 是**解码后的紧凑 JSON 字符数**；线上文本带 `\uXXXX` 转义，
   中文多的时候大约是它的 2 倍（两个数都对，别混着比）。
+
+**2026-09-20 复跑（0.5.0 发布 + 锻造图样之后，同一台机器）**
+
+```bash
+.venv/bin/python scripts/run_corpus_all_rows.py --report /tmp/corpus_patterns.json
+```
+
+| 组 | 行数 | 结果 |
+| --- | --- | --- |
+| `sweep`（119 个 intent + 1 条汇总） | 120 | PASS 119、INFO 1 |
+| `rows`（字段级 + 跨切面） | 95 | PASS 95（含 5 条新的 `patterns` 断言） |
+| `aliases`（别名等价） | 17 | PASS 17（含 `patterns` 六个别名） |
+| `mcp`（协议层） | 10 | PASS 10 |
+| **合计** | **242** | **PASS 240、INFO 2、0 FAIL / 0 WARN / 0 SKIP**，退出码 0 |
+
+- 新增的 `patterns` 行全绿：计数自洽 183、`未开始` 的 `progress` 为 null、来源带页面与
+  `trust`、变体指回基础版、名字对不上时说清图鉴条数、六个别名 `data` 逐字节相同、默认 20 条。
+- 最慢 8 次：`build(analyze)` 33.8s、`player(profile)` 9.4s、`activity(pgcr)` 9.3s、
+  `activity(clan_leaderboards)` 7.3s / 7.1s、`build(community_build)` 7.0s、`build(recommend)` 6.4s / 5.8s；
+  `weapon(patterns)` 首次 2.8s（之后 5 分钟 TTL 内 0.3–0.6s）。
+- 最大 8 个响应仍由库存与配装占着：`inventory(duplicates)` 85.4 KB、`loadout(list/get)` 71.4 KB、
+  `inventory(重复武器)` 63.6 KB；`patterns` 默认一页 **5.9 KB**。
+- `pytest -q` **1626 通过**（新增 `tests/test_pattern_query.py` 28 条、`tests/test_crafting_sources.py` 12 条）。
 
 **这一轮里语料自身的 bug（都已修，记在这里免得下次重犯）**
 

@@ -90,6 +90,8 @@ SLOW_INTENTS = {
     ("weapon_assistant", "all_weapons"),
     ("weapon_assistant", "global"),
     ("weapon_assistant", "search_all"),
+    # 锻造图样：读账号组件 900（首次约 3s，之后 5 分钟 TTL 内是缓存）
+    ("weapon_assistant", "patterns"),
     ("player_assistant", "find"),
     ("player_assistant", "find_players"),
     ("player_assistant", "fuzzy"),
@@ -418,6 +420,8 @@ def sweep_args(tool: str, intent: str, live: dict[str, Any]) -> dict[str, Any]:
     elif tool == "weapon_assistant":
         if intent == "type":
             args["weapon_type"] = "手炮"
+        elif intent in {"patterns", "pattern", "craft", "锻造", "图样", "图样进度"}:
+            args["weapon_name"] = "累积救赎"
         elif intent == "perk_description":
             args["perk_name"] = "萤火虫"
         elif intent == "community":
@@ -898,6 +902,61 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         err is None and (fdata2.get("matched_count") or 0) >= 1,
         f"matched={fdata2.get('matched_count')} unknown={fdata2.get('unknown_count')} "
         f"coverage_complete={fdata2.get('coverage_complete')}",
+        seconds=dt,
+    )
+
+    # ── weapon_assistant(intent="patterns")：锻造图样 ───────────────────
+    patterns, dt, err = await call("weapon_assistant", intent="patterns", slow=True)
+    pdata = (patterns or {}).get("data") or {}
+    pcounts = pdata.get("counts") or {}
+    pitems = (pdata.get("patterns") or {}).get("items") or []
+    psources = pdata.get("sources") or {}
+    ptotal = pcounts.get("total") or 0
+    check(
+        "rows",
+        "patterns：四档计数自洽，且图鉴总数 183（游戏里那一页的条数）",
+        err is None and (patterns or {}).get("ok") is True
+        and ptotal == 183 and pdata.get("catalog_total") == 183
+        and (pcounts.get("unlocked") or 0) + (pcounts.get("in_progress") or 0)
+        + (pcounts.get("not_started") or 0) == ptotal,
+        f"counts={pcounts} catalog_total={pdata.get('catalog_total')} 返回={len(pitems)}"
+        f" read={pdata.get('read')}",
+        seconds=dt,
+    )
+    check(
+        "rows",
+        "patterns：「未开始」的行 progress 必须是 null（没有记录 ≠ 进度 0）",
+        all(row.get("progress") is None for row in pitems if row.get("status") == "未开始"),
+        f"未开始={sum(1 for row in pitems if row.get('status') == '未开始')} "
+        f"进行中={[(r.get('name'), r.get('progress'), r.get('need')) for r in pitems if r.get('status') == '进行中'][:3]}",
+    )
+    check(
+        "rows",
+        "patterns：来源是社区资料，带页面与更新时间，且跟账号进度分开",
+        psources.get("available") is True and (psources.get("page") or {}).get("updated_at")
+        and (psources.get("page") or {}).get("trust") == "untrusted_reference",
+        f"matched={psources.get('matched')}/{psources.get('total')} page={short(psources.get('page'), 160)}",
+    )
+
+    variant, dt, err = await call("weapon_assistant", intent="patterns", weapon_name="惩戒措施（失时）")
+    vdata = (variant or {}).get("data") or {}
+    vrow = first_row((vdata.get("patterns") or {}).get("items") or [])
+    check(
+        "rows",
+        "patterns：变体（失时）指回基础版的图样，而不是报「没找到」",
+        err is None and vrow.get("name") == "惩戒措施" and "变体" in str((variant or {}).get("summary")),
+        f"summary={short((variant or {}).get('summary'), 140)}",
+        seconds=dt,
+    )
+
+    typo, dt, err = await call("weapon_assistant", intent="patterns", weapon_name="zzqq不存在")
+    check(
+        "rows",
+        "patterns：名字对不上时说清「图鉴共 183 条」，不编一句「没有来源」",
+        err is None and (typo or {}).get("ok") is True
+        and "183" in str((typo or {}).get("summary"))
+        and not ((typo or {}).get("data") or {}).get("patterns", {}).get("items"),
+        f"summary={short((typo or {}).get('summary'), 140)}",
         seconds=dt,
     )
 
@@ -1861,6 +1920,8 @@ async def run_cross(runner: Runner, live: dict[str, Any], skip_slow: bool) -> No
          lambda p: pick(p, "weapons", "items"), "weapons.items"),
         ("weapon_assistant", {"intent": "catalog", "perk_name": "萤火虫"}, 50,
          lambda p: pick(p, "matched"), "matched"),
+        ("weapon_assistant", {"intent": "patterns"}, 20,
+         lambda p: pick(p, "patterns", "items"), "patterns.items"),
         ("inventory_assistant", {"intent": "duplicates"}, 10,
          lambda p: pick(p, "duplicate_weapons"), "duplicate_weapons"),
         ("loadout_assistant", {"intent": "list"}, 5,
@@ -1996,6 +2057,7 @@ _ALIAS_GROUPS: list[tuple[str, dict[str, Any], list[str], bool]] = [
     ("weapon_assistant", {"weapon_name": "无感"}, ["compare", "compare_duplicates"], False),
     ("weapon_assistant", {"weapon_name": "遗产"}, ["perk_pool", "perks"], False),
     ("weapon_assistant", {"weapon_name": "遗产"}, ["popularity", "selection_rates", "perk_selection", "selection", "usage_rates"], False),
+    ("weapon_assistant", {"weapon_name": "累积救赎"}, ["patterns", "pattern", "craft", "锻造", "图样", "图样进度"], False),
     ("subclass_assistant", {"character": "hunter"}, ["get", "subclass"], False),
     ("activity_assistant", {"character": "hunter"}, ["stats", "career", "historical_stats"], False),
     ("activity_assistant", {"count": 2}, ["weapon_history", "weapons", "weapon_usage", "weapon_leaderboard"], False),
