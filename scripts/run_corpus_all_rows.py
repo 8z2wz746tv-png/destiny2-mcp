@@ -1626,14 +1626,18 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         group_id="4611686018490000000",
         slow=True,
     )
+    # 伪公会 ID 的答案取决于上游当时怎么回：正常是 404 → upstream_not_found_error，
+    # 但实测（2026-09-20）会返回**空响应** → a_p_i_error + "不要凭记忆给排名"。两种都是
+    # 如实回答（我们分不清"没这个公会"和"上游抖了一下"），所以两种码都算过；
+    # 缺 group_id 那条仍然必须是我们自己的 invalid_argument_error。
+    fake_code = ((clan_fake or {}).get("error") or {}).get("code")
     check(
         "rows",
-        "activity：clan_leaderboards 缺 group_id → invalid_argument_error；伪 ID → upstream_not_found_error",
+        "activity：clan_leaderboards 缺 group_id → invalid_argument_error；伪 ID → 上游如实报错",
         err is None and err2 is None
         and ((clan_missing or {}).get("error") or {}).get("code") == "invalid_argument_error"
-        and ((clan_fake or {}).get("error") or {}).get("code") == "upstream_not_found_error",
-        f"缺 ID → {((clan_missing or {}).get('error') or {}).get('code')} "
-        f"| 伪 ID → {((clan_fake or {}).get('error') or {}).get('code')}",
+        and fake_code in {"upstream_not_found_error", "a_p_i_error"},
+        f"缺 ID → {((clan_missing or {}).get('error') or {}).get('code')} | 伪 ID → {fake_code}",
         seconds=dt,
     )
 
