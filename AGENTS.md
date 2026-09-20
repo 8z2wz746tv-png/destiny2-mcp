@@ -231,6 +231,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/COMPATIBILITY.md` — 改响应形状、加/删别名、删旧键之前：哪些入口必须留、哪些能删、删之前先做什么。
 - `docs/community/COMMUNITY_DATA_NOTICE.md` — 引用或再分发社区资料（Starside）之前看授权与边界。
 - `docs/community/小黑盒_功能总览.md` — 面向中文玩家的八工具功能总览；写对外说明或话术时对齐口径。
+- `docs/community/小黑盒_更新公告_2026-09-18.md` — 上次发文以来的**新增与修复**发布稿（计数器/生涯三档/纯 PvP 武器榜 + 一串口径修复）；要发更新文章或对齐对外口径时看它。
 - `docs/plans/ARMOR_FORMAT_PLAN.md` — 动护甲载荷格式（体积口径、字段取舍）之前看实机证据与取舍。
 - `docs/plans/EQUIP_FLOW_PLAN.md` — 动装备流程（候选签发 → `confirmed` → 回读）之前看它为什么长这样。
 - `docs/plans/PVP_STATS_PLAN.md` — 动生涯/赛季战绩（计数器 vs 统计接口、模式与角色范围标注）之前看它为什么分三档。
