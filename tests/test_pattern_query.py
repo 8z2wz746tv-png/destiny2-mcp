@@ -127,9 +127,15 @@ OBJECTIVES = {
 class FakeManifest:
     """只实现 PatternService 用到的那三个方法。"""
 
-    def __init__(self, *, tree: dict[int, dict] | None = None, search: dict[str, int] | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        tree: dict[int, dict] | None = None,
+        search: dict[str, int] | None = None,
+        records_override: dict[int, dict] | None = None,
+    ) -> None:
         self._nodes = tree if tree is not None else nodes()
-        self._records = records()
+        self._records = records_override if records_override is not None else records()
         self._search = search if search is not None else {
             "惩戒措施": FATEBRINGER,
             # 模糊命中：催化记录名 → 同名武器（必须被精确比对挡掉）
@@ -138,6 +144,8 @@ class FakeManifest:
             "苦痛": SUFFERANCE,
             "继承": INHERITANCE,
             "惩戒措施（失时）": VARIANT,
+            # 角色级记录那条（只在 character_tree() 的目录里出现）
+            "面纱威胁": CHARACTER_WEAPON,
         }
 
     def get_definition(self, table: str, hash_id: int) -> dict | None:
@@ -180,15 +188,25 @@ class FakeResolver:
         return {"membership_id": MID, "membership_type": MTYPE, "display_name": PLAYER}
 
 
-def profile_with(records_map: dict[int, dict] | None = None) -> dict:
-    """组件 900 的响应形状：`Response.profileRecords.data.records`。
+def profile_with(
+    records_map: dict[int, dict] | None = None,
+    *,
+    character_records: list[dict[int, dict]] | None = None,
+) -> dict:
+    """组件 900 的响应形状：`Response.profileRecords` + `Response.characterRecords`。
 
-    真实账号的记录组件里总有几千条别的记录（实测 5299 条），这里补一条无关记录 ——
-    "组件不是空的"和"这条图样没解锁"是两件事，替身也要能同时表达。
+    真实账号的记录组件里总有几千条别的记录（实测 5299 条 + 每个角色 869 条），
+    这里补一条无关记录 —— "组件不是空的"和"这条图样没解锁"是两件事，替身也要能同时表达。
     """
     entries: dict[int, dict] = {UNRELATED_RECORD: record_component(1, 1)}
     entries.update(records_map or {})
-    return {"profileRecords": {"data": {"records": {str(k): v for k, v in entries.items()}}}}
+    profile = {"profileRecords": {"data": {"records": {str(k): v for k, v in entries.items()}}}}
+    if character_records is not None:
+        profile["characterRecords"] = {"data": {
+            f"char{index}": {"records": {str(k): v for k, v in per_char.items()}}
+            for index, per_char in enumerate(character_records)
+        }}
+    return profile
 
 
 def record_component(progress: int, need: int, state: int = 4) -> dict:
@@ -200,9 +218,12 @@ def service(
     *,
     tree: dict[int, dict] | None = None,
     starside: Any = None,
+    records_override: dict[int, dict] | None = None,
 ) -> tuple[PatternService, FakeBungie]:
     bungie = FakeBungie(profile)
-    svc = PatternService(bungie, FakeManifest(tree=tree), FakeResolver(), starside)  # type: ignore[arg-type]
+    svc = PatternService(
+        bungie, FakeManifest(tree=tree, records_override=records_override), FakeResolver(), starside,
+    )  # type: ignore[arg-type]
     return svc, bungie
 
 
@@ -308,6 +329,98 @@ async def test_missing_or_empty_component_is_an_error_not_zero_unlocked() -> Non
         assert "不能把未返回当成未解锁" in str(excinfo.value)
 
 
+# ── 角色级记录（真机上栽过的那一条） ──────────────────────────────────
+
+
+def character_tree() -> dict[int, dict]:
+    """目录里放一条**角色级**记录：实测 183 条模式记录里有 32 条是这样。"""
+    tree = nodes(with_catalyst=False)
+    tree[TYPE_HANDCANNON] = _node("手炮", records=(501, 507))
+    return tree
+
+
+CHARACTER_SCOPED = 507
+CHARACTER_WEAPON = 1006
+
+
+def character_records_override() -> dict[int, dict]:
+    out = records()
+    out[CHARACTER_SCOPED] = {
+        "displayProperties": {"name": "面纱威胁"},
+        "objectiveHashes": [708],
+        # scope=1：角色级。只读 profileRecords 会把它判成"未开始"。
+        "scope": 1,
+    }
+    return out
+
+
+ITEMS[CHARACTER_WEAPON] = {
+    "hash": CHARACTER_WEAPON,
+    "inventory": {"recipeItemHash": 9006, "tierTypeName": "传说"},
+    "displayProperties": {"name": "面纱威胁"},
+}
+ITEMS[9006] = {"hash": 9006, "crafting": {"requiredSocketTypeHashes": [
+    3868679925, 3694362576, 2316004942, 3036227398, 3036227399]}}
+OBJECTIVES[708] = {"completionValue": 5}
+
+
+async def test_character_scoped_record_is_not_reported_as_not_started() -> None:
+    """真机踩过：32 条模式记录是角色级（scope=1），只读 profileRecords 会把它们全判成"未开始"。
+
+    用户拿游戏截图当场抓出来（那 32 把其实三个角色都 5/5，账号里还有对应的已锻造副本）。
+    """
+    svc, _ = service(
+        profile_with(character_records=[
+            {CHARACTER_SCOPED: record_component(5, 5, state=67)},
+            {CHARACTER_SCOPED: record_component(5, 5, state=67)},
+            {CHARACTER_SCOPED: record_component(5, 5, state=67)},
+        ]),
+        tree=character_tree(),
+        records_override=character_records_override(),
+        starside=FakeStarside(),
+    )
+
+    rows = (await svc.patterns(PLAYER, limit=10))["rows"]
+    row = next(item for item in rows if item["name"] == "面纱威胁")
+
+    assert row["status"] == STATUS_UNLOCKED
+    assert (row["progress"], row["need"]) == (5, 5)
+    assert (await svc.patterns(PLAYER, limit=10))["read"]["record_scopes"] == ["profile", "character"]
+
+
+async def test_character_scoped_record_takes_the_best_character() -> None:
+    """模式解锁是账号级的：任一角色满就算解锁，进度取最靠前的那个角色。"""
+    svc, _ = service(
+        profile_with(character_records=[
+            {CHARACTER_SCOPED: record_component(2, 5)},
+            {CHARACTER_SCOPED: record_component(5, 5, state=67)},
+            {CHARACTER_SCOPED: record_component(1, 5)},
+        ]),
+        tree=character_tree(),
+        records_override=character_records_override(),
+        starside=FakeStarside(),
+    )
+
+    row = next(item for item in (await svc.patterns(PLAYER, limit=10))["rows"] if item["name"] == "面纱威胁")
+
+    assert (row["status"], row["progress"], row["remaining"]) == (STATUS_UNLOCKED, 5, 0)
+
+
+async def test_record_absent_from_both_scopes_is_still_not_started() -> None:
+    """两个作用域都没有 ⇒ 才是真的「未开始」（不能因为读了角色级就把缺的也说成有）。"""
+    svc, _ = service(
+        profile_with(character_records=[{}, {}]),
+        tree=character_tree(),
+        records_override=character_records_override(),
+        starside=FakeStarside(),
+    )
+
+    row = next(item for item in (await svc.patterns(PLAYER, limit=10))["rows"] if item["name"] == "面纱威胁")
+
+    assert row["status"] == STATUS_NOT_STARTED
+    assert row["progress"] is None and row["remaining"] is None
+
+
 async def test_state_is_cached_and_read_block_stays_stable() -> None:
     svc, bungie = service(profile_with({501: record_component(5, 5)}), starside=FakeStarside())
 
@@ -317,7 +430,9 @@ async def test_state_is_cached_and_read_block_stays_stable() -> None:
     assert bungie.calls == 1, "5 分钟 TTL 内不重复拉 1.44 MB 的记录组件"
     # `read` 只能是"每次都一样"的口径：别名等价那条语料比对 data 逐字节相同，
     # 放"这次读了几毫秒"进去会让同组别名跑出不同 data（真机被抓到过）。
-    assert first["read"] == second["read"] == {"component": 900, "ttl_seconds": 300}
+    assert first["read"] == second["read"] == {
+        "component": 900, "record_scopes": ["profile", "character"], "ttl_seconds": 300,
+    }
 
 
 async def test_progress_uses_the_component_value_when_it_differs_from_the_manifest() -> None:

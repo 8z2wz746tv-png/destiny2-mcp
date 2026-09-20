@@ -44,6 +44,14 @@ _MAX_TREE_DEPTH = 4
 # 不缓存那 1.44 MB 原文；5 分钟足够避免"连着问几把"重复拉整包。
 _STATE_TTL_SECONDS = 300
 
+# `read` 块：只放**每次调用都一样**的口径（数据来源 + 缓存时长）。命中缓存与现读必须返回
+# 同一个块 —— 别名等价那条语料比对 `data` 逐字节相同，两个分支给不同键就会当场判红。
+_READ_BLOCK = {
+    "component": 900,
+    "record_scopes": ["profile", "character"],
+    "ttl_seconds": _STATE_TTL_SECONDS,
+}
+
 STATUS_UNLOCKED = "已解锁"
 STATUS_IN_PROGRESS = "进行中"
 # 「未开始」= 账号里**没有这条记录**。不是"0/5 确认"、更不是"这把没有图样"——
@@ -75,6 +83,35 @@ UPGRADE_SOCKET_TYPE = 4251072212
 def name_key(value: str) -> str:
     """名字比对口径：去空白与间隔号、大小写折叠（用户输入 vs Manifest 名字）。"""
     return _NAME_NOISE.sub("", (value or "").strip().casefold())
+
+
+def _cell(component: Any) -> dict[str, Any]:
+    """一条记录的状态：只取第一个目标的进度与需求（实测模式记录就是这个形状）。"""
+    objectives = (component or {}).get("objectives") or []
+    first = objectives[0] if objectives and isinstance(objectives[0], dict) else {}
+    return {
+        "progress": first.get("progress"),
+        "need": first.get("completionValue"),
+        "state": (component or {}).get("state"),
+    }
+
+
+def _merge_cell(state: dict[int, dict], key: Any, component: Any) -> None:
+    """把一条记录并进状态表：同一记录号出现在多处（档案级 + 角色级）时取进度更靠前的那个。
+
+    模式解锁是账号级的，所以"角色 A 满了、角色 B 没满"应当算已解锁（实测那 32 条角色级记录
+    三个角色数值一致，这条规则只是为了不把话说反）。
+    """
+    if not isinstance(component, dict):
+        return
+    try:
+        record_hash = to_unsigned(int(key))
+    except (TypeError, ValueError):
+        return
+    candidate = _cell(component)
+    current = state.get(record_hash)
+    if current is None or (candidate.get("progress") or -1) > (current.get("progress") or -1):
+        state[record_hash] = candidate
 
 
 class PatternService:
@@ -169,7 +206,7 @@ class PatternService:
         cached = self._state_cache
         now = time.monotonic()
         if cached and now - cached["at"] < _STATE_TTL_SECONDS:
-            return cached["state"], {"component": 900, "ttl_seconds": _STATE_TTL_SECONDS}
+            return cached["state"], dict(_READ_BLOCK)
         started = time.perf_counter()
         profile = await self._bungie.get_profile(
             membership_id, membership_type, profile_components.PATTERNS
@@ -185,25 +222,24 @@ class PatternService:
             )
         state: dict[int, dict] = {}
         for key, component in records.items():
-            if not isinstance(component, dict):
-                continue
-            try:
-                record_hash = to_unsigned(int(key))
-            except (TypeError, ValueError):
-                continue
-            objectives = component.get("objectives") or []
-            first = objectives[0] if objectives and isinstance(objectives[0], dict) else {}
-            state[record_hash] = {
-                "progress": first.get("progress"),
-                "need": first.get("completionValue"),
-                "state": component.get("state"),
-            }
+            _merge_cell(state, key, component)
+        # **角色级记录也必须读**：实测 183 条模式记录里 151 条是档案级（scope=0）、
+        # 32 条是角色级（scope=1），只读 `profileRecords` 会把那 32 条全判成「未开始」
+        # （真机被用户拿游戏截图当场抓出来：那 32 把其实三个角色都 5/5、
+        # 账号里还有 33 件对应的已锻造副本）。模式解锁是**账号级**的，
+        # 所以同一记录号取"进度最靠前的那个角色"。
+        character = (profile.get("characterRecords") or {}).get("data")
+        for holder in (character or {}).values():
+            for key, component in ((holder or {}).get("records") or {}).items():
+                _merge_cell(state, key, component)
         self._state_cache = {"at": now, "state": state}
         logger.info(
-            "锻造武器模式：读组件 900 用了 %d ms（%d 条记录，缓存 %d 秒）",
-            int((time.perf_counter() - started) * 1000), len(state), _STATE_TTL_SECONDS,
+            "锻造武器模式：读组件 900 用了 %d ms（档案级 %d 条 + 角色级 %d 条 → 合并 %d 条，缓存 %d 秒）",
+            int((time.perf_counter() - started) * 1000), len(records),
+            sum(len(((h or {}).get("records") or {})) for h in (character or {}).values()),
+            len(state), _STATE_TTL_SECONDS,
         )
-        return state, {"component": 900, "ttl_seconds": _STATE_TTL_SECONDS}
+        return state, dict(_READ_BLOCK)
 
     @staticmethod
     def _row(entry: dict[str, Any], state: dict[int, dict]) -> dict[str, Any]:

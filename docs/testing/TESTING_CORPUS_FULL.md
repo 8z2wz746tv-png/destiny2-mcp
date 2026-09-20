@@ -80,6 +80,8 @@
 | 行 | 断言 |
 | --- | --- |
 | 计数自洽 | `counts` 四档相加 == `total` == 183，且 `not_unlocked` == 进行中 + 还没开始；`catalog_total` == 183 |
+| 两个作用域 | `read.record_scopes == ["profile","character"]`，且本账号 `未开始 == 0`（183 条模式记录分布在档案级 151 + 角色级 32，两处都读过才不会误判） |
+| 角色级抽查 | 面纱威胁 / 至善 = 已解锁（这两把的记录是角色级；只读档案级会报成未开始） |
 | 未开始 ≠ 0 | `status="未开始"` 的行 `progress` 与 `remaining` 都是 `null`（账号里没有这条记录，不是 0/5） |
 | 术语对照 | `terms` 三键（红框 / 模式 / 塑形）随响应给出去，摘要用玩家口径 |
 | 来源带出处 | `sources.available=true`、`page.updated_at` 有值、`page.trust="untrusted_reference"` |
@@ -368,7 +370,7 @@ FAIL 5 条＝「已知问题」表的 #2/#3/#4/#5/#6；#1（analyze 自相矛盾
 - 口径提醒：本文件里的 KB 是**解码后的紧凑 JSON 字符数**；线上文本带 `\uXXXX` 转义，
   中文多的时候大约是它的 2 倍（两个数都对，别混着比）。
 
-**2026-09-20 复跑（0.5.0 发布 + 锻造武器模式之后，同一台机器）**
+**2026-09-20 复跑（0.5.0 发布 + 锻造武器模式，含角色级作用域修复之后，同一台机器）**
 
 ```bash
 .venv/bin/python scripts/run_corpus_all_rows.py --report /tmp/corpus_patterns.json
@@ -377,17 +379,20 @@ FAIL 5 条＝「已知问题」表的 #2/#3/#4/#5/#6；#1（analyze 自相矛盾
 | 组 | 行数 | 结果 |
 | --- | --- | --- |
 | `sweep`（119 个 intent + 1 条汇总） | 124 | PASS 123、INFO 1 |
-| `rows`（字段级 + 跨切面） | 96 | PASS 94、INFO 2（含 6 条新的 `patterns` 断言） |
+| `rows`（字段级 + 跨切面） | 98 | PASS 97、INFO 1（含 8 条新的 `patterns` 断言） |
 | `aliases`（别名等价） | 17 | PASS 17（含 `patterns` 的 10 个取值） |
 | `mcp`（协议层） | 10 | PASS 10 |
-| **合计** | **247** | **PASS 244、INFO 3、0 FAIL / 0 WARN / 0 SKIP**，退出码 0 |
+| **合计** | **249** | **PASS 247、INFO 2、0 FAIL / 0 WARN / 0 SKIP**，退出码 0 |
 
 - 新增的 `patterns` 行全绿：计数自洽 183、`未开始` 的 `progress`/`remaining` 为 null、
   术语对照（红框/模式/塑形）随响应给出、变体的塑形配置（3 栏位 / 三四号固定 / 无深视插槽）、
   来源带页面与 `trust`、名字对不上时说清图鉴条数、10 个别名 `data` 逐字节相同、默认 20 条。
+- **角色级作用域**（用户拿游戏截图抓出来的事故）：183 条模式记录里 151 条档案级 + 32 条角色级，
+  只读 `profileRecords` 会把那 32 把报成「未开始」（149/183 → 修正为 181/183）。现在语料断言
+  `read.record_scopes == ["profile","character"]`、本账号 `未开始 == 0`、角色级的「面纱威胁」为已解锁。
 - **别名那条语料当场抓到一个真问题**：第一版把"这次读组件用了几毫秒 / 是否命中缓存"放进了
   `data.read`，10 个别名因此跑出 2 种 `data`（首调未命中缓存、其余命中）。诊断值移出答案、改记日志后一致。
-- `pytest -q` **1628 通过**（`tests/test_pattern_query.py` 30 条、`tests/test_crafting_sources.py` 12 条）。
+- `pytest -q` **1631 通过**（`tests/test_pattern_query.py` 33 条、`tests/test_crafting_sources.py` 12 条）。
 - 最慢 8 次：`build(analyze)` 34.2s、`player(profile)`、`activity(pgcr)` 等 6–9s 级；
   `weapon(patterns)` 首次 3.6s（之后 5 分钟 TTL 内 0.3–0.6s）。`patterns` 默认一页 6.4 KB。
 

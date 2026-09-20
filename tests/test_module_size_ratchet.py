@@ -94,9 +94,10 @@ CEILINGS = {
     # P5 新增：本地资料汇总（愿单/选取率/清单/社区 → 每个 plug 的 recommended）
     "destiny_mcp/services/weapon_local_data.py": 403,
     # 锻造图样查询新增登记（登记即上限）：目录（展示树 + 记录 + 目标需求）+ 账号进度
-    # （组件 900）+ 来源装配 + 变体的塑形配置（哪些栏位可塑形、有没有深视插槽）都在这里。
+    # （组件 900 的**档案级与角色级两份**）+ 来源装配 + 变体的塑形配置都在这里。
+    # 463 = 427 + 角色级记录合并（真机事故：32 条角色级记录被漏读）+ read 块收敛。
     # 再往里加就该拆"目录/账号状态"，而不是抬上限。
-    "destiny_mcp/services/pattern_service.py": 427,
+    "destiny_mcp/services/pattern_service.py": 463,
     # 同上：Starside「锻造武器来源」的名字索引（归一化 / 表格 / 正文兜底 / 出处）。
     # 名字归一化只此一处，别再抄到 pattern_service 或工具层。
     "destiny_mcp/services/starside_crafting_sources.py": 186,

@@ -926,6 +926,27 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     )
     check(
         "rows",
+        "patterns：两个作用域都读过（read 声明 profile+character），本账号未开始必须为 0",
+        err is None
+        and ((pdata.get("read") or {}).get("record_scopes") == ["profile", "character"])
+        and (pcounts.get("not_started") or 0) == 0,
+        f"read={pdata.get('read')} not_started={pcounts.get('not_started')}"
+        "｜注：183 条模式记录里 151 条档案级、32 条角色级（characterRecords）；只读档案级时"
+        "这 32 把会被误判成未开始",
+    )
+
+    scoped, dt, err = await call("weapon_assistant", intent="patterns", weapon_name="面纱威胁")
+    srow = first_row(((scoped or {}).get("data") or {}).get("patterns", {}).get("items") or [])
+    check(
+        "rows",
+        "patterns：角色级记录的那把（面纱威胁）读出来是已解锁",
+        err is None and srow.get("status") == "已解锁",
+        f"row={short(srow, 160)}",
+        seconds=dt,
+    )
+
+    check(
+        "rows",
         "patterns：「未开始」的行 progress 必须是 null（没有记录 ≠ 进度 0）",
         all(row.get("progress") is None for row in pitems if row.get("status") == "未开始"),
         f"未开始={sum(1 for row in pitems if row.get('status') == '未开始')} "

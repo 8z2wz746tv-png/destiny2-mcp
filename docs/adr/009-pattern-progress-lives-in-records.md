@@ -31,9 +31,19 @@
   英文是 pattern、第三方工具常译作「图样」。三个词指同一件事，答话时用**玩家那个词**（响应里
   带 `terms` 对照表）。
 
+**What changed（2026-09-20，用户拿游戏截图当场抓出来的事故）**：第一版只读了
+`Response.profileRecords`，把 32 把已解锁的武器报成「未开始」、总数报成 149/183。
+实测真因：**183 条模式记录里 151 条是档案级（`scope=0`）、32 条是角色级（`scope=1`）**，
+角色级那批只在 `Response.characterRecords.<角色>.data.records` 里。三条独立证据：
+① 那 32 条在 `characterRecords` 里三个角色全是 5/5（state 67）；
+② 账号里对应着 33 件带 Crafted 标记的副本（已锻造 ⇒ 模式必然解锁）；
+③ 用户截图里那些名字正好就是被误判的那一批。修正后本账号是 **181/183，进行中 2**。
+
 ## Decision
 
-1. **图样进度只从组件 900 读**，组件号登记在 `services/profile_components.PATTERNS`；
+1. **模式进度只从组件 900 读，但两个作用域都要读**（`profileRecords` + `characterRecords`，
+   同一记录号取进度最靠前的角色 —— 模式解锁是账号级的）。组件号登记在
+   `services/profile_components.PATTERNS`；
    `900` **不并入 `FULL`**（并进去会让所有武器查询都多拉 1.44 MB / +2.5 s），
    读到的 183 行状态做一个 5 分钟 TTL 的进程内缓存，不缓存 1.44 MB 原文。
 2. **组件没返回或整块为空时按失败处理**，绝不解释成"图样都没解锁"；
@@ -62,6 +72,9 @@
   任何新入口都要说清用的是哪一个，别把 219 说成"图样数"。
 - 来源来自 Starside「锻造武器来源」（社区资料，183 条里命中 172），
   必须带 `trust`/`updated_at`，且"清单里没有这一行"不能说成"这把武器没有来源"。
+- **「未开始」只在一处两处都没有记录时才给**：档案级与角色级都查过才算"没有记录"。
+  这条口径有回归测试（`tests/test_pattern_query.py` 的角色级三连），因为它是被真机抓出来的，
+  不是设计出来的。
 - 改这条决定要同时改：`pattern_service.py`、`starside_crafting_sources.py`、
   `tests/test_pattern_query.py`、`tests/test_crafting_sources.py`、
   `docs/plans/PATTERN_QUERY_PLAN.md`、`skills/destiny2-mcp/references/routing.md`。

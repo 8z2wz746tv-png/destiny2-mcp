@@ -64,13 +64,17 @@ SUBCLASS: list[int] = [200, 201, 205, *ITEM_SOCKETS]
 # 所以读取方必须重试，拿不到要如实报不可用，绝不能把"空"当成 0。
 METRICS: list[int] = [1100]
 
-# 锻造图样进度（900 = profileRecords）：读的是
+# 锻造武器模式进度（900 = profileRecords + characterRecords）：读的是
 # `Response.profileRecords.data.records[记录hash].objectives[0].progress / completionValue`
-# —— 就是游戏里那条「图样进度 4/5」。
+# —— 就是游戏里那条「模式进度 4/5」。
+#
+# **两个作用域都要读**：实测 183 条模式记录里 151 条是档案级（scope=0）、32 条是角色级（scope=1），
+# 角色级那批只在 `Response.characterRecords.<角色>.data.records` 里 —— 只读 `profileRecords`
+# 会把它们全判成「未开始」（真机被用户拿游戏截图当场抓出来，见 ADR-009）。
 #
 # 谁需要它：pattern_service（`weapon_assistant(intent="patterns")`）。**不要**并进 FULL：
-# 实测 1.44 MB / 2.5 s，而图样是它唯一的用途；另外两条候选都给不出进度 ——
-# 组件 800（收藏品）里图样解锁状态一条都没有，1300（Craftables）只回答"能塑形哪些 perk"
+# 实测 1.44 MB / 2.5 s，而模式进度是它唯一的用途；另外两条候选都给不出进度 ——
+# 组件 800（收藏品）里模式解锁状态一条都没有，1300（Craftables）只回答"能塑形哪些 perk"
 # （219 条 `visible` 全为 true）。实测见 docs/plans/PATTERN_QUERY_PLAN.md。
 PATTERNS: list[int] = [900]
 
