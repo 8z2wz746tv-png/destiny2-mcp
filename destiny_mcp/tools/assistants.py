@@ -32,6 +32,7 @@ from . import _stats_branches as stats_branches
 from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
 from . import _leaderboard_branches as leaderboard_branches
+from . import _player_branches as player_branches
 from . import _weapon_usage_branches as weapon_usage_branches
 from ._enrichment import community_enrichment, community_read
 from ._farming import farming_reference as _farming_reference
@@ -140,51 +141,7 @@ async def player_assistant(
         return ok_response("已搜索玩家。", {"players": _dump(result)})
 
     if intent in {"find", "find_players", "fuzzy"}:
-        if not name_prefix:
-            return error_response(ErrorCode.MISSING_NAME_PREFIX, "必须提供 name_prefix。")
-        try:
-            result = await player_svc.find_players(name_prefix, enrich=bool(include_profile))
-        except DestinyMCPError as exc:
-            # 上游模糊搜索不可用时必须显式失败 + 给出下一步，**不能**回空列表 ——
-            # 那会被读成「没这个人」（语料第二章：不能把没查到说成不存在）。
-            return error_response(
-                ErrorCode.API_ERROR,
-                str(exc),
-                next_actions=[{
-                    "label": "改用完整 Bungie 名（名字#1234）精确查找",
-                    "tool": "player_assistant",
-                    "arguments": {"intent": "search"},
-                }],
-            )
-        players = result.get("players") or []
-        has_more = bool(result.get("has_more"))
-        if not players:
-            return ok_response(
-                f"模糊搜索没有返回候选（前缀：{name_prefix}）。",
-                {"players": [], "page": result.get("page", 0), "has_more": has_more},
-                warnings=[
-                    "空候选只说明这次没匹配到；若要确认某人是否存在，"
-                    "请用完整 Bungie 名（名字#1234）走 intent=\"search\"。"
-                ],
-            )
-        warnings = []
-        if not include_profile:
-            # 默认不拉别人的档案：真机实测那 10 次串行档案读取要 21.8 秒（整次调用的 96%），
-            # 而它只用来排"置信度"。要排序/分辨谁是谁时再开，走并发约 5 秒。
-            warnings.append(
-                "候选默认只给名字、ID 与平台，按上游顺序排列（**没有**游玩时长/凯旋分）。"
-                "要按这些排序就说一声（include_profile=true，约 5 秒）。"
-            )
-        if has_more:
-            warnings.append(
-                "上游还有下一页候选；这里只列了最高置信度的若干条。"
-                "拿到完整名（名字#1234）后用 intent=\"search\" 精确定位。"
-            )
-        return ok_response(
-            f"已模糊搜索玩家：找到 {len(players)} 个候选。",
-            {"players": players, "page": result.get("page", 0), "has_more": has_more},
-            warnings=warnings,
-        )
+        return await player_branches.find_response(svc, name_prefix, bool(include_profile))
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"player_assistant 不支持 intent={intent!r}。")
 

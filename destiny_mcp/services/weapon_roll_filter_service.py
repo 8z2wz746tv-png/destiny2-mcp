@@ -145,15 +145,23 @@ class WeaponRollFilterService:
         )
         matched: list[dict[str, Any]] = []
 
+        # 两趟走：**第一趟只拿名字判定命中**（不带描述/图标），
+        # 第二趟**只为要返回的那一页**（≤ limit）构完整 perk 明细。
+        # 以前是一趟到底：对全库 2208 把枪都构一遍带描述+图标的 perk 明细，
+        # 真机实测 120–135 秒、内部 12 万次查询，而返回只有几十条。
+        result_limit = max(1, min(limit, 200))
+        matched: list[tuple[dict[str, Any], dict[str, Any], list[str]]] = []
+
         for candidate in candidates:
-            definition = self._manifest.get_item_definition(int(candidate.get("itemHash", 0)))
+            item_hash = int(candidate.get("itemHash", 0))
+            definition = self._manifest.get_item_definition(item_hash)
             if not isinstance(definition, dict):
                 continue
-            perk_details = self._catalog_perk_details(candidate)
+            light_perks = self._catalog_perk_names(candidate)
             # 展示名可能带强化版箭头；匹配用规范名（输出仍保留带箭头的那种）
             perk_names = [
                 wp.strip_enhanced_marker(str(perk["name"]))
-                for perk in perk_details
+                for perk in light_perks
                 if perk.get("name")
             ]
             perk_keys = [name.casefold() for name in perk_names]
@@ -174,18 +182,20 @@ class WeaponRollFilterService:
                 for name in perk_names
                 if any(term in name.casefold() for term in required + any_terms)
             })
-            matched_perk_details = [
-                perk for perk in perk_details if perk.get("name") in matched_perks
-            ]
-            matched.append(self._compact_catalog_weapon(
+            matched.append((candidate, definition, matched_perks))
+            # **不早退**：`total` 是"全库命中多少"，早退会把它变成"至少这么多"，
+            # 那是内容变化，不是优化。轻量匹配本身很便宜，贵的是明细构造（已经收窄到这一页）。
+
+        rows: list[dict[str, Any]] = []
+        # 明细只为**这一页**构（matched_count 仍是全库真实命中数，truncated 照旧标）。
+        for candidate, definition, matched_perks in matched[:result_limit]:
+            rows.append(self._compact_catalog_weapon(
                 definition,
                 matched_perks,
-                matched_perk_details,
+                self._matched_perk_details(definition, matched_perks),
                 fallback_name=str(candidate.get("name") or ""),
             ))
-
-        result_limit = max(1, min(limit, 200))
-        returned = matched[:result_limit]
+        returned = rows
         return {
             "scope": "manifest_catalog",
             "scope_label": "全量武器定义候选（未读取账号持有情况）",
@@ -204,6 +214,47 @@ class WeaponRollFilterService:
                 "excluded_perks": excluded,
             },
         }
+
+    def _catalog_perk_names(self, weapon: dict[str, Any]) -> list[dict[str, Any]]:
+        """判定命中用的**轻量** perk 列表：只有名字/hash/槽位，不带描述与图标。
+
+        体积口径与 `socket_list` 的定义级默认一致（池子不回答"什么效果"）。
+        这一步对全库每把枪都要跑，所以它必须便宜 —— 真机实测：带描述/图标那一版
+        对 2208 把枪要 120 秒+，只取名字这一版把它降到秒级。
+        """
+        if self._manifest is None:
+            return []
+        definition = self._manifest.get_item_definition(int(weapon.get("itemHash", 0)))
+        if not isinstance(definition, dict):
+            return []
+        details: list[dict[str, Any]] = []
+        for socket in weapon_payload.socket_list(
+            self._manifest, definition, include_descriptions=False, include_icons=False
+        ):
+            for option in socket.get("options") or []:
+                details.append(option | {"slot": socket.get("slot", ""), "kind": socket.get("kind", "")})
+        return details
+
+    def _matched_perk_details(
+        self, definition: dict[str, Any], matched_perks: list[str]
+    ) -> list[dict[str, Any]]:
+        """给**要返回的**命中行构完整 perk 明细（带描述与图标），只构命中的那些。
+
+        与 `_catalog_perk_names` 同源（都走 `weapon_payload.socket_list`），
+        区别只在 `include_descriptions/include_icons` —— 所以两个路径的字段不会分叉。
+        """
+        if self._manifest is None or not matched_perks:
+            return []
+        wanted = set(matched_perks)
+        details: list[dict[str, Any]] = []
+        for socket in weapon_payload.socket_list(
+            self._manifest, definition, include_descriptions=True, include_icons=True
+        ):
+            for option in socket.get("options") or []:
+                name = str(option.get("name") or "")
+                if wp.strip_enhanced_marker(name) in wanted:
+                    details.append(option | {"slot": socket.get("slot", ""), "kind": socket.get("kind", "")})
+        return details
 
     def _catalog_perk_details(self, weapon: dict[str, Any]) -> list[dict[str, Any]]:
         """池子里的每个 plug（走 weapon_payload，与 sockets/options 同一套解析）。

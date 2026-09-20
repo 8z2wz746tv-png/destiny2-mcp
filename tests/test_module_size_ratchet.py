@@ -41,7 +41,9 @@ CEILINGS = {
     # 这里净减 2 行 → 上限跟着收紧，旧上限不再是"可以慢慢长回去"的许可。
     # 条数类参数的哨兵规则收敛到 `_helpers.positive_or_default`：`if limit is None:`
     # 的壳去掉后 1401 → 1399（那些壳本身就让 0 走不进规则里）。
-    "destiny_mcp/tools/assistants.py": 1399,
+    # 性能六项：搜人分支搬去 `tools/_player_branches.py`（它有错误映射、两条话术与
+    # 响应封装，本来就该按域放 `_*_branches.py`）→ 1407 → 1364，上限跟着收紧。
+    "destiny_mcp/tools/assistants.py": 1364,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留
@@ -62,7 +64,10 @@ CEILINGS = {
     # 得先做一次有意识的决定"，而不是等它长成下一个上帝模块。当前 529 行即上限。
     # 拆分后登记：PGCR 缓存整段抽去 `services/pgcr_cache.py`（541 → 461），
     # 上限按拆分后的长度收紧 —— 缓存与聚合本来就是两个问题。
-    "destiny_mcp/services/pvp_weapon_service.py": 461,
+    # 性能六项：PGCR 数值解析与时间窗计算搬去 `services/pgcr_values.py`（与榜单逻辑无关）
+    # → 468 → 434，上限跟着收紧。
+    "destiny_mcp/services/pvp_weapon_service.py": 434,
+    "destiny_mcp/services/pgcr_values.py": 49,
     "destiny_mcp/services/pgcr_cache.py": 106,
     # P4 新增：武器分支载荷与形状工厂。定在上限处是为了让"再加一个 intent"
     # 必须先回答"是搬出去还是抬上限"，而不是悄悄长胖。
