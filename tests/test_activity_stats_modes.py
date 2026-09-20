@@ -315,3 +315,38 @@ async def test_per_mode_stats_degrade_when_counters_are_unavailable(service: Act
     assert "game_counters" not in response["data"]
     assert "上游抖动" in response["data"]["counters_unavailable"]
     assert any("没读到" in w for w in response["warnings"])
+
+
+@pytest.mark.asyncio
+async def test_stats_reads_both_sources_in_parallel(service: ActivityService) -> None:
+    """统计接口与游戏内计数器**同时**去拿（真机实测 4.9s → 约 3s）。
+
+    两边都故意睡 0.2 秒：串行 ≈ 0.4s，并发 ≈ 0.2s；断言 < 0.32s 把"真的并发"钉住。
+    """
+    import asyncio
+    import time
+
+    from destiny_mcp.tools import _stats_branches as branches
+
+    original_stats = service.get_historical_stats
+
+    async def slow_stats(*args, **kwargs):
+        await asyncio.sleep(0.2)
+        return await original_stats(*args, **kwargs)
+
+    service.get_historical_stats = slow_stats  # type: ignore[method-assign]
+    counters_svc = AsyncMock()
+
+    async def slow_counters(*_args, **_kwargs):
+        await asyncio.sleep(0.2)
+        return {"counters": [], "unavailable": ""}
+
+    counters_svc.get_career_counters.side_effect = slow_counters
+    svc = {"activity_svc": service, "activity_counters_svc": counters_svc}
+
+    started = time.monotonic()
+    response = await branches.stats_response(svc, PLAYER_NAME, None, "", "career")
+    elapsed = time.monotonic() - started
+
+    assert response["ok"] is True
+    assert elapsed < 0.32, f"看起来是串行：两个各 0.2s 的来源花了 {elapsed:.2f}s"

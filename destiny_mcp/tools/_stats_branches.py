@@ -15,9 +15,12 @@
 
 from __future__ import annotations
 
+import asyncio
+
 from typing import Any
 
 from .. import activity_stats
+from ..data import activity_modes
 from ..error_codes import ErrorCode
 from ..logging_config import get_logger
 from ._responses import error_response, ok_response
@@ -201,9 +204,22 @@ async def stats_response(
             ],
         )
 
-    result = await svc["activity_svc"].get_historical_stats(
-        player_name, character, mode, period
-    )
+    # 统计接口与游戏内计数器**互不依赖** → 同时去拿（真机实测 4.9s → 约 3s）。
+    # 计数器是账号级的，单角色路径本来就不附它，所以那种情况不预取。
+    stats_coro = svc["activity_svc"].get_historical_stats(player_name, character, mode, period)
+    prefetched: tuple[list[dict], str] = ([], "")
+    if character:
+        result = await stats_coro
+    else:
+        # 计数器要按"这次问的模式"取：`mode` 报得出来就用它，否则按默认（熔炉生涯）。
+        # 词表外的 `mode` 不预取 —— 那种情况统计调用自己会报明确的错，省一次无谓请求。
+        hinted = activity_modes.resolve(mode) if mode else _COUNTER_MODE
+        if mode and hinted is None:
+            result = await stats_coro
+        else:
+            result, prefetched = await asyncio.gather(
+                stats_coro, _read_counters(svc, player_name, hinted or _COUNTER_MODE)
+            )
     data: dict[str, Any] = {"stats": result}
 
     if result.get("scope") != activity_stats.SCOPE_ACCOUNT:
@@ -236,7 +252,7 @@ async def stats_response(
         ]
         # 同模式的游戏内计数器一并给出来（配对表有才读）：按模式的生涯数字最容易被读成
         # "游戏里那个数"，而它其实小得多（真机 trials：1,474 vs 10,696）。
-        mode_counters, mode_unavailable = await _read_counters(svc, player_name, mode_key)
+        mode_counters, mode_unavailable = prefetched
         if mode_counters:
             data["game_counters"] = mode_counters
             warnings.append(_paired_mode_warning(result, mode_counters, mode_key))
@@ -252,7 +268,7 @@ async def stats_response(
             warnings=warnings,
         )
 
-    counters, unavailable = await _read_counters(svc, player_name, _COUNTER_MODE)
+    counters, unavailable = prefetched
     if counters:
         data["game_counters"] = counters
     if unavailable:
