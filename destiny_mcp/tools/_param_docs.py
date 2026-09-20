@@ -496,3 +496,14 @@ PriorityStat = Annotated[
         "求解类 intent 里是排序用的优先级属性名。"
     )),
 ]
+
+
+IncludeProfile = Annotated[
+    bool,
+    Field(description=(
+        "模糊搜人（intent=\"find\"）时要不要连候选的档案一起读：true 会补"
+        "「游玩时长 / 最近游玩 / 凯旋分」并按置信度排序（**并发拉，约 5 秒**）；"
+        "false（默认）只给名字、ID 与平台，**不读任何人的档案**（快，约 1 秒）。"
+        "只有 intent=find 读它。"
+    )),
+]

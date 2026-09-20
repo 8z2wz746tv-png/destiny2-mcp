@@ -115,6 +115,14 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         ),
         suggestion=("player_assistant", "find"),
     ),
+    ("player_assistant", "include_profile"): _contract(
+        _only("find", "find_players", "fuzzy"),
+        hint=(
+            '模糊搜人默认不读别人的档案（只给名字/ID/平台）；要按"游玩时长/凯旋分"排序就传 '
+            "include_profile=true（并发拉，约 5 秒）。精确查人不读它。"
+        ),
+        suggestion=("player_assistant", "find"),
+    ),
     # ══ inventory_assistant ════════════════════════════════════════════════
     ("inventory_assistant", "player_name"): _contract(_all(InventoryIntent)),
     ("inventory_assistant", "location"): _contract(

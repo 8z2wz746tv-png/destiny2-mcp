@@ -319,6 +319,7 @@ Manifest 侧（**不代表拥有**）：
 | `icon_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
 | `include_inventory` | `build_assistant`：`community`、`community_build`、`starside`；`weapon_assistant`：`analyze`、`filter_rolls` |
 | `include_invisible` | `world_assistant`：`collectible_node` |
+| `include_profile` | `player_assistant`：`find`、`find_players`、`fuzzy` |
 | `include_subclass_fragment` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `item_instance_id` | `inventory_assistant`：`equip`、`equip_mod`、`item`、`lock`、`move`、`pull_postmaster`、`quest_tracking`、`track_quest`、`transfer`；`weapon_assistant`：`compare`、`compare_duplicates` |
 | `item_instance_ids` | `inventory_assistant`：`equip_items`、`equip_many` |

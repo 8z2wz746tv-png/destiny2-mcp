@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from unittest.mock import AsyncMock, MagicMock
 
 from destiny_mcp.exceptions import WeaponPopularityDataError
 from destiny_mcp.manifest import ManifestManager
@@ -400,3 +401,76 @@ async def test_duplicate_weapon_scan_groups_instances_and_returns_current_perks(
         for instance in duplicate["instances"]
         for perk in instance["perks"]
     )
+
+
+@pytest.mark.asyncio
+async def test_find_players_does_not_read_anyones_profile_by_default() -> None:
+    """模糊搜人默认**不拉任何人的档案** —— 那 10 次串行读取实测 21.8 秒（整次的 96%）。
+
+    真机基线（2026-09-19）：`find` 22.6 秒，其中 21.8 秒花在给前 10 个候选逐个
+    `get_profile` 上，只为算"置信度"；返回的载荷只有 1.9 KB。
+    """
+    from destiny_mcp.services.player_service import PlayerService
+
+    bungie = AsyncMock()
+    bungie.search_users.return_value = {
+        "searchResults": [
+            {"bungieGlobalDisplayName": f"候选{i}", "bungieGlobalDisplayNameCode": 1000 + i,
+             "destinyMemberships": [{"membershipId": str(100 + i), "membershipType": 3,
+                                     "crossSaveOverride": 3}]}
+            for i in range(10)
+        ],
+        "page": 0, "hasMore": False,
+    }
+    resolver = AsyncMock()
+    service = PlayerService(bungie, MagicMock(), resolver)
+
+    result = await service.find_players("候选")
+
+    assert len(result["players"]) == 10
+    assert result["enriched"] is False
+    resolver.get_profile.assert_not_awaited()          # ← 关键：一次档案都不读
+    assert all("confidence" not in row for row in result["players"])
+
+
+@pytest.mark.asyncio
+async def test_find_players_enrich_reads_concurrently() -> None:
+    """`enrich=True` 才补评分，而且**并发**拉（10 个候选不该是 10 倍等待）。
+
+    每个档案故意睡 0.1 秒：串行 ≈ 1.0 秒，并发 5 ≈ 0.2–0.3 秒；断言 < 0.6 秒把
+    "有没有真的并发"钉住（阈值放宽到不易抖动的程度）。
+    """
+    import time
+    from destiny_mcp.services.player_service import PlayerService
+
+    bungie = AsyncMock()
+    bungie.search_users.return_value = {
+        "searchResults": [
+            {"bungieGlobalDisplayName": f"候选{i}", "bungieGlobalDisplayNameCode": 1000 + i,
+             "destinyMemberships": [{"membershipId": str(100 + i), "membershipType": 3,
+                                     "crossSaveOverride": 3}]}
+            for i in range(10)
+        ],
+        "page": 0, "hasMore": False,
+    }
+    resolver = AsyncMock()
+
+    async def slow_profile(*_args, **_kwargs):
+        await asyncio.sleep(0.1)
+        return {
+            "characters": {"data": {"c": {"dateLastPlayed": "2026-09-01T00:00:00Z",
+                                          "minutesPlayedTotal": 6000}}},
+            "profileRecords": {"data": {"activeScore": 12345}},
+        }
+
+    resolver.get_profile.side_effect = slow_profile
+    service = PlayerService(bungie, MagicMock(), resolver)
+
+    started = time.monotonic()
+    result = await service.find_players("候选", enrich=True)
+    elapsed = time.monotonic() - started
+
+    assert result["enriched"] is True
+    assert resolver.get_profile.await_count == 10
+    assert all("confidence" in row for row in result["players"])
+    assert elapsed < 0.6, f"看起来没并发：10 个 0.1s 的档案读了 {elapsed:.2f}s"

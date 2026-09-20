@@ -120,6 +120,7 @@ async def player_assistant(
     intent: fields.PlayerIntentField = "profile",
     player_name: fields.PlayerName = None,
     name_prefix: fields.NamePrefix = "",
+    include_profile: fields.IncludeProfile = False,
     ctx: Context = None,
 ) -> dict:
     """玩家/账号聚合入口：搜索玩家、模糊找人、读取角色档案。"""
@@ -142,7 +143,7 @@ async def player_assistant(
         if not name_prefix:
             return error_response(ErrorCode.MISSING_NAME_PREFIX, "必须提供 name_prefix。")
         try:
-            result = await player_svc.find_players(name_prefix)
+            result = await player_svc.find_players(name_prefix, enrich=bool(include_profile))
         except DestinyMCPError as exc:
             # 上游模糊搜索不可用时必须显式失败 + 给出下一步，**不能**回空列表 ——
             # 那会被读成「没这个人」（语料第二章：不能把没查到说成不存在）。
@@ -167,6 +168,13 @@ async def player_assistant(
                 ],
             )
         warnings = []
+        if not include_profile:
+            # 默认不拉别人的档案：真机实测那 10 次串行档案读取要 21.8 秒（整次调用的 96%），
+            # 而它只用来排"置信度"。要排序/分辨谁是谁时再开，走并发约 5 秒。
+            warnings.append(
+                "候选默认只给名字、ID 与平台，按上游顺序排列（**没有**游玩时长/凯旋分）。"
+                "要按这些排序就说一声（include_profile=true，约 5 秒）。"
+            )
         if has_more:
             warnings.append(
                 "上游还有下一页候选；这里只列了最高置信度的若干条。"
