@@ -440,7 +440,9 @@ async def test_find_players_enrich_reads_concurrently() -> None:
     每个档案故意睡 0.1 秒：串行 ≈ 1.0 秒，并发 5 ≈ 0.2–0.3 秒；断言 < 0.6 秒把
     "有没有真的并发"钉住（阈值放宽到不易抖动的程度）。
     """
+    import asyncio
     import time
+
     from destiny_mcp.services.player_service import PlayerService
 
     bungie = AsyncMock()
@@ -473,4 +475,41 @@ async def test_find_players_enrich_reads_concurrently() -> None:
     assert result["enriched"] is True
     assert resolver.get_profile.await_count == 10
     assert all("confidence" in row for row in result["players"])
+    # 档案必须**真的读成了**：失败会被降级成低分（这是有意的），
+    # 所以只断言"有 confidence"的话，读挂了也能过 —— 那样这条测试就白测了。
+    assert {row["triumph_score"] for row in result["players"]} == {12345}
+    assert {row["playtime_hours"] for row in result["players"]} == {100}
     assert elapsed < 0.6, f"看起来没并发：10 个 0.1s 的档案读了 {elapsed:.2f}s"
+
+
+def test_matched_perk_details_collapse_the_enhanced_duplicate(monkeypatch) -> None:
+    """池子里同时有 `X` 与 `X↑` 时，明细只留基础版。
+
+    强化版的 hash 已经写在基础版的 `enhanced_plug_hash` 里，两条都发等于同一句话
+    说两遍，而且真机实测把 catalog_perk 从 55.9k 撑到 77.1k 字符。
+    池子里**只有**强化版时要保留它，否则会答成"滚不出"。
+    """
+    from destiny_mcp.services import weapon_payload
+    from destiny_mcp.services.weapon_roll_filter_service import WeaponRollFilterService
+
+    def sockets_with(*names: str) -> list[dict]:
+        return [{
+            "slot": "特性1", "kind": "trait",
+            "options": [
+                {
+                    "name": name, "plug_hash": 1 + index, "can_roll": True,
+                    "enhanced_plug_hash": 2,
+                    **({"name_plain": "萤火虫"} if name.endswith("↑") else {}),
+                }
+                for index, name in enumerate(names)
+            ],
+        }]
+
+    service = WeaponRollFilterService(manifest=object())  # type: ignore[arg-type]
+    monkeypatch.setattr(weapon_payload, "socket_list", lambda *a, **k: sockets_with("萤火虫", "萤火虫↑"))
+    details = service._matched_perk_details({}, ["萤火虫"])
+    assert [entry["name"] for entry in details] == ["萤火虫"]
+    assert details[0]["enhanced_plug_hash"] == 2, "强化版的存在要留在基础版条目上"
+
+    monkeypatch.setattr(weapon_payload, "socket_list", lambda *a, **k: sockets_with("萤火虫↑"))
+    assert [entry["name"] for entry in service._matched_perk_details({}, ["萤火虫"])] == ["萤火虫↑"]

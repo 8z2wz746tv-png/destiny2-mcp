@@ -242,18 +242,42 @@ class WeaponRollFilterService:
 
         与 `_catalog_perk_names` 同源（都走 `weapon_payload.socket_list`），
         区别只在 `include_descriptions/include_icons` —— 所以两个路径的字段不会分叉。
+
+        按**规范名**去重（`name_plain`）：池子里 `萤火虫` 与 `萤火虫↑` 是两条 plug，
+        但"这把能滚出萤火虫"只有一件事，强化版的 hash 已经写在基础版的
+        `enhanced_plug_hash` 里 —— 两条都发等于同一句话说了两遍，明细体积翻倍
+        （真机实测 catalog_perk 因此从 55.9k 涨到 77.1k 字符）。池子里只有强化版时
+        保留它，否则会答成"滚不出"。
         """
         if self._manifest is None or not matched_perks:
             return []
         wanted = set(matched_perks)
-        details: list[dict[str, Any]] = []
+        grouped: dict[str, list[dict[str, Any]]] = {}
         for socket in weapon_payload.socket_list(
             self._manifest, definition, include_descriptions=True, include_icons=True
         ):
             for option in socket.get("options") or []:
                 name = str(option.get("name") or "")
-                if wp.strip_enhanced_marker(name) in wanted:
-                    details.append(option | {"slot": socket.get("slot", ""), "kind": socket.get("kind", "")})
+                plain = wp.strip_enhanced_marker(name)
+                if plain in wanted:
+                    grouped.setdefault(plain, []).append(
+                        option | {"slot": socket.get("slot", ""), "kind": socket.get("kind", "")}
+                    )
+        details: list[dict[str, Any]] = []
+        for entries in grouped.values():
+            # "基础版"= 名字不带强化标记的那个（强化版才有 name_plain，别拿它当判据：
+            # 基础条目压根没有这个键）
+            details.append(
+                next(
+                    (
+                        entry
+                        for entry in entries
+                        if wp.strip_enhanced_marker(str(entry.get("name") or ""))
+                        == str(entry.get("name") or "")
+                    ),
+                    entries[0],
+                )
+            )
         return details
 
     def _catalog_perk_details(self, weapon: dict[str, Any]) -> list[dict[str, Any]]:
