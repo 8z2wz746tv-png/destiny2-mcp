@@ -45,7 +45,7 @@ def _stat_order(manifest: "ManifestManager", definition: Mapping[str, Any]) -> t
 def stat_list(
     manifest: "ManifestManager",
     definition: Mapping[str, Any] | None,
-    instance_stats: Mapping[str, Any] | None = None,
+    instance_stats: Mapping[str | int, Any] | None = None,  # 304 给字符串键，历史调用方也传过 int
     *,
     names: Any = None,
 ) -> list[dict[str, Any]]:

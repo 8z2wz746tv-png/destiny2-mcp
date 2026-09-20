@@ -37,6 +37,14 @@ _CANDIDATE_PROFILE_TTL_SECONDS = 300
 _CANDIDATE_PROFILE_CACHE_LIMIT = 200
 
 
+def _confidence_of(row: dict) -> float:
+    """排序用的置信度：没算过或不是数值都当 0（不编分，也不让排序炸）。"""
+    value = row.get("confidence")
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return 0.0
+    return float(value)
+
+
 class PlayerService:
     """Operations that resolve or fetch player/character data."""
 
@@ -149,7 +157,7 @@ class PlayerService:
         if enrich:
             await asyncio.gather(*(self._enrich_candidate(row) for row in candidates))
 
-        candidates.sort(key=lambda x: x.get("confidence", 0), reverse=True)
+        candidates.sort(key=_confidence_of, reverse=True)
         logger.info(
             "Found %d candidate(s) for '%s' (page=%s has_more=%s enriched=%s)",
             len(candidates), name_prefix, result.get("page", page), bool(result.get("hasMore")), enrich,

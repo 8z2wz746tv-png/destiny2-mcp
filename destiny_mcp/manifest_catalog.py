@@ -14,7 +14,10 @@ from .utils.hash_utils import to_signed
 
 
 class ItemCatalogMixin:
-    """目录侧查询：只读索引，不写任何状态。"""
+    """目录侧查询：只读索引；派生结果按 (类型, 名字) 记忆化（见 list_weapon_catalog）。"""
+
+    # 由 ManifestManager.__init__ 建立、_load_from_file 清空；这里声明类型给 mypy 看
+    _catalog_cache: dict[tuple[str, str], list[dict]]
 
     def get_exotic_armor_by_class(self, class_name: str) -> list[dict]:
         """Get all exotic armor for a specific class.
