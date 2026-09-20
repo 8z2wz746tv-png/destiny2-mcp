@@ -1831,7 +1831,7 @@ async def run_cross(runner: Runner, live: dict[str, Any], skip_slow: bool) -> No
     defaults = [
         ("inventory_assistant", {"intent": "get", "location": "vault"}, 100,
          lambda p: pick(p, "inventory", "items"), "inventory.items"),
-        ("weapon_assistant", {"intent": "type", "weapon_type": "手炮"}, 20,
+        ("weapon_assistant", {"intent": "type", "weapon_type": "手炮"}, 10,
          lambda p: pick(p, "weapons", "items"), "weapons.items"),
         ("weapon_assistant", {"intent": "catalog", "perk_name": "萤火虫"}, 50,
          lambda p: pick(p, "matched"), "matched"),

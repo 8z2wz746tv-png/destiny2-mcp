@@ -16,6 +16,7 @@ import json
 import sys
 
 from destiny_mcp.server import create_server, app_lifespan
+from destiny_mcp.services import weapon_payload
 from destiny_mcp.tools.assistants import weapon_assistant
 
 RESULTS = []
@@ -98,20 +99,21 @@ async def main():
             f"泰拉巴 count={c_exo['count']} 词条数={len(c_exo.get('catalysts') or [])}",
         )
 
-        # 6. type：列表形状
+        # 6. type：列表行形状（身份摊平 + 位置/光等 + stats，**不带** sockets/options）
         r = await call(intent="type", weapon_type="手炮", limit=5)
         block = r["data"]["weapons"]
         item = block["items"][0]
+        lean = set(weapon_payload.LIST_ROW_KEYS)
         check(
-            "⑥ type：每件 {weapon,sockets,options,stats} / 列计数 / options 是实例级 / 本地明说没查",
-            r["ok"] and set(item) == {"weapon", "sockets", "options", "stats", "perks_complete", "notes"}
-            and all(s["options_available"] is False for s in item["sockets"])
-            and all(o["scope"] == "instance" for o in item["options"])
-            and item["weapon"]["popularity"]["available"] is False
+            "⑥ type：一行一件的列表行（身份+位置+stats），不带插槽池/可换项，带翻页字段",
+            r["ok"] and lean.issubset(item)
+            and not {"sockets", "options", "perks_complete", "weapon"} & set(item)
+            and {"instance_id", "location", "power", "stats", "notes"}.issubset(item)
+            and set(block) == {"query", "total", "returned", "truncated", "offset", "next_offset", "items"}
             and block["total"] >= block["returned"] == len(block["items"]),
-            f"total={block['total']} returned={block['returned']} truncated={block['truncated']} | "
-            f"首件 {item['weapon']['name']} 列={len(item['sockets'])} 可换栏={len(item['options'])} "
-            f"stats={len(item['stats'])} 本地提示={item['weapon']['popularity']['note'][:16]}…",
+            f"total={block['total']} returned={block['returned']} truncated={block['truncated']} "
+            f"next_offset={block['next_offset']} | 首件 {item['name']} 位置={item['location']} "
+            f"stats={len(item['stats'])} 键数={len(item)}",
         )
 
         # 7. perk_description：描述来自 Manifest
@@ -216,30 +218,35 @@ async def main():
             f"warnings={r['warnings'][:1]}",
         )
 
-        # 15. 能不能换成某 Perk：看 equipped 与 instance options
-        r = await call(intent="type", weapon_type="手炮", limit=5)
-        items = [x for x in r["data"]["weapons"]["items"] if x.get("options")]
-        if items:
-            it = items[0]
-            equipped = [s["equipped"] for s in it["sockets"] if s.get("equipped")]
-            inst_opts = [o for o in it["options"]]
+        # 15. 能不能换成某 Perk：列表行不给这个答案了，改由 compare 按副本给
+        listing = await call(intent="type", weapon_type="手炮", limit=5)
+        first = ((listing["data"]["weapons"].get("items") or [{}])[0])
+        detail = await call(
+            intent="compare", weapon_name=str(first.get("name") or ""),
+            item_instance_id=str(first.get("instance_id") or ""),
+        ) if first.get("name") else None
+        instances = (((detail or {}).get("data") or {}).get("comparison") or {}).get("instances") or []
+        if instances:
+            it = instances[0]
+            equipped = [s["equipped"] for s in it.get("sockets") or [] if s.get("equipped")]
+            inst_opts = [o for o in it.get("options") or []]
             check(
-                "⑮ 能不能换成某 Perk：equipped=现在装的，options(scope=instance)=这一件能换的",
-                bool(equipped) and (bool(inst_opts) or bool(it["notes"])),
-                f"{it['weapon']['name']}：现在装 {len(equipped)} 项（例 {equipped[0] if equipped else None}）、"
-                f"实例可换栏 {len(inst_opts)}、notes={it['notes'][:1]}",
+                "⑮ 能不能换成某 Perk：列表行不给（要单查），compare 按副本给 equipped 与 instance options",
+                bool(equipped) and (bool(inst_opts) or bool(it.get("notes"))),
+                f"{first.get('name')}：现在装 {len(equipped)} 项（例 {equipped[0] if equipped else None}）、"
+                f"实例可换栏 {len(inst_opts)}、notes={(it.get('notes') or [])[:1]}",
             )
         else:
-            check("⑮ 能不能换成某 Perk", False, "这个类型下没有带实例可换项的武器样本")
+            check("⑮ 能不能换成某 Perk", False, "compare 没有返回这个副本的明细")
 
         # 17. 武器 T 级：逐副本 + 路径要对（语料里"三个 T 不能混"那条）
         r = await call(intent="type", weapon_type="手炮", limit=1)
-        type_item = ((r["data"]["weapons"].get("items") or [{}])[0]).get("weapon") or {}
+        type_item = (r["data"]["weapons"].get("items") or [{}])[0]
         r2 = await call(intent="analyze", weapon_name="遗产", include_inventory=True)
         copies = ((r2["data"].get("inventory") or {}).get("instances")) or []
         tiers = [(c.get("weapon") or {}).get("gear_tier") for c in copies]
         check(
-            "⑰ 武器 T 级：type 在 weapon.gear_tier、analyze 逐副本在 inventory.instances[].weapon.gear_tier",
+            "⑰ 武器 T 级：type 列表行在 gear_tier、analyze 逐副本在 inventory.instances[].weapon.gear_tier",
             "gear_tier" in type_item
             and len(copies) >= 2
             and all("gear_tier" in (c.get("weapon") or {}) for c in copies),
