@@ -166,6 +166,56 @@ def test_weapon_catalog_deduplicates_by_hash_across_both_signs() -> None:
     assert len(manager.list_weapon_catalog()) == 1
 
 
+def _write_sqlite_manifest(path, rows: list[tuple[int, str]]) -> None:
+    conn = sqlite3.connect(str(path))
+    conn.execute(f"CREATE TABLE {ITEM_TABLE} (id INTEGER PRIMARY KEY, json TEXT)")
+    for item_hash, raw in rows:
+        conn.execute(f"INSERT INTO {ITEM_TABLE} (id, json) VALUES (?, ?)", (item_hash, raw))
+    conn.commit()
+    conn.close()
+
+
+def test_weapon_catalog_memoizes_the_scan_but_not_the_limit(monkeypatch, tmp_path) -> None:
+    """扫一遍就该记住：重复问同一个类型不该再遍历全量索引（真机那一步约 1s）。
+
+    `limit` 不进缓存键 —— 它只在读取时切，所以同一条件的不同条数共用一份结果。
+    返回的是浅拷贝：调用方排序/删元素不许污染后面所有调用。
+    """
+    manager = _manager(english=[
+        (1, _raw("甲金枪", tier=6, display_type="手炮")),
+        (2, _raw("乙紫枪", tier=5, display_type="手炮")),
+    ])
+    calls = {"scan": 0}
+    original = manager._canonical_item_entry
+
+    def counting_canonical(item):
+        calls["scan"] += 1
+        return original(item)
+
+    monkeypatch.setattr(manager, "_canonical_item_entry", counting_canonical)
+
+    first = manager.list_weapon_catalog("手炮")
+    scanned = calls["scan"]
+    assert scanned > 0
+    assert [item["name"] for item in manager.list_weapon_catalog("手炮")] == ["甲金枪", "乙紫枪"]
+    assert calls["scan"] == scanned, "第二次不该再扫索引"
+    assert len(manager.list_weapon_catalog("手炮", limit=1)) == 1
+
+    first.clear()
+    assert len(manager.list_weapon_catalog("手炮")) == 2, "缓存不许被调用方清空"
+
+    # 重载必须重新扫（旧结果不许留下来）：用临时 sqlite 走真的 `_load_from_file`，
+    # 不碰本机那份真 Manifest —— 干净 HOME 下这条测试也要能跑。
+    db = tmp_path / "destiny_manifest.sqlite3"
+    _write_sqlite_manifest(db, [(9, _raw("丙紫枪", display_type="手炮"))])
+    monkeypatch.setattr(type(manager), "manifest_path", property(lambda self: db))
+    monkeypatch.setattr(
+        type(manager), "manifest_path_zh", property(lambda self: tmp_path / "zh.sqlite3")
+    )
+    manager._load_from_file()
+    assert [item["name"] for item in manager.list_weapon_catalog("手炮")] == ["丙紫枪"]
+
+
 # ── list_items ───────────────────────────────────────────────────────
 
 

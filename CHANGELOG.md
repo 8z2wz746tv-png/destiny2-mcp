@@ -29,6 +29,13 @@
   默认 20 → **10 件**，新增 `offset`/`next_offset` 翻页（最后一页 `truncated=false`）。
   要看某一件的插槽与可换部件：`weapon_assistant(intent="compare", weapon_name=…, item_instance_id=…)`。
   明细见 `docs/COMPATIBILITY.md`；基线已同步重录（新增 `type_list_default` 用例）。
+- **顺带的两处缓存（计划里的"顺带一项"）**：① 目录查询 `list_weapon_catalog` 的结果按 (类型, 名字)
+  记忆化 —— 这一步要遍历全量索引（真机 **1.06s**），而"我手炮都有哪些""哪些手炮能出某个 perk"
+  会反复问同一个类型；`limit` 不进缓存键，重载 Manifest 时与其它内存索引一起清空。
+  ② `include_profile=true` 的候选档案加 5 分钟 TTL（同一前缀改字再搜不必把同一批人重拉，
+  真机单人 1.1–4.6s）；只缓存成功结果，失败照旧降级、下次重试。
+  计划里写的"目录筛选结果指纹缓存"没有单独做：真正贵的是那一次索引遍历，缓存在它那一层
+  同时利好 `catalog` 与 `type`，也避开了"账号侧结果过期"的风险（`filter_rolls` 不缓存）。
 - **修复：目录命中的 perk 明细不再把强化版发两遍**。池子里 `萤火虫` 与 `萤火虫↑` 是两条 plug，
   但"能滚出萤火虫"只有一件事，强化版 hash 已经在基础版的 `enhanced_plug_hash` 里；
   两条都发会把 `catalog_perk` 从 55.9k 撑到 77.1k 字符（真机实测），也让第 2 项的"内容零变化"

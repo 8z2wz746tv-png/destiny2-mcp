@@ -15,6 +15,8 @@ from pathlib import Path
 ROOT = Path(__file__).parents[1]
 
 CEILINGS = {
+    # 性能"顺带缓存"：目录查询结果缓存登记进"重载要清"的清单，清缓存那段也改成同一张
+    # 清单（少一个"新加缓存忘了清"的漏）→ 净增 0 行，262 不动。
     "destiny_mcp/manifest.py":           262,
     # 参数说明改用 `from . import _param_docs as fields`，新增别名不再让 import 块
     # 长胖；给全部参数补说明时反而比上次短了 5 行。

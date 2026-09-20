@@ -45,6 +45,10 @@ class ItemCatalogMixin:
         results.sort(key=lambda x: x.get('name', ''))
         return results
 
+    # 记住多少种 (类型, 名字) 组合：类型只有十几种，名字是调用方给的（可能很多），
+    # 所以给个上限，满了就整块丢掉 —— 不做 LRU，省得为缓存再引入一套淘汰逻辑。
+    _CATALOG_CACHE_LIMIT = 64
+
     def list_weapon_catalog(
         self,
         weapon_type: str = "",
@@ -56,12 +60,28 @@ class ItemCatalogMixin:
 
         This is separate from profile queries and therefore includes weapons
         the configured player does not own. ``limit=0`` returns all matches.
+
+        结果按 (类型, 名字) 记忆化（**只读索引的派生结果**）：这一步要遍历全量索引，
+        真机实测 ~1s，而"我手炮都有哪些"这类问题会反复问同一个类型。`limit` 在读取时切，
+        所以同一条件的不同条数共用一份。索引重载时 `_load_from_file` 会清掉它 —— 与
+        `_name_index`/`_definition_cache` 同一套失效口径。
         """
         if not self._name_index:
             raise ManifestError("Manifest not loaded. Call ensure_loaded() first.")
 
         type_query = weapon_type.strip().casefold()
         name_query = weapon_name.strip().casefold()
+        cached = self._catalog_cache.get((type_query, name_query))
+        if cached is None:
+            cached = self._scan_weapon_catalog(type_query, name_query)
+            if len(self._catalog_cache) >= self._CATALOG_CACHE_LIMIT:
+                self._catalog_cache.clear()
+            self._catalog_cache[(type_query, name_query)] = cached
+        # 给调用方一份浅拷贝：缓存里的列表不能被调用方排/删（一改就污染后面所有调用）
+        return list(cached) if limit <= 0 else cached[:limit]
+
+    def _scan_weapon_catalog(self, type_query: str, name_query: str) -> list[dict]:
+        """遍历全量索引挑出武器（`list_weapon_catalog` 的实体，失败不缓存）。"""
         seen_hashes: set[int] = set()
         results: list[dict] = []
 
@@ -90,7 +110,7 @@ class ItemCatalogMixin:
             results.append(canonical)
 
         results.sort(key=lambda value: (-value.get("tier", 0), value.get("name", "")))
-        return results if limit <= 0 else results[:limit]
+        return results
 
     @staticmethod
 

@@ -159,6 +159,7 @@ class ManifestManager(
         self._definition_cache: dict[int, dict] = {}  # itemHash → full definition JSON
         self._plug_set_cache: dict[int, list[dict]] = {}  # plugSetHash → [{plugItemHash, ...}]
         self._sandbox_perk_cache: dict[int, dict] = {}  # perkHash → {name, description}
+        self._catalog_cache: dict[tuple[str, str], list[dict]] = {}  # 目录查询结果，见 manifest_catalog
 
     @property
     def manifest_path(self) -> Path:
@@ -205,13 +206,13 @@ class ManifestManager(
 
         logger.info("ManifestManager._load_from_file: loading from %s", self.manifest_path)
 
-        self._name_index.clear()
-        self._hash_index.clear()
-        self._english_name_by_hash.clear()
-        self._english_type_display_by_hash.clear()
-        self._definition_cache.clear()
-        self._plug_set_cache.clear()
-        self._sandbox_perk_cache.clear()
+        # 重载要清掉**全部**从索引派生的缓存 —— 写成一张清单，别让人漏掉新加的那个
+        for cache in (
+            self._name_index, self._hash_index, self._english_name_by_hash,
+            self._english_type_display_by_hash, self._definition_cache,
+            self._plug_set_cache, self._sandbox_perk_cache, self._catalog_cache,
+        ):
+            cache.clear()
 
         # Load English manifest first so names remain searchable as aliases.
         self._conn = sqlite3.connect(str(self.manifest_path))

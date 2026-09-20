@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import math
+import time
 
 import aiobungie
 
@@ -29,6 +30,12 @@ logger = get_logger(__name__)
 _ENRICH_CONCURRENCY = 10
 _ENRICH_SEMAPHORE = asyncio.Semaphore(_ENRICH_CONCURRENCY)
 
+# 别人档案摘要的 TTL 缓存：`enrich=true` 是唯一还会读别人档案的入口（真机 1.1–4.6s/人），
+# 而"名字记不全"往往要改一两个字搜几次 —— 同一批人 5 分钟内不必重拉。
+# 只缓存**成功**的结果（失败走原来的降级，不把"没读到"存起来）。
+_CANDIDATE_PROFILE_TTL_SECONDS = 300
+_CANDIDATE_PROFILE_CACHE_LIMIT = 200
+
 
 class PlayerService:
     """Operations that resolve or fetch player/character data."""
@@ -42,6 +49,7 @@ class PlayerService:
         self._bungie = bungie
         self._manifest = manifest
         self._resolver = resolver
+        self._candidate_profiles: dict[str, tuple[float, dict]] = {}
 
     async def search_player(self, player_name: str) -> list[PlayerInfo]:
         """Resolve a Bungie name to membership info.
@@ -154,6 +162,18 @@ class PlayerService:
             "enriched": enrich,
         }
 
+    async def _candidate_profile(self, membership_id: str, membership_type: int) -> dict:
+        """候选档案摘要：TTL 内直接复用（`enrich=true` 专用，见上面的常量注释）。"""
+        key = f"{membership_type}:{membership_id}"
+        cached = self._candidate_profiles.get(key)
+        if cached and (time.monotonic() - cached[0]) < _CANDIDATE_PROFILE_TTL_SECONDS:
+            return cached[1]
+        profile = await self._resolver.get_profile(membership_id, membership_type, [200, 900])
+        if len(self._candidate_profiles) >= _CANDIDATE_PROFILE_CACHE_LIMIT:
+            self._candidate_profiles.clear()
+        self._candidate_profiles[key] = (time.monotonic(), profile)
+        return profile
+
     async def _enrich_candidate(self, row: dict) -> None:
         """给一个候选补"最近游玩/时长/凯旋分"（就地写进 row）。
 
@@ -170,7 +190,7 @@ class PlayerService:
             total_playtime = 0
             triumph_score = 0
             try:
-                profile = await self._resolver.get_profile(membership_id, membership_type, [200, 900])
+                profile = await self._candidate_profile(membership_id, membership_type)
                 chars = profile.get("characters", {}).get("data", {})
                 records = profile.get("profileRecords", {}).get("data", {})
 

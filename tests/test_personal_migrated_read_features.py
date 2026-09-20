@@ -513,3 +513,70 @@ def test_matched_perk_details_collapse_the_enhanced_duplicate(monkeypatch) -> No
 
     monkeypatch.setattr(weapon_payload, "socket_list", lambda *a, **k: sockets_with("萤火虫↑"))
     assert [entry["name"] for entry in service._matched_perk_details({}, ["萤火虫"])] == ["萤火虫↑"]
+
+
+@pytest.mark.asyncio
+async def test_candidate_profiles_are_reused_within_ttl(monkeypatch) -> None:
+    """同一个前缀连搜两次，第二次不再重拉那 10 个人的档案（TTL 内复用）。"""
+    import time
+
+    from destiny_mcp.services import player_service as ps
+
+    bungie = AsyncMock()
+    bungie.search_users.return_value = {
+        "searchResults": [
+            {"bungieGlobalDisplayName": f"候选{i}", "bungieGlobalDisplayNameCode": 1000 + i,
+             "destinyMemberships": [{"membershipId": str(100 + i), "membershipType": 3,
+                                     "crossSaveOverride": 3}]}
+            for i in range(3)
+        ],
+        "page": 0, "hasMore": False,
+    }
+    resolver = AsyncMock()
+    resolver.get_profile.return_value = {
+        "characters": {"data": {"c": {"dateLastPlayed": "2026-09-01T00:00:00Z",
+                                      "minutesPlayedTotal": 6000}}},
+        "profileRecords": {"data": {"activeScore": 12345}},
+    }
+    service = ps.PlayerService(bungie, MagicMock(), resolver)
+
+    await service.find_players("候选", enrich=True)
+    assert resolver.get_profile.await_count == 3
+    started = time.monotonic()
+    second = await service.find_players("候选", enrich=True)
+    elapsed = time.monotonic() - started
+
+    assert resolver.get_profile.await_count == 3, "TTL 内不该再拉一次"
+    assert {row["triumph_score"] for row in second["players"]} == {12345}, "复用也要给同样的分"
+    assert elapsed < 0.2
+
+    # TTL 过了要重新拉（别把别人的档案当永久事实）
+    monkeypatch.setattr(ps, "_CANDIDATE_PROFILE_TTL_SECONDS", 0)
+    await service.find_players("候选", enrich=True)
+    assert resolver.get_profile.await_count == 6
+
+
+@pytest.mark.asyncio
+async def test_candidate_profile_failures_are_not_cached() -> None:
+    """失败不缓存：这次没读到就是没读到，下次还要再试（否则会把降级当成结论）。"""
+    from destiny_mcp.services import player_service as ps
+
+    bungie = AsyncMock()
+    bungie.search_users.return_value = {
+        "searchResults": [
+            {"bungieGlobalDisplayName": "候选", "bungieGlobalDisplayNameCode": 1000,
+             "destinyMemberships": [{"membershipId": "100", "membershipType": 3,
+                                     "crossSaveOverride": 3}]},
+        ],
+        "page": 0, "hasMore": False,
+    }
+    resolver = AsyncMock()
+    resolver.get_profile.side_effect = RuntimeError("上游抖了一下")
+    service = ps.PlayerService(bungie, MagicMock(), resolver)
+
+    first = await service.find_players("候选", enrich=True)
+    second = await service.find_players("候选", enrich=True)
+
+    assert resolver.get_profile.await_count == 2
+    assert {row["triumph_score"] for row in first["players"]} == {0}
+    assert {row["triumph_score"] for row in second["players"]} == {0}
