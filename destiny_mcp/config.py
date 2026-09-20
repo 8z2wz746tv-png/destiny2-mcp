@@ -108,7 +108,7 @@ BUILD_TIMEOUT_SECONDS: float = float(os.getenv("DESTINY_BUILD_TIMEOUT_SECONDS", 
 # 术士 2.43 亿 → >300s ✗）。超过阈值就提前返回可操作建议，不再让用户干等五分钟。
 # 设为 0 可关闭这道闸（回到"跑满预算再报错"的旧行为）。
 BUILD_MAX_COMBINATIONS: int = int(os.getenv("DESTINY_BUILD_MAX_COMBINATIONS", "20000000"))
-# 历史工具（expert / full 里的那 69 个）默认不暴露：它们没有参数拦截、没有参数说明、
+# 历史工具（expert / full 里的那 67 个）默认不暴露：它们没有参数拦截、没有参数说明、
 # 返回契约也不统一，混在工具面里只会多出一堆能选错的东西。要用时显式打开。
 LEGACY_TOOLS_ENABLED: bool = os.getenv(
     "DESTINY_MCP_ENABLE_LEGACY_TOOLS", ""

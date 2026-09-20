@@ -32,7 +32,7 @@ async def get_activity_history(
 
     何时跳过:
     - 用户只想看角色信息（用 get_profile）
-    - 用户想查生涯统计数据（用 get_historical_stats）
+    - 用户想查生涯统计数据（用 activity_assistant 的 intent="stats"）
 
     Args:
         player_name: Bungie 名称。不填则使用默认玩家。
@@ -118,56 +118,6 @@ async def get_pgcr(
             f"{entry['kills']:<6} {entry['deaths']:<6} {entry['assists']:<6} "
             f"{entry['kd_ratio']:<8} {completed}"
         )
-
-    return "\n".join(lines)
-
-
-@mcp.tool()
-@handle_tool_error
-async def get_historical_stats(
-    player_name: str | None = None,
-    character: str | None = None,
-    ctx: Context = None,
-) -> str:
-    """查询玩家的生涯 PvE/PvP 统计数据。
-
-    包含总击杀、总死亡、K/D 比、游戏时长、活动完成数等。
-
-    何时使用:
-    - 用户问"我的生涯数据"、"我打了多少小时"
-    - 想看 PvE 或 PvP 的总体表现
-
-    何时跳过:
-    - 用户想看近期活动详情（用 get_activity_history）
-    - 用户想看某场比赛数据（用 get_pgcr）
-
-    Args:
-        player_name: Bungie 名称。不填则使用默认玩家。
-        character: 角色名。不填则使用第一个角色。
-
-    Examples:
-        get_historical_stats(player_name="husky#1234")
-    """
-    player_name = resolve_player_name(player_name)
-    svc = get_ctx(ctx)
-    result = await svc['activity_svc'].get_historical_stats(player_name, character)
-
-    lines = ["=== 生涯统计 ===\n"]
-
-    pve = result.get("pve", {})
-    if pve:
-        lines.append("── PvE ──")
-        for stat_id, display_val in pve.items():
-            lines.append(f"  {stat_id}: {display_val}")
-
-    pvp = result.get("pvp", {})
-    if pvp:
-        lines.append("\n── PvP ──")
-        for stat_id, display_val in pvp.items():
-            lines.append(f"  {stat_id}: {display_val}")
-
-    if not pve and not pvp:
-        lines.append("未找到统计数据。")
 
     return "\n".join(lines)
 

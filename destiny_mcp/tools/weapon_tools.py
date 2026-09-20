@@ -1,83 +1,15 @@
-"""Weapon MCP tools — analyze_weapon, perk pools, owned rolls, weapon search."""
+"""Weapon MCP tools — perk pools, owned rolls, weapon search（只读旧工具面）。
+
+`analyze_weapon` 已删除（2026-09-20）：它读 P4/P6 之前的 `result["perk_pool"]`，
+早就裸抛 KeyError；同样的分析能力由 `weapon_assistant(intent="analyze")` 提供。
+"""
 
 from __future__ import annotations
 
 from mcp.server.fastmcp import Context
 
-from ..exceptions import DestinyMCPError
 from ._registry import mcp
 from ._helpers import get_ctx, handle_tool_error, resolve_player_name
-from ._responses import error_response, ok_response
-from ..error_codes import ErrorCode
-
-
-def _resolve_analysis_player_name(
-    svc: dict,
-    player_name: str | None,
-    include_inventory: bool,
-) -> str | None:
-    """Resolve which player inventory analyze_weapon should inspect."""
-    if not include_inventory:
-        return None
-    return resolve_player_name(svc, player_name)
-
-
-@mcp.tool()
-@handle_tool_error
-async def analyze_weapon(
-    weapon_name: str = "",
-    player_name: str | None = None,
-    include_inventory: bool = True,
-    ctx: Context = None,
-) -> dict:
-    """聚合分析一把武器：静态信息、perk 池、god roll、账号内副本对比。
-
-    何时使用：用户问"这把枪怎么样"、"我的命运悲剧怎么留"、"千语有哪些
-    perk，我仓库里有没有好 roll"时。
-    何时使用：不确定该调用 get_weapon_info、get_weapon_perks、get_god_roll
-    还是 compare_weapon_instances 时，优先使用这个聚合工具。
-    何时跳过：用户明确只要某个低级结果时，使用对应专用工具。
-
-    Args:
-        weapon_name: 武器名（中英文均可，支持模糊匹配）。
-        player_name: Bungie 名称；多用户登录路径不填时使用当前登录用户。
-        include_inventory: 是否尝试对比账号内副本。false 时只返回 manifest/god roll 信息。
-    """
-    svc = get_ctx(ctx)
-    analysis_svc = svc['weapon_analysis_svc']
-    resolved_player_name = _resolve_analysis_player_name(
-        svc, player_name, include_inventory
-    )
-
-    try:
-        result = await analysis_svc.analyze_weapon(
-            weapon_name,
-            player_name=resolved_player_name,
-            include_inventory=include_inventory,
-        )
-    except DestinyMCPError as exc:
-        return error_response(
-            ErrorCode.WEAPON_ANALYSIS_FAILED,
-            str(exc),
-            next_actions=[
-                {
-                    "label": "缩短武器名或确认 Bungie 登录状态后重试",
-                    "tool": "analyze_weapon",
-                }
-            ],
-        )
-
-    return ok_response(
-        result["summary"],
-        {
-            "weapon": result["weapon"],
-            "perk_pool": result["perk_pool"],
-            "god_roll": result["god_roll"],
-            "inventory": result["inventory"],
-        },
-        next_actions=result["next_actions"],
-        warnings=result["warnings"],
-    )
 
 
 @mcp.tool()

@@ -1,6 +1,6 @@
 """历史工具面（expert / full profile）的冒烟契约。
 
-这 16 个模块提供 69 个历史工具，**默认屏蔽**：要 `legacy_tools=True` 或
+这 16 个模块提供 67 个历史工具，**默认屏蔽**：要 `legacy_tools=True` 或
 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 才会注册。它们几乎没有行为测试。
 这里不测行为，只守住最容易静静腐烂的部分：模块能导入、会被注册、
 每个工具都有描述和可用的 schema、profile 清单里没有拼错的模块名。
