@@ -17,13 +17,10 @@ os.environ.setdefault("BUNGIE_CLIENT_SECRET", "dummy")
 from destiny_mcp.build.constraints import parse as parse_constraints
 from destiny_mcp.build.models import (
     Armor,
-    BuildCandidate,
-    BuildRecommendation,
     BuildRequest,
-    BuildResult,
     InventorySnapshot,
 )
-from destiny_mcp.build_import.models import CanonicalBuild
+from destiny_mcp.build_contracts import CanonicalBuild
 from destiny_mcp.exceptions import BuildValidationError
 from destiny_mcp.models import (
     ArmorStats,
@@ -35,10 +32,8 @@ from destiny_mcp.services import build_service as build_service_module
 from destiny_mcp.services import loadout_equipment_service as equipment_module
 from destiny_mcp.services.build_service import BuildService, _snapshot_version
 from destiny_mcp.services.loadout_equipment_service import LoadoutEquipmentService
-from destiny_mcp.server import build_optimizer
 from destiny_mcp.tools import _build_confirmation
 from destiny_mcp.tools.assistants import build_assistant
-from destiny_mcp.tools.build_tools import recommend_build as legacy_recommend_build
 
 
 class _Client:
@@ -342,50 +337,6 @@ async def test_build_assistant_returns_structured_domain_errors() -> None:
 
     assert result["ok"] is False
     assert result["error"]["code"] == "build_validation_error"
-
-
-@pytest.mark.asyncio
-async def test_full_recommendation_preserves_exact_build_contract() -> None:
-    snapshot, canonical = _exact_contract()
-    armor = [
-        snapshot.helmets[0],
-        snapshot.gauntlets[0],
-        snapshot.chests[0],
-        snapshot.legs[0],
-        snapshot.class_items[0],
-    ]
-    result = BuildResult(
-        score=950,
-        completion_rate=1,
-        build=BuildCandidate(items=armor),
-        canonical_build=canonical,
-    )
-    build_service = SimpleNamespace(
-        recommend_build=AsyncMock(
-            return_value=BuildRecommendation(results=[result])
-        )
-    )
-
-    response = await legacy_recommend_build(
-        player_name="Alpha#0100",
-        character="hunter",
-        include_subclass_fragment=True,
-        priority_stats=["melee", "weapons"],
-        ctx=_tool_context({"build_svc": build_service}),
-    )
-
-    expected = canonical.model_dump(mode="json")
-    request = build_service.recommend_build.await_args.args[1]
-    assert request.include_subclass_fragment is True
-    assert request.priority_stats == ["melee", "weapons"]
-    assert response["data"]["builds"][0]["canonical_build"] == expected
-    assert response["data"]["builds"][0]["armor"][0]["item_instance_id"]
-    assert response["candidates"][0]["canonical_build"] == expected
-    assert response["next_actions"][0]["arguments"] == {
-        "character": "hunter",
-        "canonical_build": expected,
-    }
-    assert "canonical_build" in build_optimizer()
 
 
 def test_priority_stats_keep_strict_order_and_remove_duplicates() -> None:

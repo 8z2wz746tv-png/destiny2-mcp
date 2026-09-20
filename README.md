@@ -12,7 +12,6 @@ Destiny 2 装备管理 MCP Server，通过 AI Agent 管理武器和装备。
 - 查询武器 perk 池、对比副本、god roll 推荐
 - 护甲配装与反推：库存无解时先查单件，单件不足再给合法的两件待刷方案
 - 查询商人库存和每周重置活动
-- 从配装文章或截图导入配装方案
 - 保存和装备配装方案（含模组与碎片配置）
 - 默认暴露 8 个聚合 assistant 工具，不把几十个低层工具直接铺给 Agent
 - 随附 Starside 中文资料：Perk、武器推荐、护甲、技能、神器、机制和活动数据
@@ -100,23 +99,10 @@ cp .env.example .env
 
 然后编辑 `.env`，填入 Bungie 应用凭据。
 
-默认工具面是 `normal`，只暴露面向自然语言的聚合入口：
-
-```bash
-DESTINY_MCP_TOOL_PROFILE=normal
-```
-
-历史工具默认屏蔽。那 69 个旧工具没有参数拦截、没有参数说明、返回契约也不统一，混在工具面里只会增加选错的概率，所以不论哪个 profile 都只暴露 8 个聚合工具。需要排查或兼容旧提示词时显式打开：
-
-```bash
-DESTINY_MCP_ENABLE_LEGACY_TOOLS=1   # 打开历史工具，配合下面的 profile 使用
-```
-
-| Profile | 默认（历史工具关闭） | 打开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 后 |
-|---|---|---|
-| `normal` | 8 个聚合工具（推荐） | 8 个聚合工具 |
-| `expert` | 8 个聚合工具 | 聚合工具 + 常用查询类旧工具，用于排查查询问题 |
-| `full` | 8 个聚合工具 | 聚合工具 + 全部历史工具，用于兼容旧提示词或开发调试 |
+工具面固定是 **8 个聚合工具**（`player_assistant` … `world_assistant`），每个工具按 `intent` 分派。
+没有 profile、也没有"历史工具"开关 —— 那 67 个低层工具（没有参数拦截、没有参数说明、返回契约混用三种）
+已于 2026-09-20 整块剥离到仓库根目录 `legacy/`（只作存档，不进包、不参与测试与 lint，
+要查旧行为见 `legacy/README.md`）。
 
 ### 3. 准备可选数据（Manifest / DIM Wish List）
 
@@ -276,9 +262,9 @@ VERIFY_OK=Destiny MCP is ready
 
 单进程、单用户的模块化单体。所有 Bungie 写操作在进程内共享账号锁，写入完成、失败或取消后，依赖账号状态的缓存都会失效。不要同时启动多个实例操作同一 Bungie 账号，跨进程互斥不在设计范围内。
 
-对外始终只暴露 8 个聚合工具（历史工具要显式打开），内部按意图校验参数并委托领域服务；配装组合计算在独立工作进程中运行，每个服务实例最多同时计算一个任务，默认 300 秒预算（`DESTINY_BUILD_TIMEOUT_SECONDS` 可调，只计算真正在计算的时间，排队不计入）；超时或取消会终止该计算进程，不阻塞 MCP 请求循环。
+对外始终只暴露 8 个聚合工具，内部按意图校验参数并委托领域服务；配装组合计算在独立工作进程中运行，每个服务实例最多同时计算一个任务，默认 300 秒预算（`DESTINY_BUILD_TIMEOUT_SECONDS` 可调，只计算真正在计算的时间，排队不计入）；超时或取消会终止该计算进程，不阻塞 MCP 请求循环。
 
-服务器通过 `create_server()` 显式注册工具。认证或 Manifest 初始化失败时停止启动，`/health` 仅在初始化完成后的生命周期内返回就绪。配装导入输出 `BuildRecipe`，可执行候选使用 `ExecutableBuild`，并继续校验一次性候选凭据和库存快照。
+服务器通过 `create_server()` 显式注册工具。认证或 Manifest 初始化失败时停止启动，`/health` 仅在初始化完成后的生命周期内返回就绪。配装候选分三档：`BuildRecipe`（只是配方）→ `CanonicalBuild`（全 hash 的候选）→ `ExecutableBuild`（可执行），执行前继续校验一次性候选凭据和库存快照。
 
 ```
 destiny_mcp/
@@ -289,11 +275,10 @@ destiny_mcp/
 ├── bungie_client.py   # Bungie API 客户端
 ├── manifest.py        # 游戏数据清单管理
 ├── models/            # Pydantic 数据模型
-├── tools/             # MCP 工具定义（默认 8 个 assistant；69 个历史工具需显式打开）
+├── tools/             # MCP 工具定义（8 个聚合工具 + 各自的 *_branches 分支）
 ├── services/          # 业务逻辑层（25+ 个 service）
-├── build/             # Armor 3.0 配装求解与合法刷取目标反推
+└── build/             # Armor 3.0 配装求解与合法刷取目标反推
 ├── utils/             # 工具函数
-└── build_import/      # 配装导入模块
 ```
 
 ## 默认工具分组

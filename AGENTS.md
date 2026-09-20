@@ -165,7 +165,6 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - `destiny_mcp/wishlist_data.py`
 **第 2 层：领域层（纯计算，可被服务和工具复用）**
 - `destiny_mcp/build/`
-- `destiny_mcp/build_import/`
 - `destiny_mcp/rag/`
 **第 3 层：服务层：账号读写、外部数据、形状工厂**
 - `destiny_mcp/services/`
@@ -175,6 +174,9 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - `destiny_mcp/__main__.py`
 - `destiny_mcp/server.py`
 <!-- code-map:end -->
+
+`legacy/`（仓库根目录）不在这张清单里，也**不进包、不参与测试与 lint**：它是 2026-09-20 剥离的
+历史工具面存档（67 个低层工具 + 配装导入整块），只作查阅用。要复活里面的东西，见 `legacy/README.md`。
 
 ### 各模块一句话职责
 
@@ -215,7 +217,6 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | `destiny_mcp/wishlist_data.py` | DIM 愿单数据获取（个人安装用）。 |
 | `destiny_mcp/data/` | 纯数据表（静态常量/映射）：`activity_modes.py` 是**模式词与 `modeType` 的唯一出处**（中文名去 Manifest 取，别再抄标签表）；`pvp_counters.py` 是「计数器 → 模式/周期」对照表。每条带实测证据，改表先看 `tests/test_activity_modes.py` / `tests/test_pvp_counters_table.py`。 |
 | `destiny_mcp/build/` | 配装求解引擎（护甲优化）：纯计算、不碰账号；`farm_target.py` 贴着 1296 上限。 |
-| `destiny_mcp/build_import/` | 从文章/截图导入配装；产出只是配方，不能直接拿去 `equip_build`。 |
 | `destiny_mcp/rag/` | 本地社区资料检索（Phase 3）。 |
 | `destiny_mcp/services/` | 服务层：账号读写、外部数据、形状工厂；判断逻辑落这里，别落工具层。**PvP 武器榜**（逐场 PGCR 聚合）在 `services/pvp_weapon_service.py`，它的结算缓存单独在 `services/pgcr_cache.py`（两者都登记了体积上限）；**游戏内生涯计数器**（profile 组件 1100）在 `services/activity_counters_service.py`：它与统计接口是两个来源，读抖动要重试、空要报 `unavailable`（不许当 0）；口径见 `docs/reference/bungie_api.md`。 |
 | `destiny_mcp/tools/` | 工具层：只做分派、参数守卫与话术；intent 取值/参数归属/响应信封三张契约表都在这层。分支响应按域放 `_*_branches.py`（如 `_counters_branches.py` = `activity_assistant(intent="counters")`）。 |

@@ -223,7 +223,7 @@ class _Context:
 
 
 def _tools() -> dict[str, Any]:
-    server.create_server("full")
+    server.create_server()
     return {d.function.__name__: d.function for d in registry._definitions}
 
 

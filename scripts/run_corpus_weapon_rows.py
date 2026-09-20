@@ -28,7 +28,7 @@ def check(row: str, ok: bool, evidence: str) -> None:
 
 
 async def main():
-    async with app_lifespan(create_server("normal")) as svc:
+    async with app_lifespan(create_server()) as svc:
         ctx = type("C", (), {"request_context": type("R", (), {"lifespan_context": svc})})()
 
         async def call(**kwargs):

@@ -2070,7 +2070,6 @@ async def run_mcp(live: dict[str, Any]) -> None:
             args=[],
             env={
                 "DESTINY_MCP_ROOT": str(ROOT),
-                "DESTINY_MCP_TOOL_PROFILE": "normal",
                 **env_extra,
             },
         )
@@ -2188,43 +2187,31 @@ async def run_mcp(live: dict[str, Any]) -> None:
     except BaseException as exc:  # noqa: BLE001
         check("mcp", "正常工具面握手", False, f"握手失败 {type(exc).__name__}: {str(exc)[:200]}")
 
-    async def legacy_body(session: Any) -> dict[str, Any]:
-        names = sorted(tool.name for tool in (await session.list_tools()).tools)
-        return {"names": names}
+    async def tool_names_body(session: Any) -> dict[str, Any]:
+        return {"names": sorted(tool.name for tool in (await session.list_tools()).tools)}
 
     try:
-        # 只设开关、用默认 normal 面：静默无效（仍是 8 个工具，而且不会给 warning）。
-        flag_only = await asyncio.wait_for(
-            with_session({"DESTINY_MCP_ENABLE_LEGACY_TOOLS": "1"}, legacy_body), timeout=300
-        )
-        flag_names = (flag_only or {}).get("names") or []
-        check(
-            "mcp",
-            "legacy：光设 DESTINY_MCP_ENABLE_LEGACY_TOOLS=1、工具面仍是 normal 时不生效（静默）",
-            len(flag_names) == 8,
-            f"count={len(flag_names)}（要老工具得同时把 DESTINY_MCP_TOOL_PROFILE 设成 full/expert）",
-            info=True,
-        )
-        # 正确组合：工具面 + 开关。
-        legacy = await asyncio.wait_for(
+        # 历史工具面已于 2026-09-20 剥离到 legacy/：现在**任何**环境变量都变不出别的工具，
+        # 连旧开关一起塞进去也只该有 8 个（少了这条，谁把旧面挂回来都不会被发现）。
+        stale = await asyncio.wait_for(
             with_session(
                 {
                     "DESTINY_MCP_TOOL_PROFILE": "full",
                     "DESTINY_MCP_ENABLE_LEGACY_TOOLS": "1",
                 },
-                legacy_body,
+                tool_names_body,
             ),
             timeout=300,
         )
-        names = (legacy or {}).get("names") or []
+        names = (stale or {}).get("names") or []
         check(
             "mcp",
-            "legacy：DESTINY_MCP_TOOL_PROFILE=full + 开关 → 暴露老工具",
-            len(names) > 8 and "get_inventory" in names,
+            "历史工具面已剥离：设旧的 profile/开关也只暴露 8 个聚合工具",
+            len(names) == 8 and "get_inventory" not in names,
             f"count={len(names)} 含 get_inventory={'get_inventory' in names}",
         )
     except BaseException as exc:  # noqa: BLE001
-        check("mcp", "legacy 工具面", False, f"{type(exc).__name__}: {str(exc)[:160]}")
+        check("mcp", "历史工具面已剥离", False, f"{type(exc).__name__}: {str(exc)[:160]}")
 
 
 async def main() -> int:

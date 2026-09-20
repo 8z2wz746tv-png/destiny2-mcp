@@ -30,7 +30,11 @@ from destiny_mcp.services.loadout_service import LoadoutService
 from destiny_mcp.services.profile_cache import ProfileCache
 from destiny_mcp.services.transfer_service import TransferService
 from destiny_mcp.tools.assistants import inventory_assistant, loadout_assistant, subclass_assistant
-from destiny_mcp.tools.api_tools import raw_api_call
+
+ASSISTANT_TOOL_NAMES = {
+    "player_assistant", "inventory_assistant", "weapon_assistant", "build_assistant",
+    "loadout_assistant", "subclass_assistant", "activity_assistant", "world_assistant",
+}
 
 
 async def test_move_uses_exact_transfer_recovery(monkeypatch) -> None:
@@ -133,19 +137,20 @@ async def test_local_loadout_save_delete_refreshes_cached_list(tmp_path) -> None
     assert service._get_cached("player") is None
 
 
-async def test_server_factories_do_not_leak_profiles_or_prompts() -> None:
-    full = server.create_server("full", legacy_tools=True)
-    normal = server.create_server("normal")
-    expert = server.create_server("expert", legacy_tools=True)
-    second_normal = server.create_server("normal")
-    def names(instance):
-        return {tool.name for tool in instance._tool_manager.list_tools()}
-    assert len(names(normal)) == 8
-    assert names(normal) == names(second_normal)
-    assert "transfer_item" in names(full)
-    assert "transfer_item" not in names(expert)
-    assert names(normal) < names(expert) < names(full)
-    assert len(await normal.list_prompts()) == len(await full.list_prompts())
+async def test_server_factories_do_not_leak_tools_or_prompts() -> None:
+    """每次 create_server 都是独立的一份：工具与提示词不许在实例之间串。
+
+    以前这条还顺带守"profile 不串"，2026-09-20 起没有 profile 了 —— 只剩 8 个聚合工具，
+    所以断言也简化成"两次构造互不影响、且每次都是那 8 个"。
+    """
+    first = server.create_server()
+    second = server.create_server()
+
+    assert first is not second
+    first_names = {tool.name for tool in await first.list_tools()}
+    second_names = {tool.name for tool in await second.list_tools()}
+    assert first_names == second_names == ASSISTANT_TOOL_NAMES
+    assert len(first_names) == 8
 
 
 async def test_readiness_tracks_lifespan(monkeypatch) -> None:
@@ -336,23 +341,6 @@ def test_import_without_credentials_does_not_create_runtime_directories(tmp_path
     assert result.returncode == 0, result.stderr
     assert not (tmp_path / "tokens").exists()
     assert not (tmp_path / "manifest").exists()
-
-
-async def test_raw_post_uses_shared_lock_and_invalidates_cache() -> None:
-    client = MagicMock()
-    client.get_access_token = AsyncMock(return_value="dummy")
-    client.rest.static_request = AsyncMock(return_value={"ok": True})
-    lock = account_action_lock(client)
-    cache, resolver = _profile_cache(lock)
-    await cache.get_profile("player")
-    ctx = SimpleNamespace(request_context=SimpleNamespace(lifespan_context={"bungie": client}))
-    async with lock:
-        pending = asyncio.create_task(raw_api_call(method="POST", path="Destiny2/Actions/Test/", ctx=ctx))
-        await asyncio.sleep(0)
-        client.rest.static_request.assert_not_awaited()
-    assert await pending == {"ok": True}
-    await cache.get_profile("player")
-    assert resolver.get_profile.await_count == 2
 
 
 async def test_mcp_protocol_calls_are_audited(monkeypatch) -> None:

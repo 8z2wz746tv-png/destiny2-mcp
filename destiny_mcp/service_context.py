@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     from .player_resolver import PlayerResolver
     from .services.build_service import BuildService
     from .services.armor_mod_service import ArmorModService
-    from .services.build_import_service import BuildImportService
     from .services.collection_service import CollectionService
     from .services.inventory_analysis_service import InventoryAnalysisService
     from .services.inventory_service import InventoryService
@@ -60,7 +59,6 @@ class ServiceContext(TypedDict):
     weekly_svc: WeeklyService
     weekly_analysis_svc: WeeklyAnalysisService
     loadout_svc: LoadoutService
-    build_import_svc: BuildImportService
     activity_svc: ActivityService
     activity_counters_svc: ActivityCountersService
     pvp_weapon_svc: PvpWeaponService

@@ -42,7 +42,6 @@ include-package-data = false
 
 [tool.setuptools.package-data]
 destiny_mcp = ["data/*.yaml", "data/weapon_popularity.json"]
-"destiny_mcp.build_import" = ["*.yaml"]
 
 [tool.setuptools.data-files]
 "share/destiny-mcp" = ["docs/community/COMMUNITY_DATA_NOTICE.md"]
@@ -68,6 +67,11 @@ check_untyped_defs = true
 warn_return_any = true
 warn_unused_configs = true
 exclude = ["scripts/", "tests/"]
+
+[tool.ruff]
+# `legacy/` 是剥离出去的历史工具面存档（见 legacy/README.md）：只作查阅，不参与 lint。
+# 它本来就不进包（packages.find 只收 destiny_mcp*）、不进测试（testpaths=["tests"]），这里再挡一道。
+extend-exclude = ["legacy"]
 
 [tool.ruff.lint]
 # 规则集写死成仓库一直干净的那四个家族：E4/E7/E9（导入与语句）+ F（pyflakes）。

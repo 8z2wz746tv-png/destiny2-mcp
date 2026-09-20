@@ -1,16 +1,8 @@
 """全部 MCP 工具的模拟调用测试。
 
-`full` profile 注册了 75 个工具，其中 67 个历史工具此前只有「能注册」的检查，
-没有任何行为覆盖。这里用一套记录型假服务把每个工具真调一遍。
-
-覆盖的是「不崩、不返回 None、失败要走错误响应」，不是「业务成功」：
-空参数下返回参数校验错误是正确结果。
-
-过程中确认了一件事：**这些工具并存三种返回契约**（2026-09-20 删掉两个早就坏掉的历史工具：
-`analyze_weapon` 与 `get_historical_stats`，77 → 75）。
-8 个 assistant 用 ok/error 信封（由 _responses 提供），部分历史工具用
-ok_response，多数历史工具直接返回原始载荷，个别（如 find_players）返回纯字符串。
-这里分别按各自契约断言，而不是假装它们统一。
+工具面就是 **8 个聚合工具**（历史工具面已于 2026-09-20 剥离到 `legacy/`）。这里用一套
+记录型假服务把每个工具真调一遍，覆盖「不崩、不返回 None、失败要走错误响应」——
+不是「业务成功」：空参数下返回参数校验错误是正确结果。
 """
 
 from __future__ import annotations
@@ -156,7 +148,7 @@ class _Context:
 
 
 def _definitions() -> list:
-    server.create_server("full", legacy_tools=True)
+    server.create_server()
     return sorted(registry._definitions, key=lambda d: d.function.__name__)
 
 
@@ -193,17 +185,18 @@ async def _call(definition) -> tuple[Any, _Context]:
     return await definition.function(**_arguments(definition.function, ctx)), ctx
 
 
-def test_full_profile_exposes_every_registered_tool() -> None:
+def test_tool_face_is_exactly_the_eight_assistants() -> None:
+    """工具面就这 8 个：多一个少一个都要有人先回答"它归哪个域"（旧工具面已剥离到 legacy/）。"""
     definitions = _definitions()
 
-    # 2026-09-20：删掉 analyze_weapon 与 get_historical_stats（都因服务形状变化而坏掉且与聚合入口重复）
-    assert len(definitions) == 75
-    assert len({d.function.__name__ for d in definitions}) == 75
+    names = {d.function.__name__ for d in definitions}
+    assert names == ASSISTANT_NAMES
+    assert len(definitions) == len(ASSISTANT_NAMES) == 8
 
 
 @pytest.mark.parametrize("definition", _definitions(), ids=lambda d: d.function.__name__)
 async def test_tool_never_raises_or_returns_none(definition) -> None:
-    """含 67 个历史工具在内的全部工具，用假服务调用一次不能抛异常。"""
+    """8 个聚合工具，用假服务调用一次不能抛异常。"""
     result, _ = await _call(definition)
 
     assert result is not None, f"{definition.function.__name__} 返回了 None"
@@ -234,22 +227,6 @@ async def test_failed_tools_return_a_structured_error_not_a_traceback() -> None:
                 failures.append(definition.function.__name__)
 
     assert not failures, f"这些工具失败时没有给出 error.code: {failures}"
-
-
-async def test_most_tools_reach_the_service_layer() -> None:
-    """多数工具要真的走到服务层，而不是停在参数校验。
-
-    当前是 73/77；未进入的 4 个都卡在模拟环境造不出的前置条件
-    （apply_mod、equip_build、get_collectible_node_status、modify_subclass）。
-    下限设为 70：掉下去说明有工具连服务层都进不去了。
-    """
-    reached: list[str] = []
-    stuck: list[str] = []
-    for definition in _definitions():
-        _, ctx = await _call(definition)
-        (reached if ctx.called else stuck).append(definition.function.__name__)
-
-    assert len(reached) >= 70, f"只有 {len(reached)} 个工具进入服务层；未进入: {stuck}"
 
 
 async def test_every_assistant_reaches_the_service_layer() -> None:

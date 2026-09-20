@@ -1,15 +1,11 @@
 """Destiny MCP Server — 提供 Destiny 2 物品管理的 MCP 工具。
 
-默认工具面使用聚合模式，避免 Agent 同时看到几十个低层工具：
-  normal: 8 个 assistant 聚合工具，推荐给普通个人部署
-  expert: 聚合工具 + 常用只读低层工具，适合排查查询问题
-  full: 聚合工具 + 全部历史低层工具，适合兼容旧提示词和调试
+工具面就是 **8 个聚合工具**（`player_assistant` … `world_assistant`）：每个工具按 `intent`
+分派，参数归属与响应信封由 `tools/_param_contracts.py` / `tools/_responses.py` 统一守。
 
-通过环境变量 DESTINY_MCP_TOOL_PROFILE 切换，默认 normal。
-
-**历史工具默认屏蔽**：不管哪个 profile，出厂都只暴露 8 个聚合工具；要 expert / full
-那部分旧工具，得同时设 DESTINY_MCP_ENABLE_LEGACY_TOOLS=1。原因是它们没有参数拦截、
-没有参数说明、返回契约三种混用 —— 放在默认工具面里只会让模型多一堆可以选错的东西。
+2026-09-20 起不再有 profile 与历史工具面：那 67 个低层工具（没有参数拦截、没有参数说明、
+返回契约三种混用）整块剥离到仓库根目录 `legacy/`，只作存档、不进包、不参与测试与 lint。
+它们的代码没有删，要查旧行为或临时复活一个，见 `legacy/README.md`。
 
 架构 (Rule 1): server.py 只做生命周期管理 + 工具注册。不含业务逻辑。
 工具定义在 tools/ 子模块中，每个领域一个文件。
@@ -32,12 +28,10 @@ from pydantic import ConfigDict
 from .audit import AuditLogger
 from .bungie_client import BungieClient
 from .config import (
-    LEGACY_TOOLS_ENABLED,
     MCP_HOST,
     MCP_PORT,
     MCP_TRANSPORT,
     ROUTING_GUIDE_URL,
-    TOOL_PROFILE,
     resolve_resource_dir,
 )
 from .logging_config import get_logger, setup_logging
@@ -45,7 +39,6 @@ from .manifest import ManifestManager
 from .player_resolver import PlayerResolver
 from .services.build_service import BuildService
 from .services.armor_mod_service import ArmorModService
-from .services.build_import_service import BuildImportService
 from .services.collection_service import CollectionService
 from .services.inventory_analysis_service import InventoryAnalysisService
 from .services.inventory_service import InventoryService
@@ -120,7 +113,6 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
         weekly_svc = WeeklyService(bungie, manifest)
         weekly_analysis_svc = WeeklyAnalysisService(weekly_svc)
         loadout_svc = LoadoutService(bungie, manifest, resolver)
-        build_import_svc = BuildImportService(manifest)
         activity_svc = ActivityService(bungie, manifest, resolver)
         activity_counters_svc = ActivityCountersService(bungie, manifest, resolver)
         pvp_weapon_svc = PvpWeaponService(bungie, manifest, resolver)
@@ -154,7 +146,6 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
             "weekly_svc": weekly_svc,
             "weekly_analysis_svc": weekly_analysis_svc,
             "loadout_svc": loadout_svc,
-            "build_import_svc": build_import_svc,
             "activity_svc": activity_svc,
             "activity_counters_svc": activity_counters_svc,
             "pvp_weapon_svc": pvp_weapon_svc,
@@ -342,52 +333,12 @@ def activity_review() -> str:
 
 
 # ── Register tools ───────────────────────────────────────────────────
-_NORMAL_TOOL_MODULES = (
+# 工具面只有 8 个聚合工具。历史工具面（67 个）已于 2026-09-20 整块剥离到 `legacy/`：
+# 默认屏蔽、不保证契约、不单独修 bug 的那一套留着只会拖累每次改公共层的决定，
+# 也没人替它们做参数守卫；需要时从 `legacy/` 或 git 历史取回，不要在这里再挂回去。
+_TOOL_MODULES = (
     "assistants",
 )
-
-_EXPERT_TOOL_MODULES = _NORMAL_TOOL_MODULES + (
-    "player_tools",
-    "inventory_tools",
-    "item_tools",
-    "fragment_tools",
-    "set_tools",
-    "collection_tools",
-    "weapon_tools",
-    "vendor_tools",
-    "build_import_tools",
-    "activity_tools",
-)
-
-_FULL_TOOL_MODULES = _NORMAL_TOOL_MODULES + (
-    "player_tools",
-    "inventory_tools",
-    "item_tools",
-    "fragment_tools",
-    "set_tools",
-    "artifact_tools",
-    "collection_tools",
-    "transfer_tools",
-    "subclass_tools",
-    "weapon_tools",
-    "build_tools",
-    "vendor_tools",
-    "loadout_tools",
-    "build_import_tools",
-    "api_tools",
-    "activity_tools",
-)
-
-
-def _tool_profile(value: str | None = None) -> str:
-    profile = (
-        value if value is not None
-        else TOOL_PROFILE
-    ).strip().lower()
-    if profile in {"normal", "expert", "full"}:
-        return profile
-    logger.warning("Unknown tool profile=%r; falling back to normal", profile)
-    return "normal"
 
 
 class AuditedMCP(FastMCP):
@@ -408,23 +359,12 @@ class AuditedMCP(FastMCP):
             raise
 
 
-def create_server(
-    tool_profile: str | None = None, legacy_tools: bool | None = None
-) -> FastMCP:
-    """Create an independent server, including when modules are already imported.
+def create_server() -> FastMCP:
+    """Create an independent server, including when modules are already imported。
 
-    `legacy_tools` 默认跟随 `config.LEGACY_TOOLS_ENABLED`（出厂为关）。
-    历史工具没有参数拦截、没有参数说明、返回契约也不统一，所以默认不暴露；
-    需要排查或兼容旧提示词时，用 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 打开。
+    参数一个不收：工具面就是 8 个聚合工具（`_TOOL_MODULES`）。以前那两个 profile 开关
+    与历史工具面一起删了 —— 留着会让人以为"换个 profile 还有别的东西"。
     """
-    profile = _tool_profile(tool_profile)
-    with_legacy = LEGACY_TOOLS_ENABLED if legacy_tools is None else legacy_tools
-    if not with_legacy and profile != "normal":
-        logger.warning(
-            "tool profile=%s 请求了历史工具，但 DESTINY_MCP_ENABLE_LEGACY_TOOLS 未打开；"
-            "本次只暴露 8 个聚合工具",
-            profile,
-        )
     readiness = {"ready": False}
 
     @asynccontextmanager
@@ -469,22 +409,14 @@ def create_server(
                 "status": "ok" if readiness["ready"] else "unavailable",
                 "service": "destiny-mcp",
                 "transport": MCP_TRANSPORT,
-                "tool_profile": profile,
                 "mode": "standalone",
             },
             status_code=200 if readiness["ready"] else 503,
         )
 
-    modules = {
-        "normal": _NORMAL_TOOL_MODULES,
-        "expert": _EXPERT_TOOL_MODULES,
-        "full": _FULL_TOOL_MODULES,
-    }[profile]
-    if not with_legacy:
-        modules = _NORMAL_TOOL_MODULES
-    for module_name in modules:
+    for module_name in _TOOL_MODULES:
         importlib.import_module(f"destiny_mcp.tools.{module_name}")
-    tool_registry.register(server, set(modules))
+    tool_registry.register(server, set(_TOOL_MODULES))
     for function in _PROMPTS:
         server.prompt()(function)
 

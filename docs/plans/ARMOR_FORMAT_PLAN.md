@@ -256,7 +256,7 @@ P0 基线 → P1 形状 → P2 详情 → P4 换模组 → P3 统一 → P5 阶�
 
 **③ legacy `apply_mod` 怎么处理？**
 
-现在：默认 8 工具里**没有**它（要 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1`），调用直接生效、无确认、
+现在：默认 8 工具里**没有**它（当时要 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1`；2026-09-20 起旧工具面整块剥离，这个开关也没了），调用直接生效、无确认、
 返回裸 dict。改完（走 `equip_mod` 的确认流程）：
 ```json
 {"ok": false, "error": {"code": "confirmation_required", "recoverable": true},

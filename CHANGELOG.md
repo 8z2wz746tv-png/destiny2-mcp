@@ -4,6 +4,22 @@
 
 ## 未发布（2026-09-20）
 
+**历史工具面整块剥离（破坏性，见 ADR-008）**
+
+- 16 个模块、67 个低层工具（`get_inventory`、`search_weapons_by_type` …）与**配装导入整块**
+  （`build_import/` 领域包 + 服务 + 工具 + 两个提示词 + 它的测试）已移到仓库根目录 `legacy/`：
+  **不进包、不参与测试与 lint**，只作查阅（`legacy/README.md` 写了为什么不维护、怎么复活）。
+- `full`/`expert` profile 与 `DESTINY_MCP_ENABLE_LEGACY_TOOLS` 开关一起删除：
+  工具面现在固定是 **8 个聚合工具**，`create_server()` 不再收参数，`/health` 不再报 `tool_profile`。
+  语料 `mcp` 组加了反向断言：把旧的 profile/开关塞进环境变量也只该有 8 个工具。
+- **配装导入功能不再提供**（决定不要，不做"搬成新 intent"的迁移）：README 功能列表与技能文档里的
+  相关宣传同步删掉。58 处引用（测试、语料、安装脚本、技能、DSH 配置）已清理。
+- 为什么这么做：那 67 个工具的既定口径是"默认屏蔽、不保证契约、不单独修 bug"，复核时已经有两个
+  烂在里面（`analyze_weapon` 裸抛 `KeyError`、`get_historical_stats` 有数据说成"未找到"）；
+  而 62/67 在 8 个聚合工具里都有对应，留着它们只是每次改公共层都要替一堆没守卫的工具做决定。
+
+
+
 - **修复（本轮改动造成的回归）：历史工具 `find_players` 会裸抛 `KeyError`**。
   它的输出契约是"按置信度排序"（要读 `confidence`/`playtime_hours`），而"模糊搜人默认不读别人档案"
   之后这些键不再存在。修法是让它**显式要评分**（`enrich=True`），行为与原来一致。

@@ -269,7 +269,7 @@
 | `<武器>` 的 Perk 池里哪些是社区推荐的 | 选项上带 `recommended.wishlist`；异域可能没有 —— 要说明「本地愿单没收录」，**不能说「这些 Perk 都不好」** | 真机抽一条 |
 | 查「遗产」的催化剂／「泰拉巴」的社区 roll | 传说 `count=0` + 原因；固定 roll 武器明说没有随机推荐 | 真机抽一条 |
 | 全游戏能滚出「萤火虫」的武器／列出我的配装 | `matched_count > returned_count` 时必须 `truncated=true`；配装列表带四个分页字段 | 基线闸门 + `test_large_response_limits.py` |
-| 你现在有哪些工具／用 `get_inventory` 试试 | 只有 8 个聚合工具；老工具名应改走聚合入口。要用老工具必须**同时**设 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**和** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 再重启：实测只设开关、工具面留在 `normal` 时仍是 8 个工具，而且**不会给 warning**（full+开关 = 77 个、expert+开关 = 49 个） | `test_tool_profiles.py` |
+| 你现在有哪些工具／用 `get_inventory` 试试 | 只有 8 个聚合工具；老工具名应改走聚合入口。历史工具面已于 2026-09-20 剥离到仓库根目录 `legacy/`（不进包、不参与测试），所以**任何**环境变量都变不出旧工具 —— 语料里那条"设旧的 profile/开关也只该有 8 个"就是守这个的 | `tests/test_tool_simulation.py`、语料 `mcp` 组 |
 
 ## 十四、只跑一次就够的整链路
 
@@ -366,7 +366,7 @@
 | 这件不在该角色身上 | 拿仓库里的实例 + `character=hunter` | `invalid_argument_error`，提示先 `intent="move"` 把它移到该角色；**不要替用户猜一个角色** |
 | 缺 `mod_name` / 缺 `character` | 同上 | 各自 `invalid_argument_error`，说清缺什么、去哪查（`build_assistant(intent="armor_mods")` 列模组名） |
 | 同一个名字有多个版本 | `mod_name="手雷模组"` | 选**真有属性加成**的那个（+10/3 能量），不是 +0/1 能量的占位版本；其它可行版本列在 `alternatives` |
-| legacy `apply_mod` | `apply_mod(...)`（要开 legacy 工具面） | 现在也**先确认**（与 `equip_mod` 同一条路），不再不确认直接改账号 |
+| 护甲模组写入 | `inventory_assistant(intent="equip_mod")` + `confirmed=true` | 先给候选、确认后才写，写完回读核对（历史工具面那个 `apply_mod` 已随旧面剥离） |
 
 ### D. 装备确认的逐件预览
 

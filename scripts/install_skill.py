@@ -328,7 +328,6 @@ def dsh_patch_block(server_root: Path, *, server_name: str = "destiny") -> str:
             f"        cwd: {root}",
             "        env:",
             f"          DESTINY_MCP_ROOT: {root}",
-            "          DESTINY_MCP_TOOL_PROFILE: normal",
             "        # 首次启动要下载/加载 Manifest，60 秒的默认上限不够。",
             "        toolCallTimeoutMs: 300000",
             "        failOnStartupError: false",
@@ -391,13 +390,13 @@ def mcp_registration_hint(host: Host, server_root: Path) -> str:
     if host.mcp == "claude-cli":
         return (
             "claude mcp add destiny --scope user "
-            f"--env DESTINY_MCP_ROOT={root} --env DESTINY_MCP_TOOL_PROFILE=normal "
+            f"--env DESTINY_MCP_ROOT={root} "
             f"-- {entry}"
         )
     if host.mcp == "codex-cli":
         return (
             f"codex mcp add destiny --env 'DESTINY_MCP_ROOT={root}' "
-            "--env DESTINY_MCP_TOOL_PROFILE=normal -- " + str(entry)
+            "-- " + str(entry)
         )
     return (
         "该宿主没有公开的注册约定：把下面这段写进它的 MCP 配置（stdio 传输），"

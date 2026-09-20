@@ -26,7 +26,7 @@
 | --- | --- | --- | --- |
 | `sweep` | 八个工具面**全部 intent**（含中文别名），给最简但有意义的参数，只验「是不是干净信封」 | 110 个 intent | 发布前；改了 intent 分派/参数守卫后 |
 | `rows` | 其余六个工具面的字段级契约 + 跨切面（默认条数、翻页、中英同义、错误信封） | 约 70 行 | 改了任一工具面后 |
-| `mcp` | 真 stdio 握手：工具数、intent 枚举覆盖、schema 层拒收、legacy 工具面 | 9 行 | 改了工具签名 / schema / 工具面后 |
+| `mcp` | 真 stdio 握手：工具数、intent 枚举覆盖、schema 层拒收、旧工具面确已剥离 | 9 行 | 改了工具签名 / schema / 工具面后 |
 
 `sweep` 的失败线（任一命中即 FAIL）：
 
@@ -194,7 +194,7 @@
 | `item_instance_id=null` | 走 schema 拒绝或干净信封，**不许**裸抛 `AttributeError` |
 | 槽位越界 21 | `less_than_equal`（协议级） |
 | 真握手读账号 | `player_assistant(intent="profile")` 得到 `ok=true` |
-| legacy 工具面 | `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 时工具数 > 8 且含 `get_inventory` |
+| 旧工具面已剥离 | 连旧的 `DESTINY_MCP_TOOL_PROFILE=full` + `ENABLE_LEGACY_TOOLS=1` 一起塞进去，也只该有 8 个工具、且没有 `get_inventory` |
 
 ## `sweep` 实测基线（110 个 intent，最简参）
 
@@ -357,4 +357,4 @@ FAIL 5 条＝「已知问题」表的 #2/#3/#4/#5/#6；#1（analyze 自相矛盾
 1. **`sweep` 一开始没把 `intent` 传下去**：110 条「体检」全落在各工具的默认 intent 上，等于同一个默认调用跑了 110 遍（还因此把 `weapon_assistant` 的 `query` 参数误判成 bug）。修好后才是真正的 110 个 intent。
 2. 断言路径写错 7 处：`inventory.type` 传了它不读的 `limit`、`search` 的键是 `result.items`（不是 `instances`）、`set_bonus` 的 2/4 件效果在 `perks[].required_count`（不是 `tiers`）、`recommend` 在 `data.recommendation.results[].build.items[]`、`analyze` 在 `data.analysis`、`search_identifiers` 在 `data.results.<kind>`、`loadout.save` 必须先给 `character` 才走到确认门。
 3. 碎片别名行把「void 组」和「strand 组」当成一组比（19 ≠ 16 是两个元素本身不同）。
-4. legacy 工具面行只设了开关、没开 `DESTINY_MCP_TOOL_PROFILE=full`：**光设开关是静默无效的**（实测 full+开关 = 77 个工具、expert+开关 = 49 个、normal+开关 = 8 个且无 warning）。
+4. 旧工具面那一行现在是**反向断言**：旧的 profile/开关都不该再变出工具（历史工具面已剥离到 `legacy/`；哪天又变回 77 个，说明有人把它挂回来了）。
