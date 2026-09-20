@@ -13,7 +13,7 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（69 个旧工具） | `get_inventory`、`search_items` … | 只在 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**且** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 时暴露；不进主路径文档、不保证契约、不单独修 bug |
 
-## 未发布：武器类型列表改列表行、默认 10 件、可翻页（破坏性）
+## 未发布：武器类型列表改列表行、默认 10 件、可翻页（破坏性，见 ADR-007）
 
 `weapon_assistant(intent="type")`（"我手炮都有哪些"）以前每件发**完整模板**
 （`{weapon, sockets, options, stats, perks_complete, notes}`），20 件就是 **18.9 万字符**，
