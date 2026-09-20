@@ -5,15 +5,15 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 6142,
-      "payload_chars": 55880
+      "elapsed_ms": 6534,
+      "payload_chars": 56644
     },
     {
       "case": "catalog_type",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 331,
+      "elapsed_ms": 362,
       "payload_chars": 5965
     },
     {
@@ -21,23 +21,23 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 3665,
-      "payload_chars": 21673
+      "elapsed_ms": 2243,
+      "payload_chars": 23092
     },
     {
       "case": "type_list_default",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 282,
-      "payload_chars": 41537
+      "elapsed_ms": 253,
+      "payload_chars": 45316
     },
     {
       "case": "filter_rolls_owned",
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 5951,
+      "elapsed_ms": 6278,
       "payload_chars": 3031
     },
     {
@@ -45,7 +45,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 237,
+      "elapsed_ms": 248,
       "payload_chars": 6878
     },
     {
@@ -53,7 +53,7 @@
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 739,
+      "elapsed_ms": 1134,
       "payload_chars": 79874
     },
     {
@@ -61,7 +61,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 17,
+      "elapsed_ms": 26,
       "payload_chars": 49377
     },
     {
@@ -69,7 +69,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 12,
+      "elapsed_ms": 15,
       "payload_chars": 15017
     },
     {
@@ -77,7 +77,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 13,
+      "elapsed_ms": 14,
       "payload_chars": 7770
     },
     {
@@ -93,7 +93,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 4,
+      "elapsed_ms": 5,
       "payload_chars": 2767
     },
     {
@@ -117,7 +117,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 16,
+      "elapsed_ms": 15,
       "payload_chars": 23428
     },
     {
@@ -125,7 +125,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 324,
+      "elapsed_ms": 378,
       "payload_chars": 108675
     },
     {
@@ -133,7 +133,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 510,
+      "elapsed_ms": 307,
       "payload_chars": 24402
     },
     {
@@ -141,7 +141,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 31,
+      "elapsed_ms": 21,
       "payload_chars": 50349
     },
     {
@@ -149,7 +149,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 18,
+      "elapsed_ms": 16,
       "payload_chars": 13188
     },
     {
@@ -157,7 +157,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 7,
+      "elapsed_ms": 5,
       "payload_chars": 825
     },
     {
@@ -165,7 +165,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 569,
+      "elapsed_ms": 658,
       "payload_chars": 1206
     },
     {
@@ -173,7 +173,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 16,
+      "elapsed_ms": 27,
       "payload_chars": 3461
     },
     {
@@ -181,7 +181,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 363,
+      "elapsed_ms": 288,
       "payload_chars": 19033
     },
     {
@@ -189,7 +189,7 @@
       "tool": "weapon_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 12,
+      "elapsed_ms": 11,
       "payload_chars": 5981
     },
     {
@@ -205,7 +205,7 @@
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 4,
+      "elapsed_ms": 3,
       "payload_chars": 7510
     },
     {
@@ -213,7 +213,7 @@
       "tool": "world_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 2410,
+      "elapsed_ms": 1812,
       "payload_chars": 6589
     }
   ]

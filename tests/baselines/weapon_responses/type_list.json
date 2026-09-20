@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 3665,
+    "elapsed_ms": 2243,
     "is_error": false,
-    "payload_chars": 21673,
+    "payload_chars": 23092,
     "steps": [
       {
         "arguments": {
@@ -32,7 +32,7 @@
         "购物清单-白弹",
         "购物清单-绿弹"
       ],
-      "matched_count": 1,
+      "matched_count": 3,
       "results": [
         {
           "element": "冰影",
@@ -60,19 +60,64 @@
             "url": "https://starside.work/shopping-primary/index.html"
           },
           "tier": "A"
+        },
+        {
+          "element": "烈日",
+          "frame": "精密",
+          "list": "购物清单-白弹",
+          "name": "信任",
+          "note": "有双溅射 Perk 和不错框架 但 Perk 多样性少 起源也差",
+          "perks": {
+            "三号位": [
+              "萤火虫"
+            ],
+            "四号位": [
+              "辉耀炽热",
+              "高爆载荷"
+            ]
+          },
+          "rank": "20",
+          "scale": "S-F",
+          "source": "智谋",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "A"
+        },
+        {
+          "element": "动能",
+          "frame": "攻击型",
+          "list": "购物清单-白弹",
+          "name": "克瑞米尔之匕",
+          "note": "起源不错 + 框架最差 溅射 Perk 尚可",
+          "perks": {
+            "三号位": [
+              "萤火虫"
+            ],
+            "四号位": [
+              "高爆载荷"
+            ]
+          },
+          "rank": "47",
+          "scale": "S-F",
+          "source": "铁旗",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "C"
         }
       ],
-      "returned_count": 1,
+      "returned_count": 3,
       "truncated": false,
-      "unmatched": [
-        "每分钟发射数",
-        "伤害",
-        "射程",
-        "稳定性",
-        "操控性",
-        "填装速度",
-        "弹匣"
-      ],
+      "unmatched": [],
       "warnings": [
         "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
         "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",

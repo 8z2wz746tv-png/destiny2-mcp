@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 282,
+    "elapsed_ms": 253,
     "is_error": false,
-    "payload_chars": 41537,
+    "payload_chars": 45316,
     "steps": [
       {
         "arguments": {
@@ -31,7 +31,7 @@
         "购物清单-白弹",
         "购物清单-绿弹"
       ],
-      "matched_count": 1,
+      "matched_count": 6,
       "results": [
         {
           "element": "冰影",
@@ -59,18 +59,139 @@
             "url": "https://starside.work/shopping-primary/index.html"
           },
           "tier": "A"
+        },
+        {
+          "element": "烈日",
+          "frame": "精密",
+          "list": "购物清单-白弹",
+          "name": "信任",
+          "note": "有双溅射 Perk 和不错框架 但 Perk 多样性少 起源也差",
+          "perks": {
+            "三号位": [
+              "萤火虫"
+            ],
+            "四号位": [
+              "辉耀炽热",
+              "高爆载荷"
+            ]
+          },
+          "rank": "20",
+          "scale": "S-F",
+          "source": "智谋",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "A"
+        },
+        {
+          "element": "动能",
+          "frame": "攻击型",
+          "list": "购物清单-白弹",
+          "name": "克瑞米尔之匕",
+          "note": "起源不错 + 框架最差 溅射 Perk 尚可",
+          "perks": {
+            "三号位": [
+              "萤火虫"
+            ],
+            "四号位": [
+              "高爆载荷"
+            ]
+          },
+          "rank": "47",
+          "scale": "S-F",
+          "source": "铁旗",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "C"
+        },
+        {
+          "dps": "13514",
+          "list": "刷取清单-异域武器",
+          "name": "叛贼",
+          "note": "叛贼 bug，在触发了叛贼 buff 后开脱手大，大招结束后马上切到爆炸武器会把叛贼的 30% 增伤转移到该武器上左侧的 DPS 是在触发了叛贼 buff 后的双增伤光芒复仇是目前游戏中能够被实际应用的最高 DPS 叛贼“潜藏能量”进度快，能够频繁进入“释放力量”模式释放力量模式自带虚弱高爆弹药，邪恶收割虚空覆盖护盾弥补了持续扣血的不足",
+          "scale": "T",
+          "scenario_tiers": {
+            "清怪": "T1",
+            "输出": "T0"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          },
+          "total_damage": "118926"
+        },
+        {
+          "element": "动能",
+          "frame": "适配 140",
+          "list": "刷取清单-白弹紫枪",
+          "name": "命运终结者",
+          "note": "手感好，perk 池和起源特性优秀",
+          "perks": {
+            "三号位": [
+              "高爆载荷",
+              "动能震颤"
+            ],
+            "四号位": [
+              "狂乱",
+              "元素磨砺",
+              "萤火虫"
+            ]
+          },
+          "scale": "T",
+          "source": "玻璃拱顶",
+          "source_ref": {
+            "local_path": "share/legendary-primary.md",
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "author_markdown",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6"
+          },
+          "tier": "T1"
+        },
+        {
+          "element": "电弧",
+          "frame": "适配",
+          "list": "购物清单-白弹",
+          "name": "回文",
+          "note": "伏特子弹在手炮上不算好 框架和起源不错 但整体 Perk 组合令人失望",
+          "perks": {
+            "三号位": [
+              "高爆载荷"
+            ],
+            "四号位": [
+              "伏特子弹"
+            ]
+          },
+          "rank": "49",
+          "scale": "S-F",
+          "source": "巅峰行动",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "C"
         }
       ],
-      "returned_count": 1,
+      "returned_count": 6,
       "truncated": false,
       "unmatched": [
-        "每分钟发射数",
-        "伤害",
-        "射程",
-        "稳定性",
-        "操控性",
-        "填装速度",
-        "弹匣"
+        "典狱长的规则（专家）",
+        "命运终结者（失时）"
       ],
       "warnings": [
         "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",

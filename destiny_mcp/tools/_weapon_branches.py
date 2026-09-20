@@ -17,7 +17,7 @@ from typing import Any
 from ..services import weapon_local_data, weapon_payload
 from ..services.weapon_payload import schema_block
 from ._enrichment import community_enrichment
-from ._farming import farming_reference, harvest_names
+from ._farming import farming_reference, item_names
 from ._responses import ok_response
 
 
@@ -217,7 +217,7 @@ def type_payload(
                 "next_offset": next_offset,
                 "items": rows,
             },
-            "farming_list": _farming(svc, harvest_names(rows)),
+            "farming_list": _farming(svc, item_names(rows)),
             **schema_block(),
         },
         warnings=warnings,
@@ -298,7 +298,7 @@ def catalog_payload(
         summary,
         {
             **filtered,
-            "farming_list": _farming(svc, harvest_names(filtered)),
+            "farming_list": _farming(svc, item_names(filtered.get("matched"))),
             **schema_block(),
         },
         warnings=warnings,

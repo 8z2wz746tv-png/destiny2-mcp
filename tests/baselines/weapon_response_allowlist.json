@@ -139,6 +139,7 @@
     "perk_pool_exotic::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
     "perk_pool_legendary::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
     "perk_pool_legendary::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "type_list::data.farming_list.unmatched[]": "修复的副作用：以前把 stats[].name（\"伤害\"\"射程\"）当成武器名送去回查清单，unmatched 里全是不存在的名字；现在只送列表行自己的 name，这 5 把都在清单里 → unmatched 为空数组（**字段还在**，只是没有元素，叶子路径因此消失）。",
     "type_list::data.weapons.items[].options": "同上：'这一件能换什么'（组件 310）不进列表行，改由 compare 给；顺带 list_view 不再请求 305/310（profile 10.16 MB → 1.86 MB）。",
     "type_list::data.weapons.items[].perks_complete": "列表行没有插槽，就不再声明'plug 是否全部解析'（这个字段说的是插槽解析完整性）。",
     "type_list::data.weapons.items[].sockets": "性能第四项：列表行不展开插槽池（真机实测它与 options 合计占该响应 2/3）。要看某一件的插槽与现在装什么：weapon_assistant(intent=\"compare\", weapon_name=…, item_instance_id=…)。",
