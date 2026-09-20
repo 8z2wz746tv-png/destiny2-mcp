@@ -49,8 +49,11 @@ ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
         "compare": ("compare_duplicates",),
         "perk_pool": ("perks",),
         "popularity": ("selection_rates", "perk_selection", "selection", "usage_rates"),
-        # 锻造图样：中文说法（永久别名）与英文近义
-        "patterns": ("pattern", "craft", "锻造", "图样", "图样进度"),
+        # 锻造武器模式：玩家说「红框」「锻造武器」（永久别名），游戏官方中文叫「模式」，
+        # 第三方工具常译作「图样」；英文近义 pattern/craft 只登记不宣传
+        "patterns": (
+            "pattern", "craft", "锻造", "锻造武器", "图样", "图样进度", "模式进度", "红框", "红框进度",
+        ),
     },
     "LoadoutIntent": {"list": ("get",)},
     "SubclassIntent": {"get": ("subclass",)},

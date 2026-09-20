@@ -55,6 +55,22 @@ _STATUS_ORDER = {STATUS_IN_PROGRESS: 0, STATUS_NOT_STARTED: 1, STATUS_UNLOCKED: 
 _VARIANT_SUFFIX = re.compile(r"[（(](?:专家|失时|痛苦|adept|timelost|harrowed)[）)]$", re.IGNORECASE)
 _NAME_NOISE = re.compile(r"[\s·・]+")
 
+# 塑形栏位：`crafting.requiredSocketTypeHashes` 里出现哪几个插槽类型，就代表塑形时能选哪几个栏位
+# （栏位名取自槽里的占位 plug「空枪管插槽」这类）。实测 2026-09-20：基础版都是这 5 个，
+# 而 36 件变体只有前 3 个 —— 两个特征栏位不在里面，所以变体的 3/4 号特性固定。
+SHAPING_SOCKETS: dict[int, str] = {
+    3868679925: "框架",
+    3694362576: "枪管",
+    2316004942: "弹夹",
+    3036227398: "特征1",
+    3036227399: "特征2",
+}
+TRAIT_SOCKETS = frozenset({3036227398, 3036227399})
+# 「空深视插槽」：只有基础版有；36 件变体全都没有，所以红框（深视共振）只会掉基础版，
+# 变体自己涨不了进度。变体那个位置是「空强化插槽」（专家/失时版的升级槽，玩家说的"只能升级"）。
+DEEPSIGHT_SOCKET_TYPE = 1085237186
+UPGRADE_SOCKET_TYPE = 4251072212
+
 
 def name_key(value: str) -> str:
     """名字比对口径：去空白与间隔号、大小写折叠（用户输入 vs Manifest 名字）。"""
@@ -147,15 +163,13 @@ class PatternService:
 
     # ── 账号进度（组件 900） ─────────────────────────────────────────
     async def _state(self, membership_id: str, membership_type: int) -> tuple[dict[int, dict], dict]:
+        # `read` 只放**每次调用都一样**的口径（数据来源与缓存时长）。"这次读了几毫秒/有没有命中缓存"
+        # 不能放进 data：别名等价那条语料比对的是 `data` 逐字节相同，而它每次都变（真机上被抓到过：
+        # 同一组 10 个别名跑出 2 种 data）。诊断信息进日志。
         cached = self._state_cache
         now = time.monotonic()
         if cached and now - cached["at"] < _STATE_TTL_SECONDS:
-            return cached["state"], {
-                "component": 900,
-                "cached": True,
-                "elapsed_ms": 0,
-                "ttl_seconds": _STATE_TTL_SECONDS,
-            }
+            return cached["state"], {"component": 900, "ttl_seconds": _STATE_TTL_SECONDS}
         started = time.perf_counter()
         profile = await self._bungie.get_profile(
             membership_id, membership_type, profile_components.PATTERNS
@@ -185,12 +199,11 @@ class PatternService:
                 "state": component.get("state"),
             }
         self._state_cache = {"at": now, "state": state}
-        return state, {
-            "component": 900,
-            "cached": False,
-            "elapsed_ms": int((time.perf_counter() - started) * 1000),
-            "ttl_seconds": _STATE_TTL_SECONDS,
-        }
+        logger.info(
+            "锻造武器模式：读组件 900 用了 %d ms（%d 条记录，缓存 %d 秒）",
+            int((time.perf_counter() - started) * 1000), len(state), _STATE_TTL_SECONDS,
+        )
+        return state, {"component": 900, "ttl_seconds": _STATE_TTL_SECONDS}
 
     @staticmethod
     def _row(entry: dict[str, Any], state: dict[int, dict]) -> dict[str, Any]:
@@ -203,6 +216,8 @@ class PatternService:
             progress = info.get("progress")
             complete = bool(progress is not None and need and progress >= need)
             status = STATUS_UNLOCKED if complete else STATUS_IN_PROGRESS
+        # 「还差几个」在服务层算好：工具层只排版面，不碰数字（那里的服务可能被替身顶掉）。
+        remaining = need - progress if (progress is not None and need) else None
         return {
             "name": entry["name"],
             "weapon_type": entry["weapon_type"],
@@ -210,10 +225,52 @@ class PatternService:
             "tier": entry["tier"],
             "need": need,
             "progress": progress,
+            "remaining": remaining,
             "status": status,
             "item_hash": entry["item_hash"],
             "record_hash": entry["record_hash"],
         }
+
+    # ── 变体：能不能塑形、能选哪些栏位（从 Manifest 现算，不写死结论） ────
+    def _variant_info(self, variant_name: str, base_name: str) -> dict[str, Any]:
+        """问（专家）/（失时）/（痛苦）这类变体时，把它的塑形配置一起给出去。
+
+        实测（2026-09-20，36 件变体无一例外）：基础版塑形栏位 5 个（框架/枪管/弹夹/特征1/特征2），
+        变体只有 3 个（框架/枪管/弹夹）—— 两个特征栏位不在配置里，3/4 号特性固定；
+        而且变体的插槽里没有「空深视插槽」，所以红框（深视共振）只会掉基础版。
+        """
+        variant = self._craftable_item(variant_name)
+        if variant is None:
+            return {}
+        base = self._craftable_item(base_name)
+        variant_types = self._shaping_sockets(variant)
+        base_types = self._shaping_sockets(base) if base else []
+        sockets = {
+            entry.get("socketTypeHash")
+            for entry in ((variant.get("sockets") or {}).get("socketEntries") or [])
+            if isinstance(entry, dict)
+        }
+        return {
+            "name": variant_name,
+            "base_name": base_name,
+            "shapeable_columns": [SHAPING_SOCKETS.get(t, f"栏位{t}") for t in variant_types],
+            "base_shapeable_columns": [SHAPING_SOCKETS.get(t, f"栏位{t}") for t in base_types],
+            "traits_fixed": not TRAIT_SOCKETS <= set(variant_types),
+            "has_deepsight_socket": DEEPSIGHT_SOCKET_TYPE in sockets,
+            "has_upgrade_socket": UPGRADE_SOCKET_TYPE in sockets,
+        }
+
+    def _shaping_sockets(self, item: dict[str, Any] | None) -> list[int]:
+        """这一件（可锻造物品）的图样条目里，可塑形的插槽类型。"""
+        if item is None:
+            return []
+        recipe_hash = int((item.get("inventory") or {}).get("recipeItemHash") or 0)
+        pattern_item = self._manifest.get_item_definition(recipe_hash) or {}
+        return [
+            value
+            for value in ((pattern_item.get("crafting") or {}).get("requiredSocketTypeHashes") or [])
+            if isinstance(value, int)
+        ]
 
     # ── 来源（本地社区资料，可选、可失败） ────────────────────────────
     def _sources(self, names: list[str]) -> dict[str, Any]:
@@ -257,9 +314,12 @@ class PatternService:
         rows = [self._row(entry, state) for entry in catalog]
 
         variant_of = ""
+        variant_info: dict[str, Any] = {}
         candidates: list[dict[str, Any]] = []
         if weapon_name.strip():
             rows, candidates, variant_of = self._by_name(rows, weapon_name.strip())
+        if variant_of and rows:
+            variant_info = self._variant_info(variant_of, rows[0]["name"])
         available_types = sorted({row["weapon_type"] for row in rows if row["weapon_type"]})
         if weapon_type.strip():
             rows = self._by_type(rows, weapon_type.strip())
@@ -285,6 +345,7 @@ class PatternService:
             "next_offset": next_offset,
             "filtered": bool(weapon_name.strip() or weapon_type.strip()),
             "variant_of": variant_of,
+            "variant": variant_info,
             "candidates": candidates,
             "available_types": available_types,
             "sources": sources,
@@ -322,7 +383,12 @@ class PatternService:
 
     @staticmethod
     def _counts(rows: list[dict[str, Any]]) -> dict[str, int]:
-        counts = {"total": len(rows), "unlocked": 0, "in_progress": 0, "not_started": 0}
+        # `not_unlocked` 是玩家口径的「未解锁」= 进行中 + 还没开始（游戏里两者都显示未解锁）；
+        # 在服务层算好，工具层不碰数字。
+        counts = {
+            "total": len(rows), "unlocked": 0, "not_unlocked": 0,
+            "in_progress": 0, "not_started": 0,
+        }
         for row in rows:
             key = {
                 STATUS_UNLOCKED: "unlocked",
@@ -331,6 +397,7 @@ class PatternService:
             }.get(row["status"])
             if key:
                 counts[key] += 1
+        counts["not_unlocked"] = counts["in_progress"] + counts["not_started"]
         return counts
 
     @staticmethod

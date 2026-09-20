@@ -289,7 +289,7 @@ destiny_mcp/
 |---|---|
 | `player_assistant` | 玩家搜索、档案、角色概况 |
 | `inventory_assistant` | 背包/仓库查询、精确重复武器扫描、移动、装备、批量装备、邮政官、锁定、任务追踪 |
-| `weapon_assistant` | 武器分析、指定实例对比、perk 池、全武器目录筛选、perk 选取率、god roll |
+| `weapon_assistant` | 武器分析、指定实例对比、perk 池、全武器目录筛选、perk 选取率、god roll、锻造武器模式（红框）进度与来源 |
 | `build_assistant` | 护甲配装推荐、候选、诊断、合法 Armor 3.0 单件/两件刷取目标反推、确认后精确装备 |
 | `loadout_assistant` | 玩家已存配装、Bungie 官方配装槽读取/写入/清空；社区模板走 `build_assistant` |
 | `subclass_assistant` | 子职业、碎片、神器查询和确认后修改 |

@@ -21,13 +21,15 @@ WeaponIntent = Literal[
     "analyze", "catalog", "search_catalog", "all_weapons", "global", "search_all", "filter_rolls",
     "compare", "compare_duplicates", "perk_pool", "perks", "god_roll", "popularity", "selection_rates",
     "perk_selection", "selection", "usage_rates", "type", "info", "stats", "perk_description", "catalyst", "community",
-    # 锻造图样（图鉴「模式和催化」的武器模式那一半）：进度读账号组件 900
-    "patterns", "pattern", "craft", "锻造", "图样", "图样进度",
+    # 锻造武器模式（图鉴「模式和催化」的武器模式那一半）：进度读账号组件 900。
+    # 别名按玩家话术收：玩家说「红框」（带红框的深视共振武器）与「锻造武器」，
+    # 游戏官方中文叫「模式」（那条进度写「模式进度」），第三方工具常译作「图样」。
+    "patterns", "pattern", "craft", "锻造", "锻造武器", "图样", "图样进度", "模式进度", "红框", "红框进度",
 ]
 # 同一组同义 intent 写一次：工具层分派与参数归属都从这里取，别再各抄一份。
 # 内容必须与上面的 Literal 一致 —— `tests/test_pattern_query.py` 会核对。
 WEAPON_PATTERN_INTENTS: tuple[str, ...] = (
-    "patterns", "pattern", "craft", "锻造", "图样", "图样进度",
+    "patterns", "pattern", "craft", "锻造", "锻造武器", "图样", "图样进度", "模式进度", "红框", "红框进度",
 )
 BuildIntent = Literal["recommend", "find", "analyze", "farm_target", "equip_build", "armor_mods", "exotic_armor", "set_bonus", "community", "community_build", "starside"]
 LoadoutIntent = Literal["list", "get", "save", "delete", "equip_loadout", "search_identifiers", "snapshot_official", "update_official_identifiers", "clear_official"]

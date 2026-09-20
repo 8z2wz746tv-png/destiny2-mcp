@@ -57,7 +57,25 @@ ITEM_SUFFERANCE = {"hash": SUFFERANCE, "inventory": {"tierTypeName": "异域"},
                    "displayProperties": {"name": "苦痛"}}
 ITEM_INHERITANCE = {"hash": INHERITANCE, "inventory": {"recipeItemHash": 9003, "tierTypeName": "传说"},
                     "displayProperties": {"name": "继承"}}
-ITEMS = {item["hash"]: item for item in (ITEM_FATEBRINGER, ITEM_RETROFIT, ITEM_SUFFERANCE, ITEM_INHERITANCE)}
+
+# 变体（失时）：可锻造、但塑形配置只覆盖 3 个栏位，插槽里也没有深视插槽。
+# 实测（2026-09-20，36 件变体无一例外）就是这个形状。
+VARIANT = 1005
+ITEM_VARIANT = {
+    "hash": VARIANT,
+    "inventory": {"recipeItemHash": 9004, "tierTypeName": "传说"},
+    "displayProperties": {"name": "惩戒措施（失时）"},
+    "sockets": {"socketEntries": [{"socketTypeHash": 4251072212}]},
+}
+ITEMS = {
+    item["hash"]: item
+    for item in (ITEM_FATEBRINGER, ITEM_RETROFIT, ITEM_SUFFERANCE, ITEM_INHERITANCE, ITEM_VARIANT)
+}
+# 图样条目：`crafting.requiredSocketTypeHashes` 决定"塑形能选哪几个栏位"。
+ITEMS[9001] = {"hash": 9001, "crafting": {"requiredSocketTypeHashes": [
+    3868679925, 3694362576, 2316004942, 3036227398, 3036227399]}}
+ITEMS[9004] = {"hash": 9004, "crafting": {"requiredSocketTypeHashes": [
+    3868679925, 3694362576, 2316004942]}}
 
 
 def _node(name: str, *, records: tuple[int, ...] = (), nodes: tuple[int, ...] = ()) -> dict:
@@ -119,6 +137,7 @@ class FakeManifest:
             "糖果生意": RETROFIT,
             "苦痛": SUFFERANCE,
             "继承": INHERITANCE,
+            "惩戒措施（失时）": VARIANT,
         }
 
     def get_definition(self, table: str, hash_id: int) -> dict | None:
@@ -289,16 +308,16 @@ async def test_missing_or_empty_component_is_an_error_not_zero_unlocked() -> Non
         assert "不能把未返回当成未解锁" in str(excinfo.value)
 
 
-async def test_state_is_cached_and_the_read_block_says_so() -> None:
+async def test_state_is_cached_and_read_block_stays_stable() -> None:
     svc, bungie = service(profile_with({501: record_component(5, 5)}), starside=FakeStarside())
 
     first = await svc.patterns(PLAYER)
     second = await svc.patterns(PLAYER)
 
     assert bungie.calls == 1, "5 分钟 TTL 内不重复拉 1.44 MB 的记录组件"
-    assert first["read"]["cached"] is False and first["read"]["component"] == 900
-    assert second["read"]["cached"] is True
-    assert first["read"]["ttl_seconds"] > 0
+    # `read` 只能是"每次都一样"的口径：别名等价那条语料比对 data 逐字节相同，
+    # 放"这次读了几毫秒"进去会让同组别名跑出不同 data（真机被抓到过）。
+    assert first["read"] == second["read"] == {"component": 900, "ttl_seconds": 300}
 
 
 async def test_progress_uses_the_component_value_when_it_differs_from_the_manifest() -> None:
@@ -329,7 +348,9 @@ async def test_counts_and_groups_follow_the_filter() -> None:
 
     result = await svc.patterns(PLAYER, weapon_type="手炮")
 
-    assert result["counts"] == {"total": 3, "unlocked": 1, "in_progress": 0, "not_started": 2}
+    assert result["counts"] == {
+        "total": 3, "unlocked": 1, "not_unlocked": 2, "in_progress": 0, "not_started": 2,
+    }
     assert result["catalog_total"] == 3
     assert result["by_group"][0]["group"] == "主武器模式"
     assert result["by_group"][0]["by_type"] == [{"weapon_type": "手炮", "total": 3, "unlocked": 1}]
@@ -441,9 +462,22 @@ async def test_overview_summary_names_what_is_in_progress() -> None:
 
     payload = _patterns_branches.patterns_payload(await svc.patterns(PLAYER))
 
-    assert payload["summary"] == "锻造图样：已解锁 0 / 3；进行中：惩戒措施 4/5；未开始 2 把。"
+    assert payload["summary"] == (
+        "锻造武器模式（红框）：已解锁 0 / 3；未解锁 3（进行中 1、还没开始 2）。进行中：惩戒措施 4/5。"
+    )
     assert payload["data"]["counts"]["total"] == 3
     assert payload["data"]["patterns"]["items"][0]["status"] == STATUS_IN_PROGRESS
+
+
+async def test_terms_teach_the_agent_the_player_words() -> None:
+    """玩家说红框、游戏说模式、工具说图样 —— 三个词的关系必须随响应给出去。"""
+    svc, _ = service(profile_with({}), starside=FakeStarside())
+
+    payload = _patterns_branches.patterns_payload(await svc.patterns(PLAYER))
+
+    terms = payload["data"]["terms"]
+    assert set(terms) == {"红框", "模式", "塑形"}
+    assert "深视共振" in terms["红框"] and "pattern" in terms["模式"]
 
 
 async def test_single_weapon_summary_says_how_many_are_left() -> None:
@@ -451,7 +485,7 @@ async def test_single_weapon_summary_says_how_many_are_left() -> None:
 
     payload = _patterns_branches.patterns_payload(await svc.patterns(PLAYER, weapon_name="惩戒措施"))
 
-    assert payload["summary"] == "「惩戒措施」：进行中 4/5，还差 1 次深视萃取。"
+    assert payload["summary"] == "「惩戒措施」：进行中 4/5，还差 1 个红框萃取。"
 
 
 async def test_unlocked_and_not_started_summaries_do_not_lie() -> None:
@@ -461,8 +495,8 @@ async def test_unlocked_and_not_started_summaries_do_not_lie() -> None:
     done = _patterns_branches.patterns_payload(await unlocked.patterns(PLAYER, weapon_name="惩戒措施"))
     todo = _patterns_branches.patterns_payload(await started.patterns(PLAYER, weapon_name="惩戒措施"))
 
-    assert "可以塑形" in done["summary"]
-    assert "没有这条图样记录" in todo["summary"]
+    assert "可以在圣物塑形" in done["summary"]
+    assert "没有这条模式的进度记录" in todo["summary"]
     assert todo["data"]["patterns"]["items"][0]["progress"] is None
 
 
@@ -480,7 +514,29 @@ async def test_variant_summary_points_at_the_base_weapon() -> None:
 
     payload = _patterns_branches.patterns_payload(await svc.patterns(PLAYER, weapon_name="惩戒措施（失时）"))
 
-    assert payload["summary"] == "「惩戒措施（失时）」是变体，图样挂在基础版上：「惩戒措施」已解锁 5/5。"
+    assert payload["summary"] == (
+        "「惩戒措施（失时）」没有单独的模式：模式是基础版「惩戒措施」的，已解锁 5/5。"
+        "变体可塑形的栏位更少：只有 框架/枪管/弹夹（基础版 框架/枪管/弹夹/特征1/特征2），三四号特性固定。"
+        "变体自己不带深视插槽（带的是强化插槽，升级用），红框（深视共振）掉的是基础版。"
+    )
+
+
+async def test_variant_facts_come_from_the_manifest_not_from_a_hardcoded_sentence() -> None:
+    """变体能不能塑形、能选哪些栏位、有没有深视插槽，全部按查到的那一件现算。"""
+    svc, _ = service(profile_with({501: record_component(5, 5)}), starside=FakeStarside())
+
+    payload = _patterns_branches.patterns_payload(await svc.patterns(PLAYER, weapon_name="惩戒措施（失时）"))
+
+    assert payload["data"]["variant"] == {
+        "name": "惩戒措施（失时）",
+        "base_name": "惩戒措施",
+        "shapeable_columns": ["框架", "枪管", "弹夹"],
+        "base_shapeable_columns": ["框架", "枪管", "弹夹", "特征1", "特征2"],
+        "traits_fixed": True,
+        "has_deepsight_socket": False,
+        "has_upgrade_socket": True,
+    }
+    assert "变体可塑形的栏位更少" in payload["data"]["note"]
 
 
 async def test_unknown_name_says_the_catalog_size_instead_of_guessing() -> None:

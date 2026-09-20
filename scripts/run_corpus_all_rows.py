@@ -38,6 +38,7 @@ if str(ROOT) not in sys.path:
 from destiny_mcp.server import app_lifespan, create_server  # noqa: E402
 from destiny_mcp.tools import assistants as assistants_module  # noqa: E402
 from destiny_mcp.tools._requests import (  # noqa: E402
+    WEAPON_PATTERN_INTENTS,
     WRITE_INTENTS,
     ActivityIntent,
     BuildIntent,
@@ -420,7 +421,7 @@ def sweep_args(tool: str, intent: str, live: dict[str, Any]) -> dict[str, Any]:
     elif tool == "weapon_assistant":
         if intent == "type":
             args["weapon_type"] = "手炮"
-        elif intent in {"patterns", "pattern", "craft", "锻造", "图样", "图样进度"}:
+        elif intent in WEAPON_PATTERN_INTENTS:
             args["weapon_name"] = "累积救赎"
         elif intent == "perk_description":
             args["perk_name"] = "萤火虫"
@@ -943,10 +944,23 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     vrow = first_row((vdata.get("patterns") or {}).get("items") or [])
     check(
         "rows",
-        "patterns：变体（失时）指回基础版的图样，而不是报「没找到」",
-        err is None and vrow.get("name") == "惩戒措施" and "变体" in str((variant or {}).get("summary")),
-        f"summary={short((variant or {}).get('summary'), 140)}",
+        "patterns：变体（失时）指回基础版，并给出它的塑形配置（3 栏位 / 三四号固定 / 无深视插槽）",
+        err is None and vrow.get("name") == "惩戒措施" and "没有单独的模式" in str((variant or {}).get("summary"))
+        and (vdata.get("variant") or {}).get("shapeable_columns") == ["框架", "枪管", "弹夹"]
+        and (vdata.get("variant") or {}).get("base_shapeable_columns")
+        == ["框架", "枪管", "弹夹", "特征1", "特征2"]
+        and (vdata.get("variant") or {}).get("traits_fixed") is True
+        and (vdata.get("variant") or {}).get("has_deepsight_socket") is False
+        and (vdata.get("variant") or {}).get("has_upgrade_socket") is True,
+        f"summary={short((variant or {}).get('summary'), 200)} variant={short(vdata.get('variant'), 200)}",
         seconds=dt,
+    )
+
+    check(
+        "rows",
+        "patterns：术语对照随响应给出去（玩家说红框、游戏说模式、工具说图样）",
+        set(((pdata.get("terms") or {}).keys())) == {"红框", "模式", "塑形"},
+        f"terms={short(pdata.get('terms'), 200)}",
     )
 
     typo, dt, err = await call("weapon_assistant", intent="patterns", weapon_name="zzqq不存在")
@@ -2057,7 +2071,8 @@ _ALIAS_GROUPS: list[tuple[str, dict[str, Any], list[str], bool]] = [
     ("weapon_assistant", {"weapon_name": "无感"}, ["compare", "compare_duplicates"], False),
     ("weapon_assistant", {"weapon_name": "遗产"}, ["perk_pool", "perks"], False),
     ("weapon_assistant", {"weapon_name": "遗产"}, ["popularity", "selection_rates", "perk_selection", "selection", "usage_rates"], False),
-    ("weapon_assistant", {"weapon_name": "累积救赎"}, ["patterns", "pattern", "craft", "锻造", "图样", "图样进度"], False),
+    ("weapon_assistant", {"weapon_name": "累积救赎"},
+     ["patterns", "pattern", "craft", "锻造", "锻造武器", "图样", "图样进度", "模式进度", "红框", "红框进度"], False),
     ("subclass_assistant", {"character": "hunter"}, ["get", "subclass"], False),
     ("activity_assistant", {"character": "hunter"}, ["stats", "career", "historical_stats"], False),
     ("activity_assistant", {"count": 2}, ["weapon_history", "weapons", "weapon_usage", "weapon_leaderboard"], False),

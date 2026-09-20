@@ -64,8 +64,8 @@
 
 ### 4.1 intent 与参数
 
-- `weapon_assistant(intent="patterns")`；别名 `pattern` / `patterns` / `craft` / `锻造` / `图样` / `图样进度`
-  （写进 `tools/_requests.py` 的意图表，别名要么永久要么登记待删）
+- `weapon_assistant(intent="patterns")`；别名 `pattern` / `craft` / `锻造` / `锻造武器` / `图样` / `图样进度` /
+  `模式进度` / `红框` / `红框进度`（写进 `tools/_requests.py` 的意图表，别名要么永久要么登记待删）
 - 参数全部复用已有归属，不新增：`weapon_name`（查单把）、`weapon_type`（按类型筛）、`limit` / `offset`（翻页）
 
 ### 4.2 响应形状
@@ -73,19 +73,29 @@
 ```json
 {
   "ok": true,
-  "summary": "锻造图样：已解锁 149 / 183；进行中 2 把；未开始 32 把。",
+  "summary": "锻造武器模式（红框）：已解锁 149 / 183；未解锁 34（进行中 2、还没开始 32）。",
   "data": {
-    "counts": {"total": 183, "unlocked": 149, "in_progress": 2, "not_started": 32},
+    "counts": {"total": 183, "unlocked": 149, "not_unlocked": 34, "in_progress": 2, "not_started": 32},
     "by_group": [{"slot": "主武器模式", "total": 81, "unlocked": 66, "in_progress": 1, "not_started": 14,
                   "by_type": [{"weapon_type": "脉冲步枪", "total": 17, "unlocked": 13}]}],
     "patterns": {"total": 183, "returned": 20, "offset": 0, "next_offset": 20, "items": []},
-    "variants_note": "另有 36 件（专家/失时/痛苦）变体不单列图样，图样记录挂在基础版上。",
-    "read": {"component": 900, "cached": false, "elapsed_ms": 2550}
+    "terms": {"红框": "…", "模式": "…", "塑形": "…"},
+    "note": "同一把的（专家）/（失时）/（痛苦）变体不单列模式：模式按基础版算……",
+    "read": {"component": 900, "ttl_seconds": 300}
   }
 }
 ```
 
-列表行（尽量瘦）：`name` / `weapon_type` / `slot` / `tier` / `need` / `progress` / `status` / `item_hash`。
+列表行（尽量瘦）：`name` / `weapon_type` / `group` / `tier` / `need` / `progress` / `remaining` /
+`status` / `item_hash` / `source`。
+
+两条硬规矩（都是真机抓出来的）：
+
+- `read` 只放**每次调用都一样**的口径（数据来源 + 缓存时长）：`cached`/`elapsed_ms` 这类每次都变的
+  诊断值放进去，会让「同组别名返回逐字节相同的 `data`」那条语料判红（实测：10 个别名跑出 2 种 `data`）；
+  诊断进日志。
+- 「还差几个」在**服务层**算好（`remaining`），工具层不做数字运算 —— 工具层的服务可能被替身顶掉
+  （`tests/test_ignored_parameters.py` 的 `_Reply` 不支持加减，真机被抓到 TypeError）。
 
 - 三档 status：`已解锁`（记录已完成）/ `进行中`（有进度未满）/ `未开始`
 - **`未开始` 的措辞是红线**：账号里没有这条记录，只能说"接口未返回该图样的进度（游戏里是未解锁状态）"，
@@ -149,6 +159,29 @@
 落点：新模块 `destiny_mcp/services/starside_crafting_sources.py`（仿 `starside_rated_lists.py`：
 自己建索引、`StarsideService.lookup_crafting_sources()` 转发），失败只降级成 `available: false` + warning，
 不影响图样本身的账号结果。
+
+### 4.4 术语与变体（2026-09-20 补，用户反馈驱动）
+
+**术语**：游戏官方中文是「**模式**」（记录类型「武器模式」、目标那行写「模式进度」、节点说明
+"萃取解锁其模式，才能被圣物塑形"），英文是 `Weapon Pattern`；玩家口语是「**红框**」（深视共振武器），
+第三方工具常译作「图样」。第一版我按英文直译写成「锻造图样」，中文客户端里根本没这个词 —— 现在：
+
+- 别名收玩家话术：`红框`/`红框进度`/`锻造武器`/`模式进度`；
+- 摘要用「锻造武器模式（红框）」「未解锁 / 还没开始」这类玩家口径；
+- 响应里带 `terms` 三键对照（红框 / 模式 / 塑形），让 Agent 用玩家那个词答话。
+
+**变体（专家/失时/痛苦）——实测 36 件无一例外**：
+
+| 项 | 基础版 | 变体 |
+| --- | --- | --- |
+| 图样条目 `crafting.requiredSocketTypeHashes` | 5（框架/枪管/弹夹/特征1/特征2） | **3**（框架/枪管/弹夹）→ 三四号特性固定 |
+| 组件 1300 每条插槽可选项数 | 11 / 19 / 15 / 19 / 19 | 11 / 19 / 15 |
+| 「空深视插槽」 | 有 | **没有**（换成「空强化插槽」= 玩家说的"只能升级"）→ 红框只掉基础版 |
+
+这些数字**现算**（判据就是上面两个字段），不写死一句话：上游改配置时答案跟着变。
+真机摘要现在是：「惩戒措施（失时）」没有单独的模式：模式是基础版「惩戒措施」的，已解锁 5/5。
+变体可塑形的栏位更少：只有 框架/枪管/弹夹（基础版 …），三四号特性固定。变体自己不带深视插槽
+（带的是强化插槽，升级用），红框（深视共振）掉的是基础版。
 
 ## 6. 待拍板（已拍板 2026-09-20）
 
