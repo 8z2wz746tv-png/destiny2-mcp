@@ -65,7 +65,7 @@ def _row(payload: dict, group_key: str, stat_id: str) -> dict:
 
 
 async def main() -> int:
-    async with app_lifespan(create_server("normal")) as svc:
+    async with app_lifespan(create_server()) as svc:
         ctx = type("C", (), {"request_context": type("R", (), {"lifespan_context": svc})})()
 
         # ── ① 三档数字 ────────────────────────────────────────────────────────

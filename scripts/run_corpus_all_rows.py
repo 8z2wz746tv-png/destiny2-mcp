@@ -2234,7 +2234,7 @@ async def main() -> int:
     args = parser.parse_args()
 
     runner = Runner(timeout=args.timeout, slow_timeout=args.slow_timeout)
-    async with app_lifespan(create_server("normal")) as service:
+    async with app_lifespan(create_server()) as service:
         runner.ctx = type(
             "C", (), {"request_context": type("R", (), {"lifespan_context": service})}
         )()
