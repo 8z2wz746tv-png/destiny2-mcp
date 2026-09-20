@@ -48,4 +48,4 @@ jobs:
           BUNGIE_CLIENT_ID: "1"
           BUNGIE_CLIENT_SECRET: ci-placeholder
         run: |
-          python -c "from destiny_mcp.server import create_server; create_server('normal'); print('create_server ok')"
+          python -c "from destiny_mcp.server import create_server; names = sorted(t.name for t in create_server()._tool_manager.list_tools()); assert len(names) == 8, names; print('create_server ok:', names)"
