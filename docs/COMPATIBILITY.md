@@ -13,6 +13,27 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（69 个旧工具） | `get_inventory`、`search_items` … | 只在 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**且** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 时暴露；不进主路径文档、不保证契约、不单独修 bug |
 
+## 未发布：武器类型列表改列表行、默认 10 件、可翻页（破坏性）
+
+`weapon_assistant(intent="type")`（"我手炮都有哪些"）以前每件发**完整模板**
+（`{weapon, sockets, options, stats, perks_complete, notes}`），20 件就是 **18.9 万字符**，
+其中 **2/3** 是插槽池与可换项 —— 而列表只是"有哪些"。现在改成既定的**列表行**
+（`services/weapon_payload.py` 的 `LIST_ROW_KEYS`，与 `catalog` 的 `matched[]` 同一套写法）：
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 行形状 | `{weapon, sockets, options, stats, perks_complete, notes}` | **摊平**的身份字段 + 副本字段（`instance_id`/`location`/`power`/`is_equipped`/`locked`/`tracked`）+ `stats` + `notes` |
+| 插槽池与可换项 | 每件都给（定义级 `sockets` + 实例级 `options`） | **不给**：要看某一件的部件用 `compare(weapon_name, item_instance_id)`（一次调用拿全） |
+| 每件还会读的组件 | 305（已装 plug）+ 310（能换什么） | **不读**（profile 10.16 MB → 1.86 MB，实测 3.79s → 0.63s） |
+| 逐件的本地资料 | `farming`/`popularity`/`community`/`sources` 四块（精简版） | **不带**：整张列表的清单在顶层 `farming_list`，单把的结论用 `info`/`analyze` |
+| 默认条数 | 20 件 | **10 件**（响应里 `total`/`returned`/`truncated` 照旧） |
+| 翻页 | 无（只能靠调大 `limit`） | `offset` + 响应里的 `next_offset`；最后一页 `truncated=false` |
+| `perks_complete` | 有 | 不给了（它说的是"插槽解析完整性"，而列表行没有插槽） |
+
+真机实测（2026-09-20，同一账号）：`type 手炮` 默认调用 **387,598 → 41,537 字符**（9.3×），
+热调用 0.78s → 0.30s。**信息没丢**：插件明细在 `compare` 里一件不少，`stats` 每行照给，
+清单评级在 `farming_list.results[]` 里按名字对。
+
 ## 未发布：`stats` 的口径与行形状（破坏性，见 ADR-005）
 
 `activity_assistant(intent="stats"/"career"/"historical_stats")` 的三个别名仍走同一段分派，

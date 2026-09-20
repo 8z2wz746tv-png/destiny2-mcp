@@ -73,12 +73,22 @@ CEILINGS = {
     # 必须先回答"是搬出去还是抬上限"，而不是悄悄长胖。
     # P5：本地资料挂载 + 固定/随机话术 + 覆盖表，各分支都要交代自己带哪些块（444 → 454）。
     # 再往上就该把"覆盖表 + 挂载"抽出去，而不是继续在这里加 intent。
-    "destiny_mcp/tools/_weapon_branches.py": 454,
+    # 性能第四项：`inventory_assistant(intent="type")` 的载荷搬去 `_inventory_branches.py`
+    # ——它本来就不是武器 intent（不读账号武器服务），一直占着这个文件的位置；
+    # `type` 改成列表行后上限跟着收紧到 412。
+    "destiny_mcp/tools/_weapon_branches.py": 412,
+    # 性能第四项新增登记：从 `weapon_payload.py`（上帝模块，加了闸）拆出的属性值形状。
+    # 登记即上限：以后再往里加东西要先回答"是搬出去还是抬上限"。
+    "destiny_mcp/services/weapon_stats_payload.py": 92,
+    # 同上：`inventory_assistant` 的分支载荷（从 `_weapon_branches.py` 搬出来）。
+    "destiny_mcp/tools/_inventory_branches.py": 76,
     # P6：体积口径（定义级不带描述/图标）写在工厂里，349 → 363。
     # +2（4a）：gear_tier=0 → null 时给一句说明。
     # 0.1.12：`with_equipped`（定义级 sockets 标"现在装的是哪个"）搬去
     # `weapon_profile.py` —— 那里才是插槽助手的老家，也顺便给"强化版名标 ↑"腾出空间。
-    "destiny_mcp/services/weapon_payload.py": 334,
+    # 性能第四项：属性值形状拆去 `weapon_stats_payload.py`、删掉两个 0 引用的空壳
+    # （`roll_summary`/`instance_extras`），腾出位置放 `list_row` → 上限 334 → 297。
+    "destiny_mcp/services/weapon_payload.py": 297,
     # P5 新增：本地资料汇总（愿单/选取率/清单/社区 → 每个 plug 的 recommended）
     "destiny_mcp/services/weapon_local_data.py": 403,
 }

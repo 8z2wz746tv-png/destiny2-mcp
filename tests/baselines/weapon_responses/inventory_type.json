@@ -1,8 +1,8 @@
 {
   "_case": {
-    "elapsed_ms": 1860,
+    "elapsed_ms": 739,
     "is_error": false,
-    "payload_chars": 79829,
+    "payload_chars": 79874,
     "steps": [
       {
         "arguments": {
@@ -30,25 +30,6 @@
           "location": "vault",
           "name": "月之狂嚎",
           "name_en": "Luna's Howl",
-          "power": 10,
-          "rarity": "传说",
-          "rarity_tier": 5,
-          "roll_kind": "random",
-          "rpm": 140,
-          "weapon_type": "手炮"
-        },
-        {
-          "bucket_type": "Vault (General)",
-          "frame": "适配框架",
-          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7dd2e364430e90a4b74a15a75843f602.jpg",
-          "instance_id": "6917530009587394121",
-          "is_craftable": false,
-          "is_equipped": false,
-          "item_hash": 6857689,
-          "kind": "weapon",
-          "location": "vault",
-          "name": "滑雪季",
-          "name_en": "Annual Skate",
           "power": 10,
           "rarity": "传说",
           "rarity_tier": 5,
@@ -2337,6 +2318,25 @@
           "weapon_type": "手炮"
         },
         {
+          "bucket_type": "Energy Weapons",
+          "frame": "适配框架",
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7dd2e364430e90a4b74a15a75843f602.jpg",
+          "instance_id": "6917530009587394121",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 6857689,
+          "kind": "weapon",
+          "location": "warlock",
+          "name": "滑雪季",
+          "name_en": "Annual Skate",
+          "power": 10,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "rpm": 140,
+          "weapon_type": "手炮"
+        },
+        {
           "bucket_type": "Kinetic Weapons",
           "frame": "适配框架",
           "icon_url": "https://www.bungie.net/common/destiny2_content/icons/9385daf600d89dd759c3b3f690edbc03.jpg",
@@ -2386,6 +2386,6 @@
   },
   "next_actions": [],
   "ok": true,
-  "summary": "「手炮」持有 124 件（其中武器 124 件）；这里只有身份与位置，要看可换部件请用 weapon_assistant(intent=\"type\")。",
+  "summary": "「手炮」持有 124 件（其中武器 124 件）；这里只有身份与位置；要看某一件的插槽与可换部件用 weapon_assistant(intent=\"compare\", weapon_name=…, item_instance_id=…)。",
   "warnings": []
 }

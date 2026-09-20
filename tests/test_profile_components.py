@@ -90,7 +90,11 @@ def _source(module) -> str:
         (transfer_service, "INVENTORY", 1),
         # P4：对比也要 310（"这一件能换什么"），所以从 INVENTORY_SOCKETS 升到 WEAPON_DETAIL
         (weapon_compare_service, "WEAPON_DETAIL", 2),
-        (weapon_detail_service, "WEAPON_DETAIL", 2),
+        # 性能第四项：完整模板 1 处（filter_rolls/社区核对/旧工具面走它），列表视图（`type`）
+        # 另走 INVENTORY —— 列表行不带插槽，就不该把 305/310 拉回来。两处掩码原本各写一份，
+        # 只改一边会让"没缓存时"多拉组件（这条钉桩当时就抓到了）。
+        (weapon_detail_service, "WEAPON_DETAIL", 1),
+        (weapon_detail_service, "INVENTORY", 1),
         (artifact_service, "ARTIFACT", 5),  # 装模组读+回读、读神器状态、换神器读+回读
         (subclass_service, "SUBCLASS", 3),  # 读当前配置 + 换之前找候选 + 换完回读核对
         (loadout_subclass_sockets, "SUBCLASS", 2),  # 换之前读一次、换完重读插槽

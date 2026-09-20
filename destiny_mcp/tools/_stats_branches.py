@@ -185,8 +185,15 @@ async def stats_response(
     character: str | None = None,
     mode: str = "",
     period: str = "",
+    query: str = "",
 ) -> dict[str, Any]:
-    """`activity_assistant(intent="stats")` 的响应（P1 三档 + P2 双来源 + P3-2 模式/周期）。"""
+    """`activity_assistant(intent="stats")` 的响应（P1 三档 + P2 双来源 + P3-2 模式/周期）。
+
+    `query`：按**统计项名称**（中文名或上游 id 片段）筛行，大小写不敏感。
+    为什么要它：一次账号级 `mode=crucible` 有 60 行 ≈ 30 KB，而"我熔炉击败多少"只需要一行；
+    筛完只回那一行，模型要读的 token 直接降一个数量级。筛不到就**如实说没匹配到**
+    （列一下可用的名称供改词），不回一个空壳当答案。
+    """
     # 上游没有赛季/篇章周期：**先如实报取不到**，别拿生涯冒充，也别去试会 500 的 periodType=3。
     if period.strip().lower() in activity_stats.UNSUPPORTED_PERIOD_REASONS:
         wanted = period.strip().lower()
@@ -206,7 +213,9 @@ async def stats_response(
 
     # 统计接口与游戏内计数器**互不依赖** → 同时去拿（真机实测 4.9s → 约 3s）。
     # 计数器是账号级的，单角色路径本来就不附它，所以那种情况不预取。
-    stats_coro = svc["activity_svc"].get_historical_stats(player_name, character, mode, period)
+    stats_coro = svc["activity_svc"].get_historical_stats(
+        player_name, character, mode, period, query
+    )
     prefetched: tuple[list[dict], str] = ([], "")
     if character:
         result = await stats_coro
@@ -221,11 +230,15 @@ async def stats_response(
                 stats_coro, _read_counters(svc, player_name, hinted or _COUNTER_MODE)
             )
     data: dict[str, Any] = {"stats": result}
+    # 筛选发生在服务层（`activity_stats.filter_groups`）——判断逻辑不落工具层；
+    # 这里只把"没匹配到"的说明接进 warnings。
+    query_hint = str(result.get("query_hint") or "")
 
     if result.get("scope") != activity_stats.SCOPE_ACCOUNT:
         name = (result.get("character") or {}).get("name") or character or "该角色"
         scope_label = _mode_period_label(result)
         warnings = [
+            *([query_hint] if query_hint else []),
             f"这是 {name} 一个角色的数字（scope=character、source=GetHistoricalStats），"
             "不是账号生涯；要账号级三档就不传 character。",
             "游戏内计数器是账号级的（不按角色拆），要那个数用 intent=\"counters\"。",
@@ -243,6 +256,7 @@ async def stats_response(
     if result.get("mode"):
         mode_key = str((result.get("mode") or {}).get("key") or "")
         warnings = [
+            *([query_hint] if query_hint else []),
             "这是按模式的账号级合计（scope=account、aggregation=computed）："
             "逐角色取上游按角色统计后按同一套语义合并（可加相加 / 最多取最大 / 比值重算），"
             "上游**没有**这个模式的合并视图，所以这三个档位不是上游给的。",
@@ -282,6 +296,8 @@ async def stats_response(
         warnings.append(result["unavailable"])
     if result.get("empty_reason"):
         warnings.append(result["empty_reason"])
+    if query_hint:
+        warnings.append(query_hint)
 
     return ok_response(
         _account_question(result),

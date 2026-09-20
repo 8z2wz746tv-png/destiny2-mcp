@@ -265,7 +265,10 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ),
     ("weapon_assistant", "limit"): _contract(
         _only(*_W_ROLL_FILTERS, "type", "community"),
-        hint="catalog、filter_rolls、type 和 community 支持限量；type 会另给 total_weapons/truncated。",
+        hint=(
+            "catalog、filter_rolls、type 和 community 支持限量；type 默认 10 件，"
+            "响应里给 total/returned/truncated/next_offset。"
+        ),
         suggestion=("weapon_assistant", "filter_rolls"),
     ),
     ("weapon_assistant", "knowledge_id"): _contract(
@@ -277,7 +280,8 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("weapon_assistant", "community"),
     ),
     ("weapon_assistant", "offset"): _contract(
-        _only("community"), hint='只有 intent="community" 支持翻页。',
+        _only("community", "type"),
+        hint='community 与 type 支持翻页：type 的响应里有 next_offset，接着传它。',
         suggestion=("weapon_assistant", "community"),
     ),
     # ══ build_assistant ════════════════════════════════════════════════════
@@ -586,9 +590,12 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("activity_assistant", "history"),
     ),
     ("activity_assistant", "query"): _contract(
-        _only("counters", "community"),
-        hint='关键词搜索在 intent="counters"（筛计数器名称/描述）和社区活动资料 intent="community" 上用。',
-        suggestion=("activity_assistant", "community"),
+        _only("counters", *_A_STATS, "community"),
+        hint=(
+            '关键词在 intent="counters"（筛计数器名称/描述）、intent="stats"（按统计项名称筛行，'
+            '例如"击败"，省得一次读 60 行）与社区活动资料 intent="community" 上用。'
+        ),
+        suggestion=("activity_assistant", "stats"),
     ),
     ("activity_assistant", "knowledge_id"): _contract(
         _only("community"), hint='读资料详情用 intent="community" 并给 knowledge_id。',

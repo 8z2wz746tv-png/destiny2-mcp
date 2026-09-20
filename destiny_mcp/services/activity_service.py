@@ -188,6 +188,7 @@ class ActivityService:
         character: str | None = None,
         mode: str = "",
         period: str = "",
+        query: str = "",
     ) -> dict:
         """Fetch lifetime PvE/PvP statistics.
 
@@ -227,12 +228,12 @@ class ActivityService:
         if period:
             _stats_period_type(period)  # 上游没有的周期直接报错，不退化成生涯
         if character:
-            return await self._character_stats(player_name, character, mode, period)
+            return await self._character_stats(player_name, character, mode, period, query)
         if mode:
-            return await self._mode_stats(player_name, mode, period)
-        return await self._account_stats(player_name)
+            return await self._mode_stats(player_name, mode, period, query)
+        return await self._account_stats(player_name, query)
 
-    async def _account_stats(self, player_name: str) -> dict:
+    async def _account_stats(self, player_name: str, query: str = "") -> dict:
         """账号级三档统计（`GetHistoricalStatsForAccount`）。"""
         mid, mtype = await self._resolve_membership(player_name)
         logger.info("Fetching account-level historical stats: player=%s", player_name)
@@ -281,7 +282,7 @@ class ActivityService:
             player_name, len(characters), payload["characters"]["existing"],
             payload["characters"]["deleted"],
         )
-        return payload
+        return activity_stats.filter_groups(payload, query)
 
     async def _character_stats(
         self,
@@ -289,6 +290,7 @@ class ActivityService:
         character: str,
         mode: str = "",
         period: str = "",
+        query: str = "",
     ) -> dict:
         """单角色统计（`GetHistoricalStats`）：标了角色名，就不再是"生涯"。
 
@@ -335,9 +337,11 @@ class ActivityService:
             ),
             "period": activity_stats.period_label(period or "career", period_type),
         })
-        return payload
+        return activity_stats.filter_groups(payload, query)
 
-    async def _mode_stats(self, player_name: str, mode: str, period: str = "") -> dict:
+    async def _mode_stats(
+        self, player_name: str, mode: str, period: str = "", query: str = ""
+    ) -> dict:
         """账号级 + 按模式：逐角色取、自己合（账号级端点会**静默忽略** `modes`）。
 
         为什么要逐角色：真机实测（2026-09-18）`.../Account/{id}/Stats/?modes=84` 与不传
@@ -422,7 +426,7 @@ class ActivityService:
                 f"{len(failures)} 个角色的这个模式统计没读到（已用其余 {len(sections['all'])} 个角色合并）："
                 + "；".join(failures[:3])
             )
-        return payload
+        return activity_stats.filter_groups(payload, query)
 
     async def _fetch_mode_section(
         self,

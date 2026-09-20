@@ -158,7 +158,7 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
 
 | | `inventory_assistant(intent="type")` | `weapon_assistant(intent="type")` |
 | --- | --- | --- |
-| 内容 | 精简身份块 + 位置/光等 | 完整武器模板（定义级 sockets + 实例级 options） |
+| 内容 | 精简身份块 + 位置/光等 | **列表行**：精简身份块 + 位置/光等 + `stats`（2026-09-20 起不再带 sockets/options —— 形状见 `LIST_ROW_KEYS`，理由见 `docs/COMPATIBILITY.md`） |
 | 请求组件 | 现状（不请求 305/310） | 305 + 310 + 300 |
 | 用途 | "我有哪些手炮" | "我这把手炮能换成什么" |
 
@@ -368,7 +368,9 @@ DimPlug    { plugDef, cannotCurrentlyRoll, enabled }
   详情服务的"能滚几栏"按 item_hash 缓存；列表类不再为每件武器展开池子。
 - 体积（26 例基线，同一口径）：P0 391 KB → P5 962 KB → **P6 692 KB**；
   `perk_pool` 44.5 → 99.0 → **45.4 KB**，`info` 7.7 → 101.2 → **47.6 KB**，
-  `type_list`（5 把）31 → 117.8 → **99.4 KB**（每件约 9.7 KB 紧凑 JSON）。
+  `type_list`（5 把）31 → 117.8 → **99.4 KB**（每件约 9.7 KB 紧凑 JSON）；
+  2026-09-20 性能第四项再降一档：同一用例 **21.7 KB**（每件 2.4 KB），默认 10 件的用例 23.2 KB ——
+  列表行不带插槽池，明细改由 `compare` 单件给。
 - **未达标项（诚实记录）**：计划写的"`perk_pool` ≤ 10 KB 量级"没做到，实测紧凑 JSON 24.7 KB
   （基线口径 45.4 KB）。拆开看：79 个可滚选项本身 14 KB（名字+hash+能不能滚+强化版+数值效果+本地结论，
   每项约 177 B）、采样后的非 roll 栏 3.7 KB、`weapon` 块 5.6 KB（其中社区条目 3.5 KB）。

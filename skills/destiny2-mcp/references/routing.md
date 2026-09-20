@@ -85,7 +85,7 @@
   它**只存在于副本上**（组件 300 的 `gearTier`），定义里没有：`info`／`perk_pool`／`god_roll`／
   `popularity` 拿不到它（连键都没有），必须读账号：
   `weapon_assistant(intent="analyze")` → `inventory.instances[].weapon.gear_tier`；
-  `weapon_assistant(intent="type")` → `weapons.items[].weapon.gear_tier`；
+  `weapon_assistant(intent="type")` → `weapons.items[].gear_tier`（列表行的身份字段是摊平的）；
   `weapon_assistant(intent="compare")` → `comparison.instances[].weapon.gear_tier`。
   **`null` 表示"不在分级体系内"**（组件里是 `gearTier=0`，旧装备或不属于分级的武器），
   **不是 T0**；响应里会附一句说明。
@@ -133,7 +133,7 @@ Manifest 侧（**不代表拥有**）：
 | `stats` | 基础属性数值（`{weapon, stats[]}`，顺序按 Bungie 的属性组） | `weapon_name` |
 | `catalyst` | 催化剂情况（`weapon` 为身份块 + `unlock_state=not_checked`） | `weapon_name` |
 | `perk_description` | 单个 Perk 的效果（`{perk, community_references}`） | `perk_name` |
-| `type` | 按武器类型列**我持有的**武器（`weapons.items[]`：身份块 + 列计数 `sockets` + 实例 `options`） | `weapon_type`、`limit` |
+| `type` | 按武器类型列**我持有的**武器（`weapons.items[]` 是**列表行**：身份 + 位置/光等 + `stats`，**不带** `sockets`/`options`）。**默认 10 件**，响应给 `total`/`returned`/`truncated`/`offset`/`next_offset`。要看某一件的插槽与可换部件用 `compare(weapon_name, item_instance_id)` | `weapon_type`、`limit`、`offset` |
 | `god_roll` | 社区愿单里的推荐 roll（`{weapon, sockets, god_roll}`；固定武器给固定内容） | `weapon_name` |
 
 账号侧（当前副本）：
@@ -340,13 +340,13 @@ Manifest 侧（**不代表拥有**）：
 | `name_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
 | `name_prefix` | `player_assistant`：`find`、`find_players`、`fuzzy` |
 | `notes` | `loadout_assistant`：`save` |
-| `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
+| `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`community`、`type`；`world_assistant`：`community` |
 | `period` | `activity_assistant`：`career`、`counters`、`historical_stats`、`stats` |
 | `perk_name` | `weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`perk_description`、`search_all`、`search_catalog` |
 | `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact`、`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`filter_rolls`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`vendor` |
 | `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |
 | `priority_stats` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
-| `query` | `activity_assistant`：`community`、`counters`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |
+| `query` | `activity_assistant`：`career`、`community`、`counters`、`historical_stats`、`stats`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |
 | `rarity` | `inventory_assistant`：`get`、`inventory`、`list` |
 | `replacement_slot` | `build_assistant`：`farm_target` |
 | `required_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
@@ -392,7 +392,8 @@ Manifest 侧（**不代表拥有**）：
 ## 五、评级刻度：三种刻度不能混
 
 单把武器（`info`/`analyze`/`perk_pool`/`god_roll`）的清单评级在 `weapon.farming`，
-列表类（`type`/`catalog`/`filter_rolls`）在顶层 `farming_list`（覆盖整张列表）。
+列表类（`type`/`catalog`/`filter_rolls`）在顶层 `farming_list`（覆盖整张列表）——
+`type` 的列表行**不逐把**读本地资料（那是单件的问题），清单按名字在 `farming_list.results[]` 里对。
 每行都写明来自哪张清单、哪个 `scale`，跨刻度比较是错的；`weapon.sources[]` 给出来源与更新时间。
 
 `weapon.farming.cross_check` 是清单与**当前 Manifest** 的交叉核对：清单写的框架/伤害类型对不对得上、

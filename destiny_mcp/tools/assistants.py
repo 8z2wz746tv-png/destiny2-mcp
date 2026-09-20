@@ -27,6 +27,7 @@ from ._helpers import get_ctx, handle_tool_error, positive_or_default, resolve_p
 from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
 from . import _counters_branches as counters_branches
+from . import _inventory_branches as inventory_branches
 from . import _equip_branches as equip_branches
 from . import _stats_branches as stats_branches
 from . import _subclass_branches as subclass_branches
@@ -58,7 +59,9 @@ _WORLD_LIMIT_DEFAULT = 12
 _INVENTORY_DEFAULT_LIMIT = 100
 _INVENTORY_PAGE_INTENTS = {"get", "inventory", "list"}
 _LOADOUT_DEFAULT_LIMIT = 5
-_WEAPON_TYPE_DEFAULT_LIMIT = 20
+# 按类型列武器：列表行（身份+位置+属性值）真机约 2.3k 字符/件，20 件 ≈ 4.6 万字符，
+# 而"我手炮都有哪些"这个问题通常只要看头几件；默认 10 件 + next_offset 翻页。
+_WEAPON_TYPE_DEFAULT_LIMIT = 10
 
 
 def _dump(value: Any) -> Any:
@@ -301,7 +304,7 @@ async def inventory_assistant(
             location,
         )
         # 武器走精简身份块（列表类边界：不请求 305/310，所以没有 perk 与可换部件）
-        return weapon_branches.inventory_type_payload(
+        return inventory_branches.inventory_type_payload(
             svc, result, type_name or item_type, location
         )
 
@@ -410,8 +413,8 @@ async def weapon_assistant(
     svc = get_ctx(ctx)
     intent = cast(WeaponIntent, (intent or "analyze").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
-    # 按类型列武器默认 20 件：每件带完整模板（真机约 9.7 KB 紧凑 JSON），50 件 ≈ 452 KB
-    # ≈ 13 万 tokens，一次就能把调用方上下文吃掉大半；目录/筛选仍是 50（行很轻）。
+    # 按类型列武器走列表行（真机约 2.3k 字符/件），默认 10 件见 `_WEAPON_TYPE_DEFAULT_LIMIT`；
+    # 目录/筛选仍是 50（命中行很轻，而且那是"全库找枪"的问题，条数少了反而要反复问）。
     limit = positive_or_default(limit, _WEAPON_TYPE_DEFAULT_LIMIT if intent == "type" else 50)
     include_inventory = True if include_inventory is None else include_inventory
     community_section = community_section or "text"
@@ -483,12 +486,7 @@ async def weapon_assistant(
         return weapon_branches.popularity_payload(svc, result, weapon_name)
 
     if intent == "type":
-        result = await svc["weapon_detail_svc"].get_weapon_details_by_type(
-            resolved,
-            weapon_type,
-            limit=limit,
-        )
-        return weapon_branches.type_payload(svc, result, weapon_type)
+        return await weapon_branches.type_branch(svc, resolved, weapon_type, limit, offset)
 
     if intent == "filter_rolls":
         if not include_inventory:
@@ -1239,7 +1237,7 @@ async def activity_assistant(
         return ok_response("已读取活动结算。", {"pgcr": await svc["activity_svc"].get_pgcr(activity_id)})
 
     if intent in {"stats", "career", "historical_stats"}:
-        return await stats_branches.stats_response(svc, resolved, character, mode or "", period or "")
+        return await stats_branches.stats_response(svc, resolved, character, mode or "", period or "", query)
 
     if intent == "counters":
         return await counters_branches.counters_response(svc, resolved, query, count, mode or "", period or "")

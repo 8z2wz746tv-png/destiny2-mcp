@@ -1,7 +1,10 @@
 {
   "_note": "允许消失的字段登记在这里：键是路径（list 索引写成 []），值写明去向。三种键都认：`用例::路径`（只在某个 intent 消失 —— 整块搬家时用，避免全局登记把别的用例一起放过）、`路径`（所有用例都该消失）、`用例::块根`（子树登记，字段整块改名时用，别抄几百个叶子）。没登记的消失会让 scripts/diff_weapon_baseline.py 退出码非 0。P4 把十处形状收敛成 weapon/sockets/stats、P5 把本地资料收进模板，旧键去向见 docs/testing/TESTING_CORPUS.md 的键映射表。",
   "removed": {
-    "data.god_roll": "P2：god_roll 从一段文字改成结构化 {kind, source, pve[], pvp[], fixed_perks[], note}；文字内容进 note 与 pve/pvp 列表（analyze 里的同一字段同步改）。",
+    "analyze_exotic::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "analyze_exotic::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "analyze_legendary::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
+    "analyze_legendary::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
     "data.catalyst.weapon": "P4：catalyst.weapon 从字符串改成精简身份块（含 rarity/frame/rpm）",
     "data.catalyst.weaponEn": "P4：catalyst.weapon 从字符串改成精简身份块（含 rarity/frame/rpm）",
     "data.comparison.instances[].god_roll_score": "P4：副本改成 {weapon, sockets, options, stats}，字段并入 weapon.instance",
@@ -17,6 +20,7 @@
     "data.comparison.instances[].perks[].plug_hash": "P4：副本已装 plug → sockets[].equipped，可换项 → options[]",
     "data.comparison.instances[].power": "P4：副本改成 {weapon, sockets, options, stats}，字段并入 weapon.instance",
     "data.comparison.weapon_name": "P4：comparison.weapon 从字符串改成身份块（含 owned 摘要）",
+    "data.god_roll": "P2：god_roll 从一段文字改成结构化 {kind, source, pve[], pvp[], fixed_perks[], note}；文字内容进 note 与 pve/pvp 列表（analyze 里的同一字段同步改）。",
     "data.inventory.instances[].god_roll_score": "P4：副本字段进 instances[].weapon.instance（instance_id/location/power/locked…），可换项与属性单独成块",
     "data.inventory.instances[].icon_url": "P4：副本字段进 instances[].weapon.instance（instance_id/location/power/locked…），可换项与属性单独成块",
     "data.inventory.instances[].instance_id": "P4：副本字段进 instances[].weapon.instance（instance_id/location/power/locked…），可换项与属性单独成块",
@@ -121,10 +125,6 @@
     "data.weapons.weapons[].stats.zoom": "P4：type 的每件武器改 {weapon,sockets,options,stats,perks_complete,notes}；身份块在 weapon 内，位置/光等在 weapon.instance，定义池改成列计数（完整池用 info/perk_pool）",
     "data.weapons.weapons[].tier": "P4：type 的每件武器改 {weapon,sockets,options,stats,perks_complete,notes}；身份块在 weapon 内，位置/光等在 weapon.instance，定义池改成列计数（完整池用 info/perk_pool）",
     "data.weapons.weapons[].weapon_type": "P4：type 的每件武器改 {weapon,sockets,options,stats,perks_complete,notes}；身份块在 weapon 内，位置/光等在 weapon.instance，定义池改成列计数（完整池用 info/perk_pool）",
-    "analyze_exotic::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
-    "analyze_exotic::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
-    "analyze_legendary::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
-    "analyze_legendary::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
     "info_common::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
     "info_common::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
     "info_exotic::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
@@ -138,6 +138,14 @@
     "perk_pool_exotic::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
     "perk_pool_exotic::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
     "perk_pool_legendary::data.community_references": "P5：社区资料从兄弟字段收进 `weapon.community`（archive_available / matched_count / results）；perk_description 仍保留顶层 community_references（不是武器）。",
-    "perk_pool_legendary::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。"
+    "perk_pool_legendary::data.farming_list": "P5：单把武器的刷取清单从兄弟字段收进 `weapon.farming`（+recommended_perks / source_ref.updated_at / cross_check）；列表类 intent 仍在顶层保留覆盖整张列表的 farming_list。",
+    "type_list::data.weapons.items[].options": "同上：'这一件能换什么'（组件 310）不进列表行，改由 compare 给；顺带 list_view 不再请求 305/310（profile 10.16 MB → 1.86 MB）。",
+    "type_list::data.weapons.items[].perks_complete": "列表行没有插槽，就不再声明'plug 是否全部解析'（这个字段说的是插槽解析完整性）。",
+    "type_list::data.weapons.items[].sockets": "性能第四项：列表行不展开插槽池（真机实测它与 options 合计占该响应 2/3）。要看某一件的插槽与现在装什么：weapon_assistant(intent=\"compare\", weapon_name=…, item_instance_id=…)。",
+    "type_list::data.weapons.items[].weapon": "列表行把身份字段摊平到行首（与 matched[] 的列表行同一写法），不再嵌一层 weapon；键集合见 services/weapon_payload.py 的 LIST_ROW_KEYS。",
+    "type_list_default::data.weapons.items[].options": "同 type_list。",
+    "type_list_default::data.weapons.items[].perks_complete": "同 type_list。",
+    "type_list_default::data.weapons.items[].sockets": "同 type_list（新增的默认条数用例，第一次录就是列表行）。",
+    "type_list_default::data.weapons.items[].weapon": "同 type_list。"
   }
 }

@@ -89,7 +89,10 @@ def account():
     ctx = SimpleNamespace(request_context=SimpleNamespace(lifespan_context={
         "weapon_detail_svc": detail, "weapon_roll_filter_svc": filter_svc,
     }))
-    return SimpleNamespace(manifest=manifest, definitions=definitions, profile=profile, detail=detail, ctx=ctx)
+    return SimpleNamespace(
+        manifest=manifest, definitions=definitions, profile=profile,
+        detail=detail, ctx=ctx, resolver=resolver,
+    )
 
 
 async def test_empty_type_scans_all_owned_weapons_with_actual_sockets(account):
@@ -119,6 +122,49 @@ async def test_type_query_limit_reports_total_and_truncation(account):
     assert result.returned_weapons == 5
     assert result.total_weapons == 129
     assert result.truncated is True
+
+
+async def test_type_query_pages_without_gaps_or_repeats(account):
+    """翻页必须不重不漏：同名同光等的副本靠 instance_id 兜底排序，否则两页会交叉。"""
+    first = await account.detail.get_weapon_details_by_type("test", "手炮", limit=5, offset=0)
+    second = await account.detail.get_weapon_details_by_type("test", "手炮", limit=5, offset=5)
+
+    ids = [
+        w.weapon["instance"]["instance_id"] for w in [*first.weapons, *second.weapons]
+    ]
+    assert len(ids) == len(set(ids)) == 10
+    assert first.truncated is True
+
+
+async def test_last_page_is_not_reported_as_truncated(account):
+    """最后一页后面没有东西了：这时还说"已截断"会把翻到头误报成还有更多。"""
+    last = await account.detail.get_weapon_details_by_type("test", "手炮", limit=5, offset=125)
+
+    assert last.returned_weapons == 4
+    assert last.total_weapons == 129
+    assert last.truncated is False
+
+
+async def test_list_view_skips_sockets_and_never_asks_for_305_or_310(account):
+    """列表行不带插槽池/可换项，那就不该去请求 305/310（多取组件 = 更大的 profile）。"""
+    result = await account.detail.get_weapon_details_by_type(
+        "test", "手炮", limit=3, list_view=True
+    )
+
+    assert all(w.sockets == [] and w.options == [] for w in result.weapons)
+    requested = account.resolver.get_profile.await_args.args[2]
+    assert 305 not in requested and 310 not in requested
+    assert 300 in requested and 304 in requested, "副本字段与属性值仍然要读"
+    # list_view 没读 310，就不许写"没有可换部件"这种把"没读"当成"没有"的说明
+    assert all(not any("310" in note for note in w.notes) for w in result.weapons)
+
+
+async def test_list_view_refuses_selectable_plugs(account):
+    """两者互斥：放过去会静默返回"没有可选 perk"，让社区配装核对得出错误结论。"""
+    with pytest.raises(ValueError, match="list_view"):
+        await account.detail.get_weapon_details_by_type(
+            "test", "手炮", include_selectable_plugs=True, list_view=True
+        )
 
 
 async def test_type_query_without_limit_returns_everything(account):

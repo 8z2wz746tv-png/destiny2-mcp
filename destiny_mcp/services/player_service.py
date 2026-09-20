@@ -157,8 +157,9 @@ class PlayerService:
     async def _enrich_candidate(self, row: dict) -> None:
         """给一个候选补"最近游玩/时长/凯旋分"（就地写进 row）。
 
-        并发受 `_ENRICH_CONCURRENCY` 限制：真机实测上游单次档案 1.1–4.6 秒，
-        10 个并发会撞限流，5 个刚好两批（与 PGCR 那边"并发 3 最划算"同源的取舍）。
+        并发受 `_ENRICH_CONCURRENCY`（=10）限制：真机实测上游单次档案 1.1–4.6 秒，
+        串行 16.7 秒；并发 3/5 会忽快忽慢（3.9–14.5 秒），10 个稳定在 2.8–4.2 秒。
+        （PGCR 那边逐场结算的取舍不同：那里是并发 3 最划算，别把两处数字抄混。）
         失败只降级成低分并留痕，不让整次搜索失败 —— 搜索本身已经成功了。
         """
         async with _ENRICH_SEMAPHORE:

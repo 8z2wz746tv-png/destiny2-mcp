@@ -343,6 +343,15 @@ FAIL 5 条＝「已知问题」表的 #2/#3/#4/#5/#6；#1（analyze 自相矛盾
   `weapon(type)` 184.2 KB、`loadout(list)` 71.4 KB、`inventory(duplicates)` 85.4 KB。
 - `pytest -q` 1439 通过（新增 12 条回归锁）。
 
+**2026-09-20 复跑（性能六项之后，同一台机器）**
+
+- `weapon_assistant(type)` 这个"最大响应"已经不在榜首：默认 10 件的列表行是 **23.2 KB**
+  （2.3 KB/件），而它改之前是 **184.2 KB / 20 件**。同一份响应的线上文本 387,598 → 41,537 字符。
+- 只读的武器面重新录了基线（`tests/baselines/weapon_responses`，新增 `type_list_default` 用例），
+  `scripts/diff_weapon_baseline.py` 对改前快照 **0 个无理由消失**；其余用例耗时与体积照旧。
+- 口径提醒：本文件里的 KB 是**解码后的紧凑 JSON 字符数**；线上文本带 `\uXXXX` 转义，
+  中文多的时候大约是它的 2 倍（两个数都对，别混着比）。
+
 **这一轮里语料自身的 bug（都已修，记在这里免得下次重犯）**
 
 1. **`sweep` 一开始没把 `intent` 传下去**：110 条「体检」全落在各工具的默认 intent 上，等于同一个默认调用跑了 110 遍（还因此把 `weapon_assistant` 的 `query` 参数误判成 bug）。修好后才是真正的 110 个 intent。

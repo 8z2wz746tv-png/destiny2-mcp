@@ -20,10 +20,16 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from destiny_mcp.tools.assistants import inventory_assistant, loadout_assistant
+from destiny_mcp.tools.assistants import (
+    inventory_assistant,
+    loadout_assistant,
+    weapon_assistant,
+)
 
 INVENTORY_DEFAULT = 100
 LOADOUT_DEFAULT = 5
+# 列表行（身份+位置+属性值）约 2.3k 字符/件：20 件就要 4.6 万字符，所以默认给 10 件 + 翻页
+WEAPON_TYPE_DEFAULT = 10
 
 
 def _inventory_svc(items: int = 250) -> SimpleNamespace:
@@ -137,6 +143,82 @@ async def test_zero_or_negative_limit_falls_back_to_the_default(intent) -> None:
         intent=intent, limit=0, ctx=_ctx(inventory_svc=inventory, starside_svc=None)
     )
     assert response["data"]["inventory"]["returned_items"] == INVENTORY_DEFAULT
+
+
+# ── 武器类型列表：默认限量 + 翻页（列表行体积口径见 PERFORMANCE_PLAN 第四项）──────
+
+
+class _WeaponDetailStub:
+    """替身：只回一页数据，但把服务层收到的 limit/offset/list_view 记下来。"""
+
+    def __init__(self, total: int = 124) -> None:
+        self.total = total
+        self.calls: list[dict[str, Any]] = []
+
+    async def get_weapon_details_by_type(
+        self,
+        player_name: str,
+        type_name: str,
+        limit: int | None = None,
+        include_selectable_plugs: bool = False,
+        offset: int = 0,
+        *,
+        list_view: bool = False,
+    ) -> SimpleNamespace:
+        self.calls.append({
+            "type_name": type_name, "limit": limit, "offset": offset,
+            "list_view": list_view, "include_selectable_plugs": include_selectable_plugs,
+        })
+        size = self.total - offset if not limit or limit <= 0 else min(limit, self.total - offset)
+        size = max(size, 0)
+        rows = [
+            SimpleNamespace(
+                weapon={"name": f"第{offset + i}把", "instance": {"instance_id": f"i{offset + i}"}},
+                stats=[],
+                notes=[],
+            )
+            for i in range(size)
+        ]
+        return SimpleNamespace(
+            total_weapons=self.total,
+            returned_weapons=size,
+            truncated=offset + size < self.total,
+            weapons=rows,
+        )
+
+
+async def test_weapon_type_list_is_bounded_by_default_and_says_so() -> None:
+    service = _WeaponDetailStub()
+    response = await weapon_assistant(
+        intent="type", weapon_type="手炮", ctx=_ctx(weapon_detail_svc=service)
+    )
+
+    block = response["data"]["weapons"]
+    assert service.calls[-1]["limit"] == WEAPON_TYPE_DEFAULT
+    assert service.calls[-1]["list_view"] is True, "列表类必须走列表视图（不取 305/310）"
+    assert block["returned"] == WEAPON_TYPE_DEFAULT
+    assert block["total"] == 124
+    assert block["truncated"] is True
+    assert block["next_offset"] == WEAPON_TYPE_DEFAULT
+    assert any(f"offset={WEAPON_TYPE_DEFAULT}" in warning for warning in response["warnings"]), (
+        response["warnings"]
+    )
+
+
+async def test_weapon_type_list_pages_with_offset() -> None:
+    service = _WeaponDetailStub()
+    response = await weapon_assistant(
+        intent="type", weapon_type="手炮", limit=10, offset=120,
+        ctx=_ctx(weapon_detail_svc=service),
+    )
+
+    block = response["data"]["weapons"]
+    assert service.calls[-1]["offset"] == 120
+    assert block["offset"] == 120
+    assert block["returned"] == 4
+    assert block["truncated"] is False, "翻到最后一页就不该再说自己截断了"
+    assert block["next_offset"] is None
+    assert not any("offset=" in warning for warning in response["warnings"])
 
 
 # ── analyze 的组合规模闸（D5）：超规模提前失败，不让人干等 5 分钟 ──────────

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..services import weapon_local_data, weapon_payload, weapon_profile
+from ..services import weapon_local_data, weapon_payload
 from ..services.weapon_payload import schema_block
 from ._enrichment import community_enrichment
 from ._farming import farming_reference, harvest_names
@@ -157,33 +157,53 @@ def stats_payload(svc: dict[str, Any], weapon_name: str) -> dict[str, Any]:
 # ── 副本级：type / compare ───────────────────────────────────────────────
 
 
-def type_payload(
-    svc: dict[str, Any], result: Any, weapon_type: str
+async def type_branch(
+    svc: dict[str, Any],
+    player_name: str,
+    weapon_type: str,
+    limit: int,
+    offset: int,
 ) -> dict[str, Any]:
-    """按类型列持有武器：每件=完整模板（定义级 sockets + 实例级 options）。"""
-    items: list[dict[str, Any]] = []
-    lean_warnings: list[str] = []
-    for weapon in result.weapons:
-        item = weapon.model_dump(mode="json")
-        block = item.get("weapon")
-        if isinstance(block, dict):
-            # 列表类口径：逐件只查清单摘要（本地索引在内存里，代价很小），
-            # 但四个键必须都在 —— 少键会被读成"这把没有本地资料"。
-            name = str(block.get("name") or "")
-            local = _local(svc, name) if name else weapon_local_data.LocalWeaponData()
-            lean_warnings += _attach_local(
-                svc, local, weapon=block, sockets=[], weapon_name=name, mode="lean"
-            )
-        items.append(item)
+    """`weapon_assistant(intent="type")`：按类型列**持有**的武器（列表行）。"""
+    result = await svc["weapon_detail_svc"].get_weapon_details_by_type(
+        player_name, weapon_type, limit=limit, offset=offset, list_view=True
+    )
+    return type_payload(svc, result, weapon_type, offset=offset)
+
+
+def type_payload(
+    svc: dict[str, Any],
+    result: Any,
+    weapon_type: str,
+    *,
+    offset: int = 0,
+) -> dict[str, Any]:
+    """按类型列持有武器：一行一件的**列表行**（身份 + 副本位置 + 属性值）。
+
+    列表不展开插槽池与可换项 —— 那是"你要看某一件"的问题。真机实测（2026-09-20）：
+    20 件带 sockets/options 时是 18.9 万字符，其中 2/3 是这两块；看某一件的部件走
+    `weapon_assistant(intent="compare", weapon_name=…, item_instance_id=…)`。
+    """
+    rows = [
+        weapon_payload.list_row(item.weapon, stats=item.stats, notes=item.notes)
+        for item in result.weapons
+    ]
     label = weapon_type or "全部武器"
     summary = (
         f"已读取「{label}」持有 {result.total_weapons} 件，本次返回 {result.returned_weapons} 件"
         + ("（已截断）。" if result.truncated else "。")
     )
-    warnings = _collect_notes(items) + lean_warnings
+    next_offset = offset + result.returned_weapons if result.truncated else None
+    warnings = _collect_notes(rows)
     if result.truncated:
         warnings.append(
-            f"只返回了前 {result.returned_weapons} 件；提高 limit 或缩小 weapon_type 才能看全。"
+            f"只返回了前 {result.returned_weapons} 件；"
+            + (f"继续读传 offset={next_offset}。" if next_offset else "提高 limit 才能看全。")
+        )
+    if rows:
+        warnings.append(
+            "列表行只有身份/位置/属性值：要看某一件的插槽与可换部件，用 "
+            'weapon_assistant(intent="compare", weapon_name=…, item_instance_id=…)。'
         )
     return ok_response(
         summary,
@@ -193,9 +213,11 @@ def type_payload(
                 "total": result.total_weapons,
                 "returned": result.returned_weapons,
                 "truncated": result.truncated,
-                "items": items,
+                "offset": offset,
+                "next_offset": next_offset,
+                "items": rows,
             },
-            "farming_list": _farming(svc, harvest_names(items)),
+            "farming_list": _farming(svc, harvest_names(rows)),
             **schema_block(),
         },
         warnings=warnings,
@@ -385,67 +407,6 @@ def perk_description_payload(svc: dict[str, Any], perk_name: str) -> dict[str, A
         {
             "perk": perk,
             "community_references": community,
-            **schema_block(),
-        },
-    )
-
-
-def inventory_type_payload(
-    svc: dict[str, Any],
-    result: Any,
-    type_name: str,
-    location: str = "",
-) -> dict[str, Any]:
-    """`inventory_assistant(intent="type")`：按类型列**持有**的物品。
-
-    边界（与 `weapon.type` 的分工）：这里只请求库存+实例组件，不请求 305/310，
-    所以给的是精简身份块 + 位置/光等，**没有 perk 与可换部件**；要看"能换成什么"
-    用 `weapon_assistant(intent="type")`。物品不是武器时原样返回，不硬套武器字段。
-    """
-    payload = result.model_dump(mode="json") if hasattr(result, "model_dump") else dict(result)
-    manifest = svc.get("manifest")
-    rows: list[dict[str, Any]] = []
-    weapons = 0
-    for item in payload.get("items") or []:
-        definition = (
-            manifest.get_item_definition(item.get("item_hash", 0)) if manifest else None
-        )
-        if not isinstance(definition, dict) or definition.get("itemType") != 3:
-            rows.append({"kind": "item", **item})
-            continue
-        weapons += 1
-        row = weapon_payload.lean_identity(
-            manifest,
-            definition,
-            roll_kind=weapon_profile.roll_kind(definition),
-            fallback_name=str(item.get("name") or ""),
-        )
-        row.update({
-            "kind": "weapon",
-            "instance_id": item.get("item_instance_id", ""),
-            "location": item.get("location", ""),
-            "power": item.get("power"),
-            "is_equipped": item.get("is_equipped", False),
-            "bucket_type": item.get("bucket_type", ""),
-            "icon_url": row.get("icon_url") or item.get("icon_url", ""),
-        })
-        rows.append(row)
-
-    label = type_name or "全部"
-    scope = f"（{location}）" if location else ""
-    return ok_response(
-        f"「{label}」{scope}持有 {len(rows)} 件（其中武器 {weapons} 件）；"
-        "这里只有身份与位置，要看可换部件请用 weapon_assistant(intent=\"type\")。",
-        {
-            "result": {
-                "query": payload.get("query", type_name),
-                "location": location,
-                "total": len(rows),
-                "returned": len(rows),
-                "truncated": False,
-                "items": rows,
-                "weapon_count": weapons,
-            },
             **schema_block(),
         },
     )

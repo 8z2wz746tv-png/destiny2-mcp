@@ -38,6 +38,8 @@ CASES: list[tuple[str, str, dict]] = [
     ("catalog_perk", "weapon_assistant", {"intent": "catalog", "perk_name": "萤火虫"}),
     ("catalog_type", "weapon_assistant", {"intent": "catalog", "weapon_type": "手炮", "limit": 5}),
     ("type_list", "weapon_assistant", {"intent": "type", "weapon_type": "手炮", "limit": 5}),
+    # 默认条数也钉住：列表行体积与翻页字段（offset/next_offset）都在这一例里
+    ("type_list_default", "weapon_assistant", {"intent": "type", "weapon_type": "手炮"}),
     ("filter_rolls_owned", "weapon_assistant", {"intent": "filter_rolls", "weapon_name": "刚玉战锤"}),
     ("filter_rolls_catalog", "weapon_assistant", {"intent": "filter_rolls", "weapon_type": "微型冲锋枪", "include_inventory": False, "limit": 5}),
     ("inventory_type", "inventory_assistant", {"intent": "type", "type_name": "手炮"}),

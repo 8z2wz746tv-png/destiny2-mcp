@@ -9,7 +9,7 @@ from __future__ import annotations
 from ..exceptions import AuthenticationError, ConfigError, ItemNotFoundError
 from ..logging_config import get_logger
 from ..manifest_names import names_for
-from . import profile_components, weapon_payload, weapon_profile
+from . import profile_components, weapon_payload, weapon_profile, weapon_stats_payload
 from ..manifest import ManifestManager, class_type_name
 from ..models import WeaponComparison
 from ..player_resolver import PlayerResolver
@@ -332,7 +332,7 @@ class WeaponCompareService:
                 "weapon": instance_block,
                 "sockets": sockets,
                 "options": options,
-                "stats": weapon_payload.stat_list(
+                "stats": weapon_stats_payload.stat_list(
                     self._manifest, inst_definition, (stats_data.get(inst_id) or {}).get("stats"), names=names
                 ),
             })

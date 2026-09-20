@@ -123,7 +123,8 @@ class _Resolver:
         return {"membership_id": "m1", "membership_type": 3}
 
     async def get_profile(self, membership_id: str, membership_type: int, components: list[int]) -> dict:
-        assert components in (profile_components.WEAPON_DETAIL,)
+        assert components in (profile_components.WEAPON_DETAIL, profile_components.INVENTORY)
+        self.requested_components = list(components)
         return {
             "characters": {"data": {"c1": {"classType": 1}}},
             "profileInventory": {"data": {"items": [
@@ -291,20 +292,34 @@ async def test_stats_keys_and_primary_flag(services) -> None:
     assert stats[0]["display"] == "140"  # 定义值；实例值只在副本级覆盖
 
 
-async def test_type_items_carry_definition_pool_and_instance_options(services) -> None:
+async def test_type_items_are_list_rows_without_the_socket_pool(services) -> None:
+    """`type` 是列表类：一行一件，插槽池与可换项不进列表（要看某一件用 compare）。"""
     response = await _call(services, intent="type", weapon_type="手炮")
 
     block = response["data"]["weapons"]
-    assert sorted(block.keys()) == ["items", "query", "returned", "total", "truncated"]
+    assert sorted(block.keys()) == [
+        "items", "next_offset", "offset", "query", "returned", "total", "truncated",
+    ]
     assert block["total"] == block["returned"] == len(block["items"]) == 1
-    item = block["items"][0]
-    assert sorted(item.keys()) == ["notes", "options", "perks_complete", "sockets", "stats", "weapon"]
-    assert item["weapon"]["instance"]["instance_id"] == "i1"
-    assert item["weapon"]["gear_tier"] == 5
-    # 定义级 sockets 带 equipped（现在装的固有框架），实例级 options 是能换的
-    assert item["sockets"][0]["equipped"] == {"plug_hash": 900, "name": "精确重击框架"}
-    assert [entry["scope"] for entry in item["options"]] == ["instance"]
-    assert [stat["value"] for stat in item["stats"]] == [140]  # 实例值覆盖定义值
+    assert block["offset"] == 0
+    assert block["next_offset"] is None
+    row = block["items"][0]
+    assert sorted(row.keys()) == sorted(
+        weapon_payload.LIST_ROW_KEYS + weapon_payload.INSTANCE_ROW_KEYS + ("stats", "notes")
+    )
+    assert set(weapon_payload.LEAN_IDENTITY_KEYS).issubset(row.keys())
+    # 插槽池/可换项/本地四块一律不进列表行
+    assert not {"sockets", "options", "perks_complete", "farming", "popularity",
+                "community", "sources", "weapon"} & row.keys()
+    # 副本字段摊平；属性值用实例值覆盖定义值；roll_summary 仍是同一个形状
+    assert row["instance_id"] == "i1"
+    assert row["location"] == "仓库"
+    assert row["gear_tier"] == 5
+    assert sorted(row["roll_summary"].keys()) == ROLL_SUMMARY_KEYS
+    assert [stat["value"] for stat in row["stats"]] == [140]
+    # 列表行这次**没请求** 305/310：载荷里没有插槽，就不该去把插槽拉回来
+    requested = services["resolver"].requested_components
+    assert 305 not in requested and 310 not in requested
 
 
 async def test_compare_instances_use_the_same_weapon_block(services) -> None:
