@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -580,3 +581,35 @@ async def test_candidate_profile_failures_are_not_cached() -> None:
     assert resolver.get_profile.await_count == 2
     assert {row["triumph_score"] for row in first["players"]} == {0}
     assert {row["triumph_score"] for row in second["players"]} == {0}
+
+
+@pytest.mark.asyncio
+async def test_legacy_find_players_tool_asks_for_scoring() -> None:
+    """历史工具面不维护（不单独修 bug），但**我们改出来的回归要修**。
+
+    `player_tools.find_players` 的输出契约是"按置信度排序"（它读 confidence/playtime_hours），
+    而"模糊搜人默认不读别人档案"之后这些键不存在了 → 它会裸抛 KeyError。
+    所以这一条只钉住"那个调用方必须显式要评分"，不代表我们开始维护历史工具面。
+    """
+    from destiny_mcp.tools import player_tools
+
+    calls: list[dict] = []
+
+    class _PlayerService:
+        async def find_players(self, name: str, *, enrich: bool = False) -> dict:
+            calls.append({"name": name, "enrich": enrich})
+            return {
+                "players": [{"display_name": "候选甲#1234", "membership_id": "1",
+                             "membership_type": 3, "confidence": 41.5,
+                             "last_played": "2026-09-01", "playtime_hours": 812,
+                             "triumph_score": 12345}],
+                "page": 0, "has_more": False, "enriched": enrich,
+            }
+
+    ctx = SimpleNamespace(request_context=SimpleNamespace(
+        lifespan_context={"player_svc": _PlayerService()}
+    ))
+    text = await player_tools.find_players(name="候选", ctx=ctx)
+
+    assert calls == [{"name": "候选", "enrich": True}], "不显式要评分，下面那几个键就不存在"
+    assert "候选甲#1234" in text and "41.5" in text and "812h" in text

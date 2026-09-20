@@ -11,7 +11,7 @@
 | --- | --- | --- |
 | **永久别名**（中文说法） | `概况` = `summary`、`重复武器` = `duplicates`、`角色`/`档案` = `profile` | **不许删**。中文用户会这么说，删了等于砍功能；它们必须永远和 canonical 走同一段代码 |
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
-| **历史工具面**（69 个旧工具） | `get_inventory`、`search_items` … | 只在 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**且** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 时暴露；不进主路径文档、不保证契约、不单独修 bug |
+| **历史工具面**（69 个旧工具） | `get_inventory`、`search_items` … | 只在 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**且** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 时暴露；不进主路径文档、不保证契约、不单独修 bug。已知两处早就烂在那里（2026-09-20 复核）：`analyze_weapon` 读 P4/P6 之前的 `result["perk_pool"]`、`get_historical_stats` 读 0.2.0 之前的 `{pve, pvp}` 手写八键（会把有数据说成"未找到统计数据"）—— 按本行规矩**不修**，哪天真要用这个工具面再一起重做 |
 
 ## 未发布：武器类型列表改列表行、默认 10 件、可翻页（破坏性，见 ADR-007）
 

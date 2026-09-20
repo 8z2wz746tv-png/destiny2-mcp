@@ -2,6 +2,17 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 未发布（2026-09-20）
+
+- **修复（本轮改动造成的回归）：历史工具 `find_players` 会裸抛 `KeyError`**。
+  它的输出契约是"按置信度排序"（要读 `confidence`/`playtime_hours`），而"模糊搜人默认不读别人档案"
+  之后这些键不再存在 → 这个工具直接崩。修法是让它**显式要评分**（`enrich=True`），
+  保留它原来的行为；真机复验：10 个候选带置信度/时长/成就分正常输出。
+
+  **另外两处历史工具的既存损坏（`analyze_weapon` 读早已不存在的 `perk_pool`、
+  `get_historical_stats` 读 0.2.0 前的 `{pve, pvp}`）确认是改动之前就坏的，按
+  `docs/COMPATIBILITY.md` 那条「历史工具面……不单独修 bug」**不动**，只记在这里免得再被当成新问题查一遍。**
+
 ## 未发布（2026-09-19）
 
 **性能六项（按 `docs/plans/PERFORMANCE_PLAN.md` 的顺序落地）**：
