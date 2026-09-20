@@ -1,0 +1,360 @@
+"""锻造图样查询：图鉴「模式和催化」里**武器模式**那一半（183 条）。
+
+两个来源、两种性质，绝不能混：
+
+- **Manifest**：图样目录 —— 展示树（根节点 `PATTERN_ROOT_NODE`）→ 槽位分组 → 武器类型 → 记录，
+  每条记录的名字就是武器名、目标 `completionValue` 就是要萃取几次；静态，随 Manifest 变。
+- **账号**：profile 组件 900（`profileRecords`）里那条记录的 `objectives[0].progress`
+  —— 就是游戏里那条「图样进度 4/5」。账号数据，每次现读（5 分钟 TTL 缓存提取后的状态）。
+
+为什么不走另外两个组件（实测，见 `docs/plans/PATTERN_QUERY_PLAN.md`）：
+
+- 800（收藏品）里图样解锁状态**一条都没有**：拿「模式和催化」的节点去查 `collectible_node`
+  只能回 `total=0`（响应里那句"条目的解锁状态不在这个组件里"说的就是这件事）；
+- 1300（Craftables）有 219 条但 `visible` 全是 true，只回答"这把能塑形哪些 perk"，没有进度。
+
+目录判据不认本地化类型字符串（中文「武器模式」/英文 `Weapon Pattern` 都不当判据）：
+**记录名必须与某件可锻造武器（`inventory.recipeItemHash` 非空）的名字精确相等**。
+实测 183/183 命中、零歧义，而且顺带把 141 条异域催化挡在门外 —— 催化记录名带「催化」后缀，
+用模糊匹配会误中同名武器。同一把武器的（专家）/（失时）/（痛苦）变体不单列图样（图样记录挂在
+基础版上），单独问变体名时指回基础版。
+"""
+
+from __future__ import annotations
+
+import re
+import time
+from typing import Any, Iterator
+
+from ..bungie_client import BungieClient
+from ..exceptions import APIError
+from ..logging_config import get_logger
+from ..manifest import ManifestManager
+from ..player_resolver import PlayerResolver
+from ..utils.hash_utils import to_unsigned
+from . import profile_components
+from .starside_crafting_sources import CraftingSources
+
+logger = get_logger(__name__)
+
+# 图鉴「模式和催化」的根展示节点；子结构：根 → 分组容器 → 槽位分组 → 武器类型 → 记录。
+PATTERN_ROOT_NODE = 2642502414
+_MAX_TREE_DEPTH = 4
+# 记录进度读一次 1.44 MB / 约 2.5 s（实测），所以缓存**提取后的状态**（几百条小字典），
+# 不缓存那 1.44 MB 原文；5 分钟足够避免"连着问几把"重复拉整包。
+_STATE_TTL_SECONDS = 300
+
+STATUS_UNLOCKED = "已解锁"
+STATUS_IN_PROGRESS = "进行中"
+# 「未开始」= 账号里**没有这条记录**。不是"0/5 确认"、更不是"这把没有图样"——
+# 措辞见 `_pattern_branches`，这里只给状态码。
+STATUS_NOT_STARTED = "未开始"
+_STATUS_ORDER = {STATUS_IN_PROGRESS: 0, STATUS_NOT_STARTED: 1, STATUS_UNLOCKED: 2}
+
+# （专家）/（失时）/（痛苦）这类变体后缀：它们不单列图样，问到了要指回基础版。
+_VARIANT_SUFFIX = re.compile(r"[（(](?:专家|失时|痛苦|adept|timelost|harrowed)[）)]$", re.IGNORECASE)
+_NAME_NOISE = re.compile(r"[\s·・]+")
+
+
+def name_key(value: str) -> str:
+    """名字比对口径：去空白与间隔号、大小写折叠（用户输入 vs Manifest 名字）。"""
+    return _NAME_NOISE.sub("", (value or "").strip().casefold())
+
+
+class PatternService:
+    """锻造图样：目录（Manifest）+ 进度（账号）+ 来源（本地社区资料，可选）。"""
+
+    def __init__(
+        self,
+        bungie: BungieClient,
+        manifest: ManifestManager,
+        resolver: PlayerResolver,
+        starside: Any = None,
+    ) -> None:
+        self._bungie = bungie
+        self._manifest = manifest
+        self._resolver = resolver
+        self._starside = starside
+        self._catalog_cache: list[dict[str, Any]] | None = None
+        self._state_cache: dict[str, Any] | None = None
+
+    # ── 目录（Manifest，进程内缓存一次） ──────────────────────────────
+    def _walk(self, node_hash: int, *, depth: int = 0, slot: str = "") -> Iterator[tuple[str, str, int]]:
+        if depth > _MAX_TREE_DEPTH:
+            return
+        node = self._manifest.get_definition("DestinyPresentationNodeDefinition", node_hash) or {}
+        name = str((node.get("displayProperties") or {}).get("name") or "")
+        children = node.get("children") or {}
+        records = [
+            item.get("recordHash")
+            for item in children.get("records") or []
+            if isinstance(item, dict) and isinstance(item.get("recordHash"), int)
+        ]
+        if records:
+            for record_hash in records:
+                yield slot, name, record_hash
+            return
+        # 第 2 层才是槽位分组（主武器模式/特殊武器模式/重武器模式），拿它当分组标签。
+        next_slot = name if depth == 2 else slot
+        for child in children.get("presentationNodes") or []:
+            if isinstance(child, dict) and isinstance(child.get("presentationNodeHash"), int):
+                yield from self._walk(child["presentationNodeHash"], depth=depth + 1, slot=next_slot)
+
+    def _craftable_item(self, name: str) -> dict[str, Any] | None:
+        """按名字找**可锻造武器本体**：同名条目里只认 `recipeItemHash` 非空的那个。
+
+        同名条目有两类：武器本体（type 3，有 `recipeItemHash`）与图样条目（type 30，没有）；
+        精确比名字是必须的 —— 模糊匹配会让「糖果生意催化」命中「糖果生意」。
+        """
+        for hit in self._manifest.search(name, limit=5, item_type=3):
+            if str(hit.get("name") or "").strip() != name:
+                continue
+            definition = self._manifest.get_item_definition(int(hit.get("itemHash") or 0)) or {}
+            if (definition.get("inventory") or {}).get("recipeItemHash"):
+                return definition
+        return None
+
+    def _catalog(self) -> list[dict[str, Any]]:
+        """183 条图样：名字、记录 hash、需要的次数、对应武器、类型、分组。"""
+        if self._catalog_cache is not None:
+            return self._catalog_cache
+        entries: list[dict[str, Any]] = []
+        for slot, weapon_type, record_hash in self._walk(PATTERN_ROOT_NODE):
+            definition = self._manifest.get_definition("DestinyRecordDefinition", record_hash) or {}
+            name = str((definition.get("displayProperties") or {}).get("name") or "").strip()
+            if not name:
+                continue
+            item = self._craftable_item(name)
+            if item is None:
+                continue
+            objective_hash = next(iter(definition.get("objectiveHashes") or []), None)
+            objective = (
+                self._manifest.get_definition("DestinyObjectiveDefinition", objective_hash)
+                if isinstance(objective_hash, int)
+                else None
+            ) or {}
+            entries.append({
+                "name": name,
+                "record_hash": to_unsigned(record_hash),
+                "need": objective.get("completionValue"),
+                "item_hash": to_unsigned(int(item.get("hash") or 0)),
+                "weapon_type": weapon_type,
+                "group": slot,
+                "tier": (item.get("inventory") or {}).get("tierTypeName") or "",
+            })
+        self._catalog_cache = entries
+        return entries
+
+    # ── 账号进度（组件 900） ─────────────────────────────────────────
+    async def _state(self, membership_id: str, membership_type: int) -> tuple[dict[int, dict], dict]:
+        cached = self._state_cache
+        now = time.monotonic()
+        if cached and now - cached["at"] < _STATE_TTL_SECONDS:
+            return cached["state"], {
+                "component": 900,
+                "cached": True,
+                "elapsed_ms": 0,
+                "ttl_seconds": _STATE_TTL_SECONDS,
+            }
+        started = time.perf_counter()
+        profile = await self._bungie.get_profile(
+            membership_id, membership_type, profile_components.PATTERNS
+        )
+        data = (profile.get("profileRecords") or {}).get("data")
+        records = data.get("records") if isinstance(data, dict) else None
+        if not isinstance(records, dict) or not records:
+            # 拿不到就说拿不到："未返回"绝不能读成"图样都没解锁"。
+            raise APIError(
+                "查询锻造图样",
+                "Bungie 未返回记录组件（900），这次拿不到图样进度；"
+                "不能把未返回当成未解锁，请稍后重试。",
+            )
+        state: dict[int, dict] = {}
+        for key, component in records.items():
+            if not isinstance(component, dict):
+                continue
+            try:
+                record_hash = to_unsigned(int(key))
+            except (TypeError, ValueError):
+                continue
+            objectives = component.get("objectives") or []
+            first = objectives[0] if objectives and isinstance(objectives[0], dict) else {}
+            state[record_hash] = {
+                "progress": first.get("progress"),
+                "need": first.get("completionValue"),
+                "state": component.get("state"),
+            }
+        self._state_cache = {"at": now, "state": state}
+        return state, {
+            "component": 900,
+            "cached": False,
+            "elapsed_ms": int((time.perf_counter() - started) * 1000),
+            "ttl_seconds": _STATE_TTL_SECONDS,
+        }
+
+    @staticmethod
+    def _row(entry: dict[str, Any], state: dict[int, dict]) -> dict[str, Any]:
+        info = state.get(entry["record_hash"])
+        need = entry["need"]
+        if info is None:
+            status, progress = STATUS_NOT_STARTED, None
+        else:
+            need = info.get("need") or need
+            progress = info.get("progress")
+            complete = bool(progress is not None and need and progress >= need)
+            status = STATUS_UNLOCKED if complete else STATUS_IN_PROGRESS
+        return {
+            "name": entry["name"],
+            "weapon_type": entry["weapon_type"],
+            "group": entry["group"],
+            "tier": entry["tier"],
+            "need": need,
+            "progress": progress,
+            "status": status,
+            "item_hash": entry["item_hash"],
+            "record_hash": entry["record_hash"],
+        }
+
+    # ── 来源（本地社区资料，可选、可失败） ────────────────────────────
+    def _sources(self, names: list[str]) -> dict[str, Any]:
+        """按名字查「锻造武器来源」；这一路失败只降级成 `available=false` + warning。"""
+        if self._starside is None:
+            return {
+                "available": False,
+                "results": [],
+                "unmatched": list(names),
+                "page": {},
+                "warnings": ["本次没有接上本地社区资料；图样进度不受影响。"],
+            }
+        try:
+            return CraftingSources.from_service(self._starside).lookup(names)
+        except Exception as exc:  # noqa: BLE001 - 本地资料是附加项，坏了不能弄坏主结果
+            logger.warning("锻造武器来源资料读取失败：%s", exc)
+            return {
+                "available": False,
+                "results": [],
+                "unmatched": list(names),
+                "page": {},
+                "error": str(exc),
+                "warnings": [f"本地「锻造武器来源」资料读取失败：{exc}"],
+            }
+
+    # ── 查询 ─────────────────────────────────────────────────────────
+    async def patterns(
+        self,
+        player_name: str = "",
+        *,
+        weapon_name: str = "",
+        weapon_type: str = "",
+        limit: int = 20,
+        offset: int = 0,
+    ) -> dict[str, Any]:
+        catalog = self._catalog()
+        if not catalog:
+            raise APIError("查询锻造图样", "Manifest 里没有找到图样记录，无法查询。")
+        player = await self._resolver.resolve_player(player_name)
+        state, read = await self._state(player["membership_id"], player["membership_type"])
+        rows = [self._row(entry, state) for entry in catalog]
+
+        variant_of = ""
+        candidates: list[dict[str, Any]] = []
+        if weapon_name.strip():
+            rows, candidates, variant_of = self._by_name(rows, weapon_name.strip())
+        available_types = sorted({row["weapon_type"] for row in rows if row["weapon_type"]})
+        if weapon_type.strip():
+            rows = self._by_type(rows, weapon_type.strip())
+
+        rows.sort(key=lambda row: (_STATUS_ORDER.get(row["status"], 9),))
+        sources = self._sources([row["name"] for row in rows])
+        source_map = {item["name"]: item["source"] for item in sources.get("results") or []}
+        for row in rows:
+            row["source"] = source_map.get(row["name"])
+
+        total = len(rows)
+        limit = max(1, limit)
+        page = rows[offset : offset + limit]
+        next_offset = offset + len(page) if offset + len(page) < total else None
+        return {
+            "catalog_total": len(catalog),
+            "counts": self._counts(rows),
+            "by_group": self._by_group(rows),
+            "rows": page,
+            "total": total,
+            "returned": len(page),
+            "offset": offset,
+            "next_offset": next_offset,
+            "filtered": bool(weapon_name.strip() or weapon_type.strip()),
+            "variant_of": variant_of,
+            "candidates": candidates,
+            "available_types": available_types,
+            "sources": sources,
+            "read": read,
+        }
+
+    def _by_name(
+        self, rows: list[dict[str, Any]], query: str
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], str]:
+        key = name_key(query)
+        exact = [row for row in rows if name_key(row["name"]) == key]
+        if exact:
+            return exact, [], ""
+        for match in (
+            [row for row in rows if name_key(row["name"]).startswith(key)],
+            [row for row in rows if key in name_key(row["name"])],
+        ):
+            if len(match) == 1:
+                return match, [], ""
+            if len(match) > 1:
+                return [], [{k: row[k] for k in ("name", "weapon_type", "status", "item_hash")} for row in match[:8]], ""
+        # 变体（专家/失时/痛苦）：图样挂在基础版上，问变体名就指回基础版。
+        base = _VARIANT_SUFFIX.sub("", query)
+        if base != query:
+            base_key = name_key(base)
+            for row in rows:
+                if name_key(row["name"]) == base_key:
+                    return [row], [], query
+        return [], [], ""
+
+    @staticmethod
+    def _by_type(rows: list[dict[str, Any]], weapon_type: str) -> list[dict[str, Any]]:
+        key = name_key(weapon_type)
+        return [row for row in rows if key and key in name_key(row["weapon_type"])]
+
+    @staticmethod
+    def _counts(rows: list[dict[str, Any]]) -> dict[str, int]:
+        counts = {"total": len(rows), "unlocked": 0, "in_progress": 0, "not_started": 0}
+        for row in rows:
+            key = {
+                STATUS_UNLOCKED: "unlocked",
+                STATUS_IN_PROGRESS: "in_progress",
+                STATUS_NOT_STARTED: "not_started",
+            }.get(row["status"])
+            if key:
+                counts[key] += 1
+        return counts
+
+    @staticmethod
+    def _by_group(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        groups: dict[str, dict[str, Any]] = {}
+        for row in rows:
+            bucket = groups.setdefault(
+                row["group"] or "未分组",
+                {"group": row["group"] or "未分组", "total": 0, "unlocked": 0,
+                 "in_progress": 0, "not_started": 0, "types": {}},
+            )
+            bucket["total"] += 1
+            status_key = {
+                STATUS_UNLOCKED: "unlocked",
+                STATUS_IN_PROGRESS: "in_progress",
+                STATUS_NOT_STARTED: "not_started",
+            }.get(row["status"])
+            if status_key:
+                bucket[status_key] += 1
+            type_bucket = bucket["types"].setdefault(row["weapon_type"], {"total": 0, "unlocked": 0})
+            type_bucket["total"] += 1
+            if row["status"] == STATUS_UNLOCKED:
+                type_bucket["unlocked"] += 1
+        return [
+            bucket | {"by_type": [{"weapon_type": name} | value for name, value in bucket.pop("types").items()]}
+            for bucket in groups.values()
+        ]

@@ -64,6 +64,16 @@ SUBCLASS: list[int] = [200, 201, 205, *ITEM_SOCKETS]
 # 所以读取方必须重试，拿不到要如实报不可用，绝不能把"空"当成 0。
 METRICS: list[int] = [1100]
 
+# 锻造图样进度（900 = profileRecords）：读的是
+# `Response.profileRecords.data.records[记录hash].objectives[0].progress / completionValue`
+# —— 就是游戏里那条「图样进度 4/5」。
+#
+# 谁需要它：pattern_service（`weapon_assistant(intent="patterns")`）。**不要**并进 FULL：
+# 实测 1.44 MB / 2.5 s，而图样是它唯一的用途；另外两条候选都给不出进度 ——
+# 组件 800（收藏品）里图样解锁状态一条都没有，1300（Craftables）只回答"能塑形哪些 perk"
+# （219 条 `visible` 全为 true）。实测见 docs/plans/PATTERN_QUERY_PLAN.md。
+PATTERNS: list[int] = [900]
+
 # 缓存里一次取全：读多写少的场景共用（profile_cache）。
 # 必须覆盖所有调用方要的组件（含 308 催化剂进度），否则后台刷新会把并集降级、
 # 下一次调用又要重新拉一遍 10 MB 的 profile。

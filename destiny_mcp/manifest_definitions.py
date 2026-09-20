@@ -41,6 +41,11 @@ class ItemDefinitionMixin:
         "DestinyLoadoutIconDefinition",
         "DestinyLoadoutNameDefinition",
         "DestinyMetricDefinition",
+        # 锻造图样（图鉴「模式和催化」）：图样的解锁进度是**记录**，不是收藏品 ——
+        # 组件 800 里一条都没有、组件 1300 只给"能塑形哪些 perk"（实测见
+        # docs/plans/PATTERN_QUERY_PLAN.md），所以记录与它的目标定义必须查得到。
+        "DestinyRecordDefinition",
+        "DestinyObjectiveDefinition",
     })
 
     def get_item_info(self, item_hash: int) -> dict | None:

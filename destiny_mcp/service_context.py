@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from .services.artifact_service import ArtifactService
     from .services.set_bonus_service import SetBonusService
     from .services.starside_service import StarsideService
+    from .services.pattern_service import PatternService
 
 
 class ServiceContext(TypedDict):
@@ -68,3 +69,4 @@ class ServiceContext(TypedDict):
     set_bonus_svc: SetBonusService
     collection_svc: CollectionService
     starside_svc: StarsideService
+    pattern_svc: PatternService

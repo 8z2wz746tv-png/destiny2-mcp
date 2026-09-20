@@ -65,6 +65,7 @@ from .services.fragment_service import FragmentService
 from .services.artifact_service import ArtifactService
 from .services.set_bonus_service import SetBonusService
 from .services.starside_service import StarsideService
+from .services.pattern_service import PatternService
 from .wishlist_data import ensure_wishlist_data
 from .service_context import ServiceContext
 from .services.account_action_lock import account_action_lock
@@ -121,6 +122,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
         set_bonus_svc = SetBonusService(manifest)
         collection_svc = CollectionService(bungie, manifest, resolver)
         starside_svc = StarsideService(manifest)
+        pattern_svc = PatternService(bungie, manifest, resolver, starside_svc)
         armor_mod_svc = ArmorModService(bungie, manifest, resolver)
 
         stack.push_async_callback(profile_cache.stop_refresh)
@@ -155,6 +157,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
             "set_bonus_svc": set_bonus_svc,
             "collection_svc": collection_svc,
             "starside_svc": starside_svc,
+            "pattern_svc": pattern_svc,
             "armor_mod_svc": armor_mod_svc,
         }
         logger.info("Destiny MCP server ready (standalone)")

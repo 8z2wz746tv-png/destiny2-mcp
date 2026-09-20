@@ -42,6 +42,7 @@ from ._requests import (
     LoadoutIntent,
     PlayerIntent,
     SubclassIntent,
+    WEAPON_PATTERN_INTENTS,
     WeaponIntent,
     WorldIntent,
 )
@@ -91,6 +92,8 @@ _W_ROLL_FILTERS = ("filter_rolls", *_W_CATALOG)
 _W_POPULARITY = (
     "popularity", "selection_rates", "perk_selection", "selection", "usage_rates",
 )
+# 锻造图样：读账号（组件 900）+ Manifest 图鉴，按名/按类型筛、可翻页
+_W_PATTERNS = WEAPON_PATTERN_INTENTS
 # ── build_assistant ─────────────────────────────────────────────────────────
 _B_CRAFT = ("recommend", "find", "analyze", "farm_target")
 _B_COMMUNITY = ("community", "community_build", "starside")
@@ -220,7 +223,7 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ),
     # ══ weapon_assistant ═══════════════════════════════════════════════════
     ("weapon_assistant", "player_name"): _contract(
-        _only("analyze", "compare", "compare_duplicates", "type", "filter_rolls"),
+        _only("analyze", "compare", "compare_duplicates", "type", "filter_rolls", *_W_PATTERNS),
         hint="只有读账号的武器 intent 需要玩家名；纯定义查询（catalog/info/stats/perk_pool 等）与账号无关。",
     ),
     ("weapon_assistant", "weapon_name"): _contract(
@@ -228,7 +231,7 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint='按武器类型查要传 weapon_type（intent="type"，不是 weapon_name）；查单个 Perk 用 perk_name（intent="perk_description"）。',
     ),
     ("weapon_assistant", "weapon_type"): _contract(
-        _only(*_W_ROLL_FILTERS, "type"),
+        _only(*_W_ROLL_FILTERS, "type", *_W_PATTERNS),
         hint='按类型列举用 intent="type"；按类型在全量定义里筛用 intent="catalog"。',
         suggestion=("weapon_assistant", "catalog"),
     ),
@@ -264,10 +267,10 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("weapon_assistant", "compare"),
     ),
     ("weapon_assistant", "limit"): _contract(
-        _only(*_W_ROLL_FILTERS, "type", "community"),
+        _only(*_W_ROLL_FILTERS, "type", "community", *_W_PATTERNS),
         hint=(
-            "catalog、filter_rolls、type 和 community 支持限量；type 默认 10 件，"
-            "响应里给 total/returned/truncated/next_offset。"
+            "catalog、filter_rolls、type、patterns 和 community 支持限量；type 默认 10 件、"
+            "patterns 默认 20 条，响应里给 total/returned/truncated/next_offset。"
         ),
         suggestion=("weapon_assistant", "filter_rolls"),
     ),
@@ -280,8 +283,8 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("weapon_assistant", "community"),
     ),
     ("weapon_assistant", "offset"): _contract(
-        _only("community", "type"),
-        hint='community 与 type 支持翻页：type 的响应里有 next_offset，接着传它。',
+        _only("community", "type", *_W_PATTERNS),
+        hint='community、type 与 patterns 支持翻页：响应里有 next_offset，接着传它。',
         suggestion=("weapon_assistant", "community"),
     ),
     # ══ build_assistant ════════════════════════════════════════════════════

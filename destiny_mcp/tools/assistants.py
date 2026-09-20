@@ -34,6 +34,7 @@ from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
 from . import _leaderboard_branches as leaderboard_branches
 from . import _player_branches as player_branches
+from . import _patterns_branches as patterns_branches
 from . import _weapon_usage_branches as weapon_usage_branches
 from ._enrichment import community_enrichment, community_read
 from ._farming import farming_reference as _farming_reference
@@ -44,6 +45,7 @@ from . import _param_docs as fields
 from ._requests import (
     ActivityIntent, BuildIntent, InventoryIntent, LoadoutIntent, PlayerIntent,
     SubclassIntent, WeaponIntent, WorldIntent,
+    WEAPON_PATTERN_INTENTS,
     WRITE_INTENTS,
     InventoryRequest, LoadoutRequest, SubclassRequest, validate_request,
 )
@@ -62,6 +64,7 @@ _LOADOUT_DEFAULT_LIMIT = 5
 # 按类型列武器：列表行（身份+位置+属性值）真机约 2.3k 字符/件，20 件 ≈ 4.6 万字符，
 # 而"我手炮都有哪些"这个问题通常只要看头几件；默认 10 件 + next_offset 翻页。
 _WEAPON_TYPE_DEFAULT_LIMIT = 10
+_WEAPON_PATTERN_DEFAULT_LIMIT = 20
 
 
 def _dump(value: Any) -> Any:
@@ -378,12 +381,13 @@ async def weapon_assistant(
         "武器查询意图。analyze=武器分析（不含选取率）；"
         "perk_pool=可能 Roll 到的 Perk 池；popularity=Perk 选取率和热门组合；"
         "catalog=从全量 Manifest 按武器类型和 Perk 查找，不限账号是否拥有；"
-        "filter_rolls=只筛选账号持有副本；community=本地社区武器/Perk/DPS 资料搜索或详情。"
+        "filter_rolls=只筛选账号持有副本；patterns=锻造图样进度（图鉴「模式和催化」那一页，读账号）；"
+        "community=本地社区武器/Perk/DPS 资料搜索或详情。"
     ))] = "analyze",
     player_name: fields.PlayerName = None,
     weapon_name: fields.WeaponName = "",
     weapon_type: Annotated[
-        str, Field(description="武器类型；filter_rolls 留空扫描全部持有武器。")
+        str, Field(description="武器类型；filter_rolls 留空扫描全部持有武器，patterns 用它筛图样。")
     ] = "",
     perk_name: Annotated[
         str, Field(description="单个 Perk 名称（中英文）；未传 required_perks 时作为必需 Perk。")
@@ -405,6 +409,8 @@ async def weapon_assistant(
     catalog 查询完整 Manifest，适用于“所有武器中找带某个 perk
     的某类武器”；filter_rolls 才查玩家账号内的实际副本，按当前插槽筛选，
     不包含未选中的可切换 Perk。limit 只限制返回条数，不限制扫描范围。
+    patterns 给图鉴「模式和催化」里 183 条武器图样的进度（账号组件 900，就是游戏里那条
+    「4/5」）与掉落来源；`未开始` = 账号里没有这条记录，不是进度 0。
     coverage_complete=false 时不能将 0 命中解释为账号中没有。
     community 用 weapon_name/perk_name 搜索；knowledge_id 读取详情。
     community_section=text/tables/links；按 next_offset 继续读取，正文 offset 单位为字符。
@@ -413,16 +419,20 @@ async def weapon_assistant(
     svc = get_ctx(ctx)
     intent = cast(WeaponIntent, (intent or "analyze").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
-    # 按类型列武器走列表行（真机约 2.3k 字符/件），默认 10 件见 `_WEAPON_TYPE_DEFAULT_LIMIT`；
-    # 目录/筛选仍是 50（命中行很轻，而且那是"全库找枪"的问题，条数少了反而要反复问）。
-    limit = positive_or_default(limit, _WEAPON_TYPE_DEFAULT_LIMIT if intent == "type" else 50)
+    # 按类型列武器（列表行，约 2.3k 字符/件）默认 10 件、锻造图样默认 20 条；其余 50
+    # （目录/筛选命中行很轻，且是"全库找枪"，条数少了反而要反复问）。
+    weapon_defaults = dict.fromkeys(WEAPON_PATTERN_INTENTS, _WEAPON_PATTERN_DEFAULT_LIMIT)
+    weapon_defaults["type"] = _WEAPON_TYPE_DEFAULT_LIMIT
+    limit = positive_or_default(limit, weapon_defaults.get(intent, 50))
     include_inventory = True if include_inventory is None else include_inventory
     community_section = community_section or "text"
     catalog_intents = {"catalog", "search_catalog", "all_weapons", "global", "search_all"}
-    uses_catalog = intent in catalog_intents or (
-        intent == "filter_rolls" and not include_inventory
-    )
+    uses_catalog = intent in catalog_intents or (intent == "filter_rolls" and not include_inventory)
     resolved = None if uses_catalog else resolve_player_name(player_name)
+
+    if intent in WEAPON_PATTERN_INTENTS:
+        return await patterns_branches.patterns_branch(
+            svc, resolved, weapon_name, weapon_type, limit, offset)
 
     if intent == "community":
         result = _community_read(
@@ -492,20 +502,11 @@ async def weapon_assistant(
         if not include_inventory:
             catalog_required_perks = _perk_filter_terms(required_perks, perk_name)
             filtered = svc["weapon_roll_filter_svc"].filter_catalog(
-                weapon_name=weapon_name,
-                weapon_type=weapon_type,
-                required_perks=catalog_required_perks,
-                any_perks=any_perks,
-                excluded_perks=excluded_perks,
-                limit=limit,
+                weapon_name=weapon_name, weapon_type=weapon_type, required_perks=catalog_required_perks,
+                any_perks=any_perks, excluded_perks=excluded_perks, limit=limit,
             )
-            return weapon_branches.catalog_payload(
-                svc, filtered, include_inventory=False, intent=intent
-            )
-        detail = await svc["weapon_detail_svc"].get_weapon_details_by_type(
-            resolved,
-            weapon_type,
-        )
+            return weapon_branches.catalog_payload(svc, filtered, include_inventory=False, intent=intent)
+        detail = await svc["weapon_detail_svc"].get_weapon_details_by_type(resolved, weapon_type)
         filtered = svc["weapon_roll_filter_svc"].filter_rolls(
             [weapon.model_dump(mode="json") for weapon in detail.weapons],
             weapon_name=weapon_name,

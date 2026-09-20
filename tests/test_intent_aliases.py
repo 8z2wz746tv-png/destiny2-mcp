@@ -49,6 +49,8 @@ ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
         "compare": ("compare_duplicates",),
         "perk_pool": ("perks",),
         "popularity": ("selection_rates", "perk_selection", "selection", "usage_rates"),
+        # 锻造图样：中文说法（永久别名）与英文近义
+        "patterns": ("pattern", "craft", "锻造", "图样", "图样进度"),
     },
     "LoadoutIntent": {"list": ("get",)},
     "SubclassIntent": {"get": ("subclass",)},
@@ -100,7 +102,37 @@ def _dispatch_groups() -> list[set[str]]:
     groups: list[set[str]] = []
     for path in _DISPATCH_FILES:
         groups.extend(_groups_in(path))
+    # 同义 intent 收进 `_requests.py` 的模块常量、分派里只写 `intent in SOME_CONST`
+    # 是正确做法（单一出处），这里要把那些常量也算成"同一处分派"。
+    groups.extend(_module_constants().values())
     return groups
+
+
+def _module_constants() -> dict[str, set[str]]:
+    """`_requests.py` 与分派文件里的模块级"全字符串常量"：名字 → 取值集合。"""
+    found: dict[str, set[str]] = {}
+    for path in [Path(R.__file__), *_DISPATCH_FILES]:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in tree.body:
+            if isinstance(node, ast.AnnAssign):
+                targets: list[ast.expr] = [node.target]
+            elif isinstance(node, ast.Assign):
+                targets = list(node.targets)
+            else:
+                continue
+            value = node.value
+            if not isinstance(value, (ast.Set, ast.Tuple, ast.List)) or not value.elts:
+                continue
+            if not all(
+                isinstance(element, ast.Constant) and isinstance(element.value, str)
+                for element in value.elts
+            ):
+                continue
+            names = {element.value for element in value.elts}
+            for target in targets:
+                if isinstance(target, ast.Name):
+                    found[target.id] = names
+    return found
 
 
 def _groups_in(path: Path) -> list[set[str]]:

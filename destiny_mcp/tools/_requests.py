@@ -21,7 +21,14 @@ WeaponIntent = Literal[
     "analyze", "catalog", "search_catalog", "all_weapons", "global", "search_all", "filter_rolls",
     "compare", "compare_duplicates", "perk_pool", "perks", "god_roll", "popularity", "selection_rates",
     "perk_selection", "selection", "usage_rates", "type", "info", "stats", "perk_description", "catalyst", "community",
+    # 锻造图样（图鉴「模式和催化」的武器模式那一半）：进度读账号组件 900
+    "patterns", "pattern", "craft", "锻造", "图样", "图样进度",
 ]
+# 同一组同义 intent 写一次：工具层分派与参数归属都从这里取，别再各抄一份。
+# 内容必须与上面的 Literal 一致 —— `tests/test_pattern_query.py` 会核对。
+WEAPON_PATTERN_INTENTS: tuple[str, ...] = (
+    "patterns", "pattern", "craft", "锻造", "图样", "图样进度",
+)
 BuildIntent = Literal["recommend", "find", "analyze", "farm_target", "equip_build", "armor_mods", "exotic_armor", "set_bonus", "community", "community_build", "starside"]
 LoadoutIntent = Literal["list", "get", "save", "delete", "equip_loadout", "search_identifiers", "snapshot_official", "update_official_identifiers", "clear_official"]
 SubclassIntent = Literal[
