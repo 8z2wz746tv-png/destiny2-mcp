@@ -1054,8 +1054,8 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     lost = rdata.get("lost_sector") or {}
     check(
         "rows",
-        "rotations：遗失区域没锚点就只给候选、不给「今天是谁」",
-        lost.get("anchored") is False and lost.get("total") == 31
+        "rotations：遗失区域说明「专家常驻、传说/大师未核对」，只给候选不给「今天是谁」",
+        lost.get("anchored") is False and lost.get("total") == 27 and lost.get("expert_always_available") is True
         and bool(lost.get("how_to_anchor"))
         and not [row for row in rrows if row.get("kind") == "lost_sector"],
         f"anchored={lost.get('anchored')} total={lost.get('total')} 行数={len(rrows)}",

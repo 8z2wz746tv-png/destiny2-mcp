@@ -265,15 +265,20 @@ class RotationService:
 
     @staticmethod
     def _lost_sector_block() -> dict[str, Any]:
-        """遗失区域：顺序**没核对过**，所以只给候选与核对办法，不给"今天是谁"。"""
+        """遗失区域：**专家是常驻列表**（27 个地点，按目的地分组，实测于游戏内截图），
+        传说/大师有没有「每日轮换」还没核对过 —— 所以不给"今天是谁"。"""
         return {
             "anchored": tables.LOST_SECTOR_ANCHORED,
+            "expert_always_available": True,
+            "groups": [{"destination": destination, "locations": list(names)}
+                       for destination, names in tables.LOST_SECTOR_GROUPS],
             "candidates": list(tables.LOST_SECTOR_LOCATIONS),
             "total": tables.LOST_SECTOR_TOTAL,
             "verified_at": tables.LOST_SECTOR_VERIFIED_AT,
+            "verified_against": tables.LOST_SECTOR_VERIFIED_AGAINST,
             "how_to_anchor": (
-                "在游戏里看一眼今天的传说/大师遗失区域是哪个地点，把名字报出来，"
-                "就能补上锚点（游戏已停更，核对一次长期有效）。"
+                "看一眼游戏里「传说/大师遗失区域」那个入口：是常驻全部，还是每天只放一个？"
+                "如果是后者，把今天的地点名报出来即可补锚点（游戏已停更，核对一次长期有效）。"
             ),
         }
 

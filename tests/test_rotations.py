@@ -84,9 +84,13 @@ def test_weekly_rotations_declare_how_they_were_verified() -> None:
         assert rotation.anchor_index < len(rotation.candidates)
 
 
-def test_lost_sector_table_is_not_anchored_and_says_how_to_anchor() -> None:
+def test_lost_sector_table_is_the_expert_playlist() -> None:
+    """专家列表实测自游戏内截图：27 个地点、按目的地分组；被排除的 4 个要写清理由。"""
     assert tables.LOST_SECTOR_ANCHORED is False
-    assert len(tables.LOST_SECTOR_LOCATIONS) == tables.LOST_SECTOR_TOTAL == 31
+    assert len(tables.LOST_SECTOR_LOCATIONS) == tables.LOST_SECTOR_TOTAL == 27
+    assert "空坦克" not in tables.LOST_SECTOR_LOCATIONS, "只有传说/大师、没有专家变体"
+    assert not [n for n in tables.LOST_SECTOR_LOCATIONS if n.startswith("消息")], "那不是遗失区域"
+    assert tables.LOST_SECTOR_GROUPS[0][0] == "欧洲无人区"
 
 
 # ── 服务：官方那半 ───────────────────────────────────────────────────
@@ -224,7 +228,9 @@ async def test_lost_sector_block_is_honest_about_the_missing_anchor() -> None:
     result = await service().rotations(limit=50)
 
     assert result["lost_sector"]["anchored"] is False
-    assert len(result["lost_sector"]["candidates"]) == 31
+    assert result["lost_sector"]["expert_always_available"] is True
+    assert len(result["lost_sector"]["candidates"]) == 27
+    assert len(result["lost_sector"]["groups"]) == 9
     assert "核对" in result["lost_sector"]["how_to_anchor"]
     assert not [row for row in result["rows"] if row["kind"] == "lost_sector"], "没锚点就不给行"
 
