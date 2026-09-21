@@ -33,15 +33,21 @@ async def test_queue_wait_is_not_charged_to_the_budget() -> None:
 
 
 async def test_slow_computation_still_times_out() -> None:
-    """真正的计算超时还是要报，并说清预算和怎么办。"""
+    """真正的计算超时还是要报，说清预算、怎么办，**并且明说"没算完不等于配不出来"**。
+
+    最后一条是 P1 的纪律（见 `tests/test_build_budget_honesty.py`）：超时是"没搜完"，
+    不是"不可行"。话术里少了这句，读的人就会把超时当成"配不出来"。
+    """
     compute = BuildCompute(timeout_seconds=1)
 
     with pytest.raises(BuildValidationError) as excinfo:
         await compute.run(_sleep, 5)
 
     message = str(excinfo.value)
-    assert "1s budget" in message
+    assert "1 秒" in message
     assert "DESTINY_BUILD_TIMEOUT_SECONDS" in message
+    assert "没算完" in message
+    assert "不代表配不出来" in message
 
 
 def test_budget_defaults_to_config_and_is_overridable(monkeypatch: pytest.MonkeyPatch) -> None:

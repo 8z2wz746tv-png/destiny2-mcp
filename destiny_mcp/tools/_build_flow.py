@@ -117,6 +117,23 @@ def _tuning_summary(builds: Any) -> dict[str, Any] | None:
     }
 
 
+def _empty_message(search: dict[str, Any] | None) -> str:
+    """0 候选时说的话**必须自证"搜完了"**。
+
+    否则读的人分不清"枚举完了、真没有满足下限的方案"与"没搜完/被截断"——
+    这正是本仓库栽过的坑（`analyze` 曾在没验证过的情况下断言"没有合法组合"）。
+    """
+    if search is None or search.get("exhaustive"):
+        combos = (search or {}).get("combos")
+        scope = f"（枚举了 {combos:,} 套组合）" if isinstance(combos, int) else ""
+        return f"找到 0 个候选配装：枚举完了，没有任何一套能满足这些下限{scope}。"
+    return (
+        "这次**没有搜完**，所以不能说「没有满足下限的方案」"
+        f"（截断原因：{search.get('truncated_by') or '未说明'}）。"
+        "可以收窄请求后重试，或调高搜索预算。"
+    )
+
+
 async def find(
     svc: Any,
     player_name: str,
@@ -124,17 +141,21 @@ async def find(
     query: dict[str, Any],
     dump: Callable[[Any], Any],
 ) -> dict[str, Any]:
+    coverage: list[Any] = []
     try:
-        result = await svc["build_svc"].find_build(player_name, request)
+        result = await svc["build_svc"].find_build(player_name, request, coverage)
     except BuildTooLargeError as exc:
         return _not_computed(str(exc), query, key="builds")
+    search = coverage[0].to_dict() if coverage else None
     builds = with_slot_keys(dump(result))
     tuning = _tuning_summary(builds)
     if not builds:
-        ladder = await armor_ladder.no_solution_ladder(svc, player_name, request)
+        ladder = await armor_ladder.no_solution_ladder(
+            svc, player_name, request, coverage=search
+        )
         return ok_response(
-            "找到 0 个候选配装。",
-            {"builds": builds, "query": query, "ladder": ladder},
+            _empty_message(search),
+            {"builds": builds, "query": query, "ladder": ladder, "search": search},
             next_actions=[
                 "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；"
                 "降级要用户同意后再重试。",

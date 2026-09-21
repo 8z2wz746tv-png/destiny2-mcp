@@ -26,6 +26,7 @@ from ..build.process_types import (
     ARTIFICE_STAT_BOOST,
     MAJOR_STAT_BOOST,
     ProcessArmorSet,
+    SearchCoverage,
     armor_to_process_item,
 )
 from ..build.solver import prepare_fixed_set_context, validate_fixed_process_items
@@ -556,23 +557,36 @@ def _rebuild(verified: ProcessArmorSet, arms: Sequence[Armor]) -> ProcessArmorSe
     )
 
 
+@dataclass(frozen=True)
+class TuningOutcome:
+    """一次"求解 + 调谐补救"的完整结果。
+
+    为什么不是三元组：`coverage` 必须跟着候选一起走 —— 调用方拿它区分"搜完了真没解"
+    与"没搜完"，这个判断不能被漏掉（P1 的整条纪律见 `SearchCoverage` 的注释）。
+    """
+
+    pool: list[ProcessArmorSet]
+    tuning_map: dict[tuple[str, ...], TuningPlan]
+    coverage: SearchCoverage
+    #: 这一趟有没有动用"放宽目标 + 调谐补救"（给话术与诊断用，不参与判定）
+    rescued: bool
+
+
 async def solve_with_tuning(
     compute: Any,
     snapshot: Any,
     constraints: BuildConstraints,
     manifest: Any,
-) -> tuple[list[ProcessArmorSet], dict[tuple[str, ...], TuningPlan]]:
+) -> TuningOutcome:
     """按原目标求解；没达标时再用调谐额度复解一遍并逐套复核。
 
-    Returns:
-        (候选池, 键为护甲实例 ID 组合的调谐方案表)。候选池里被调谐救回来的方案排在
-        前面 —— `find_build` 只取前 top_n 套，得先保证它们进得来。
+    候选池里被调谐救回来的方案排在前面 —— `find_build` 只取前 top_n 套，得先保证它们进得来。
     """
     solved = await compute.run(_solve, snapshot, constraints)
     strict_sets = list(solved.sets)
     if strict_sets and sets_meet_targets(strict_sets, constraints):
         # 已经达标：一个字都不改（基线里那些本来就绿的方案必须保持一致）
-        return strict_sets, {}
+        return TuningOutcome(strict_sets, {}, solved.coverage, rescued=False)
 
     rescues = rescue_sets(snapshot, constraints, manifest, strict_sets)
     rescued_keys = {set_key(rescue.armor_set.armor) for rescue in rescues}
@@ -605,7 +619,7 @@ async def solve_with_tuning(
         for armor_set in strict_sets
         if set_key(armor_set.armor) not in rescued_keys
     )
-    return pool, plans
+    return TuningOutcome(pool, plans, solved.coverage, rescued=True)
 
 
 def _solve(snapshot: Any, constraints: BuildConstraints) -> Any:
@@ -650,6 +664,7 @@ __all__ = [
     "relax_targets",
     "rescue_sets",
     "sets_meet_targets",
+    "TuningOutcome",
     "solve_with_tuning",
     "tuning_allowance",
     "verification_search",

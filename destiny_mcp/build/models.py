@@ -23,6 +23,7 @@ from .armor_rules import (
     tuning_options,
 )
 from .constants import (
+    REQUEST_TARGET_FIELDS,
     ARMOR_SLOT_MAP,
     NAME_TO_STAT_HASH,
     STAT_HASH_TO_NAME,
@@ -648,6 +649,10 @@ class BuildRequest(BaseModel):
         default=None, ge=2, le=4,
         description="Required number of set pieces (2 or 4). Default: 2",
     )
+    def target_vector(self) -> list[int | None]:
+        """六个下限，按 `STAT_NAMES` 顺序（没给的项是 None，不是 0）。"""
+        return [getattr(self, REQUEST_TARGET_FIELDS[name], None) for name in STAT_NAMES]
+
     priority_stats: list[str] = Field(
         default_factory=list,
         description="Stats to maximize in strict order after meeting all minimums. "

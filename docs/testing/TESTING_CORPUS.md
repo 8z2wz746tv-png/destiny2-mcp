@@ -380,6 +380,7 @@
 | --- | --- | --- |
 | ⭐ 照社区配装的六维来一套 | `build_assistant(intent="find")` 带模板硬约束（猎人 武器150/职业100/超能80/近战70/手雷70 + 金装 快速装弹松身裤） | 0.1.6 起**有解**：5 套候选、每套 `requires_tuning=true` 且只改 1 件调谐就达标（这条以前是"无解"的样板，现在是调谐补齐的核心实机证据） |
 | 真的配不出来时告诉我差在哪 | 同上，但把生命值推到 `health_target=200` | 0 候选 + `ladder`：`shortfall`、`ceiling`（**同一套约束下同时能达到**的上限，实采）、`trials`、`suggestion`，以及 `verdict.satisfiable=false`（按**原始优先级**实测 0 候选；并说明 ceiling 是逐项最大值、trials 里 ok=true 的档是换了优先级之后的解） |
+| 0 候选时凭什么说"配不出来" | `build_assistant(intent="find")` 跑到 0 候选（如把生命值推到 200） | 响应必须**自证枚举完了**：`summary` 写「枚举完了，没有任何一套能满足这些下限（枚举了 N 套组合）」、`data.search = {exhaustive: true, combos: N, truncated_by: null}`；`ladder.verdict.satisfiable=false`。**没搜完时（`exhaustive=false`）必须是 `satisfiable=null` + 「这次没搜完」**，不许把预算/配额截断写成不可行（P1 守门见 `tests/test_build_budget_honesty.py`） |
 | 这个"上限"是什么上限 | `ladder.single_stat_ceiling` | 那是**单项**上限（把点全堆一项）；拿它当"同时能达到"会得出"你什么都够"。两个字段都在，回答时不能混 |
 | 只差几点，非降目标不可吗 | `ladder.tuning_first` + `find` 的 `tuning_changes` | 求解器**真的试过调谐**（没达标时用调谐额度复解 + 逐套精确复核）：能补的直接给带 `tuning_changes` 的候选（`requires_tuning=true`）；补不上时这一档如实分三种口径（额度够但让不出来 / 额度不够 / 只差 ≤10 看属性模组），并带 `solver_attempted` |
 | 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` **不含调谐插件** —— 调谐写入本项目还没验证过（见 ADR-013），别把它说成"上游只允许游戏内改"（那句出自 ADR-012 推翻的 1663） |

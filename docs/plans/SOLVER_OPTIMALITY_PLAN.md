@@ -294,6 +294,54 @@ P0 读码得到的三条更正（已并入上文）：`combos` 已经存在、`s
 `coverage.complete` 还不存在；`analyze`/`ladder` 仍只在无解路径跑；
 `arms_response_allowlist.json` 里还没登记任何 build 用例的预期变更。
 
+---
+
+## 四·六、P1 落地记录（2026-09-22）
+
+**先查清了"今天到底会不会说谎"**，结论是：**不会，而且原因是可指认的**。
+
+`[]`（0 候选）在今天的实现里确实是"枚举完了、没有任何一套能满足下限"，因为：
+
+1. 五层枚举**没有配额**（`solver.py:509-652` 是完整笛卡尔积，`combs` 只用来计数）；
+2. 补不上下限的组合在**进堆之前**就被 `validate_fixed_process_items` 拒掉
+   （`solver.py:600-602`，它内部真的跑一次模组分配，`pick_and_assign_slot_independent_mods`
+   拿 `needed_stats` 当目标，补不上返回 None）——所以堆里**只有**满足下限的解，
+   top-N 截断挤不掉"唯一那套达标的"；
+3. 唯一"搜不了"的状态（组合规模超限）走 `BuildTooLargeError` → 工具返回 `not_computed`，不是"无解"；
+4. 超时走 `BuildValidationError` → 错误响应，也不是"无解"。
+
+**实测证据**：构造 3125 套组合、其中 3124 套"优先级高但永远达不到下限"、唯一达标那套在优先级上垫底、
+堆容量只有 200 —— `solve()` 如实返回 **1** 套（不是 0）。这条已固化成守门
+（`tests/test_build_budget_honesty.py::test_a_satisfying_set_survives_the_top_n_heap`）：
+把"能否满足下限"从"进堆前的校验"挪到"进堆后的排序"，它会立刻变红（注入验证过）。
+
+**交付**：
+
+- `build/process_types.SearchCoverage` + `ProcessResult.complete/truncated_by`：
+  "搜完了没有"成为**类型**而不是注释；默认 `complete=True`，将来加预算必须显式置 False。
+- `solve_with_tuning` 返回 `TuningOutcome`（pool / tuning_map / **coverage** / rescued）——
+  覆盖率跟着候选一起走，调用方漏不掉。
+- `BuildService.find_build(..., coverage=[ ])` 可选收集器；`build_service.py` **卡在 901 行上限**，
+  所以这次是靠压缩同文件里的冗余 logger 调用把行数腾出来的（上限只许降不许抬）。
+- 工具层：0 候选时摘要自证 + `data.search`；**有候选的正常响应逐字节不变**（基线不用重录）。
+- `ladder.verdict.satisfiable` 在 `exhaustive=false` 时变成 `null`，evidence 说明"没搜完"。
+- 超时话术改中文并加「没算完，不代表配不出来」。
+- 顺手收掉"一个事实写三处"：`STAT_NAMES → 请求字段名`（`class_stat` 对应 `class_target`）
+  统一到 `build/constants.REQUEST_TARGET_FIELDS`。**这条是真 bug**：`build_service` 的日志
+  按 `STAT_NAMES` 拼 `f"{name}_target"` 会抛 `AttributeError`，真机路径上必炸。
+
+**真机验收**（`hunter` + 生命值 200 那条无解路径）：
+
+```
+summary: 找到 0 个候选配装：枚举完了，没有任何一套能满足这些下限（枚举了 6,283,200 套组合）。
+search : {"exhaustive": true, "combos": 6283200, "truncated_by": null}
+verdict: {"satisfiable": false, "evidence": "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）", ...}
+```
+
+**未在 P1 做**：P0 记录里那条"同请求 75.6s → 238.0s"的成本漂移**仍未归因**
+（要把当时的 commit worktree 出来 paired 跑）；`analyze` 的 `precision` 语义没动；
+`hunter_infeasible` 走工具层时 `ladder` 的额外几次 `analyze`/`recommend` 成本也还没量。
+
 ### P1 诚实性：阶段分离 + `coverage.complete`
 
 - **改**：`build/solver.py`（feasibility pass 与有界排序分开）、`services/build_service.py`、

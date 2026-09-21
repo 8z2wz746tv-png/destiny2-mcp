@@ -4,6 +4,22 @@
 
 ## 未发布
 
+**修复（重要）：0 候选不再是一句空口"没解"** —— P1 阶段分离，见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md`：
+
+- 空结果现在**自证枚举完了**：`data.search = {exhaustive, combos, truncated_by}`，摘要写
+  「枚举完了，没有任何一套能满足这些下限（枚举了 N 套组合）」；真机上 6,283,200 套的用例已验。
+- **"没搜完"与"不可行"在类型上分开**：新增 `build/process_types.SearchCoverage`，
+  `ProcessResult.complete` 默认 True（五层枚举无配额），将来加预算的人必须显式置 False。
+  `ladder.verdict.satisfiable` 因此多了 `null` —— 没搜完时不许断言不可行
+  （对齐 d2-armor-solver 的 "no limit can create an infeasibility proof"）。
+- 超时话术从英文改成中文，并明说「**没算完**，不代表配不出来」。
+- 顺带收掉一处"一个事实写三处"：`STAT_NAMES → 请求字段名` 的映射（`class_stat` 对应 `class_target`）
+  以前在 `tools/_armor_ladder.py` 抄了一份、`build_service` 的日志又按 `STAT_NAMES` 拼字符串，
+  于是 `class_stat_target` 直接 `AttributeError`（真机路径上会炸）。现在单一出处是
+  `build/constants.REQUEST_TARGET_FIELDS`，`BuildRequest.target_vector()` 也走它。
+- 守门：`tests/test_build_budget_honesty.py`（7 条，其中 4 条注入验证过会红），
+  含"堆截断不许把唯一满足下限的那套挤掉"（3125 组合 / 堆容量 200 的构造用例）。
+
 **新增工具：护甲求解器基准** `scripts/benchmark_build_solver.py`（P0，见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md`）：
 
 - 固定用例 × 3 次取中位，每条用例同时量**端到端**（`BuildService.find_build`，含 worker 进程开销）

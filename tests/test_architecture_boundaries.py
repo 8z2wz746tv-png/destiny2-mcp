@@ -285,7 +285,7 @@ async def test_compute_timeout_terminates_worker_and_releases_capacity() -> None
     previous_pid = await compute.run(os.getpid)
     compute._timeout_seconds = 0.05
     # 消息里要带上预算和调法（以前只有一句 "timed out"，看不出该怎么办）
-    with pytest.raises(BuildValidationError, match="exceeded the .* budget") as excinfo:
+    with pytest.raises(BuildValidationError, match="没算完") as excinfo:
         await compute.run(time.sleep, 10)
     assert "DESTINY_BUILD_TIMEOUT_SECONDS" in str(excinfo.value)
     compute._timeout_seconds = 5

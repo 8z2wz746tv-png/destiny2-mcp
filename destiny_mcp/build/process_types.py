@@ -138,12 +138,46 @@ class ProcessArmorSet:
     power: int = 0
 
 
+@dataclass(frozen=True)
+class SearchCoverage:
+    """这次搜索**到底搜完了没有**。
+
+    存在的理由：调用方要能区分"枚举完了、真的没有满足下限的方案"与"没搜完/被截断"。
+    本仓库已经栽过一次同类跟头（`analyze` 在没验证过的情况下断言"没有合法组合"，0.1.13 修），
+    所以这条纪律写进类型里而不是靠注释：**预算/配额用尽永远不能产生"不可行"的结论**
+    （对照 d2-armor-solver 的 "no limit can create an infeasibility proof"）。
+
+    今天五层枚举没有配额，所以 `exhaustive` 恒为 True；P4 要把调谐枚举与预算做进来时，
+    这里是唯一的出口。
+    """
+
+    exhaustive: bool
+    combos: int
+    truncated_by: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "exhaustive": self.exhaustive,
+            "combos": self.combos,
+            "truncated_by": self.truncated_by or None,
+        }
+
+
 @dataclass
 class ProcessResult:
     """Result from the solver."""
 
     sets: list[ProcessArmorSet] = field(default_factory=list)
     combos: int = 0
+    #: 搜索有没有跑完。默认 True（五层枚举无配额）；将来加了配额就必须如实置 False。
+    complete: bool = True
+    truncated_by: str = ""
+
+    @property
+    def coverage(self) -> SearchCoverage:
+        return SearchCoverage(
+            exhaustive=self.complete, combos=self.combos, truncated_by=self.truncated_by
+        )
 
 
 # ═══════════════════════════════════════════════════════════════════════════

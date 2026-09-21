@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from typing import Any, Sequence
 
+from ..build.constants import REQUEST_TARGET_FIELDS
 from ..logging_config import get_logger
 from ..vocabulary import STAT_LABELS_ZH as STAT_LABELS  # 单一出处：vocabulary.py
 
@@ -25,14 +26,8 @@ logger = get_logger(__name__)
 
 STAT_ORDER: tuple[str, ...] = tuple(STAT_LABELS)
 
-TARGET_FIELDS: dict[str, str] = {
-    "weapons": "weapons_target",
-    "health": "health_target",
-    "class_stat": "class_target",
-    "grenade": "grenade_target",
-    "melee": "melee_target",
-    "super_stat": "super_target",
-}
+#: 单一出处：`build/constants.REQUEST_TARGET_FIELDS`（这里只换名字，调用点照旧）
+TARGET_FIELDS: dict[str, str] = dict(REQUEST_TARGET_FIELDS)
 
 _LADDER_STEP = 10
 
@@ -347,6 +342,7 @@ async def no_solution_ladder(
     request: Any,
     *,
     max_probes: int = 4,
+    coverage: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """无解时算这张表：逐级放松目标再解，把"降哪一档就能穿"摊开。
 
@@ -434,9 +430,19 @@ async def no_solution_ladder(
     # 这张阶梯**只在工具按原始请求 0 候选时**才会生成，所以 satisfiable 一定是 false；
     # 但 trials 里可能有 ok=true 的档 —— 那是"换了优先级顺序"或"放下目标"之后的结果。
     # 实机踩过：把 trials[0].ok 当结论会说成"其实配得出来"，而工具自己那一次是 0 候选。
+    # `coverage` 是生成这张阶梯的那次求解的自证：只有"枚举完了"才敢说不可行。
+    # 没搜完（预算/配额截断）时 `satisfiable` 必须是 None —— **不许把"没搜完"写成"不可行"**
+    # （d2-armor-solver 的原话：no limit can create an infeasibility proof）。
+    exhausted = True if coverage is None else bool(coverage.get("exhaustive"))
     table["verdict"] = {
-        "satisfiable": False,
-        "evidence": "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）",
+        "satisfiable": False if exhausted else None,
+        "evidence": (
+            "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）"
+            if exhausted
+            else f"工具按原始优先级返回 0 候选，但**这次没搜完**"
+                 f"（截断原因：{(coverage or {}).get('truncated_by') or '未说明'}），"
+                 "所以不能断言不可行"
+        ),
         "note": (
             "ceiling 是各次探测**逐项**取的最大值，不等于同一套护甲能同时达到；"
             "trials 里 ok=true 的档是**换了优先级顺序或放下目标**之后的解，原始请求一个字没改；"

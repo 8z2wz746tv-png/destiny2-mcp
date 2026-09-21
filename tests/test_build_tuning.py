@@ -297,13 +297,15 @@ async def test_solve_with_tuning_returns_untouched_when_targets_are_met() -> Non
     snapshot = _snapshot(armors)
     compute = _FakeCompute()
 
-    pool, plans = await solve_with_tuning(
+    outcome = await solve_with_tuning(
         compute, snapshot, BuildConstraints(grenade_min=40), manifest
     )
 
     assert len(compute.calls) == 1, "达标时不该再解第二遍"
-    assert plans == {}
-    assert pool and pool[0].stats[STAT_INDEX["grenade"]] == 50
+    assert outcome.tuning_map == {}
+    assert outcome.rescued is False
+    assert outcome.coverage.exhaustive is True, "枚举跑完了才敢说'没有满足下限的方案'"
+    assert outcome.pool and outcome.pool[0].stats[STAT_INDEX["grenade"]] == 50
 
 
 @pytest.mark.asyncio
@@ -314,13 +316,14 @@ async def test_solve_with_tuning_rescues_a_five_point_gap() -> None:
     compute = _FakeCompute()
     constraints = BuildConstraints(grenade_min=55)
 
-    pool, plans = await solve_with_tuning(compute, snapshot, constraints, manifest)
+    outcome = await solve_with_tuning(compute, snapshot, constraints, manifest)
 
     assert len(compute.calls) == 2, "没达标时要用放宽后的目标再解一遍"
     assert compute.calls[1].grenade_min == 30  # 55 − 25
-    assert len(plans) == 1
-    assert pool and list(pool[0].stats)[STAT_INDEX["grenade"]] == 55
-    assert sets_meet_targets(pool, constraints) is True
+    assert outcome.rescued is True
+    assert len(outcome.tuning_map) == 1
+    assert outcome.pool and list(outcome.pool[0].stats)[STAT_INDEX["grenade"]] == 55
+    assert sets_meet_targets(outcome.pool, constraints) is True
 
 
 @pytest.mark.asyncio
@@ -331,12 +334,12 @@ async def test_solve_with_tuning_keeps_the_original_pool_when_it_cannot_help() -
     compute = _FakeCompute()
     constraints = BuildConstraints(grenade_min=100)
 
-    pool, plans = await solve_with_tuning(compute, snapshot, constraints, manifest)
+    outcome = await solve_with_tuning(compute, snapshot, constraints, manifest)
 
-    assert plans == {}
+    assert outcome.tuning_map == {}
     # 这份替身 Manifest 里没有属性模组，所以严格解本身就会被剪掉（pool 为空也正常）；
     # 关键是：没救回来时不能凭空造方案，也不能报"达标"。
-    assert sets_meet_targets(pool, constraints) is False
+    assert sets_meet_targets(outcome.pool, constraints) is False
 
 
 # ── 供"无解"阶梯引用的额度证据 ───────────────────────────────────────

@@ -108,7 +108,7 @@ async def test_ladder_finds_the_smallest_relaxation_that_works() -> None:
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             seen.append(request.melee_target)
             if request.melee_target is None:
                 return [SimpleNamespace(build=SimpleNamespace(weapons=200, grenade=41, melee=26))]
@@ -140,7 +140,7 @@ async def test_single_stat_maximum_is_not_used_as_the_simultaneous_ceiling() -> 
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             # 同一套约束下按当前优先级：武器能到 200，但近战只有 26
             return [SimpleNamespace(build=SimpleNamespace(weapons=200, melee=26))]
 
@@ -281,7 +281,7 @@ async def test_too_large_requests_are_refused_with_narrowing_advice() -> None:
         async def recommend_build(self, player_name, request):
             raise BuildTooLargeError(reason)
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             raise BuildTooLargeError(reason)
 
     svc = {"build_svc": _Build()}
@@ -355,7 +355,7 @@ async def test_ladder_pulls_tuning_evidence_from_the_inventory_service() -> None
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             # 放开目标那一档能解出手雷 65（于是原目标 70 差 5 点）
             if request.grenade_target is None:
                 return [SimpleNamespace(build=SimpleNamespace(grenade=65))]
@@ -388,7 +388,7 @@ async def test_ladder_survives_a_failing_inventory_lookup() -> None:
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             return []
 
     class _Inventory:
@@ -396,7 +396,7 @@ async def test_ladder_survives_a_failing_inventory_lookup() -> None:
             raise RuntimeError("组件缺失")
 
     class _BuildWithSample(_Build):
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             if request.grenade_target is None:
                 return [SimpleNamespace(build=SimpleNamespace(grenade=65))]
             return []
@@ -427,7 +427,7 @@ async def test_find_reports_which_candidates_need_tuning() -> None:
     }
 
     class _Build:
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             return [
                 {
                     "score": 50.0,
@@ -457,7 +457,7 @@ async def test_find_hides_the_tuning_block_when_nothing_needs_it() -> None:
     from destiny_mcp.tools import _build_flow
 
     class _Build:
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             return [
                 {
                     "score": 50.0,
@@ -487,7 +487,7 @@ async def test_ladder_says_when_the_original_targets_are_impossible() -> None:
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             return []
 
     table = await ladder.no_solution_ladder(
@@ -509,7 +509,7 @@ async def test_ladder_reports_insufficient_tuning_headroom_instead_of_silence() 
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None):
             if request.grenade_target is None:
                 return [SimpleNamespace(build=SimpleNamespace(grenade=20))]
             return []

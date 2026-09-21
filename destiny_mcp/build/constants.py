@@ -23,6 +23,19 @@ STAT_NAMES: tuple[str, ...] = (
     "super_stat",
 )
 
+#: `STAT_NAMES` → `BuildRequest` 的字段名。只有 `class_stat` 不一样（请求里叫
+#: `class_target`）。以前这张表在 `tools/_armor_ladder.py` 里抄了一份，`build_service`
+#: 的日志又按 `STAT_NAMES` 拼字符串，于是 `class_stat_target` 直接 AttributeError ——
+#: 一个事实写三处就会这样，收到这里。
+REQUEST_TARGET_FIELDS: dict[str, str] = {
+    "weapons": "weapons_target",
+    "health": "health_target",
+    "class_stat": "class_target",
+    "grenade": "grenade_target",
+    "melee": "melee_target",
+    "super_stat": "super_target",
+}
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Destiny 2 stat hashes (from DestinyStatDefinition)
 # ═══════════════════════════════════════════════════════════════════════════

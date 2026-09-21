@@ -39,10 +39,12 @@ class BuildCompute:
                         cancellable=True,
                     )
             except TimeoutError as exc:
+                # 话术必须是中文，而且要**明确说"没算完"**：这句以前是英文，读的人容易
+                # 把它当成"配不出来"。没搜完 ≠ 不可行（见 build/process_types.SearchCoverage）。
                 raise BuildValidationError(
-                    f"Build computation exceeded the {self._timeout_seconds:.0f}s budget; "
-                    "narrow the request (fewer stat targets or a specific replacement slot) "
-                    "or raise DESTINY_BUILD_TIMEOUT_SECONDS."
+                    f"这次配装计算超过 {self._timeout_seconds:.0f} 秒预算，**没算完**，"
+                    "不代表配不出来。可以收窄请求（少几个属性下限、指定金装或具体部位）后重试，"
+                    "或调高 DESTINY_BUILD_TIMEOUT_SECONDS。"
                 ) from exc
             except BrokenWorkerProcess as exc:
                 # worker 起不来时以前是裸抛：客户端只看到 anyio 的原始异常，看不出原因。
