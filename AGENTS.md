@@ -238,6 +238,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/plans/PVP_STATS_PLAN.md` — 动生涯/赛季战绩（计数器 vs 统计接口、模式与角色范围标注）之前看它为什么分三档。
 - `docs/plans/LEGACY_SURFACE_REMOVAL_PLAN.md` — 要动历史工具面（`full`/`expert` profile、`ENABLE_LEGACY_TOOLS`）或配装导入入口之前看它：删什么、导入怎么搬、怎么验都在里面。
 - `docs/plans/PATTERN_QUERY_PLAN.md` — 要做锻造武器模式（玩家说的红框、「模式和催化」那一页、游戏里的「模式进度 4/5」）查询之前看它：进度只在组件 900、183 vs 219 两个口径的实测证据都在里面。
+- `docs/plans/ROTATION_PLAN.md` — 要做周常轮换（夜幕/宗师词缀、遗失区域、上维挑战、泉源、异域任务、突袭/地牢特色）之前看它：官方接口给了哪半、哪半只能维护周期表、锚点与诚实口径都在里面。
 - `docs/plans/PERFORMANCE_PLAN.md` — 要动性能（搜索 N+1、武器目录全量展开、载荷体积、启动、并发与缓存）之前看它：六项的实测基线与验收口径都在里面。
 - `docs/plans/PVP_WEAPON_BOARD_PLAN.md` — 动 PvP 武器榜（PGCR 窗口聚合、成本与并发实测、模式名出处）之前看它为什么只能给"最近 N 场"。
 - `docs/plans/SUBCLASS_ARTIFACT_PLAN.md` — 动子职业/神器读写之前看计划与取舍。
