@@ -112,7 +112,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | `+ tests/test_skill_contracts.py` | 3 秒 | 动了 `skills/**` 或 intent/参数契约时 |
 | `scripts/run_corpus_all_rows.py`（260 行，打真机） | ≈ 4–5 分钟 | 一个功能**只在提交前跑一次**；不要每改一处就跑 |
 | `scripts/install_skill.py` | < 1 秒 | 动过 `skills/**` 之后 |
-| 线上 DSH 服务器重启（bump 重连标记） | ≈ 40 秒 | 要让 GUI 用上新代码时 |
+| `scripts/install_skill.py --mcp`（重连标记改成**代码版本**，DSH 随即重组重连） | < 1 秒 + 重连 ≈ 40 秒 | 要让宿主/GUI 用上新代码时；同一版本重复跑是幂等的 |
 
 - **别把重活并发跑**：实测与其它任务并发时 pytest 从 100 秒涨到 155 秒，还会让
   `tests/test_build_compute.py::test_queue_wait_is_not_charged_to_the_budget` 假失败。
