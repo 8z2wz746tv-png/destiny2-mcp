@@ -14,7 +14,7 @@
 | 轮次 | 现象 | 判决 |
 | --- | --- | --- |
 | 1、7 | `equip` 一件在**仓库**里的物品 → 上游 404 | **上游铁律 + 我们的锅**：`EquipItem` 只接受"在该角色身上"的实例。我们**应该预检**并直接说"先用 move 搬到角色身上（或让我自动搬）"，而不是把 404 原样抛给调用方 |
-| 3、4 | 装异域胸甲时还穿着异域臂铠 → 500 `DestinyItemUniqueEquipRestricted` | **上游铁律**（全身只能一件金装）。但 DIM 会**自动把冲突的那件换成非异域**再装目标；我们没做 |
+| 3、4 | 装异域胸甲时还穿着异域臂铠 → 500 `DestinyItemUniqueEquipRestricted` | **上游铁律**：同类异域只能一件（异域**护甲**一件 + 异域**武器**一件，**两类互不冲突**；Manifest 证据见 §七）。当时记成了"全身只能一件金装"——这个**过宽**的说法就是 §七 那次复发的源头。DIM 会**自动把冲突的那件换成非异域**再装目标；我们没做 |
 | 5 | `move` 一件**已装备**物品 → 500 `DestinyCannotPerformActionOnEquippedItem` | **上游铁律 + 我们的锅**：应预检并说"它正装备着，要先换下来" |
 | 6 | 转移到角色 → 500 `DestinyNoRoomInDestination`（背包 176/176 满） | **上游铁律**，但消息该给数字与出路（腾位/换用背包里现有的非异域） |
 | 8 | Agent 列了 103 件臂铠、存文件再 grep | **Agent 侧的浪费**（我们没引导）。它想要的是"术士背包里的非异域臂铠"——`intent="get", armor_slot="gauntlets"` 本来就能直接答 |
@@ -79,7 +79,8 @@
    谁是装备着的以 `equipped_keys` 为准 —— 真机上 `characterEquipment`/`characterInventories` 的条目
    **没有 `isEquipped`**，那个字段只在组件 300 的 `instances.data[实例]` 上。
 3. **失败话术**：`tools/_responses.py` 的 `_WRITE_FAILURE_HINTS` 补两条 ——
-   `UniqueEquipRestricted` → "全身只能一件异域，先穿一件非异域的同部位顶下它再装目标"；
+   `UniqueEquipRestricted` → "全身只能一件异域，先穿一件非异域的同部位顶下它再装目标"
+   （**判据过宽，对武器冲突是误导；见 §七**）；
    `ItemNotFound`/"not found in the character's inventory" → "`EquipItem` 只接受在该角色身上的实例，
    先 move 过来或换用他背包里那件"；`NoRoomInDestination` 并入"空间不足"。
 4. **单测**：`tests/test_equip_planner.py` 14 条全绿（四种预检、计划顺序、挑不到中间件的如实失败、
@@ -161,3 +162,81 @@ status = ready
 - 意义：**护甲 3.0 的求解模型（基 roll + 大师杰作 + 属性模组 + 调谐）在真账号上首次被完整验证**，
   预测值与游戏内实测值误差为 0；
 - 模组由用户在游戏内手动安装 —— API 装不了（**ADR-002**）。
+
+---
+
+## 七、复发：冲突模型写错了（2026-09-21）
+
+本节是**修法定稿**：用户 2026-09-19 那份猎人社区配装复盘里"又出这个问题了"的现场，根因在这里。
+
+### 症状（真机复现，两次都是 `confirmed=false` 的预检，零写入）
+
+| 角色 | 请求 | 预检给出的计划 | 应有的判断 |
+| --- | --- | --- | --- |
+| hunter | 装异域弓**需求层级**（威能槽正穿异域刀剑**狼毒**） | 只有一步 `equip`，**零冲突识别** | 同类异域武器冲突 → 该先顶下狼毒 |
+| warlock | 装异域火箭筒**龙息**（动能槽正穿异域自动步枪**赫沃斯托夫7G-0X**） | 先脱异域**胸甲**「星火协议」再装 | 护甲与武器**不冲突**；真冲突（两把异域武器）反而没识别 |
+
+第二行就是复盘里那个误导现场：调用方被指去"顶下异域护甲"，而真因是异域武器。
+
+### 根因（两处，方向相反）
+
+1. **判据过宽**：`plan_equip` 写的是"另一个槽的异域就算冲突"，话术写成"全身只能装备一件异域"。
+   真实规则是**分类别**的 —— 异域武器一件 + 异域护甲一件，两类**互不冲突**。于是"装异域武器 +
+   正穿异域护甲"被误判成冲突，凭空多一步顶下护甲。
+2. **武器看不见**：`InventoryItem.slot` 只按护甲桶填（`item_parser` 的 `_ARMOR_BUCKETS`），
+   武器 `slot` 一律空串；冲突过滤里有 `and item.slot`，等于把武器全部跳过。于是"两把异域武器"
+   这种真冲突**永远漏判**，计划停在 `equip` 一步，真执行必撞 500。
+
+`tools/_responses.py` 的 `_WRITE_FAILURE_HINTS` 又把任何 `UniqueEquipRestricted` 都解释成
+"从该角色背包挑一件非异域的**同部位护甲**"——对武器冲突是纯误导。
+
+### 规则不用猜：Manifest 自己编码了（本机全量实测）
+
+`DestinyInventoryItemDefinition.equippingBlock` 里两个字段正好是这两件事的唯一正主：
+
+| 字段 | 含义 | 实测取值 |
+| --- | --- | --- |
+| `uniqueLabel` | 同类互斥的**组** | `exotic_armor`（348 件，**含异域职业物品** Solipsism/Stoicism/Relativism）、`exotic_weapon`（179 件）；其余取值全是一件一号的纪念徽章，与装备无关 |
+| `equipmentSlotTypeHash` | 装备槽，**武器与护甲一视同仁** | 查 `DestinyEquipmentSlotDefinition` 得名字：Helmet / Gauntlets / Chest Armor / Leg Armor / Class Armor、Kinetic / Energy / Power Weapons |
+
+**判据收敛成一句话**：两件装备冲突 ⇔ 它们的 `uniqueLabel` 相同且非空。
+同槽位换异域不算冲突（装上就把它替换掉了）；异域职业物品与异域护甲冲突也自动落在这条里，不用特判。
+
+### 修法（四处）
+
+1. **冲突判据换成 `uniqueLabel`**：`equip_planner` 不再自己判"是不是异域"（`_is_exotic` 在这条路上退场，
+   只保留"定义查不到就不下结论"的 `None` 语义）；
+2. **槽位改读 `equipmentSlotTypeHash`**：这一条**顺带把"给武器补 slot"整个绕开** ——
+   不必动 `InventoryItem.slot` / `item_parser` / `_DISPLAY_TO_SLOT`（那 43 处读 `slot` 的地方一处不碰），
+   而且"仓库里的护甲 bucketHash 认不出部位"这个老问题（`_slot_from_definition` 的由来）一起消失；
+3. **失败话术改同类口径**：`_WRITE_FAILURE_HINTS` 那条不再说"异域护甲"，改成"同类的异域"；
+4. **`equip_many` 接进同一套编排**：它现在绕过 planner 直接打上游批量 `EquipItems`
+   （`transfer_service.equip_items`），既不预检也不给计划。
+
+### 明确不是解法的：调换"传说在前、异域在后"
+
+用户提过这个方向。它对一半：要装异域 X 而同类异域 Y 正穿着，**必须先用一件同部位的非异域把 Y 顶下**。
+但它与**全局顺序**无关，只与"顶下来的那件落在哪个槽"有关：
+
+- warlock 那一例，计划里根本没有一件落在冲突槽的传说武器，怎么排序都没用；
+- 反过来，只要计划里显式包含"先顶下冲突的那件"，顺序对错都行；
+- 批量接口内部是否按调用方给的顺序处理，我们**没有实测依据**，拿它躲冲突是在赌。
+
+### 已定（2026-09-21，用户拍板）
+
+1. **`equip_many` 的编排粒度 = 整套模拟（A）**：把这一批当作"最终要穿上的一套"算一次 ——
+   先算穿上后各部位的归属，再看最终 `uniqueLabel` 是否重复。这样"这批里本来就有一件紫臂铠
+   会替换掉冲突的异域臂铠"不会被算成冲突、也不会多出没必要的顶下；而**集合内部自带两件同类异域
+   时直接报 `blocked`**（那套本身不合法），不让上游去 500。
+   （被否掉的 B「逐件独立计划」实现简单，但上面两种情况都会给错计划。）
+2. **冲突模型单独开一条 ADR**：`docs/adr/011-exotic-exclusivity-follows-unique-label.md`
+   （编号规矩见 `docs/adr/README.md`：写 `ADR-NNN` 就必须真有那一篇，否则 `tests/test_agent_docs.py` 红）。
+
+### 验收
+
+- 单测（替身）：`uniqueLabel` 冲突（武器↔武器、护甲↔护甲、职业物品↔护甲、跨类**不**冲突）、
+  同槽位换异域不冲突、集合内部两件同类异域 → `blocked`、槽位来自 `equipmentSlotTypeHash`；
+- 真机（只读，`confirmed=false`）：上面两行症状必须反过来 ——
+  hunter 那行要给出"先顶下狼毒"的步骤，warlock 那行**不许**再出现顶下星火协议；
+- 语料：补 `equip` 的两段式行（`docs/testing/TESTING_CORPUS_FULL.md` 至今只登记了断言、没有行）；
+- 提交前 `pytest` 全量 + 语料各跑一次。
