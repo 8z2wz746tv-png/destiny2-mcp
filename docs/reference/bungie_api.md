@@ -445,3 +445,17 @@ item 条目 `state & 8`）的武器，其模式必然已解锁 —— 实测这�
 
 组件 1300（`characterCraftables`）的键是**图样条目 hash**（0.9 MB 那个 219 条），不是武器 hash；
 要按武器找就用 `inventory.recipeItemHash` 换算。
+
+## 十五、周常轮换：官方只给两处（2026-09-21 实测）
+
+| 数据 | 在哪 | 实测 |
+| --- | --- | --- |
+| 本周特色突袭/地牢 | `/Destiny2/Milestones/` | 本周 12 条（带 `startDate`/`endDate`/`order`/`activities[].activityHash`）；**`challenges` 全空、`phaseHash` 全 null** —— 所以"本周突袭挑战"做不了 |
+| 本周夜幕/宗师（打击 + 词缀 + 掉落） | profile **组件 204** `characterActivities.availableActivities[]` | 294 条可用活动里日落/宗师 4 条：`切除: 宗师` 带 10 条 `modifierHashes` 与 `visibleRewards`（故我在 / 故我在催化 / 上维碎片）；**三个角色完全一致**；上游只给难度时（名字就是 `日落: 大师`）拿不到打击名 |
+| 遗失区域（专家） | 常驻列表，**不在 API**（靠 Manifest） | 有「专家」变体的地点 **27 个**：游戏内「World Lost Sector」页按目的地列出（用户截图核对）；`空坦克` 只有传说/大师、`消息，第一/二/三部分` 一条难度变体都没有 → 排除 |
+| 遗失区域（传说/大师） | **哪都没有** | 里程碑没有；组件 204 的 294 条里一条都没有；Manifest 的「遗失区域」清单（`3142056444`，42 条，**角色级组件 202**）记的是"打过哪些"（本账号 42/42），不是"今天轮到哪个" |
+| 上维挑战 / 异域任务 / 泉源 | 只有候选 | Manifest 里活动与名字齐，但没有任何接口给"这周/今天是哪个"；社区工具都自己排表（Braytech 的 `rotationLostSectors` 甚至是用户可填参数） |
+| 顺带：清单（checklists） | 组件 **104**（档案级 19 条）+ **202**（角色级 3 条） | 地区宝箱 / 猫雕像 / 腐化的卵 / 阿罕卡拉遗骨 / 遗失区域 42 / 玉兔 2/9 / 永恒远古头骨 0/7 —— 零新增端点的收集品进度源 |
+
+口径与取舍见 ADR-010，实现见 `destiny_mcp/data/rotations.py` + `services/rotation_service.py`。
+
