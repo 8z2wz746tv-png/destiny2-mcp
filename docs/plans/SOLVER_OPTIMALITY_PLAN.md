@@ -409,9 +409,10 @@ reachable: {weapons 107, health 12, class_stat 76, grenade 120, melee 76, super_
   `skills/destiny2-mcp/references/routing.md`、语料、`docs/COMPATIBILITY.md`。
 - **有解时也给可达区间**：复用 `analyzer._max_possible_stats` 与 `_armor_ladder.ceiling`，
   带 `single_stat_ceiling` 与"**逐项可达 ≠ 同时可达**"的既有话术（语料已钉）。
-- **守门**：`tests/test_build_target_ranges.py` —— ① 超上限算违规且有明确标注；
-  ② 上限进剪枝界（能被剪掉的组合不许全枚举）；③ 不传 `*_max` = 不限，不许悄悄按 100 截断
-  （200 才是游戏上限，`build/constants.py` 的 `MAX_STAT`）。
+- **守门**：`tests/test_build_stat_caps.py` —— ① 超上限算违规且有明确标注；
+  ② 上限进 `desired_max`（模组不再往那一项堆）与排序位；③ 不传上限 = 不限，不许悄悄按 100 截断
+  （200 才是游戏上限）；④ 不认识的键 / 上限低于下限 / 超 0-200 都要报错。
+  （原计划的"上限进剪枝界"已在落地时作废，理由见 P2 落地记录。）
 - **验收**：把模板六项**原样**传进去，能报出"超能 110 超过上限 100"；不再需要人工把区间拍成下限。
 
 ### P3 排序口径统一
