@@ -103,6 +103,22 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - **CI 现在跑 ruff**（`python -m ruff check`，紧挨在 pytest 前面）：它抓「未定义的 name / 未使用的 import」这类，比测试更早——真机上它抓到过 `profile_components` 用了没导入（build 取账号护甲那条路直接 NameError）。mypy 存量 411 个错，**不进 CI**；路线是「新代码先干净」：先把某个模块修到 mypy 干净，再加进 ci.yml 里那行注释的文件列表。
 - **声称之前先量**：性能改动给前后对比，文档里的数字必须来自实跑。
 
+**验证成本与省时约定**（2026-09-21 实测，写在这是为了让每个 agent 都少烧时间）：
+
+| 动作 | 实测耗时 | 什么时候才跑 |
+| --- | --- | --- |
+| `pytest -q`（1652 条） | ≈ 2.5 分钟 | 代码改完、提交前跑一次；**文档改动不要跑全量** |
+| `pytest -q tests/test_agent_docs.py` | 5 秒 | 只动 `docs/**` 时 |
+| `+ tests/test_skill_contracts.py` | 3 秒 | 动了 `skills/**` 或 intent/参数契约时 |
+| `scripts/run_corpus_all_rows.py`（260 行，打真机） | ≈ 4–5 分钟 | 一个功能**只在提交前跑一次**；不要每改一处就跑 |
+| `scripts/install_skill.py` | < 1 秒 | 动过 `skills/**` 之后 |
+| 线上 DSH 服务器重启（bump 重连标记） | ≈ 40 秒 | 要让 GUI 用上新代码时 |
+
+- **别把重活并发跑**：实测与其它任务并发时 pytest 从 100 秒涨到 155 秒，还会让
+  `tests/test_build_compute.py::test_queue_wait_is_not_charged_to_the_budget` 假失败。
+- 要游戏内才能确认的事实（入口是常驻还是轮换、某个名字到底叫啥）**先问用户**，
+  不要围着未知先造一套表再返工。
+
 ### 注释、文档与提交
 
 - 注释写**为什么**（根因、踩过的坑、不能改的理由），不写"做了什么"：例 `a_p_i_error` 为什么长这样、`or ""` 防的是什么。
