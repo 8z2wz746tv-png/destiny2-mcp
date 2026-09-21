@@ -374,15 +374,17 @@ class ModSocketMixin(PlugLookupMixin):
         character_id: str,
         membership_type: int,
     ) -> dict:
-        """插模组：**先走 free 接口**，只有上游说这个插槽不免费时才退回付费接口。
+        """插模组：**先走 free 接口**，只有上游回"这个插槽不走免费"时才退回付费接口。
 
         以前按"能量消耗 > 0"选接口，那是错的：Bungie 的 free 指的是**没有材料消耗**，
-        官方文档明确 `InsertSocketPlugFree` 就覆盖 "Perks, **Armor Mods**, Shaders, Ornaments"
-        （https://bungie-net.github.io/）。护甲模组消耗的是能量、不是材料，所以它本来就该走 free；
-        走付费接口需要 `AdvancedWriteActions` scope，于是真机上装属性模组一直 403
-        `Access not permitted by application scope`（DIM 能做正是因为 DIM 用 free 接口）。
-        free 接口对"非免费可逆"的 plug（强化/调谐类）会回 1663 `DestinyItemActionForbidden`
-        "This action can only be done in-game."，那种才需要退回付费接口（并要求 scope）。
+        官方文档明确 `InsertSocketPlugFree` 就覆盖 "Perks, **Armor Mods**, Shaders, Ornaments"，
+        而且**不需要 `AdvancedWriteActions`**（原文：does not require 'Advanced Write Action'
+        authorization and is available to 3rd-party apps）。护甲模组消耗的是能量、不是材料，
+        所以它本来就该走 free —— 真机上 5 颗属性模组就是这么装上的（ADR-012）。
+
+        退回付费接口只针对"非免费可逆"的 plug（调谐/强化类）。但**付费那条路我们没实现**：
+        它要 AWA 三段流程（`AwaInitializeRequest` → 用户亲自批准 → `AwaGetActionToken`）拿
+        `actionToken`，我们没发这个字段，所以退过去也是白退——本来该在免费失败时就如实说清楚。
         """
         result = await self._bungie.insert_socket_plug_free(
             item_instance_id,

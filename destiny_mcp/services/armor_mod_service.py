@@ -365,9 +365,13 @@ class ArmorModService(ModSocketMixin):
             message = str((result or {}).get("Message") or "Bungie 没有说明原因")
             lowered = message.lower()
             if "accessnotpermittedbyapplicationscope" in lowered or "scope" in lowered:
+                # 免费插槽接口**不需要** AWA（官方原文：does not require 'Advanced Write Action'
+                # authorization and is available to 3rd-party apps）。所以撞到缺 scope，
+                # 说明这颗 plug 走到了**付费**接口——那类要 AWA 三段流程，我们没实现（ADR-012）。
                 message = (
-                    "Bungie 拒绝了这次写入：当前授权的应用没有 AdvancedWriteActions 权限"
-                    "（要改模组/深层配置需要在 Bungie 应用页面开启并重新登录）。原文："
+                    "Bungie 拒绝了这次写入：这颗模组的写入走到了需要 `AdvancedWriteActions` 的"
+                    "付费插槽接口，而本项目没有实现 AWA 的授权流程（要用户在某一步亲自批准）。"
+                    "护甲模组本身走免费接口就能装，报到这里说明这颗不属于免费可逆的那类。原文："
                     + message[:200]
                 )
             raise TransferError(f"装模组失败：{message[:300]}")

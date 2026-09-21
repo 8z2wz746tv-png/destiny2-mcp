@@ -33,12 +33,18 @@ logger = get_logger(__name__)
 _CANCEL_ROLLBACK_TIMEOUT_SECONDS = 60
 
 def _mod_write_needs_in_game(result: dict) -> bool:
-    """模组写入是不是被 Bungie 的策略挡了（而不是我们写错）。
+    """模组写入是不是被上游挡住了（而不是我们写错）。
 
-    真机实测两种：
-    - 403 `Access not permitted by application scope`：装护甲模组要 `AdvancedWriteActions`，
-      本应用没有这个 scope；
-    - 500 `This action can only be done in-game.`：卸/换模组只能在游戏里做。
+    真机实测两种，**原因不同、别混为一谈**（ADR-012 纠过一次）：
+
+    - 403 `Access not permitted by application scope`：只有**付费**插槽接口
+      `InsertSocketPlug` 会这样，它要 `AdvancedWriteActions`（AWA）；免费接口
+      `InsertSocketPlugFree` 官方明说**不需要**它、对第三方开放。走到这条说明我们
+      对这颗 plug 用错了接口，或者它本来就属于"非免费、要 AWA 三段流程"的那类。
+    - 1663 `DestinyItemActionForbidden` `This action can only be done in-game.`：
+      这是**上游一句含糊的话术**，实测至少对应两种情形 —— 角色不在社交区/轨道/离线
+      （上游的硬前提），或这个插槽本身禁用/不是免费可逆的（例如星相没开出来的碎片位）。
+      我们**不替它下结论**，原文照转。
 
     这两种都不是"重试能成"的错误，也不该把已经换好的装备回滚掉 —— 如实告诉用户
     "这几颗模组请在游戏里装"才是对的。
