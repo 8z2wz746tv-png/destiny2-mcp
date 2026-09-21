@@ -21,6 +21,7 @@
 | [ADR-010](010-rotations-are-mostly-hand-maintained.md) | 周常轮换只有突袭/地牢（里程碑）与夜幕/宗师（组件 204）是官方数据，其余靠自维护周期表 + 锚点；没锚点的（遗失区域）只给候选 | accepted |
 | [ADR-011](011-exotic-exclusivity-follows-unique-label.md) | 异域互斥按 Manifest 的 `uniqueLabel` 判（不是"全身一件"），槽位按 `equipmentSlotTypeHash` 取；判据必须同时作用于 `equip` 与 `equip_many` | accepted |
 | [ADR-012](012-free-socket-writes-are-a-format-bug.md) | 免费插槽写入（护甲模组/子职业/Perk）走 API 是**线上格式写错了**（字段名 `itemId`、hash 要无符号），不是"应用没权限"；**推翻 ADR-002** | accepted |
+| [ADR-013](013-armor-mod-insertability-is-per-character.md) | 护甲模组能不能插，看角色级可插入清单（组件 207 `characterPlugSets`）而不是 Manifest 的 plug set；1676 是"插入条件没满足"，不许说成"去游戏里装" | accepted |
 
 ## 编号规矩
 

@@ -66,9 +66,10 @@ be in a social space, in orbit, or offline."** Required Scope(s): `MoveEquipDest
   其中"调谐只能游戏内改"的**理由**也换了：不是"接口不给第三方"，而是"付费接口要 AWA，我们没实现"。
 - 护甲模组与子职业插槽现在**真的能通过 API 写**，真机已验证：5 颗属性模组全部写入成功，
   装完六维与求解器预测**零差值**（武器 107 / 生命 7 / 职业 71 / 手雷 120 / 近战 71 / 超能 110，逐项吻合）。
-- 一份"只能在游戏内"的清单要跟着改：`_mod_write_needs_in_game` 的判定、`armor_mod_service` 的
-  403 话术、`build_results` / `_build_flow` 的措辞、README 的写入权限段、`TESTING_CORPUS.md`
-  与 `小黑盒_功能总览.md` 的对应条目。
+- 一份"只能在游戏内"的清单跟着改了：`_mod_write_needs_in_game` 的判定已被
+  `ModSocketMixin.mod_write_blocker` 取代（三种原因分开，见 ADR-013）、`armor_mod_service` 的
+  403 话术、`build_results` / `_build_flow` 的措辞、README 的写入权限段已经改完；
+  `TESTING_CORPUS.md` 的对应条目随 ADR-013 一起更新，`小黑盒_功能总览.md` **还没扫**。
 - 守门：`tests/test_bungie_client_actions.py` 两条新测试钉住"免费接口用 `itemId`"与
   "plug hash 转无符号"（已注入违规确认会红）。
 - 改这条决定要同时改：`destiny_mcp/bungie_client.py`、`services/armor_mod_service.py`、

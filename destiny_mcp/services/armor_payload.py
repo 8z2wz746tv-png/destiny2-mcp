@@ -83,6 +83,10 @@ _WEAPON_SLOT_LABELS: dict[int, tuple[str, str]] = {
     2465295065: ("energy", "能量武器"),
     953998645: ("power", "威能武器"),
 }
+#: 护甲 bucket hash（无符号）→ 槽位键。与 `_ARMOR_SLOT_HASHES` 同一张表，方向相反。
+_ARMOR_BUCKET_TO_KEY: dict[int, str] = {
+    slot_hash: key for key, slot_hash in _ARMOR_SLOT_HASHES.items()
+}
 EQUIP_SLOT_LABELS: dict[int, tuple[str, str]] = {
     **{slot_hash: (key, SLOT_DISPLAY[key]) for key, slot_hash in _ARMOR_SLOT_HASHES.items()},
     **_WEAPON_SLOT_LABELS,
@@ -142,6 +146,19 @@ GEAR_TIER_NOTE = "这件不在分级体系内（组件里的 gearTier=0 或缺�
 def slot_key_from_bucket(bucket: str) -> str:
     """`"Leg Armor"` → `"legs"`；认不出来就原样返回。"""
     return _BUCKET_TO_KEY.get(bucket, bucket)
+
+
+def slot_key_from_bucket_hash(bucket_hash: int) -> str:
+    """护甲 bucket hash → 统一槽位键；认不出来给空串。
+
+    **必须按无符号比**：Manifest 里 `inventory.bucketTypeHash` 存的是无符号值
+    （头盔 3448274439、臂铠 3551918588），拿有符号的 -846692857 去查会静默给空串 ——
+    换模组的确认请求因此印成「光芒领主面具（，540，T5）」（真机日志可见）。
+    `to_unsigned` 两种写法都收，调用方不用自己判正负。
+    """
+    if not isinstance(bucket_hash, int):
+        return ""
+    return _ARMOR_BUCKET_TO_KEY.get(to_unsigned(bucket_hash), "")
 
 
 def slot_key_from_solver(slot: str) -> str:

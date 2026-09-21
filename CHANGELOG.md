@@ -4,6 +4,36 @@
 
 ## 未发布
 
+**修复（重要）：护甲上"剩下的模组槽"本来就是能通过 API 写的，"装不了"是第三件事** ——
+部位模组（头盔/手臂/胸甲/腿甲/职业物品）在 API 面前和属性模组一样，被拒的是**这一位还没解锁**的
+那几颗（见 ADR-013）：
+
+- 真机验证：6 类插槽各做一次"同类别、能量不增的一换一 → 回读 → 换回"，**6/6 全部成功**
+  （`scripts/verify_armor_mod_sockets.py --apply`）。所以这不是字段名/有符号 hash 那类格式 bug。
+- 真因：能不能插由**这一位角色**决定，清单在组件 207 `characterPlugSets`（随 305 一起回来），
+  不是 Manifest 的 `reusablePlugItems`。实测头盔 plug set Manifest 有 61 颗、这一位只有 21 颗；
+  手臂 25/56；一般模组 9/24。被拒的那几颗发的是 **1676 `DestinyFailedPlugInsertionRules`**，
+  它们 Manifest 的 `insertionRules` 里都写着「必须在赛季神器中选择」。
+- 以前的行为：把这颗当能装 → 用户确认完才失败；同名有"已解锁/未解锁"两档时按属性加成挑，
+  可能正好挑到没解锁那档；`equip_loadout` 还把 1676 说成"Bungie 不允许 API 改护甲模组，
+  请游戏内手动装"——**游戏里同样装不上**。
+- 现在：`plan` 先按可插入清单挑（同名优先已解锁那档），挑不到就 `writable=false` 并带上 Manifest
+  的插入条件；配装预检在**写之前**报同样的话；`apply` 与配装的写入失败按 1676/403/1663
+  **三种原因分开说**，1676 说的是"插入条件没满足"。上游没给这份清单时 `unlock_state=null`
+  且照旧可写（**没数据 ≠ 不允许**）。
+- 顺带修一个显示 bug：`ArmorModService._slot_key` 用**有符号** bucket hash 查表，而 Manifest 存的是
+  无符号值 → 头盔与臂铠的槽名一直是空串，确认请求印成「光芒领主面具（，540，T5）」（真机日志可见）。
+  改走 `armor_payload._ARMOR_SLOT_HASHES` 那张表，不再手抄第二份。
+- 调谐的理由也换了：不再是"上游只允许游戏内改"（那句出自 ADR-012 推翻的 1663），
+  而是"本项目没验证过"。实测免费接口能寻址调谐槽（原样重插回 **1679 `DestinySocketAlreadyHasPlug`**）。
+- 又一处有符号 hash 坑：`manifest.search` 给**有符号** hash、profile 给**无符号**，第一版直接比
+  → 凡是负数 hash 的模组（`复原`、`特殊终结技`……）全被判成「没解锁」。现在
+  `insertable_plugs` 统一收成无符号，`plug_is_insertable` 与 `_find_mod_socket` 两边都转
+  （顺带修掉"这个槽已经装着它了"认不出来、会错装到别的同类槽）。
+- 目标已经是槽里现值时（上游 1679 `DestinySocketAlreadyHasPlug`）当**无操作成功**报
+  （`already_installed=true`），不再抛成失败。
+- 守门：`tests/test_armor_mod_unlock.py`（24 条，其中 7 条注入验证过会变红）。
+
 **修复（重要）：护甲模组与子职业插槽本来就该能通过 API 写** —— 之前"个人应用没有
 `AdvancedWriteActions`、只能游戏内手动装"的结论是**归因错误**（见 ADR-012，推翻 ADR-002）。
 真因是两个线上格式错误，都在免费插槽接口那条路上：

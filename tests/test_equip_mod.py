@@ -393,15 +393,19 @@ async def test_plan_can_change_tuning_by_its_full_name() -> None:
 
 
 async def test_tuning_plan_is_marked_not_writable() -> None:
-    """调谐只能在游戏内改（实机：Bungie 回 "This action can only be done in-game."）。
+    """调谐带 `writable=False` + 原因，工具层据此**不**走"确认后写入"那套。
 
-    所以方案要带 `writable=False` + 原因，工具层据此**不**走"确认后写入"那套。
+    理由**不能再引用 1663**：那句 "This action can only be done in-game." 出自 ADR-012 推翻的
+    字段名 bug（当时 `itemId` 缺失才被回 1663），拿它当"上游只允许游戏内改"的证据是错的。
+    实测免费接口能寻址调谐槽（原样重插回的是 1679 `DestinySocketAlreadyHasPlug`），
+    但"换一颗真的调谐"会改账号属性、本项目没做过，所以照旧只给方案 —— 措辞要如实。
     """
     plan = await _service().plan("Tester#1234", "6917", "+职业 / -手雷", "hunter")
 
     assert plan["kind"] == "tuning"
     assert plan["writable"] is False
-    assert "in-game" in plan["writable_reason"]
+    assert "还没验证过" in plan["writable_reason"]
+    assert "1663" not in plan["writable_reason"]
 
 
 async def test_apply_raises_when_bungie_returns_an_error_envelope() -> None:

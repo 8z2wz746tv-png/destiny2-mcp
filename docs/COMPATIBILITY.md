@@ -13,6 +13,26 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：换模组的响应多出"能不能插"的字段，配装步骤名从 `mod_in_game` 改成 `mod_blocked`（见 ADR-013）
+
+`inventory_assistant(intent="equip_mod")` 的方案新增 `to.unlock_state`（`true`/`false`/`null`）、
+`to.conditions` 与 `alternatives[].unlock_state`；目标已经是槽里现值的请求现在回
+`success=true` + `already_installed=true`（上游 1679），摘要改成「已经装着它，这次没有改动」；`writable=false` 的 `writable_reason` 改成
+"没解锁 + Manifest 的插入条件"。配装执行里"模组被上游拒绝"那一步的 `action` 从
+**`mod_in_game` 改名成 `mod_blocked`**，`detail` 里带具体原因（1676 插入条件 / 403 AWA / 1663 含糊话术）。
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 调谐方案的 `writable_reason` | "Bungie 的插槽接口实测回 1663…第三方写不进去" | "本项目**还没验证过**调谐写入"（1663 那句出自 ADR-012 推翻的字段名 bug，不再引用） |
+| 没解锁的模组 | 当能装：给确认请求，确认后上游回 1676，被说成"请游戏内手动装" | 直接 `writable=false` + `written=false`，reason 给出 Manifest 的插入条件；`confirmed=true` 也不写 |
+| 同名多版本 | 按属性加成 / 能量挑 | **先按这一位是否已解锁**挑，其余列在 `alternatives[].unlock_state` |
+| 上游没给可插入清单 | （以前根本没读这份清单） | `unlock_state=null` 且照旧可写 —— **没数据 ≠ 不允许** |
+| 配装步骤 `action` | `mod_in_game`（"Bungie 不允许 API 装，请游戏内手动装"） | `mod_blocked`（"上游拒绝写入，原因见 detail；这些条件游戏里同样要先解决"） |
+| 目标已是槽里现值 | 上游回 1679 被当失败抛出 | `success=true` + `already_installed=true` + 摘要「已经装着它，这次没有改动」 |
+
+`writable` / `written` 两个键的语义没变（`false` 就是"这次不写账号"），
+所以只判断"写没写"的调用方不用改；把 `writable_reason` 当固定话术转述的调用方要跟着更新。
+
 ## 未发布：`equip` 的异域互斥改成"同类"判据，计划里出现武器槽位（见 ADR-011）
 
 `equip` 的异域互斥判据从"全身只能穿一件异域"改成 Manifest 自己的 `equippingBlock.uniqueLabel`：

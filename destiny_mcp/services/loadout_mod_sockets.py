@@ -9,6 +9,7 @@ from __future__ import annotations
 from ..exceptions import TransferError
 from ..manifest import ManifestManager
 from ..models import LoadoutItem
+from ..utils.hash_utils import to_unsigned
 from . import profile_components, write_readback
 from .loadout_plug_lookup import PlugLookupMixin
 
@@ -79,6 +80,33 @@ class ModSocketMixin(PlugLookupMixin):
 
         return mods
 
+    def mod_write_blocker(self, result: dict, plug_hash: int) -> str:
+        """写入被上游挡住时给一句中文原因；不是"挡住"就返回空串。
+
+        三种实测，**原因不同**，都不是重试能成的：
+
+        - 403 `Access not permitted by application scope`：只有**付费**插槽接口
+          `InsertSocketPlug` 会这样，它要 `AdvancedWriteActions`（AWA）而本项目没实现那段
+          授权流程；免费接口官方明说不需要它，所以撞到这条说明这颗 plug 属于"非免费可逆"那类。
+        - 1663 `DestinyItemActionForbidden` / `can only be done in-game`：上游一句含糊话术，
+          至少对应"角色不在社交区/轨道/离线"与"这个槽本身禁用"两种，原文照转、不替它下结论。
+        - 1676 `DestinyFailedPlugInsertionRules`：这颗模组的**插入条件**没满足（实测被拒的
+          那些条件里都有「必须在赛季神器中选择」）。这条**游戏里同样装不上**，以前把它归到
+          "去游戏里手动装"是错的。
+        """
+        text = f"{result.get('Message', '')} {result.get('ErrorStatus', '')}"
+        if "DestinyFailedPlugInsertionRules" in text or result.get("ErrorCode") == 1676:
+            conditions = self.plug_insertion_conditions(plug_hash)
+            return (
+                "插入条件没满足（1676）："
+                + ("；".join(conditions) if conditions else "上游没给条件文本")
+            )
+        if "Access not permitted by application scope" in text:
+            return "走到了需要 AdvancedWriteActions（AWA）的付费插槽接口，本项目没实现那段授权"
+        if "can only be done in-game" in text:
+            return "上游回「This action can only be done in-game.」（原文照转，未替它判断原因）"
+        return ""
+
     def _plug_energy_cost(self, plug_hash: int) -> int | None:
         """Return a plug's manifest energy cost, or None if it is unknown."""
         definition = self._manifest.get_item_definition(plug_hash)
@@ -133,8 +161,14 @@ class ModSocketMixin(PlugLookupMixin):
         membership_type: int,
         sockets_cache: dict[str, list[dict]],
         instances_data: dict,
+        insertable: dict[int, set[int]] | None = None,
     ) -> list[tuple[str, int, int]]:
-        """Order minimal energy-clearing writes before requested mod writes."""
+        """Order minimal energy-clearing writes before requested mod writes.
+
+        `insertable` = `PlugLookupMixin.insertable_plugs` 的结果。给了就**在计划阶段**先查
+        "这一位能不能插这颗"：不能就带着插入条件报错，别等写到一半才让上游回 1676。
+        没给（None）或上游没给这个 plug set，都退回不判断。
+        """
         sockets = sockets_cache.get(item.item_instance_id) or []
         if not sockets:
             # 插槽缺失/为空 → 现场新读（含同步窗口重试），写回 cache 供后面的能量预检与写入用。
@@ -186,6 +220,23 @@ class ModSocketMixin(PlugLookupMixin):
 
             target_cost = self._plug_energy_cost(mod_hash)
             current_hash = sockets[socket_index].get("plugHash", 0)
+            if insertable is not None:
+                state = self.plug_is_insertable(
+                    insertable,
+                    self._manifest.get_item_definition(item.item_hash),
+                    socket_index,
+                    mod_hash,
+                    int(current_hash or 0),
+                )
+                if state is False:
+                    conditions = self.plug_insertion_conditions(mod_hash)
+                    raise TransferError(
+                        "模组预检",
+                        f"'{item.name}' 插槽 {socket_index} 的模组 {mod_hash} 不在 Bungie 给"
+                        "这一位角色的可插入清单里（实测这种写入会被回 1676，游戏里同样装不上）。"
+                        "它的插入条件是："
+                        + ("；".join(conditions) if conditions else "上游没给条件文本"),
+                    )
             current_cost = self._plug_energy_cost(current_hash) if current_hash else 0
             if target_cost is None or current_cost is None:
                 raise TransferError(
@@ -319,6 +370,11 @@ class ModSocketMixin(PlugLookupMixin):
         if mod_category not in self._MOD_CATEGORY_HASHES:
             return None
 
+        # 所有 hash 比较都过 `to_unsigned`：profile 给的 plugHash 是无符号的，而
+        # `manifest.search` / 方案里的 mod_hash 是**有符号**的（实测 `复原` = -207911122
+        # vs 4087056174）。直接比永远不相等 —— 于是"这个槽已经装着它了"永远判不出来，
+        # pass 1 还会把它当成"别的同类模组"返回错槽。
+        target = to_unsigned(mod_hash)
         item_definition = self._manifest.get_item_definition(item_hash)
         if isinstance(item_definition, dict):
             socket_entries = (item_definition.get("sockets") or {}).get(
@@ -327,7 +383,7 @@ class ModSocketMixin(PlugLookupMixin):
             for index, entry in enumerate(socket_entries):
                 if index >= len(sockets_data) or index in excluded_socket_indices:
                     continue
-                if sockets_data[index].get("plugHash", 0) == mod_hash:
+                if to_unsigned(sockets_data[index].get("plugHash", 0)) == target:
                     return index
                 for plug_set_hash in {
                     entry.get("reusablePlugSetHash", 0),
@@ -339,7 +395,7 @@ class ModSocketMixin(PlugLookupMixin):
                         "DestinyPlugSetDefinition", plug_set_hash
                     )
                     if isinstance(plug_set, dict) and any(
-                        item.get("plugItemHash", 0) == mod_hash
+                        to_unsigned(item.get("plugItemHash", 0)) == target
                         for item in plug_set.get("reusablePlugItems", [])
                     ):
                         return index
@@ -349,7 +405,7 @@ class ModSocketMixin(PlugLookupMixin):
             if i in excluded_socket_indices:
                 continue
             plug_hash = socket.get("plugHash", 0)
-            if plug_hash == mod_hash:
+            if to_unsigned(plug_hash) == target:
                 continue
             if plug_hash:
                 current_category = self._plug_category_hash(plug_hash)
@@ -360,8 +416,7 @@ class ModSocketMixin(PlugLookupMixin):
         for i, socket in enumerate(sockets_data):
             if i in excluded_socket_indices:
                 continue
-            plug_hash = socket.get("plugHash", 0)
-            if plug_hash == mod_hash:
+            if to_unsigned(socket.get("plugHash", 0)) == target:
                 return i
 
         return None

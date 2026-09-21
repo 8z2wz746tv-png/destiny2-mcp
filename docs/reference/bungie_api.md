@@ -91,6 +91,45 @@
 - 结论：**接口语义 ≠ 权限**。护甲模组走 free；要不要 scope 是另一条线（付费接口才要
   `AdvancedWriteActions`）。别再拿"消耗大不大"去决定用哪个接口。
 
+### 插槽写入的第三种结局：1676 `DestinyFailedPlugInsertionRules`（"条件没满足"）
+- 事实：除了 403（没 scope）与 1663（`in-game` 含糊话术），还有 **1676**
+  `DestinyFailedPlugInsertionRules` —— "The request to apply a change to an item failed.
+  The requirements have not been met."，`message_data` 是**空的**，不说是哪条没过。
+- 出处：<https://bungie-net.github.io/> → `Destiny2/Actions/Items/InsertSocketPlugFree/`
+  与 `Exceptions` 的 `PlatformErrorCodes`（文档版本 2.21.8，2026-09-21 查阅）
+- 实测：2026-09-21 真机 —— 给护甲换部位模组时，四颗被回 1676；它们在 Manifest 的
+  `plug.insertionRules[].failureMessage` 里都写着「**必须在赛季神器中选择**」。
+  同批的另一颗（职业物品的终结技模组）条件里没有这条，**写通了**。
+- 结论：1676 = **这颗模组这一位还没解锁**，游戏里同样装不上；不许报成"请去游戏里手动装"、
+  也不许当成重试能成的错误。能拿到的中文说法只有 `plug.insertionRules[].failureMessage`
+  （`services/loadout_plug_lookup.py: plug_insertion_conditions`）。这条由
+  `tests/test_armor_mod_unlock.py` 的 1676 两条钉住。
+
+### 能不能插，看组件 207 `characterPlugSets`（随 305 一起回来）
+- 事实：`DestinyProfilePlugSetsComponent` / `DestinyCharacterPlugSetsComponent` 给出
+  **每一位玩家/角色实际能插入**的 plug 清单（`plugItems[].canInsert` / `enabled`），
+  比 Manifest 的 `reusablePlugItems` 小得多。
+- 出处：<https://bungie-net.github.io/> → `DestinyComponentType`（106 `ProfilePlugSets`、
+  207 `CharacterPlugSets`）与 `DestinyPlugSet`（文档版本 2.21.8，2026-09-21 查阅）
+- 实测：2026-09-21 真机 —— 请求 305 时响应里**已经带着** `profilePlugSets` 与
+  `characterPlugSets`（不用单独请求 106/207；实测专门请求 `components=106,207` 反而什么都不回）。
+  头盔 plug set：Manifest 61 颗、这一位只能插 21 颗；手臂 25/56；一般模组 9/24。
+  四颗被 1676 拒掉的全不在这份清单里，写通的全在。
+- 结论：`insertable_plugs(profile, character_id)` 是"这一位能插哪些"的唯一读法，
+  profile 级与角色级**都要并**；**上游没给这个 plug set 时返回缺键**（`None` = 不判断），
+  绝不能把"没数据"读成"不允许"。调谐槽里正装着的那颗不在清单里 —— 所以"已装在槽里的那颗"
+  单独放行（见 ADR-013）。
+
+### 1679 `DestinySocketAlreadyHasPlug`：原样重插的回执
+- 事实：往某个槽插入它**已经有**的 plug，上游回 1679 `DestinySocketAlreadyHasPlug`
+  （"Refresh the item and try again."），不是 1663。
+- 实测：2026-09-21 真机 —— 用免费接口把两颗调谐插件原样重插，都是 1679。
+- 处置：`ArmorModService.apply` 把 1679 当**无操作成功**（`already_installed=true`，摘要写
+  「已经装着它，这次没有改动」）—— 用户要的状态已经成立，报失败会诱使重试。
+- 结论：这条说明免费接口**能寻址调谐槽**（旧说法"免费接口对调谐回 1663、所以第三方写不进去"
+  是那个字段名 bug 的残留，见 ADR-012）。这只证明"寻址得到"，**不证明"换一颗能成"** ——
+  真要放开调谐写入得另做一次可逆的真机验证。
+
 ### 两个端点官方都标 Preview
 - 事实：官方端点清单里 `InsertSocketPlug` 与 `InsertSocketPlugFree` 都挂着
   `Preview - Not Ready for Release` 标记。

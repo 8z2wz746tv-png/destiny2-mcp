@@ -248,20 +248,22 @@ async def equip_mod(
         plan["from"] = {"hash": None, "name": None, "energy_cost": 0}
     plan["summary"] = _mod_echo(plan)
 
-    # 调谐写不进去（Bungie 只允许游戏内改）：不要走"确认后写入"那套，
-    # 否则用户确认了、我们却只能失败。直接把方案交出去，并说明要游戏内改。
-    if plan.get("kind") == "tuning":
+    # 写不进去的不要走"确认后写入"那套：用户确认了、我们却只能失败。
+    # 两种情形共用这一条路（原因见 services/armor_mod_service.plan 的 writable_reason）：
+    #   调谐 —— 本项目没验证过能不能通过 API 换，只给方案；
+    #   未解锁 —— 这颗不在 Bungie 给这一位角色的可插入清单里（实测回 1676），游戏里也装不上。
+    if plan.get("writable") is False:
         return ok_response(
-            f"{plan['item_name']} 的调谐建议：{plan['from'].get('name') or '（空）'} → "
-            f"{plan['to']['name']}。调谐只能在游戏内改（Bungie 接口不允许第三方写）。",
+            f"{plan['item_name']} 的模组建议：{plan['from'].get('name') or '（空）'} → "
+            f"{plan['to']['name']}（这次不写账号）。",
             {"armor_mod": {**plan, "written": False}},
             next_actions=[
-                "把上面这条改动告诉玩家，让他在游戏里手动改调谐；"
-                "不要调用 confirmed=true——那一步会被 Bungie 拒绝。",
+                "把 writable_reason 原样告诉玩家，让他先把条件解决掉；"
+                "不要调用 confirmed=true——这一步会被 Bungie 拒绝。",
                 f"要看这件护甲现在的状态，用 inventory_assistant(intent=\"item\", "
                 f"item_instance_id=\"{plan['item_instance_id']}\")。",
             ],
-            warnings=[plan.get("writable_reason") or "调谐只能游戏内修改。"],
+            warnings=[plan.get("writable_reason") or "这次没有写入账号。"],
         )
 
     if not confirmed:
@@ -271,9 +273,19 @@ async def equip_mod(
     armor_mod: dict[str, Any] = {"summary": plan["summary"]}
     if isinstance(result, dict):
         armor_mod.update(result)
+    if isinstance(result, dict) and result.get("already_installed"):
+        # 槽里已经是它了（上游 1679）：说成"换上"会让人以为改过东西，也会让人以为失败要重试。
+        headline = (
+            f"{plan['item_name']} 的槽 {plan['socket_index']} 已经装着 "
+            f"{plan['to']['name']}，这次没有改动。"
+        )
+    else:
+        headline = (
+            f"已把 {plan['item_name']} 的槽 {plan['socket_index']} 换成 "
+            f"{plan['to']['name']}（能量 {plan['energy']['after']}/{plan['energy']['capacity']}）。"
+        )
     return ok_response(
-        f"已把 {plan['item_name']} 的槽 {plan['socket_index']} 换成 "
-        f"{plan['to']['name']}（能量 {plan['energy']['after']}/{plan['energy']['capacity']}）。",
+        headline,
         {"armor_mod": armor_mod},
         next_actions=[
             "要看这件护甲现在的完整状态，用 inventory_assistant(intent=\"item\", "

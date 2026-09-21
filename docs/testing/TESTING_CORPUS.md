@@ -382,9 +382,13 @@
 | 真的配不出来时告诉我差在哪 | 同上，但把生命值推到 `health_target=200` | 0 候选 + `ladder`：`shortfall`、`ceiling`（**同一套约束下同时能达到**的上限，实采）、`trials`、`suggestion`，以及 `verdict.satisfiable=false`（按**原始优先级**实测 0 候选；并说明 ceiling 是逐项最大值、trials 里 ok=true 的档是换了优先级之后的解） |
 | 这个"上限"是什么上限 | `ladder.single_stat_ceiling` | 那是**单项**上限（把点全堆一项）；拿它当"同时能达到"会得出"你什么都够"。两个字段都在，回答时不能混 |
 | 只差几点，非降目标不可吗 | `ladder.tuning_first` + `find` 的 `tuning_changes` | 求解器**真的试过调谐**（没达标时用调谐额度复解 + 逐套精确复核）：能补的直接给带 `tuning_changes` 的候选（`requires_tuning=true`）；补不上时这一档如实分三种口径（额度够但让不出来 / 额度不够 / 只差 ≤10 看属性模组），并带 `solver_attempted` |
-| 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；**调谐只能在游戏内手动改**，`canonical_build` 不含调谐插件（实测 Bungie 回 `This action can only be done in-game.`） |
-| 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | 给出「从什么改成什么 + 六维变化」，`writable=false`、`written=false`，并带「只能在游戏内改」的 warning；`confirmed=true` 也不会写账号 |
-| 换一个真花能量的模组 | `intent="equip_mod"` + `confirmed=true` | 走付费插槽接口：当前应用没有 `AdvancedWriteActions` 时**如实报错**（消息里点名权限），不许把失败说成成功（0.1.8 实机修） |
+| 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` **不含调谐插件** —— 调谐写入本项目还没验证过（见 ADR-013），别把它说成"上游只允许游戏内改"（那句出自 ADR-012 推翻的 1663） |
+| 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | 给出「从什么改成什么 + 六维变化」，`writable=false`、`written=false`，warning 说的是「本项目**还没验证过**调谐写入」，不是「上游不允许」；`confirmed=true` 也不会写账号 |
+| 换一个真花能量的模组 | `intent="equip_mod"` + `confirmed=true` | 走**免费**插槽接口（护甲模组本来就属于它覆盖的范围，见 ADR-012），成功后回读核对；失败要核对 `ErrorCode` 并把上游原文带出来，不许报成功（0.1.8 实机修） |
+| 这颗模组这一位还没解锁 | 换一颗**不在** `characterPlugSets` 可插入清单里的模组（实测「重型弹药搜寻者」，条件里写着「必须在赛季神器中选择」） | **写之前**就返回 `writable=false` + `written=false`，`writable_reason` 带上 Manifest 的插入条件；`confirmed=true` 也不写。**不许**说成「Bungie 不允许 API 改护甲模组／请去游戏里手动装」—— 游戏里同样装不上（ADR-013） |
+| 同名模组有已解锁与未解锁两档 | 同上，但那颗有同名变体 | 挑**这一位已解锁**的那档（`to.unlock_state=true`），不是按属性加成挑到没解锁的那颗 |
+| 换一颗槽里已经装着的模组 | `intent="equip_mod"` + `confirmed=true`，目标就是该槽现值 | `success=true` + `already_installed=true`，摘要写「已经装着它，这次没有改动」——上游会回 1679 `DestinySocketAlreadyHasPlug`，**不许报成失败**（那会让人以为要重试） |
+| 上游没给可插入清单 | 任何换模组请求，但响应里没有 `characterPlugSets` | `to.unlock_state=null` + 照旧可写：**没数据 ≠ 不允许**，不许拿「没查到」把能装的模组判成装不了 |
 | ⭐ 社区配装能不能直接穿 | `build_assistant(intent="community", community_build_id=…, include_inventory=true)` | summary 里必须出现「**不可直接执行**」，第一条 warning 给 `execution_supported=false` + blocker + 「要走 find → canonical_build → 确认」；`execution_eligible` 是 false |
 | 社区模板说的套装我没见过 | 同上的 `armor_set` 行 | 活动名（玻璃拱顶）自动解析成套装名（埃希恩记忆）并标 `resolved_via=activity_alias`；对不上时给 `unresolved_reason` + `set_name_candidates`；行里直接有 `owned_count`/`missing_slot_count`（几件、缺几件） |
 | 这一项是「没有」还是「没查」 | 任意 requirement 行 | `not_account_checked` 必带 `unverifiable_reason` 枚举；`unresolved` 必带 `unresolved_reason`；武器 roll 分三层：`perks_current_match`（现在装着）/ `perks_available_to_switch`（换一下就行）/ `perks_unavailable`（换也换不到）；只有 `selectable_plug_status="available"` 才说明这一层真读了，没读时是 `alternate_perk_options_checked=false` + 原因 |
@@ -447,6 +451,8 @@
 | 武器形状/键集合/插槽/实例/本地资料/体积口径 | `test_weapon_keys_snapshot.py`、`test_weapon_profile.py`、`test_weapon_sockets.py`、`test_weapon_instance.py`、`test_weapon_local_data.py` |
 | 武器基线差异（字段无声消失） | `tests/test_weapon_baseline.py` + `scripts/capture|diff_weapon_baseline.py` |
 | 武器章节的端到端断言（真机） | `scripts/run_corpus_weapon_rows.py`（16 行） |
+| 护甲**每一类模组插槽**能不能写（真机，含"这一位能不能插"的判定） | `scripts/verify_armor_mod_sockets.py`（只读看现状；`--apply` 做 6 类插槽的"一换一 → 回读 → 换回"往返） |
+| 装备编排的异域互斥与槽位判据（真机，只读） | `scripts/verify_equip_planner.py` |
 | 八工具面全 intent 体检 + 其余六面字段级 + 协议层（真机） | `scripts/run_corpus_all_rows.py`（见 `docs/testing/TESTING_CORPUS_FULL.md`） |
 | 错误码与信封 | `test_failure_envelope_regressions.py`、`test_upstream_error_mapping.py`、`test_service_error_contract.py` |
 | 大响应限流与翻页 | `test_large_response_limits.py` |
