@@ -13,6 +13,22 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：`equip` 的异域互斥改成"同类"判据，计划里出现武器槽位（见 ADR-011）
+
+`equip` 的异域互斥判据从"全身只能穿一件异域"改成 Manifest 自己的 `equippingBlock.uniqueLabel`：
+异域**武器**一件 + 异域**护甲**一件，两类**互不冲突**。
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 装异域武器、身上穿着异域护甲 | 计划里多一步"顶下异域护甲"（**错**，执行了也解决不了问题） | 不冲突，直接装 |
+| 装异域武器、身上穿着另一把异域武器 | **零冲突识别**，真执行撞 500 `UniqueEquipRestricted` | 给出"先用**同槽位**的非异域顶下"的步骤 |
+| 失败话术 `UniqueEquipRestricted` | "全身只能穿一件异域**护甲**…挑一件非异域的同部位护甲" | "同类的异域只能穿一件（异域武器一件 + 异域护甲一件）…挑一件非异域的同部位装备" |
+
+**`slot` 取值**：护甲那半的键一个没动（`helmet`/`gauntlets`/`chest`/`legs`/`class_item`），
+但 `EquipPlan.target_slot` / `EquipPlanStep.slot` / `EquipPlanBlock.slot` 现在**也可能是武器槽位**
+（`kinetic`/`energy`/`power`）—— 武器目标以前这里给的是**空串**（认不出部位），现在给真实槽位。
+把 `slot` 当"只会是护甲槽"读的调用方要放宽；只看护甲的调用方行为不变。
+
 ## 未发布：武器类型列表改列表行、默认 10 件、可翻页（破坏性，见 ADR-007）
 
 `weapon_assistant(intent="type")`（"我手炮都有哪些"）以前每件发**完整模板**

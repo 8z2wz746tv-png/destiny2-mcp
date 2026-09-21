@@ -240,3 +240,28 @@ status = ready
   hunter 那行要给出"先顶下狼毒"的步骤，warlock 那行**不许**再出现顶下星火协议；
 - 语料：补 `equip` 的两段式行（`docs/testing/TESTING_CORPUS_FULL.md` 至今只登记了断言、没有行）；
 - 提交前 `pytest` 全量 + 语料各跑一次。
+
+### 落地记录（2026-09-21）
+
+**已完成（第一刀：判据与槽位）**
+
+| 改动 | 位置 |
+| --- | --- |
+| 装备槽键补上武器那一半（`kinetic`/`energy`/`power`），武器护甲同一套键 | `services/armor_payload.py` 的 `EQUIP_SLOT_LABELS` + `equip_slot_of(definition)` |
+| 冲突判据换 `equippingBlock.uniqueLabel`；槽位换 `equipmentSlotTypeHash`；`_is_exotic` 与 `_slot_from_definition` 退场 | `services/equip_planner.py` 的 `item_traits()` + `plan_equip` |
+| **连带修复**：回滚/回读以前按 `item.slot` 认部位（护甲专用），武器步骤会整个漏掉 —— 现在与规划层共用 `item_traits` | `services/transfer_service.py` 的 `_equipped_by_equip_slot()` |
+| 失败话术改成同类口径 | `tools/_responses.py` 的 `_WRITE_FAILURE_HINTS` |
+
+- 单测：`tests/test_equip_planner.py` 20 条（含跨类**不**冲突、武器↔武器冲突、异域职业物品↔异域护甲、
+  槽位来自定义而非 bucket），`tests/test_equip_execute.py` 新增"武器步骤也要能回滚"；
+- 全量 `pytest`：**1657 passed**（改动前 1652）；
+- 一条测试写错被自己抓住：异域职业物品与异域胸甲同组，要装它得先把**胸甲**换成非异域，
+  拿另一件披风顶不了事 —— 代码判对了，是测试预期错了。
+
+**还没做（第二刀：`equip_many`）**
+
+`equip_many` 目前仍绕过 planner 直接打上游批量 `EquipItems`（`transfer_service.equip_items`），
+即"同一条判据"还没作用到它身上；整套模拟（集合内部两件同类异域 → `blocked`）也还没实现。
+在它落地之前，`equip` 已经是对的，`equip_many` 保持原样。
+
+**还剩**：真机只读复验（症状两行必须反过来）、`equip` 两段式语料行。
