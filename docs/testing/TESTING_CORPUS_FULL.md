@@ -157,7 +157,7 @@
 | --- | --- |
 | equip 不带确认 | `confirmation_required`，`candidates[0].steps` 里是「先顶下、再装」两步，**零写入** |
 | equip 带确认 | `ok:true` + `verified:true` + `equipped_now` 说清受影响部位现在装着什么 |
-| equip 撞金装冲突 | `equip_blocked`，消息说清全身只能一件异域 + 下一步（不是 `equip_failed`） |
+| equip 撞异域冲突 | `equip_blocked`，消息说清**同类**异域只能一件（武器一件 + 护甲一件）+ 下一步（不是 `equip_failed`） |
 | equip 已在身上 | `ok:true`，无事可做、不写 |
 
 
