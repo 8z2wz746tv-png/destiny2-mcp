@@ -18,6 +18,7 @@
 | [ADR-007](007-weapon-lists-carry-list-rows.md) | 「我有哪些武器」给列表行（不带插槽池/可换项，默认 10 件 + 翻页），单件明细走 `compare` | accepted |
 | [ADR-008](008-legacy-tool-face-archived.md) | 历史工具面整块剥离到 `legacy/`（不进包/测试/lint），工具面固定 8 个聚合工具；配装导入一并放弃 | accepted |
 | [ADR-009](009-pattern-progress-lives-in-records.md) | 锻造武器模式（红框）的进度只在 profile 记录组件（900）；目录按"记录名 == 可锻造武器名"取 183 条（不是 `is_craftable` 的 219 件） | accepted |
+| [ADR-010](010-rotations-are-mostly-hand-maintained.md) | 周常轮换只有突袭/地牢（里程碑）与夜幕/宗师（组件 204）是官方数据，其余靠自维护周期表 + 锚点；没锚点的（遗失区域）只给候选 | accepted |
 
 ## 编号规矩
 

@@ -92,6 +92,7 @@
 | 换神器 | `subclass_assistant(intent="equip_artifact")` | 新 intent（写入，走确认信封）；名字精确匹配，不模糊 |
 | 纯 PvP 武器榜 | `activity_assistant(intent="pvp_weapons")` | 新 intent（`scope="pvp_recent"`、`source="pgcr_aggregation"`，逐场 PGCR 聚合最近 N 场）；**不是** `weapon_history` 的别名，两者口径不同、并存。**只认 PvP 家族 + 智谋**：`mode="raid"` 这类 PvE 词报 `invalid_argument_error`（要全模式武器击杀用 `weapon_history`） |
 | 角色身上的神器 | `subclass_assistant(intent="artifact", character=…)` | `artifact` 原来的返回一个键没少，多附 `character_artifact` |
+| 周常轮换表 | `world_assistant(intent="rotations")` | 新 intent（只读）：本周特色突袭/地牢（官方里程碑）、本周夜幕/宗师**哪个打击 + 词缀 + 掉落**（角色活动组件 204）、上维挑战/异域任务/泉源（自维护周期表 + 锚点）。每行带 `source=official\|schedule`；**遗失区域顺序未核对，只给候选**（见 ADR-010） |
 | 图样按稀有度筛 | `weapon_assistant(intent="patterns", rarity="异域")` | 新参数（只被 `patterns` 读）：异域/金枪、传说/紫枪、稀有；稀有度词表收拢到 `vocabulary.RARITY_ALIASES`（`inventory_assistant` 原来私藏一份）。同时 `counts` 旁多了 `by_tier` 汇总——真机上出现过"只读第一页把 16 把金枪报成 2 把" |
 | 锻造武器模式查询 | `weapon_assistant(intent="patterns")` | 新 intent（只读）：图鉴「模式和催化」183 条武器模式的进度（组件 900，就是游戏里那条「模式进度 4/5」）、还差几个红框萃取、需求次数、掉落来源。**新能力，非破坏性**：没动任何既有 intent 的键；两个"可锻造"口径并存（模式 183 条 vs `is_craftable` 219 件，后者含 36 件变体，变体可塑形栏位更少、且不带深视插槽），见 ADR-009 |
 
@@ -124,6 +125,7 @@
 | | `weapon_history` | `weapons`、`weapon_usage`、`weapon_leaderboard` |
 | | `aggregate` | `activity_aggregate`、`activity_stats` |
 | | `leaderboards` | `leaderboard` |
+| `world_assistant` | `rotations` | `轮换`、`周常轮换`、`这周`（永久中文说法） |
 | `build_assistant` | `community` | `starside` |
 
 ## 三个"看着像别名、其实不是"的坑
