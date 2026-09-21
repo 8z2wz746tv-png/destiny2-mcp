@@ -1,6 +1,7 @@
-# 周常轮换与词缀查询 · 开发计划 v1（待拍板）
+# 周常轮换与词缀查询 · 开发计划 v1
 
-状态：**待拍板**（第 5 节三个选择，给了默认值，不反对即按默认执行）
+状态：**已落地**（v1 已实现并推送 `main`；实际范围比第 5 节的默认选项更大——六类里五类上了、
+遗失区域只上了专家常驻那半，见 §2.8；剩余未决项见 §7）
 范围：新增一个只读 intent（`world_assistant(intent="rotations")`）+ 一张周期表 + 一个纯计算模块
 不动：现有 `weekly` / `vendor` / milestones 的行为（只在旁边加"轮换"这一块）
 
@@ -120,24 +121,36 @@ Braytech 现在连「扭曲（Distortion）轮换」也自己排表，见 <https
 ### 3.1 intent 与参数
 - `world_assistant(intent="rotations")`，别名 `轮换`/`周常轮换`/`这周`（放 world 面，和 `weekly` 并列：
   `weekly` 答"本周概要"，`rotations` 专答"轮换表"）
-- 参数复用已有归属：`mode`（nightfall/lost_sector/ascendant/wellspring/exotic/raid/all，留空=全部）、
-  `count`（往后看几天/几周，默认 7 天）
+- 落地**没有新增参数**，只用已有的 `player_name` + `limit`（默认 30 行，`_WORLD_ROTATION_LIMIT`）：
+  官方那半与三张表**一次全给**，不做 `mode` 筛选 —— 想看某一类就由调用方按行上的 `kind` 过滤。
+  （本节原先写的 `mode` + `count`（默认 7 天）没有实现，2026-09-21 按代码对齐。）
 
-### 3.2 响应形状（每行一条）
-```json
-{"date": "2026-09-23", "week_of": "2026-09-22T17:00Z", "kind": "ascendant_challenge",
- "name": "衔尾蛇", "activity_hash": 0, "modifiers": [],
- "source": "schedule", "schedule_revision": "2026-09-21", "confidence": "核对过"}
-```
-- **官方给的**标 `source: "official"`（突袭/地牢，附官方 `startDate`/`endDate`）；
-- **周期表算的**标 `source: "schedule"` + `schedule_revision`（最后一次核对日期）；
-- 表里锚点超过 8 周没核对 → 降级 `confidence: "可能已过期，以游戏内为准"`。
+### 3.2 响应形状（每行一条，2026-09-21 按代码对齐）
+
+两个来源的行共用一套键：`kind` / `kind_label` / `name` / `difficulty` / `week_of` / `modifiers[]` /
+`rewards[]` / `source`。
+
+- **官方那半**（`source: "official"`）：
+  - 里程碑（特色突袭/地牢）：另有 `activity_type`、`until`、`activities[]{name, activity_hash}`；
+  - 组件 204（夜幕/宗师）：另有 `upstream_name`、`strike_known`、`activity_hash`、`recommended_light`、
+    `completed`；`rewards[]{name, item_hash, quantity}`。`strike_known=false` 时 `name` 留空（上游只给了难度）。
+- **周期表那半**（`source: "schedule"`）：每行都带 `verified_at`（核对日期）与 `verified_against`（怎么核的），
+  周表另带 `note`；泉源行带 `day_of` 与 `variants`（标准/专家/大师）。
+- 顶层另有 `counts`（`official` / `schedule` **分计**，口径不许混）、`truncated`、`week_of`、`today`、
+  `tables`（每张表的候选、周期与锚点）、`lost_sector`、`read`；口径与缺口说明在 `warnings` 里。
+
+**不做"锚点过期"降级**：这些表的前提是游戏已停更、周期不再变化，核对一次即长期有效（§2.5 / §5.5），
+所以响应里**没有** `confidence` / `schedule_revision` 这类字段。原先设想的"锚点超过 8 周没核对就降级"
+是照一个还在更新的游戏写的，放在停更前提下只会变成从某个日子起**永久误报**"可能已过期"——已删除。
 
 ### 3.3 红线（诚实口径）
 1. 官方没给的一律标 `schedule`，**不许写成官方数据**；
 2. `{var:...}` 没插值就原样显示，**不猜数字**；
-3. 锚点过期要自己说出来，不装作还准；
-4. 周期性内容会随版本变（Bungie 改顺序就得改表）——这句话要进响应，不能只写在文档里。
+3. 每条表算出来的行都必须带 `verified_at` / `verified_against`（什么时候、凭什么核的），
+   **不许有无依据的行**；停更前提下锚点长期有效、**不做"过期"降级**（理由见 §3.2），
+   一旦发现对不上就改表并同时更新依据；
+4. "表的前提是游戏已停更、周期不再变化"要让调用方看得到：目前它只出现在
+   `lost_sector.how_to_anchor` 与 `data/rotations.py` 的模块注释里，**没有**作为顶层 `warnings` 的一句 —— 见 §7。
 
 ## 4. 落点与验收
 
@@ -175,5 +188,8 @@ Braytech 现在连「扭曲（Distortion）轮换」也自己排表，见 <https
    - 每天一个 → 报一个地点名即可钉锚点（`data/rotations.py` 的 `LOST_SECTOR_ANCHORED` 与锚点常量）。
 2. 上维挑战 / 异域任务 / 泉源三张表的锚点来自用户截图，`verified_at=2026-09-21`；
    若日后发现对不上（理论上停更后不会），改表要同时更新 `verified_against`。
-3. 本次会话到此为止的轮换工作**已全部提交但未推送**（`git log origin/main..HEAD`）。
+3. 轮换这批工作**已推送 `main`**（2026-09-21：`main` 由 `58b7596` 推进到 `4cbc530`，20 个提交，CI 绿）。
+   本节其余未决项与推送无关，仍按上面的口径等游戏内确认。
+4. §3.3 红线 4 那句"停更前提"目前只在 `lost_sector.how_to_anchor` 里，还没提到顶层 `warnings` ——
+   下次决定是提上去，还是把这条红线降成文档约定。
 
