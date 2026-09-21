@@ -1,9 +1,15 @@
 # ADR-002: 护甲模组只能游戏内手动装，工具侧只列清单且不回滚已换上的装备
 
-- Status: accepted
+- Status: superseded by ADR-012
 - Date: 2026-09-17
 - Decision By: 用户（Husky）／上游约束（Bungie）
 - Scope: `services/loadout_mod_sockets.py`, `services/armor_mod_service.py`, `services/loadout_equipment_service.py`, `tools/_equip_branches.py`
+
+> **本条件已被 [ADR-012](012-free-socket-writes-are-a-format-bug.md) 推翻（2026-09-21）。**
+> 这里的实测记录是真的，但**归因错了**：那几次失败的根因是免费插槽接口的**请求字段名写错**
+> （aiobungie 用了付费接口的 `itemInstanceId`，免费接口要 `itemId`），以及护甲模组的 plug hash
+> 是**有符号**数。免费接口官方明说**不需要** `AdvancedWriteActions`。修好格式后护甲模组真机
+> 写入成功。下面保留原文，作为"当时相信什么"的记录。
 
 ## Context
 

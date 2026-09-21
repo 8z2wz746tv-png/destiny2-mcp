@@ -18,10 +18,15 @@ Destiny 2 装备管理 MCP Server，通过 AI Agent 管理武器和装备。
 - 可选 Starside 网页归档：提供社区配装模板，保留出处，可匹配账号库存
 - 调谐（Tuning）参与配装求解：目标差一点时，求解器会实际尝试更换调谐，能补上就返回带
   `tuning_changes`（逐件 from/to 与六维变化）的候选，补不上则说明是额度不足还是无法让步。
-  调谐只能在游戏内手动修改（Bungie 插槽接口返回 `This action can only be done in-game.`），
-  工具输出的是「改哪几件、改成什么」的清单，`equip_build` 不会代替玩家改调谐
-- 写入失败会如实报错：需要消耗能量的插槽写入要求 Bungie 应用具备 `AdvancedWriteActions` 权限，
-  缺少权限时接口返回 `AccessNotPermittedByApplicationScope`，工具会指出这一权限，不会把失败报成成功
+  调谐属于"非免费可逆"的插槽动作，走的是需要 `AdvancedWriteActions` 的付费接口，而本项目
+  **没有实现 AWA 的授权流程**（要用户亲自批准）——所以工具输出的是「改哪几件、改成什么」的清单，
+  `equip_build` 不会代替玩家改调谐
+- **护甲模组是真的能通过 API 装的**（工具会直接装，装不上才列清单）：走免费插槽接口
+  `InsertSocketPlugFree`，官方明确它覆盖 Perks / **Armor Mods** / Shaders / Ornaments，且
+  **不需要** `AdvancedWriteActions`。子职业插槽（超能/手雷/近战/职业技能/星相/碎片）同理。
+  详见 ADR-012——此前"个人应用没权限、只能游戏内装"的结论是一次**归因错误**
+- 写入失败会如实转述上游原文：不把"角色不在社交区/轨道"、插槽禁用、缺 AWA 流程混成一句
+  "需要更高权限"，也不把失败报成成功
 
 ## 快速开始
 

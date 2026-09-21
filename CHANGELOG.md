@@ -4,6 +4,24 @@
 
 ## 未发布
 
+**修复（重要）：护甲模组与子职业插槽本来就该能通过 API 写** —— 之前"个人应用没有
+`AdvancedWriteActions`、只能游戏内手动装"的结论是**归因错误**（见 ADR-012，推翻 ADR-002）。
+真因是两个线上格式错误，都在免费插槽接口那条路上：
+
+- **字段名**：免费接口 `InsertSocketPlugFree` 的物品字段叫 **`itemId`**，付费接口才叫
+  `itemInstanceId`；`aiobungie` 把付费那套抄进了免费方法，于是 `itemId` 缺失、上游取不到物品，
+  固定回 1663 `DestinyItemActionForbidden` + `{'request.itemInstanceId': "The item being
+  socketed doesn't have sockets."}`。那句"物品没有插槽"其实是**字段没绑上**。现在自己拼 body。
+- **有符号 hash**：护甲模组方案里的 plug hash 是**有符号**的（实测 `武器模组` = `-111671246`），
+  直接发负数上游回 `InvalidPostBody`；两个接口现在都过 `to_unsigned()`。
+- 官方原文：该接口**不需要** `AdvancedWriteActions`，对第三方开放，只要 `MoveEquipDestinyItems`。
+- 真机验证：术士 5 颗属性模组全部通过 API 写入成功，装完六维与求解器预测**逐项零差值**
+  （武器 107 / 生命 7 / 职业 71 / 手雷 120 / 近战 71 / 超能 110）；子职业手雷与碎片也写通了。
+- 顺带纠正：`socketArrayType` 只有 `Default=0` / `Intrinsic=1`，此前注释写的"1 = reusable"是错的。
+- 守门：`tests/test_bungie_client_actions.py` 两条新测试钉住字段名与无符号转换。
+- **没变的**：付费插槽接口（调谐/强化类）仍然做不到——它要 AWA 三段流程，本项目没实现；
+  现在如实说"我们没实现"，不再说成"应用没有权限"。
+
 **新增能力：周常轮换表** `world_assistant(intent="rotations")`（别名 `轮换`/`周常轮换`/`这周`）：
 
 - **官方那半**：本周特色突袭/地牢来自 `/Destiny2/Milestones/`（带官方起止时间）；本周夜幕/宗师的
