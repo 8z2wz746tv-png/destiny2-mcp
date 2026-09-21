@@ -24,6 +24,7 @@ from .exceptions import (
     ManifestError,
 )
 from .logging_config import get_logger
+from .utils.hash_utils import to_unsigned
 from .bungie_errors import (
     _bungie_unavailable_result,
     _http_error_code,
@@ -463,32 +464,30 @@ class BungieClient:
         character_id: str,
         membership_type: int,
     ) -> dict:
-        """Insert a free socket plug (subclass abilities, perk switching, etc.).
+        """Insert a free socket plug (subclass abilities, armor mods, perk switching…).
 
-        Uses Bungie's InsertSocketPlugFree endpoint. Free plugs include
-        subclass abilities (super, melee, grenade, aspects, fragments)
-        and weapon perk switching.
-
-        Args:
-            item_instance_id: The item instance ID (e.g. subclass instance).
-            plug_item_hash: The plug item hash to insert.
-            socket_index: The socket index on the item.
-            socket_array_type: 0 = default, 1 = reusable.
-            character_id: The character ID.
-            membership_type: Platform membership type.
+        `socket_array_type`：0 = Default，1 = Intrinsic（官方枚举只有这两个值）。
         """
         try:
-            plug = aiobungie.builders.PlugSocketBuilder()
-            plug.set_plug_item(plug_item_hash)
-            plug.set_socket_index(socket_index)
-            plug.set_socket_array(socket_array_type)
             token = await self.get_access_token()
-            await self.rest.insert_socket_plug_free(
-                token,
-                instance_id=int(item_instance_id),
-                plug=plug,
-                character_id=int(character_id),
-                membership_type=aiobungie.MembershipType(membership_type),
+            # 免费接口的物品字段是 `itemId`（付费接口才叫 `itemInstanceId`）；aiobungie 抄错了
+            # 字段名 → `itemId` 缺失 → 上游 1663 "doesn't have sockets."。见 ADR-012。
+            await self.rest.static_request(
+                "POST",
+                "Destiny2/Actions/Items/InsertSocketPlugFree/",
+                auth=token,
+                json={
+                    "plug": {
+                        # hash 转无符号：方案里的 hash 可能是有符号的（`武器模组`=-111671246），
+                        # 直接发负数上游回 `InvalidPostBody`。
+                        "plugItemHash": to_unsigned(plug_item_hash),
+                        "socketIndex": socket_index,
+                        "socketArrayType": socket_array_type,
+                    },
+                    "itemId": str(item_instance_id),
+                    "characterId": str(character_id),
+                    "membershipType": membership_type,
+                },
             )
             logger.debug(
                 "InsertSocketPlugFree OK: item=%s plug=%s socket=%s",
@@ -537,7 +536,8 @@ class BungieClient:
                 auth=token,
                 json={
                     "plug": {
-                        "plugItemHash": plug_item_hash,
+                        # 同免费那条：hash 一律转无符号（方案里的 hash 可能是有符号的）。
+                        "plugItemHash": to_unsigned(plug_item_hash),
                         "socketIndex": socket_index,
                         "socketArrayType": socket_array_type,
                     },

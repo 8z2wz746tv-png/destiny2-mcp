@@ -283,3 +283,51 @@ async def test_get_collectible_item_status_reads_profile_collectible_state() -> 
     assert result["items"][0]["collectible_hash"] == 9001
     assert result["items"][0]["acquired"] is True
     assert result["items"][0]["state_labels"] == ["已获得"]
+
+
+# ── 插槽写入的线上格式（2026-09-21 真机踩出来的两个坑）──────────────────
+
+
+@pytest.mark.asyncio
+async def test_free_socket_plug_uses_the_free_endpoints_field_name() -> None:
+    """免费插槽接口的物品字段叫 `itemId`，**不是** `itemInstanceId`。
+
+    真机现场：aiobungie 的 `insert_socket_plug_free` 把**付费**那套字段名抄了过来，于是
+    免费请求里 `itemId` 缺失、上游取不到物品，固定回 1663 `DestinyItemActionForbidden` +
+    `{'request.itemInstanceId': "The item being socketed doesn't have sockets."}` ——
+    那句"物品没有插槽"其实是字段没绑上。子职业换不了、护甲模组装不上，全卡在这一条，
+    还一度被误判成"个人应用没有写权限"。官方两个接口的字段名不同：
+    免费 `itemId`、付费 `itemInstanceId`（Bungie OpenAPI 生成的类型可逐字对上）。
+    """
+    client, rest = make_client()
+
+    await client.insert_socket_plug_free(
+        "6917530133660010012", 4183296050, 0, 0, "2305843009754046315", 3
+    )
+
+    method, path, kwargs = rest.calls[0]
+    body = kwargs["json"]
+    assert method == "POST"
+    assert path == "Destiny2/Actions/Items/InsertSocketPlugFree/"
+    assert body["itemId"] == "6917530133660010012"
+    assert "itemInstanceId" not in body, "免费接口用 itemId，写成付费的字段名上游取不到物品"
+    assert body["plug"] == {
+        "plugItemHash": 4183296050, "socketIndex": 0, "socketArrayType": 0,
+    }
+
+
+@pytest.mark.asyncio
+async def test_socket_plug_hash_is_always_sent_unsigned() -> None:
+    """plug hash 一律转无符号：**护甲模组方案里的 hash 是有符号的**。
+
+    实测 `武器模组` = `-111671246`（= 无符号 `4183296050`）。直接发负数，上游回
+    `InvalidPostBody`「JSON Serialization Error」。子职业的 plug hash 天生是正数，
+    所以这个坑只在护甲模组上暴露过。
+    """
+    client, rest = make_client()
+
+    await client.insert_socket_plug_free("1", -111671246, 0, 0, "2", 3)
+    assert rest.calls[0][2]["json"]["plug"]["plugItemHash"] == 4183296050
+
+    await client.insert_socket_plug("1", -111671246, 0, 0, "2", 3)
+    assert rest.calls[1][2]["json"]["plug"]["plugItemHash"] == 4183296050
