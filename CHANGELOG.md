@@ -4,6 +4,23 @@
 
 ## 未发布
 
+**新增工具：护甲求解器基准** `scripts/benchmark_build_solver.py`（P0，见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md`）：
+
+- 固定用例 × 3 次取中位，每条用例同时量**端到端**（`BuildService.find_build`，含 worker 进程开销）
+  与**内核**（直接 `solve()`，给 `combos` 这个确定性工作量）；`--source-root` 指向另一个 checkout 做
+  paired 对照（实测 `sys.path` 前置能压过 editable 安装的 finder），`--compare a.json b.json` 出对照表。
+- 默认用例集按**实测成本**拆分：`hunter_priority_only`(18s)、`titan_meets_minimum`(7.8s) 默认跑；
+  `hunter_priority_set`(283s)、`hunter_infeasible`(28s)、术士两条进 `--heavy`。
+- 落盘 `docs/benchmarks/build-solver-p0-*.json`。
+- 顺带给 `scripts/capture_weapon_baseline.py` 补 `--only`（**补录新用例必须用它**：整面重录会把已有的
+  "改动前"对照覆盖成今天的值），并加了三条钉目标语义的护甲面用例 `build_priority_targets` /
+  `build_priority_only` / `build_range_targets`。
+
+**实测（P0 先量，全部写进计划文档）**：同一个人把目标从 手雷≥100 抬到 ≥130，
+求解器**能**给出 手雷130（其余下限仍达标），但端到端从 9.2s 涨到 140s —— 内核工作量一模一样
+（3,769,920 组合、5.7s），差的是"严格解为空 → 调谐补救"那条路（同一请求分段实测：内核 0.27s /
+`solve_with_tuning` 212.66s）。所以"属性不够极限"的真因是**没人要求过** + **要价太贵**，不是算法够不着。
+
 **修复（重要）：护甲上"剩下的模组槽"本来就是能通过 API 写的，"装不了"是第三件事** ——
 部位模组（头盔/手臂/胸甲/腿甲/职业物品）在 API 面前和属性模组一样，被拒的是**这一位还没解锁**的
 那几颗（见 ADR-013）：

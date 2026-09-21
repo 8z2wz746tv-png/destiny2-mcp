@@ -144,6 +144,37 @@ ARMOR_CASES: list[tuple[str, object]] = [
             "$canonical_from": "data.builds[0].canonical_build",
         }),
     ]),
+    # ── 目标语义与排序（SOLVER_OPTIMALITY_PLAN 的 P1–P4 要动的东西）──────────
+    # 这三条钉住的是"求解器的目标函数"本身：达标口径、优先级会不会真的把属性顶上去、
+    # 以及上限（模板给的区间上半截）现在有没有被当回事。改排序/改上限语义时，
+    # 这里的 diff 必须是**有理由的**（用 armor_response_allowlist.json 登记），
+    # 不许无声漂移。
+    # ① 目标 + 优先级：钉住候选排序与最终六维（优先级高的那一项应该被顶到能量允许的最高）。
+    #    两步：带 `exotic_name` 的第一次只回金装确认，真正求解在回传候选之后。
+    ("build_priority_targets", [
+        ("build_assistant", {
+            "intent": "find", "character": "hunter", "exotic_name": "快速装弹松身裤",
+            "weapons_target": 150, "class_target": 100, "super_target": 80,
+            "melee_target": 70, "grenade_target": 70,
+            "priority_stats": ["weapons", "class_stat", "super_stat", "melee", "grenade"],
+            "top_n": 5,
+        }),
+        ("build_assistant", {"$replay_candidate": 0}),
+    ]),
+    # ② 只有优先级、没有硬目标：钉住"没要求就不额外优化"这条口径
+    ("build_priority_only", "build_assistant", {
+        "intent": "recommend", "character": "hunter",
+        "priority_stats": ["grenade", "weapons"], "top_n": 3,
+    }),
+    # ③ 上限：模板式区间（手雷 100~200）在本会话里被拍成了下限 100，属性堆到 110 也没人
+    #    说"超了"。P2 之后这里应当出现"超过上限"的标注 —— 这条用例就是为了让那次变更
+    #    在 diff 里显形。
+    ("build_range_targets", "build_assistant", {
+        "intent": "find", "character": "titan",
+        "weapons_target": 100, "grenade_target": 100,
+        "class_target": 70, "melee_target": 70, "super_target": 80,
+        "priority_stats": ["grenade", "weapons"], "top_n": 3,
+    }),
 ]
 
 SURFACES: dict[str, tuple[Path, list]] = {
@@ -275,8 +306,22 @@ async def capture(out_dir: Path, cases: list) -> int:
                     f"{meta.get('elapsed_ms')}ms {meta.get('payload_chars')}B "
                     f"code={(payload.get('error') or {}).get('code')}"
                 )
-    (out_dir / "index.json").write_text(
-        json.dumps({"cases": index}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    index_path = out_dir / "index.json"
+    # 用 `--only` 补录时**合并**而不是覆盖：index.json 是这一面全部用例的记录，
+    # 只录三例就把它截成三行，等于把已有的耗时/体积对照丢掉。
+    merged: dict[str, dict] = {}
+    if index_path.exists():
+        try:
+            for entry in json.loads(index_path.read_text(encoding="utf-8")).get("cases", []):
+                merged[entry["case"]] = entry
+        except (json.JSONDecodeError, KeyError, TypeError):
+            pass
+    for entry in index:
+        merged[entry["case"]] = entry
+    index_path.write_text(
+        json.dumps({"cases": [merged[key] for key in sorted(merged)]}, ensure_ascii=False, indent=2)
+        + "\n",
+        encoding="utf-8",
     )
     total_ms = sum(item["elapsed_ms"] or 0 for item in index)
     total_chars = sum(item["payload_chars"] or 0 for item in index)
@@ -288,9 +333,26 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=None, help="不填就用该面的默认目录")
     parser.add_argument("--surface", choices=sorted(SURFACES), default="weapon")
+    parser.add_argument(
+        "--only",
+        action="append",
+        default=[],
+        help="只录指定用例（可重复）。补录新用例时必须用它 —— 整面重录会把已有的"
+             "「改动前」对照物覆盖成今天的值，那份对照就废了。",
+    )
     args = parser.parse_args()
     default_out, cases = SURFACES[args.surface]
-    return asyncio.run(capture(args.out or default_out, _as_cases(cases)))
+    normalized = _as_cases(cases)
+    if args.only:
+        wanted = set(args.only)
+        known = {case_id for case_id, _ in normalized}
+        unknown = wanted - known
+        if unknown:
+            print(f"没有这些用例：{sorted(unknown)}；这一面有的是：{sorted(known)}")
+            return 2
+        normalized = [case for case in normalized if case[0] in wanted]
+        print(f"只录 {len(normalized)} 例：{sorted(wanted)}")
+    return asyncio.run(capture(args.out or default_out, normalized))
 
 
 if __name__ == "__main__":

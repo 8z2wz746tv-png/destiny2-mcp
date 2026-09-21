@@ -1,20 +1,20 @@
 {
   "cases": [
     {
-      "case": "armor_get_legs",
-      "tool": "inventory_assistant",
-      "ok": true,
-      "error_code": null,
-      "elapsed_ms": 5196,
-      "payload_chars": 3841
-    },
-    {
       "case": "armor_get_exotic",
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
       "elapsed_ms": 1569,
       "payload_chars": 2902
+    },
+    {
+      "case": "armor_get_legs",
+      "tool": "inventory_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 5196,
+      "payload_chars": 3841
     },
     {
       "case": "armor_get_vault",
@@ -25,22 +25,6 @@
       "payload_chars": 935
     },
     {
-      "case": "armor_search",
-      "tool": "inventory_assistant",
-      "ok": true,
-      "error_code": null,
-      "elapsed_ms": 1621,
-      "payload_chars": 2692
-    },
-    {
-      "case": "armor_item_t5",
-      "tool": "inventory_assistant",
-      "ok": true,
-      "error_code": null,
-      "elapsed_ms": 2872,
-      "payload_chars": 5929
-    },
-    {
       "case": "armor_item_legacy",
       "tool": "inventory_assistant",
       "ok": true,
@@ -49,76 +33,12 @@
       "payload_chars": 10607
     },
     {
-      "case": "equip_mod_confirm",
-      "tool": "inventory_assistant",
-      "ok": false,
-      "error_code": "confirmation_required",
-      "elapsed_ms": 3710,
-      "payload_chars": 1536
-    },
-    {
-      "case": "ladder_no_solution",
-      "tool": "build_assistant",
-      "ok": true,
-      "error_code": null,
-      "elapsed_ms": 75579,
-      "payload_chars": 32628
-    },
-    {
-      "case": "ladder_infeasible_verdict",
-      "tool": "build_assistant",
-      "ok": true,
-      "error_code": null,
-      "elapsed_ms": 90178,
-      "payload_chars": 4854
-    },
-    {
-      "case": "equip_mod_wrong_slot",
-      "tool": "inventory_assistant",
-      "ok": false,
-      "error_code": "invalid_argument_error",
-      "elapsed_ms": 2189,
-      "payload_chars": 285
-    },
-    {
-      "case": "inventory_summary",
+      "case": "armor_item_t5",
       "tool": "inventory_assistant",
       "ok": true,
       "error_code": null,
-      "elapsed_ms": 2597,
-      "payload_chars": 23671
-    },
-    {
-      "case": "exotic_armor_list",
-      "tool": "build_assistant",
-      "ok": true,
-      "error_code": null,
-      "elapsed_ms": 307,
-      "payload_chars": 26858
-    },
-    {
-      "case": "exotic_armor_detail",
-      "tool": "build_assistant",
-      "ok": true,
-      "error_code": null,
-      "elapsed_ms": 10,
-      "payload_chars": 7349
-    },
-    {
-      "case": "set_bonus_list",
-      "tool": "build_assistant",
-      "ok": true,
-      "error_code": null,
-      "elapsed_ms": 15,
-      "payload_chars": 26557
-    },
-    {
-      "case": "set_bonus_detail",
-      "tool": "build_assistant",
-      "ok": true,
-      "error_code": null,
-      "elapsed_ms": 8,
-      "payload_chars": 7765
+      "elapsed_ms": 2872,
+      "payload_chars": 5929
     },
     {
       "case": "armor_mods_all",
@@ -137,12 +57,84 @@
       "payload_chars": 36425
     },
     {
+      "case": "armor_search",
+      "tool": "inventory_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 1621,
+      "payload_chars": 2692
+    },
+    {
+      "case": "build_priority_only",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 19854,
+      "payload_chars": 42016
+    },
+    {
+      "case": "build_priority_targets",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 238028,
+      "payload_chars": 32609
+    },
+    {
+      "case": "build_range_targets",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 7825,
+      "payload_chars": 39344
+    },
+    {
       "case": "community_build_inventory",
       "tool": "build_assistant",
       "ok": true,
       "error_code": null,
       "elapsed_ms": 10051,
       "payload_chars": 125374
+    },
+    {
+      "case": "equip_confirm_echo",
+      "tool": "build_assistant",
+      "ok": false,
+      "error_code": "confirmation_required",
+      "elapsed_ms": 4395,
+      "payload_chars": 77258
+    },
+    {
+      "case": "equip_mod_confirm",
+      "tool": "inventory_assistant",
+      "ok": false,
+      "error_code": "confirmation_required",
+      "elapsed_ms": 3710,
+      "payload_chars": 1536
+    },
+    {
+      "case": "equip_mod_wrong_slot",
+      "tool": "inventory_assistant",
+      "ok": false,
+      "error_code": "invalid_argument_error",
+      "elapsed_ms": 2189,
+      "payload_chars": 285
+    },
+    {
+      "case": "exotic_armor_detail",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 10,
+      "payload_chars": 7349
+    },
+    {
+      "case": "exotic_armor_list",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 307,
+      "payload_chars": 26858
     },
     {
       "case": "farm_target_armor",
@@ -153,12 +145,44 @@
       "payload_chars": 2635
     },
     {
-      "case": "equip_confirm_echo",
+      "case": "inventory_summary",
+      "tool": "inventory_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 2597,
+      "payload_chars": 23671
+    },
+    {
+      "case": "ladder_infeasible_verdict",
       "tool": "build_assistant",
-      "ok": false,
-      "error_code": "confirmation_required",
-      "elapsed_ms": 4395,
-      "payload_chars": 77258
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 90178,
+      "payload_chars": 4854
+    },
+    {
+      "case": "ladder_no_solution",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 75579,
+      "payload_chars": 32628
+    },
+    {
+      "case": "set_bonus_detail",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 8,
+      "payload_chars": 7765
+    },
+    {
+      "case": "set_bonus_list",
+      "tool": "build_assistant",
+      "ok": true,
+      "error_code": null,
+      "elapsed_ms": 15,
+      "payload_chars": 26557
     }
   ]
 }
