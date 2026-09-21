@@ -308,6 +308,35 @@ DSH_PATCH_BEGIN = "# destiny2-mcp:mcp-begin"
 DSH_PATCH_END = "# destiny2-mcp:mcp-end"
 
 
+def _reconnect_mark(root: Path) -> str:
+    """重连标记：profile 里这一行一变，DSH 就重组 profile 并重连 MCP 服务器。
+
+    取**代码版本**而不是时间戳 —— 同一个版本重复安装保持幂等（`--mcp` 跑第二遍仍是"已是最新"），
+    而一旦有新提交或工作区变脏，标记自己就变，宿主换到新代码不必等谁记得手改。
+    不是 git 仓库、或机器上没有 git 时给固定的 `unknown`：宁可不变，也别每次装都抖动。
+    想强制重连就手改这一行的值（服务器忽略它，DSH 会重连）。
+
+    为什么必须由安装器写：这一段是**整块重写**的（见 `install_dsh_mcp`），少写一行就等于
+    每次 `--mcp` 都把标记删掉。
+    """
+
+    def _git(*argv: str) -> subprocess.CompletedProcess[str] | None:
+        try:
+            return subprocess.run(
+                ["git", "-C", str(root), *argv],
+                capture_output=True, text=True, timeout=5,
+            )
+        except (OSError, subprocess.SubprocessError):
+            return None
+
+    head = _git("rev-parse", "--short", "HEAD")
+    if head is None or head.returncode != 0 or not head.stdout.strip():
+        return "unknown"
+    dirty = _git("status", "--porcelain")
+    suffix = "-dirty" if dirty is not None and dirty.stdout.strip() else ""
+    return f"{head.stdout.strip()}{suffix}"
+
+
 def dsh_patch_block(server_root: Path, *, server_name: str = "destiny") -> str:
     """DSH profile 的 patch 条目：把本地 stdio 服务器挂成 `mcp__<name>__*` 工具。"""
     root = server_root.resolve()
@@ -328,6 +357,9 @@ def dsh_patch_block(server_root: Path, *, server_name: str = "destiny") -> str:
             f"        cwd: {root}",
             "        env:",
             f"          DESTINY_MCP_ROOT: {root}",
+            "          # 改这一行会触发 profile 实时重组重连（服务器进程因此换成新代码）；",
+            "          # 服务器自己忽略它。值 = 代码版本：新提交或工作区变脏都会自动变。",
+            f'          DESTINY_MCP_RECONNECT_MARK: "{_reconnect_mark(root)}"',
             "        # 首次启动要下载/加载 Manifest，60 秒的默认上限不够。",
             "        toolCallTimeoutMs: 300000",
             "        failOnStartupError: false",

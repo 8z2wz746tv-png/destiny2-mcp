@@ -10,6 +10,8 @@
 from __future__ import annotations
 
 import importlib.util
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -229,6 +231,46 @@ def test_dsh_patch_block_is_marked_and_complete(tmp_path: Path) -> None:
         if not line.startswith("# destiny2-mcp:mcp-begin") and not line.startswith("# destiny2-mcp:mcp-end")
     ))
     assert parsed[0]["insert"][0]["id"] == "mcp-destiny"
+
+
+def test_dsh_patch_block_carries_a_reconnect_mark(tmp_path: Path) -> None:
+    """重连标记必须在块里：它是「服务器进程被换掉后让 DSH 重连」的唯一触发点。
+
+    踩过的坑：安装器**整块重写**这一段，却不写这一行 —— 本机 profile 里那行是手写的，
+    于是照文档跑一次 `--mcp` 就会把它删掉，重连机制永久失效，而且没人会发现。
+    """
+    import yaml
+
+    block = installer.dsh_patch_block(tmp_path)
+    assert "DESTINY_MCP_RECONNECT_MARK" in block
+
+    parsed = yaml.safe_load("\n".join(
+        line for line in block.splitlines()
+        if not line.startswith("# destiny2-mcp:mcp")
+    ))
+    env = parsed[0]["insert"][0]["config"]["env"]
+    assert env["DESTINY_MCP_RECONNECT_MARK"] == "unknown", "非 git 目录给固定值，幂等才成立"
+
+
+def test_reconnect_mark_follows_the_code_revision(tmp_path: Path) -> None:
+    """标记跟着代码版本走：同一状态稳定（幂等），新提交或工作区变脏就变（于是自动重连）。"""
+    if shutil.which("git") is None:
+        pytest.skip("这台机器没有 git")
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "-c", "user.email=t@example.com", "-c", "user.name=t",
+         "commit", "-q", "--allow-empty", "-m", "x"],
+        cwd=repo, check=True,
+    )
+
+    clean = installer._reconnect_mark(repo)
+    assert clean != "unknown"
+    assert installer._reconnect_mark(repo) == clean, "同一状态必须稳定"
+
+    (repo / "f.txt").write_text("x", encoding="utf-8")
+    assert installer._reconnect_mark(repo) == f"{clean}-dirty"
 
 
 def test_dsh_mcp_registration_is_idempotent(tmp_path: Path, monkeypatch, capsys) -> None:
