@@ -256,6 +256,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/plans/PATTERN_QUERY_PLAN.md` — 要做锻造武器模式（玩家说的红框、「模式和催化」那一页、游戏里的「模式进度 4/5」）查询之前看它：进度只在组件 900、183 vs 219 两个口径的实测证据都在里面。
 - `docs/plans/ROTATION_PLAN.md` — 要做周常轮换（夜幕/宗师词缀、遗失区域、上维挑战、泉源、异域任务、突袭/地牢特色）之前看它：官方接口给了哪半、哪半只能维护周期表、锚点与诚实口径都在里面。
 - `docs/plans/PERFORMANCE_PLAN.md` — 要动性能（搜索 N+1、武器目录全量展开、载荷体积、启动、并发与缓存）之前看它：六项的实测基线与验收口径都在里面。
+- `docs/plans/SOLVER_OPTIMALITY_PLAN.md` — 要动护甲求解器的**目标函数与排序**（"刚好达标"、上限、偏好、调谐进搜索、可达区间）之前看它：根因的代码位置、五条待拍板口径与 P0–P6 阶段划分都在里面。
 - `docs/plans/PVP_WEAPON_BOARD_PLAN.md` — 动 PvP 武器榜（PGCR 窗口聚合、成本与并发实测、模式名出处）之前看它为什么只能给"最近 N 场"。
 - `docs/plans/SUBCLASS_ARTIFACT_PLAN.md` — 动子职业/神器读写之前看计划与取舍。
 - `docs/plans/WEAPON_FORMAT_PLAN.md` — 动武器载荷格式之前看计划与实机证据。
