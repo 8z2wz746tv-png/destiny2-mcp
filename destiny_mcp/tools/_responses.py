@@ -67,9 +67,9 @@ def confirmation_required_response(
 _WRITE_FAILURE_HINTS: tuple[tuple[tuple[str, ...], str], ...] = (
     (
         ("UniqueEquipRestricted", "只能装备一件", "一件异域"),
-        "全身只能穿一件异域护甲（金装），目标槽与已经穿着的那件冲突：先从该角色背包里挑一件"
-        "**非异域**的同部位护甲穿上去顶下它，再装目标"
-        '（`inventory_assistant` 的 `intent="get", armor_slot=…` 能列出他有哪些候选）。',
+        "同类的异域只能穿一件（异域**武器**一件 + 异域**护甲**一件，两类互不冲突）：目标与已经"
+        "穿着的那件同属一类，先从该角色背包里挑一件**非异域的同部位**装备穿上去顶下它，再装目标"
+        '（`inventory_assistant` 的 `intent="get"`：武器用 `item_type="武器"`，护甲用 `armor_slot=…`）。',
     ),
     (
         ("equipped item", "CannotPerformActionOnEquippedItem", "已装备"),
