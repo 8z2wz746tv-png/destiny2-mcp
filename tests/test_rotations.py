@@ -15,6 +15,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+
+from destiny_mcp.data.rotations import wellspring_upcoming
 from typing import get_args
 
 import pytest
@@ -220,7 +222,11 @@ async def test_schedule_rows_carry_verified_metadata() -> None:
         assert row["source"] == "schedule"
         assert row["verified_at"] == "2026-09-21" and row["verified_against"]
     wellspring = [r for r in result["rows"] if r["kind"] == "wellspring"]
-    assert [r["name"] for r in wellspring] == ["泉源：防御", "泉源：攻击"], "今天 + 明天"
+    # 泉源按天在「攻击/防御」之间交替，所以**不能把"今天是哪个"写死** —— 这条断言以前写死成
+    # 「防御, 攻击」，2026-09-22 一过零点就红了（判据本身没问题，是断言错了）。
+    # 期望值从同一个出处现算：`wellspring_upcoming` 与响应走的是同一个函数。
+    expected = [f"泉源：{mode}" for _, mode in wellspring_upcoming(datetime.now(timezone.utc))]
+    assert [r["name"] for r in wellspring] == expected, "今天 + 明天"
     assert wellspring[0]["variants"] == ["标准", "专家", "大师"]
 
 
