@@ -649,6 +649,15 @@ class BuildRequest(BaseModel):
         default=None, ge=2, le=4,
         description="Required number of set pieces (2 or 4). Default: 2",
     )
+    stat_caps: dict[str, int] = Field(
+        default_factory=dict,
+        description=(
+            "属性**上限**映射，键与 priority_stats 同一套词（weapons/health/class_stat/"
+            "grenade/super_stat/melee，也认 职业/手雷 这类中文）。超上限算违规：会被排到后面"
+            "并在结果里标注，但**不阻止出解**。不传 = 不限。"
+        ),
+    )
+
     def target_vector(self) -> list[int | None]:
         """六个下限，按 `STAT_NAMES` 顺序（没给的项是 None，不是 0）。"""
         return [getattr(self, REQUEST_TARGET_FIELDS[name], None) for name in STAT_NAMES]
@@ -685,6 +694,14 @@ class BuildConstraints(BaseModel):
     grenade_min: int = 0
     melee_min: int = 0
     super_stat_min: int = 0
+    #: 上限：0 = 不限（与 `process_utils` 里 `desired_max_stats` 的 0 语义一致）。
+    #: **超上限不阻止出解**，只是排到后面 + 在结果里标注 —— 见 docs/plans/SOLVER_OPTIMALITY_PLAN.md 决定 1。
+    weapons_max: int = 0
+    health_max: int = 0
+    class_stat_max: int = 0
+    grenade_max: int = 0
+    melee_max: int = 0
+    super_stat_max: int = 0
     exotic_hash: int | None = None
     exotic_hashes: set[int] = Field(default_factory=set, description="All hashes for the exotic (different versions of same item)")
     class_type: int | None = None
@@ -699,6 +716,10 @@ class BuildConstraints(BaseModel):
     def as_vector(self) -> list[int]:
         """Return stat minimums as a list in STAT_NAMES order."""
         return [getattr(self, f"{s}_min") for s in STAT_NAMES]
+
+    def max_vector(self) -> list[int]:
+        """Return stat **caps** in STAT_NAMES order；0 = 不限。"""
+        return [getattr(self, f"{s}_max") for s in STAT_NAMES]
 
     def subclass_and_fragment_vector(self) -> list[int]:
         """Return combined subclass + fragment bonuses as a vector."""
@@ -778,6 +799,13 @@ class BuildResult(BaseModel):
     missing_requirements: list[str] = Field(
         default_factory=list,
         description="Stat targets that weren't met",
+    )
+    max_violations: list[dict] = Field(
+        default_factory=list,
+        description=(
+            "超过 `stat_caps` 的项：[{stat, label, actual, max}]。空表 = 没超过任何上限。"
+            "超上限**不阻止出解**，只是这套会被排到没超上限的方案后面（口径见计划文档决定 1）。"
+        ),
     )
     fragment_details: list[dict] = Field(
         default_factory=list,

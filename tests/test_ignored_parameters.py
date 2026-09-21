@@ -124,6 +124,10 @@ WRITE_INTENTS = set(_requests.WRITE_INTENTS) | {"equip_build"}
 # 探针要按下游的合法范围给。
 PROBE_OVERRIDES: dict[tuple[str, str], tuple[Any, Any]] = {
     ("build_assistant", "set_bonus_count"): (4, 2),
+    # 上限映射必须是**合法的属性键**：默认探针用的是一段凭据字符串，
+    # 拿它当上限键会被 `build/constraints.parse` 判成"不认识的上限属性"而提前抛错，
+    # 于是两次调用的服务层记录一样，看门狗只会得出"没读到"（那是探针的问题，不是代码的）。
+    ("build_assistant", "stat_caps"): ({"grenade": 100}, {"grenade": 40}),
 }
 
 

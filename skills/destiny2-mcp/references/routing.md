@@ -356,6 +356,7 @@ Manifest 侧（**不代表拥有**）：
 | `set_bonus_count` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `set_bonus_name` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend`、`set_bonus` |
 | `slot_number` | `loadout_assistant`：`clear_official`、`snapshot_official`、`update_official_identifiers` |
+| `stat_caps` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `statid` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
 | `super_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `to_character` | `inventory_assistant`：`transfer` |

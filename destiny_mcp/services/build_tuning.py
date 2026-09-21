@@ -17,7 +17,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Any, Iterable, Sequence
 
 from ..build.constants import STAT_NAMES
@@ -570,6 +570,8 @@ class TuningOutcome:
     coverage: SearchCoverage
     #: 这一趟有没有动用"放宽目标 + 调谐补救"（给话术与诊断用，不参与判定）
     rescued: bool
+    #: 逐项可达上限，**只取严格那一趟**的（放宽目标那趟的口径和请求不一样，混起来是错的）
+    reachable_ceilings: list[int] = field(default_factory=list)
 
 
 async def solve_with_tuning(
@@ -586,7 +588,9 @@ async def solve_with_tuning(
     strict_sets = list(solved.sets)
     if strict_sets and sets_meet_targets(strict_sets, constraints):
         # 已经达标：一个字都不改（基线里那些本来就绿的方案必须保持一致）
-        return TuningOutcome(strict_sets, {}, solved.coverage, rescued=False)
+        return TuningOutcome(
+            strict_sets, {}, solved.coverage, False, solved.reachable_ceilings
+        )
 
     rescues = rescue_sets(snapshot, constraints, manifest, strict_sets)
     rescued_keys = {set_key(rescue.armor_set.armor) for rescue in rescues}
@@ -619,7 +623,9 @@ async def solve_with_tuning(
         for armor_set in strict_sets
         if set_key(armor_set.armor) not in rescued_keys
     )
-    return TuningOutcome(pool, plans, solved.coverage, rescued=True)
+    return TuningOutcome(
+        pool, plans, solved.coverage, True, solved.reachable_ceilings
+    )
 
 
 def _solve(snapshot: Any, constraints: BuildConstraints) -> Any:

@@ -16,10 +16,15 @@ from typing import Any
 class HeapEntry:
     """Entry in the min-heap.
 
-    Comparison is based on (enabled_stats_total, stat_mix, stats_total, power),
+    Comparison is based on (caps_ok, enabled_stats_total, stat_mix, stats_total, power),
     all ascending for min-heap ordering (worst first).
+
+    `caps_ok`：1 = 没超过任何属性上限，0 = 超了。它**必须排在最前**，否则"超上限的方案
+    排到后面"就只是一句话：min-heap 里 root 是"最差"的那套，而元组越小越差，
+    所以 `caps_ok=0`（更小）自动沉底、被优先挤出去。
     """
 
+    caps_ok: int
     enabled_stats_total: int
     stat_mix: int
     stats_total: int
@@ -42,14 +47,20 @@ class HeapSetTracker:
         self.capacity = capacity
         self._heap: list[HeapEntry] = []
 
-    def could_insert(self, enabled_stats_total: int) -> bool:
-        """Check if a set with this total could qualify for the top N.
+    def could_insert(self, caps_ok: int, enabled_stats_total: int) -> bool:
+        """这套有没有可能进 top-N。O(1)，看堆顶（最差的那套）。
 
-        O(1) check using the root (worst set) of the min-heap.
+        **必须是保守的**：宁可多算，也不能把本来进得来的方案挡在外面。
+        因为 `caps_ok` 在比较里优先，只比 `enabled_stats_total` 会漏判 ——
+        一套"没超上限、但总值低于超上限的堆顶"的方案其实进得来（0 < 1），
+        按老写法就会被剪掉，那就是 P1 说的"截断制造假无解"。
         """
         if len(self._heap) < self.capacity:
             return True
-        return enabled_stats_total >= self._heap[0].enabled_stats_total
+        worst = self._heap[0]
+        if caps_ok != worst.caps_ok:
+            return caps_ok > worst.caps_ok
+        return enabled_stats_total >= worst.enabled_stats_total
 
     def insert(self, entry: HeapEntry) -> bool:
         """Insert a set into the heap.

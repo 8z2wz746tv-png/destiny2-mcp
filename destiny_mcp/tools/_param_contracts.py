@@ -338,6 +338,11 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         _only(*_B_CRAFT), hint='属性目标是求解类 intent 的硬约束；社区配装不受它影响。',
         suggestion=("build_assistant", "recommend"),
     ),
+    ("build_assistant", "stat_caps"): _contract(
+        _only(*_B_CRAFT),
+        hint='属性上限只被求解类 intent 读（community 等模板查询不受它影响）。',
+        suggestion=("build_assistant", "recommend"),
+    ),
     ("build_assistant", "fragment_names"): _contract(
         _only(*_B_CRAFT), hint='碎片计入配装只在求解类 intent 上生效。',
         suggestion=("build_assistant", "recommend"),

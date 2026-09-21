@@ -40,7 +40,7 @@ from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..models import Loadout, LoadoutSubclassConfig
 from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
-from ..build.process_types import SearchCoverage
+from ..build.process_types import SearchDiagnostics
 from .build_tuning import solve_with_tuning
 from .build_results import (
     LOADOUT_SLOT_NAMES as _LOADOUT_SLOT_NAMES,
@@ -488,7 +488,7 @@ class BuildService:
         self,
         player_name: str,
         request: BuildRequest,
-        coverage: list[SearchCoverage] | None = None,
+        diagnostics: list[SearchDiagnostics] | None = None,
     ) -> list[BuildResult]:
         """Find the best armor builds for the given request.
 
@@ -497,13 +497,12 @@ class BuildService:
         Args:
             player_name: Bungie name.
             request: User's build request (targets + constraints).
-            coverage: 可选收集器。给了就把"这次搜索到底搜完了没有"塞进去
-                （`build/process_types.SearchCoverage`）—— 空结果必须能自证"枚举完了"，
-                否则调用方分不清"真没有"与"没搜完"。
+            diagnostics: 可选收集器。给了就把"这次搜索到底搜完了没有 + 每项属性单独
+                能顶到多少"塞进去（`build/process_types.SearchDiagnostics`）—— 空结果必须能
+                自证"枚举完了"，否则调用方分不清"真没有"与"没搜完"。
 
         Returns:
-            Top-K BuildResults sorted by score (best first); 空表 = 枚举完了但没有满足下限的方案
-            （原因见 `coverage`，别把"没搜完"读成"没有"）。
+            Top-K BuildResults sorted by score (best first)；空表 = 枚举完了但没有满足下限的方案。
         """
         if not request.character_class:
             raise BuildValidationError("必须指定 hunter、warlock 或 titan。")
@@ -577,8 +576,10 @@ class BuildService:
         # 没达标才用调谐额度复解一遍（把"差 5 点"变成可执行方案）并逐套精确复核。
         solved = await solve_with_tuning(self._compute, snapshot, parsed, self._manifest)
         pool, tuning_map = solved.pool, solved.tuning_map
-        if coverage is not None:
-            coverage.append(solved.coverage)
+        if diagnostics is not None:
+            diagnostics.append(SearchDiagnostics(
+                coverage=solved.coverage, reachable_ceilings=solved.reachable_ceilings
+            ))
         logger.info("Solver: %d sets (%d 靠调谐补齐)", len(pool), len(tuning_map))
         if not pool:
             logger.warning("No build satisfies constraints for %s", player_name)

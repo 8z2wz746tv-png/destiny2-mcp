@@ -141,12 +141,17 @@ async def find(
     query: dict[str, Any],
     dump: Callable[[Any], Any],
 ) -> dict[str, Any]:
-    coverage: list[Any] = []
+    diagnostics: list[Any] = []
     try:
-        result = await svc["build_svc"].find_build(player_name, request, coverage)
+        result = await svc["build_svc"].find_build(player_name, request, diagnostics)
     except BuildTooLargeError as exc:
         return _not_computed(str(exc), query, key="builds")
-    search = coverage[0].to_dict() if coverage else None
+    report = diagnostics[0].to_dict() if diagnostics else None
+    search = (
+        {key: report[key] for key in ("exhaustive", "combos", "truncated_by")}
+        if report
+        else None
+    )
     builds = with_slot_keys(dump(result))
     tuning = _tuning_summary(builds)
     if not builds:
@@ -176,6 +181,22 @@ async def find(
         message += (
             f"其中 {tuning['build_count']} 个要先改调谐才能达标"
             "（调谐免费、不占能量；逐件改动见各自的 tuning_changes）。"
+        )
+    # 有解时也给"每项单独能顶到多少" —— 用户说"不够极限"时，答案就在这几个数里。
+    # `reachable_note` 必须一起带上：逐项可达**不等于**同一套能同时达到。
+    if report and report.get("reachable"):
+        payload["reachable"] = report["reachable"]
+        payload["reachable_note"] = report.get("reachable_note")
+    violated = [row for row in builds if isinstance(row, dict) and row.get("max_violations")]
+    if violated:
+        payload["max_violations"] = [
+            {"build_index": index, "item": row.get("max_violations")}
+            for index, row in enumerate(builds)
+            if isinstance(row, dict) and row.get("max_violations")
+        ]
+        message += (
+            f"其中 {len(violated)} 套超过了指定的属性上限（见各自的 max_violations），"
+            "已排到没超上限的方案后面。"
         )
     return ok_response(message, payload)
 

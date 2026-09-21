@@ -584,6 +584,7 @@ async def build_assistant(
     super_target: Annotated[int | None, Field(ge=0, le=200, description=(
         "大招属性最低目标（0-200），属于硬约束；无解时不得自动降低。"
     ))] = None,
+    stat_caps: fields.StatCaps = None,
     fragment_names: Annotated[list[str] | None, Field(description=(
         "要计入配装的碎片名称列表；重试和金装确认时必须原样保留。"
     ))] = None,
@@ -735,6 +736,7 @@ async def build_assistant(
         "grenade_target": grenade_target,
         "melee_target": melee_target,
         "super_target": super_target,
+        "stat_caps": (None if stat_caps is None else dict(stat_caps)),
         "fragment_names": (
             None if fragment_names is None else list(fragment_names)
         ),
@@ -851,6 +853,7 @@ async def build_assistant(
         grenade_target=grenade_target,
         melee_target=melee_target,
         super_target=super_target,
+        stat_caps=dict(stat_caps or {}),
         include_subclass_fragment=include_subclass_fragment,
         fragment_names=fragment_names or [],
         set_bonus_name=set_bonus_name,
@@ -871,6 +874,7 @@ async def build_assistant(
             "super": request.super_target,
         },
         "priority_stats": request.priority_stats,
+        "stat_caps": request.stat_caps or None,
     }
     if intent == "farm_target":
         query["replacement_slot"] = replacement_slot

@@ -19,11 +19,12 @@ from dataclasses import dataclass, field
 from typing import Any, Sequence
 
 from ..build.constants import STAT_NAMES
-from ..build.models import BuildCandidate, BuildResult
+from ..build.models import BuildCandidate, BuildConstraints, BuildResult
 from ..build.scorer import score as _score
 from ..build.tuning import TuningPlan
 from ..build_contracts import ExecutableBuild
 from ..models import LoadoutItem, LoadoutSubclassConfig
+from ..vocabulary import STAT_LABELS_ZH
 
 
 LOADOUT_SLOT_NAMES = {
@@ -130,6 +131,7 @@ def build_results(
                 completion_rate=_count_met(candidate, parsed) / max(1, _count_targets(parsed)),
                 build=candidate,
                 missing_requirements=_missing_requirements(candidate, parsed),
+                max_violations=_max_violations(candidate, parsed),
                 fragment_details=context.fragment_details,
                 active_set_bonuses=_calculate_set_bonuses(list(armor_set.armor), context.manifest),
                 tuning_changes=(
@@ -234,6 +236,24 @@ def build_results(
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# 上限违规（对外字段：max_violations）—— 超了不拦，只标注 + 排序时靠后
+
+
+def _max_violations(candidate: BuildCandidate, constraints: BuildConstraints) -> list[dict]:
+    """哪几项超过了 `stat_caps`。没给上限的项（0）永远不算违规。"""
+    caps = constraints.max_vector()
+    return [
+        {
+            "stat": STAT_NAMES[index],
+            "label": STAT_LABELS_ZH[STAT_NAMES[index]],
+            "actual": candidate.stat(STAT_NAMES[index]),
+            "max": caps[index],
+        }
+        for index in range(6)
+        if caps[index] > 0 and candidate.stat(STAT_NAMES[index]) > caps[index]
+    ]
+
+
 # 目标达成统计（对外字段：completion_rate / missing_requirements）
 # ═══════════════════════════════════════════════════════════════════════════
 

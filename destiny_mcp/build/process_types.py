@@ -163,6 +163,34 @@ class SearchCoverage:
         }
 
 
+@dataclass(frozen=True)
+class SearchDiagnostics:
+    """一次求解"关于自己"的全部信息：搜完了没有 + 每项属性**单独**能顶到多少。
+
+    `reachable_ceilings` 按 `STAT_NAMES` 顺序，是"在其余属性仍满足下限的前提下，这一项
+    最多能到多少"（`update_max_stats` 逐点试出来的，DIM 同源）。**逐项可达 ≠ 同时可达**：
+    六个数放在一起并不能构成一套配装，回答时必须原样带上这句话（阶梯那边已经钉过同一条）。
+    """
+
+    coverage: SearchCoverage
+    reachable_ceilings: list[int] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            **self.coverage.to_dict(),
+            "reachable": dict(zip(STAT_NAMES, self.reachable_ceilings)),
+            "reachable_note": (
+                "每一项都是「其余属性仍满足下限时，这一项**已验证能到**多少」。"
+                "两个都要记住：① 它是**保守下界**，不是上限 —— 模组按 5/10 加减，这一步只验证了"
+                "「要求到这么多」时还装得下，实际可能更高（真机实测手雷报 120，把下限写成 130 "
+                "时确实能到 130）；② **逐项可达 ≠ 同时达到**，六个数放在一起不构成一套配装。"
+                "要真的顶上去，就把目标写成下限再加优先级。"
+            )
+            if self.reachable_ceilings
+            else None,
+        }
+
+
 @dataclass
 class ProcessResult:
     """Result from the solver."""
@@ -172,11 +200,19 @@ class ProcessResult:
     #: 搜索有没有跑完。默认 True（五层枚举无配额）；将来加了配额就必须如实置 False。
     complete: bool = True
     truncated_by: str = ""
+    #: 逐项可达上限，按 `STAT_NAMES` 顺序（空 = 没算）。口径见 `SearchDiagnostics`。
+    reachable_ceilings: list[int] = field(default_factory=list)
 
     @property
     def coverage(self) -> SearchCoverage:
         return SearchCoverage(
             exhaustive=self.complete, combos=self.combos, truncated_by=self.truncated_by
+        )
+
+    @property
+    def diagnostics(self) -> SearchDiagnostics:
+        return SearchDiagnostics(
+            coverage=self.coverage, reachable_ceilings=list(self.reachable_ceilings)
         )
 
 

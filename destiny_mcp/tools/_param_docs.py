@@ -357,6 +357,17 @@ SetBonusName = Annotated[
     Field(description='套装名。intent="set_bonus" 查它的 2/4 件效果；求解类 intent 把它当硬约束。'),
 ]
 
+StatCaps = Annotated[
+    dict[str, int] | None,
+    Field(description=(
+        "属性**上限**映射，键与 priority_stats 同一套词（weapons/health/class_stat/grenade/"
+        "super_stat/melee，也认 武器/生命/职业/手雷/超能/近战）。例："
+        '{"grenade": 100} = 手雷别超过 100。语义：超上限算**违规** —— 会被排到没超上限的'
+        "方案后面、并在结果的 max_violations 里逐项标注，**但不阻止出解**（不会因此报无解）；"
+        "同时求解器不再往已经到上限的属性上堆模组。不传 = 不限。上限低于下限会直接报错。"
+    )),
+]
+
 SetBonusCount = Annotated[
     int | None,
     Field(ge=2, le=4, description="套装件数约束（2 或 4）。只在求解类 intent 上生效。"),

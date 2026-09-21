@@ -224,7 +224,24 @@ def prepare_fixed_set_context(
     bonus_vector = constraints.subclass_and_fragment_vector()
     desired_min = [max(0, raw_min[i] - bonus_vector[i]) for i in range(6)]
     priority_indices = constraints.ordered_priority_indices
-    if priority_indices:
+    # 上限（`stat_caps`，0 = 不限）优先；没给上限时退回老口径：
+    # 优先属性允许吃到满，其余属性的上限就压在它的下限上（"没要求就别浪费能量"）。
+    raw_max = constraints.max_vector()
+    capped = [
+        max(0, raw_max[i] - bonus_vector[i]) if raw_max[i] > 0 else 0 for i in range(6)
+    ]
+    if any(capped):
+        desired_max = [
+            capped[i]
+            if capped[i] > 0
+            else (MAX_STAT if i in priority_indices else desired_min[i])
+            for i in range(6)
+        ]
+        # 上限不许低于下限：调用方（`build/constraints.parse`）已经拦过矛盾输入，
+        # 这里再兜一次是为了"从别的入口直接调 solve()"时不出现 desired_max < desired_min
+        # （那会让 pick_optimal_stat_mods 的 max_added_stats 变成负数）。
+        desired_max = [max(desired_min[i], desired_max[i]) for i in range(6)]
+    elif priority_indices:
         desired_max = [
             MAX_STAT if index in priority_indices else desired_min[index]
             for index in range(6)
@@ -501,8 +518,10 @@ def solve(
     # ── Build tracker ──────────────────────────────────────────────────
     tracker = HeapSetTracker(returned_sets or RETURNED_ARMOR_SETS)
 
-    # Track stat ranges for reporting
-    stat_ranges: list[list[int]] = [[MAX_STAT, 0] for _ in range(6)]
+    # 逐项可达上限（"其余属性仍满足下限时这一项单独能到多少"）。
+    # 以前这里叫 `stat_ranges`，形状是 `[[MAX_STAT, 0]] * 6` 且只有 [1] 被写 —— [0] 永远留着
+    # MAX_STAT 那个假下限，而整个变量算完就丢。现在只留上限、并且真的返回给调用方。
+    reachable_ceilings: list[int] = [0] * 6
 
     combo_count = 0
     # ── 5-level nested loop ────────────────────────────────────────────
@@ -594,7 +613,14 @@ def solve(
                             priority_indices,
                             optimistic_bonus=max_mod_bonus,
                         )
-                        if not tracker.could_insert(opt_total):
+                        # 保守版本：只有"这套光靠词条就已经超上限"时才置 0（模组只会加不会减，
+                        # 所以这种组合永远不可能不超）。其余一律按 1 算 —— 宁可多算，
+                        # 也不能把一套其实没超上限的方案剪掉（P1 的纪律）。
+                        opt_caps_ok = 0 if any(
+                            desired_max[i] > 0 and stats[i] > desired_max[i]
+                            for i in range(6)
+                        ) else 1
+                        if not tracker.could_insert(opt_caps_ok, opt_total):
                             continue
 
                         fixed_result = validate_fixed_process_items(armor, context)
@@ -609,7 +635,7 @@ def solve(
                             num_artifice,
                             desired_min,
                             desired_max,
-                            stat_ranges,
+                            reachable_ceilings,
                         )
 
                         bonus_stats = fixed_result.bonus_stats
@@ -624,7 +650,13 @@ def solve(
                             final_stats,
                             priority_indices,
                         )
-                        if not tracker.could_insert(priority_weighted_total):
+                        # `desired_max` 同时承担两件事：模组不再往超上限的属性上加
+                        # （见 prepare_fixed_set_context），以及这里的排序位。
+                        caps_ok = 0 if any(
+                            desired_max[i] > 0 and final_stats[i] > desired_max[i]
+                            for i in range(6)
+                        ) else 1
+                        if not tracker.could_insert(caps_ok, priority_weighted_total):
                             continue
 
                         # ── Encode stat mix and insert ─────────────────
@@ -640,6 +672,7 @@ def solve(
                         ]
 
                         tracker.insert(HeapEntry(
+                            caps_ok=caps_ok,
                             enabled_stats_total=priority_weighted_total,
                             stat_mix=stat_mix,
                             stats_total=sum(stats),
@@ -675,4 +708,5 @@ def solve(
     return ProcessResult(
         sets=result_sets,
         combos=combo_count,
+        reachable_ceilings=reachable_ceilings,
     )

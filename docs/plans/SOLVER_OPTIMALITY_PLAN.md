@@ -342,6 +342,56 @@ verdict: {"satisfiable": false, "evidence": "工具按原始优先级实测 0 �
 （要把当时的 commit worktree 出来 paired 跑）；`analyze` 的 `precision` 语义没动；
 `hunter_infeasible` 走工具层时 `ladder` 的额外几次 `analyze`/`recommend` 成本也还没量。
 
+---
+
+## 四·七、P2 落地记录（2026-09-22）
+
+**交付**：
+
+- **上限（`stat_caps`）**：`BuildRequest.stat_caps` → `BuildConstraints.*_max`（0 = 不限）→
+  `prepare_fixed_set_context` 的 `desired_max`。给了上限时，`desired_max` 取
+  `max(下限, 上限 − 碎片/子职业加成)`；只有部分属性给了上限时，没给的优先项照旧吃满，
+  没给的非优先项照旧压在下限上。
+- **超上限的处置**：`HeapEntry` 最前面加 `caps_ok`（1 = 没超）。min-heap 里元组越小越差，
+  于是超上限的方案自动沉底、被优先挤出。`could_insert` 相应改成**保守**判定
+  （`caps_ok` 不同就先比它，相同再比总值）—— 不这么改会漏判：
+  一套"没超上限但总值低于超上限的堆顶"的方案其实进得来，按老写法会被剪掉，那就是 P1 说的假无解。
+- **逐项可达**：`stat_ranges` 那段死计算（形状 `[[MAX_STAT, 0]]*6`，`[0]` 永远是假的）改成
+  只维护上限的 `reachable_ceilings`，经 `ProcessResult` → `TuningOutcome` → `SearchDiagnostics`
+  一路到 `data.reachable`。
+- **输入校验**：不认识的键 / 超 0-200 / 上限低于下限 → `build_validation_error`。
+  上限**不许静默忽略**（忽略了用户会拿到自己声明过不要超过的配装，且看不出哪里错了）。
+- 参数面：`stat_caps` 登记进 `_param_contracts`（求解类 intent）+ `_param_docs`，
+  `routing.md` 的参数表重新生成（`python -m destiny_mcp.tools._param_contracts --write-doc`）。
+
+**两处与计划的偏差，都是实测逼出来的**：
+
+1. **"上限进剪枝界"这条没做，而且是**故意**不做**：它和决定 1 的"超上限不阻止出解"直接冲突
+   （按上限剪枝会把唯一那套解剪没）。上限只进 `desired_max`（模组不再往上堆）+ 排序位 + 标注。
+   计划里那句验收口径作废，以这里为准。
+2. **`reachable` 不是"上限"，是"已验证能到的保守下界"**。真机实测打脸：
+   同一组约束下 `reachable` 报手雷 **120**，但把手雷下限写成 **130** 时求解器确实能给 130
+   （而且那套 **超能正好 100、不超上限**）。原因是这一步按 +1 粒度试算，而它依赖的
+   `choose_auto_mods` 是**贪心**的（DIM 那边是精确枚举），要求 +1 时可能装不下、于是提前 break。
+   所以措辞定成"保守下界"，两句免责（保守下界 / 逐项可达 ≠ 同时达到）都写进了
+   `reachable_note` 并由守门钉住。**要变成真上限，得让这一步走精确枚举 —— 成本上升，
+   留给 P4 一起量。**
+
+**真机验收**（术士 + 星火协议 + 埃希恩记忆 4 件，模板六项原样：下限 生命0/近战70/手雷100/超能80/职业70/武器100，
+上限 手雷200/超能100/职业100/武器200）：
+
+```
+找到 3 个候选配装。其中 3 套超过了指定的属性上限（见各自的 max_violations），已排到没超上限的方案后面。
+reachable: {weapons 107, health 12, class_stat 76, grenade 120, melee 76, super_stat 110}
+候选0: 武器107 生命12 职业71 手雷120 超能105 近战71  ← max_violations: 超能 105 > 100
+把手雷下限抬到 130（同样 caps）：
+候选0: 武器102 生命12 职业71 手雷130 超能100 近战71  ← **不超任何上限**
+```
+
+两条结论：① **上限真的会被报出来**（以前 110 > 模板上限 100 没人吭声）；
+② "顶上去"和"不超上限"**可以兼得** —— 只要说清楚要哪个。这也再次印证 P0 的判断：
+"不够极限"是**没人要求**，不是算法够不着。
+
 ### P1 诚实性：阶段分离 + `coverage.complete`
 
 - **改**：`build/solver.py`（feasibility pass 与有界排序分开）、`services/build_service.py`、
