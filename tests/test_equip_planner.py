@@ -22,20 +22,59 @@ from destiny_mcp.services.item_parser import parse_items_from_profile
 EXOTIC = 6
 LEGENDARY = 5
 
+# 装备槽 hash —— 物品定义的 `equippingBlock.equipmentSlotTypeHash`（2026-09-21 从 Manifest 实录）。
+SLOT_HASH: dict[str, int] = {
+    "helmet": 3448274439,
+    "gauntlets": 3551918588,
+    "chest": 14239492,
+    "legs": 20886954,
+    "class_item": 1585787867,
+    "kinetic": 1498876634,
+    "energy": 2465295065,
+    "power": 953998645,
+}
+WEAPON_SLOT_KEYS = frozenset({"kinetic", "energy", "power"})
+# 互斥组（Manifest 的 `uniqueLabel`）：异域武器与异域护甲分属两组，**互不冲突**（ADR-011）。
+EXOTIC_ARMOR = "exotic_armor"
+EXOTIC_WEAPON = "exotic_weapon"
+
 
 class FakeManifest:
-    """只给稀有度与名字：`_is_exotic` 读定义里的 inventory.tierType。"""
+    """给 `_traits` 读的两样：`equippingBlock.uniqueLabel` 与 `equipmentSlotTypeHash`。
 
-    def __init__(self, tiers: dict[int, int] | None = None, names: dict[int, str] | None = None):
+    `tiers` 仍按稀有度写（6=异域），替身把它翻成 Manifest 真实的互斥组 —— 测试因此与代码走
+    **同一套说法**（ADR-011），而不是自己判"是不是异域"。`slots` 是 hash → 槽位键；没登记的
+    hash 不给 `equippingBlock`，等于"定义里读不到槽位"，用来验证退回实例 `slot` 的那条路。
+    """
+
+    def __init__(
+        self,
+        tiers: dict[int, int] | None = None,
+        names: dict[int, str] | None = None,
+        slots: dict[int, str] | None = None,
+    ):
         self.tiers = tiers or {}
         self.names = names or {}
+        self.slots = slots or {}
         self.definition_calls: list[int] = []
 
     def get_item_definition(self, item_hash: int) -> dict | None:
         self.definition_calls.append(item_hash)
         if item_hash not in self.tiers:
             return None
-        return {"inventory": {"tierType": self.tiers[item_hash]}}
+        definition: dict = {"inventory": {"tierType": self.tiers[item_hash]}}
+        slot_key = self.slots.get(item_hash)
+        if slot_key:
+            exotic = self.tiers[item_hash] == EXOTIC
+            definition["equippingBlock"] = {
+                "uniqueLabel": (
+                    (EXOTIC_WEAPON if slot_key in WEAPON_SLOT_KEYS else EXOTIC_ARMOR)
+                    if exotic
+                    else ""
+                ),
+                "equipmentSlotTypeHash": SLOT_HASH[slot_key],
+            }
+        return definition
 
     def get_item_name(self, item_hash: int) -> str:
         return self.names.get(item_hash, f"物品{item_hash}")
@@ -193,6 +232,7 @@ def test_exotic_conflict_plans_a_downgrade_before_the_target() -> None:
     manifest = FakeManifest(
         {2000: EXOTIC, 3000: LEGENDARY, 4000: EXOTIC},
         {2000: "逃逸艺术家", 3000: "光芒领主手套", 4000: "星火协议"},
+        {2000: "gauntlets", 3000: "gauntlets", 4000: "chest"},
     )
 
     plan = plan_equip(
@@ -211,7 +251,7 @@ def test_exotic_conflict_plans_a_downgrade_before_the_target() -> None:
     assert downgrade.item == "光芒领主手套"
     assert downgrade.replaces == "逃逸艺术家"
     assert downgrade.to_location == "equipped"
-    assert "全身只能装备一件异域" in downgrade.why
+    assert "同类的异域只能装备一件" in downgrade.why
     assert plan.steps[2].item == "星火协议"
 
 
@@ -224,6 +264,8 @@ def test_downgrade_picks_the_highest_power_legendary_in_the_slot() -> None:
     manifest = FakeManifest(
         {2000: EXOTIC, 3001: LEGENDARY, 3002: LEGENDARY, 3003: LEGENDARY, 4000: EXOTIC},
         {},
+        {2000: "gauntlets", 3001: "gauntlets", 3002: "gauntlets", 3003: "helmet",
+         4000: "chest"},
     )
 
     plan = plan_equip(
@@ -252,7 +294,9 @@ def test_no_legendary_in_that_slot_says_so_and_points_somewhere() -> None:
     wrong_slot = item("i-helmet", "普通头盔", slot="helmet", item_hash=3003)
     target = item("i-target", "星火协议", equipped=False, item_hash=4000)
     manifest = FakeManifest(
-        {2000: EXOTIC, 2001: EXOTIC, 3003: LEGENDARY, 4000: EXOTIC}, {}
+        {2000: EXOTIC, 2001: EXOTIC, 3003: LEGENDARY, 4000: EXOTIC},
+        {},
+        {2000: "gauntlets", 2001: "gauntlets", 3003: "helmet", 4000: "chest"},
     )
 
     plan = plan_equip(
@@ -277,6 +321,79 @@ def test_unknown_rarity_does_not_claim_a_conflict() -> None:
 
     assert plan.status == "ready"
     assert [step.action for step in plan.steps] == ["equip"]
+
+
+# ── ADR-011：冲突按 Manifest 的 uniqueLabel 判，武器与护甲互不冲突 ──────────
+
+
+def test_exotic_weapon_does_not_conflict_with_worn_exotic_armor() -> None:
+    """装异域武器时，身上那件异域护甲**不是**冲突 —— 两类异域可以同时穿。
+
+    这就是 2026-09-21 复发的那个 bug：旧判据"另一个槽的异域就算冲突"会凭空多出一步
+    顶下护甲，而真冲突（另一把异域武器）因为武器没有 slot 反而整个被跳过。
+    """
+    worn_exotic_armor = item(
+        "i-exotic-chest", "星火协议", slot="chest", equipped=True, item_hash=2000
+    )
+    target = item("i-target", "狼毒", slot="power", equipped=False, item_hash=4000)
+    manifest = FakeManifest(
+        {2000: EXOTIC, 4000: EXOTIC}, {}, {2000: "chest", 4000: "power"}
+    )
+
+    plan = plan_equip(request_for(target, inventory=[worn_exotic_armor]), manifest)
+
+    assert plan.status == "ready"
+    assert [step.action for step in plan.steps] == ["equip"]
+    assert plan.target_slot == "power"
+
+
+def test_exotic_weapon_conflicts_with_another_exotic_weapon() -> None:
+    """两把异域武器是真冲突：要先用**同槽位**的非异域武器顶下正穿着那把。"""
+    worn = item("i-worn", "需求层级", slot="energy", equipped=True, item_hash=2000)
+    spare = item("i-spare", "信任", slot="energy", equipped=False, item_hash=3000)
+    target = item("i-target", "狼毒", slot="power", equipped=False, item_hash=4000)
+    manifest = FakeManifest(
+        {2000: EXOTIC, 3000: LEGENDARY, 4000: EXOTIC},
+        {},
+        {2000: "energy", 3000: "energy", 4000: "power"},
+    )
+
+    plan = plan_equip(request_for(target, inventory=[worn, spare]), manifest)
+
+    assert [step.action for step in plan.steps] == ["downgrade", "equip"]
+    assert plan.steps[0].slot == "energy"
+    assert plan.steps[0].item == "信任"
+    assert plan.steps[0].replaces == "需求层级"
+
+
+def test_exotic_class_item_conflicts_with_exotic_armor() -> None:
+    """异域职业物品在 Manifest 里也是 `exotic_armor`，所以与异域护甲**同组互斥**：
+    要装它，得先把正穿着的异域胸甲换成**非异域胸甲**（拿另一件披风顶不了事）。"""
+    worn = item("i-worn", "星火协议", slot="chest", equipped=True, item_hash=2000)
+    spare_chest = item("i-spare", "光泽胸甲", slot="chest", equipped=False, item_hash=3000)
+    target = item("i-target", "相对主义", slot="class_item", equipped=False, item_hash=4000)
+    manifest = FakeManifest(
+        {2000: EXOTIC, 3000: LEGENDARY, 4000: EXOTIC},
+        {},
+        {2000: "chest", 3000: "chest", 4000: "class_item"},
+    )
+
+    plan = plan_equip(request_for(target, inventory=[worn, spare_chest]), manifest)
+
+    assert [step.action for step in plan.steps] == ["downgrade", "equip"]
+    assert plan.steps[0].slot == "chest"
+    assert plan.steps[0].replaces == "星火协议"
+
+
+def test_slot_comes_from_the_definition_not_the_bucket() -> None:
+    """槽位由定义给 —— 认不出部位（仓库格 / 武器）时也能判，不必给武器补 `slot`。"""
+    target = item("i-target", "狼毒", slot="", equipped=False, item_hash=4000)
+    manifest = FakeManifest({4000: EXOTIC}, {}, {4000: "power"})
+
+    plan = plan_equip(request_for(target), manifest)
+
+    assert plan.target_slot == "power"
+    assert plan.steps[0].slot == "power"
 
 
 # ── 无确认不写：预检只读，计划里没有任何写入副作用 ──────────────────────
@@ -355,10 +472,17 @@ class _ProfileManifest:
         return "Gauntlets"
 
     def get_item_definition(self, item_hash: int) -> dict | None:
+        slot_key = {2000: "gauntlets", 3000: "gauntlets", 4000: "chest"}.get(item_hash, "chest")
+        exotic = item_hash in {2000, 4000}
         return {
-            "inventory": {"tierType": 6 if item_hash in {2000, 4000} else 5},
-            # 仓库里的护甲认不出 bucket，只能靠这个显示名回退（真机也是这条路）
+            "inventory": {"tierType": 6 if exotic else 5},
+            # 仓库里的护甲认不出 bucket（bucketHash 是仓库格），部位只能从定义读 ——
+            # 真机也是这条路，所以这里给 `equippingBlock.equipmentSlotTypeHash`（ADR-011）。
             "itemTypeDisplayName": self._DISPLAY.get(item_hash, "胸部护甲"),
+            "equippingBlock": {
+                "uniqueLabel": EXOTIC_ARMOR if exotic else "",
+                "equipmentSlotTypeHash": SLOT_HASH[slot_key],
+            },
         }
 
 

@@ -31,7 +31,7 @@ from ..models import EquipPlan, EquipPlanBlock, EquipPlanStep, InventoryItem
 from ..vocabulary import LOCATION_LABELS_ZH  # 位置中文标签的单一出处
 from ..build.constants import ARMOR_SLOT_MAP
 from . import profile_components
-from .armor_payload import slot_key_from_display, slot_key_from_solver
+from .armor_payload import equip_slot_of, slot_key_from_solver
 from .item_parser import parse_items_from_profile
 
 # 装备部位 → 背包 bucket（无符号 32 位，profile 的 buckets 组件用的就是这个）。
@@ -46,7 +46,34 @@ ARMOR_BUCKET_BY_SLOT: dict[str, int] = {
     if bucket_hash > 0
 }
 
-_TIER_TYPE_EXOTIC = 6
+_WEAPON_SLOTS = frozenset({"kinetic", "energy", "power"})
+
+
+def _catalog_hint(slot_key: str) -> str:
+    """给调用方的"这个部位有哪些东西"提示：武器与护甲的过滤参数**不是一个**。"""
+    if slot_key in _WEAPON_SLOTS:
+        return 'intent="get", item_type="武器"'
+    return f'intent="get", armor_slot="{slot_key}"'
+
+
+def item_traits(manifest: EquipItemInfo, item: InventoryItem) -> tuple[str, str, str | None]:
+    """(装备槽键, 装备槽中文, 互斥组)。
+
+    槽位与互斥组都取物品定义里的 `equippingBlock` —— 这是游戏自己的说法，武器和护甲一视同仁
+    （ADR-011）。互斥组 `None` 表示**判不了**（定义查不到 / 没有这个字段），此时不下结论；
+    槽位查不到就退回按 bucket 认出来的护甲槽（老路径），仍认不出给空串。
+
+    **这是"实例 → 槽位"的唯一口径**：`transfer_service` 的回滚/回读也用它，
+    否则执行层按护甲槽找、规划层按装备槽出步骤，武器那一步就会在回滚里凭空消失。
+    """
+    definition = manifest.get_item_definition(item.item_hash)
+    slot_key, slot_display = equip_slot_of(definition)
+    if not slot_key:
+        slot_key, slot_display = item.slot, item.slot_display
+    block = (definition or {}).get("equippingBlock")
+    if not isinstance(block, dict) or "uniqueLabel" not in block:
+        return slot_key, slot_display, None
+    return slot_key, slot_display, str(block.get("uniqueLabel") or "")
 
 
 def _where(location: str) -> str:
@@ -122,33 +149,6 @@ class EquipPlanRequest:
 ARMOR_BUCKET_BY_SLOT: dict[str, int] = ARMOR_BUCKET_BY_SLOT
 
 
-def _slot_from_definition(manifest: EquipItemInfo, item_hash: int) -> str:
-    """定义级的护甲槽位：`itemTypeDisplayName`（"胸部护甲" → `chest`）。
-
-    为什么需要它：`InventoryItem.slot` 是按 **bucketHash** 认的，而**仓库里的护甲**
-    bucketHash 是仓库格、认不出部位（`slot` 为空）。装一件仓库里的护甲正是最需要编排的场景，
-    所以这里退回定义里的显示名；认不出来给空串（不猜）。
-    """
-    definition = manifest.get_item_definition(item_hash) or {}
-    display = str(definition.get("itemTypeDisplayName") or "")
-    return slot_key_from_display(display) if display else ""
-
-
-def _is_exotic(manifest: EquipItemInfo, item_hash: int) -> bool | None:
-    """稀有度：6 = 异域。**判断不了给 None**，不把「没查到」说成「不是异域」。
-
-    只在完整定义里判：`tierType` 的单一出处就是 Manifest 的物品定义，
-    索引摘要（get_item_info）不一定带这个键。
-    """
-    definition = manifest.get_item_definition(item_hash)
-    if not isinstance(definition, dict):
-        return None
-    inventory = definition.get("inventory")
-    if not isinstance(inventory, dict) or "tierType" not in inventory:
-        return None
-    return int(inventory.get("tierType") or 0) == _TIER_TYPE_EXOTIC
-
-
 def _locations(item: InventoryItem, character_id: str) -> list[str]:
     """这个实例**已经按目标角色**在哪：正装备 → 背包 → 仓库。
 
@@ -182,21 +182,25 @@ def _block(
 
 
 def _downgrade_candidates(
-    request: EquipPlanRequest, manifest: EquipItemInfo, slot: str
+    request: EquipPlanRequest, manifest: EquipItemInfo, slot_key: str
 ) -> list[InventoryItem]:
-    """背包里能顶下金装的非异域同部位护甲，光等降序（挑不到返回空列表）。
+    """背包里能顶下同类异域的同部位**非异域**装备，光等降序（挑不到返回空列表）。
 
     只从 `carried()`（背包，不含装备位）里挑：仓库里的要先搬，会撞"背包满"。
+    "是不是异域"同样按 Manifest 的 `uniqueLabel` 判：空串 = 非异域；**判不了（None）不当候选** ——
+    没有证据就不拿它当中间件。槽位键为空（认不出部位）时直接返回空：那意味着"同部位"这个
+    判据本身不成立，不能拿所有认不出部位的装备来凑。
     """
-    candidates = [
-        item
-        for item in request.carried()
-        if item.slot == slot and item.item_instance_id != request.target.item_instance_id
-    ]
-    legendary = [
-        item for item in candidates if _is_exotic(manifest, item.item_hash) is False
-    ]
-    return sorted(legendary, key=lambda item: (-(item.power or 0), item.item_instance_id))
+    if not slot_key:
+        return []
+    plain: list[InventoryItem] = []
+    for item in request.carried():
+        if item.item_instance_id == request.target.item_instance_id:
+            continue
+        item_key, _display, label = item_traits(manifest, item)
+        if item_key == slot_key and label == "":
+            plain.append(item)
+    return sorted(plain, key=lambda item: (-(item.power or 0), item.item_instance_id))
 
 
 def _plan_sentences(steps: list[EquipPlanStep]) -> list[str]:
@@ -228,7 +232,8 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
     `blockers` 给出数字与出路）、`ready`（`steps` 可执行，顺序是「先搬/先顶下、再装目标」）。
     """
     target = request.target
-    target_slot = target.slot or _slot_from_definition(manifest, target.item_hash)
+    # 槽位与互斥组都来自 Manifest（ADR-011）：武器和护甲同一套槽位键。
+    target_slot, target_slot_display, target_label = item_traits(manifest, target)
     plan = EquipPlan(
         status="ready",
         character=request.character,
@@ -252,19 +257,19 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
             f"「{target.name}」正装备在{_where(where)}身上，"
             f"上游不允许移动已装备的物品：先在{_where(where)}上换一件同部位的别的装备把它换下来，"
             f"或直接 equip 到{_where(where)}（如果它本来就该穿在那个角色上）。",
-            slot=target.slot,
+            slot=target_slot,
         ))
 
     needs_move = target.location != request.character
-    capacity = request.bucket_capacity.get(target.slot) if target.slot else None
+    capacity = request.bucket_capacity.get(target_slot) if target_slot else None
     if needs_move and capacity is not None and capacity.free <= 0:
         # ── 预检 3：目标角色该类目背包满（给数字，别只说"空间不足"） ──
         blockers.append(_block(
             "inventory_full",
             f"{request.character} 的该类目背包已满（{capacity.used}/{capacity.capacity}），"
             f"搬不进「{target.name}」。出路：先腾出位置（分解/转移到仓库），"
-            f'或直接装备该角色背包里已有的一件（intent="get", armor_slot="{target.slot}"）。',
-            slot=target.slot,
+            f"或直接装备该角色背包里已有的一件（{_catalog_hint(target_slot)}）。",
+            slot=target_slot,
             numbers={
                 "used": capacity.used,
                 "capacity": capacity.capacity,
@@ -272,32 +277,40 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
             },
         ))
 
-    # ── 预检 2：目标异域 vs 该角色另一个槽的异域 ──
+    # ── 预检 2：目标异域 vs 该角色**另一个槽**的**同类**异域（ADR-011）──
+    # 判据直接用 Manifest 的 `uniqueLabel`：互斥组相同、槽位不同才算冲突。同槽位是"装上去把它
+    # 替换掉"，不是冲突；异域武器与异域护甲分属两个互斥组，因此**互不冲突** ——
+    # 以前这里写的是"另一槽的异域就算冲突"（话术还说成"全身只能装备一件异域"），
+    # 于是"装异域武器 + 正穿异域护甲"会被误判，而真冲突（两把异域武器）因为武器没有 slot
+    # 反而全被跳过。
     downgrade: EquipPlanStep | None = None
-    conflict_item: InventoryItem | None = None
-    if _is_exotic(manifest, target.item_hash) is True:
-        conflicts = [
-            item
-            for item in request.worn()
-            if item.slot != target.slot
-            and item.slot
-            and _is_exotic(manifest, item.item_hash) is True
-        ]
-        if conflicts:
-            conflict_item = conflicts[0]
-            candidates = _downgrade_candidates(request, manifest, conflict_item.slot)
+    if target_label:
+        conflict_item: InventoryItem | None = None
+        conflict_slot = ""
+        conflict_slot_display = ""
+        for worn in request.worn():
+            worn_slot, worn_display, worn_label = item_traits(manifest, worn)
+            if worn_label != target_label:
+                continue
+            # 同槽位（且槽位认得出）说明装上目标就会把它替换掉，不算冲突。
+            if target_slot and worn_slot == target_slot:
+                continue
+            conflict_item, conflict_slot, conflict_slot_display = worn, worn_slot, worn_display
+            break
+        if conflict_item is not None:
+            candidates = _downgrade_candidates(request, manifest, conflict_slot)
             if candidates:
                 chosen = candidates[0]
                 downgrade = EquipPlanStep(
                     action="downgrade",
                     item=chosen.name,
                     item_instance_id=chosen.item_instance_id,
-                    slot=conflict_item.slot,
+                    slot=conflict_slot,
                     from_location=request.character,
                     to_location="equipped",
                     replaces=conflict_item.name,
                     why=(
-                        f"全身只能装备一件异域：先穿一件非异域的"
+                        f"同类的异域只能装备一件：先穿一件非异域的"
                         f"「{chosen.name}」把「{conflict_item.name}」顶下来，"
                         f"才能装上异域的「{target.name}」"
                         f"（顶下的那件回到背包，不分解、不移动）。"
@@ -305,18 +318,16 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
                     success=True,
                 )
             else:
+                where = conflict_slot_display or conflict_slot or "同部位"
                 blockers.append(_block(
                     "exotic_conflict",
-                    f"「{target.name}」是异域，而 {request.character} 正装备着"
-                    f"「{conflict_item.name}」（异域 {conflict_item.slot_display or conflict_item.slot}）；"
-                    f"全身只能一件异域，需要先换一件非异域的"
-                    f"{conflict_item.slot_display or conflict_item.slot}顶下它，"
-                    f"但该角色背包里没有可用的非异域"
-                    f"{conflict_item.slot_display or conflict_item.slot}。"
-                    f'出路：intent="get", location="{request.character}", '
-                    f'armor_slot="{conflict_item.slot}" 看有哪些，'
-                    f"或用 move 从仓库搬一件非异域的同部位装备过来。",
-                    slot=conflict_item.slot,
+                    f"「{target.name}」与 {request.character} 正装备的「{conflict_item.name}」"
+                    f"属于同一类异域（{where}）；同类异域只能装备一件，"
+                    f"需要先换一件非异域的{where}顶下它，"
+                    f"但该角色背包里没有可用的非异域{where}。"
+                    f"出路：{_catalog_hint(conflict_slot)} 看有哪些，"
+                    f"或用 move 从仓库搬一件同部位的非异域装备过来。",
+                    slot=conflict_slot,
                 ))
 
     if blockers:

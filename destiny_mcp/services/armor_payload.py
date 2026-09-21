@@ -66,6 +66,42 @@ SLOT_DISPLAY: dict[str, str] = {
 # 反向：定义级查询手里只有 `itemTypeDisplayName`（"腿部护甲"），没有 bucket 字符串
 _DISPLAY_TO_SLOT: dict[str, str] = {value: key for key, value in SLOT_DISPLAY.items()}
 
+# ── 装备槽：武器与护甲同一套键（ADR-011）────────────────────────────────
+# 正主是物品定义的 `equippingBlock.equipmentSlotTypeHash`（2026-09-21 实测：护甲给护甲桶 hash、
+# 武器给武器桶 hash）。以前这套代码里**武器没有槽位**概念（`InventoryItem.slot` 是护甲专用的），
+# 装备编排因此看不见武器上的异域；这里补上武器那一半，护甲那半复用 `SLOT_DISPLAY`，
+# 保证"槽位键"只有一个出处。
+_ARMOR_SLOT_HASHES: dict[str, int] = {
+    "helmet": 3448274439,
+    "gauntlets": 3551918588,
+    "chest": 14239492,
+    "legs": 20886954,
+    "class_item": 1585787867,
+}
+_WEAPON_SLOT_LABELS: dict[int, tuple[str, str]] = {
+    1498876634: ("kinetic", "动能武器"),
+    2465295065: ("energy", "能量武器"),
+    953998645: ("power", "威能武器"),
+}
+EQUIP_SLOT_LABELS: dict[int, tuple[str, str]] = {
+    **{slot_hash: (key, SLOT_DISPLAY[key]) for key, slot_hash in _ARMOR_SLOT_HASHES.items()},
+    **_WEAPON_SLOT_LABELS,
+}
+
+
+def equip_slot_of(definition: dict | None) -> tuple[str, str]:
+    """物品定义 → (装备槽键, 中文名)；武器与护甲同一套键（ADR-011）。
+
+    判不了给 `("", "")` —— 不猜，也不把"没查到"说成某个槽。
+    """
+    block = (definition or {}).get("equippingBlock")
+    if not isinstance(block, dict):
+        return "", ""
+    slot_hash = block.get("equipmentSlotTypeHash")
+    if not isinstance(slot_hash, int):
+        return "", ""
+    return EQUIP_SLOT_LABELS.get(slot_hash & 0xFFFFFFFF, ("", ""))
+
 # 定义级没有实例，就不给 T 级 / 分族结论（族是按实例结构判的）
 DEFINITION_TIER_NOTE = (
     "这是定义级查询，没有具体副本：T 级与护甲分族要看实例，"
