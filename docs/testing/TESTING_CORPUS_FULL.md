@@ -91,6 +91,16 @@
 | 别名等价 | `patterns`/`pattern`/`craft`/`锻造`/`锻造武器`/`图样`/`图样进度`/`模式进度`/`红框`/`红框进度` 同参返回逐字节相同的 `data` |
 | 默认条数 | 不传 `limit` 返回 20 条（`cross` 组的默认条数体检） |
 
+### world_assistant（`intent="rotations"`：周常轮换）
+
+| 行 | 断言 |
+| --- | --- |
+| 口径分离 | 每行 `source` ∈ {official, schedule}；官方 ≥ 14 行（10 特色突袭/地牢 + 4 夜幕/宗师），表那半 6 行 |
+| 夜幕/宗师 | 宗师那条 `name` 是打击名、`difficulty` 是难度、`modifiers` 非空且**不含空串**；奖励 `quantity=0` 原样保留 |
+| 表与锚点 | 上维挑战/异域任务各给本周+下周，名字与 `verified_at` 都在；泉源给今天+明天且**交替**（今天防御 → 明天攻击） |
+| 遗失区域 | `lost_sector.anchored=false`、31 个候选、`how_to_anchor` 有核对办法；**不产出 `kind=lost_sector` 的行** |
+| 别名等价 | `rotations`/`轮换`/`周常轮换`/`这周` 同参返回逐字节相同的 `data` |
+
 ### build_assistant
 
 | 行 | 断言 |

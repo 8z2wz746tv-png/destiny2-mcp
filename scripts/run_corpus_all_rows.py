@@ -1015,6 +1015,52 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         seconds=dt,
     )
 
+    # ── world_assistant(intent="rotations")：周常轮换 ───────────────────
+    rot, dt, err = await call("world_assistant", intent="rotations", slow=True)
+    rdata = (rot or {}).get("data") or {}
+    rrows = rdata.get("rows") or []
+    kinds = {row.get("kind") for row in rrows}
+    check(
+        "rows",
+        "rotations：每行都标了口径（official/schedule），官方那半含特色突袭/地牢 + 夜幕/宗师",
+        err is None and (rot or {}).get("ok") is True
+        and all(row.get("source") in ("official", "schedule") for row in rrows)
+        and (rdata.get("counts") or {}).get("official", 0) >= 5
+        and {"raid", "nightfall"} <= kinds,
+        f"counts={rdata.get('counts')} kinds={sorted(k for k in kinds if k)}",
+        seconds=dt,
+    )
+
+    nf = next((row for row in rrows if row.get("kind") == "nightfall" and row.get("strike_known")), None)
+    check(
+        "rows",
+        "rotations：夜幕/宗师带打击名 + 难度 + 词缀（不含空串）+ 掉落（quantity=0 原样）",
+        bool(nf) and nf.get("name") and nf.get("difficulty")
+        and bool(nf.get("modifiers")) and "" not in nf["modifiers"]
+        and all("quantity" in item for item in nf.get("rewards") or []),
+        f"row={short(nf, 260)}",
+    )
+
+    table_rows = [row for row in rrows if row.get("source") == "schedule"]
+    check(
+        "rows",
+        "rotations：自维护表那半带核对元数据，泉源今天/明天交替",
+        all(row.get("verified_at") and row.get("verified_against") for row in table_rows)
+        and [row["name"] for row in table_rows if row.get("kind") == "wellspring"][:2]
+        == ["泉源：防御", "泉源：攻击"],
+        f"表行={[(r['kind'], r['name']) for r in table_rows]}",
+    )
+
+    lost = rdata.get("lost_sector") or {}
+    check(
+        "rows",
+        "rotations：遗失区域没锚点就只给候选、不给「今天是谁」",
+        lost.get("anchored") is False and lost.get("total") == 31
+        and bool(lost.get("how_to_anchor"))
+        and not [row for row in rrows if row.get("kind") == "lost_sector"],
+        f"anchored={lost.get('anchored')} total={lost.get('total')} 行数={len(rrows)}",
+    )
+
     community, dt, err = await call(
         "build_assistant", intent="community", query="术士", include_inventory=False
     )
@@ -2112,6 +2158,7 @@ _ALIAS_GROUPS: list[tuple[str, dict[str, Any], list[str], bool]] = [
     ("weapon_assistant", {"weapon_name": "无感"}, ["compare", "compare_duplicates"], False),
     ("weapon_assistant", {"weapon_name": "遗产"}, ["perk_pool", "perks"], False),
     ("weapon_assistant", {"weapon_name": "遗产"}, ["popularity", "selection_rates", "perk_selection", "selection", "usage_rates"], False),
+    ("world_assistant", {}, ["rotations", "轮换", "周常轮换", "这周"], False),
     ("weapon_assistant", {"weapon_name": "累积救赎"},
      ["patterns", "pattern", "craft", "锻造", "锻造武器", "图样", "图样进度", "模式进度", "红框", "红框进度"], False),
     ("subclass_assistant", {"character": "hunter"}, ["get", "subclass"], False),
