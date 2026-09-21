@@ -43,6 +43,7 @@ from ._requests import (
     PlayerIntent,
     SubclassIntent,
     WEAPON_PATTERN_INTENTS,
+    WORLD_ROTATION_INTENTS,
     WeaponIntent,
     WorldIntent,
 )
@@ -620,8 +621,8 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ),
     # ══ world_assistant ════════════════════════════════════════════════════
     ("world_assistant", "player_name"): _contract(
-        _only("vendor", "collectible_node", "collectible_item"),
-        hint="周常、搜节点、社区资料与账号无关；商人库存和收藏品状态才需要玩家名。",
+        _only("vendor", "collectible_node", "collectible_item", *WORLD_ROTATION_INTENTS),
+        hint="周常、搜节点、社区资料与账号无关；商人库存、收藏品状态和轮换（要读角色活动组件 204）才需要玩家名。",
     ),
     ("world_assistant", "character"): _contract(
         _only("vendor", "collectible_node", "collectible_item", "community"),
@@ -656,8 +657,10 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("world_assistant", "collectible_node"),
     ),
     ("world_assistant", "limit"): _contract(
-        _only("weekly", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item", "community"),
-        hint="完整周常（weekly_full）不读 limit；vendor 用它限制商人数（菜单）或每个商人的商品数（详情）。",
+        _only("weekly", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item",
+              "community", *WORLD_ROTATION_INTENTS),
+        hint="完整周常（weekly_full）不读 limit；vendor 用它限制商人数（菜单）或每个商人的商品数（详情）；"
+             "rotations 用它限制返回行数（默认 30）。",
     ),
     ("world_assistant", "community_category"): _contract(
         _only("community"), hint='只有 intent="community" 能跨分类搜索。',

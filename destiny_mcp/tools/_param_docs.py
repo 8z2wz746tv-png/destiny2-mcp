@@ -213,6 +213,7 @@ WorldIntentField = Annotated[
     WorldIntent,
     Field(description=(
         "世界/周常意图。weekly=本周概要；weekly_full=完整周常；vendor=商人当前货架；"
+        "rotations=周常轮换表（本周特色突袭/地牢、夜幕/宗师词缀与掉落、上维挑战/异域任务/泉源）；"
         "search_collectible_nodes=按关键词搜收藏品节点；collectible_node=某节点解锁状态（需要 collectible_node_hash）；"
         "collectible_item=某件物品的收藏状态；community=本地社区资料（唯一能跨分类搜的入口）。"
     )),

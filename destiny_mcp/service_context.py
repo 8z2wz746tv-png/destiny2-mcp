@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from .services.set_bonus_service import SetBonusService
     from .services.starside_service import StarsideService
     from .services.pattern_service import PatternService
+    from .services.rotation_service import RotationService
 
 
 class ServiceContext(TypedDict):
@@ -70,3 +71,4 @@ class ServiceContext(TypedDict):
     collection_svc: CollectionService
     starside_svc: StarsideService
     pattern_svc: PatternService
+    rotation_svc: RotationService

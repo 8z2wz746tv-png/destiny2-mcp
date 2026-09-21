@@ -35,6 +35,7 @@ from . import _weapon_branches as weapon_branches
 from . import _leaderboard_branches as leaderboard_branches
 from . import _player_branches as player_branches
 from . import _patterns_branches as patterns_branches
+from . import _rotation_branches as rotation_branches
 from . import _weapon_usage_branches as weapon_usage_branches
 from ._enrichment import community_enrichment, community_read
 from ._farming import farming_reference as _farming_reference
@@ -45,7 +46,7 @@ from . import _param_docs as fields
 from ._requests import (
     ActivityIntent, BuildIntent, InventoryIntent, LoadoutIntent, PlayerIntent,
     SubclassIntent, WeaponIntent, WorldIntent,
-    WEAPON_PATTERN_INTENTS,
+    WEAPON_PATTERN_INTENTS, WORLD_ROTATION_INTENTS,
     WRITE_INTENTS,
     InventoryRequest, LoadoutRequest, SubclassRequest, validate_request,
 )
@@ -58,6 +59,8 @@ from ._responses import (
 
 # world_assistant 里「没传 limit」时各 intent 用的条数（vendor 除外，它按菜单/详情取默认）。
 _WORLD_LIMIT_DEFAULT = 12
+# 轮换表：默认 30 行（本周特色突袭/地牢 + 夜幕/宗师 + 周期表那半）
+_WORLD_ROTATION_LIMIT = 30
 _INVENTORY_DEFAULT_LIMIT = 100
 _INVENTORY_PAGE_INTENTS = {"get", "inventory", "list"}
 _LOADOUT_DEFAULT_LIMIT = 5
@@ -1290,7 +1293,9 @@ async def world_assistant(
     # 自动填参时也分不清"传了 12"和"没传"。vendor 自己按菜单/详情分别取默认，留给它 None。
     community_section = community_section or "text"
     # vendor 自己按菜单/详情分别取默认，所以只有它保留 None（见上面那段注释）。
-    limit = limit if intent == "vendor" else positive_or_default(limit, _WORLD_LIMIT_DEFAULT)
+    # rotations 一屏要给 10 条特色突袭/地牢 + 夜幕/宗师 + 三张表，默认 30 行（见 _WORLD_ROTATION_LIMIT）。
+    world_default = _WORLD_ROTATION_LIMIT if intent in WORLD_ROTATION_INTENTS else _WORLD_LIMIT_DEFAULT
+    limit = limit if intent == "vendor" else positive_or_default(limit, world_default)
 
     if intent == "community":
         result = _community_read(
@@ -1299,17 +1304,16 @@ async def world_assistant(
             section=community_section, limit=limit, offset=offset,
         )
         return ok_response("已读取 Starside 社区资料。", result, warnings=[
-            "这是社区机制资料；数值和版本可能变化，回答中会保留来源路径或页面与更新时间。"
-        ])
+            "这是社区机制资料；数值和版本可能变化，回答中会保留来源路径或页面与更新时间。"])
 
     if intent == "weekly":
         result = await svc["weekly_analysis_svc"].summarize_weekly_reset(limit=limit)
-        return ok_response(
-            result["summary"],
-            {"weekly": result["weekly"]},
-            next_actions=result["next_actions"],
-            warnings=result["warnings"],
-        )
+        return ok_response(result["summary"], {"weekly": result["weekly"]},
+                           next_actions=result["next_actions"], warnings=result["warnings"])
+
+    if intent in WORLD_ROTATION_INTENTS:
+        result = await svc["rotation_svc"].rotations(resolve_player_name(player_name), limit=limit)
+        return rotation_branches.rotations_payload(result)
 
     if intent == "weekly_full":
         result = await svc["weekly_svc"].get_weekly_reset()
@@ -1326,15 +1330,9 @@ async def world_assistant(
         vendors = _dump(result)
         payload: dict[str, Any] = {"vendors": vendors}
         if result.mode == "detail":
-            payload["farming_list"] = _farming_reference(
-                svc.get("starside_svc"), _sale_item_names(vendors)
-            )
-        return ok_response(
-            result.question or "已读取商人库存。",
-            payload,
-            next_actions=result.next_actions,
-            warnings=result.warnings,
-        )
+            payload["farming_list"] = _farming_reference(svc.get("starside_svc"), _sale_item_names(vendors))
+        return ok_response(result.question or "已读取商人库存。", payload,
+                           next_actions=result.next_actions, warnings=result.warnings)
 
     if intent == "search_collectible_nodes":
         result = svc["collection_svc"].search_collectible_nodes(query, limit)
@@ -1343,22 +1341,13 @@ async def world_assistant(
     if intent == "collectible_node":
         resolved = resolve_player_name(player_name)
         result = await svc["collection_svc"].get_collectible_node_status(
-            resolved,
-            collectible_node_hash,
-            character or None,
-            include_invisible,
-            limit,
-        )
+            resolved, collectible_node_hash, character or None, include_invisible, limit)
         return ok_response(result.get("message", "已读取收藏品节点。"), result)
 
     if intent == "collectible_item":
         resolved = resolve_player_name(player_name)
         result = await svc["collection_svc"].get_collectible_item_status(
-            resolved,
-            item_name,
-            character or None,
-            limit,
-        )
+            resolved, item_name, character or None, limit)
         return ok_response(result.get("message", "已读取收藏品状态。"), result)
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"world_assistant 不支持 intent={intent!r}。")

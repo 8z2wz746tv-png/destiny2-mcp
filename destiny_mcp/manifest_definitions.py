@@ -46,6 +46,9 @@ class ItemDefinitionMixin:
         # docs/plans/PATTERN_QUERY_PLAN.md），所以记录与它的目标定义必须查得到。
         "DestinyRecordDefinition",
         "DestinyObjectiveDefinition",
+        # 活动词缀（本周夜幕/宗师那些「团灭/有限复活/勇士敌人」）：组件 204 只给 hash，
+        # 名字只能从这里查（`rotation_service._modifier_name`）。
+        "DestinyActivityModifierDefinition",
     })
 
     def get_item_info(self, item_hash: int) -> dict | None:

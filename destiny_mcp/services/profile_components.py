@@ -78,6 +78,11 @@ METRICS: list[int] = [1100]
 # （219 条 `visible` 全为 true）。实测见 docs/plans/PATTERN_QUERY_PLAN.md。
 PATTERNS: list[int] = [900]
 
+# 角色当前可打的活动（204 = characterActivities）：`availableActivities[]` 里带
+# `modifierHashes` 与 `visibleRewards` —— 实测**本周夜幕/宗师及其词缀、掉落**就在这里
+# （三个角色的该组条目完全一致）。谁需要它：rotation_service（`world_assistant(intent="rotations")`）。
+CHARACTER_ACTIVITIES: list[int] = [204]
+
 # 缓存里一次取全：读多写少的场景共用（profile_cache）。
 # 必须覆盖所有调用方要的组件（含 308 催化剂进度），否则后台刷新会把并集降级、
 # 下一次调用又要重新拉一遍 10 MB 的 profile。

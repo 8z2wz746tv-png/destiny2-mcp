@@ -38,7 +38,9 @@ SubclassIntent = Literal[
     "artifact", "artifact_mod", "equip_artifact_mod", "equip_artifact", "community",
 ]
 ActivityIntent = Literal["history", "pgcr", "stats", "career", "historical_stats", "counters", "weapon_history", "weapons", "weapon_usage", "weapon_leaderboard", "pvp_weapons", "aggregate", "activity_aggregate", "activity_stats", "leaderboards", "leaderboard", "clan_leaderboards", "community"]
-WorldIntent = Literal["weekly", "weekly_full", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item", "community"]
+WorldIntent = Literal["weekly", "weekly_full", "rotations", "轮换", "周常轮换", "这周", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item", "community"]
+# 周常轮换：一组同义 intent 写一次，分派与参数归属都从这里取（守门：tests/test_rotations.py）
+WORLD_ROTATION_INTENTS: tuple[str, ...] = ("rotations", "轮换", "周常轮换", "这周")
 
 NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 

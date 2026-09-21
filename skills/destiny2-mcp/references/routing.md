@@ -259,6 +259,7 @@ Manifest 侧（**不代表拥有**）：
 | `collectible_node` | 某个节点的解锁状态 | `collectible_node_hash`、`character`、`include_invisible`、`limit` |
 | `collectible_item` | 某件物品的收藏品状态 | `item_name`、`character`、`limit` |
 | `community` | 社区机制／来源资料，**唯一能跨分类搜的入口** | `query`、`community_category`、`knowledge_id`、`community_section`、`limit`、`offset` |
+| `rotations`（`轮换`、`周常轮换`、`这周`） | **周常轮换表**：本周特色突袭/地牢（官方里程碑，带起止时间）、本周夜幕/宗师（**哪个打击 + 词缀 + 掉落**，来自角色活动组件 204）、上维挑战与异域任务（本周+下周，自维护周期表）、泉源（今天+明天，日循环）。每行带 `source`：`official` = 官方口径，`schedule` = 我们自己排的表（带 `verified_at`/`verified_against`）。**遗失区域的顺序表还没核对过，只给候选、不给「今天是谁」** | `player_name`、`limit` |
 
 商人查询分两步，响应里的 `mode` 直接写明是哪一种：
 
@@ -328,7 +329,7 @@ Manifest 侧（**不代表拥有**）：
 | `item_type` | `inventory_assistant`：`get`、`inventory`、`list`、`search_type`、`summarize`、`summary`、`type`、`概况` |
 | `kind` | `loadout_assistant`：`search_identifiers` |
 | `knowledge_id` | `activity_assistant`：`community`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
-| `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`summarize`、`summary`、`概况`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`craft`、`filter_rolls`、`global`、`pattern`、`patterns`、`search_all`、`search_catalog`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`search_collectible_nodes`、`vendor`、`weekly` |
+| `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`summarize`、`summary`、`概况`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`craft`、`filter_rolls`、`global`、`pattern`、`patterns`、`search_all`、`search_catalog`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：除 `weekly_full` 外全部 |
 | `loadout_id` | `loadout_assistant`：`delete`、`equip_loadout` |
 | `location` | `inventory_assistant`：`find_item`、`get`、`inventory`、`list`、`search`、`search_type`、`summarize`、`summary`、`type`、`概况`；`weapon_assistant`：`filter_rolls` |
 | `locked` | `inventory_assistant`：`lock` |
@@ -344,7 +345,7 @@ Manifest 侧（**不代表拥有**）：
 | `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`community`、`craft`、`pattern`、`patterns`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：`community` |
 | `period` | `activity_assistant`：`career`、`counters`、`historical_stats`、`stats` |
 | `perk_name` | `weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`perk_description`、`search_all`、`search_catalog` |
-| `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact`、`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`craft`、`filter_rolls`、`pattern`、`patterns`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：`collectible_item`、`collectible_node`、`vendor` |
+| `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact`、`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`craft`、`filter_rolls`、`pattern`、`patterns`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：`collectible_item`、`collectible_node`、`rotations`、`vendor`、`周常轮换`、`轮换`、`这周` |
 | `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |
 | `priority_stats` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `query` | `activity_assistant`：`career`、`community`、`counters`、`historical_stats`、`stats`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |

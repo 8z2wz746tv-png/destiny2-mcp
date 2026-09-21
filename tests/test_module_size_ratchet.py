@@ -102,6 +102,13 @@ CEILINGS = {
     # 同上：Starside「锻造武器来源」的名字索引（归一化 / 表格 / 正文兜底 / 出处）。
     # 名字归一化只此一处，别再抄到 pattern_service 或工具层。
     "destiny_mcp/services/starside_crafting_sources.py": 186,
+    # 周常轮换新增登记（登记即上限）：周期表 + 锚点 + 六类轮换的取值规则（纯计算）。
+    # 官方接口只给突袭/地牢（里程碑）与夜幕/宗师（组件 204），其余靠这张表 —— 见 ADR-010。
+    "destiny_mcp/data/rotations.py": 151,
+    # 同上：把官方那半（里程碑 + 组件 204）与表那半拼起来，并给每行标 source。
+    "destiny_mcp/services/rotation_service.py": 308,
+    # 同上：`intent="rotations"` 的载荷与话术（口径分离 / 未锚点说明 / {var:} 提醒）。
+    "destiny_mcp/tools/_rotation_branches.py": 109,
     # 同上：`intent="patterns"` 的载荷与话术（总览 / 单把 / 变体 / 术语对照 /「未开始」措辞）。
     # 211 是加上"玩家说红框、游戏说模式"的术语块与变体话术（含强化插槽）之后的长度；
     # 215 = 211 + 载荷里的 by_tier 汇总。

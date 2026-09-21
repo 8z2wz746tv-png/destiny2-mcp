@@ -64,7 +64,10 @@ ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
         "leaderboards": ("leaderboard",),
     },
     "BuildIntent": {"community": ("starside",)},
-    "WorldIntent": {},
+    "WorldIntent": {
+        # 周常轮换：中文说法（永久别名）
+        "rotations": ("轮换", "周常轮换", "这周"),
+    },
 }
 
 # 独立行为：自己有单独一段分派、不是任何东西的别名。新增 intent 必须落进
