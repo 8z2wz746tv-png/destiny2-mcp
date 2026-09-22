@@ -384,15 +384,15 @@
 | 排序是不是加权分 | 同上，改 `score` 不该改顺序 | 顺序只由 `build/ranking.goodness_key` 决定；`score` 只剩展示含义（**封顶后的六维总和**，超上限部分不计） |
 | 属性上限（"别超过 100"） | `intent="find"` + `stat_caps={"super_stat": 100}` | 上限是**软**约束：超了照样出解，但在结果的 `max_violations` 里逐项标注（`{stat,label,actual,max}`）、排到没超上限的方案后面，并且求解器不再往那一项堆模组。**不传 = 不限**（不许悄悄按 100 截断）；上限键不认识、或上限低于下限 → `build_validation_error` |
 | 这套护甲每项最多能到多少 | `intent="find"` 的 `data.reachable` | 逐项给"已验证能到"的值 + `reachable_note`：**保守下界**（模组按 5/10 加减，实际可能更高）且**逐项可达 ≠ 同时达到**；真机实测手雷报 120 而把下限写成 130 时确实到 130 |
-| 这件调谐我到底能不能换 | `inventory_assistant(intent="equip_mod")` 给调谐时的 `writable_reason` | 口径是「**能换，但只能换成你已经拥有的那一颗**」（2026-09-22 真机：换成别的护甲正装着的那颗成功；换成没有的 → 1675 要材料）。本项目还没开替你写这条路，所以 `writable=false`/`written=false`，**但理由不是"上游只允许游戏内改"**（那句出自 ADR-012 推翻的 1663）。判"拥有"不能看组件 207 —— 那份清单整个漏掉调谐槽 |
+| 这件调谐我到底能不能换 | `inventory_assistant(intent="equip_mod")` 给调谐时的 `writable`/`writable_reason` | 口径是「**这颗在不在件允许的清单里**」（组件 310，每件不一样）。在 → `writable=true`；不在 → `false` + 1675 的含义（"这颗装不到这件上"，**不是"你没材料"**，也不是"上游只允许游戏内改"——那句出自 ADR-012 推翻的 1663）。判"允许"不能看组件 207 —— 那份清单整个漏掉调谐槽 |
 | `平衡调整` 到底加什么 | `find` 结果的六维，或 `scripts/verify_tuning_write.py` 的预期/实测对账 | **只给"恰好三项并列最低"的那三项各 +1**（真机：基值 武器30/生命5/职业5/手雷30/超能25/近战5 → 装上后 武器30/生命6/职业6/手雷30/超能25/近战6）。Manifest 的 `investmentStats` 写的是"六维各 +1"，**照它建模每项会多算 1**；单一出处是 `armor_rules.balanced_tuning_bonus`（ADR-014） |
 | ⭐ 达标之后还能不能更高 | 上面那条猎人模板，或术士 `find`（手雷下限 100、超能上限 100） | P4 起**默认**就在候选池上做单件调谐邻域贪心（每一步都过权威复核）：真机术士那套手雷 **120 → 145**、超能 110 → **95**（不超上限），端到端 9.2s → 17.6s。只报**净改动**（每件一条：原样 → 最终样），不报贪心中间步；`requires_tuning=true` 时 `canonical_build` 仍**不含**调谐插件 |
 | 我什么都没要求，别动我的调谐 | `intent="find"` 不带任何目标/优先级 | 没有目标也没有优先级时**不动调谐**（唯一还能提升的只剩排序键最后那位封顶总和，为 +6 让用户改 5 件不是他要的）；守门见 `tests/test_build_local_tuning.py` |
 | 0 候选时凭什么说"配不出来" | `build_assistant(intent="find")` 跑到 0 候选（如把生命值推到 200） | 响应必须**自证枚举完了**：`summary` 写「枚举完了，没有任何一套能满足这些下限（枚举了 N 套组合）」、`data.search = {exhaustive: true, combos: N, truncated_by: null}`；`ladder.verdict.satisfiable=false`。**没搜完时（`exhaustive=false`）必须是 `satisfiable=null` + 「这次没搜完」**，不许把预算/配额截断写成不可行（P1 守门见 `tests/test_build_budget_honesty.py`） |
 | 这个"上限"是什么上限 | `ladder.single_stat_ceiling` | 那是**单项**上限（把点全堆一项）；拿它当"同时能达到"会得出"你什么都够"。两个字段都在，回答时不能混 |
 | 只差几点，非降目标不可吗 | `ladder.tuning_first` + `find` 的 `tuning_changes` | 求解器**真的试过调谐**（没达标时用调谐额度复解 + 逐套精确复核）：能补的直接给带 `tuning_changes` 的候选（`requires_tuning=true`）；补不上时这一档如实分三种口径（额度够但让不出来 / 额度不够 / 只差 ≤10 看属性模组），并带 `solver_attempted` |
-| 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` **不含调谐插件** —— 本项目还没开替你写调谐这条路；**换调谐本身是能写的**，条件是"只能换成你已经拥有的那一颗"（1675 就是"你没有这颗"），别把它说成"上游只允许游戏内改"（那句出自 ADR-012 推翻的 1663） |
-| 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | 给出「从什么改成什么 + 六维变化」，`writable=false`、`written=false`，warning 说的是「本项目**还没验证过**调谐写入」，不是「上游不允许」；`confirmed=true` 也不会写账号 |
+| 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` 的 `items[].mods` **含调谐插件**（只含这件允许的），`equip_build` 确认后一起写；别把调谐说成"只能在游戏内改"（那句出自 ADR-012 推翻的 1663），也别把 1675 说成"没材料"（它是"这颗装不到这件上"） |
+| 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | **能写**（2026-09-22 开放）：`writable=true` → `confirmed=false` 回 `confirmation_required`、`confirmed=true` 才写并回读核对；**清单外**的调谐 → `writable=false` + 1675 的含义，`confirmed=true` 也不写 |
 | 换一个真花能量的模组 | `intent="equip_mod"` + `confirmed=true` | 走**免费**插槽接口（护甲模组本来就属于它覆盖的范围，见 ADR-012），成功后回读核对；失败要核对 `ErrorCode` 并把上游原文带出来，不许报成功（0.1.8 实机修） |
 | 这颗模组这一位还没解锁 | 换一颗**不在** `characterPlugSets` 可插入清单里的模组（实测「重型弹药搜寻者」，条件里写着「必须在赛季神器中选择」） | **写之前**就返回 `writable=false` + `written=false`，`writable_reason` 带上 Manifest 的插入条件；`confirmed=true` 也不写。**不许**说成「Bungie 不允许 API 改护甲模组／请去游戏里手动装」—— 游戏里同样装不上（ADR-013） |
 | 同名模组有已解锁与未解锁两档 | 同上，但那颗有同名变体 | 挑**这一位已解锁**的那档（`to.unlock_state=true`），不是按属性加成挑到没解锁的那颗 |
@@ -412,12 +412,12 @@
 - 只对 **T5** 建模词条反推；T3/T4/老护甲在响应里明确说"不支持反推 + 原因"（T1/T2 本账号无样本，
   不建模、不猜）；
 - 待刷的**虚拟件**没有能量数据：`energy` 为 `null` 而不是 0，也不能据此说"装不下"；
-- 调谐**只能换成你已经拥有的那一颗**（2026-09-22 真机验证，`scripts/verify_tuning_write.py`）：
-  换成身上别的护甲正装着的那颗 → 免费接口 `ErrorCode=1`、回读插槽与六维都对、换回也成功；
-  换成一颗你没有的 → **1675** `DestinyCannotAffordMaterialRequirements`（换调谐要材料），
-  账号一个字节没变。旧的"不能通过 API 写入 / 实测 1663"出自 ADR-012 推翻的字段名 bug，已作废。
-  本项目**还没开替你写调谐这条路**：所以 `tuning_changes` 仍是"给玩家的手动清单"，
-  `equip_build` 不会替玩家改调谐，达标六维里那部分要玩家自己改完才成立。
+- 调谐**的允许清单是逐件的**（2026-09-22 真机验证，`scripts/verify_tuning_write.py`）：
+  判据只有一条 —— 那颗在**这件护甲**的组件 310 清单里（别把 1675 读成"你没材料"，
+  那句是"这颗装不到这件上"；也别读成"上游只允许游戏内改"，那句出自 ADR-012 推翻的 1663）。
+  清单内写入：免费接口 `ErrorCode=1`、回读插槽与六维都对、换回也成功、**不花材料**。
+  **2026-09-22 起代写调谐是正式能力**：`tuning_changes` 与 `canonical_build.items[].mods` 里的
+  调谐都是可执行的，`equip_build` 确认后连同护甲与模组一起写（清单外的不会进计划），见 ADR-014。
 - 调谐救援的候选池有上限（放宽那趟留 1500 套、只精确复核最值得的前 40 套）：实测
   武器150+生命103 在池 200 时救回 0 套、池 1500 时救回 16 套；`tuning_changes` 里的方案
   一定过了真实目标的精确复核，但"没救回来"不等于"游戏里绝对做不到"，只等于"这轮没找到"。
@@ -465,7 +465,7 @@
 | 武器章节的端到端断言（真机） | `scripts/run_corpus_weapon_rows.py`（16 行） |
 | 护甲**每一类模组插槽**能不能写（真机，含"这一位能不能插"的判定） | `scripts/verify_armor_mod_sockets.py`（只读看现状；`--apply` 做 6 类插槽的"一换一 → 回读 → 换回"往返） |
 | 护甲**模型口径**和游戏数据对不对得上（真机，468 件） | `scripts/audit_armor_model.py`（只读；六项对账：stats=304−模组、310 清单、装着的那颗在清单里、调谐反推不为负、大师档位、词条重建=304。退出码 0/1，可当机器检查。`--capture` 重抽证人清单） | 已跑（2026-09-22）：六项全过；顺手挖出"大师是档位不是有/无"并修掉。**固定证人** 29 件在 `tests/baselines/armor_witnesses.json`（5 个大师档位 × 12 个词条原型 × 金装 0/31 颗 × 非 T5），每次跑逐条点名 |
-| 护甲**调谐**能不能通过 API 换（真机） | `scripts/verify_tuning_write.py`（只读列每件的调谐槽与可换项；`--apply` 做"换一颗 → 回读插槽 + 回读组件 304 的六维 → 换回"；`--to <hash>` 指定换成哪颗，`--include-empty` 试"撤掉调谐"） | 已跑（2026-09-22）：换成**你已拥有**的一颗 → `ErrorCode=1`、六维按"平衡调整只给最低三项 +1"变；换成**没有**的一颗 → **1675** 要材料、账号不变。结论见 ADR-014 |
+| 护甲**调谐**能不能通过 API 换（真机） | `scripts/verify_tuning_write.py`（只读列每件的调谐槽与可换项；`--apply` 做"换一颗 → 回读插槽 + 回读组件 304 的六维 → 换回"；`--to <hash>` 指定换成哪颗，`--include-empty` 试"撤掉调谐"） | 已跑（2026-09-22）：换成**这件允许的**一颗 → `ErrorCode=1`、六维按"平衡调整只给最低三项 +1"变、**不花材料**、换回也成功；换成**不在清单里**的一颗 → **1675**、账号不变。**并且量到组件 305/plug set 的"这一位能不能插"对调谐不可信**（正装着的那颗都不在清单里，一颗被判 false 的调谐照样写成功）—— 所以写入只看 310。结论见 ADR-014 |
 | 装备编排的异域互斥与槽位判据（真机，只读） | `scripts/verify_equip_planner.py` |
 | 八工具面全 intent 体检 + 其余六面字段级 + 协议层（真机） | `scripts/run_corpus_all_rows.py`（见 `docs/testing/TESTING_CORPUS_FULL.md`） |
 | 错误码与信封 | `test_failure_envelope_regressions.py`、`test_upstream_error_mapping.py`、`test_service_error_contract.py` |

@@ -22,7 +22,7 @@
 | [ADR-011](011-exotic-exclusivity-follows-unique-label.md) | 异域互斥按 Manifest 的 `uniqueLabel` 判（不是"全身一件"），槽位按 `equipmentSlotTypeHash` 取；判据必须同时作用于 `equip` 与 `equip_many` | accepted |
 | [ADR-012](012-free-socket-writes-are-a-format-bug.md) | 免费插槽写入（护甲模组/子职业/Perk）走 API 是**线上格式写错了**（字段名 `itemId`、hash 要无符号），不是"应用没权限"；**推翻 ADR-002** | accepted |
 | [ADR-013](013-armor-mod-insertability-is-per-character.md) | 护甲模组能不能插，看角色级可插入清单（组件 207 `characterPlugSets`）而不是 Manifest 的 plug set；1676 是"插入条件没满足"，不许说成"去游戏里装" | accepted |
-| [ADR-014](014-tuning-writes-need-ownership.md) | 调谐能用免费接口换，但**只能换成你已经拥有的那一颗**（没有的回 1675 要材料；1679 不是失败）；`平衡调整` 是**最低三项各 +1**，不是六维各 +1 | accepted |
+| [ADR-014](014-tuning-writes-need-ownership.md) | 调谐能用免费接口换，判据是**这件护甲允许的清单**（组件 310；不在里面的回 1675，1679 不是失败）；写入已开放为正式能力；`平衡调整` 是**最低三项各 +1**，不是六维各 +1 | accepted |
 | [ADR-015](015-solver-objective-and-ranking.md) | 配装求解口径：上限是**软**的（排名 + 标注，不剪枝）、排序只有 `goodness_key` 一把尺子、调谐吃干净但是**局部**最优、`reachable` 是**保守下界**、没算完不许说不可行 | accepted |
 
 ## 编号规矩

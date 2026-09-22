@@ -21,9 +21,9 @@ Destiny 2 装备管理 MCP Server，通过 AI Agent 管理武器和装备。
 - 可选 Starside 网页归档：提供社区配装模板，保留出处，可匹配账号库存
 - 调谐（Tuning）参与配装求解：目标差一点时，求解器会实际尝试更换调谐，能补上就返回带
   `tuning_changes`（逐件 from/to 与六维变化）的候选，补不上则说明是额度不足还是无法让步。
-  调谐**换得动，但只能换成你已经拥有的那一颗**（2026-09-22 真机验证：换成身上别的护甲正装着的那颗 → 免费接口 `ErrorCode=1`、回读插槽与六维都对；换成一颗你没有的 → **1675** `DestinyCannotAffordMaterialRequirements`，账号不变）。
-  本项目**还没开替你写调谐这条路**，所以工具输出的是「改哪几件、改成什么」的清单，
-  `equip_build` 不会代替玩家改调谐
+  调谐**能通过 API 换，也能替你换**（2026-09-22 真机验证并开放）：条件只有一条 —— 那颗在**这件
+  护甲允许的清单**里（组件 310，每件不一样）。在 → `equip_build` 确认后连同护甲与模组一起写、
+  不花材料；不在 → 上游回 **1675**，那句读作"这颗装不到这件上"（不是"你没材料"），工具如实报且不写。
 - **护甲模组是真的能通过 API 装的**（工具会直接装，装不上才列清单）：走免费插槽接口
   `InsertSocketPlugFree`，官方明确它覆盖 Perks / **Armor Mods** / Shaders / Ornaments，且
   **不需要** `AdvancedWriteActions`。子职业插槽（超能/手雷/近战/职业技能/星相/碎片）同理。
@@ -232,10 +232,12 @@ VERIFY_OK=Destiny MCP is ready
 - 写入权限：读操作不受限制；消耗能量的插槽写入需要在 Bungie 应用里勾选 `AdvancedWriteActions`。
   没有该权限时接口返回 403 `AccessNotPermittedByApplicationScope`，工具会指出这一权限；
   这属于权限配置问题，重试不会成功。
-- 调谐怎么换：调谐**换得动，但只能换成你已经拥有的那一颗**（2026-09-22 真机验证：换成身上别的护甲正装着的那颗 → 免费接口 `ErrorCode=1`、回读插槽与六维都对；换成一颗你没有的 → **1675** `DestinyCannotAffordMaterialRequirements`，账号不变）。
-  `find`/`recommend` 返回的 `tuning_changes` 是给玩家的手动清单，照着在游戏里改完，
-  方案里的六维才成立；`equip_build` 只更换护甲与模组。（旧说法「调谐只能在游戏内改、
-  实测 1663」出自 ADR-012 推翻的那个字段名 bug，已作废。）
+- 调谐怎么换：调谐**能通过 API 换**，条件只有一条 —— 那颗在**这件护甲允许的清单**里
+  （组件 310；真机实测：清单内的写入 `ErrorCode=1`、回读插槽与六维都对、**不花材料**；清单外回
+  **1675**，那句读作"这颗装不到这件上"）。`find`/`recommend` 的 `tuning_changes` 与
+  `canonical_build` 里的调谐插件都**是可执行的**：`equip_build` 确认后连同护甲与模组一起改
+  （旧说法「调谐只能在游戏内改、要材料」出自 ADR-012 推翻的那个字段名 bug，已作废；
+  见 ADR-014 与 `docs/plans/TUNING_WRITE_PLAN.md`）。
 - 无解诊断耗时较长：真正配不出来时会给「六维阶梯」（逐级放松目标实采），实测 80–165 秒；
   求解器还会先尝试调谐补齐。MCP 客户端超时建议设为 300 秒（DSH 的 `toolCallTimeoutMs`）。
 
