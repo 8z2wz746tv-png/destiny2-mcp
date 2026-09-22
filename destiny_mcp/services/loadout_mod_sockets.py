@@ -90,14 +90,20 @@ class ModSocketMixin(PlugLookupMixin):
           授权流程；免费接口官方明说不需要它，所以撞到这条说明这颗 plug 属于"非免费可逆"那类。
         - 1663 `DestinyItemActionForbidden` / `can only be done in-game`：上游一句含糊话术，
           至少对应"角色不在社交区/轨道/离线"与"这个槽本身禁用"两种，原文照转、不替它下结论。
-        - 1675 `DestinyCannotAffordMaterialRequirements`：这个动作**要材料**，免费接口不接
-          —— 实测换调谐就是这条（2026-09-22，`scripts/verify_tuning_write.py`）：换成你已经
-          拥有的那颗能成，换成没有的那颗回 1675。
+        - 1675 `DestinyCannotAffordMaterialRequirements`：这个动作**要材料**，免费接口不接。
+          2026-09-22 实测撞到它的那次是**调谐**：想装的调谐不在这件护甲允许的清单里（组件 310）
+          → 1675；清单里的调谐写入不花材料、直接成功。**算"挡住"而不是硬失败**：装备已经换好了，
+          为一颗插件把整条配装回退更糟（也符合"调谐写不进去不回退"这条口径）。
         - 1676 `DestinyFailedPlugInsertionRules`：这颗模组的**插入条件**没满足（实测被拒的
           那些条件里都有「必须在赛季神器中选择」）。这条**游戏里同样装不上**，以前把它归到
           "去游戏里手动装"是错的。
         """
         text = f"{result.get('Message', '')} {result.get('ErrorStatus', '')}"
+        if result.get("ErrorCode") == 1675 or "DestinyCannotAffordMaterialRequirements" in text:
+            return (
+                "要材料（1675）：免费插槽接口不接这类动作。调谐实测只有「这颗不在这件护甲允许的"
+                "清单里」那一档会撞上它（清单里的调谐不花材料、能直接写）"
+            )
         if "DestinyFailedPlugInsertionRules" in text or result.get("ErrorCode") == 1676:
             conditions = self.plug_insertion_conditions(plug_hash)
             return (

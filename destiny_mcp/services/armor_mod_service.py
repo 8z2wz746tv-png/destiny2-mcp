@@ -186,13 +186,15 @@ class ArmorModService(ModSocketMixin):
         )
 
         # 必须带上容器组件（200 角色背包 / 201 已装备），否则拿不到"这件在谁身上"，
-        # 会把每件护甲都误判成"不在该角色身上"。305 用来读插槽，300 读能量与 T 级。
+        # 会把每件护甲都误判成"不在该角色身上"。305 用来读插槽，300 读能量与 T 级，
+        # **310 用来读"这件允许哪些调谐"**（调谐写入的唯一判据，见 ADR-014 修订）。
         profile = await self._resolver.get_profile(
-            membership_id, membership_type, INVENTORY_SOCKETS
+            membership_id, membership_type, [*INVENTORY_SOCKETS, 310]
         )
         components = profile.get("itemComponents") or {}
         instances = (components.get("instances") or {}).get("data") or {}
         sockets_data = (components.get("sockets") or {}).get("data") or {}
+        reusable_plugs = (components.get("reusablePlugs") or {}).get("data") or {}
         equipment = ((profile.get("characterEquipment") or {}).get("data") or {}).get(
             character_id, {}
         ).get("items") or []
@@ -288,34 +290,53 @@ class ArmorModService(ModSocketMixin):
                 })
 
         is_tuning = self._plug_category_hash(matched_hash) == _TUNING_CATEGORY_HASH
-        unlock_state = _unlock_state(socket_index, matched_hash)
+        # 调谐：这颗在不在"这件护甲允许的清单"里（组件 310，单一出处见 models）。
+        # 读不到清单 = 不拦（缺数据 ≠ 不许，交给上游说话）；读到了且不在里面 = 明确不写 ——
+        # 省得让用户确认完再去撞 1675。
+        from ..build.models import tuning_options_from_reusable  # 局部导入，同上
+
+        allowed = tuning_options_from_reusable(
+            (reusable_plugs.get(item_instance_id) or {}),
+            self._plug_category_hash,
+            _TUNING_CATEGORY_HASH,
+        )
+        tuning_allowed = (not is_tuning) or (not allowed) or (int(matched_hash) in allowed)
+        raw_unlock_state = _unlock_state(socket_index, matched_hash)
+        # **调谐不看 `unlock_state`** —— 那份"这一位能不能插"的判定在调谐槽上不可信：实测连
+        # 正装着的那颗调谐都被判 false（`loadout_plug_lookup.plug_is_insertable` 为此打过补丁），
+        # 而一颗被判 false 的调谐写入上游照样接受（2026-09-22 真机：至高碎片槽 11
+        # `+武器 / -超能` → `ErrorCode=1`，回读插槽与六维都对）。拿它拦会把能装的调谐说成
+        # "游戏里同样装不上"。判据只有组件 310 清单一条（ADR-014 修订）。
+        # 也不把它报出去：调谐配上 `unlock_state: false` 会被读成"写不了"。
+        unlock_state = None if is_tuning else raw_unlock_state
         conditions = self.plug_insertion_conditions(matched_hash)
+        # 写不进去的情形都别走"确认后写入"：用户确认了、我们却只能失败。三条各自说清：
+        #   ① 调谐不在**这件护甲**允许的清单里（组件 310）→ 上游回 1675，
+        #      那句话读作"这颗装不到这件上"，**不是**"你没材料"；
+        #   ② 非调谐模组不在这一位角色的可插入清单里 → 上游回 1676（插入条件没满足），游戏里同样装不上；
+        #   ③ 其余情况可写（角色级清单"没数据"不算拦截 —— 缺数据 ≠ 不许，交给上游说话）。
+        if is_tuning and not tuning_allowed:
+            reason = (
+                "这颗调谐**不在这件护甲允许的调谐里**（组件 310 的清单里没有它）："
+                "上游会回 1675「这颗装不到这件上」，不是「你没材料」。"
+                "换一件能装它的护甲，或者换成这件清单里已有的那几颗。"
+            )
+        elif (not is_tuning) and unlock_state is False:
+            reason = (
+                f"「{_mod_label(self._manifest.get_item_definition(matched_hash), mod_name)}」"
+                "不在 Bungie 给这一位角色的可插入清单里 —— 实测这种写入会被回 1676"
+                "（插入条件没满足），游戏里同样装不上。它的插入条件是："
+                + ("；".join(conditions) if conditions else "上游没给条件文本")
+                + "。条件里有「必须在赛季神器中选择」时，先在赛季神器里解锁它。"
+            )
+        else:
+            reason = ""
         return {
             "player_name": player_name,
             "item_instance_id": item_instance_id,
             "kind": "tuning" if is_tuning else "mod",
-            # 写不进去的两种情形都别走"确认后写入"：用户确认了、我们却只能失败。
-            "writable": not is_tuning and unlock_state is not False,
-            "writable_reason": (
-                # 调谐：**换得动，但只能换成你已经拥有的那一颗**（2026-09-22 真机验证）：
-                # 换成身上别的护甲正装着的那颗 → ErrorCode=1、回读插槽与六维都对、换回也成功；
-                # 换成一颗你没有的 → 1675「cannot afford the material requirements」，账号不变。
-                # 旧说法"上游只允许游戏内改（1663）"出自 ADR-012 推翻的字段名 bug，已作废。
-                # 之所以仍然只给方案：本项目还没开替你写调谐这条路（换调谐要材料）。
-                "调谐**换得动，但只能换成你已经拥有的那一颗**（换成没有的一颗，上游回 1675"
-                "「负担不起这个动作的材料要求」，换调谐是要材料的）。本项目还没开替你写调谐"
-                "这条路，所以这份方案告诉你要把哪一件改成什么，请进游戏手动改。"
-                if is_tuning
-                else (
-                    f"「{_mod_label(self._manifest.get_item_definition(matched_hash), mod_name)}」"
-                    "不在 Bungie 给这一位角色的可插入清单里 —— 实测这种写入会被回 1676"
-                    "（插入条件没满足），游戏里同样装不上。它的插入条件是："
-                    + ("；".join(conditions) if conditions else "上游没给条件文本")
-                    + "。条件里有「必须在赛季神器中选择」时，先在赛季神器里解锁它。"
-                    if unlock_state is False
-                    else ""
-                )
-            ),
+            "writable": tuning_allowed if is_tuning else unlock_state is not False,
+            "writable_reason": reason,
             "note": (
                 "调谐不花能量、也不占模组槽；它是零和的："
                 "to.stat_bonus 里同时有 +5 和 −5 两项。"

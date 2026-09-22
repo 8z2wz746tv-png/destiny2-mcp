@@ -444,6 +444,26 @@ def test_mod_write_blocker_names_the_insertion_conditions() -> None:
     assert "游戏里" not in detail, "1676 不是「去游戏里装」，别那样写"
 
 
+def test_mod_write_blocker_treats_1675_as_blocked_not_fatal() -> None:
+    """1675 要材料 = **挡住这一颗**，不是硬失败 —— 否则一颗插件会把整条配装回退掉。
+
+    2026-09-22 实测：调谐不在组件 310 清单里时上游回 1675。配装那边靠
+    `steps.mod_blocked` 判定"装备已换好、只这一颗没写进去"，见
+    `tests/test_exact_build_execution.py::test_a_blocked_plug_keeps_the_equipment_and_skips_rollback`。
+    """
+    service = _equipment(_plan_manifest())
+
+    detail = service.mod_write_blocker(
+        {"ErrorCode": 1675, "ErrorStatus": "DestinyCannotAffordMaterialRequirements"}, LOCKED_MOD
+    )
+
+    assert "要材料" in detail and "1675" in detail
+    # 旧说法"换成你已经拥有的那一颗"作废了：1675 是"这颗装不到这件上"。
+    assert "你已经拥有" not in detail
+    # 1675 与 1676 是两回事，别串味。
+    assert "插入条件" not in detail
+
+
 def test_mod_write_blocker_separates_scope_and_in_game() -> None:
     service = _equipment(_plan_manifest())
 

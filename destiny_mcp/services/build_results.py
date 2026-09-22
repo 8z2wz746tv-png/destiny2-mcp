@@ -63,14 +63,10 @@ def set_key(items: Sequence[Any]) -> tuple[str, ...]:
 def tuning_note(plan: TuningPlan | None, item_names: dict[str, str] | None = None) -> str:
     """把调谐改动说成人话（没有改动就返回空串）。
 
-    口径（2026-09-22 真机验证，`scripts/verify_tuning_write.py --apply`）：调谐**换得动**，
-    但**只能换成你已经拥有的那一颗**。
-      - 换成身上别的护甲正装着的那颗（平衡调整）：免费插槽接口 `ErrorCode=1`，回读插槽真变、
-        组件 304 的六维也按真机规则变（平衡调整只给最低三项各 +1），换回原样也成功；
-      - 换成一颗你没有的：回 **1675** `DestinyCannotAffordMaterialRequirements`
-        （"You cannot afford the material requirements for that action."），账号一个字节没变。
-    所以这句话仍然是"要你在游戏里手动改哪几件"，但**不是因为"上游只允许游戏内改"** ——
-    那句出自 ADR-012 推翻的 1663（当时是字段名 bug），不再作为理由。
+    口径（2026-09-22）：调谐**能替你写**，条件只有一条 —— **这颗在这件护甲允许的清单里**
+    （组件 310）。真机已验证：写入 `ErrorCode=1`、回读插槽与六维一致、不花材料
+    （见 ADR-014 的修订与 `docs/plans/TUNING_WRITE_PLAN.md`）。
+    所以这句话现在是"**确认后会一起改**"，不再是"要你进游戏手动改"。
     """
     if plan is None or not plan.feasible or not plan.changes:
         return ""
@@ -81,8 +77,7 @@ def tuning_note(plan: TuningPlan | None, item_names: dict[str, str] | None = Non
         parts.append(f"{who} 改成「{change.to_name}」")
     head = (
         f"这套方案要先把 {len(plan.changes)} 件护甲的调谐改掉才能达标"
-        "（调谐不占能量、不影响模组；换调谐要材料，而且只能换成你已经拥有的那一颗，"
-        "所以这一句是**要你在游戏里手动改**）："
+        "（调谐不占能量、不影响模组；确认后**一起改**，改不了会说明是哪一件、为什么）："
     )
     tail = ""
     if plan.exhausted:
@@ -124,11 +119,19 @@ def build_results(
 
         key = set_key(armor_set.armor)
         plan = context.tuning.get(key)
-        # 调谐**不进** `mods`：换调谐要材料、而且只能换成你已经拥有的那一颗（2026-09-22
-        # 真机验证，1675 就是"你没有这颗"），本项目还没开替你写调谐这条路；
-        # 写进去只会让 equip_build 失败或静默少做一步。调谐只作为"要你在游戏里改"的清单。
+        # 调谐**并进** `mods`（2026-09-22 开放代写）：执行器按插件类别找插槽，本来就会往调谐槽写，
+        # 回读也会一起核对 —— 走同一条可执行路径，不新增字段。只放"这件允许的"那几颗：
+        # 不在组件 310 清单里的调谐**不进计划**（否则等于让 equip_build 去撞 1675）。
+        tuning_plugs: dict[str, int] = {}
+        if plan is not None and plan.feasible:
+            by_id = {str(getattr(item, "item_instance_id", "")): item for item in armor_set.armor}
+            for change in plan.changes:
+                armor = by_id.get(str(change.item_instance_id))
+                allowed = {int(h) for h in (getattr(armor, "tuning_option_hashes", ()) or ())}
+                if armor is not None and int(change.to_plug) in allowed:
+                    tuning_plugs[str(change.item_instance_id)] = int(change.to_plug)
         # 注意 `requires_tuning` 要按**方案**算，不能按"有没有插件要写"算 ——
-        # 后者在调谐不可写之后恒为 False（实机语料第 ⑩ 行抓到的回归）。
+        # 后者在调谐不可写那阵子恒为 False（实机语料第 ⑩ 行抓到的回归）。
         has_plan = bool(plan is not None and plan.feasible and plan.changes)
         item_names = {
             str(getattr(item, "item_instance_id", "")): str(getattr(item, "name", ""))
@@ -225,12 +228,18 @@ def build_results(
                             name=armor.name,
                             slot=LOADOUT_SLOT_NAMES.get(armor.slot, armor.slot),
                             item_instance_id=armor.item_instance_id,
-                            # 只有属性模组：调谐插件不在里面（见上面 has_plan 的说明）
-                            mods=list(
-                                armor_set.stat_mod_assignments.get(
+                            # 属性模组 +（如果这套要改调谐）调谐插件：执行器按类别找槽，
+                            # 调谐槽本来就是插槽，回读一视同仁。
+                            mods=[
+                                *armor_set.stat_mod_assignments.get(
                                     armor.item_instance_id, []
-                                )
-                            ),
+                                ),
+                                *(
+                                    [tuning_plugs[armor.item_instance_id]]
+                                    if armor.item_instance_id in tuning_plugs
+                                    else []
+                                ),
+                            ],
                             source_location=getattr(armor, "source_location", ""),
                             source_character_id=getattr(armor, "source_character_id", ""),
                             was_equipped=getattr(armor, "is_equipped", False),

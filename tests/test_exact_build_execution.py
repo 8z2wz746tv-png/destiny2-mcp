@@ -27,6 +27,7 @@ from destiny_mcp.models import (
     Loadout,
     LoadoutItem,
     LoadoutOperationResult,
+    MoveItemStep,
 )
 from destiny_mcp.services import build_service as build_service_module
 from destiny_mcp.services import loadout_equipment_service as equipment_module
@@ -368,6 +369,32 @@ async def test_exact_equipment_verifies_success() -> None:
     assert result.success is True
     assert result.steps[-1].action == "verify"
     service._restore_exact_state.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_a_blocked_plug_keeps_the_equipment_and_skips_rollback() -> None:
+    """上游拒绝某一颗插件（1675 等）时**不回退**：装备已经换好了，如实汇报就行。
+
+    这条分支以前**没有测试**盖住（`_equip_local_unlocked` 返回 `success=False` + 一个
+    `mod_blocked` step）。2026-09-22 起它是"调谐写不进去不回退"的落地处 —— 调谐插件现在跟在
+    `mods` 里由同一个执行器写，所以要钉住：既不能回退，也不能报成"成功"。
+    """
+    service = _equipment_service()
+    service._capture_recovery_state = AsyncMock(return_value={})
+    service._equip_local_unlocked = AsyncMock(return_value=LoadoutOperationResult(
+        success=False,
+        loadout_name="Exact",
+        message="装备已经换上；但 1 颗模组被上游拒绝写入",
+        steps=[MoveItemStep(action="mod_blocked", detail="要材料（1675）", success=False)],
+    ))
+    service._verify_loadout = AsyncMock(return_value=False)
+    service._restore_exact_state = AsyncMock(return_value=True)
+
+    result = await service.equip_exact("Alpha#0100", _loadout())
+
+    assert result.success is False, "被挡住不许报成功"
+    service._restore_exact_state.assert_not_awaited()
+    assert not any(step.action == "verify" for step in result.steps)
 
 
 @pytest.mark.asyncio

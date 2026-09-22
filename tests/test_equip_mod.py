@@ -18,6 +18,8 @@ MOD_HASH = 5001
 EMPTY_GENERAL = 2001
 EMPTY_LEGS = 2002
 TUNING = 4001
+#: 另一颗调谐（同类别、假 Manifest 认识）：当"清单里有调谐、但没有你要的那一颗"里的那个"有"
+OTHER_TUNING = 4002
 # 真机 Manifest 里 "+职业 / -手雷" 的 hash（实机抓过）
 TUNING_CLASS_UP_GRENADE_DOWN = 1879022254
 
@@ -51,6 +53,12 @@ DEFS: dict[int, dict[str, Any]] = {
         "itemType": 19,
         "plug": {"plugCategoryIdentifier": "core.gear_systems.armor_tiering.plugs.tuning.mods",
                  "plugCategoryHash": 3481777685, "energyCost": {"energyCost": 0}},
+    },
+    OTHER_TUNING: {
+        "displayProperties": {"name": "+纪律 / -力量"},
+        "itemType": 19,
+        "plug": {"plugCategoryHash": 3481777685, "energyCost": {"energyCost": 0}},
+        "investmentStats": [],
     },
     TUNING_CLASS_UP_GRENADE_DOWN: {
         "displayProperties": {"name": "+职业 / -手雷"},
@@ -392,24 +400,83 @@ async def test_plan_can_change_tuning_by_its_full_name() -> None:
     assert "零和" in plan["note"]
 
 
-async def test_tuning_plan_is_marked_not_writable() -> None:
-    """调谐带 `writable=False` + 原因，工具层据此**不**走"确认后写入"那套。
+async def test_tuning_plan_is_writable_when_nothing_says_otherwise() -> None:
+    """调谐**能写**：`writable=True`，工具层据此走"确认后写入"那套。
 
-    理由的口径（2026-09-22 真机验证，ADR-014）：**换得动，但只能换成你已经拥有的那一颗** ——
-    换成身上别的护甲正装着的那颗成功（`ErrorCode=1`、回读插槽与六维都对、换回也成），
-    换成没有的一颗回 **1675** 要材料。本项目还没开替你写调谐这条路，所以照旧只给方案。
+    判据只有一条 —— **这颗在不在"这件护甲允许的清单"里**（组件 310，ADR-014 修订）。
+    读不到那份清单时**不拦**（缺数据 ≠ 不许），交给上游说话。
     """
     plan = await _service().plan("Tester#1234", "6917", "+职业 / -手雷", "hunter")
 
     assert plan["kind"] == "tuning"
+    assert plan["writable"] is True
+    assert plan["writable_reason"] == ""
+    # 被推翻的说法一个都不许回来。
+    for stale in ("1663", "只允许游戏内改", "还没验证过", "只能换成你已经拥有的那一颗"):
+        assert stale not in str(plan), f"旧口径又出现了：{stale}"
+
+
+async def test_a_tuning_the_role_list_says_no_to_is_still_writable() -> None:
+    """**判据只有组件 310 一条**：那份"这一位能不能插"的清单在调谐槽上不可信，不许拿它拦调谐。
+
+    2026-09-22 真机（`scripts/verify_tuning_write.py warlock --piece 6917530188462629544
+    --to 891771298 --apply`）：至高碎片槽 11 的 `+武器 / -超能` 被这份清单判"不可插入"
+    （连**正装着的那颗**都不在清单里），写入却成功 —— `ErrorCode=1`，回读六维
+    超能 25→20、近战 0→5。拿它拦的后果是把能装的调谐说成"游戏里同样装不上"。
+
+    这里把角色级清单桩成"这个 plug set 只认别的调谐"（→ 判 False），而那件护甲的 310 清单
+    里有这颗 → 期望可写，且**不报** `unlock_state`：false 摆在 `to` 里会被读成"写不了"。
+    """
+    service = _service()
+    profile = await service._resolver.get_profile("1", 3, [])
+    profile["characterPlugSets"] = {
+        "data": {"char-hunter": {"plugs": {"1155052024": [{"plugItemHash": OTHER_TUNING}]}}}
+    }
+    profile["itemComponents"]["reusablePlugs"] = {
+        "data": {"6917": {"plugs": {"2": [
+            {"plugItemHash": TUNING_CLASS_UP_GRENADE_DOWN, "canInsert": True},
+        ]}}}
+    }
+
+    async def stable(membership_id, membership_type, components):
+        return profile
+
+    service._resolver.get_profile = stable  # type: ignore[assignment]
+    plan = await service.plan("Tester#1234", "6917", "+职业 / -手雷", "hunter")
+
+    assert plan["kind"] == "tuning"
+    assert plan["writable"] is True, plan["writable_reason"]
+    assert plan["writable_reason"] == ""
+    assert plan["to"]["unlock_state"] is None
+    for stale in ("1676", "游戏里同样装不上", "不在 Bungie 给这一位角色的可插入清单里"):
+        assert stale not in str(plan), f"该判据又拿调谐当模组拦了：{stale}"
+
+
+async def test_tuning_plan_is_blocked_when_the_piece_does_not_allow_it() -> None:
+    """清单里**没有**这颗 → 明确不写（省得用户确认完再撞 1675），并把 1675 的含义说清。
+
+    注意两件事（写这条测试时踩过）：
+    ① 桩的 `get_profile` 每次返回**新字典**，要在替换后的函数里返回同一个对象，改动才生效；
+    ② 清单里那颗必须是**假 Manifest 认识的调谐类别**（否则类别查成 0，会被当成"没有清单"）。
+    """
+    service = _service()
+    profile = await service._resolver.get_profile("1", 3, [])
+    # 这件护甲的调谐清单里只有 4002（另一颗），而我们要换成的是「+职业 / -手雷」（4001）
+    profile["itemComponents"]["reusablePlugs"] = {
+        "data": {"6917": {"plugs": {"2": [{"plugItemHash": OTHER_TUNING, "canInsert": True}]}}}
+    }
+
+    async def stable(membership_id, membership_type, components):
+        return profile
+
+    service._resolver.get_profile = stable  # type: ignore[assignment]
+    plan = await service.plan("Tester#1234", "6917", "+职业 / -手雷", "hunter")
+
+    assert plan["kind"] == "tuning"
     assert plan["writable"] is False
     reason = plan["writable_reason"]
-    assert "只能换成你已经拥有的那一颗" in reason
-    assert "1675" in reason
-    # 被推翻的两代说法都不许回来（1663 出自字段名 bug；"还没验证过"已被真机验证取代）。
-    assert "1663" not in reason
-    assert "只允许游戏内改" not in reason
-    assert "还没验证过" not in reason
+    assert "310" in reason and "1675" in reason
+    assert "不是「你没材料」" in reason
 
 
 async def test_apply_raises_when_bungie_returns_an_error_envelope() -> None:
@@ -467,8 +534,8 @@ async def test_apply_maps_a_missing_scope_to_a_readable_message() -> None:
         await service.apply(plan)
 
 
-async def test_tool_returns_the_tuning_plan_without_asking_for_confirmation() -> None:
-    """调谐写不进去：工具直接给方案 + 警告，而不是让用户确认一个做不到的写入。"""
+async def test_tool_asks_for_confirmation_before_writing_tuning() -> None:
+    """调谐现在能写：`confirmed=false` 时只签发确认请求，**一个字节都不写**。"""
     bungie = _Bungie()
     service = _service(bungie)
 
@@ -477,10 +544,10 @@ async def test_tool_returns_the_tuning_plan_without_asking_for_confirmation() ->
         "Tester#1234", "6917", "+职业 / -手雷", "hunter", False,
     )
 
-    assert response["ok"] is True
-    assert response["data"]["armor_mod"]["written"] is False
-    assert response["warnings"], "必须说清「只能在游戏内改」"
-    assert not bungie.inserts, "一个字节都不能写"
+    assert response["ok"] is False
+    assert response["error"]["code"] == "confirmation_required"
+    assert response["candidates"][0]["writable"] is True
+    assert not bungie.inserts, "没确认就一个字节都不能写"
 
 
 async def test_ambiguous_tuning_query_makes_the_caller_pick_one() -> None:

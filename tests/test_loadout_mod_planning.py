@@ -785,3 +785,37 @@ async def test_empty_socket_cache_is_reread_instead_of_failing_the_preflight() -
     )
 
     assert index == 0, "空缓存要触发重读，而不是当成没有插槽"
+
+
+async def test_find_mod_socket_writes_tuning_like_any_other_mod() -> None:
+    """**调谐槽也是插槽**：`equip_build` 把调谐和属性模组一视同仁地写进去。
+
+    这是"代写调谐"这条能力的执行端守门（口径见 `docs/plans/TUNING_WRITE_PLAN.md`）：
+    候选计划里带的调谐插件走的就是 `mods` → `_find_mod_socket`（它按插件类别找槽，
+    调谐类别本来就在 `_MOD_CATEGORY_HASHES` 里），不需要第二条写入路径。
+    """
+    tuning_category = 3481777685  # core.gear_systems.armor_tiering.plugs.tuning.mods
+    manifest = _Manifest(
+        definitions={900: _mod(tuning_category, 0)},
+        plug_sets={701: {"reusablePlugItems": [{"plugItemHash": 900}]}},
+    )
+    service = _service(manifest)
+    manifest._definitions[100] = {
+        "sockets": {
+            "socketEntries": [
+                {"reusablePlugSetHash": 0},
+                {"reusablePlugSetHash": 701},   # 调谐槽在这一位
+            ]
+        }
+    }
+
+    result = await service._find_mod_socket(
+        "item-1",
+        100,
+        900,
+        "player",
+        3,
+        sockets_cache={"item-1": [{"plugHash": 0}, {"plugHash": 0}]},
+    )
+
+    assert result == 1, "调谐必须和别的模组一样，按类别找到它自己的插槽"

@@ -250,8 +250,8 @@ async def equip_mod(
 
     # 写不进去的不要走"确认后写入"那套：用户确认了、我们却只能失败。
     # 两种情形共用这一条路（原因见 services/armor_mod_service.plan 的 writable_reason）：
-    #   调谐 —— 本项目没验证过能不能通过 API 换，只给方案；
-    #   未解锁 —— 这颗不在 Bungie 给这一位角色的可插入清单里（实测回 1676），游戏里也装不上。
+    #   调谐 —— 这颗不在**这件护甲**允许的清单里（组件 310，上游回 1675）；
+    #   未解锁 —— 非调谐模组不在 Bungie 给这一位角色的可插入清单里（实测回 1676），游戏里也装不上。
     if plan.get("writable") is False:
         return ok_response(
             f"{plan['item_name']} 的模组建议：{plan['from'].get('name') or '（空）'} → "

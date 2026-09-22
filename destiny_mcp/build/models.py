@@ -7,7 +7,8 @@ keep the Build Engine domain isolated (see docs/adr/001-canonical-build-strategy
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, cast
+from collections.abc import Callable, Mapping
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import BaseModel, Field
 
@@ -93,6 +94,34 @@ def _matching_armor3_roll(
         if actual == tuple(expected):
             matches.append((template, option))
     return matches[0] if len(matches) == 1 else None
+
+
+def tuning_options_from_reusable(
+    item_reusable: Mapping[str, Any],
+    category_of: Callable[[int], int],
+    tuning_category: int,
+) -> tuple[int, ...]:
+    """从组件 310（`ItemReusablePlugs`）里取出"**这件护甲允许装**的调谐插件"。
+
+    为什么必须用它、不能用 Manifest：Manifest 的调谐 plug set 是全局那 32 颗（真机里两件
+    同名手套指向同一个集合），而每件实际只开放"某一个属性 +5"的 5 颗 + 平衡调整。
+    返回空元组 = **读不到**（没请求 310 / 这件没有调谐槽）—— 缺数据 ≠ 允许，调用方要么不规划，
+    要么拦下写入。真机口径见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 四·十四。
+
+    单一出处：解析（`InventorySnapshot.from_profile`）与写入前的校验（`ArmorModService.plan`）
+    都走这里，避免两处各写一遍"哪个槽是调谐槽"。
+    """
+    for rows in (item_reusable.get("plugs") or {}).values():
+        first = next((int((r or {}).get("plugItemHash", 0) or 0) for r in (rows or []) if r), 0)
+        # 同一个槽里的插件同类别，看第一颗就够（每件要过好几个槽，别全查）
+        if not first or category_of(first) != tuning_category:
+            continue
+        return tuple(
+            int((r or {}).get("plugItemHash", 0) or 0)
+            for r in (rows or [])
+            if r and (r or {}).get("plugItemHash")
+        )
+    return ()
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -568,22 +597,12 @@ class InventorySnapshot(BaseModel):
                 else f"https://www.bungie.net{icon_path}" if icon_path else ""
             )
 
-            # ── 调谐：**允许装哪些只信组件 310** ──────────────────────────
-            # Manifest 的调谐 plug set 是全局那 32 颗（同名两件手套指向同一个集合），
-            # 而每件实际只开放"某一个属性 +5"的 5 颗 + 平衡调整。310 没请求时这里是空元组
-            # —— 缺数据 ≠ 允许，求解器会因此"不规划这件"（见 build/tuning.piece_tuning）。
-            tuning_options: tuple[int, ...] = ()
-            for socket_index, rows in (reusable_plugs_map.get(inst_id, {}) or {}).get("plugs", {}).items():
-                first = next((int(r.get("plugItemHash", 0) or 0) for r in (rows or []) if r), 0)
-                # 同一个槽里的插件事先同类别，看第一颗就够（每件要过 6 个槽，别全查）
-                if not first or _plug_category(first) != _ARMOR3_TUNING_CATEGORY:
-                    continue
-                tuning_options = tuple(
-                    int(r.get("plugItemHash", 0) or 0)
-                    for r in (rows or [])
-                    if r and r.get("plugItemHash")
-                )
-                break
+            # ── 调谐：**允许装哪些只信组件 310**（单一出处：模块级 `tuning_options_from_reusable`）
+            tuning_options = tuning_options_from_reusable(
+                reusable_plugs_map.get(inst_id) or {},
+                _plug_category,
+                _ARMOR3_TUNING_CATEGORY,
+            )
 
             return Armor(
                 item_instance_id=inst_id,

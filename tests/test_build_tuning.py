@@ -93,6 +93,7 @@ def _armor(
     *,
     item_hash: int = T5_ARMOR_HASH,
     tuning: int | None = None,
+    legal: tuple[int, ...] | None = None,
 ) -> Armor:
     rounded = {name: values.get(name, 0) for name in STAT_NAMES}
     return Armor(
@@ -104,7 +105,8 @@ def _armor(
         armor_system="armor_3",
         gear_tier=5,
         tuning_mod_hash=tuning,
-        tuning_option_hashes=_all_tuning_hashes(),
+        # `legal=None` = 夹具不模拟组件 310，显式声明"全部允许"；真机那份逐件清单用 legal 传
+        tuning_option_hashes=_all_tuning_hashes() if legal is None else legal,
     )
 
 
@@ -577,14 +579,14 @@ def test_pick_and_rescue_verifies_only_the_top_k(monkeypatch) -> None:
     ), "排序要按残差从小到大，复核只做最值得的前 K 套"
 
 
-def test_tuning_plan_flags_but_never_ships_plugs_as_writable_mods() -> None:
-    """两条不变量（实机语料第 ⑩ 行抓到的回归）：
+def test_tuning_plan_ships_only_the_tunings_the_piece_allows() -> None:
+    """调谐**能执行**之后的两条不变量：
 
     1. 靠调谐才达标的方案，`requires_tuning` 必须是 True、`tuning_changes` 必须有内容
-       （以前按"有没有插件要写"算，调谐不可写之后就恒为 False）；
-    2. `canonical_build.items[].mods` **不能**夹带调谐插件 —— 换调谐要材料、而且只能换成
-       你已经拥有的那一颗（2026-09-22 真机验证，ADR-014），本项目还没开替你写这条路，
-       写进去只会让 equip_build 失败或少做一步。
+       （以前按"有没有插件要写"算，调谐不可写那阵子恒为 False —— 实机语料第 ⑩ 行抓到的回归）；
+    2. `canonical_build.items[].mods` 里**带上这颗调谐**（执行器按插件类别找槽，调谐槽本来就是插槽），
+       但**只带这件护甲允许的**（组件 310 清单）—— 清单外的一律不进计划，
+       否则等于让 `equip_build` 去撞 1675。
     """
     from destiny_mcp.build.constraints import parse as parse_constraints
     from destiny_mcp.build.models import BuildRequest
@@ -630,7 +632,28 @@ def test_tuning_plan_flags_but_never_ships_plugs_as_writable_mods() -> None:
     top = results[0]
     assert top.requires_tuning is True
     assert top.tuning_changes and top.tuning_changes[0]["to"]["name"] == "+手雷 / -职业"
-    assert "只能换成你已经拥有的那一颗" in top.tuning_note
-    assert "只允许游戏内改" not in top.tuning_note
+    # 话术：不再是"要你进游戏手动改"，而是"确认后一起改"
+    assert "一起改" in top.tuning_note
+    assert "手动改" not in top.tuning_note
     mods = [mod for item in top.canonical_build.items for mod in item.mods]
-    assert 1922571986 not in mods, "调谐插件不许进 canonical_build 的 mods"
+    assert 1922571986 in mods, "清单允许的调谐必须进可执行计划"
+
+    # 反面：这件护甲**不允许**这颗 → 计划里不许出现它（宁可少做一步，也不撞 1675）
+    restricted = _armor("helmets", {"grenade": 50, "weapons": 40}, legal=(EMPTY_TUNING_PLUG_HASH,))
+    restricted_set = _set_from([restricted, *armors[1:]])
+    restricted_context = ResultContext(
+        parsed=parsed,
+        request=BuildRequest(character_class="hunter", grenade_target=55),
+        manifest=manifest,
+        class_type="hunter",
+        snapshot_version="test",
+        bonus_vector=[0] * 6,
+        tuning={(("inst-chests", "inst-class_items", "inst-gauntlets", "inst-helmets", "inst-legs")): plan},
+    )
+
+    restricted_top = build_results([restricted_set], restricted_context)[0]
+    restricted_mods = [
+        mod for item in restricted_top.canonical_build.items for mod in item.mods
+    ]
+    assert 1922571986 not in restricted_mods, "清单外的调谐不许进计划"
+    assert restricted_top.requires_tuning is True, "方案本身仍然标着「要改调谐才达标」"
