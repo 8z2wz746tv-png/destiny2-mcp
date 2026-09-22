@@ -550,9 +550,7 @@ def _rebuild(verified: ProcessArmorSet, arms: Sequence[Armor]) -> ProcessArmorSe
         bonus_stats=list(verified.bonus_stats),
         stat_mods=list(verified.stat_mods),
         stat_mod_assignments=dict(verified.stat_mod_assignments),
-        enabled_stats_total=verified.enabled_stats_total,
-        stats_total=verified.stats_total,
-        stat_mix=verified.stat_mix,
+        rank_key=verified.rank_key,
         power=verified.power,
     )
 

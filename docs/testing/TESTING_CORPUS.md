@@ -380,6 +380,8 @@
 | --- | --- | --- |
 | ⭐ 照社区配装的六维来一套 | `build_assistant(intent="find")` 带模板硬约束（猎人 武器150/职业100/超能80/近战70/手雷70 + 金装 快速装弹松身裤） | 0.1.6 起**有解**：5 套候选、每套 `requires_tuning=true` 且只改 1 件调谐就达标（这条以前是"无解"的样板，现在是调谐补齐的核心实机证据） |
 | 真的配不出来时告诉我差在哪 | 同上，但把生命值推到 `health_target=200` | 0 候选 + `ladder`：`shortfall`、`ceiling`（**同一套约束下同时能达到**的上限，实采）、`trials`、`suggestion`，以及 `verdict.satisfiable=false`（按**原始优先级**实测 0 候选；并说明 ceiling 是逐项最大值、trials 里 ok=true 的档是换了优先级之后的解） |
+| 高优先达标 vs 低优先达标 | `intent="find"`，武器高优先、下限 武器100/生命100 | 必须选**武器达标那套**（`[武器100/生命80]` 赢 `[武器90/生命100]`）—— 这是 d2-armor-solver 公开自查里的反例，老口径（按总偏差）会选错。判据：① 第一位是「有没有规则没满足」的布尔；② 每个优先项各一层，先看达没达、再看差多少；③ 普通层先比未达标个数、再比缺口 |
+| 排序是不是加权分 | 同上，改 `score` 不该改顺序 | 顺序只由 `build/ranking.goodness_key` 决定；`score` 只剩展示含义（**封顶后的六维总和**，超上限部分不计） |
 | 属性上限（"别超过 100"） | `intent="find"` + `stat_caps={"super_stat": 100}` | 上限是**软**约束：超了照样出解，但在结果的 `max_violations` 里逐项标注（`{stat,label,actual,max}`）、排到没超上限的方案后面，并且求解器不再往那一项堆模组。**不传 = 不限**（不许悄悄按 100 截断）；上限键不认识、或上限低于下限 → `build_validation_error` |
 | 这套护甲每项最多能到多少 | `intent="find"` 的 `data.reachable` | 逐项给"已验证能到"的值 + `reachable_note`：**保守下界**（模组按 5/10 加减，实际可能更高）且**逐项可达 ≠ 同时达到**；真机实测手雷报 120 而把下限写成 130 时确实到 130 |
 | 0 候选时凭什么说"配不出来" | `build_assistant(intent="find")` 跑到 0 候选（如把生命值推到 200） | 响应必须**自证枚举完了**：`summary` 写「枚举完了，没有任何一套能满足这些下限（枚举了 N 套组合）」、`data.search = {exhaustive: true, combos: N, truncated_by: null}`；`ladder.verdict.satisfiable=false`。**没搜完时（`exhaustive=false`）必须是 `satisfiable=null` + 「这次没搜完」**，不许把预算/配额截断写成不可行（P1 守门见 `tests/test_build_budget_honesty.py`） |

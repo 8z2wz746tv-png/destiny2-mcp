@@ -13,6 +13,23 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：候选排序口径统一（**破坏性**，见计划文档决定 2）
+
+求解器内部堆、展示排序、`score` 以前是**三套口径**，现在只有一套
+（`build/ranking.goodness_key`：布尔违规位 → 每个优先项一层「先达没达、再差多少」→
+普通层「先个数、再缺口」→ 优先级值 → 封顶总和）。**候选顺序会变**。
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 排序键 | 求解器堆：优先级字典序；展示：`completion_rate` 打头 → 优先级 → 加权总分 | 三处**共用**同一把键 |
+| `score` 的含义 | 加权总分（达标率×1000 + 六维总和×0.1 − **超出目标每点×0.5**） | **封顶后的六维总和**（超上限部分不计）；**不再是排序键** |
+| 「多堆 10 点手雷」 | 在评分里是负收益（浪费惩罚） | 不影响达标判定；达标之后按优先级"越高越好" |
+| 超上限 | 无概念 | 与「没达下限」同级：掉到不违规的方案后面 |
+| `completion_rate` | 排序第一键 | 只作展示 |
+
+`BuildResult.score` 的**数值会整体变化**（量级从"1000+ 的加权分"变成"200~1200 的总和"）。
+只把它当"越大越好"读的调用方不受影响；把绝对值当阈值的要改。
+
 ## 未发布：`build_assistant` 新增 `stat_caps`（属性上限）与 `data.reachable`（可达区间）
 
 求解类 intent（`recommend`/`find`/`analyze`/`farm_target`）新增参数 `stat_caps`：

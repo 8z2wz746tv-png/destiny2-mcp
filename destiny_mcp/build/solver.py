@@ -36,7 +36,8 @@ from .process_utils import (
     precalculate_structures,
     update_max_stats,
 )
-from .set_tracker import HeapEntry, HeapSetTracker, encode_stat_mix
+from .ranking import goodness_key
+from .set_tracker import HeapEntry, HeapSetTracker
 
 logger = get_logger(__name__)
 
@@ -44,23 +45,6 @@ logger = get_logger(__name__)
 RETURNED_ARMOR_SETS = 200
 _STAT_RANK_BASE = MAX_STAT + 1
 _TOTAL_STAT_RANK_BASE = MAX_STAT * 6 + 1
-
-
-def _ranking_metric(
-    stats: list[int],
-    priority_indices: list[int],
-    optimistic_bonus: int = 0,
-) -> int:
-    """Encode strict priority order, then total stats, into one heap key."""
-    if not priority_indices:
-        return sum(stats) + optimistic_bonus
-
-    metric = 0
-    for index in priority_indices:
-        value = min(MAX_STAT, stats[index] + optimistic_bonus)
-        metric = metric * _STAT_RANK_BASE + value
-    total = min(MAX_STAT * 6, sum(stats) + optimistic_bonus)
-    return metric * _TOTAL_STAT_RANK_BASE + total
 
 
 def _snapshot_auto_mod_data(snapshot: InventorySnapshot) -> AutoModData:
@@ -373,8 +357,7 @@ def validate_fixed_process_items(
         bonus_stats=bonus_stats,
         stat_mods=mod_hashes,
         stat_mod_assignments=assignments,
-        enabled_stats_total=_ranking_metric(final_stats, context.priority_indices),
-        stats_total=sum(stats),
+        rank_key=goodness_key(final_stats, context.constraints),
     )
 
 
@@ -512,7 +495,6 @@ def solve(
     bonus_vector = context.bonus_vector
     desired_min = context.desired_min
     desired_max = context.desired_max
-    priority_indices = context.priority_indices
     info = context.info
 
     # ── Build tracker ──────────────────────────────────────────────────
@@ -606,21 +588,13 @@ def solve(
 
                         armor = [helm, gaunt, chest, leg, class_item]
 
-                        # This deliberately overestimates every priority so the
-                        # top-N prune cannot discard a lexicographically better set.
-                        opt_total = _ranking_metric(
-                            stats,
-                            priority_indices,
-                            optimistic_bonus=max_mod_bonus,
+                        # 乐观键：规则维度按"缺口还能靠模组补上"算（上限例外，见 `gap_vector`），
+                        # 偏好维度加上"这套最多还能再涨多少"。乐观键的每一项都不比真实键差，
+                        # 所以拿它剪枝是保守的 —— 只会少剪，不会把还能更好的方案剪掉。
+                        opt_key = goodness_key(
+                            stats, constraints, span=max_mod_bonus
                         )
-                        # 保守版本：只有"这套光靠词条就已经超上限"时才置 0（模组只会加不会减，
-                        # 所以这种组合永远不可能不超）。其余一律按 1 算 —— 宁可多算，
-                        # 也不能把一套其实没超上限的方案剪掉（P1 的纪律）。
-                        opt_caps_ok = 0 if any(
-                            desired_max[i] > 0 and stats[i] > desired_max[i]
-                            for i in range(6)
-                        ) else 1
-                        if not tracker.could_insert(opt_caps_ok, opt_total):
+                        if not tracker.could_insert(opt_key):
                             continue
 
                         fixed_result = validate_fixed_process_items(armor, context)
@@ -646,21 +620,9 @@ def solve(
                         ]
 
                         # ── Final prune and insertion ────────────────────
-                        priority_weighted_total = _ranking_metric(
-                            final_stats,
-                            priority_indices,
-                        )
-                        # `desired_max` 同时承担两件事：模组不再往超上限的属性上加
-                        # （见 prepare_fixed_set_context），以及这里的排序位。
-                        caps_ok = 0 if any(
-                            desired_max[i] > 0 and final_stats[i] > desired_max[i]
-                            for i in range(6)
-                        ) else 1
-                        if not tracker.could_insert(caps_ok, priority_weighted_total):
+                        rank_key = goodness_key(final_stats, constraints)
+                        if not tracker.could_insert(rank_key):
                             continue
-
-                        # ── Encode stat mix and insert ─────────────────
-                        stat_mix = encode_stat_mix(final_stats, desired_max)
 
                         # Store both Armor objects (for output) and ProcessItems (for reference)
                         original_armor = [
@@ -672,10 +634,7 @@ def solve(
                         ]
 
                         tracker.insert(HeapEntry(
-                            caps_ok=caps_ok,
-                            enabled_stats_total=priority_weighted_total,
-                            stat_mix=stat_mix,
-                            stats_total=sum(stats),
+                            rank_key=rank_key,
                             power=sum(a.power for a in armor if a.power > 0) // 5,
                             armor=original_armor,
                             stats=stats,
@@ -697,9 +656,7 @@ def solve(
             bonus_stats=entry.bonus_stats,
             stat_mods=entry.stat_mods,
             stat_mod_assignments=entry.stat_mod_assignments,
-            enabled_stats_total=entry.enabled_stats_total,
-            stats_total=entry.stats_total,
-            stat_mix=entry.stat_mix,
+            rank_key=entry.rank_key,
             power=entry.power,
         )
         for entry in tracker.get_armor_sets()

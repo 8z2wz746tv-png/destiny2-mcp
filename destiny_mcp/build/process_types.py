@@ -132,9 +132,10 @@ class ProcessArmorSet:
     bonus_stats: list[int] = field(default_factory=list)
     stat_mods: list[int] = field(default_factory=list)
     stat_mod_assignments: dict[str, list[int]] = field(default_factory=dict)
-    enabled_stats_total: int = 0
-    stats_total: int = 0
-    stat_mix: int = 0
+    #: 排序键（`build/ranking.goodness_key`），搜索/剪枝/候选保留/展示**同一处**生成。
+    #: 以前这里是三个各自为政的字段（enabled_stats_total / stat_mix / stats_total），
+    #: 外面还有一套加权总分和 `completion_rate` 打头的展示排序 —— 三套口径互相打架。
+    rank_key: tuple[int, ...] = ()
     power: int = 0
 
 

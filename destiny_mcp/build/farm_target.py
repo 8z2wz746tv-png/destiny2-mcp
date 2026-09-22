@@ -35,6 +35,7 @@ from .models import (
     BuildConstraints,
     InventorySnapshot,
 )
+from .ranking import priority_desc
 from .process_types import (
     ARTIFICE_STAT_BOOST,
     MAJOR_STAT_BOOST,
@@ -402,11 +403,8 @@ def _ordered_relevant_virtual_rolls(
     return sorted(
         representatives.values(),
         key=lambda roll: (
-            -sum(
-                min(deficits[index], roll.projected[index])
-                for index in relevant_indices
-            ),
-            *(-roll.projected[index] for index in context.priority_indices),
+            -sum(min(deficits[i], roll.projected[i]) for i in relevant_indices),
+            *priority_desc(list(roll.projected), context.constraints),
             _roll_choice_key(roll),
         ),
     )
@@ -429,9 +427,9 @@ def _baseline_priority_key(
     state: _BaselineState,
     context: FixedSetEvaluationContext,
 ) -> tuple:
-    return (
-        *(state.stats[index] for index in context.priority_indices),
-        *(state.stats[index] for index in range(len(STAT_NAMES))),
+    return (  # 升序 key + reverse=True，与共享口径同源
+        *priority_desc(list(state.stats), context.constraints),
+        *(-state.stats[index] for index in range(len(STAT_NAMES))),
     )
 
 
@@ -596,7 +594,8 @@ def _plan_sort_key(
         for index in range(len(STAT_NAMES))
     )
     return (
-        *(-final[index] for index in context.priority_indices),
+        # 属性那一段来自共享口径；中间插的调谐数/越界点数是本模块自己的刷取成本
+        *priority_desc(list(final), context.constraints),
         sum(
             _tuning_rank(piece.tuning_hash, piece.tuning_name)
             for piece in plan.pieces
@@ -797,9 +796,8 @@ def _inventory_candidate_order_key(
     context: FixedSetEvaluationContext,
 ) -> tuple:
     stats = tuple(armor.stats.get(stat_name) for stat_name in STAT_NAMES)
-    priority = tuple(-stats[index] for index in context.priority_indices)
-    return (
-        *priority,
+    return (  # 属性偏好走共享口径，别在这里再抄一遍"按优先级降序"
+        *priority_desc(list(stats), context.constraints),
         -sum(stats),
         -max(0, int(armor.energy_capacity or 0)),
         -int(armor.is_artifice),
@@ -1193,7 +1191,7 @@ def _farm_sort_key(
     locked_items: tuple[tuple[str, str], ...],
     context: FixedSetEvaluationContext,
 ) -> tuple:
-    priority = tuple(-final[index] for index in context.priority_indices)
+    priority = priority_desc(list(final), context.constraints)
     target_excess = sum(
         max(0, final[index] - context.constraints.as_vector()[index])
         for index in range(len(STAT_NAMES))

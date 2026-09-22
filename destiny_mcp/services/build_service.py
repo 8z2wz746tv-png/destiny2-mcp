@@ -41,6 +41,7 @@ from ..models import Loadout, LoadoutSubclassConfig
 from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
 from ..build.process_types import SearchDiagnostics
+from ..build.ranking import rank_results
 from .build_tuning import solve_with_tuning
 from .build_results import (
     LOADOUT_SLOT_NAMES as _LOADOUT_SLOT_NAMES,
@@ -602,21 +603,11 @@ class BuildService:
             ),
         )
 
-        priority_indices = parsed.ordered_priority_indices
-        if priority_indices:
-            results.sort(
-                key=lambda result: (
-                    result.completion_rate,
-                    *(
-                        result.build.stat(STAT_NAMES[index])
-                        for index in priority_indices
-                    ),
-                    result.score,
-                ),
-                reverse=True,
-            )
-        else:
-            results.sort(key=lambda result: result.score, reverse=True)
+        # 展示排序与**求解器内部**共用同一个比较器（`build/ranking.rank_results`）。
+        # 以前这里是第三套口径：`completion_rate` 打头、再按优先级、最后才是加权总分 ——
+        # 而求解器堆里用的是另一套字典序，`score` 又是第三套。三套口径必然互相打架，
+        # "超一点就扣分"就是加权那套写出来的。
+        results = rank_results(results, parsed)
 
         for result in results:
             if result.canonical_build:
