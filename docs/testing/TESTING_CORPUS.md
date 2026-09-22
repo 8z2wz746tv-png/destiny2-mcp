@@ -8,7 +8,7 @@
 | 层 | 跑什么 | 什么时候跑 |
 | --- | --- | --- |
 | **L1 自动化**（不需要账号） | `pytest -q`（1272 条）／`scripts/verify_mcp.py`／`tests/agent_behavior_cases.yaml`（路由） | 每次提交 |
-| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 25 行）／**
+| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 25 行）／`scripts/run_corpus_starside_entities.py`（Starside 实体层 8 行，见文末那一章）／**
 - `scripts/run_corpus_pvp_rows.py` —— PvP/生涯**口径**的真机语料（19 行，冷启约 1 分钟）：游戏内 ID、生涯三档（现存/已删/账号级）、计数器 124,495、试炼/铁旗/赛季、`period=season` 如实失败、武器榜 `all_modes`、模式词表外报错、equip 只给计划、**PGCR 参与者名一律游戏内 ID**、**排行榜空响应如实上报**、**PvP 武器榜（`pvp_weapons`）的窗口/口径/模式过滤与智谋 PvPvE 标记**、**PvE 模式词被拒**、**`count=0` 与不传等价（哨兵规则）**。
    真机提示：这批行会真的打上游，偶发上游读抖动（profile 类读失败）会让个别行红；先重跑一次再判断是不是回归 —— 连续两次红才是回归。盯的是**口径**，信封与形状仍归 `run_corpus_all_rows.py`。
 `scripts/run_corpus_all_rows.py`（八工具面全 intent + 字段级 + 协议层，见 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)）**／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线） | 改动任一工具面后 |
@@ -474,3 +474,25 @@
 | 工具面与 profile（8 个聚合工具、老工具隐藏） | `test_tool_profiles.py` |
 | skill 文档与代码一致（intent 覆盖、参数表逐字一致） | `test_skill_contracts.py`、`test_skill_install.py` |
 | 社区资料/配装匹配等消费者回归 | `test_starside_integration.py`、`test_tool_simulation.py` |
+
+---
+
+## Starside 实体层（数据层语料，8 行）
+
+数据是 Starside 作者给的新归档（`data/starside/entities/*.json`，见
+[STARSIDE_ENTITY_PLAN.md](../plans/STARSIDE_ENTITY_PLAN.md)）。P0 只入库、**不改任何响应**，所以这一章跑的是
+**数据层**的真机语料：`scripts/run_corpus_starside_entities.py`（需要 OAuth + 本地 Manifest）。
+它拿账号里真实的武器与模组去查实体层，并打印"P1 接入后会长的样子"供人眼核对。
+
+| 行 | 验收点 | 最近一次实跑（2026-09-23） |
+| --- | --- | --- |
+| ① 出处元数据 | `source`/`unofficial`/`snapshot_at`/`authors`/`sha256` 齐全 | 快照 2026-09-21、作者 Aegis+LGpig、4,483 物品 / 2,676 perk |
+| ② 我账号的命中率 | 账号里的武器能在实体层查到，且要有带作者推荐的 | 500 把全中（100%），其中 Aegis 189 把、LGpig 72 把 |
+| ③ Aegis 字段与 perk 名 | 评级在 S–F、有理由与选定栏位；推荐里的 perk 名我们查得到（≥90%） | 294 个名里 7 个查不到（2.4%，如「B 计划」「Häkke 突入武装」）→ P1 必须"原样保留 + 留痕" |
+| ④ LGpig 数值可解析 | 分场景评级；`{num\|…}`/`∞` 解包后是数值；只写解释没评级算合法 | 有评级 38 把、无评级 2 把、数值异常 0 |
+| ⑤ 武器→框架→帧表 | `derived.archetype` join 帧级 DPS 表，关键键齐全 | 326/500 把能 join，帧表 40 个键 |
+| ⑥ 闭环 | 推荐 perk 名 → plug 物品 → `perks[].perkHash`（**sandbox perk**）→ 反查哪些枪有它 | 592/925 走通。**关键区分**：`manifest.search` 给的是 plug 物品 hash，而 `onItems` 在 sandbox perk 空间 —— 拿 plug hash 直接查闭环率 0% |
+| ⑦ 神器关联 | 本季神器的模组能指到神器（以覆盖率为准，缺口要在响应里说明） | 本季「好奇之器」35 个模组 → 归档指到 21 个（60%） |
+| ⑧ 缺值行为 | 未知 hash 一律 `None`/空，不编也不炸 | item/perk/反查/帧表/神器 五条查询都返回空 |
+
+退出码 0 = 8 行成立；非 0 看不成立的行（FAL 行的判定依据会写清是数据缺口还是检查过期）。
