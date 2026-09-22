@@ -551,6 +551,8 @@ def apply_local_tuning(
     snapshot: Any,
     constraints: BuildConstraints,
     manifest: Any,
+    *,
+    top_n: int = 5,
 ) -> tuple[list[ProcessArmorSet], dict[tuple[str, ...], TuningPlan]]:
     """把**免费的调谐额度**在一池候选上吃干净（有解时走的便宜路）。
 
@@ -563,12 +565,30 @@ def apply_local_tuning(
     if not pool:
         return pool, tuning_map
     context = prepare_fixed_set_context(snapshot, constraints)
-    improved = improve_pool_with_local_tuning(pool, context, manifest)
+    # ── 成本护栏：只吃"有机会被返回"的那一段 ────────────────────────────────
+    # 内核一次会交回整整一池（`RETURNED_ARMOR_SETS` = 200 套），而用户看到的只有 `top_n` 套。
+    # 逐套跑贪心的代价实测是 **60–120 秒**（titan 那条：内核实测 8s，端到端 130s）——
+    # 也就是说这一趟比枚举本身贵一个数量级。窗口按当前 `rank_key` 取前 K 套，
+    # K = max(2 × top_n, 10)：调谐提升的幅度有上界（每件几十点），窗口外的套要挤进
+    # 前 top_n 得先跨过整个窗口，这不是证明、是**有意的成本取舍**（数字见计划文档 P5 记录）。
+    window = max(top_n * 2, 10)
     plans = dict(tuning_map)
-    for armor_set, plan in improved:
-        if plan.changes:
+    if len(pool) <= window:
+        pairs = improve_pool_with_local_tuning(pool, context, manifest)
+    else:
+        head_index = sorted(
+            range(len(pool)), key=lambda index: pool[index].rank_key, reverse=True
+        )[:window]
+        improved_head = improve_pool_with_local_tuning(
+            [pool[index] for index in head_index], context, manifest
+        )
+        pairs = [(armor_set, None) for armor_set in pool]
+        for slot, index in enumerate(head_index):
+            pairs[index] = improved_head[slot]
+    for armor_set, plan in pairs:
+        if plan is not None and plan.changes:
             plans[set_key(armor_set.armor)] = plan
-    return [armor_set for armor_set, _ in improved], plans
+    return [armor_set for armor_set, _ in pairs], plans
 
 
 @dataclass(frozen=True)

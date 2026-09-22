@@ -580,7 +580,7 @@ class BuildService:
         # P4 便宜路径：达标之后把免费的调谐额度吃干净（0 能量、+5/−5）。局部搜索、每步过权威复核；
         # 只对进池的候选做，所以**不是全局最优的证明**（边界写在 build/tuning.local_tuning_improvement）。
         pool, tuning_map = apply_local_tuning(
-            pool, tuning_map, snapshot, parsed, self._manifest
+            pool, tuning_map, snapshot, parsed, self._manifest, top_n=parsed.top_n
         )
         if diagnostics is not None:
             diagnostics.append(SearchDiagnostics(

@@ -36,7 +36,7 @@ from .process_utils import (
     precalculate_structures,
     update_max_stats,
 )
-from .ranking import goodness_key
+from .ranking import goodness_key, vectors_for
 from .set_tracker import HeapEntry, HeapSetTracker
 
 logger = get_logger(__name__)
@@ -499,6 +499,10 @@ def solve(
 
     # ── Build tracker ──────────────────────────────────────────────────
     tracker = HeapSetTracker(returned_sets or RETURNED_ARMOR_SETS)
+    # 排序用的派生向量**只在这里算一次**：下面是最内层循环，按组合调用的
+    # `goodness_key` 如果每次都去读 pydantic 约束，实测能占掉整个内核的大头
+    # （628 万组合那条用例：光 `max_vector()` 就被调 857 万次、36 秒）。见 ranking.py。
+    rank_vectors = vectors_for(constraints)
 
     # 逐项可达上限（"其余属性仍满足下限时这一项单独能到多少"）。
     # 以前这里叫 `stat_ranges`，形状是 `[[MAX_STAT, 0]] * 6` 且只有 [1] 被写 —— [0] 永远留着
@@ -592,7 +596,7 @@ def solve(
                         # 偏好维度加上"这套最多还能再涨多少"。乐观键的每一项都不比真实键差，
                         # 所以拿它剪枝是保守的 —— 只会少剪，不会把还能更好的方案剪掉。
                         opt_key = goodness_key(
-                            stats, constraints, span=max_mod_bonus
+                            stats, constraints, span=max_mod_bonus, vectors=rank_vectors
                         )
                         if not tracker.could_insert(opt_key):
                             continue
@@ -620,7 +624,9 @@ def solve(
                         ]
 
                         # ── Final prune and insertion ────────────────────
-                        rank_key = goodness_key(final_stats, constraints)
+                        rank_key = goodness_key(
+                            final_stats, constraints, vectors=rank_vectors
+                        )
                         if not tracker.could_insert(rank_key):
                             continue
 
