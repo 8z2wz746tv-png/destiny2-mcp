@@ -384,6 +384,8 @@
 | 排序是不是加权分 | 同上，改 `score` 不该改顺序 | 顺序只由 `build/ranking.goodness_key` 决定；`score` 只剩展示含义（**封顶后的六维总和**，超上限部分不计） |
 | 属性上限（"别超过 100"） | `intent="find"` + `stat_caps={"super_stat": 100}` | 上限是**软**约束：超了照样出解，但在结果的 `max_violations` 里逐项标注（`{stat,label,actual,max}`）、排到没超上限的方案后面，并且求解器不再往那一项堆模组。**不传 = 不限**（不许悄悄按 100 截断）；上限键不认识、或上限低于下限 → `build_validation_error` |
 | 这套护甲每项最多能到多少 | `intent="find"` 的 `data.reachable` | 逐项给"已验证能到"的值 + `reachable_note`：**保守下界**（模组按 5/10 加减，实际可能更高）且**逐项可达 ≠ 同时达到**；真机实测手雷报 120 而把下限写成 130 时确实到 130 |
+| ⭐ 达标之后还能不能更高 | 上面那条猎人模板，或术士 `find`（手雷下限 100、超能上限 100） | P4 起**默认**就在候选池上做单件调谐邻域贪心（每一步都过权威复核）：真机术士那套手雷 **120 → 145**、超能 110 → **95**（不超上限），端到端 9.2s → 17.6s。只报**净改动**（每件一条：原样 → 最终样），不报贪心中间步；`requires_tuning=true` 时 `canonical_build` 仍**不含**调谐插件 |
+| 我什么都没要求，别动我的调谐 | `intent="find"` 不带任何目标/优先级 | 没有目标也没有优先级时**不动调谐**（唯一还能提升的只剩排序键最后那位封顶总和，为 +6 让用户改 5 件不是他要的）；守门见 `tests/test_build_local_tuning.py` |
 | 0 候选时凭什么说"配不出来" | `build_assistant(intent="find")` 跑到 0 候选（如把生命值推到 200） | 响应必须**自证枚举完了**：`summary` 写「枚举完了，没有任何一套能满足这些下限（枚举了 N 套组合）」、`data.search = {exhaustive: true, combos: N, truncated_by: null}`；`ladder.verdict.satisfiable=false`。**没搜完时（`exhaustive=false`）必须是 `satisfiable=null` + 「这次没搜完」**，不许把预算/配额截断写成不可行（P1 守门见 `tests/test_build_budget_honesty.py`） |
 | 这个"上限"是什么上限 | `ladder.single_stat_ceiling` | 那是**单项**上限（把点全堆一项）；拿它当"同时能达到"会得出"你什么都够"。两个字段都在，回答时不能混 |
 | 只差几点，非降目标不可吗 | `ladder.tuning_first` + `find` 的 `tuning_changes` | 求解器**真的试过调谐**（没达标时用调谐额度复解 + 逐套精确复核）：能补的直接给带 `tuning_changes` 的候选（`requires_tuning=true`）；补不上时这一档如实分三种口径（额度够但让不出来 / 额度不够 / 只差 ≤10 看属性模组），并带 `solver_attempted` |

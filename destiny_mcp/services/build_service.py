@@ -42,7 +42,7 @@ from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
 from ..build.process_types import SearchDiagnostics
 from ..build.ranking import rank_results
-from .build_tuning import solve_with_tuning
+from .build_tuning import apply_local_tuning, solve_with_tuning
 from .build_results import (
     LOADOUT_SLOT_NAMES as _LOADOUT_SLOT_NAMES,
     ResultContext,
@@ -577,6 +577,11 @@ class BuildService:
         # 没达标才用调谐额度复解一遍（把"差 5 点"变成可执行方案）并逐套精确复核。
         solved = await solve_with_tuning(self._compute, snapshot, parsed, self._manifest)
         pool, tuning_map = solved.pool, solved.tuning_map
+        # P4 便宜路径：达标之后把免费的调谐额度吃干净（0 能量、+5/−5）。局部搜索、每步过权威复核；
+        # 只对进池的候选做，所以**不是全局最优的证明**（边界写在 build/tuning.local_tuning_improvement）。
+        pool, tuning_map = apply_local_tuning(
+            pool, tuning_map, snapshot, parsed, self._manifest
+        )
         if diagnostics is not None:
             diagnostics.append(SearchDiagnostics(
                 coverage=solved.coverage, reachable_ceilings=solved.reachable_ceilings

@@ -1,0 +1,105 @@
+{
+  "label": "p4-after",
+  "sourceRoot": "/Users/husky/项目/destiny2-mcp",
+  "destinyMcpFile": "/Users/husky/项目/destiny2-mcp/destiny_mcp/__init__.py",
+  "trials": 1,
+  "heavy": true,
+  "rows": [
+    {
+      "case": "hunter_priority_set",
+      "character": "hunter",
+      "request": {
+        "exotic_name": "快速装弹松身裤",
+        "weapons_target": 150,
+        "class_target": 100,
+        "super_target": 80,
+        "melee_target": 70,
+        "grenade_target": 70,
+        "priority_stats": [
+          "weapons",
+          "class_stat",
+          "super_stat",
+          "melee",
+          "grenade"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 292775.8,
+        "solveMs": 759.5,
+        "combos": 75712,
+        "candidates": 2
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 292775.8,
+          "candidates": 2,
+          "topStats": {
+            "weapons": 175,
+            "health": 6,
+            "class_stat": 101,
+            "grenade": 70,
+            "super_stat": 80,
+            "melee": 71
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 759.5,
+          "combos": 75712,
+          "setsFromKernel": 0
+        }
+      ]
+    },
+    {
+      "case": "warlock_khvostov",
+      "character": "warlock",
+      "request": {
+        "exotic_name": "星火协议",
+        "set_bonus_name": "埃希恩记忆",
+        "set_bonus_count": 4,
+        "weapons_target": 100,
+        "grenade_target": 100,
+        "class_target": 70,
+        "melee_target": 70,
+        "super_target": 80,
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 17588.8,
+        "solveMs": 6143.1,
+        "combos": 3769920,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 17588.8,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 101,
+            "health": 6,
+            "class_stat": 71,
+            "grenade": 145,
+            "super_stat": 95,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 6143.1,
+          "combos": 3769920,
+          "setsFromKernel": 6
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "秒数受机器负载影响，跨机器比较无意义；有意义的只有同机 paired 对照与 combos 这类计数。",
+    "没解时对应字段是 null，不是 0。",
+    "端到端走 BuildService.find_build（含 worker 进程开销），内核是直接 solve()。"
+  ]
+}

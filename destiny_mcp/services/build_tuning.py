@@ -21,7 +21,7 @@ from dataclasses import dataclass, field, replace
 from typing import Any, Iterable, Sequence
 
 from ..build.constants import STAT_NAMES
-from ..build.models import Armor, ArmorStats, BuildConstraints
+from ..build.models import Armor, BuildConstraints
 from ..build.process_types import (
     ARTIFICE_STAT_BOOST,
     MAJOR_STAT_BOOST,
@@ -31,6 +31,8 @@ from ..build.process_types import (
 )
 from ..build.solver import prepare_fixed_set_context, validate_fixed_process_items
 from ..build.tuning import (
+    armor_with_tuning,
+    improve_pool_with_local_tuning,
     PieceTuning,
     TuningChange,
     TuningChoice,
@@ -166,18 +168,6 @@ def _mod_budget(arms: Sequence[Armor], context: Any) -> int:
     num_artifice = sum(1 for armor in arms if getattr(armor, "is_artifice", False))
     general = int(getattr(context.info, "num_available_general_mods", 0) or 0)
     return num_artifice * ARTIFICE_STAT_BOOST + general * MAJOR_STAT_BOOST
-
-
-def armor_with_tuning(armor: Armor, piece: PieceTuning, choice: TuningChoice) -> Armor:
-    """把一件护甲换成指定的调谐（属性与 tuning 字段一起改，别只改一半）。"""
-    values = piece.stats_with(choice)
-    return armor.model_copy(
-        update={
-            "stats": ArmorStats(**dict(zip(STAT_NAMES, values))),
-            "tuning_mod_hash": choice.plug_hash,
-            "tuning_name": choice.name,
-        }
-    )
 
 
 @dataclass(slots=True)
@@ -555,6 +545,32 @@ def _rebuild(verified: ProcessArmorSet, arms: Sequence[Armor]) -> ProcessArmorSe
     )
 
 
+def apply_local_tuning(
+    pool: list[ProcessArmorSet],
+    tuning_map: dict[tuple[str, ...], TuningPlan],
+    snapshot: Any,
+    constraints: BuildConstraints,
+    manifest: Any,
+) -> tuple[list[ProcessArmorSet], dict[tuple[str, ...], TuningPlan]]:
+    """把**免费的调谐额度**在一池候选上吃干净（有解时走的便宜路）。
+
+    与 `solve_with_tuning` 的分工：那个是"差得补不上"时的穷举补救（贵，只在严格解为空时走）；
+    这个是"已经达标、还想更好"时的局部提升（池子大小 × 单件选项，亚秒级）。
+    `improve_pool_with_local_tuning` 在 `build/tuning.py`，判据与补救路径相同。
+
+    放在这里的理由：`build_service.py` 卡在 901 行上限，判断逻辑按约定落服务层。
+    """
+    if not pool:
+        return pool, tuning_map
+    context = prepare_fixed_set_context(snapshot, constraints)
+    improved = improve_pool_with_local_tuning(pool, context, manifest)
+    plans = dict(tuning_map)
+    for armor_set, plan in improved:
+        if plan.changes:
+            plans[set_key(armor_set.armor)] = plan
+    return [armor_set for armor_set, _ in improved], plans
+
+
 @dataclass(frozen=True)
 class TuningOutcome:
     """一次"求解 + 调谐补救"的完整结果。
@@ -663,6 +679,7 @@ def headroom_payload(snapshot: Any, manifest: Any) -> dict[str, Any]:
 __all__ = [
     "Rescue",
     "SLOT_ATTRS",
+    "apply_local_tuning",
     "armor_with_tuning",
     "headroom_payload",
     "relax_targets",

@@ -257,6 +257,188 @@ def piece_tuning(
     )
 
 
+def armor_with_tuning(armor: Any, piece: PieceTuning, choice: TuningChoice) -> Any:
+    """把一件护甲换成指定的调谐：**属性与 tuning 字段一起改**，别只改一半。
+
+    以前这个方法在 `services/build_tuning.py`（第 3 层），于是 `build/` 里想用就用不了 ——
+    层规则挡着。它本身是纯的（只依赖 `PieceTuning` 与 `ArmorStats`），挪到这一层才对。
+    """
+    from .models import ArmorStats
+
+    return armor.model_copy(
+        update={
+            "stats": ArmorStats(**dict(zip(STAT_NAMES, piece.stats_with(choice)))),
+            "tuning_mod_hash": choice.plug_hash,
+            "tuning_name": choice.name,
+        }
+    )
+
+
+def local_tuning_improvement(
+    armor_set: Any,
+    context: Any,
+    manifest: Any,
+    *,
+    max_steps: int = 12,
+) -> tuple[Any, TuningPlan]:
+    """在"单件调谐"这个邻域里贪心提升一套**已经达标**的配装。
+
+    为什么要有它（与 `plan_tuning` 的分工）：
+
+    - `plan_tuning`：**差得补不上**时的穷举补救 —— 先放宽目标复解、再逐套复核，
+      真机实测一条请求要 200 多秒。它只在"严格解为空"那条路走。
+    - 这里：**已经达标、还想更好**时的局部提升。真机上"手雷 120 就能到 130"那 10 点
+      全在免费的调谐槽里（0 能量、+5/−5），以前没人去拿。
+
+    两件事判据**完全相同**：每一步都过 `validate_fixed_process_items`（按真实目标重新分配
+    属性模组、再逐项比六维），所以"换了调谐反而掉破另一项"的走法不会被接受。
+
+    **这是局部搜索，不是全局最优的证明** —— 只能保证"没有单件调谐替换能再改进"
+    （d2-armor-solver 对同类算法写过同一句：局部邻域完成 ≠ 全局最优）。
+    """
+    if max_steps <= 0:
+        return armor_set, TuningPlan(feasible=True, reason="没开局部调谐优化。")
+
+
+    from .process_types import ProcessArmorSet, armor_to_process_item
+    from .solver import validate_fixed_process_items
+
+    arms = list(armor_set.armor)
+    pieces: list[PieceTuning] = []
+    for armor in arms:
+        piece = piece_tuning(armor, manifest)
+        if piece is None or piece.note:
+            return armor_set, TuningPlan(feasible=True, reason="有的护甲没有可用的调谐槽。")
+        pieces.append(piece)
+    # 原件视角留着算**净改动**：贪心可能对同一件走好几步（第一步 +手雷/−生命值，
+    # 第二步发现那一项已经见底、改成 +手雷/−超能 是白拿的），中间步骤不是用户要看的
+    # —— 真机第一次跑就报了 12 条改动、实际只涉及 5 件。对外只给"从原样改成最终样"。
+    original = list(pieces)
+
+    constraints = context.constraints
+    # 用户什么都没要求时**不动他的调谐**：调谐免费，但"改 5 件"要他自己动手点。
+    # 没有目标也没有优先级时，唯一还能提升的只剩排序键最后那位"封顶总和"——
+    # 为了 +6 总点让用户改 5 件，不是他要的（真机第一次跑就出现过这个噪音）。
+    if not constraints.has_any_target and not constraints.ordered_priority_indices:
+        return armor_set, TuningPlan(feasible=True, reason="没有目标也没有优先级，不动调谐。")
+    maximums = constraints.max_vector()
+    priority_indices = constraints.ordered_priority_indices
+    changes: list[TuningChange] = []
+
+    def _evaluate(candidate_arms: Sequence[Any]) -> Any:
+        items = [armor_to_process_item(armor) for armor in candidate_arms]
+        return validate_fixed_process_items(items, context)
+
+    # 每一步都要和**当前**状态比，不能和原始状态比 —— 第一版就是拿 `armor_set.rank_key`
+    # 当基线，于是"当前已经比任何单件替换都好，但仍然优于原始"时它会继续接受更差的走法
+    # （守门测试 `test_no_single_piece_tuning_can_improve_the_result_any_further` 抓到的）。
+    current_key = armor_set.rank_key
+    for _ in range(max_steps):
+        best: tuple[tuple[int, ...], int, TuningChoice] | None = None
+        for piece_index, piece in enumerate(pieces):
+            for choice in piece.options:
+                if choice.is_noop or choice.plug_hash == piece.current.plug_hash:
+                    continue
+                delta = piece.delta_of(choice)
+                # 只试"可能变好"的方向（判据见 docs/plans/SOLVER_OPTIMALITY_PLAN.md P4）：
+                # 提升某个优先项 / 把超上限的那项降下来 / 抬高封顶总和。
+                # 一个只动非优先且都在区间内的项、又不改封顶总和的走法，
+                # 在排序键上不可能有任何一项变好 —— 跳过是**安全**的（不会漏掉改进）。
+                raises_priority = any(delta[index] > 0 for index in priority_indices)
+                # `ArmorStats` 是 pydantic 模型，`.get()` 只收一个参数 —— 用 `getattr` 取
+                # （真机上这一行抛过 TypeError：`get(name, 0)` 多给了默认值）。
+                now = [getattr(arms[piece_index].stats, name, 0) for name in STAT_NAMES]
+                fixes_cap = any(
+                    delta[index] < 0 and maximums[index] > 0 and now[index] > maximums[index]
+                    for index in range(6)
+                )
+                raises_total = any(
+                    delta[index] > 0
+                    and (maximums[index] == 0 or now[index] < maximums[index])
+                    for index in range(6)
+                )
+                if not (raises_priority or fixes_cap or raises_total):
+                    continue
+                candidate = list(arms)
+                candidate[piece_index] = armor_with_tuning(
+                    arms[piece_index], piece, choice
+                )
+                verified = _evaluate(candidate)
+                if verified is None:
+                    continue
+                if best is None or verified.rank_key > best[0]:
+                    best = (verified.rank_key, piece_index, choice)
+        if best is None or best[0] <= current_key:
+            break
+        current_key, piece_index, choice = best
+        arms[piece_index] = armor_with_tuning(arms[piece_index], pieces[piece_index], choice)
+        moved = piece_tuning(arms[piece_index], manifest)
+        if moved is not None:
+            pieces[piece_index] = moved
+
+    for index, piece in enumerate(original):
+        final_hash = _canon(int(getattr(arms[index], "tuning_mod_hash", 0) or 0))
+        if final_hash == piece.current.plug_hash:
+            continue
+        final_choice = piece.option(final_hash)
+        if final_choice is None:  # pragma: no cover - 选项来自同一个目录
+            continue
+        changes.append(TuningChange(
+            item_instance_id=piece.item_instance_id,
+            item_name=piece.name,
+            slot=piece.slot,
+            from_plug=piece.current.plug_hash,
+            from_name=piece.current.name,
+            to_plug=final_choice.plug_hash,
+            to_name=final_choice.name,
+            delta=piece.delta_of(final_choice),
+            increased=final_choice.increased,
+            decreased=final_choice.decreased,
+        ))
+
+    if not changes:
+        return armor_set, TuningPlan(feasible=True, reason="现状已经吃满了免费的调谐额度。")
+
+    verified = _evaluate(arms)
+    if verified is None:  # pragma: no cover - 每一步都验过，走不到
+        return armor_set, TuningPlan(feasible=False, reason="局部调谐优化复核失败。")
+    final = ProcessArmorSet(
+        armor=arms,
+        process_items=list(verified.process_items),
+        stats=list(verified.stats),
+        bonus_stats=list(verified.bonus_stats),
+        stat_mods=list(verified.stat_mods),
+        stat_mod_assignments=dict(verified.stat_mod_assignments),
+        rank_key=verified.rank_key,
+        power=armor_set.power,
+    )
+    delta = [0] * len(STAT_NAMES)
+    for change in changes:
+        for index, value in enumerate(change.delta):
+            delta[index] += value
+    return final, TuningPlan(
+        feasible=True, changes=tuple(changes), final_delta=tuple(delta)
+    )
+
+
+def improve_pool_with_local_tuning(
+    armor_sets: Sequence[Any],
+    context: Any,
+    manifest: Any,
+    *,
+    max_steps: int = 12,
+) -> list[tuple[Any, TuningPlan]]:
+    """对一池候选逐个做局部调谐提升，返回 `[(提升后的集合, 计划)]`（顺序不变）。
+
+    只在**有解**时跑。判据与补救路径相同（`validate_fixed_process_items`），
+    但成本是"池子大小 × 单件选项"，不是"放宽目标再解一遍 + 逐套复核"。
+    """
+    return [
+        local_tuning_improvement(armor_set, context, manifest, max_steps=max_steps)
+        for armor_set in armor_sets
+    ]
+
+
 def tuning_headroom(pieces: Iterable[PieceTuning]) -> dict[str, int]:
     """每项最多能靠调谐加多少点（把每件能给出的最大正增益加起来）。"""
     headroom = {name: 0 for name in STAT_NAMES}
@@ -630,5 +812,8 @@ __all__ = [
     "piece_tuning",
     "plan_tuning",
     "tuning_catalog",
+    "armor_with_tuning",
+    "improve_pool_with_local_tuning",
+    "local_tuning_improvement",
     "tuning_headroom",
 ]
