@@ -27,12 +27,14 @@ from __future__ import annotations
 import asyncio
 import sys
 import time
+from typing import Any
 
 from destiny_mcp.build.models import BuildRequest
 from destiny_mcp.build.process_types import SearchDiagnostics
 from destiny_mcp.bungie_client import BungieClient
 from destiny_mcp.manifest import ManifestManager
 from destiny_mcp.player_resolver import PlayerResolver
+from destiny_mcp.services import profile_components
 from destiny_mcp.services.build_service import BuildService
 from destiny_mcp.services.inventory_service import InventoryService
 from destiny_mcp.tools._helpers import resolve_player_name
@@ -66,15 +68,24 @@ SCENES: dict[str, tuple[str, dict]] = {
         ),
     ),
     "caps": (
-        "社区模板六项原样传入（手雷 100 / 生命 100 / 职业 80 / 超能 100），看上限有没有被如实报出来",
+        "社区模板六项**按区间原样**传入（生命0 近战70 手雷100~200 超能80~100 职业70~100 "
+        "武器100~200），看上限有没有被如实报出来",
         dict(
             character_class="warlock",
             exotic_name="星火协议",
+            # 下限就是模板区间的下端
             weapons_target=100,
-            health_target=100,
-            class_target=80,
+            class_target=70,
             grenade_target=100,
-            super_target=100,
+            super_target=80,
+            melee_target=70,
+            # 上限就是模板区间的上端（软约束：超了照样出解，但要被标出来）
+            stat_caps={
+                "weapons": 200,
+                "class_stat": 100,
+                "grenade": 200,
+                "super_stat": 100,
+            },
             top_n=3,
         ),
     ),
@@ -87,38 +98,64 @@ def _fmt(values: dict[str, int] | list[int]) -> str:
     return " ".join(f"{STAT_LABELS[k]}{values.get(k, 0)}" for k in STAT_ORDER)
 
 
-async def _equipped_stats(inventory: InventoryService, player: str, character: str) -> dict:
-    """现在穿着的六件总和（含调谐、不含子职业加成）—— 当"改之前"的对照。
+async def _equipped_stats(
+    inventory: InventoryService, resolver: Any, player: str, character: str
+) -> dict:
+    """**身上那五件**的六维（含调谐、不含子职业加成）—— 当"改之前"的对照。
 
-    只看**已装备**的那一套（`InventorySnapshot` 是背包全景，不是身上那套），所以按
-    `item_instance_id` 挑出装备位里的五件。
+    `InventorySnapshot` 是**背包全景**（这个账号两百多件护甲），不能直接求和 ——
+    第一版就是这么写的，打出来"武器 2727"这种一眼假的数。要按组件 200
+    （`characterEquipment`）挑出真正穿着的那五件。
     """
     snapshot = await inventory.get_armor_snapshot(player, character)
-    by_id: dict[str, tuple[str, dict, str]] = {}
+    resolved = await resolver.resolve_player(player)
+    character_id = await resolver.resolve_character_id(
+        resolved["membership_id"], resolved["membership_type"], character
+    )
+    profile = await resolver.get_profile(
+        resolved["membership_id"], resolved["membership_type"],
+        profile_components.ARMOR_SNAPSHOT,
+    )
+    equipped = {
+        str(item.get("itemInstanceId") or "")
+        for item in (
+            ((profile.get("characterEquipment") or {}).get("data") or {})
+            .get(character_id, {})
+            .get("items")
+            or []
+        )
+    }
+    pieces: list[tuple[str, dict, str]] = []
     for group in (snapshot.helmets, snapshot.gauntlets, snapshot.chests,
                   snapshot.legs, snapshot.class_items):
         for armor in group:
+            if armor.item_instance_id not in equipped:
+                continue
             row = {key: int(getattr(armor.stats, key, 0) or 0) for key in STAT_ORDER}
-            by_id[armor.item_instance_id] = (
-                armor.name, row, getattr(armor, "tuning_name", "") or ""
-            )
-    return {"pieces": list(by_id.values())}
+            pieces.append((
+                f"{armor.name}（{getattr(armor, 'slot', '?')}）",
+                row,
+                getattr(armor, "tuning_name", "") or "",
+            ))
+    return {"pieces": pieces}
 
 
 async def run_scene(build_svc: BuildService, inventory: InventoryService,
-                    player: str, scene: str) -> int:
+                    resolver: Any, player: str, scene: str) -> int:
     note, kwargs = SCENES[scene]
     character = kwargs.get("character_class", "warlock")
     print("=" * 100)
     print(f"场景 {scene}：{note}")
 
     try:
-        baseline = await _equipped_stats(inventory, player, character)
+        baseline = await _equipped_stats(inventory, resolver, player, character)
         totals = {key: 0 for key in STAT_ORDER}
         for _, row, _ in baseline["pieces"]:
             for key in STAT_ORDER:
                 totals[key] += row[key]
-        print(f"  背包里这套护甲（含调谐、不含子职业）：{_fmt(totals)}")
+        print(f"  现在穿着（护甲+调谐，**不含**属性模组与子职业）：{_fmt(totals)}")
+        for name, row, tuning in baseline["pieces"]:
+            print(f"    - {name:28s} {_fmt(row)}" + (f"  调谐: {tuning}" if tuning else ""))
     except Exception as exc:  # noqa: BLE001 - 对照读不到不该挡住主结论
         print(f"  （现装对照读不到：{type(exc).__name__}: {exc}）")
 
@@ -141,8 +178,14 @@ async def run_scene(build_svc: BuildService, inventory: InventoryService,
         if getattr(result, "max_violations", None):
             for violation in result.max_violations:
                 print(f"        超上限: {violation}")
+        for item in candidate.items:
+            stats = {key: int(getattr(item.stats, key, 0) or 0) for key in STAT_ORDER}
+            tuning = getattr(item, "tuning_name", "") or ""
+            print(f"        {getattr(item, 'slot', '?'):12s} "
+                  f"{getattr(item, 'name', '?'):16s} {_fmt(stats)}"
+                  + (f"  调谐: {tuning}" if tuning else ""))
         for change in getattr(result, "tuning_changes", None) or []:
-            print(f"        调谐: {change}")
+            print(f"        调谐改动: {change}")
 
     if diagnostics:
         diag = diagnostics[0]
@@ -181,6 +224,7 @@ async def main() -> int:
             exit_code |= await run_scene(
                 BuildService(bungie, manifest, resolver),
                 InventoryService(bungie, manifest, resolver),
+                resolver,
                 player,
                 scene,
             )

@@ -51,10 +51,17 @@ class HeapSetTracker:
         **必须是保守的**：宁可多算，也不能把本来进得来的方案挡在外面，
         所以调用方传进来的必须是**乐观键**（`goodness_key(..., span=...)`）：
         它的每一项都不比真实键差，于是"真实键能进"必然意味着"乐观键也能进"。
+
+        **边界是严格大于，不是 `>=`**（P5 修）：`insert()` 本来就是
+        `entry <= heap[0] → 拒绝`，所以**打平的候选永远进不了堆** ——
+        用 `>=` 放它们过去，只是让它们白跑一遍最贵的校验（重排属性模组 + 可达上限）。
+        真机踩过：一条"只有手雷下限 + 超能上限、没有 priority"的请求，
+        排序键区分度低、海量组合打平，内核从 8s 级涨到 **359s**；改成严格比较后
+        堆里的东西**一模一样**（进堆与否仍然由 `insert` 说了算），只是不再白算。
         """
         if len(self._heap) < self.capacity:
             return True
-        return rank_key >= self._heap[0].rank_key
+        return rank_key > self._heap[0].rank_key
 
     def insert(self, entry: HeapEntry) -> bool:
         """Insert a set into the heap.

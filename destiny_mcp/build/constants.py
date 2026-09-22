@@ -14,6 +14,13 @@ from __future__ import annotations
 # Intellect/Strength) replaced with (Weapons/Health/Class/Grenade/Melee/Super).
 # 'class' and 'super' are Python reserved words, so we use 'class_stat' and 'super_stat'.
 
+#: 单项属性的"无限"哨兵值（求解器内部用它表示"没设上限"）。
+#: 真机游戏里单项目标上限是 100，但求解器的中间计算（可达上限逐点推、乐观余量）
+#: 需要一个大到不会先撞上的数 —— 200 就是 DIM 同源的那个值。
+#: 放在这里是因为 `ranking` 与 `process_types` **都要用**，而 `constants` 是最底层。
+MAX_STAT: int = 200
+
+
 STAT_NAMES: tuple[str, ...] = (
     "weapons",
     "health",

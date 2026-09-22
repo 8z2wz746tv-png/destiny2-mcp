@@ -30,7 +30,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from .constants import STAT_NAMES
+from .constants import MAX_STAT, STAT_NAMES
 from .models import BuildConstraints
 
 #: 最多能表达 6 个优先层；多余的一律并进"普通"层（不会发生，`ordered_priority_indices` 已去重）。
@@ -178,6 +178,40 @@ def _preference_key(stats: list[int], vectors: RankingVectors) -> tuple[int, ...
     return (*values, _clamped_total(stats, vectors.maximums))
 
 
+def _optimistic_preference(
+    stats: list[int], vectors: RankingVectors, span: int
+) -> tuple[int, ...]:
+    """偏好段的**上界**：把 `span` 点预算按排序键的顺序花在最值钱的地方。
+
+    为什么不是"每一项都加 `span`"（第一版就是这么写的）：余量是一份**共享预算**，
+    把每项都加满会让上界虚高（6 项就是 6 × span），剪枝于是几乎不挡人 ——
+    真机踩过：一条"只有手雷下限 + 超能上限、没有 priority"的请求，排序键最后只剩
+    "封顶总和"这一位能区分，虚高的上界让几乎**每一个**组合都放进了最贵的校验
+    （重排属性模组 + 可达上限），内核 **355 秒**；把余量按预算分配后同一条请求回到秒级。
+
+    这个分配是**该预算下最紧的合法上界**：键是按 (优先级1, 优先级2, …, 封顶总和)
+    逐字段比的，所以"先把预算喂给靠前的优先级"就是任何可达方案的逐字段上界
+    （喂满第 i 项所需的花费是确定的，不会比别的方案多花）。守门见
+    `tests/test_build_ranking.py` 的保守性属性测试（枚举小预算下的全部组合）。
+    """
+    values = [0] * 6
+    remaining = span
+    for slot, index in enumerate(vectors.priorities):
+        if slot >= 6:
+            break
+        room = max(0, MAX_STAT - stats[index])
+        gain = room if room < remaining else remaining
+        values[slot] = stats[index] + gain
+        remaining -= gain
+    # 总和那一项：**整份预算最多把总和抬高 `span` 点**（花在优先级项上的那些点同样会
+    # 计进总和 —— 第一版把这份预算在总和上又扣了一次，于是上界小于真实键，
+    # `test_optimistic_key_is_an_upper_bound_for_every_reachable_vector` 当场抓到）。
+    base_total = _clamped_total(stats, vectors.maximums)
+    total_ceiling = sum(cap if cap > 0 else MAX_STAT for cap in vectors.maximums)
+    total = base_total + span
+    return (*values, total if total < total_ceiling else total_ceiling)
+
+
 def preference_rank(stats: list[int], constraints: BuildConstraints) -> tuple[int, ...]:
     """偏好维度：按 `priority_stats` 顺序逐个比大小，最后比**封顶后**的六维总和。
 
@@ -237,8 +271,7 @@ def goodness_key(
     vec = vectors if vectors is not None else vectors_for(constraints)
     rules = _rule_rank(stats, vec, span=span)
     if span:
-        optimistic = [stats[index] + span for index in range(len(STAT_NAMES))]
-        return (*rules, *_preference_key(optimistic, vec))
+        return (*rules, *_optimistic_preference(stats, vec, span))
     return (*rules, *_preference_key(stats, vec))
 
 

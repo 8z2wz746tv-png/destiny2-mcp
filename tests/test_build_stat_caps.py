@@ -229,10 +229,19 @@ def test_reachable_payload_carries_the_marginal_warning() -> None:
 
 
 def test_reachable_is_absent_when_not_computed() -> None:
-    """没算就不给 —— 空字典而不是一排 0（0 会被读成"顶不上去"）。"""
+    """没算就不给 —— 而不是一排 0（0 会被读成"顶不上去"）。
+
+    两档都要钉：① 空表（根本没进求解）；② **全 0 表**（进了求解但一套候选都没验证过，
+    真机 0 候选那档就是这样 —— P6 抓到的）。
+    """
     from destiny_mcp.build.process_types import ProcessResult
 
     payload = ProcessResult().diagnostics.to_dict()
 
     assert payload["reachable"] == {}
     assert payload["reachable_note"] is None
+
+    # ②：进了求解但一套候选都没验证过 → 上限表全是 0，同样不许报出去
+    all_zero = ProcessResult(combos=3, reachable_ceilings=[0] * 6).diagnostics.to_dict()
+    assert all_zero["reachable"] == {}
+    assert all_zero["reachable_note"] is None

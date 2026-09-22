@@ -177,3 +177,67 @@ def test_score_is_no_longer_a_ranking_key() -> None:
     assert score(candidate, constraints) == float(
         clamped_total([100, 0, 0, 0, 0, 150], constraints)
     )
+
+
+# ── 乐观键的保守性：剪枝靠它，错了会**悄悄丢解**（P5 补） ──────────────────
+
+
+def _reachable_vectors(stats: list[int], budget: int) -> list[list[int]]:
+    """把 `budget` 点预算分给六项的**全部**方案（每项 0..budget，总和 ≤ budget）。"""
+    out: list[list[int]] = []
+
+    def walk(index: int, left: int, current: list[int]) -> None:
+        if index == 6:
+            out.append(list(current))
+            return
+        for spend in range(left + 1):
+            current.append(stats[index] + spend)
+            walk(index + 1, left - spend, current)
+            current.pop()
+
+    walk(0, budget, [])
+    return out
+
+
+def test_optimistic_key_is_an_upper_bound_for_every_reachable_vector() -> None:
+    """`goodness_key(..., span=budget)` 必须 ≥ **任何**把预算花出去之后的真实键。
+
+    为什么值得一条单独的测试：`span` 是模组余量，剪枝用乐观键筛人 ——
+    如果上界算小了，本来能进 top-N 的方案会被悄悄丢掉，而且**不会有任何报错**。
+    第一版把 `span` 每项都加一遍（等于把一份共享预算当成六份），那是"太松"（慢但不丢解）；
+    P5 改成按排序键顺序分配预算（那是最紧的合法上界）。这条测试钉的就是"紧而不越界"。
+    """
+    stats = [40, 30, 20, 25, 15, 10]
+    shapes = [
+        BuildConstraints(),                                    # 什么都没有
+        BuildConstraints(grenade_min=100),                     # 只有下限
+        BuildConstraints(grenade_min=100, super_stat_max=100),  # 下限 + 上限（真机那条）
+        BuildConstraints(weapons_min=80, grenade_min=90,
+                         priority_stat_indices=[GRENADE, WEAPONS]),   # 带优先级
+        BuildConstraints(weapons_min=80, super_stat_max=60,
+                         priority_stat_indices=[WEAPONS, SUPER]),     # 优先级撞上限
+    ]
+    budget = 4
+    for constraints in shapes:
+        optimistic = goodness_key(stats, constraints, span=budget)
+        for reachable in _reachable_vectors(stats, budget):
+            assert optimistic >= goodness_key(reachable, constraints), (
+                f"乐观键不是上界：{constraints} 下 {reachable} 的真实键更大"
+            )
+
+
+def test_optimistic_key_is_tighter_than_adding_the_budget_to_every_stat() -> None:
+    """回归：不许退回"每项各加一份预算"的那个松上界。
+
+    真机代价：一条没有 priority 的请求（排序键只剩"封顶总和"能区分）因此把几乎每个组合
+    都放进最贵的校验，内核 **355 秒**；按预算分配之后同一条请求 64 秒。
+    """
+    constraints = BuildConstraints(grenade_min=100, super_stat_max=100)
+    stats = [40, 30, 20, 25, 15, 10]
+    budget = 30
+
+    optimistic = goodness_key(stats, constraints, span=budget)
+    loose_total = sum(min(value + budget, 200) for value in stats)
+    assert optimistic[-1] < loose_total, "封顶总和那一项又变回'每项各加一遍'了"
+    # 但也必须至少是真实键（保守）
+    assert optimistic >= goodness_key(stats, constraints)

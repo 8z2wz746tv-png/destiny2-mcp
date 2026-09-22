@@ -184,6 +184,9 @@ async def find(
         )
     # 有解时也给"每项单独能顶到多少" —— 用户说"不够极限"时，答案就在这几个数里。
     # `reachable_note` 必须一起带上：逐项可达**不等于**同一套能同时达到。
+    #
+    # "没量过就不给"这条规则在形状工厂里（`SearchDiagnostics.to_dict`：全 0 视为没量过），
+    # 这里只管照发，别在这里再判一次。
     if report and report.get("reachable"):
         payload["reachable"] = report["reachable"]
         payload["reachable_note"] = report.get("reachable_note")

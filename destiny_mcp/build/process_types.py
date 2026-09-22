@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from .constants import MAX_STAT as _MAX_STAT
 from .models import NAME_TO_STAT_HASH as _STAT_NAME_TO_HASH
 from .models import STAT_NAMES
 
@@ -20,7 +21,8 @@ ARTIFICE_STAT_BOOST: int = 3
 MINOR_STAT_BOOST: int = 5
 MAJOR_STAT_BOOST: int = 10
 
-MAX_STAT: int = 200
+# `MAX_STAT` 的唯一定义在 `constants.py`（`ranking` 也要用，而它不能反过来依赖本模块）。
+MAX_STAT: int = _MAX_STAT
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -177,9 +179,15 @@ class SearchDiagnostics:
     reachable_ceilings: list[int] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
+        # 全 0 = "这一趟没有任何候选被验证过"，也就是**没量过** —— 不许当成"哪项都到不了"。
+        # 门槛放在这里（形状的唯一出处），工具层只管照发；真机踩过：0 候选的响应里
+        # 报了一排 0，读起来像"你什么都顶不上去"（P6 记录）。
+        measured = any(self.reachable_ceilings)
         return {
             **self.coverage.to_dict(),
-            "reachable": dict(zip(STAT_NAMES, self.reachable_ceilings)),
+            "reachable": (
+                dict(zip(STAT_NAMES, self.reachable_ceilings)) if measured else {}
+            ),
             "reachable_note": (
                 "每一项都是「其余属性仍满足下限时，这一项**已验证能到**多少」。"
                 "两个都要记住：① 它是**保守下界**，不是上限 —— 模组按 5/10 加减，这一步只验证了"
@@ -187,7 +195,7 @@ class SearchDiagnostics:
                 "时确实能到 130）；② **逐项可达 ≠ 同时达到**，六个数放在一起不构成一套配装。"
                 "要真的顶上去，就把目标写成下限再加优先级。"
             )
-            if self.reachable_ceilings
+            if measured
             else None,
         }
 

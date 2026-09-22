@@ -24,6 +24,9 @@
 | `build-solver-p4-after.json` | P4 之后（heavy 两例） | 1 次；`hunter_priority_set` 292.8s、`warlock_khvostov` 手雷 **145** |
 | `build-solver-p5-after.json` | P5 全量（6 例，含两条默认用例） | 1 次；**这一份暴露了两条回归**（见下） |
 | `build-solver-p5-after-fix.json` | 修完两条回归后的默认两例 | 1 次；156.8→**45.6s**、130.3→**14.5s** |
+| `build-solver-p5-warlocks.json` | 术士两条重用例（修完回归后） | 1 次；`warlock_khvostov` 手雷 **150**（P4 是 145、P0 是 120） |
+| `build-solver-p5-grenade130-repeat.json` | `warlock_grenade_130` 重复测量 | 1 次；**235.9s**（同代码三次：218.2/333.3/235.9 —— 这条不稳，见下） |
+| `build-solver-p5-prune-fix.json` | 收紧乐观剪枝上界后的默认两例 | 1 次；与上一条同量级，top 六维一致（那条请求不是它的瓶颈） |
 
 P0 的关键结论（完整分析见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 的「P0 成本剖面」）：
 
@@ -45,3 +48,11 @@ P5 的两条性能回归（`build-solver-p5-after.json` 暴露，都已修，数
 
 **还没解决**：`hunter_priority_set`（389.8s）与 `warlock_grenade_130`（218.2s）由
 "放宽目标复解 + 逐套精确复核"主导，是现在最大的单项成本（计划文档待办第 1 条）。
+
+P6 又量出一条**只在特定形状上出现**的内核爆炸（已修）：
+
+- 请求**没有 `priority_stats`**、只有一两个下限/上限时，排序键最后只剩"封顶总和"一位能区分，
+  而乐观剪枝的上界当时把模组余量按"每项各加一遍"算（6 项 = 6 倍），于是几乎每个组合都进了
+  最贵的校验：真机内核 **355 秒**（300 秒预算直接超时）。修完 **66.3s**，top 方案一字未变。
+  守门是一条**保守性属性测试**（乐观键必须是任何可达向量的上界）——剪枝类改动必须配这种测试，
+  因为"上界算小"只会悄悄丢解，不会报错。
