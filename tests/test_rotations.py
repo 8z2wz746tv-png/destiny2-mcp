@@ -21,6 +21,8 @@ from typing import get_args
 
 import pytest
 
+from destiny_mcp.services import rotation_service
+
 from destiny_mcp.data import rotations as tables
 from destiny_mcp.exceptions import APIError
 from destiny_mcp.services.rotation_service import RotationService
@@ -213,6 +215,25 @@ async def test_nightfall_requires_the_character_activities_component() -> None:
         await service({"characterActivities": {"data": {}}}).rotations()
 
 
+@pytest.fixture
+def frozen_now(monkeypatch):
+    """把服务里的 `datetime.now()` 冻在截图那一周（`NOW`）。
+
+    为什么必须有：`rotation_service.rotations()` 自己取 `datetime.now(timezone.utc)`，
+    而周常（上维挑战/异域任务/夜幕）**每周三 01:00（北京）重置** —— 写死"本周是谁"的断言
+    过一周就红。2026-09-23 01:05 重置后当场红了 2 条（工具是对的，是断言过期）。
+    表级测试用 `NOW`，服务级测试用这个 fixture，两处同一个时刻。
+    """
+    class _FrozenDatetime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return NOW if tz is not None else NOW.replace(tzinfo=None)
+
+    monkeypatch.setattr(rotation_service, "datetime", _FrozenDatetime)
+    return NOW
+
+
+@pytest.mark.usefixtures("frozen_now")
 async def test_schedule_rows_carry_verified_metadata() -> None:
     result = await service().rotations(limit=50)
     ascendant = [r for r in result["rows"] if r["kind"] == "ascendant_challenge"]
@@ -225,7 +246,7 @@ async def test_schedule_rows_carry_verified_metadata() -> None:
     # 泉源按天在「攻击/防御」之间交替，所以**不能把"今天是哪个"写死** —— 这条断言以前写死成
     # 「防御, 攻击」，2026-09-22 一过零点就红了（判据本身没问题，是断言错了）。
     # 期望值从同一个出处现算：`wellspring_upcoming` 与响应走的是同一个函数。
-    expected = [f"泉源：{mode}" for _, mode in wellspring_upcoming(datetime.now(timezone.utc))]
+    expected = [f"泉源：{mode}" for _, mode in wellspring_upcoming(NOW)]
     assert [r["name"] for r in wellspring] == expected, "今天 + 明天"
     assert wellspring[0]["variants"] == ["标准", "专家", "大师"]
 
@@ -244,6 +265,7 @@ async def test_lost_sector_block_is_honest_about_the_missing_anchor() -> None:
 # ── 话术与载荷 ───────────────────────────────────────────────────────
 
 
+@pytest.mark.usefixtures("frozen_now")
 async def test_payload_separates_official_from_schedule() -> None:
     payload = _rotation_branches.rotations_payload(await service().rotations(limit=50))
     text = " ".join(payload["warnings"])
