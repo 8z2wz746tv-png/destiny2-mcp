@@ -228,8 +228,8 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
 | **P0** ✅ | 导入脚本 + 紧凑实体文件 + 懒加载器 + hash/覆盖守门 | 数据入库，**响应一个字不变** |
 | **P1** ✅ | 标记解析器 + `weapon_assistant(analyze)` 的社区块（Aegis/LGpig + 标签 + 机制细节） | 最想要的那条能力能用（2026-09-23 落地） |
 | **P2** ✅ | perk 层接线（`perk_description` 的注记 + `onItems` 反查 + `onSets` 套装 + 异域 PERK） | perk 详情与反查（2026-09-23 落地；`perk_pool` 未接，见文末） |
-| **P3** | 神器/碎片/模组/套装层（`artifact`/`fragment_details`/`armor_mods`/`set_bonus` + 双栏配对） | 神器关联与数值注记 |
-| **P4** | 帧级 DPS 模型（`derived.archetype` → 帧表）：给理论 MDPS/EDPS 与口径说明 | "这把枪打多少" |
+| **P3** ✅ | 神器/模组/套装层（`artifact`/`armor_mods`/`set_bonus`；`fragment_details` 见文末） | 神器关联与数值注记（2026-09-23 落地） |
+| **P4** ✅ | 帧级 DPS 模型（`derived.archetype` → 帧表）：`headline` + 完整 `rows` + 口径 | "这把枪打多少"（2026-09-23 落地） |
 | **P5** | 交叉指路（文本层 ↔ 实体层）、语料行、性能实测与体积登记 | 收尾 |
 
 ---
@@ -327,3 +327,15 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
 - 守门：`tests/test_starside_markup.py::test_perk_note_renders_annotations_and_reverse_index`。
 - **`perk_pool` 暂未接**：它是"这把枪的插槽池"，与 perk 层注记不是一回事；真要接应等"按池内每颗 perk
   带注记"这个需求明确（否则一次响应会塞进几十颗 perk 的文本）。
+
+### P3 / P4 / P5 落地（2026-09-23）
+
+- **P3**：`artifact`（模组注记 + 覆盖率，**当季覆盖 21/35 明说**）、`set_bonus`（`onSets` 反查评语）、
+  `armor_mods`（前 20 条有注记的模组，附 `coverage`）。三者都带 `attribution`，缺数据给 `available=false` + `reason`。
+  `armor_mods` 顺带从贴着 1364 上限的 `assistants.py` 抽到 `tools/_armor_branches.py`（净减行）。
+- **P4**：`analyze` 的 `starside.frame` 加 `headline`（typical_mdps/typical_edps/max_mdps/boss_total/
+  minor_total/base_damage/base_interval/ammoType），`rows` 保留完整帧表，`condition` 照旧说明是站点实测口径。
+- **P5（部分）**：文档（COMPATIBILITY/CHANGELOG/计划）同步；语料行的工具级行见
+  `docs/testing/TESTING_CORPUS.md` 第 ⑨⑩ 行。**未做**：`fragment_details` 的碎片属性变化/冷却接线
+  （数据与成形都已具备，挂上去是下一步）、异域职业物品双栏配对的独立展示、`perk_pool` 的逐颗注记
+  （避免一次响应塞进几十颗 perk 全文）、以及"文本层 ↔ 实体层"的交叉指路。

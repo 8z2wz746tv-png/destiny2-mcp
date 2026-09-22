@@ -955,17 +955,7 @@ async def build_assistant(
         return ok_response("配装装备流程已执行。", {"result": _dump(result)})
 
     if intent == "armor_mods":
-        # match 一起返回：词表外的词（如"速度"）会靠名字/描述子串蒙中一批模组，
-        # 光看 mods 分不出"按属性筛的"和"只在描述里出现过的"。
-        picked = svc["manifest"].get_armor_mods_filtered(
-            slot="", category="all", stat=priority_stat or ""
-        )
-        warning = picked["match"].get("warning")
-        return ok_response(
-            "已读取护甲模组。",
-            {"mods": picked["mods"], "match": picked["match"]},
-            warnings=[warning] if warning else None,
-        )
+        return armor_branches.armor_mods(svc, priority_stat)
 
     if intent == "exotic_armor":
         return armor_branches.exotic_armor(svc, character, exotic_name)

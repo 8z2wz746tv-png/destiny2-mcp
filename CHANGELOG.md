@@ -4,6 +4,14 @@
 
 ## 未发布
 
+**新增：神器/套装/护甲模组接入 Starside 社区层 + 帧表头条** —— 2026-09-23：
+
+- 神器：模组注记（档位/效果/实机细节/冷却）+ 覆盖率（**当季不全要明说**）。
+- 套装：`onSets` 反查到的 perk 评语；护甲模组：前 20 条有注记的模组（效果/冷却/来源）。
+- 帧级 DPS：`analyze` 的 `starside.frame.headline`（typical_mdps/typical_edps/boss_total…）与完整帧表一起给，
+  条件照旧附上。
+- 顺带：`assistants.py` 贴着 1364 上限，`armor_mods` 分支抽到 `tools/_armor_branches.py`（净减行）。
+
 **新增：`perk_description` 带 Starside 注记块（实机细节/属性变化/冷却/来源 + 套装与反查）** —— 2026-09-23：
 
 - `data.starside`：作者给的 perk 层栏目（实机细节、口语效果、属性变化（分职业）、冷却秒数与回复倍率、

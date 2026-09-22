@@ -30,6 +30,16 @@
 `BuildResult.score` 的**数值会整体变化**（量级从"1000+ 的加权分"变成"200~1200 的总和"）。
 只把它当"越大越好"读的调用方不受影响；把绝对值当阈值的要改。
 
+## 未发布：神器/套装/护甲模组也带 `starside` 块（2026-09-23，同日追加）
+
+- `subclass_assistant(intent="artifact")`：`data.starside` = 这件神器各模组的社区注记（档位/效果/实机细节/
+  冷却）+ `coverage`（**当季覆盖不全**，例如本季 35 个模组里 21 个有注记）。
+- `build_assistant(intent="set_bonus")`：`data.starside` = 这套装的 perk 评语（`onSets` 反查 + 机制说明）。
+- `build_assistant(intent="armor_mods")`：`data.starside` = 前 20 条**有社区注记**的模组（效果/冷却/来源）+
+  `coverage.annotated`/`returned_mods`（不逐条塞全文）。
+- `weapon_assistant(intent="analyze")` 的 `starside.frame` 增加 `headline`（typical_mdps/typical_edps/
+  boss_total… 与口径一起给），`rows` 仍是完整帧表。
+
 ## 未发布：`perk_description` 也带 `starside` 块（2026-09-23，同日追加）
 
 `weapon_assistant(intent="perk_description")` 的数据里多一个 `starside`：作者给的 perk 层结构化注记

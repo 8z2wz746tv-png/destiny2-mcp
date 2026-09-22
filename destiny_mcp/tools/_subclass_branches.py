@@ -17,6 +17,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..error_codes import ErrorCode
+from ..services.starside_notes import artifact_mod_notes
 from ._responses import error_response, ok_response
 
 
@@ -39,7 +40,12 @@ async def artifact_branch(
                     resolved, character
                 ),
             }
-        return ok_response("已读取赛季神器。", {"artifact": result})
+        # 社区层：这件神器的模组注记（档位/效果/实机细节/冷却）。神器模组不是背包物品，
+        # 要从我们 Manifest 的神器定义取列表再查归档；当季覆盖不全，coverage 一起给。
+        starside = artifact_mod_notes(
+            svc["starside_entities_svc"], svc["manifest"], svc["manifest"].get_current_artifact() or {}
+        )
+        return ok_response("已读取赛季神器。", {"artifact": result, "starside": starside})
 
     if intent == "artifact_mod":
         if not artifact_mod_hash:

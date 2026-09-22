@@ -135,6 +135,15 @@ class StarsideEntities:
         artifact = entry.get("site_artifact")
         return to_unsigned(int(artifact)) if artifact else None
 
+    def perks_of_set(self, set_hash: int | str) -> tuple[int, ...]:
+        """这套装（`onSets`）关联着哪些 perk —— 套装评语挂在 perk 上。"""
+        wanted = to_unsigned(int(set_hash))
+        return tuple(
+            int(perk_hash)
+            for perk_hash, entry in (self._perks_data() or {}).items()
+            if wanted in {to_unsigned(int(s)) for s in (entry.get("onSets") or [])}
+        )
+
     def authors_of(self, item_hash: int | str) -> dict[str, Any]:
         """这一件物品上的作者块（Aegis / LGpig …），没有就空字典。"""
         entry = self.item(item_hash) or {}

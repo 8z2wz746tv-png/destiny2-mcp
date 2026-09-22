@@ -9,6 +9,10 @@ from __future__ import annotations
 from typing import Any
 
 from ._enrichment import community_enrichment
+from ..services.starside_notes import (
+    perk_note,
+    set_notes,
+)
 from ._responses import confirmation_required_response, error_response, ok_response
 from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..services.armor_payload import armor_payload
@@ -123,8 +127,13 @@ def exotic_armor(svc: Any, character: str, exotic_name: str) -> dict:
 def set_bonus(svc: Any, set_bonus_name: str) -> dict:
     """套装效果列表或详情（原来在 `assistants.py` 里的分支）。"""
     if set_bonus_name:
+        found = svc["set_bonus_svc"].lookup_armor_set(set_bonus_name) or {}
+        starside = set_notes(
+            svc["starside_entities_svc"], svc["manifest"], int(found.get("hash") or 0), set_bonus_name
+        )
         return ok_response("已读取套装效果。", {
-            "set_bonus": svc["set_bonus_svc"].lookup_armor_set(set_bonus_name),
+            "set_bonus": found,
+            "starside": starside,
             "community_references": community_enrichment(
                 svc.get("starside_svc"), set_bonus_name, "armor"
             ),
@@ -134,7 +143,46 @@ def set_bonus(svc: Any, set_bonus_name: str) -> dict:
     })
 
 
-__all__ = ["armor_item", "exotic_armor", "set_bonus", "error_response"]
+def armor_mods(svc: Any, priority_stat: str) -> dict:
+    """护甲模组列表（原来在 `assistants.py` 里的分支）+ 有社区注记的那些的前若干条。
+
+    `match` 一起返回：词表外的词（如"速度"）会靠名字/描述子串蒙中一批模组，
+    光看 mods 分不出"按属性筛的"和"只在描述里出现过的"。
+    """
+    picked = svc["manifest"].get_armor_mods_filtered(slot="", category="all", stat=priority_stat or "")
+    warning = picked["match"].get("warning")
+    notes = []
+    for mod in picked["mods"]:
+        if len(notes) >= 20:  # 上限：一份列表响应不该塞进几十颗模组的全文
+            break
+        note = perk_note(svc["starside_entities_svc"], svc["manifest"], int(mod.get("hash") or 0))
+        if not note.get("available"):
+            continue
+        annotations = note.get("annotations") or {}
+        text = annotations.get("效果") or annotations.get("realgame_details")
+        cooldown = annotations.get("冷却与槽位") or annotations.get("基础冷却") or annotations.get("冷却")
+        if text or cooldown:
+            notes.append({"hash": mod.get("hash"), "name": mod.get("name"), "effect": text,
+                          "cooldown": cooldown, "source": annotations.get("来源")})
+    return ok_response(
+        "已读取护甲模组。",
+        {
+            "mods": picked["mods"],
+            "match": picked["match"],
+            "starside": {
+                "attribution": svc["starside_entities_svc"].attribution(),
+                "available": bool(notes),
+                "mods": notes,
+                "coverage": {"annotated": len(notes), "returned_mods": len(picked["mods"]),
+                             "note": "只列出有社区注记的模组，最多 20 条。"},
+                "reason": "" if notes else "这批模组没有社区注记。",
+            },
+        },
+        warnings=[warning] if warning else None,
+    )
+
+
+__all__ = ["armor_item", "armor_mods", "exotic_armor", "set_bonus", "error_response"]
 
 
 def _mod_echo(plan: dict[str, Any]) -> str:

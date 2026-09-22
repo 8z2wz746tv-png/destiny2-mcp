@@ -136,7 +136,14 @@ def weapon_note(entity: StarsideEntities, manifest: Any, item_hash: int) -> dict
 
     frames = entity.frame_stats_for_weapon(item_hash)
     if frames:
+        row = frames[0]
         block["frame"] = {
+            "headline": {
+                key: row.get(key)
+                for key in ("typical_mdps", "typical_edps", "max_mdps", "body_mdps",
+                            "boss_total", "minor_total", "base_damage", "base_interval", "ammoType")
+                if row.get(key) is not None
+            },
             "rows": [dict(row) for row in frames],
             "condition": FRAME_CONDITION,
         }
@@ -248,3 +255,70 @@ def weapon_note_from_svc(svc: Any, item_hash: int) -> dict[str, Any] | None:
 def perk_note_from_svc(svc: Any, perk_hash: int) -> dict[str, Any] | None:
     """同上，perk 层。"""
     return perk_note(svc["starside_entities_svc"], svc["manifest"], perk_hash) if perk_hash else None
+
+
+def artifact_mod_notes(entity: StarsideEntities, manifest: Any, artifact: dict[str, Any]) -> dict[str, Any]:
+    """神器 → 它那些模组的社区注记（档位/效果/实机细节/冷却），只收有社区数据的。
+
+    神器模组**不是背包物品**（真机语料踩过：拿背包查永远 0 命中），要从我们 Manifest 的神器定义里
+    取模组列表再查归档；当季覆盖不全（60%），所以 `coverage` 一起给出去。
+    """
+    names = _name_resolver(manifest)
+    mods: list[dict[str, Any]] = []
+    total = 0
+    for tier_index, tier in enumerate(artifact.get("tiers") or [], start=1):
+        for mod in tier.get("mods") or tier.get("items") or []:
+            if not isinstance(mod, dict) or not mod.get("hash"):
+                continue
+            total += 1
+            note = perk_note(entity, manifest, int(mod["hash"]))
+            if not note.get("available"):
+                continue
+            annotations = note.get("annotations") or {}
+            mods.append({
+                "tier": tier_index,
+                "hash": int(mod["hash"]),
+                "name": mod.get("name") or names(str(mod.get("name") or "")) or str(mod["hash"]),
+                "tier_label": mod.get("tier_label"),
+                "effect": annotations.get("效果") or annotations.get("realgame_details"),
+                "cooldown": annotations.get("冷却与槽位") or annotations.get("基础冷却") or annotations.get("冷却"),
+                "source": annotations.get("来源"),
+            })
+    return {
+        "attribution": entity.attribution(),
+        "available": bool(mods),
+        "mods": mods,
+        "coverage": {
+            "with_community_notes": len(mods),
+            "total_mods": total,
+            "note": "Starside 对神器模组的整理不是逐季齐全（当前归档覆盖到赛季 28）；没注记的模组不在这里。",
+        },
+        "reason": "" if mods else "这件神器的模组没有社区注记（归档未覆盖本季）。",
+    }
+
+
+def set_notes(entity: StarsideEntities, manifest: Any, set_hash: int, set_name: str = "") -> dict[str, Any]:
+    """套装 → 属于它的那些 perk 的社区评语（`onSets` 反查 + `realgame_details`）。"""
+    names = _name_resolver(manifest)
+    items: list[dict[str, Any]] = []
+    for perk_hash in entity.perks_of_set(int(set_hash)):
+        entry = entity.perk(perk_hash) or {}
+        zh = entry.get("zh") or {}
+        text = markup.render(zh.get("realgame_details"), names=names) or markup.render(
+            zh.get("效果"), names=names
+        )
+        if not text:
+            continue
+        definition = manifest.get_item_definition(int(perk_hash)) or {}
+        items.append({
+            "perk_hash": int(perk_hash),
+            "perk": (definition.get("displayProperties") or {}).get("name") or zh.get("name") or int(perk_hash),
+            "note": text,
+        })
+    return {
+        "attribution": entity.attribution(),
+        "available": bool(items),
+        "set": set_name or set_hash,
+        "perks": items,
+        "reason": "" if items else "这套装的 perk 没有社区评语。",
+    }
