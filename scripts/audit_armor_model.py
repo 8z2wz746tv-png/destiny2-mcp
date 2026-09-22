@@ -10,9 +10,16 @@
 
 用法：
 
-    .venv/bin/python scripts/audit_armor_model.py                 # 全账号护甲
+    .venv/bin/python scripts/audit_armor_model.py                 # 全账号护甲（有证人清单时逐条点名）
+    .venv/bin/python scripts/audit_armor_model.py --capture       # 重抽证人清单并落盘
     .venv/bin/python scripts/audit_armor_model.py --limit 20      # 只看前 20 件
     .venv/bin/python scripts/audit_armor_model.py --verbose       # 每件都打一行
+
+**证人清单**（`tests/baselines/armor_witnesses.json`）：全账号是"浮动样本"——今天抽到什么
+明天不一定还在，而模型改动需要**固定的证人**。所以清单里按"每个部位 × 每个大师档位 +
+金装 + legacy + 带负数的件 + 每个词条原型各一件"抽一批**具体实例 ID** 存进仓库；
+每次跑审计都会**逐条点名**，谁对不上一眼可见。清单只记"查哪些件、为什么查它"，
+期望值永远来自游戏当场的数据（不写死，免得把旧结论当真理）。
 
 **只读**：只读账号（背包/已装备/组件 300/304/305/310），不写任何东西。
 退出码：0 = 没有对不上的；1 = 有（可以当机器检查用）。
@@ -21,6 +28,7 @@
 from __future__ import annotations
 
 import asyncio
+import pathlib
 import sys
 from typing import Any
 
@@ -42,6 +50,9 @@ LABEL = {"weapons": "武器", "health": "生命", "class_stat": "职业",
 TUNING_CATEGORY = 3481777685          # core.gear_systems.armor_tiering.plugs.tuning.mods
 MASTERWORK_CATEGORY = "v460.plugs.armor.masterworks"
 DIRECTIONAL_TUNING_BONUS = 5          # = armor_rules.DIRECTIONAL_TUNING_STAT_BONUS
+#: 证人清单落盘位置（相对仓库根）。
+WITNESS_FILE = "tests/baselines/armor_witnesses.json"
+
 MOD_CATEGORY_HASHES = {
     2487827355,  # v2_general（属性模组）
     2323986101,  # v2_general 的另一个变体（artifice 走同一个家族）
@@ -255,6 +266,53 @@ class Audit:
             )
 
 
+def _pick_witnesses(pieces: list[Any]) -> list[dict]:
+    """抽一批**多样的固定证人**：每部位 × 每大师档位、金装（每部位 ≤2）、legacy（≤3）、
+    每个词条原型各一件。目标是"覆盖所有规则分支"而不是"覆盖所有件"——证人多了没人看。"""
+    picked: dict[str, list[str]] = {}
+
+    def take(armor: Any, why: str) -> None:
+        tags = picked.setdefault(armor.item_instance_id, [])
+        if why not in tags:
+            tags.append(why)
+
+    seen_slot_tier: set[tuple[Any, ...]] = set()
+    seen_archetype: set[str] = set()
+    exotics_per_slot: dict[str, int] = {}
+    legacy = 0
+    for armor in sorted(pieces, key=lambda a: a.item_instance_id):
+        slot = str(getattr(armor, "slot", ""))
+        if armor.armor_system != "armor_3":
+            if legacy < 3:
+                take(armor, "legacy（没有 T 级/调谐槽）")
+                legacy += 1
+            continue
+        gear_tier = getattr(armor, "gear_tier", None)
+        if gear_tier != 5:
+            # 非 T5（T3/T4/无 T 级）：我们**故意不反推**词条，但"不反推"这条分支也要有证人，
+            # 免得哪天有人把"读不到"当成"没有"（或反过来）而没人发现。
+            if ("非T5", gear_tier) not in seen_slot_tier:
+                seen_slot_tier.add(("非T5", gear_tier))
+                take(armor, f"T{gear_tier}（按设计不反推）")
+            continue
+        tier = int(getattr(armor, "masterwork_level", 0) or 0)
+        if (slot, tier) not in seen_slot_tier:
+            seen_slot_tier.add((slot, tier))
+            take(armor, f"大师{tier}档")
+        archetype = str(getattr(armor, "archetype_name", "") or "")
+        if archetype and archetype not in seen_archetype:
+            seen_archetype.add(archetype)
+            take(armor, f"词条原型 {archetype}")
+        if getattr(armor, "is_exotic", False) and exotics_per_slot.get(slot, 0) < 2:
+            exotics_per_slot[slot] = exotics_per_slot.get(slot, 0) + 1
+            options = len(getattr(armor, "tuning_option_hashes", ()) or ())
+            take(armor, f"金装（调谐 {options} 颗）")
+    return [
+        {"item_instance_id": inst, "why": why}
+        for inst, why in sorted(picked.items())
+    ]
+
+
 async def main() -> int:
     limit = 0
     if "--limit" in sys.argv:
@@ -285,20 +343,86 @@ async def main() -> int:
             pieces.extend(snapshot.get_slot(slot))
         if limit:
             pieces = pieces[:limit]
+        by_id = {armor.item_instance_id: armor for armor in pieces}
+
+        if "--capture" in sys.argv:
+            import json as _json
+            import pathlib as _pathlib
+
+            witnesses = _pick_witnesses(pieces)
+            target = _pathlib.Path(WITNESS_FILE)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(
+                _json.dumps(
+                    {
+                        "note": "口径审计的固定证人：只记'查哪些件、为什么查它'；"
+                                "期望值来自游戏当场的数据，不写死。用 "
+                                "scripts/audit_armor_model.py --capture 重抽。",
+                        "witnesses": [
+                            {**row, "name": by_id[row["item_instance_id"]].name}
+                            for row in witnesses
+                            if row["item_instance_id"] in by_id
+                        ],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            print(f"证人清单已落盘：{WITNESS_FILE}（{len(witnesses)} 件）")
+            for row in witnesses:
+                armor = by_id.get(row["item_instance_id"])
+                if armor:
+                    print(f"  {armor.name:16s} {armor.slot:12s} {'、'.join(row['why'])}")
+            return 0
+
+        witness_ids: list[str] = []
+        witness_why: dict[str, list[str]] = {}
+        wpath = pathlib.Path(WITNESS_FILE)
+        if wpath.exists():
+            import json as _json
+
+            data = _json.loads(wpath.read_text(encoding="utf-8"))
+            for row in data.get("witnesses", []):
+                inst = str(row.get("item_instance_id", ""))
+                if inst:
+                    witness_ids.append(inst)
+                    witness_why[inst] = list(row.get("why", []))
+        else:
+            print(f"（还没有证人清单：{WITNESS_FILE}，先跑 --capture）")
+
+        before: dict[str, int] = {}
         for armor in pieces:
             inst = armor.item_instance_id
+            before[inst] = len(audit.problems)
             audit.check_piece(armor, {
                 "stats": (raw_stats.get(inst) or {}).get("stats") or {},
                 "sockets": (raw_sockets.get(inst) or {}).get("sockets") or [],
                 "instances": raw_instances.get(inst) or {},
                 "reusable": raw_reusable.get(inst) or {},
             })
+            if inst in witness_why:
+                failed = [
+                    line for line in audit.problems[before[inst]:]
+                ]
+                verdict = "✓" if not failed else "✗"
+                print(f"  证人 {verdict} {armor.name:16s} {armor.slot:12s} "
+                      f"（{'、'.join(witness_why[inst])}）")
+                for line in failed:
+                    print(f"        {line}")
             if verbose:
                 print(f"  {armor.name:16s} {armor.slot:12s} "
                       f"{_fmt({k: int(getattr(armor.stats, k, 0) or 0) for k in STAT_NAMES})}"
                       f"  可调谐={len(getattr(armor, 'tuning_option_hashes', ()) or ())} 颗")
 
-        print(f"\n审计了 {audit.checked} 件护甲")
+        print(f"\n审计了 {audit.checked} 件护甲"
+              + (f"（其中固定证人 {len(witness_ids)} 件）" if witness_ids else ""))
+        missing = [inst for inst in witness_ids if inst not in by_id]
+        if missing:
+            print(f"**证人清单里有 {len(missing)} 件不在账号里了**（分解/转移过？）：")
+            for inst in missing[:8]:
+                print(f"  {inst}（原为：{'、'.join(witness_why.get(inst, []))}）")
         print("按设计不适用的:", dict(sorted(audit.counts.items(), key=lambda kv: -kv[1])) or "（无）")
         if audit.evidence:
             print(f"口径证据（{len(audit.evidence)} 条）：")
