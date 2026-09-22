@@ -49,15 +49,27 @@ def _matching_armor3_roll(
     gear_tier: int,
     archetype_hash: int,
     tuning_hash: int | None,
+    *,
+    masterwork_bonus: int = 0,
 ) -> tuple[ArmorRollTemplate, ArmorTuningOption | None] | None:
-    """Restore a legal Tier-5 roll from stats after installed mods are removed."""
+    """Restore a legal Tier-5 roll from stats after installed mods are removed.
+
+    `masterwork_bonus` = **大师插槽那颗插件声明的档位**（1–5；没改造过就是 0）。
+    真机（2026-09-22）：插件声明的是"六维各 +N"，但**实际只加在"非词条那三项"上** ——
+    和 `平衡调整` 一样属于"声明值 ≠ 生效范围"。降临回音臂铠 `…539530` 是档位 3：
+    词条 武器20/超能30/近战25 + 非词条三项各 +3 = 304 里那六个 `20 3 3 3 30 25`。
+    以前这里固定拿 `gear_tier`（=5）当加成，于是"只升到 3 档"的件永远反推不出来。
+    """
     archetype = resolve_archetype(archetype_hash)
     if archetype is None:
         return None
     actual = tuple(int(final_stats.get(stat_name, 0)) for stat_name in STAT_NAMES)
     matches: list[tuple[ArmorRollTemplate, ArmorTuningOption | None]] = []
     for template in tier5_templates(archetype):
-        expected = [value + gear_tier if value == 0 else value for value in template.base_stats]
+        expected = [
+            value + masterwork_bonus if value == 0 else value
+            for value in template.base_stats
+        ]
         option: ArmorTuningOption | None = None
         if tuning_hash is not None:
             option = next(
@@ -283,6 +295,9 @@ class InventorySnapshot(BaseModel):
         _ARTIFICE_PLUG_CATEGORIES = {3773173029, 595201146}
         _ARMOR3_ARCHETYPE_CATEGORY = 778194869
         _ARMOR3_TUNING_CATEGORY = 3481777685
+        #: 大师插槽的**类别标识字符串**（不是 hash）—— 判断"有没有真大师"要用它比对
+        #: `plugCategoryIdentifier`；同名「升级护甲」两种插件的区别就在 `investmentStats` 上。
+        _ARMOR3_MASTERWORK_CATEGORY = "v460.plugs.armor.masterworks"
 
         def _plug_category(plug_hash: int) -> int:
             """插件的 `plugCategoryHash`（读不到定义返回 0）。"""
@@ -406,7 +421,12 @@ class InventorySnapshot(BaseModel):
             # an informational field for Armor 3.0 pieces.
             energy = instance.get("energy", {}) if isinstance(instance, dict) else {}
             energy_capacity = int(energy.get("energyCapacity", 0) or 0) if isinstance(energy, dict) else 0
-            is_masterworked = gear_tier == 5 if armor_system == "armor_3" else energy_capacity >= 10
+            # 满大师先按老口径给个初值；Armor 3.0 的件读完插槽后会**由大师插件改写**
+            # （真机 2026-09-22 纠正：以前 `gear_tier == 5` 把"没改造过"的 T5 也算满大师，
+            # 于是词条反推按 +5×3 去凑、永远对不上，农场反推跟着错）。
+            is_masterworked = (
+                gear_tier == 5 if armor_system == "armor_3" else energy_capacity >= 10
+            )
 
             # Artifice armor & set bonus wildcard: check sockets
             sockets_data = sockets_data_map.get(inst_id, {}).get("sockets", [])
@@ -415,6 +435,9 @@ class InventorySnapshot(BaseModel):
             archetype_hashes: list[int] = []
             tuning_hash: int | None = None
             tuning_name = ""
+            #: 大师插槽那颗「升级护甲」声明的**档位**（1–5；只带能量标记的那种是 0）。
+            #: 真机：插件声明"六维各 +N"，实际只加在"非词条那三项"上（见 `_matching_armor3_roll`）。
+            masterwork_tier = 0
             for socket in sockets_data:
                 plug_hash = socket.get("plugHash", 0)
                 if plug_hash:
@@ -427,6 +450,19 @@ class InventorySnapshot(BaseModel):
                             has_set_bonus_mod_socket = True
                         if plug_category == _ARMOR3_ARCHETYPE_CATEGORY:
                             archetype_hashes.append(int(plug_hash))
+                        if (
+                            (plug_def.get("plug") or {}).get("plugCategoryIdentifier")
+                            == _ARMOR3_MASTERWORK_CATEGORY
+                        ):
+                            masterwork_tier = max(
+                                (
+                                    int(entry.get("value", 0) or 0)
+                                    for entry in plug_def.get("investmentStats", [])
+                                    if isinstance(entry, dict)
+                                    and entry.get("statTypeHash") in MAIN_STAT_HASHES
+                                ),
+                                default=0,
+                            )
                         if plug_category == _ARMOR3_TUNING_CATEGORY:
                             if any(
                                 entry.get("statTypeHash") in MAIN_STAT_HASHES
@@ -453,6 +489,10 @@ class InventorySnapshot(BaseModel):
             base_roll_stats = ArmorStats()
             masterwork_level = gear_tier or 0
             if armor_system == "armor_3":
+                # 大师看**插槽里那颗插件声明的档位**（0 = 没改造）：以前按 T 级一律当满大师，
+                # 于是"只升到 3 档"的件被当成 +5、词条反推永远对不上。见 `_matching_armor3_roll`。
+                is_masterworked = masterwork_tier > 0
+                masterwork_level = masterwork_tier
                 # 这些是**给人看**的话（会进分析结果），所以写中文、说清"能不能反推"，
                 # 不要留英文开发者口气（语料「已知问题」表里登记过这条）。
                 if gear_tier is None:
@@ -469,7 +509,10 @@ class InventorySnapshot(BaseModel):
                     roll_parse_error = "这件护甲的词条原型插槽缺失或无法确定，无法反推。"
                 else:
                     archetype_hash = archetype_hashes[0]
-                    roll = _matching_armor3_roll(base_stats_dict, gear_tier, archetype_hash, tuning_hash)
+                    roll = _matching_armor3_roll(
+                        base_stats_dict, gear_tier, archetype_hash, tuning_hash,
+                        masterwork_bonus=masterwork_tier,
+                    )
                     if roll is None:
                         roll_parse_error = (
                             "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。"

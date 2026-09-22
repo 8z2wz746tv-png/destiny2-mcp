@@ -464,6 +464,7 @@
 | 武器基线差异（字段无声消失） | `tests/test_weapon_baseline.py` + `scripts/capture|diff_weapon_baseline.py` |
 | 武器章节的端到端断言（真机） | `scripts/run_corpus_weapon_rows.py`（16 行） |
 | 护甲**每一类模组插槽**能不能写（真机，含"这一位能不能插"的判定） | `scripts/verify_armor_mod_sockets.py`（只读看现状；`--apply` 做 6 类插槽的"一换一 → 回读 → 换回"往返） |
+| 护甲**模型口径**和游戏数据对不对得上（真机，468 件） | `scripts/audit_armor_model.py`（只读；六项对账：stats=304−模组、310 清单、装着的那颗在清单里、调谐反推不为负、大师档位、词条重建=304。退出码 0/1，可当机器检查） | 已跑（2026-09-22）：六项全过；顺手挖出"大师是档位不是有/无"并修掉 |
 | 护甲**调谐**能不能通过 API 换（真机） | `scripts/verify_tuning_write.py`（只读列每件的调谐槽与可换项；`--apply` 做"换一颗 → 回读插槽 + 回读组件 304 的六维 → 换回"；`--to <hash>` 指定换成哪颗，`--include-empty` 试"撤掉调谐"） | 已跑（2026-09-22）：换成**你已拥有**的一颗 → `ErrorCode=1`、六维按"平衡调整只给最低三项 +1"变；换成**没有**的一颗 → **1675** 要材料、账号不变。结论见 ADR-014 |
 | 装备编排的异域互斥与槽位判据（真机，只读） | `scripts/verify_equip_planner.py` |
 | 八工具面全 intent 体检 + 其余六面字段级 + 协议层（真机） | `scripts/run_corpus_all_rows.py`（见 `docs/testing/TESTING_CORPUS_FULL.md`） |
