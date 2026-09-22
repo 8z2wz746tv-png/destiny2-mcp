@@ -579,6 +579,36 @@ def test_pick_and_rescue_verifies_only_the_top_k(monkeypatch) -> None:
     ), "排序要按残差从小到大，复核只做最值得的前 K 套"
 
 
+def test_tuning_allowed_compares_hashes_unsigned() -> None:
+    """`tuning_is_allowed` 两边过 `to_unsigned`：真机那一对（-268553035 / 4026414261）。
+
+    组件的 310 清单来自 profile（无符号），而 `manifest.search` 给有符号 —— 裸 `in`
+    会把清单里有的调谐判成"装不到这件上"（真机：光芒领主面具 6917530188460608169）。
+    这条守门钉的是**两个方向**都成立，免得以后有人把它改回集合成员判断。
+    """
+    from destiny_mcp.build.models import (
+        tuning_is_allowed,
+        tuning_options_from_reusable,
+    )
+
+    unsigned = 4026414261
+    signed = -268553035
+    assert signed & 0xFFFFFFFF == unsigned, "这一对就是同一个 hash 的两种写法"
+
+    assert tuning_is_allowed((unsigned,), signed) is True
+    assert tuning_is_allowed((signed,), unsigned) is True
+    assert tuning_is_allowed((unsigned,), unsigned) is True
+    assert tuning_is_allowed((673231129,), signed) is False
+    assert tuning_is_allowed((), signed) is False, "空清单 = 读不到，由调用方决定拦不拦"
+
+    # 源头也统一写法：310 那行即便写成有符号，出来的清单也必须是无符号
+    # 类别用真机那个调谐 plug 类别 hash（3481777685），免得夹具类别对不上、清单被判成"读不到"
+    rows = {"plugs": {"2": [{"plugItemHash": signed}]}}
+    category = 3481777685
+    options = tuning_options_from_reusable(rows, lambda _h: category, category)
+    assert options == (unsigned,), f"清单源头要统一成无符号：{options}"
+
+
 def test_tuning_plan_ships_only_the_tunings_the_piece_allows() -> None:
     """调谐**能执行**之后的两条不变量：
 

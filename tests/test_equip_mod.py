@@ -22,6 +22,8 @@ TUNING = 4001
 OTHER_TUNING = 4002
 # 真机 Manifest 里 "+职业 / -手雷" 的 hash（实机抓过）
 TUNING_CLASS_UP_GRENADE_DOWN = 1879022254
+# 真机抓过的一对：`+超能 / -生命值` 搜索给有符号、组件 310 给无符号（光芒领主面具 6917530188460608169）
+SIGNED_TUNING = -268553035
 
 DEFS: dict[int, dict[str, Any]] = {
     157934631: {
@@ -60,6 +62,13 @@ DEFS: dict[int, dict[str, Any]] = {
         "plug": {"plugCategoryHash": 3481777685, "energyCost": {"energyCost": 0}},
         "investmentStats": [],
     },
+    SIGNED_TUNING: {
+        "displayProperties": {"name": "+超能 / -生命值"},
+        "itemType": 19,
+        "plug": {"plugCategoryIdentifier": "core.gear_systems.armor_tiering.plugs.tuning.mods",
+                 "plugCategoryHash": 3481777685, "energyCost": {"energyCost": 0}},
+        "investmentStats": [],
+    },
     TUNING_CLASS_UP_GRENADE_DOWN: {
         "displayProperties": {"name": "+职业 / -手雷"},
         "itemType": 19,
@@ -94,6 +103,11 @@ PLUG_SETS = {
 class _Manifest:
     def get_item_definition(self, item_hash: int):
         definition = DEFS.get(item_hash)
+        if definition is None and item_hash > 2**31:
+            # 真机 manifest 两种写法都认（有符号的 -268553035 与无符号的 4026414261 是同一颗）。
+            # 夹具不认的话，310 里那颗按无符号查不到类别 → 整份清单被当成"读不到" →
+            # 判据短路成"可写"，守门就成了摆设（这条测试第一版就是这么假通过的）。
+            definition = DEFS.get(item_hash - 2**32)
         if definition is None:
             return None
         if item_hash == 157934631:
@@ -114,6 +128,8 @@ class _Manifest:
             return [{"itemHash": MOD_HASH, "itemType": 19}]
         if query.replace(" ", "") == "+职业/-手雷":
             return [{"itemHash": TUNING_CLASS_UP_GRENADE_DOWN, "itemType": 19}]
+        if query.replace(" ", "") == "+超能/-生命值":
+            return [{"itemHash": SIGNED_TUNING, "itemType": 19}]
         return []
 
     def get_item_name(self, item_hash: int):
@@ -450,6 +466,35 @@ async def test_a_tuning_the_role_list_says_no_to_is_still_writable() -> None:
     assert plan["to"]["unlock_state"] is None
     for stale in ("1676", "游戏里同样装不上", "不在 Bungie 给这一位角色的可插入清单里"):
         assert stale not in str(plan), f"该判据又拿调谐当模组拦了：{stale}"
+
+
+async def test_a_signed_hash_tuning_that_is_in_the_list_is_writable() -> None:
+    """清单里**有**这颗、但它的 hash 是负数（有符号）时，必须判成可写。
+
+    真机踩到（2026-09-22）：光芒领主面具 `6917530188460608169` 的 310 清单里有
+    `+超能 / -生命值`（组件 310 给的是**无符号** `4026414261`），而 `manifest.search`
+    给的是**有符号** `-268553035` —— 裸 `in` 永远 False，工具于是把清单里有的调谐
+    判成"装不到这件上"，还附了一句 1675 的理由（错判、且是**过严**那一侧）。
+    """
+    service = _service()
+    profile = await service._resolver.get_profile("1", 3, [])
+    # 310 给无符号（真机口径），搜索给有符号 —— 这正是两边不相等的那一对
+    profile["itemComponents"]["reusablePlugs"] = {
+        "data": {"6917": {"plugs": {"2": [
+            {"plugItemHash": SIGNED_TUNING & 0xFFFFFFFF, "canInsert": True},
+        ]}}}
+    }
+
+    async def stable(membership_id, membership_type, components):
+        return profile
+
+    service._resolver.get_profile = stable  # type: ignore[assignment]
+    plan = await service.plan("Tester#1234", "6917", "+超能 / -生命值", "hunter")
+
+    assert plan["kind"] == "tuning"
+    assert plan["to"]["hash"] == SIGNED_TUNING, "方案里照旧报搜索给的那颗（有符号）"
+    assert plan["writable"] is True, plan["writable_reason"]
+    assert plan["writable_reason"] == ""
 
 
 async def test_tuning_plan_is_blocked_when_the_piece_does_not_allow_it() -> None:

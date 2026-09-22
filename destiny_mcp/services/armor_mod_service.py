@@ -286,21 +286,34 @@ class ArmorModService(ModSocketMixin):
                     "stat_bonus": bonus,
                     "energy_cost": self._plug_energy_cost(alt_hash) or 0,
                     "socket_index": alt_socket,
-                    "unlock_state": _unlock_state(alt_socket, alt_hash),
+                    # 调谐一律 null：那份"这一位能不能插"的判定在调谐槽上不可信（见下面 is_tuning
+                    # 那段），报出去会被读成"写不了"。与 `to.unlock_state` 同一口径。
+                    "unlock_state": (
+                        None
+                        if self._plug_category_hash(alt_hash) == _TUNING_CATEGORY_HASH
+                        else _unlock_state(alt_socket, alt_hash)
+                    ),
                 })
 
         is_tuning = self._plug_category_hash(matched_hash) == _TUNING_CATEGORY_HASH
         # 调谐：这颗在不在"这件护甲允许的清单"里（组件 310，单一出处见 models）。
         # 读不到清单 = 不拦（缺数据 ≠ 不许，交给上游说话）；读到了且不在里面 = 明确不写 ——
         # 省得让用户确认完再去撞 1675。
-        from ..build.models import tuning_options_from_reusable  # 局部导入，同上
+        from ..build.models import (  # 局部导入，同上
+            tuning_is_allowed,
+            tuning_options_from_reusable,
+        )
 
         allowed = tuning_options_from_reusable(
             (reusable_plugs.get(item_instance_id) or {}),
             self._plug_category_hash,
             _TUNING_CATEGORY_HASH,
         )
-        tuning_allowed = (not is_tuning) or (not allowed) or (int(matched_hash) in allowed)
+        # `tuning_is_allowed` 两边过 `to_unsigned`：`matched_hash` 来自 manifest.search（有符号），
+        # 310 清单来自 profile（无符号）—— 裸 `in` 会把清单里有的那颗判成"装不到这件上"（真机踩过）。
+        tuning_allowed = (
+            (not is_tuning) or (not allowed) or tuning_is_allowed(allowed, matched_hash)
+        )
         raw_unlock_state = _unlock_state(socket_index, matched_hash)
         # **调谐不看 `unlock_state`** —— 那份"这一位能不能插"的判定在调谐槽上不可信：实测连
         # 正装着的那颗调谐都被判 false（`loadout_plug_lookup.plug_is_insertable` 为此打过补丁），

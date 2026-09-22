@@ -19,7 +19,12 @@ from dataclasses import dataclass, field
 from typing import Any, Sequence
 
 from ..build.constants import STAT_NAMES
-from ..build.models import BuildCandidate, BuildConstraints, BuildResult
+from ..build.models import (
+    BuildCandidate,
+    BuildConstraints,
+    BuildResult,
+    tuning_is_allowed,
+)
 from ..build.scorer import score as _score
 from ..build.tuning import TuningPlan
 from ..build_contracts import ExecutableBuild
@@ -127,8 +132,11 @@ def build_results(
             by_id = {str(getattr(item, "item_instance_id", "")): item for item in armor_set.armor}
             for change in plan.changes:
                 armor = by_id.get(str(change.item_instance_id))
-                allowed = {int(h) for h in (getattr(armor, "tuning_option_hashes", ()) or ())}
-                if armor is not None and int(change.to_plug) in allowed:
+                # `tuning_is_allowed` 两边过 `to_unsigned`（求解器给的是无符号，但这条比较
+                # 是"写入前的兜底"，不许依赖上游有没有归一 —— 一个规矩只写一次）
+                if armor is not None and tuning_is_allowed(
+                    getattr(armor, "tuning_option_hashes", ()) or (), change.to_plug
+                ):
                     tuning_plugs[str(change.item_instance_id)] = int(change.to_plug)
         # 注意 `requires_tuning` 要按**方案**算，不能按"有没有插件要写"算 ——
         # 后者在调谐不可写那阵子恒为 False（实机语料第 ⑩ 行抓到的回归）。

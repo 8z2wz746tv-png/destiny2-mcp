@@ -7,7 +7,7 @@ keep the Build Engine domain isolated (see docs/adr/001-canonical-build-strategy
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 from pydantic import BaseModel, Field
@@ -110,6 +110,10 @@ def tuning_options_from_reusable(
 
     单一出处：解析（`InventorySnapshot.from_profile`）与写入前的校验（`ArmorModService.plan`）
     都走这里，避免两处各写一遍"哪个槽是调谐槽"。
+
+    **返回值统一成无符号**（`to_unsigned`）：profile/310 本来就是无符号，但清单会一路流到求解器与
+    写入兜底，那里再跟 `manifest.search` 的有符号 hash 比 —— 与其让每个消费方各自记得换算，
+    不如在这里定成一种写法（比较那颗仍走 `tuning_is_allowed`）。
     """
     for rows in (item_reusable.get("plugs") or {}).values():
         first = next((int((r or {}).get("plugItemHash", 0) or 0) for r in (rows or []) if r), 0)
@@ -117,11 +121,27 @@ def tuning_options_from_reusable(
         if not first or category_of(first) != tuning_category:
             continue
         return tuple(
-            int((r or {}).get("plugItemHash", 0) or 0)
+            to_unsigned(int((r or {}).get("plugItemHash", 0) or 0))
             for r in (rows or [])
             if r and (r or {}).get("plugItemHash")
         )
     return ()
+
+
+def tuning_is_allowed(tuning_options: Sequence[int], plug_hash: int) -> bool:
+    """这颗调谐在**这件护甲允许的清单**里吗 —— 两边都过 `to_unsigned`。
+
+    为什么必须归一：`manifest.search` 给的是**有符号** hash，组件 310 给的是**无符号**，
+    裸 `in` 永远不相等。真机踩到（2026-09-22）：光芒领主面具 `6917530188460608169` 的 310
+    清单里明明有 `+超能 / -生命值`（4026414261），而按名字搜出来是 `-268553035`
+    → 工具把清单里有的调谐判成"装不到这件上"，还给了个 1675 的理由（**错判**）。
+    这是本项目的老坑（`plug_is_insertable` / `_find_mod_socket` 都为此过 `to_unsigned`，
+    见 `loadout_plug_lookup` 的注释），所以调谐这条也收进同一个规矩里。
+
+    空清单 = **读不到**（缺数据 ≠ 允许）：由调用方决定是"不规划"还是"不拦"。
+    """
+    target = to_unsigned(int(plug_hash))
+    return any(to_unsigned(int(option)) == target for option in (tuning_options or ()))
 
 
 # ═══════════════════════════════════════════════════════════════════════════

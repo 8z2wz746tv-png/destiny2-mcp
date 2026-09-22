@@ -40,6 +40,7 @@
 | `equip_build` | 只换护甲与模组，调谐要玩家自己改 | 确认后**连调谐一起写**（写失败如实报哪几件没成，不回退） |
 | `equip_mod` 对调谐的 `writable` | 恒 `false`（"本项目还没验证过"） | 清单里有 → `true`；清单里没有 → `false` + 1675 的含义（"这颗装不到这件上"，不是"你没材料"） |
 | `equip_mod` 的 `unlock_state`（含 `to.unlock_state`、`alternatives[].unlock_state`） | 对调谐也照报组件 305/plug set 的判定 | 调谐一律 `null` —— 那份判定在调谐槽上不可信（实测一颗被判 false 的调谐写入成功），报出去会被读成"写不了"；非调谐模组不变 |
+| 调谐的 `writable`（hash 为负的那些） | 裸比较 hash → 清单里**有**也判 `false` + 一句 1675 的理由（错判、过严） | 两边过 `to_unsigned`（`build.models.tuning_is_allowed`）→ 判 `true`；真机：光芒领主面具 `+超能 / -生命值`（`-268553035`）原来被判装不上，改后写入成功 |
 | `tuning_changes` / `tuning_note` | "要你在游戏里手动改" | "确认后一起改；改不了会说明是哪一件、为什么" |
 
 ## 未发布：有解时默认会动调谐（P4，行为变化）
