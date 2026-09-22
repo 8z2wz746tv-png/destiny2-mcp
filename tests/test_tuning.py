@@ -510,13 +510,10 @@ def test_plan_delta_payload_only_lists_changed_stats() -> None:
     payload = plan.as_dict()
 
     assert payload["change_count"] == 1
-    delta = payload["changes"][0]["delta"]
-    assert delta["grenade"] == 5
-    # 只列**变过**的项：手雷 +5 与代价那一项 −5（新算术下代价如实出现），
-    # 没动的项（武器 40、生命 30）一个都不许出现
-    assert set(delta) == {"grenade", change_decreased_of(payload)}
-    assert min(delta.values()) == -5
-    assert payload["final_delta"]["grenade"] == 5
+    # 代价那一项本来就见底（职业/超能 = 0）→ 白给：净变化里**只有手雷 +5**
+    # （没动的项一样不许出现：武器 40、生命 30 都不在里面）
+    assert payload["changes"][0]["delta"] == {"grenade": 5}
+    assert payload["final_delta"] == {"grenade": 5}
 
 
 @pytest.mark.parametrize("kind", ["directional", "balanced", "empty"])
@@ -529,17 +526,16 @@ def test_choice_as_dict_keeps_hash_and_kind(kind: str) -> None:
     assert payload["kind"] == kind
 
 
-def test_dumping_a_stat_that_is_already_zero_is_not_free() -> None:
-    """把 −5 打在已经见底的项上**不是白给** —— 组件 304 如实记负数。
+def test_dumping_a_stat_that_is_already_zero_is_free() -> None:
+    """把 −5 打在已经见底的项上**是白给**的：效果上夹在 0，人物那一项不掉点数。
 
-    真机证据（2026-09-22）：光芒领主手套 `6917530188462631525` 装着「+职业 / -生命值」，
-    它的生命基础值是 0，而 304 里写的就是 **生命 −5** —— 游戏自己没夹 0。
-    旧口径（"夹到 0，所以牺牲见底的项是白给"）会让反推（`observed − delta`）把被夹掉的
-    5 点当成本来就有：贪心每走一步凭空长 5 点，真机同一件几步之后从
-    武器25/生命−5/手雷0/超能0 变成 武器30/生命5/手雷5/超能5（用户发现的那个 bug）。
+    口径来源：用户在游戏里确认（2026-09-22）——"属性到 0 之后，就算是负数也没有数值上的影响"。
+    组件 304 报的 `生命−5` 只是**记录值**，不代表人物真的少 5 点。
 
-    这条测试钉的是"代价要如实出现在 delta 里"，不是"不许牺牲见底的项"：
-    那一项**没有目标**，所以扣它仍然合法（游戏里也有这种装法，304 就是证据）。
+    **但"白给"只能夹在比较层（`delta_of`）**：`base`/`stats_with` 必须保持不夹（跟 304 一致），
+    否则反推 `observed − delta` 会把被夹掉的 5 点当成本来就有，贪心每走一步凭空长 5 点
+    （上午那个 bug：真机同一件几步后从 武器25/生命−5/手雷0/超能0 变成 武器30/生命5/手雷5/超能5）。
+    存储层与比较层分开，是这条口径的正确实现。
     """
     piece = _piece("腿甲", _stats(weapons=30, health=25, grenade=20))
 
@@ -555,7 +551,7 @@ def test_dumping_a_stat_that_is_already_zero_is_not_free() -> None:
     assert change.increased == "grenade"
     assert change.delta[STAT_NAMES.index("grenade")] == 5
     assert change.delta[STAT_NAMES.index("weapons")] == 0, "武器不能被扣（它卡在目标上）"
-    assert min(change.delta) == -5, "代价那一项必须如实记成 −5，不许被夹成 0"
+    assert min(change.delta) == 0, "被牺牲的项已经见底 → 净代价 0（不许记成 −5）"
     assert change.decreased in {"class_stat", "super_stat", "melee"}, (
         "被牺牲的必须是**没有目标**的那几项之一"
     )
@@ -595,7 +591,30 @@ def test_piece_stats_change_by_exactly_the_tuning_delta() -> None:
         "只有 +武器/−近战 生效；生命/手雷/超能 一个点都不许变"
     )
     before, after = piece.stats_with(None), piece.stats_with(choice)
-    assert sum(after) - sum(before) == sum(piece.delta_of(choice))
+    # `stats_with` 是**记录值**（跟 304 一致、不夹）：变化正好等于那一对 ±5
+    assert sum(after) - sum(before) == 0
+    # 生效值（比较时夹到 0）的变化 == 求解器看到的 delta：
+    # 武器 +5、职业 −5（换走「+职业」就丢掉那 5 点）、近战 −5；生命见底 → 0（白给）
+    assert piece.delta_of(choice) == (5, 0, -5, 0, -5, 0)
+
+    # **防凭空长点的关键不变量**：换调谐不许改基础值 —— 把换完的件再解析一次，
+    # 反推出来的 base 必须与换之前一模一样（上午那个 bug 就是每换一步 base 涨 5）
+    from destiny_mcp.build.models import Armor as _Armor, ArmorStats as _ArmorStats
+    from destiny_mcp.build.tuning import armor_with_tuning
+
+    armor = _Armor(
+        item_instance_id="gold", item_hash=T5_ARMOR_HASH, name="光芒领主手套", slot="gauntlets",
+        stats=_ArmorStats(weapons=25, health=-5, class_stat=25, melee=30),
+        armor_system="armor_3", gear_tier=5,
+        tuning_mod_hash=directional_tuning_hash("class_stat", "health"),
+        # 夹具显式声明"允许全部调谐"（真实的逐件清单来自组件 310，夹具不模拟）
+        tuning_option_hashes=_all_tuning_hashes(),
+    )
+    original = piece_tuning(armor, _manager())
+    assert original is not None
+    tuned_armor = armor_with_tuning(armor, original, choice)
+    again = piece_tuning(tuned_armor, _manager())
+    assert again is not None and again.base == original.base, "换调谐把基础值改了 = 凭空长点"
 
 
 def test_uninvertible_piece_is_not_movable_and_never_invents_stats(monkeypatch) -> None:

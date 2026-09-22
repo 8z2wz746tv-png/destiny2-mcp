@@ -241,7 +241,9 @@ def armor_to_process_item(armor: Any) -> ProcessItem:
     stats: dict[int, int] = {}
     for stat_name in STAT_NAMES:
         stat_hash = _STAT_NAME_TO_HASH[stat_name]
-        stats[stat_hash] = armor.stats.get(stat_name)
+        # **生效值**：每件夹到 0（用户口径 2026-09-22：一项见底后再扣不掉点数；
+        # 304 报的负数是记录值）。整件护甲的六维不会因为"牺牲见底的项"而真的往下掉。
+        stats[stat_hash] = max(0, int(armor.stats.get(stat_name) or 0))
 
     # **能拿来装属性模组的能量 = 容量 − 已装的"方案不动"的模组**（手臂/职业/头盔那些）。
     # 以前这里直接给整个容量，于是求解器给每件都排 +10 属性模组，而真机上它们装不下

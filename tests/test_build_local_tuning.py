@@ -293,14 +293,16 @@ def test_running_the_local_pass_twice_does_not_invent_points() -> None:
     assert plan1.changes, "第一趟本来就该吃出改动，否则这条用例是真空成立"
     assert totals(twice) == totals(once), "第二趟把六维改动了（凭空长点或来回摇）"
 
-    # 逐件对账：每件的六维变化必须**正好等于**它那条调谐改动的 delta
+    # 逐件对账：**换调谐不许改基础值** —— 把换完的件再解析一次，反推出来的 base
+    # 必须与换之前一模一样（上午那个 bug 就是每换一步 base 涨 5，累计 +15）。
+    # 这比"总和相等"更准：总和相等可能被"一边丢 5 一边白拿 5"凑出来。
+    manifest2 = _FakeManifest()
     before = {a.item_instance_id: a for a in solved.sets[0].armor}
     after = {a.item_instance_id: a for a in once.armor}
     for change in plan1.changes:
-        old = before[change.item_instance_id]
-        new = after[change.item_instance_id]
-        old_sum = sum(int(getattr(old.stats, name, 0) or 0) for name in STAT_NAMES)
-        new_sum = sum(int(getattr(new.stats, name, 0) or 0) for name in STAT_NAMES)
-        assert new_sum - old_sum == sum(change.delta), (
-            f"{change.item_name} 的六维变化与调谐 delta 对不上：凭空长点"
+        old_piece = piece_tuning(before[change.item_instance_id], manifest2)
+        new_piece = piece_tuning(after[change.item_instance_id], manifest2)
+        assert old_piece is not None and new_piece is not None
+        assert new_piece.base == old_piece.base, (
+            f"{change.item_name} 换完调谐后基础值变了（凭空长点）"
         )

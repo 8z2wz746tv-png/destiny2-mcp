@@ -242,12 +242,18 @@ class PieceTuning:
     def delta_of(self, choice: TuningChoice) -> tuple[int, ...]:
         """相对**现状**的净变化（求解器里的属性已经是含当前调谐的值）。
 
-        "−5 打在本就见底的项上是白给"这条**不需要夹 0 也成立**：两个状态都带着那 −5，
-        差值自然就是 0。以前夹 0 反而把"见底"这件事记漏了（见 `base_with`）。
+        **比的是"生效值"：每项先夹到 0** —— 用户口径（2026-09-22，他在游戏里确认）：
+        人物那一项见底之后，再往下扣**不掉点数**；组件 304 报的负数只是记录值，没有实际影响。
+        所以"牺牲一个已经见底的属性"是**白给**的，改成 0 才不会把免费走法误判成有代价。
+
+        注意**只夹在这里**（比较用）：`base` 与 `stats_with` 保持**不夹**（跟 304 一致），
+        否则反推会凭空长出点数 —— 上午就是因为把夹 0 写进了存储层才出的那个 bug。
         """
         now = self.stats_with(None)
         after = self.stats_with(choice)
-        return tuple(new - old for new, old in zip(after, now))
+        return tuple(
+            max(0, new) - max(0, old) for new, old in zip(after, now)
+        )
 
 
 def _invert_tuning(
