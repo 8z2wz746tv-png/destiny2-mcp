@@ -120,3 +120,27 @@ def test_analyze_payload_carries_the_community_block(monkeypatch) -> None:
 
     miss = payload(4294967295)["data"]["starside"]
     assert miss["available"] is False and "没有这件装备的社区记录" in miss["reason"]
+
+
+def test_perk_note_renders_annotations_and_reverse_index() -> None:
+    """perk 层：注记要渲染、套装与反查要给名字、缺数据要有原因。"""
+    from destiny_mcp.services.starside_notes import perk_note
+
+    entity = StarsideEntities()
+    perks = json.loads((ENTITIES / "perks.json").read_text(encoding="utf-8"))["perks"]
+    manifest = _Manifest()
+
+    annotated = next(k for k, v in perks.items() if (v.get("zh") or {}).get("效果"))
+    block = perk_note(entity, manifest, int(annotated))
+    assert block["available"] is True
+    assert block["annotations"]["效果"], "效果文本要渲染出来"
+    assert block["attribution"]["unofficial"] is True
+    blob = json.dumps(block, ensure_ascii=False)
+    for token in ("{perk|", "{num|", "{el-", "{note|", "{unsure|"):
+        assert token not in blob, f"perk 块里不许残留站点标记：{token}"
+
+    with_index = next(k for k, v in perks.items() if v.get("onItems"))
+    assert perk_note(entity, manifest, int(with_index))["on_items"]["count"] > 0
+
+    missing = perk_note(entity, manifest, 4294967295)
+    assert missing["available"] is False and "没有这颗 perk" in missing["reason"]

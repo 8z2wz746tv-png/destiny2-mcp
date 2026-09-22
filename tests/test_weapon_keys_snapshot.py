@@ -233,7 +233,9 @@ async def _call(services: dict[str, Any], **kwargs) -> dict:
         ("type", {"weapon_type": "手炮"},
          ["farming_list", "weapon_schema_version", "weapons"]),
         ("perk_description", {"perk_name": "快速命中"},
-         ["community_references", "perk", "weapon_schema_version"]),
+         # `starside` = 作者给的 perk 层结构化注记（实机细节/效果/属性变化/冷却/来源 + 套装/反查）；
+         # `community_references` 是页面正文检索，两者分工不同、都要留。
+         ["community_references", "perk", "starside", "weapon_schema_version"]),
         ("filter_rolls", {"weapon_type": "手炮"},
          ["checked_count", "coverage_complete", "farming_list", "filters", "matched",
           "matched_count", "not_matched", "perk_scope", "returned_count", "scope",

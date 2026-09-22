@@ -30,6 +30,13 @@
 `BuildResult.score` 的**数值会整体变化**（量级从"1000+ 的加权分"变成"200~1200 的总和"）。
 只把它当"越大越好"读的调用方不受影响；把绝对值当阈值的要改。
 
+## 未发布：`perk_description` 也带 `starside` 块（2026-09-23，同日追加）
+
+`weapon_assistant(intent="perk_description")` 的数据里多一个 `starside`：作者给的 perk 层结构化注记
+（实机细节／口语效果／属性变化（分职业）／冷却秒数与回复倍率／来源／异域 PERK／碎片槽位／右栏）、
+套装关联（`sets`）与反查索引（`on_items`：出现在哪些物品上，名字回我们 Manifest 取）。
+`community_references` 仍是**页面正文**检索，两者分工不同、都保留。没注记时 `available=false` + `reason`。
+
 ## 未发布：`weapon_assistant(intent="analyze")` 多一个 `starside` 块（2026-09-23）
 
 Starside 作者给的新归档（按 hash 的实体数据）接进来了：`analyze` 的数据里多一个 `starside` 键，

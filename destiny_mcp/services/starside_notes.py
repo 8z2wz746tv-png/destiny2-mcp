@@ -159,3 +159,92 @@ def weapon_note(entity: StarsideEntities, manifest: Any, item_hash: int) -> dict
         # 原样保留，但要说清"这不是我们查到的官方名"。
         block["unresolved_names"] = sorted(unresolved_names)
     return block
+
+
+#: perk 层的注记栏目（站点自己的栏名，照原样收；值过标记解析器）
+PERK_TEXT_FIELDS = (
+    "realgame_details", "realgame_details#2", "效果", "属性变化",
+    "冷却与槽位", "基础冷却", "冷却", "费用", "来源", "碎片槽位", "异域 PERK", "右栏",
+)
+
+
+def perk_note(entity: StarsideEntities, manifest: Any, perk_hash: int) -> dict[str, Any]:
+    """perk / 模组 / 碎片层的社区注记（实机细节、口语效果、属性变化、冷却、来源…）。
+
+    另外给两样**结构化的关联**：`sets`（这颗 perk 属于哪些套装，2/4 件效果）与
+    `on_items`（作者的反查索引：出现在哪些物品上；名字一律回我们 Manifest 取，
+    因为其中一部分物品没有社区条目 —— 见 `StarsideEntities.items_with_perk` 的说明）。
+    """
+    attribution = entity.attribution()
+    entry = entity.perk(perk_hash)
+    if not entry:
+        return {
+            "attribution": attribution,
+            "available": False,
+            "reason": "Starside 没有这颗 perk 的社区注记（perk 层覆盖 2,676/5,200）。",
+        }
+
+    names = _name_resolver(manifest)
+    zh = entry.get("zh") or {}
+    block: dict[str, Any] = {"attribution": attribution, "available": True, "gaps": []}
+    unresolved: list[str] = []
+    unresolved_names: set[str] = set()
+
+    def collect(text: object) -> None:
+        unresolved.extend(markup.unknown_tokens(str(text)))
+        for perk_name in markup.perk_names(text):
+            if not names(perk_name):
+                unresolved_names.add(perk_name)
+
+    texts = {}
+    for field in PERK_TEXT_FIELDS:
+        if zh.get(field):
+            texts[field] = markup.render(zh[field], names=names)
+            collect(zh[field])
+    if texts:
+        block["annotations"] = texts
+
+    authors = entry.get("authors") or zh.get("authors") or {}
+    notes = []
+    for author, payload in (authors or {}).items():
+        if not isinstance(payload, dict):
+            continue
+        for field, value in payload.items():
+            if field in ("应用场景", "获取地点", "realgame_details"):
+                notes.append(f"[{author}·{field}] {markup.render(value, names=names)}")
+                collect(value)
+    if notes:
+        block["author_notes"] = notes
+
+    set_names = []
+    for set_hash in entity.sets_of_perk(perk_hash):
+        info = manifest.get_set_bonus_by_hash(set_hash) if hasattr(manifest, "get_set_bonus_by_hash") else None
+        set_names.append((info or {}).get("name") or set_hash)
+    if set_names:
+        block["sets"] = set_names
+
+    owners = entity.items_with_perk(perk_hash)
+    if owners:
+        examples = []
+        for owner in owners[:3]:
+            definition = manifest.get_item_definition(owner) or {}
+            examples.append((definition.get("displayProperties") or {}).get("name") or owner)
+        block["on_items"] = {"count": len(owners), "examples": examples}
+
+    if not texts and not notes:
+        block["gaps"].append("这颗 perk 只有反查索引、没有文字注记")
+    if unresolved:
+        block["unresolved_tokens"] = sorted(set(unresolved))
+    if unresolved_names:
+        block["unresolved_names"] = sorted(unresolved_names)
+    return block
+
+
+def weapon_note_from_svc(svc: Any, item_hash: int) -> dict[str, Any] | None:
+    """工具层一行调用：从服务上下文取实体层与 Manifest（`hash` 为 0 时给 `None`）。"""
+    return weapon_note(svc["starside_entities_svc"], svc["manifest"], item_hash) if item_hash else None
+
+
+def perk_note_from_svc(svc: Any, perk_hash: int) -> dict[str, Any] | None:
+    """同上，perk 层。"""
+    return perk_note(svc["starside_entities_svc"], svc["manifest"], perk_hash) if perk_hash else None

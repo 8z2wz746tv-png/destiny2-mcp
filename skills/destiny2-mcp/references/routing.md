@@ -132,7 +132,7 @@ Manifest 侧（**不代表拥有**）：
 | `info` | 武器完整定义（定义级 `sockets` + `stats` + 清单块） | `weapon_name` |
 | `stats` | 基础属性数值（`{weapon, stats[]}`，顺序按 Bungie 的属性组） | `weapon_name` |
 | `catalyst` | 催化剂情况（`weapon` 为身份块 + `unlock_state=not_checked`） | `weapon_name` |
-| `perk_description` | 单个 Perk 的效果（`{perk, community_references}`） | `perk_name` |
+| `perk_description` | 单个 Perk 的效果（`{perk, community_references}`） | `perk_name` |（`starside` 块是作者给的 perk 层结构化注记：实机细节/属性变化/冷却/来源 + 套装与反查；`community_references` 是页面正文，两者分工不同）
 | `type` | 按武器类型列**我持有的**武器（`weapons.items[]` 是**列表行**：身份 + 位置/光等 + `stats`，**不带** `sockets`/`options`）。**默认 10 件**，响应给 `total`/`returned`/`truncated`/`offset`/`next_offset`。要看某一件的插槽与可换部件用 `compare(weapon_name, item_instance_id)` | `weapon_type`、`limit`、`offset` |
 | `god_roll` | 社区愿单里的推荐 roll（`{weapon, sockets, god_roll}`；固定武器给固定内容） | `weapon_name` |
 

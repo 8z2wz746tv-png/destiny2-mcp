@@ -4,6 +4,14 @@
 
 ## 未发布
 
+**新增：`perk_description` 带 Starside 注记块（实机细节/属性变化/冷却/来源 + 套装与反查）** —— 2026-09-23：
+
+- `data.starside`：作者给的 perk 层栏目（实机细节、口语效果、属性变化（分职业）、冷却秒数与回复倍率、
+  来源、异域 PERK、碎片槽位、右栏）全部过标记解析器；另给 `sets`（这颗 perk 属于哪些套装）与
+  `on_items`（反查：出现在哪些物品上，`count` + 前 3 个例子，名字回我们 Manifest 取 —— 其中一部分
+  物品没有社区条目，靠 Manifest 解释）；作者注记进 `author_notes`。
+- 与既有 `community_references`（页面正文检索）**分工不同、都保留**；没注记给 `available=false` + `reason`。
+
 **新增：`weapon_assistant(intent="analyze")` 带 Starside 社区块（作者推荐 + 实测数值 + 帧表）** —— 2026-09-23：
 
 - 数据来自站点作者给的归档（5,760 物品 / 5,200 perk 的社区层），经 `scripts/import_starside_entities.py`

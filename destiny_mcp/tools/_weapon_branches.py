@@ -16,9 +16,9 @@ from typing import Any
 
 from ..services import weapon_local_data, weapon_payload
 from ..services.weapon_payload import schema_block
-from ._enrichment import community_enrichment
 from ._farming import farming_reference, item_names
-from ..services.starside_notes import weapon_note
+from ..services.starside_notes import weapon_note_from_svc
+from . import _perk_branches as perk_branches
 from ._responses import ok_response
 
 
@@ -128,14 +128,7 @@ async def perk_pool_payload(svc: dict[str, Any], weapon_name: str) -> dict[str, 
 
 def analyze_payload(svc: dict[str, Any], result: dict[str, Any], weapon_name: str) -> dict[str, Any]:
     local = _local(svc, weapon_name)
-    # Starside 社区块（作者推荐/评语/实测数值）：按 hash 查，缺数据时块里自带 reason 与 gaps，
-    # 不编也不吞 —— 口径见 docs/plans/STARSIDE_ENTITY_PLAN.md。
-    weapon_hash = int((result.get("weapon") or {}).get("hash") or 0)
-    starside = (
-        weapon_note(svc["starside_entities_svc"], svc["manifest"], weapon_hash)
-        if weapon_hash
-        else None
-    )
+    starside = weapon_note_from_svc(svc, int((result.get("weapon") or {}).get("hash") or 0))
     warnings = _attach_local(
         svc, local, weapon=result["weapon"], sockets=result["sockets"], weapon_name=weapon_name
     )
@@ -408,15 +401,5 @@ def catalyst_payload(svc: dict[str, Any], weapon_name: str) -> dict[str, Any]:
 
 
 def perk_description_payload(svc: dict[str, Any], perk_name: str) -> dict[str, Any]:
-    perk = svc["manifest_query_svc"].get_perk_description(perk_name)
-    # perk 不是武器，没有 weapon 块可挂；社区资料单独给一块，且必须**照实说**
-    # 资料可不可用（语料里"腐坏的可选资料不能静默消失"这条横切规则）。
-    community = community_enrichment(svc.get("starside_svc"), perk_name, "weapons")
-    return ok_response(
-        f"已读取 Perk「{perk.get('name') or perk_name}」的说明。",
-        {
-            "perk": perk,
-            "community_references": community,
-            **schema_block(),
-        },
-    )
+    """薄转发：实现在 `_perk_branches.py`（perk 域名，别把这文件顶过 412 上限）。"""
+    return perk_branches.perk_description_payload(svc, perk_name)

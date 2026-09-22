@@ -227,7 +227,7 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
 | --- | --- | --- |
 | **P0** ✅ | 导入脚本 + 紧凑实体文件 + 懒加载器 + hash/覆盖守门 | 数据入库，**响应一个字不变** |
 | **P1** ✅ | 标记解析器 + `weapon_assistant(analyze)` 的社区块（Aegis/LGpig + 标签 + 机制细节） | 最想要的那条能力能用（2026-09-23 落地） |
-| **P2** | perk 层接线（`perk_description`/`perk_pool` + `onItems`/`onSets`/`异域 PERK`） | perk 详情与反查 |
+| **P2** ✅ | perk 层接线（`perk_description` 的注记 + `onItems` 反查 + `onSets` 套装 + 异域 PERK） | perk 详情与反查（2026-09-23 落地；`perk_pool` 未接，见文末） |
 | **P3** | 神器/碎片/模组/套装层（`artifact`/`fragment_details`/`armor_mods`/`set_bonus` + 双栏配对） | 神器关联与数值注记 |
 | **P4** | 帧级 DPS 模型（`derived.archetype` → 帧表）：给理论 MDPS/EDPS 与口径说明 | "这把枪打多少" |
 | **P5** | 交叉指路（文本层 ↔ 实体层）、语料行、性能实测与体积登记 | 收尾 |
@@ -317,3 +317,13 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
   `number()` 三种写法 + `∞`、社区块口径与缺口、工具层接线）。
 - 文档同步：`docs/COMPATIBILITY.md`、`CHANGELOG.md`、`skills/destiny2-mcp/references/routing.md`、
   `docs/testing/TESTING_CORPUS.md`（新增第 ⑨ 行）。
+
+### P2 落地（2026-09-23）
+
+- `services/starside_notes.py` 加 `perk_note()`：12 个站内栏目（实机细节／效果／属性变化／冷却与槽位／
+  基础冷却／冷却／费用／来源／碎片槽位／异域 PERK／右栏）全部过 `starside_markup`；`sets`（`onSets` → 套装名）
+  与 `on_items`（反查 count + 前 3 个名字，名字回 Manifest 取）两样结构化关联；作者注记进 `author_notes`。
+- 接线：`tools/_weapon_branches.perk_description_payload` 的 `data.starside`；键集快照同步。
+- 守门：`tests/test_starside_markup.py::test_perk_note_renders_annotations_and_reverse_index`。
+- **`perk_pool` 暂未接**：它是"这把枪的插槽池"，与 perk 层注记不是一回事；真要接应等"按池内每颗 perk
+  带注记"这个需求明确（否则一次响应会塞进几十颗 perk 的文本）。
