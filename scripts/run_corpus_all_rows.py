@@ -28,6 +28,7 @@ import json
 import re
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, get_args
 
@@ -35,6 +36,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from destiny_mcp.data import rotations as tables  # noqa: E402
 from destiny_mcp.server import app_lifespan, create_server  # noqa: E402
 from destiny_mcp.tools import assistants as assistants_module  # noqa: E402
 from destiny_mcp.tools._requests import (  # noqa: E402
@@ -1042,13 +1044,20 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     )
 
     table_rows = [row for row in rrows if row.get("source") == "schedule"]
+    # 泉源**按天交替，不能把"今天是哪个"写死** —— 这里原先是 `== ["泉源：防御", "泉源：攻击"]`，
+    # 写的是作者那天的顺序，2026-09-22 跑就红了（工具是对的，是断言过期：
+    # 锚点 09-15T17:00Z=攻击 ⇒ 09-22 攻击）。与 `tests/test_rotations.py` 同一条规矩：
+    # 期望值从同一个出处现算（`wellspring_upcoming` 就是响应里用的那个函数）。
+    expected_wellspring = [
+        f"泉源：{mode}" for _, mode in tables.wellspring_upcoming(datetime.now(timezone.utc))
+    ]
     check(
         "rows",
         "rotations：自维护表那半带核对元数据，泉源今天/明天交替",
         all(row.get("verified_at") and row.get("verified_against") for row in table_rows)
-        and [row["name"] for row in table_rows if row.get("kind") == "wellspring"][:2]
-        == ["泉源：防御", "泉源：攻击"],
-        f"表行={[(r['kind'], r['name']) for r in table_rows]}",
+        and [row["name"] for row in table_rows if row.get("kind") == "wellspring"]
+        == expected_wellspring,
+        f"表行={[(r['kind'], r['name']) for r in table_rows]} 期望={expected_wellspring}",
     )
 
     lost = rdata.get("lost_sector") or {}
