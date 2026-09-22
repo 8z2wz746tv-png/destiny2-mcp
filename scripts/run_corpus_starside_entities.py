@@ -34,30 +34,14 @@ if str(ROOT) not in sys.path:
 
 from destiny_mcp.server import app_lifespan, create_server  # noqa: E402
 from destiny_mcp.services.starside_entities import StarsideEntities  # noqa: E402
+from destiny_mcp.services.starside_markup import number as unwrap_number  # noqa: E402
 from destiny_mcp.tools._helpers import resolve_player_name  # noqa: E402
 
 RESULTS: list[tuple[str, bool, str]] = []
 TIERS = {"S", "A", "B", "C", "D", "E", "F"}
 PERK_TOKEN = re.compile(r"\{perk\|([^{}|]+)\}")
-NUM_TOKEN = re.compile(r"\{num\|([^{}]*)\}")
-#: 站点把"多个值/带标签的值"写成 `{num|13514\\11384}`、`{num|7087\\(级联点)}`，还有 `∞`
-#: （真机语料挖出来的）——解析器必须先解包再判数值，不能拿原串当数字。
+#: 站点有些 perk 引用带武器名后缀（`{perk|Suros 协同（铭纹-41）}`）——查名时先去掉再试一次
 PAREN_SUFFIX = re.compile(r"（[^）]*）\s*$")
-
-
-def unwrap_number(value: object) -> tuple[str, bool]:
-    """把站点数值写法解包成 `(文本, 是否可当数值看)`。`∞` 也算合法（作者就这么写的）。"""
-    text = str(value or "").strip()
-    text = NUM_TOKEN.sub(lambda m: m.group(1), text)
-    text = text.split("\\")[0].strip()
-    text = PAREN_SUFFIX.sub("", text).strip()
-    if text in ("∞", "-∞"):
-        return text, True
-    try:
-        float(text)
-    except ValueError:
-        return text, False
-    return text, True
 
 
 def check(row: str, ok: bool, evidence: str) -> None:

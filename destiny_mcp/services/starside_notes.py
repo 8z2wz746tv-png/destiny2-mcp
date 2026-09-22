@@ -1,0 +1,161 @@
+"""把实体层的一条记录成形为响应里的"社区块"。
+
+三条口径（计划文档第五节的硬规矩）在这里落地：
+
+1. **两套评级各自成字段、各自带作者与刻度**，永不合并成一个"评分"；LGpig 的分场景（清怪/高难/输出）
+   也分开列。
+2. **缺失给 `None` + 原因**（`gaps`）：只有 748/2,208 把武器有 Aegis 推荐、339 把有 LGpig、28 个框架有
+   帧表 —— 没评过就说没评过，不编。
+3. **社区块永远带出处**（`attribution`：source/snapshot_at/authors/unofficial），数值附适用条件。
+
+文本一律过 `starside_markup.render`：`{perk|…}` 翻成我们 Manifest 的官方中文名，`{unsure|…}` 保留，
+`{pvp|…}` 标成 PvP 专用，解不开的原样留着并由 `unresolved` 报出来。
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from . import starside_markup as markup
+from .starside_entities import StarsideEntities
+
+#: 帧表是站点实测口径 —— 只给数字不给条件就是误导（用户拍板的口径之一）
+FRAME_CONDITION = (
+    "站点实测口径：数值来自作者的帧级测试（弹药类型、是否含增伤、打哪类目标见该帧表字段），"
+    "不是我们对游戏机制的断言；换配装/换 perk 会变。"
+)
+COMMUNITY_TAGS_NOTE = "以下标签是 Starside 整理（非 Bungie 官方字段），以我们本地 Manifest 为准的项已注明。"
+
+#: Aegis 的栏位推荐（每项都可能是"多选"，用 `\\` 分隔）
+AEGIS_SLOTS = ("barrel", "magazine", "origin", "perk1", "perk2")
+#: LGpig 的实测数值字段
+LGPIG_NUMBERS = ("dps", "total_damage", "switch_dps")
+
+
+def _name_resolver(manifest: Any):
+    def resolve(name: str) -> str | None:
+        try:
+            found = manifest.search(name, limit=1)
+        except Exception:  # 结论路径不许静默：查名失败退回原名（下面 unresolved 会记）
+            return None
+        if not found:
+            return None
+        definition = manifest.get_item_definition(int(found[0].get("itemHash") or 0)) or {}
+        official = (definition.get("displayProperties") or {}).get("name")
+        return official or None
+
+    return resolve
+
+
+def _render_field(value: object, names) -> dict[str, Any]:
+    """一个可能是"多选"的字段 → `{"options": [...], "text": "A／B"}`。"""
+    options = [markup.render(part, names=names) for part in markup.alternatives(value)]
+    return {"options": options, "text": "／".join(options)}
+
+
+def weapon_note(entity: StarsideEntities, manifest: Any, item_hash: int) -> dict[str, Any]:
+    """武器（或任何有社区记录的东西）的社区块；没有记录时给 `available=False` + 原因。"""
+    attribution = entity.attribution()
+    entry = entity.item(item_hash)
+    if not entry:
+        return {
+            "attribution": attribution,
+            "available": False,
+            "reason": "Starside 没有这件装备的社区记录（覆盖率见 attribution 里的 counts）。",
+        }
+
+    names = _name_resolver(manifest)
+    authors = entity.authors_of(item_hash)
+    block: dict[str, Any] = {"attribution": attribution, "available": True, "authors": {}, "gaps": []}
+    unresolved: list[str] = []
+    unresolved_names: set[str] = set()
+
+    def collect(text: object) -> None:
+        """把一段站点文本里的记号与查不到的名字都记下来（留痕，不静默）。"""
+        unresolved.extend(markup.unknown_tokens(str(text)))
+        for perk_name in markup.perk_names(text):
+            if not names(perk_name):
+                unresolved_names.add(perk_name)
+
+    aegis = authors.get("Aegis")
+    if aegis:
+        slots = {slot: _render_field(aegis.get(slot), names) for slot in AEGIS_SLOTS if aegis.get(slot)}
+        block["authors"]["Aegis"] = {
+            "tier": aegis.get("aegis_tier") or None,
+            "scale": "Aegis 总榜：S/A/B/C/D/E/F",
+            **slots,
+            "masterwork": markup.render(aegis.get("masterwork"), names=names) or None,
+            "explanation": markup.render(aegis.get("explanation_1"), names=names) or None,
+            "source": markup.render(aegis.get("aegis_source"), names=names) or None,
+            "alias": aegis.get("name") or None,
+        }
+        for value in aegis.values():
+            collect(value)
+    else:
+        block["gaps"].append("Aegis 没有评过这把（748/2208 把武器有）")
+
+    lgpig = authors.get("LGpig")
+    if lgpig:
+        numbers = {}
+        for key in LGPIG_NUMBERS:
+            if lgpig.get(key) in (None, ""):
+                continue
+            text, numeric = markup.number(lgpig[key])
+            numbers[key] = text
+            if not numeric:
+                block["gaps"].append(f"LGpig 的 {key} 不是纯数值（原文 {text!r}），照原样给出")
+        block["authors"]["LGpig"] = {
+            "tier": str(lgpig.get("lgpig_tier") or "").strip() or None,
+            "scale": "LGpig 分场景榜：T0/T0.5/…/T4，按 清怪／高难／输出 分别给",
+            "tier_explanation": markup.render(lgpig.get("lgpig_tier_explanation"), names=names) or None,
+            "role": [part for part in markup.alternatives(lgpig.get("role"))] or None,
+            "numbers": numbers or None,
+            "perk1": _render_field(lgpig.get("perk1"), names) if lgpig.get("perk1") else None,
+            "perk2": _render_field(lgpig.get("perk2"), names) if lgpig.get("perk2") else None,
+            "explanations": [
+                text
+                for key in ("explanation_1", "explanation_2", "explanation_3")
+                if (text := markup.render(lgpig.get(key), names=names))
+            ],
+            "notes": markup.render(lgpig.get("notes"), names=names) or None,
+            "source": markup.render(lgpig.get("lgpig_source"), names=names) or None,
+        }
+        if not block["authors"]["LGpig"]["tier"]:
+            block["gaps"].append("LGpig 只写了说明、没给评级（按未评级展示）")
+        for value in lgpig.values():
+            collect(value)
+    else:
+        block["gaps"].append("LGpig 没有评过这把（339/2208 把武器有）")
+
+    zh = entry.get("zh") or {}
+    if zh.get("realgame_details"):
+        block["mechanism"] = markup.render(zh["realgame_details"], names=names)
+        collect(zh["realgame_details"])
+    if zh.get("site_source"):
+        block["source_text"] = markup.render(zh["site_source"], names=names)
+
+    frames = entity.frame_stats_for_weapon(item_hash)
+    if frames:
+        block["frame"] = {
+            "rows": [dict(row) for row in frames],
+            "condition": FRAME_CONDITION,
+        }
+    else:
+        block["gaps"].append("这把的框架没有帧级实测表（28 个框架有）")
+
+    derived = entry.get("derived") or {}
+    tags = {k: derived.get(k) for k in ("release", "season", "foundry", "craftable", "tierable") if derived.get(k)}
+    for key in ("isAdept", "isHolofoil"):
+        if entry.get(key):
+            tags[key] = True
+    if entry.get("sameAs"):
+        tags["same_as"] = entry["sameAs"]
+    if tags:
+        block["tags"] = {**tags, "note": COMMUNITY_TAGS_NOTE}
+    if unresolved:
+        block["unresolved_tokens"] = sorted(set(unresolved))
+    if unresolved_names:
+        # 站点用了我们库里没有的名字（真机语料实测占 2.4%，多为品牌/瞄具叫法）：
+        # 原样保留，但要说清"这不是我们查到的官方名"。
+        block["unresolved_names"] = sorted(unresolved_names)
+    return block
