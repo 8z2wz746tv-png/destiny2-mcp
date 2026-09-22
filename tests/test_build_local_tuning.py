@@ -118,7 +118,9 @@ def test_no_single_piece_tuning_can_improve_the_result_any_further() -> None:
     """这条就是"吃干净"的定义：返回的解在单件邻域里已经是局部最优。"""
     manifest = _FakeManifest()
     snapshot = _snapshot(_five(grenade=19, melee=20, health=20))
-    constraints = BuildConstraints(grenade_min=95, melee_min=100)
+    constraints = BuildConstraints(
+        grenade_min=95, melee_min=100, priority_stat_indices=[GRENADE]
+    )
     solved = solve(snapshot, constraints)
     assert solved.sets, "这套要能解出来，否则验不到「局部最优」"
 
@@ -195,7 +197,11 @@ def test_changes_are_netted_per_piece() -> None:
     """
     manifest = _FakeManifest()
     snapshot = _snapshot(_five(grenade=19, melee=20, health=20))
-    constraints = BuildConstraints(grenade_min=95, melee_min=100)
+    # 手雷设成优先级：这样"+手雷/−生命值"在**不夹 0** 的新算术下仍然是真改进
+    # （净总和不变，但优先级那一层涨了）。没有优先级时它不是改进，见下一条测试。
+    constraints = BuildConstraints(
+        grenade_min=95, melee_min=100, priority_stat_indices=[GRENADE]
+    )
     solved = solve(snapshot, constraints)
     context = prepare_fixed_set_context(snapshot, constraints)
 
@@ -251,3 +257,42 @@ def test_local_search_reports_its_own_boundary() -> None:
     doc = local_tuning_improvement.__doc__ or ""
 
     assert "局部" in doc and "全局" in doc
+
+
+def test_running_the_local_pass_twice_does_not_invent_points() -> None:
+    """第二趟不许再"长点"：贪心必须幂等。
+
+    这条是用户发现的那个 bug 的**哨兵**：旧实现把 `base + delta` 夹在 0、反推时又把被夹掉的
+    点当成本来就有，于是每跑一趟六维就往上飘（真机同一件飘了 15 点）。幂等性一破，
+    就说明又有人在某处"补"了不该补的点。
+    """
+    manifest = _FakeManifest()
+    snapshot = _snapshot(_five(grenade=19, melee=20, health=20))
+    constraints = BuildConstraints(
+        grenade_min=95, melee_min=100, priority_stat_indices=[GRENADE]
+    )
+    solved = solve(snapshot, constraints)
+    context = prepare_fixed_set_context(snapshot, constraints)
+
+    once, plan1 = local_tuning_improvement(solved.sets[0], context, manifest)
+    twice, plan2 = local_tuning_improvement(once, context, manifest)
+
+    def totals(armor_set) -> list[int]:
+        return [
+            armor_set.stats[index] + armor_set.bonus_stats[index] for index in range(6)
+        ]
+
+    assert plan1.changes, "第一趟本来就该吃出改动，否则这条用例是真空成立"
+    assert totals(twice) == totals(once), "第二趟把六维改动了（凭空长点或来回摇）"
+
+    # 逐件对账：每件的六维变化必须**正好等于**它那条调谐改动的 delta
+    before = {a.item_instance_id: a for a in solved.sets[0].armor}
+    after = {a.item_instance_id: a for a in once.armor}
+    for change in plan1.changes:
+        old = before[change.item_instance_id]
+        new = after[change.item_instance_id]
+        old_sum = sum(int(getattr(old.stats, name, 0) or 0) for name in STAT_NAMES)
+        new_sum = sum(int(getattr(new.stats, name, 0) or 0) for name in STAT_NAMES)
+        assert new_sum - old_sum == sum(change.delta), (
+            f"{change.item_name} 的六维变化与调谐 delta 对不上：凭空长点"
+        )

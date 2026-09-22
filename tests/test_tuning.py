@@ -306,8 +306,9 @@ def test_plan_closes_a_five_point_gap_with_one_change() -> None:
     change = plan.changes[0]
     assert change.increased == "grenade"
     assert plan.final_delta[STAT_NAMES.index("grenade")] == 5
-    # 这件护甲的近战本来就是 0，−5 打上去是白给的：不用动任何非零项
-    assert change.decreased == "melee"
+    # 被牺牲的那一项必须**没有目标**（这件上就是 生命/职业/超能/近战 里的一件）。
+    # 具体挑哪一件由捐赠代价排序决定 —— 新算术下每种牺牲都一样贵，别把某一件写死。
+    assert change.decreased not in {"weapons", "grenade"}
 
 
 def test_plan_refuses_when_the_decreased_side_would_break_a_target() -> None:
@@ -366,14 +367,17 @@ def test_plan_can_undo_a_tuning_that_hurts_the_target() -> None:
 
     assert plan.feasible is True
     assert plan.change_count == 1
-    # 换个"不再减手雷"的调谐即可：手雷 +5，被减的那一项本来就是 0（夹在 0 不动），
-    # 比直接撤掉调谐更好 —— 撤掉会把武器 +5 也一起丢掉。
+    # 换个"不再减手雷"的调谐即可：手雷 +5，代价是丢掉现在这条调谐给的武器 +5
+    # （新算术下这笔代价如实出现在 delta 里，不再被夹 0 抹掉）。
     change = plan.changes[0]
     assert change.delta[STAT_NAMES.index("grenade")] == 5
-    assert all(
-        value >= 0 for index, value in enumerate(change.delta)
-        if index != STAT_NAMES.index("grenade")
+    assert change.delta[STAT_NAMES.index("grenade")] > 0
+    # 要害是**没有目标被掉破**：生命卡在 5，换完还得 ≥ 5
+    after = tuple(
+        now + delta for now, delta in zip((35, 5, 0, 15, 0, 0), change.delta)
     )
+    assert after[STAT_NAMES.index("health")] >= 5
+    assert after[STAT_NAMES.index("grenade")] >= 20
 
 
 def test_plan_rejects_a_gap_larger_than_all_five_pieces_can_cover() -> None:
@@ -472,6 +476,13 @@ def test_plan_is_deterministic() -> None:
     ]
 
 
+def change_decreased_of(payload: dict) -> str:
+    """载荷里那项负收益的键名（代价项）。"""
+    return next(
+        key for key, value in payload["changes"][0]["delta"].items() if value < 0
+    )
+
+
 def test_plan_delta_payload_only_lists_changed_stats() -> None:
     piece = _piece("腿甲", _stats(weapons=40, health=30, grenade=15))
 
@@ -479,9 +490,13 @@ def test_plan_delta_payload_only_lists_changed_stats() -> None:
     payload = plan.as_dict()
 
     assert payload["change_count"] == 1
-    # 代价那一项本来就见底（职业 = 0），所以净变化只有手雷 +5
-    assert payload["changes"][0]["delta"] == {"grenade": 5}
-    assert payload["final_delta"] == {"grenade": 5}
+    delta = payload["changes"][0]["delta"]
+    assert delta["grenade"] == 5
+    # 只列**变过**的项：手雷 +5 与代价那一项 −5（新算术下代价如实出现），
+    # 没动的项（武器 40、生命 30）一个都不许出现
+    assert set(delta) == {"grenade", change_decreased_of(payload)}
+    assert min(delta.values()) == -5
+    assert payload["final_delta"]["grenade"] == 5
 
 
 @pytest.mark.parametrize("kind", ["directional", "balanced", "empty"])
@@ -494,8 +509,18 @@ def test_choice_as_dict_keeps_hash_and_kind(kind: str) -> None:
     assert payload["kind"] == kind
 
 
-def test_dumping_a_stat_that_is_already_zero_is_free() -> None:
-    """T5 词条本来就只有三项非零：把 −5 打在本就为 0 的项上，净代价是 0。"""
+def test_dumping_a_stat_that_is_already_zero_is_not_free() -> None:
+    """把 −5 打在已经见底的项上**不是白给** —— 组件 304 如实记负数。
+
+    真机证据（2026-09-22）：光芒领主手套 `6917530188462631525` 装着「+职业 / -生命值」，
+    它的生命基础值是 0，而 304 里写的就是 **生命 −5** —— 游戏自己没夹 0。
+    旧口径（"夹到 0，所以牺牲见底的项是白给"）会让反推（`observed − delta`）把被夹掉的
+    5 点当成本来就有：贪心每走一步凭空长 5 点，真机同一件几步之后从
+    武器25/生命−5/手雷0/超能0 变成 武器30/生命5/手雷5/超能5（用户发现的那个 bug）。
+
+    这条测试钉的是"代价要如实出现在 delta 里"，不是"不许牺牲见底的项"：
+    那一项**没有目标**，所以扣它仍然合法（游戏里也有这种装法，304 就是证据）。
+    """
     piece = _piece("腿甲", _stats(weapons=30, health=25, grenade=20))
 
     plan = plan_tuning(
@@ -509,5 +534,64 @@ def test_dumping_a_stat_that_is_already_zero_is_free() -> None:
     change = plan.changes[0]
     assert change.increased == "grenade"
     assert change.delta[STAT_NAMES.index("grenade")] == 5
-    assert change.delta[STAT_NAMES.index("weapons")] == 0, "武器不能被扣"
-    assert min(change.delta) == 0, "整条改动不应该有任何负数（减的那项已经见底）"
+    assert change.delta[STAT_NAMES.index("weapons")] == 0, "武器不能被扣（它卡在目标上）"
+    assert min(change.delta) == -5, "代价那一项必须如实记成 −5，不许被夹成 0"
+    assert change.decreased in {"class_stat", "super_stat", "melee"}, (
+        "被牺牲的必须是**没有目标**的那几项之一"
+    )
+
+
+# ── "不许凭空长点"：用户发现的那个 bug（2026-09-22） ─────────────────────
+
+
+def test_piece_stats_change_by_exactly_the_tuning_delta() -> None:
+    """换调谐，六维只能按那一对 ±5 变 —— 一项都不许多出来。
+
+    旧实现：`base_with()` 把 `base + delta` **夹在 0**（生命 0 − 5 → 0），而反推
+    `_invert_tuning` 又做 `observed − delta`（0 − (−5) = **+5**）—— 每"牺牲一项已经见底的
+    属性"就凭空长 5 点。贪心对同一件走几步就累加：真机同一件从
+    武器25/生命−5/手雷0/超能0 变成 武器30/生命5/手雷5/超能5（**多 15 点**）。
+
+    真机案例（2026-09-22，`inventory_assistant(intent="item")`）：
+    光芒领主手套 `6917530188462631525` 的组件 304 = 武器25 生命−5 职业35 手雷0 超能0 近战30
+    （职业那 35 里有 10 点是模组，护甲面是 25），装着「+职业 / -生命值」。
+    它的基础值 = 武器25 生命0 职业20 手雷0 超能0 近战30；换成「+武器 / -近战」之后
+    必须是 武器30 生命0 职业20 手雷0 超能0 近战25。
+    """
+    piece = _piece(
+        "光芒领主手套",
+        _stats(weapons=25, health=-5, class_stat=25, grenade=0, super_stat=0, melee=30),
+        tuning=directional_tuning_hash("class_stat", "health"),
+    )
+
+    assert piece.movable is True
+    # STAT_NAMES 顺序：武器 生命 职业 手雷 近战 超能
+    assert piece.base == (25, 0, 20, 0, 30, 0)
+    assert piece.stats_with(None) == (25, -5, 25, 0, 30, 0)
+
+    choice = piece.option(directional_tuning_hash("weapons", "melee"))
+    assert choice is not None
+    assert piece.stats_with(choice) == (30, 0, 20, 0, 25, 0), (
+        "只有 +武器/−近战 生效；生命/手雷/超能 一个点都不许变"
+    )
+    before, after = piece.stats_with(None), piece.stats_with(choice)
+    assert sum(after) - sum(before) == sum(piece.delta_of(choice))
+
+
+def test_uninvertible_piece_is_not_movable_and_never_invents_stats(monkeypatch) -> None:
+    """反推不出基础六维的件：`movable=False`、`note` 有话说，且**任何改法都返回观测值**。
+
+    这一对（机器可读的 `movable` 与人话 `note`）必须同进同出；而 `stats_with` 在
+    反推不出来时返回观测值 —— 宁可"不动它"，也不许编一个改法出来（以前那条兜底
+    会把当前调谐再加一遍）。
+    """
+    from destiny_mcp.build import tuning as tuning_module
+
+    monkeypatch.setattr(tuning_module, "_invert_tuning", lambda observed, current: None)
+    piece = _piece("腿甲", _stats(weapons=30, health=25, grenade=20))
+
+    assert piece.movable is False
+    assert piece.note, "反推不出来必须有一句人话说明"
+    observed = tuple(getattr(piece, "observed"))
+    for choice in piece.options:
+        assert piece.stats_with(choice) == observed, "不许编改法"

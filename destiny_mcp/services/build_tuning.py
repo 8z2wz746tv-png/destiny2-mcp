@@ -208,7 +208,9 @@ def rescue_sets(
         if len(arms) != 5:
             continue
         pieces = [piece_tuning(armor, manifest) for armor in arms]
-        tunable = [piece for piece in pieces if piece is not None]
+        # 只动"反推得出基础六维"的件：反推不出来的件连它现在是什么都算不准，
+        # 更不该拿它去规划改法（`movable` 是机器可读的那一份，见 build/tuning.py）。
+        tunable = [piece for piece in pieces if piece is not None and piece.movable]
         if not tunable:
             continue
 
@@ -344,7 +346,7 @@ def _pick_and_rescue(
         tunable = [
             piece
             for armor in arms
-            if (piece := piece_tuning(armor, manifest)) is not None
+            if (piece := piece_tuning(armor, manifest)) is not None and piece.movable
         ]
         if not _worth_search(
             arms,

@@ -192,9 +192,21 @@ class PieceTuning:
     options: tuple[TuningChoice, ...]
     base: tuple[int, ...]  # 减掉当前调谐之后的六维（STAT_NAMES 顺序）
     note: str = ""
+    #: 观测到的六维（含当前调谐，与组件 304 同口径）。反推不出来时它就是"保持现状"的值。
+    observed: tuple[int, ...] = ()
+    #: 这件**能不能动调谐**。反推不出基础六维时为 False —— 机器可读的那一份，
+    #: 与 `note != ""` 恒等（`tests/test_tuning.py` 钉住这条一致性）。
+    movable: bool = True
 
     def stats_with(self, choice: TuningChoice | None) -> tuple[int, ...]:
-        """装上 `choice`（None = 保持现状）之后这件护甲的六维。"""
+        """装上 `choice`（None = 保持现状）之后这件护甲的六维。
+
+        反推不出基础六维的件**原样返回观测值**：它的调谐改动我们算不出来，
+        那就"不动它"，而不是编一个改法出来（调用方本来就该看 `movable` 先跳过它，
+        这里是防止有人漏看时凭空造出属性）。
+        """
+        if not self.movable:
+            return self.observed
         chosen = self.current if choice is None else choice
         return self.base_with(self.choice_delta(chosen))
 
@@ -208,10 +220,17 @@ class PieceTuning:
         return choice.delta
 
     def base_with(self, delta: Sequence[int]) -> tuple[int, ...]:
-        return tuple(
-            max(0, value + change)
-            for value, change in zip(self.base, delta)
-        )
+        """基础六维 + 一份调谐增量。
+
+        **不夹 0**（2026-09-22 真机纠正）：以前这里写 `max(0, base + delta)`，
+        理由是"游戏里属性不会变成负数"。可组件 304 **如实报负数** —— 光芒领主手套
+        `…631525` 的 304 就是「生命 −5」（它的生命基础值是 0，装着 +职业/−生命值）。
+        夹 0 会让反推（`observed − delta`）把被夹掉的那 5 点当成"本来就有"，
+        于是贪心每走一步就凭空长 5 点：真机同一件走几步后从 武器25/生命−5/手雷0/超能0
+        变成 武器30/生命5/手雷5/超能5 —— **多出 15 点账面属性**（用户发现的）。
+        模型必须等于游戏报的数，所以这里如实算。
+        """
+        return tuple(value + change for value, change in zip(self.base, delta))
 
     def option(self, plug_hash: int) -> TuningChoice | None:
         wanted = _canon(plug_hash)
@@ -223,10 +242,8 @@ class PieceTuning:
     def delta_of(self, choice: TuningChoice) -> tuple[int, ...]:
         """相对**现状**的净变化（求解器里的属性已经是含当前调谐的值）。
 
-        按"每项最低到 0"计算：−5 打在本就是 0 的那一项上是白给的（游戏里属性不会
-        变成负数，T5 词条本来就只有三项非零）。所以这里用夹到 0 之后的差值，
-        而不是原始 ±5 —— 否则会把"牺牲一个已经见底的属性"误判成有代价，
-        也会算出负数这种游戏里不存在的值。
+        "−5 打在本就见底的项上是白给"这条**不需要夹 0 也成立**：两个状态都带着那 −5，
+        差值自然就是 0。以前夹 0 反而把"见底"这件事记漏了（见 `base_with`）。
         """
         now = self.stats_with(None)
         after = self.stats_with(choice)
@@ -257,7 +274,7 @@ def _invert_tuning(
             for index, value in enumerate(observed)
         )
         restored = tuple(
-            max(0, value + bonus)
+            value + bonus
             for value, bonus in zip(candidate, balanced_tuning_bonus(candidate))
         )
         if restored == observed:
@@ -287,9 +304,13 @@ def piece_tuning(
     observed = tuple(int(getattr(stats, name, 0) or 0) for name in STAT_NAMES)
     base = _invert_tuning(observed, current)
     note = ""
+    movable = True
     if base is None or any(value < 0 for value in base):
-        # 反推不出来（理论上不会发生）：宁可只让这件保持现状，也不要编一个负的基础值。
-        base = tuple(max(0, value) for value in observed)
+        # 反推不出来（数据对不上）：宁可只让这件保持现状，也不要编一个基础值 ——
+        # 更不许拿它去算"换成某个调谐会怎样"（以前这里是 `base = observed`，
+        # 配上 `stats_with(当前调谐)` 会把当前调谐**再加一遍**）。
+        base = tuple(value for value in observed)
+        movable = False
         note = "这件护甲反推不出未调谐的基础属性，只能保持当前调谐。"
 
     return PieceTuning(
@@ -301,6 +322,8 @@ def piece_tuning(
         options=catalog,
         base=base,
         note=note,
+        observed=observed,
+        movable=movable,
     )
 
 
@@ -360,7 +383,7 @@ def local_tuning_improvement(
     pieces: list[PieceTuning] = []
     for armor in arms:
         piece = piece_tuning(armor, manifest)
-        if piece is None or piece.note:
+        if piece is None or not piece.movable:
             return armor_set, TuningPlan(feasible=True, reason="有的护甲没有可用的调谐槽。")
         pieces.append(piece)
     # 原件视角留着算**净改动**：贪心可能对同一件走好几步（第一步 +手雷/−生命值，
@@ -504,7 +527,7 @@ def tuning_headroom(pieces: Iterable[PieceTuning]) -> dict[str, int]:
     """每项最多能靠调谐加多少点（把每件能给出的最大正增益加起来）。"""
     headroom = {name: 0 for name in STAT_NAMES}
     for piece in pieces:
-        if piece.note:
+        if not piece.movable:
             continue
         gains = [0] * len(STAT_NAMES)
         for choice in piece.options:
@@ -616,7 +639,7 @@ def plan_tuning(
     实机踩过：把预算按"某项优先"硬摊到每一项头上，会得出"明明只差 4 点却说补不上"，
     或者白白改 5 件护甲的调谐。合计口径才是和复核一致的口径。
     """
-    usable = [piece for piece in pieces if not piece.note]
+    usable = [piece for piece in pieces if piece.movable]
     if not usable:
         return TuningPlan(feasible=False, reason="没有带调谐槽的护甲，调谐补不了。")
 
@@ -726,9 +749,10 @@ def plan_tuning(
         )
         if not meets_all and remaining > max(0, total_budget):
             return
-        for index, value in enumerate(offset):
-            if int(stats_now[index]) + value < 0:
-                return
+        # 这里**没有**"任何一项都不许变成负数"的硬规则（2026-09-22 真机纠正）：
+        # 游戏允许把 −5 打在基础值为 0 的项上（光芒领主手套 `…631525` 的 304 就是
+        # 生命 −5），所以"扣成负数"是合法走法，只按**目标**判合格与否（`_meets`）。
+        # 以前那条规则会把这类走法全部判死，于是"牺牲一项没用的属性去补目标"永远出不来。
         changes = tuple(
             TuningChange(
                 item_instance_id=piece.item_instance_id,

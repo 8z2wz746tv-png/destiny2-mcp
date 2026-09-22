@@ -223,8 +223,10 @@ def test_rescue_closes_a_five_point_gap_and_reports_the_change() -> None:
     assert rescue.plan.change_count == 1
     change = rescue.plan.changes[0]
     assert change.increased == "grenade"
-    # 这件护甲的近战本来就是 0，−5 打上去白给：不用牺牲任何非零项
-    assert change.decreased == "melee"
+    # 被牺牲的必须是**没有目标**的那一项（这件上是 生命/职业/超能/近战 之一）。
+    # 具体挑哪一件由捐赠代价排序决定 —— 别写死某一件（2026-09-22：去掉"−5 打在 0 上白给"
+    # 那个夹 0 口径之后，这一项从 近战 变成了 生命，两者都合法）。
+    assert change.decreased in {"health", "class_stat", "super_stat", "melee"}
     # 复核后的六维必须真的到 55
     stats = list(rescue.armor_set.stats)
     assert stats[STAT_INDEX["grenade"]] == 55

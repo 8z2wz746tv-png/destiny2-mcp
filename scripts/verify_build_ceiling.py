@@ -181,9 +181,20 @@ async def run_scene(build_svc: BuildService, inventory: InventoryService,
         for item in candidate.items:
             stats = {key: int(getattr(item.stats, key, 0) or 0) for key in STAT_ORDER}
             tuning = getattr(item, "tuning_name", "") or ""
+            extras = " ".join(
+                part for part in (
+                    f"T{getattr(item, 'gear_tier', 0) or '?'}",
+                    f"原型 {getattr(item, 'archetype_name', '') or '?'}",
+                    f"套装 {getattr(item, 'set_bonus_name', '') or '—'}",
+                    "大师" if getattr(item, "is_masterworked", False) else "未大师",
+                    f"能量 {getattr(item, 'energy_capacity', 0) or '?'}",
+                    "已装备" if getattr(item, "is_equipped", False) else "",
+                ) if part
+            )
             print(f"        {getattr(item, 'slot', '?'):12s} "
                   f"{getattr(item, 'name', '?'):16s} {_fmt(stats)}"
                   + (f"  调谐: {tuning}" if tuning else ""))
+            print(f"            id={getattr(item, 'item_instance_id', '?')}  {extras}")
         for change in getattr(result, "tuning_changes", None) or []:
             print(f"        调谐改动: {change}")
 
