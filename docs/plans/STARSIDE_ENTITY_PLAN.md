@@ -1,6 +1,6 @@
 # Starside 实体数据接入计划（作者新归档）
 
-**状态（2026-09-23）**：方案待用户确认后开工。数据来源：**Starside 站点作者给出的新归档**
+**状态（2026-09-23）**：三条口径已拍板；**P0 已落地**（见第八节的落地记录）。数据来源：**Starside 站点作者给出的新归档**
 （`归档/inventory-items.json` 13.1 MB、`归档/sandbox-perks.json` 2.9 MB、`归档/traits.json` 42 KB，
 快照时间 2026-09-21 15:30）。归档本身**不进 git**（`.gitignore` 已加），入库的是我们转换后的紧凑子集。
 
@@ -225,7 +225,7 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
 
 | 阶段 | 做什么 | 产出 |
 | --- | --- | --- |
-| **P0** | 导入脚本 + 紧凑实体文件 + 懒加载器 + hash/覆盖守门 | 数据入库，**响应一个字不变** |
+| **P0** ✅ | 导入脚本 + 紧凑实体文件 + 懒加载器 + hash/覆盖守门 | 数据入库，**响应一个字不变** |
 | **P1** | 标记解析器 + `weapon_assistant(analyze)` 的社区块（Aegis/LGpig + 标签 + 机制细节） | 最想要的那条能力能用 |
 | **P2** | perk 层接线（`perk_description`/`perk_pool` + `onItems`/`onSets`/`异域 PERK`） | perk 详情与反查 |
 | **P3** | 神器/碎片/模组/套装层（`artifact`/`fragment_details`/`armor_mods`/`set_bonus` + 双栏配对） | 神器关联与数值注记 |
@@ -255,3 +255,32 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
    不让玩家把"查不到"读成"游戏里没有"。
 3. **数值必须带适用条件**：`dps`/`total_damage`/帧表一律附口径（弹药类型、是否含增伤、打什么目标、
    PvE/PvP），只给数字不给条件算误导。
+
+---
+
+## 十一、P0 落地记录（2026-09-23）
+
+- `scripts/import_starside_entities.py`：读作者导出 → 只留有社区字段的物品与 perk → 写
+  `data/starside/entities/{items,perks}.json`（**物品 4,483 / perk 2,676；1.64 + 1.14 MB**），
+  并把来源（sha256/字节数/快照时间/作者/覆盖数/引用计数）写进 `data/starside/index.json` 的 `entities` 段。
+  **确定性**：同样输入逐字节同样输出（改坏后重跑还原，已实测）。
+  **全有或全无**：物品→item 表、perk→sandboxPerk 表、神器→item 表 + `DestinySeasonDefinition.artifactItemHash`、
+  套装→set 表、以及 `onItems`/`sameAs`/`catalyst`/`perkColumns`/`enhanced.by` 全部逐条校验，一条不通就退出。
+- `scripts/audit_starside_entities.py`：真机只读审计（退出码 0/1），Manifest 更新后随时可复核。
+  **已跑：全部对得上 ✓**（神器 7 个全部指到赛季）。
+- `destiny_mcp/services/starside_entities.py`：懒加载 + 按 hash 查询（`item`/`perk`/`items_with_perk`/
+  `sets_of_perk`/`frame_stats`/`frame_stats_for_weapon`/`artifact_of`/`authors_of`/`attribution`）。
+- `tests/test_starside_entities.py`：6 条守门（无符号键与出处元数据、覆盖/引用计数对账、引用格式、
+  有符号/无符号双向查询、缺数据给 None+原因、三条真实链路）。三条注入验证过（覆盖数改小 / 加有符号键 /
+  引用计数改错 → 各自变红）。
+
+**两处实施偏差（与方案的差异，记在这里）**
+
+1. 加载器放在 `destiny_mcp/services/starside_entities.py`，**不是** `destiny_mcp/rag/`：`rag/` 至今是
+   占位包（社区检索实际在 `services/starside_service.py`），放 `services/` 与
+   `starside_crafting_sources.py` 同一分工。P0 **不登记进 `ServiceContext`**（P1 接线时再登记，
+   免得现在就有个没被用到的服务）。
+2. 我们只收**有社区字段**的物品（5,760 → 4,483），所以 `onItems` 的 6,134 条边里有 922 条指向的物品
+   在本文件里没有条目 —— 那些物品的名字/类型按"单一出处"去 Manifest 取，真机审计保证每条边都能解出。
+   原始导出实测是 6,134/6,134 全在文件内；过滤后的数字写进 `_meta.counts` 当 ratchet
+   （`onItems_edges_in_file` = 5,212、`sameAs_in_file` = 627）。
