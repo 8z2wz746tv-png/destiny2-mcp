@@ -1,0 +1,265 @@
+{
+  "label": "p5-after",
+  "sourceRoot": "/Users/husky/项目/destiny2-mcp",
+  "destinyMcpFile": "/Users/husky/项目/destiny2-mcp/destiny_mcp/__init__.py",
+  "trials": 1,
+  "heavy": true,
+  "rows": [
+    {
+      "case": "hunter_priority_only",
+      "character": "hunter",
+      "request": {
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 156802.6,
+        "solveMs": 95045.0,
+        "combos": 6283200,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 156802.6,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 110,
+            "health": 10,
+            "class_stat": 75,
+            "grenade": 200,
+            "super_stat": 85,
+            "melee": 20
+          },
+          "topCompletionRate": 0.0,
+          "solveMs": 95045.0,
+          "combos": 6283200,
+          "setsFromKernel": 200
+        }
+      ]
+    },
+    {
+      "case": "titan_meets_minimum",
+      "character": "titan",
+      "request": {
+        "weapons_target": 100,
+        "grenade_target": 100,
+        "class_target": 70,
+        "melee_target": 70,
+        "super_target": 80,
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 130345.3,
+        "solveMs": 8000.7,
+        "combos": 3876000,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 130345.3,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 100,
+            "health": 15,
+            "class_stat": 70,
+            "grenade": 165,
+            "super_stat": 80,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 8000.7,
+          "combos": 3876000,
+          "setsFromKernel": 200
+        }
+      ]
+    },
+    {
+      "case": "hunter_priority_set",
+      "character": "hunter",
+      "request": {
+        "exotic_name": "快速装弹松身裤",
+        "weapons_target": 150,
+        "class_target": 100,
+        "super_target": 80,
+        "melee_target": 70,
+        "grenade_target": 70,
+        "priority_stats": [
+          "weapons",
+          "class_stat",
+          "super_stat",
+          "melee",
+          "grenade"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 389799.5,
+        "solveMs": 318.2,
+        "combos": 75712,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 389799.5,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 180,
+            "health": 0,
+            "class_stat": 100,
+            "grenade": 70,
+            "super_stat": 80,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 318.2,
+          "combos": 75712,
+          "setsFromKernel": 0
+        }
+      ]
+    },
+    {
+      "case": "hunter_infeasible",
+      "character": "hunter",
+      "request": {
+        "weapons_target": 150,
+        "class_target": 100,
+        "super_target": 80,
+        "melee_target": 70,
+        "health_target": 200,
+        "priority_stats": [
+          "weapons",
+          "class_stat",
+          "super_stat",
+          "melee"
+        ]
+      },
+      "median": {
+        "serviceMs": 38298.1,
+        "solveMs": 17605.8,
+        "combos": 6283200,
+        "candidates": 0
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 38298.1,
+          "candidates": 0,
+          "topStats": null,
+          "topCompletionRate": null,
+          "solveMs": 17605.8,
+          "combos": 6283200,
+          "setsFromKernel": 0
+        }
+      ]
+    },
+    {
+      "case": "warlock_khvostov",
+      "character": "warlock",
+      "request": {
+        "exotic_name": "星火协议",
+        "set_bonus_name": "埃希恩记忆",
+        "set_bonus_count": 4,
+        "weapons_target": 100,
+        "grenade_target": 100,
+        "class_target": 70,
+        "melee_target": 70,
+        "super_target": 80,
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 18799.0,
+        "solveMs": 8231.7,
+        "combos": 3769920,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 18799.0,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 100,
+            "health": 5,
+            "class_stat": 70,
+            "grenade": 150,
+            "super_stat": 90,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 8231.7,
+          "combos": 3769920,
+          "setsFromKernel": 6
+        }
+      ]
+    },
+    {
+      "case": "warlock_grenade_130",
+      "character": "warlock",
+      "request": {
+        "exotic_name": "星火协议",
+        "set_bonus_name": "埃希恩记忆",
+        "set_bonus_count": 4,
+        "weapons_target": 100,
+        "grenade_target": 130,
+        "class_target": 70,
+        "melee_target": 70,
+        "super_target": 80,
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 218226.7,
+        "solveMs": 4649.4,
+        "combos": 3769920,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 218226.7,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 100,
+            "health": 0,
+            "class_stat": 70,
+            "grenade": 150,
+            "super_stat": 95,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 4649.4,
+          "combos": 3769920,
+          "setsFromKernel": 0
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "秒数受机器负载影响，跨机器比较无意义；有意义的只有同机 paired 对照与 combos 这类计数。",
+    "没解时对应字段是 null，不是 0。",
+    "端到端走 BuildService.find_build（含 worker 进程开销），内核是直接 solve()。"
+  ]
+}

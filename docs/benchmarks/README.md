@@ -21,6 +21,9 @@
 | `build-solver-p0-baseline.json` | 改动前的默认集（3 例 × 3 次） | P1–P4 的对照物 |
 | `build-solver-p0-heavy.json` | `hunter_infeasible`、`warlock_grenade_130` | 1 次/例，贵的用例 |
 | `build-solver-p0-warlock-100.json` | 本会话那套（术士 + 星火协议 + 埃希恩记忆 4 件），手雷 ≥100 | 1 次 |
+| `build-solver-p4-after.json` | P4 之后（heavy 两例） | 1 次；`hunter_priority_set` 292.8s、`warlock_khvostov` 手雷 **145** |
+| `build-solver-p5-after.json` | P5 全量（6 例，含两条默认用例） | 1 次；**这一份暴露了两条回归**（见下） |
+| `build-solver-p5-after-fix.json` | 修完两条回归后的默认两例 | 1 次；156.8→**45.6s**、130.3→**14.5s** |
 
 P0 的关键结论（完整分析见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 的「P0 成本剖面」）：
 
@@ -29,3 +32,16 @@ P0 的关键结论（完整分析见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 的�
   多出来的时间全在"严格解为空 → 调谐补救"那条路上；
 - 所以"属性不够极限"的真因是**没人要求过** + **要价太贵**，不是算法够不着。
   这决定了 P2（让用户能表达"顶"）与 P4（让"顶"别再花 140 秒）的分工。
+
+P5 的两条性能回归（`build-solver-p5-after.json` 暴露，都已修，数字是实跑）：
+
+- **内核慢 7.7 倍**（`hunter_priority_only` 12.4s → 95.0s）：P3 那把逐字段字典序的键被按组合调用
+  286 万次，而它每次都从 pydantic 约束上重建常量向量（`max_vector()` 一个就被调 857 万次、36s）。
+  修法：`RankingVectors` 在 `solve()` 里只算一次往下传 → **95.0s → 35.8s**。剩下对比 P0 的差距
+  是 P3 的有意代价（一把键换掉三套打架的口径），不再优化。
+- **服务侧多出 60–120 秒**：内核一次交回整池 200 套，局部调谐逐套跑贪心。
+  修法：候选窗口（前 `max(2 × top_n, 10)` 套）→ 两条用例端到端 **156.8→45.6s**、**130.3→14.5s**，
+  且 **top 六维一字未变**。
+
+**还没解决**：`hunter_priority_set`（389.8s）与 `warlock_grenade_130`（218.2s）由
+"放宽目标复解 + 逐套精确复核"主导，是现在最大的单项成本（计划文档待办第 1 条）。
