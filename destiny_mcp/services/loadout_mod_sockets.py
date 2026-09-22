@@ -90,6 +90,9 @@ class ModSocketMixin(PlugLookupMixin):
           授权流程；免费接口官方明说不需要它，所以撞到这条说明这颗 plug 属于"非免费可逆"那类。
         - 1663 `DestinyItemActionForbidden` / `can only be done in-game`：上游一句含糊话术，
           至少对应"角色不在社交区/轨道/离线"与"这个槽本身禁用"两种，原文照转、不替它下结论。
+        - 1675 `DestinyCannotAffordMaterialRequirements`：这个动作**要材料**，免费接口不接
+          —— 实测换调谐就是这条（2026-09-22，`scripts/verify_tuning_write.py`）：换成你已经
+          拥有的那颗能成，换成没有的那颗回 1675。
         - 1676 `DestinyFailedPlugInsertionRules`：这颗模组的**插入条件**没满足（实测被拒的
           那些条件里都有「必须在赛季神器中选择」）。这条**游戏里同样装不上**，以前把它归到
           "去游戏里手动装"是错的。

@@ -63,9 +63,14 @@ def set_key(items: Sequence[Any]) -> tuple[str, ...]:
 def tuning_note(plan: TuningPlan | None, item_names: dict[str, str] | None = None) -> str:
     """把调谐改动说成人话（没有改动就返回空串）。
 
-    口径（0.1.8 实机修正）：调谐**不能在游戏外改** —— Bungie 的插槽接口实测回
-    "This action can only be done in-game."（ErrorCode 1663）。所以这句话是"要你在游戏里
-    手动改哪几件"，不是"确认后我们会替你改"。
+    口径（2026-09-22 真机验证，`scripts/verify_tuning_write.py --apply`）：调谐**换得动**，
+    但**只能换成你已经拥有的那一颗**。
+      - 换成身上别的护甲正装着的那颗（平衡调整）：免费插槽接口 `ErrorCode=1`，回读插槽真变、
+        组件 304 的六维也按真机规则变（平衡调整只给最低三项各 +1），换回原样也成功；
+      - 换成一颗你没有的：回 **1675** `DestinyCannotAffordMaterialRequirements`
+        （"You cannot afford the material requirements for that action."），账号一个字节没变。
+    所以这句话仍然是"要你在游戏里手动改哪几件"，但**不是因为"上游只允许游戏内改"** ——
+    那句出自 ADR-012 推翻的 1663（当时是字段名 bug），不再作为理由。
     """
     if plan is None or not plan.feasible or not plan.changes:
         return ""
@@ -76,9 +81,14 @@ def tuning_note(plan: TuningPlan | None, item_names: dict[str, str] | None = Non
         parts.append(f"{who} 改成「{change.to_name}」")
     head = (
         f"这套方案要先把 {len(plan.changes)} 件护甲的调谐改掉才能达标"
-        "（调谐免费、不占能量、不影响模组，但**只能在游戏内手动改**）："
+        "（调谐不占能量、不影响模组；换调谐要材料，而且只能换成你已经拥有的那一颗，"
+        "所以这一句是**要你在游戏里手动改**）："
     )
-    return head + "；".join(parts) + "。"
+    tail = ""
+    if plan.exhausted:
+        # 碰了步数上限就是"没吃干净"，不能装成已经最优（P4 的局部最优不变量会抓这个）。
+        tail = "（这轮局部优化是碰到步数上限停的，可能还有别的改法没试到，不代表已经最优。）"
+    return head + "；".join(parts) + "。" + tail
 
 
 def build_results(
@@ -114,8 +124,8 @@ def build_results(
 
         key = set_key(armor_set.armor)
         plan = context.tuning.get(key)
-        # 调谐**不进** `mods`：实测 Bungie 的插槽接口对调谐回
-        # "This action can only be done in-game."（ErrorCode 1663），
+        # 调谐**不进** `mods`：换调谐要材料、而且只能换成你已经拥有的那一颗（2026-09-22
+        # 真机验证，1675 就是"你没有这颗"），本项目还没开替你写调谐这条路；
         # 写进去只会让 equip_build 失败或静默少做一步。调谐只作为"要你在游戏里改"的清单。
         # 注意 `requires_tuning` 要按**方案**算，不能按"有没有插件要写"算 ——
         # 后者在调谐不可写之后恒为 False（实机语料第 ⑩ 行抓到的回归）。

@@ -68,7 +68,7 @@
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
-| `equip_mod` | 给一件护甲换一个模组：先返回「哪件、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写。**调谐是个例外**：Bungie 只允许游戏内改（实测 `This action can only be done in-game.`），所以调谐只给方案（`writable=false`/`written=false` + warning），`confirmed=true` 也不会写 | `item_instance_id`、`mod_name`、`character` |
+| `equip_mod` | 给一件护甲换一个模组：先返回「哪件、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写。**调谐是个例外**：换调谐要材料，而且只能换成**你已经拥有的那一颗**（换成没有的一颗，免费接口回 1675 `DestinyCannotAffordMaterialRequirements`；换成身上别的护甲正装着的同款则能成 —— 2026-09-22 真机验证）。本项目还没开替你写调谐这条路，所以调谐只给方案（`writable=false`/`written=false` + warning），`confirmed=true` 也不会写 | `item_instance_id`、`mod_name`、`character` |
 | `move` | 移动物品，可顺带装备 | `item_name`、`destination`、`equip`、`from_character`、`item_instance_id` |
 | `transfer` | 按实例 ID 转移到指定角色 | `item_instance_id`、`to_character`、`from_character` |
 | `equip` | 按实例 ID 装备到指定角色 | `item_instance_id`、`character` |
@@ -191,6 +191,18 @@ Manifest 侧（**不代表拥有**）：
 
 只给优先级、不给硬目标时 `completion_rate` 会是 `null`（附 `completion_rate_note`）——
 那不代表"一个都没满足"。
+
+**上限（`stat_caps`）是软的**：想说"手雷别超过 100"就传 `stat_caps={"super_stat": 100}` 这种形式；
+超了照样出解，但会排到没超的方案后面，并在 `max_violations` 里逐项标出来
+（`{stat,label,actual,max}`）—— 所以**别把 `max_violations` 当失败**，它只是"这套不理想"。
+不传 = 不限。
+
+**`data.reachable` 是保守下界**：那是"其余属性仍满足下限时，这一项**已验证能到**多少"，
+且**逐项可达 ≠ 同时达到**（六个数放在一起不构成一套配装）。真机实测它报 120 而把下限写成 130
+时确实能到 130 —— 所以**要顶上去就把目标写成下限**（可再加优先级），别拿 `reachable` 当上限说事。
+
+**0 候选必须自证搜完了**：`data.search = {exhaustive, combos, truncated_by}`；只有
+`exhaustive=true` 才能说"配不出来"，没搜完时 `ladder.verdict.satisfiable` 是 `null`。
 
 指定 `exotic_name` 的首次查询**必须**返回候选并等玩家确认，重试时原样回传 `confirmed_exotic_hash` 与 `exotic_confirmation_token`，其它参数不得丢失。`community_build_id` 只对 `community` 有效，传给别的 intent 会被拒绝。
 
@@ -431,7 +443,7 @@ Manifest 侧（**不代表拥有**）：
 
 `move`、`transfer`、`equip`、`equip_many`（`equip_items`）、`equip_mod`、`pull_postmaster`、`lock`、`track_quest`（`quest_tracking`）、`save`、`delete`、`equip_loadout`、`snapshot_official`、`update_official_identifiers`、`clear_official`、`modify`、`equip_artifact_mod`、`equip_artifact`、`equip_build` 都会改变账号状态（这份清单与 `_requests.WRITE_INTENTS` 一致，由测试保证）。
 
-另外两条硬前提（实机验证过）：**花能量的插槽写入需要 Bungie 应用的 `AdvancedWriteActions` 权限**（没有就回 `AccessNotPermittedByApplicationScope`，工具会点名这条权限，不要读成「稍后重试」）；**调谐只能游戏内改**，工具只给方案不改账号。
+另外两条硬前提（实机验证过）：**花能量的插槽写入需要 Bungie 应用的 `AdvancedWriteActions` 权限**（没有就回 `AccessNotPermittedByApplicationScope`，工具会点名这条权限，不要读成「稍后重试」）；**调谐只能换成你已经拥有的那一颗**（换成没有的一颗回 1675），本项目还没开替你写调谐这条路，工具只给方案不改账号。
 
 - `confirmed=false` 时返回 `confirmation_required`，**服务层不会被调用**，游戏状态不变。确认必须来自用户的明确同意，不能由 Agent 自己推断——用户说「不用问了直接执行」也不行。
 - 展示确认时要给精确目标：实例 ID、槽位号、数值，而不是笼统描述。

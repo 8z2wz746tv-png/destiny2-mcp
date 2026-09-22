@@ -109,10 +109,10 @@ def _tuning_summary(builds: Any) -> dict[str, Any] | None:
         "note": (
             "这些方案是「按原目标求解器没达标 → 放宽目标复解 → 用真实目标逐套复核」"
             "找出来的；tuning_changes 里是要改的调谐（从什么改成什么、六维怎么变）。"
-            "注意：调谐**只能在游戏内手动改**（Bungie 接口实测回 "
-            "「This action can only be done in-game.」），"
-            "canonical_build 里不含调谐插件 —— 确认装备只换护甲与模组，"
-            "调谐这一步要把清单交给玩家。"
+            "注意：调谐换得动，但只能换成**你已经拥有的那一颗**（换成没有的一颗，"
+            "免费接口回 1675「负担不起材料要求」；实测见 scripts/verify_tuning_write.py）；"
+            "本项目还没开替你写调谐这条路，canonical_build 里也不含调谐插件 —— "
+            "确认装备只换护甲与模组，调谐这一步要把清单交给玩家。"
         ),
     }
 
@@ -180,7 +180,7 @@ async def find(
         payload["tuning"] = tuning
         message += (
             f"其中 {tuning['build_count']} 个要先改调谐才能达标"
-            "（调谐免费、不占能量；逐件改动见各自的 tuning_changes）。"
+            "（调谐不占能量、不影响模组；逐件改动见各自的 tuning_changes）。"
         )
     # 有解时也给"每项单独能顶到多少" —— 用户说"不够极限"时，答案就在这几个数里。
     # `reachable_note` 必须一起带上：逐项可达**不等于**同一套能同时达到。
