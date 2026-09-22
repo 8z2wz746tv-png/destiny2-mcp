@@ -63,6 +63,13 @@ class _FakeManifest:
         ]}}
 
 
+def _all_tuning_hashes() -> tuple[int, ...]:
+    """夹具里的件**允许装全部调谐**（真实清单来自组件 310，每件只有 6 颗）。"""
+    from destiny_mcp.build.tuning import tuning_catalog
+
+    return tuple(choice.plug_hash for choice in tuning_catalog(_FakeManifest()))
+
+
 def _armor(slot: str, stats: dict[str, int], *, tuning: int | None = None) -> Armor:
     return Armor(
         item_instance_id=f"p-{slot}",
@@ -74,6 +81,7 @@ def _armor(slot: str, stats: dict[str, int], *, tuning: int | None = None) -> Ar
         armor_system="armor_3",
         gear_tier=5,
         tuning_mod_hash=tuning,
+        tuning_option_hashes=_all_tuning_hashes(),
     )
 
 

@@ -297,6 +297,21 @@ def piece_tuning(
     catalog = tuning_catalog(manifest)
     by_hash = {choice.plug_hash: choice for choice in catalog}
     empty = by_hash[EMPTY_TUNING_PLUG_HASH]
+    # ── 这件**允许装**哪些调谐：只信组件 310 的清单（`Armor.tuning_option_hashes`）──
+    # Manifest 的调谐 plug set 是全局那 32 颗（真机：两件同名手套指向同一个集合），照它规划
+    # 就会给出"这件根本装不上"的调谐 —— 用户发现的那个问题。每件实际只开放"某一个属性 +5"
+    # 的 5 颗 + 平衡调整（真机：一件是 职业、另一件是 近战）。
+    legal = tuple(int(h) for h in (getattr(armor, "tuning_option_hashes", ()) or ()))
+    if legal:
+        allowed = set(legal)
+        options = tuple(choice for choice in catalog if choice.plug_hash in allowed)
+        if EMPTY_TUNING_PLUG_HASH not in allowed:
+            # 撤掉调谐（插回空插件）永远可以做，它一般不在 310 的清单里
+            options = (*options, empty)
+    else:
+        # 读不到清单：**缺数据 ≠ 允许** —— 只留"撤掉"这一个动作，不规划任何改法。
+        options = (empty,)
+        no_options_note = "读不到这件护甲的调谐候选（组件 310），不猜它能装什么。"
     current_hash = _canon(int(getattr(armor, "tuning_mod_hash", 0) or 0))
     current = by_hash.get(current_hash, empty)
 
@@ -305,6 +320,9 @@ def piece_tuning(
     base = _invert_tuning(observed, current)
     note = ""
     movable = True
+    if not legal:
+        note = no_options_note
+        movable = False
     if base is None or any(value < 0 for value in base):
         # 反推不出来（数据对不上）：宁可只让这件保持现状，也不要编一个基础值 ——
         # 更不许拿它去算"换成某个调谐会怎样"（以前这里是 `base = observed`，
@@ -319,7 +337,7 @@ def piece_tuning(
         name=str(getattr(armor, "name", "") or ""),
         slot=str(getattr(armor, "slot", "") or ""),
         current=current,
-        options=catalog,
+        options=options,
         base=base,
         note=note,
         observed=observed,

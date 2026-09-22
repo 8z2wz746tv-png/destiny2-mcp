@@ -441,7 +441,7 @@ async def match_inventory(
     ):
         try:
             snapshot = await inventory_service.get_armor_snapshot(
-                player_name, build["class"]["id"]
+                player_name, build["class"]["id"], with_tuning_options=False
             )
         except DestinyMCPError as exc:
             read_errors.append(

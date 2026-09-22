@@ -37,6 +37,17 @@ INVENTORY_SOCKETS: list[int] = [102, 200, 201, 205, 300, *ITEM_SOCKETS]
 # 护甲快照：属性值 + 插槽（模组要写进插槽，所以两个都要）
 ARMOR_SNAPSHOT: list[int] = [102, 200, 201, 205, 300, 304, *ITEM_SOCKETS]
 
+#: 配装求解/规划要用的组件：比 `ARMOR_SNAPSHOT` 多一个 **310 `ItemReusablePlugs`**。
+#:
+#: 为什么非它不可：**每件护甲允许装哪些调谐，只在 310 里**。Manifest 的调谐 plug set 是
+#: 全局那 32 颗（真机实测：两件同名「光芒领主手套」指向同一个 plug set、内容一模一样），
+#: 而实际每件只开放"某一个属性 +5"的 5 颗 + 平衡调整（这两件分别是 职业 和 近战）。
+#: 求解器照 Manifest 规划，就会给出"这件根本装不上"的调谐 —— 用户发现的就是这个。
+#:
+#: 代价（真机实测，术士一具角色的全账号护甲）：响应 **4.11 MB → 8.90 MB**。
+#: 所以**只给需要规划调谐的那条路**（配装求解）用，不要往 `ARMOR_SNAPSHOT`（单件详情）上加。
+BUILD_ARMOR: list[int] = [*ARMOR_SNAPSHOT, 310]
+
 # 武器详情/按类型列武器：已装 plug + 能换的 plug + Bungie 的展示 perk + 催化剂进度
 WEAPON_DETAIL: list[int] = INVENTORY + [*ITEM_SOCKETS, 302, 310, 308]
 

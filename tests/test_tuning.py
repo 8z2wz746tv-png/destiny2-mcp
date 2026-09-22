@@ -58,12 +58,24 @@ def _stats(
     )
 
 
+def _MANIFEST_FOR_FIXTURES():
+    return _manager()
+
+
+def _all_tuning_hashes(manifest=None) -> tuple[int, ...]:
+    """夹具里的件**允许装全部调谐**（真实清单来自组件 310，每件只有 6 颗）。"""
+    from destiny_mcp.build.tuning import tuning_catalog
+
+    return tuple(choice.plug_hash for choice in tuning_catalog(manifest or _manager()))
+
+
 def _armor(
     name: str,
     stats: ArmorStats,
     *,
     tuning: int | None = None,
     item_hash: int = T5_ARMOR_HASH,
+    legal: tuple[int, ...] | None = None,
 ) -> Armor:
     return Armor(
         item_instance_id=f"inst-{name}",
@@ -74,6 +86,9 @@ def _armor(
         armor_system="armor_3",
         gear_tier=5,
         tuning_mod_hash=tuning,
+        # `legal=None` = 夹具不模拟组件 310，显式声明"全部允许"；
+        # 真机那条清单用 `legal=(…)` 传进来（下面的两条金标准就是）。
+        tuning_option_hashes=_all_tuning_hashes() if legal is None else legal,
     )
 
 
@@ -285,9 +300,14 @@ def test_tuning_headroom_counts_every_piece_that_can_help() -> None:
 # ── 分配器 ───────────────────────────────────────────────────────────
 
 
-def _piece(name: str, stats: ArmorStats, tuning: int | None = None):
+def _piece(
+    name: str,
+    stats: ArmorStats,
+    tuning: int | None = None,
+    legal: tuple[int, ...] | None = None,
+):
     manager = _manager()
-    piece = piece_tuning(_armor(name, stats, tuning=tuning), manager)
+    piece = piece_tuning(_armor(name, stats, tuning=tuning, legal=legal), manager)
     assert piece is not None
     return piece
 
@@ -595,3 +615,63 @@ def test_uninvertible_piece_is_not_movable_and_never_invents_stats(monkeypatch) 
     observed = tuple(getattr(piece, "observed"))
     for choice in piece.options:
         assert piece.stats_with(choice) == observed, "不许编改法"
+
+
+# ── 每件的可调谐属性来自组件 310（用户指出、真机核实） ───────────────────────
+
+
+def _legal_for(increased: str, *others: str) -> tuple[int, ...]:
+    """真机 310 里那种"某一个属性 +5 的 5 颗 + 平衡调整"清单。"""
+    return (
+        *(directional_tuning_hash(increased, other) for other in others),
+        BALANCED_HASH,
+    )
+
+
+def test_tuning_options_are_per_piece_and_come_from_component_310() -> None:
+    """每件允许装的调谐**不是** Manifest 那份全局 32 颗，而是组件 310 给的那 6 颗。
+
+    真机（2026-09-22 读组件 310）：两件同名的「光芒领主手套」可调谐属性**不一样** ——
+      - `6917530188462631525` = **职业**：只有 `+职业/−{手雷,武器,生命,超能,近战}` + 平衡调整；
+      - `6917530191138019736` = **近战**：只有 `+近战/−{手雷,武器,生命,职业,超能}` + 平衡调整。
+    所以"给这两件都换 +武器/−近战"是**装不上**的 —— 用户就是这样发现求解器在乱开选项的。
+    """
+    five = ("weapons", "health", "class_stat", "grenade", "super_stat", "melee")
+
+    a = _piece(
+        "光芒领主手套A",
+        _stats(weapons=25, health=-5, class_stat=25, melee=30),
+        tuning=directional_tuning_hash("class_stat", "health"),
+        legal=_legal_for("class_stat", *(s for s in five if s != "class_stat")),
+    )
+    a_directional = {c.name for c in a.options if c.kind == "directional"}
+    assert a_directional == {
+        "+职业 / -手雷", "+职业 / -武器", "+职业 / -生命值", "+职业 / -超能", "+职业 / -近战",
+    }, "这件只能加职业"
+    assert "+武器 / -近战" not in {c.name for c in a.options}, "装不上的不许出现在选项里"
+    assert any(c.kind == "balanced" for c in a.options), "平衡调整在 310 清单里，要保留"
+    assert any(c.kind == "empty" for c in a.options), "撤掉调谐永远可以做"
+
+    b = _piece(
+        "光芒领主手套B",
+        _stats(weapons=20, health=6, class_stat=6, grenade=30, super_stat=25, melee=6),
+        tuning=BALANCED_HASH,
+        legal=_legal_for("melee", *(s for s in five if s != "melee")),
+    )
+    b_directional = {c.name for c in b.options if c.kind == "directional"}
+    assert b_directional == {
+        "+近战 / -手雷", "+近战 / -武器", "+近战 / -生命值", "+近战 / -职业", "+近战 / -超能",
+    }, "这件的可调谐属性是近战"
+    assert not any(c.name.startswith("+武器") for c in b.options)
+
+
+def test_piece_without_component_310_is_not_movable() -> None:
+    """读不到 310 的清单：**缺数据 ≠ 允许** —— 不许规划任何改法，只留"撤掉"。
+
+    以前求解器拿 Manifest 的全局 32 颗当选项，于是给"只能加职业"的件开了 `+武器/−近战`。
+    """
+    piece = _piece("腿甲", _stats(weapons=30, health=25, grenade=20), legal=())
+
+    assert piece.movable is False
+    assert "组件 310" in piece.note
+    assert [choice.kind for choice in piece.options] == ["empty"]

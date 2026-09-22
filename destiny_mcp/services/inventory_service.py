@@ -436,12 +436,19 @@ class InventoryService:
 
     # ── Armor Snapshot (Build Engine) ─────────────────────────────────
 
-    async def get_armor_snapshot(self, player_name: str, character_class: str = "") -> InventorySnapshot:
+    async def get_armor_snapshot(
+        self,
+        player_name: str,
+        character_class: str = "",
+        *,
+        with_tuning_options: bool = True,
+    ) -> InventorySnapshot:
         """Fetch all armor pieces with stats, grouped by slot.
 
         This is the data input for Build Engine. Fetches components
-        102+200+201+205+300+304+305 (includes ItemStats for the 6 armor
-        stats and ItemSockets for artifice detection).
+        102+200+201+205+300+304+305 (ItemStats for the 6 armor stats,
+        ItemSockets for artifice detection) plus **310 `ItemReusablePlugs`**
+        when `with_tuning_options` is on (the default) — 每件允许装哪些调谐只在 310 里。
 
         Must be called after the manifest is loaded.
 
@@ -457,9 +464,15 @@ class InventoryService:
             PlayerNotFoundError: If the player name cannot be resolved.
         """
         logger.info("Building armor snapshot for %s (class=%s)", player_name, character_class or "all")
-        _, profile = await self._resolve_and_fetch(
-            player_name, _ARMOR_SNAPSHOT_COMPONENTS
+        # 默认带 310：这个方法的定位就是"求解器的数据输入"，而**每件允许装哪些调谐只在 310 里**
+        # （Manifest 那份是全局 32 颗，照它会规划出装不上的调谐）。代价 4.11→8.90 MB，
+        # 不规划调谐的调用方（社区模板核对）显式传 `with_tuning_options=False` 省掉它。
+        components = (
+            profile_components.BUILD_ARMOR
+            if with_tuning_options
+            else _ARMOR_SNAPSHOT_COMPONENTS
         )
+        _, profile = await self._resolve_and_fetch(player_name, components)
         self._validate_armor_snapshot_components(profile, character_class)
         snapshot = InventorySnapshot.from_profile(profile, self._manifest, character_class)
         logger.info(

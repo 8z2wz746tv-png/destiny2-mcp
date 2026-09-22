@@ -124,6 +124,10 @@ class Armor(BaseModel):
     base_roll_stats: ArmorStats = Field(default_factory=ArmorStats)
     masterwork_level: int = Field(default=0, ge=0, le=5)
     tuning_mod_hash: int | None = None
+    #: 这件护甲**允许装**的调谐插件 hash（组件 310 的清单）。**空 = 读不到，缺数据 ≠ 允许** ——
+    #: 求解器不许拿 Manifest 那份全局 32 颗当选项（每件实际只开放"某一个属性 +5"的 5 颗
+    #: + 平衡调整，真机实测见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 四·十四）。
+    tuning_option_hashes: tuple[int, ...] = ()
     tuning_name: str = ""
     armor3_roll_verified: bool = False
     roll_parse_error: str = ""
@@ -265,6 +269,9 @@ class InventorySnapshot(BaseModel):
             .get("stats", {})
             .get("data", {})
         )
+        reusable_plugs_map = (
+            profile.get("itemComponents", {}).get("reusablePlugs", {}).get("data", {})
+        )
         sockets_data_map = (
             profile.get("itemComponents", {})
             .get("sockets", {})
@@ -276,6 +283,11 @@ class InventorySnapshot(BaseModel):
         _ARTIFICE_PLUG_CATEGORIES = {3773173029, 595201146}
         _ARMOR3_ARCHETYPE_CATEGORY = 778194869
         _ARMOR3_TUNING_CATEGORY = 3481777685
+
+        def _plug_category(plug_hash: int) -> int:
+            """插件的 `plugCategoryHash`（读不到定义返回 0）。"""
+            definition = manifest.get_item_definition(plug_hash) or {}
+            return int(((definition.get("plug") or {}).get("plugCategoryHash", 0) or 0))
         _SET_BONUS_SELECTOR_CATEGORY = 1313063513
         _MOD_CATEGORIES = {
             2487827355,  # armor mods (grenade, melee, etc.)
@@ -495,6 +507,23 @@ class InventorySnapshot(BaseModel):
                 else f"https://www.bungie.net{icon_path}" if icon_path else ""
             )
 
+            # ── 调谐：**允许装哪些只信组件 310** ──────────────────────────
+            # Manifest 的调谐 plug set 是全局那 32 颗（同名两件手套指向同一个集合），
+            # 而每件实际只开放"某一个属性 +5"的 5 颗 + 平衡调整。310 没请求时这里是空元组
+            # —— 缺数据 ≠ 允许，求解器会因此"不规划这件"（见 build/tuning.piece_tuning）。
+            tuning_options: tuple[int, ...] = ()
+            for socket_index, rows in (reusable_plugs_map.get(inst_id, {}) or {}).get("plugs", {}).items():
+                first = next((int(r.get("plugItemHash", 0) or 0) for r in (rows or []) if r), 0)
+                # 同一个槽里的插件事先同类别，看第一颗就够（每件要过 6 个槽，别全查）
+                if not first or _plug_category(first) != _ARMOR3_TUNING_CATEGORY:
+                    continue
+                tuning_options = tuple(
+                    int(r.get("plugItemHash", 0) or 0)
+                    for r in (rows or [])
+                    if r and r.get("plugItemHash")
+                )
+                break
+
             return Armor(
                 item_instance_id=inst_id,
                 item_hash=item_hash,
@@ -521,6 +550,7 @@ class InventorySnapshot(BaseModel):
                 masterwork_level=masterwork_level,
                 tuning_mod_hash=tuning_hash,
                 tuning_name=tuning_name,
+                tuning_option_hashes=tuning_options,
                 armor3_roll_verified=armor3_roll_verified,
                 roll_parse_error=roll_parse_error,
                 is_artifice=is_artifice,

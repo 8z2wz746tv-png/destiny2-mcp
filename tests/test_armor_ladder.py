@@ -326,6 +326,13 @@ class _StubManifest:
         return ""
 
 
+def _all_tuning_hashes() -> tuple[int, ...]:
+    """夹具里的件**允许装全部调谐**（真实清单来自组件 310，每件只有 6 颗）。"""
+    from destiny_mcp.build.tuning import tuning_catalog
+
+    return tuple(choice.plug_hash for choice in tuning_catalog(_StubManifest()))
+
+
 def _tunable_snapshot():
     from destiny_mcp.build.models import Armor, ArmorStats, InventorySnapshot
     from destiny_mcp.build.constants import STAT_NAMES
@@ -341,6 +348,7 @@ def _tunable_snapshot():
                 stats=ArmorStats(**{name: 10 for name in STAT_NAMES}),
                 armor_system="armor_3",
                 gear_tier=5,
+                tuning_option_hashes=_all_tuning_hashes(),
             )
         ]
     return InventorySnapshot(**buckets)
