@@ -202,3 +202,63 @@ def test_blank_stat_is_not_a_filter() -> None:
 
     assert picked["match"]["kind"] == "all"
     assert len(picked["mods"]) == 5
+
+
+# ── 记忆化：这一步是**全表扫**（真机 ~5.8 秒/次，每次护甲快照都问一遍） ──────────
+
+
+def test_armor_mod_scan_is_memoized_and_copies_out(monkeypatch) -> None:
+    """重复问同一 (部位, 类别) 不许再扫全表；发出去的必须是拷贝。
+
+    真机实测（2026-09-22）：护甲快照构建 7.3 秒里有 **5.8 秒**花在这次全表扫上
+    （`SELECT ... WHERE json LIKE '%"itemType":19%'` → 一万多行逐行 `json.loads`），
+    而求解、复核、装备预检各会问一遍。
+    """
+    manager = _manager()
+    scans = {"n": 0}
+    original = ManifestManager._scan_armor_mods
+
+    def counting(self, *args, **kwargs):
+        scans["n"] += 1
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(ManifestManager, "_scan_armor_mods", counting)
+
+    first = manager.get_armor_mods(category="all")
+    assert scans["n"] == 1
+    again = manager.get_armor_mods(category="all")
+    assert scans["n"] == 1, "第二次不该再扫全表"
+    assert [m["name"] for m in again] == [m["name"] for m in first]
+
+    # 不同键各扫一次（部位/类别都会换 target_hashes）
+    manager.get_armor_mods(slot="helmet", category="all")
+    assert scans["n"] == 2
+
+    # 出参是浅拷贝：调用方（`_armor_branches` 会给模组补 writable/理由）改不动缓存
+    first.clear()
+    assert len(manager.get_armor_mods(category="all")) == len(again), "缓存不许被调用方清空"
+    cached_row = manager.get_armor_mods(category="all")[0]
+    cached_row["writable"] = False
+    assert "writable" not in manager.get_armor_mods(category="all")[0], "就地改会污染缓存"
+
+
+def test_reloading_the_manifest_drops_the_armor_mod_cache(tmp_path, monkeypatch) -> None:
+    """重载必须重扫：缓存在 `_load_from_file` 那张派生缓存清单里（新加的别漏）。"""
+    import sqlite3
+
+    manager = _manager()
+    manager.get_armor_mods(category="all")
+    assert manager._armor_mod_cache, "先要有缓存才谈得上失效"
+
+    db = tmp_path / "destiny_manifest.sqlite3"
+    conn = sqlite3.connect(str(db))
+    conn.execute(f"CREATE TABLE {ITEM_TABLE} (id INTEGER PRIMARY KEY, json TEXT)")
+    conn.commit()
+    conn.close()
+    monkeypatch.setattr(type(manager), "manifest_path", property(lambda self: db))
+    monkeypatch.setattr(
+        type(manager), "manifest_path_zh", property(lambda self: tmp_path / "zh.sqlite3")
+    )
+    manager._load_from_file()
+
+    assert manager._armor_mod_cache == {}, "重载后旧结果不许留下来"

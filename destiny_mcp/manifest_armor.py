@@ -26,6 +26,9 @@ class ArmorCatalogMixin:
     _conn: "sqlite3_types.Connection | None"
     _zh_conn: "sqlite3_types.Connection | None"
 
+    # 由 ManifestManager.__init__ 建立、_load_from_file 清空；这里声明类型给 mypy 看
+    _armor_mod_cache: dict[tuple[str, str], list[dict]]
+
     if TYPE_CHECKING:
         def get_sandbox_perk_description(self, perk_hash: int) -> dict[str, Any] | None: ...
         def get_item_definition(self, item_hash: int) -> dict[str, Any] | None: ...
@@ -210,6 +213,23 @@ class ArmorCatalogMixin:
             if category != "general":
                 target_hashes.add(2487827355)
 
+        # ── 记忆化：这一步是**全表扫**（`json LIKE '%"itemType":19%'` → 一万多行逐行
+        # `json.loads`），真机实测单次 ~5.8 秒，而每次护甲快照都会问一遍（求解、复核、
+        # 装备预检各一次）。键就是 (部位, 类别)，它的取值空间是封闭的（见上面的校验），
+        # 所以不用设上限。缓存的清空走 `_load_from_file` 那张派生缓存清单。
+        key = (slot_key, category)
+        cached = self._armor_mod_cache.get(key)
+        if cached is None:
+            cached = self._scan_armor_mods(conn, target_hashes, category)
+            self._armor_mod_cache[key] = cached
+        # 给调用方一份**浅拷贝**：调用方会往这些 dict 上 `update`（见 `_armor_branches`
+        # 给模组补 writable/理由），直接发缓存对象会被就地改坏。
+        return [dict(row) for row in cached]
+
+    def _scan_armor_mods(
+        self, conn: "sqlite3_types.Connection", target_hashes: set[int], category: str
+    ) -> list[dict]:
+        """遍历全表挑出护甲模组（`_collect_armor_mods` 的实体，结果按 (部位, 类别) 记忆化）。"""
         results: list[dict] = []
         cur = conn.execute(
             "SELECT id, json FROM DestinyInventoryItemDefinition "

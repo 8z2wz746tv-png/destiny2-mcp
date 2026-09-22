@@ -145,8 +145,7 @@ class ManifestManager(
 ):
     """Manages the Destiny manifest (SQLite) for item lookups.
 
-    Supports bilingual search (English + Chinese) by loading two manifest
-    files and merging their name indexes.
+    Bilingual (English + Chinese): loads both files, merges their name indexes.
     """
 
     def __init__(self) -> None:
@@ -160,6 +159,7 @@ class ManifestManager(
         self._plug_set_cache: dict[int, list[dict]] = {}  # plugSetHash → [{plugItemHash, ...}]
         self._sandbox_perk_cache: dict[int, dict] = {}  # perkHash → {name, description}
         self._catalog_cache: dict[tuple[str, str], list[dict]] = {}  # 目录查询结果，见 manifest_catalog
+        self._armor_mod_cache: dict[tuple[str, str], list[dict]] = {}  # 护甲模组扫描结果，见 manifest_armor
 
     @property
     def manifest_path(self) -> Path:
@@ -211,7 +211,7 @@ class ManifestManager(
             self._name_index, self._hash_index, self._english_name_by_hash,
             self._english_type_display_by_hash, self._definition_cache,
             self._plug_set_cache, self._sandbox_perk_cache, self._catalog_cache,
-        ):
+            self._armor_mod_cache,):
             cache.clear()
 
         # Load English manifest first so names remain searchable as aliases.
