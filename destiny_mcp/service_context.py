@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from .services.fragment_service import FragmentService
     from .services.artifact_service import ArtifactService
     from .services.set_bonus_service import SetBonusService
+    from .services.starside_entities import StarsideEntities
     from .services.starside_service import StarsideService
     from .services.pattern_service import PatternService
     from .services.rotation_service import RotationService
@@ -70,5 +71,6 @@ class ServiceContext(TypedDict):
     set_bonus_svc: SetBonusService
     collection_svc: CollectionService
     starside_svc: StarsideService
+    starside_entities_svc: StarsideEntities
     pattern_svc: PatternService
     rotation_svc: RotationService

@@ -90,3 +90,33 @@ def test_weapon_note_keeps_scales_apart_and_names_the_gaps() -> None:
 
     missing = weapon_note(entity, manifest, 4294967295)
     assert missing["available"] is False and "没有这件装备的社区记录" in missing["reason"]
+
+
+def test_analyze_payload_carries_the_community_block(monkeypatch) -> None:
+    """工具层接线：`analyze` 的响应里必须带 `starside` 块（有数据给内容、没数据给原因）。
+
+    这里把 `_local`/`_attach_local` 打成空实现，只验接线本身；真机渲染由
+    `scripts/run_corpus_starside_entities.py` 负责。
+    """
+    from destiny_mcp.tools import _weapon_branches as branches
+
+    items = json.loads((ENTITIES / "items.json").read_text(encoding="utf-8"))["items"]
+    aegis_key = next(k for k, v in items.items() if "Aegis" in ((v.get("zh") or {}).get("site_authors") or {}))
+    monkeypatch.setattr(branches, "_local", lambda svc, name: {})
+    monkeypatch.setattr(branches, "_attach_local", lambda *a, **k: [])
+
+    def payload(weapon_hash: int) -> dict:
+        result = {
+            "weapon": {"hash": weapon_hash, "name": "测试武器"},
+            "sockets": {}, "stats": {}, "god_roll": {}, "inventory": {},
+            "inventory_status": {}, "summary": "x", "next_actions": [], "warnings": [],
+        }
+        svc = {"manifest": _Manifest(), "starside_entities_svc": StarsideEntities()}
+        return branches.analyze_payload(svc, result, "测试武器")
+
+    hit = payload(int(aegis_key))["data"]["starside"]
+    assert hit["available"] is True and hit["authors"]["Aegis"]["tier"]
+    assert hit["attribution"]["source"] == "starside.work" and hit["attribution"]["unofficial"] is True
+
+    miss = payload(4294967295)["data"]["starside"]
+    assert miss["available"] is False and "没有这件装备的社区记录" in miss["reason"]

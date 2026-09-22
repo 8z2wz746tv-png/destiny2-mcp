@@ -30,6 +30,14 @@
 `BuildResult.score` 的**数值会整体变化**（量级从"1000+ 的加权分"变成"200~1200 的总和"）。
 只把它当"越大越好"读的调用方不受影响；把绝对值当阈值的要改。
 
+## 未发布：`weapon_assistant(intent="analyze")` 多一个 `starside` 块（2026-09-23）
+
+Starside 作者给的新归档（按 hash 的实体数据）接进来了：`analyze` 的数据里多一个 `starside` 键，
+内容是社区层（Aegis/LGpig 两套推荐、机制说明、标签、帧级 DPS 表）+ **出处四件套**
+（`source`/`snapshot_at`/`authors`/`unofficial`）+ `gaps`（缺什么、为什么缺）+ `unresolved_names`
+（站点用了我们库里没有的名字，原样保留并标注）。没评过的装备给 `available: false` + `reason`，
+不编。口径与字段见 `docs/plans/STARSIDE_ENTITY_PLAN.md`。
+
 ## 未发布：调谐变成可执行的一部分（2026-09-22，行为变化）
 
 调谐以前只出现在"给玩家的手动清单"里；现在它是**可执行计划的一部分**：

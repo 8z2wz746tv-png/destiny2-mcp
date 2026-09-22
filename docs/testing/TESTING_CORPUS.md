@@ -494,5 +494,6 @@
 | ⑥ 闭环 | 推荐 perk 名 → plug 物品 → `perks[].perkHash`（**sandbox perk**）→ 反查哪些枪有它 | 592/925 走通。**关键区分**：`manifest.search` 给的是 plug 物品 hash，而 `onItems` 在 sandbox perk 空间 —— 拿 plug hash 直接查闭环率 0% |
 | ⑦ 神器关联 | 本季神器的模组能指到神器（以覆盖率为准，缺口要在响应里说明） | 本季「好奇之器」35 个模组 → 归档指到 21 个（60%） |
 | ⑧ 缺值行为 | 未知 hash 一律 `None`/空，不编也不炸 | item/perk/反查/帧表/神器 五条查询都返回空 |
+| ⑨ 工具接线 | `weapon_assistant(intent="analyze")` 的 `data.starside` 块：两套评级分开、出处齐全、缺数据 `available=false` + `reason`、响应里无 `{…\|…}` 残留 | 见 `tests/test_starside_markup.py`（替身）+ `scripts/run_corpus_weapon_rows.py` |
 
 退出码 0 = 8 行成立；非 0 看不成立的行（FAL 行的判定依据会写清是数据缺口还是检查过期）。

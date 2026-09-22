@@ -4,6 +4,21 @@
 
 ## 未发布
 
+**新增：`weapon_assistant(intent="analyze")` 带 Starside 社区块（作者推荐 + 实测数值 + 帧表）** —— 2026-09-23：
+
+- 数据来自站点作者给的归档（5,760 物品 / 5,200 perk 的社区层），经 `scripts/import_starside_entities.py`
+  转成按 hash 的紧凑文件（4,483 + 2,676 条、2.8 MB）；**hash 逐条校验、全有或全无**，
+  真机审计 `scripts/audit_starside_entities.py` 可复核。
+- `analyze` 的 `data.starside`：Aegis（S–F 总榜 + 枪管/弹匣/起源/3、4 号位 + 理由）与
+  LGpig（分场景 T0… 榜 + 实测 dps/总伤/换弹 dps + 备注）**各自成字段、不合并**；机制说明走标记解析器
+  （41 token 单一出处：`{num|…}`/`∞` 解包、`{unsure|…}` 保留、`{pvp|…}` 与 PvE 分开、查不到的名字
+  原样保留并记进 `unresolved_names`）；帧级 DPS 表附适用条件；缺什么写进 `gaps`。
+- 出处四件套（`source`/`snapshot_at`/`authors`/`unofficial`）随块一起出去；没评过给
+  `available=false` + `reason`。
+- 语料：`scripts/run_corpus_starside_entities.py` 8 行真机（账号 500 把武器 100% 命中，
+  Aegis 189 / LGpig 72 把，326 把能 join 帧表，本季神器模组覆盖 60%）。
+
+
 **性能（重要）：两条回归 + 一个 300 秒超时，都修了** —— P5/P6：
 
 - **内核慢 7.7 倍**（纯枚举那条用例 12.4s → 95.0s）：那把统一后的排序键被**按组合**调用 286 万次，

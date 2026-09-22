@@ -64,6 +64,7 @@ from .services.manifest_query_service import ManifestQueryService
 from .services.fragment_service import FragmentService
 from .services.artifact_service import ArtifactService
 from .services.set_bonus_service import SetBonusService
+from .services.starside_entities import StarsideEntities
 from .services.starside_service import StarsideService
 from .services.pattern_service import PatternService
 from .services.rotation_service import RotationService
@@ -123,6 +124,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
         set_bonus_svc = SetBonusService(manifest)
         collection_svc = CollectionService(bungie, manifest, resolver)
         starside_svc = StarsideService(manifest)
+        starside_entities_svc = StarsideEntities()
         pattern_svc = PatternService(bungie, manifest, resolver, starside_svc)
         rotation_svc = RotationService(bungie, manifest, resolver)
         armor_mod_svc = ArmorModService(bungie, manifest, resolver)
@@ -159,6 +161,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
             "set_bonus_svc": set_bonus_svc,
             "collection_svc": collection_svc,
             "starside_svc": starside_svc,
+            "starside_entities_svc": starside_entities_svc,
             "pattern_svc": pattern_svc,
             "rotation_svc": rotation_svc,
             "armor_mod_svc": armor_mod_svc,

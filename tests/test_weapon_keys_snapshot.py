@@ -224,7 +224,9 @@ async def _call(services: dict[str, Any], **kwargs) -> dict:
         ("catalyst", {"weapon_name": "测试武器"},
          ["catalyst", "weapon_schema_version"]),
         ("analyze", {"weapon_name": "测试武器", "include_inventory": False},
-         ["god_roll", "inventory", "inventory_status", "sockets", "stats", "weapon",
+         # `starside` = Starside 作者给的社区推荐/评语块（见 STARSIDE_ENTITY_PLAN）；缺数据时块里
+         # 自带 available=false + reason，所以键恒在。
+         ["god_roll", "inventory", "inventory_status", "sockets", "starside", "stats", "weapon",
           "weapon_schema_version"]),
         ("compare", {"weapon_name": "测试武器"},
          ["comparison", "farming_list", "weapon_schema_version"]),

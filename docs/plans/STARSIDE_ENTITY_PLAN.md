@@ -226,7 +226,7 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
 | 阶段 | 做什么 | 产出 |
 | --- | --- | --- |
 | **P0** ✅ | 导入脚本 + 紧凑实体文件 + 懒加载器 + hash/覆盖守门 | 数据入库，**响应一个字不变** |
-| **P1** | 标记解析器 + `weapon_assistant(analyze)` 的社区块（Aegis/LGpig + 标签 + 机制细节） | 最想要的那条能力能用 |
+| **P1** ✅ | 标记解析器 + `weapon_assistant(analyze)` 的社区块（Aegis/LGpig + 标签 + 机制细节） | 最想要的那条能力能用（2026-09-23 落地） |
 | **P2** | perk 层接线（`perk_description`/`perk_pool` + `onItems`/`onSets`/`异域 PERK`） | perk 详情与反查 |
 | **P3** | 神器/碎片/模组/套装层（`artifact`/`fragment_details`/`armor_mods`/`set_bonus` + 双栏配对） | 神器关联与数值注记 |
 | **P4** | 帧级 DPS 模型（`derived.archetype` → 帧表）：给理论 MDPS/EDPS 与口径说明 | "这把枪打多少" |
@@ -300,3 +300,20 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
    直接查，闭环率 **0%**；改走 plug → `perks[].perkHash` 后 **592/925 走通**。
 4. **神器模组不是背包物品**：查"我身上有没有"永远是 0；正确做法是从我们 Manifest 的本季神器定义取模组
    列表再查归档（覆盖率 60%，缺口要在响应里说明）。
+
+---
+
+## 十二、P1 落地记录（2026-09-23）
+
+- `services/starside_markup.py`：41 个 token 的单一出处表 + `render()`/`number()`/`alternatives()`/
+  `perk_names()`/`unknown_tokens()`。按 P0 语料挖出的四条要求实现（`{num|…}` 多值与带标签解包、`∞`、
+  查不到的名字原样保留 + 留痕、`{unsure|…}` 与 `{pvp|…}` 不许抹平/混淆）。
+- `services/starside_notes.py`：`weapon_note()` 把一条记录成形为社区块（两套刻度分开、`gaps` 说缺什么、
+  `unresolved_names` 记查不到的名字、帧表附适用条件、标签注明"Starside 整理"）。
+- 接线：`ServiceContext` 加 `starside_entities_svc`（`server.py` 里构造，**懒加载**所以不影响启动），
+  `tools/_weapon_branches.analyze_payload` 在 `data.starside` 里带上它；`weapon_payload.py` 卡在 297 上限
+  没动它。
+- 守门：`tests/test_starside_markup.py` 5 条（token 表覆盖已入库数据、渲染不留记号壳、
+  `number()` 三种写法 + `∞`、社区块口径与缺口、工具层接线）。
+- 文档同步：`docs/COMPATIBILITY.md`、`CHANGELOG.md`、`skills/destiny2-mcp/references/routing.md`、
+  `docs/testing/TESTING_CORPUS.md`（新增第 ⑨ 行）。

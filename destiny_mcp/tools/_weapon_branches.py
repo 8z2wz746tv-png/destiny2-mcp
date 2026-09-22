@@ -18,6 +18,7 @@ from ..services import weapon_local_data, weapon_payload
 from ..services.weapon_payload import schema_block
 from ._enrichment import community_enrichment
 from ._farming import farming_reference, item_names
+from ..services.starside_notes import weapon_note
 from ._responses import ok_response
 
 
@@ -127,6 +128,14 @@ async def perk_pool_payload(svc: dict[str, Any], weapon_name: str) -> dict[str, 
 
 def analyze_payload(svc: dict[str, Any], result: dict[str, Any], weapon_name: str) -> dict[str, Any]:
     local = _local(svc, weapon_name)
+    # Starside 社区块（作者推荐/评语/实测数值）：按 hash 查，缺数据时块里自带 reason 与 gaps，
+    # 不编也不吞 —— 口径见 docs/plans/STARSIDE_ENTITY_PLAN.md。
+    weapon_hash = int((result.get("weapon") or {}).get("hash") or 0)
+    starside = (
+        weapon_note(svc["starside_entities_svc"], svc["manifest"], weapon_hash)
+        if weapon_hash
+        else None
+    )
     warnings = _attach_local(
         svc, local, weapon=result["weapon"], sockets=result["sockets"], weapon_name=weapon_name
     )
@@ -139,6 +148,7 @@ def analyze_payload(svc: dict[str, Any], result: dict[str, Any], weapon_name: st
             "god_roll": result["god_roll"],
             "inventory": result["inventory"],
             "inventory_status": result["inventory_status"],
+            "starside": starside,
             **schema_block(),
         },
         next_actions=result["next_actions"],
