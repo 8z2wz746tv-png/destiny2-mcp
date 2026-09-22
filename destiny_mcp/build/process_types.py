@@ -243,7 +243,13 @@ def armor_to_process_item(armor: Any) -> ProcessItem:
         stat_hash = _STAT_NAME_TO_HASH[stat_name]
         stats[stat_hash] = armor.stats.get(stat_name)
 
-    remaining_energy = max(0, int(getattr(armor, "energy_capacity", 0) or 0))
+    # **能拿来装属性模组的能量 = 容量 − 已装的"方案不动"的模组**（手臂/职业/头盔那些）。
+    # 以前这里直接给整个容量，于是求解器给每件都排 +10 属性模组，而真机上它们装不下
+    # （真机实测：光芒领主手套容量 11、手臂模组占 9，只剩 2 点，排 3 点的模组必然失败）。
+    # 一般插槽里那颗不算 —— 它会被替换掉，能量会还回来。
+    capacity = max(0, int(getattr(armor, "energy_capacity", 0) or 0))
+    used_by_other = max(0, int(getattr(armor, "energy_used_by_other_mods", 0) or 0))
+    remaining_energy = max(0, capacity - used_by_other)
 
     return ProcessItem(
         id=armor.item_instance_id,

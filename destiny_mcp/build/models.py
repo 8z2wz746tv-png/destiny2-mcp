@@ -136,6 +136,10 @@ class Armor(BaseModel):
     base_roll_stats: ArmorStats = Field(default_factory=ArmorStats)
     masterwork_level: int = Field(default=0, ge=0, le=5)
     tuning_mod_hash: int | None = None
+    #: 已装的"方案不会去动"的模组占掉的能量（手臂/职业/头盔那些 `enhancements.v2_*`）。
+    #: 求解器只能拿**剩下的**能量装属性模组 —— 见 `armor_to_process_item` 与
+    #: docs/plans/SOLVER_OPTIMALITY_PLAN.md 四·十六。**一般插槽里那颗不算**（它会被替换掉）。
+    energy_used_by_other_mods: int = 0
     #: 这件护甲**允许装**的调谐插件 hash（组件 310 的清单）。**空 = 读不到，缺数据 ≠ 允许** ——
     #: 求解器不许拿 Manifest 那份全局 32 颗当选项（每件实际只开放"某一个属性 +5"的 5 颗
     #: + 平衡调整，真机实测见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 四·十四）。
@@ -431,6 +435,8 @@ class InventorySnapshot(BaseModel):
             # Artifice armor & set bonus wildcard: check sockets
             sockets_data = sockets_data_map.get(inst_id, {}).get("sockets", [])
             is_artifice = False
+            #: 已装的**非一般插槽**模组占的能量（求解器不能拿它来装属性模组）。
+            other_mod_energy = 0
             has_set_bonus_mod_socket = False
             archetype_hashes: list[int] = []
             tuning_hash: int | None = None
@@ -450,6 +456,18 @@ class InventorySnapshot(BaseModel):
                             has_set_bonus_mod_socket = True
                         if plug_category == _ARMOR3_ARCHETYPE_CATEGORY:
                             archetype_hashes.append(int(plug_hash))
+                        category_identifier = str(
+                            (plug_def.get("plug") or {}).get("plugCategoryIdentifier") or ""
+                        )
+                        if category_identifier.startswith("enhancements.") and (
+                            category_identifier != "enhancements.v2_general"
+                        ):
+                            # 部位模组（手臂/职业/头盔…）：方案不改它们，但它们**占着能量**。
+                            # 一般插槽（v2_general，属性模组）不算 —— 那颗会被替换掉。
+                            other_mod_energy += int(
+                                ((plug_def.get("plug") or {}).get("energyCost") or {})
+                                .get("energyCost", 0) or 0
+                            )
                         if (
                             (plug_def.get("plug") or {}).get("plugCategoryIdentifier")
                             == _ARMOR3_MASTERWORK_CATEGORY
@@ -594,6 +612,7 @@ class InventorySnapshot(BaseModel):
                 tuning_mod_hash=tuning_hash,
                 tuning_name=tuning_name,
                 tuning_option_hashes=tuning_options,
+                energy_used_by_other_mods=other_mod_energy,
                 armor3_roll_verified=armor3_roll_verified,
                 roll_parse_error=roll_parse_error,
                 is_artifice=is_artifice,

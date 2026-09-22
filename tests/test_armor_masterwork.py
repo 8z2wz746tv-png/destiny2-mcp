@@ -85,3 +85,44 @@ def test_tier_zero_piece_has_no_masterwork_bonus() -> None:
         tuning_hash=CLASS_UP_HEALTH_DOWN, masterwork_bonus=5,
     )
     assert inflated is None, "0 档的件按 +5 去套必须对不上"
+
+
+# ── 能量账：属性模组只能用"扣掉方案不动的那些模组"之后剩下的能量（2026-09-22 真机） ──
+
+
+def test_stat_mod_budget_excludes_installed_piece_mods() -> None:
+    """光芒领主手套 `6917530191138019736` 真机账：容量 11、手臂模组占 9 → 只剩 **2**。
+
+    求解器以前拿到的是整个容量 11，于是给这件排了 3 点的 `武器模组`（+10 武器），
+    真机上必然 `12/11` 装不下 —— 用户落地时才发现的。现在只能排 1 点的
+    `小型武器模组`（+5 武器），正好和实际装进去的一致。
+    """
+    from destiny_mcp.build.models import Armor, ArmorStats
+    from destiny_mcp.build.process_types import armor_to_process_item
+
+    armor = Armor(
+        item_instance_id="gloves", item_hash=1, name="手套", slot="gauntlets",
+        stats=ArmorStats(weapons=20, grenade=30, super_stat=25),
+        armor_system="armor_3", gear_tier=5,
+        energy_capacity=11, energy_used_by_other_mods=9,
+    )
+    assert armor_to_process_item(armor).remaining_energy_capacity == 2
+
+    # 一般插槽里那颗不算：胸甲那种"已经装着武器模组"的件，换同类模组不该被饿死
+    already_has_stat_mod = armor.model_copy(
+        update={"energy_used_by_other_mods": 7}
+    )
+    assert armor_to_process_item(already_has_stat_mod).remaining_energy_capacity == 4
+
+
+def test_stat_mod_budget_never_goes_negative() -> None:
+    """数据对不上时（占用 > 容量）夹到 0，不许给求解器一个负预算。"""
+    from destiny_mcp.build.models import Armor, ArmorStats
+    from destiny_mcp.build.process_types import armor_to_process_item
+
+    armor = Armor(
+        item_instance_id="odd", item_hash=1, name="怪件", slot="legs",
+        stats=ArmorStats(weapons=10), armor_system="armor_3", gear_tier=5,
+        energy_capacity=5, energy_used_by_other_mods=9,
+    )
+    assert armor_to_process_item(armor).remaining_energy_capacity == 0
