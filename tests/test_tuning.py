@@ -1,7 +1,7 @@
 """调谐（Tuning）纯计算层的特征测试。
 
 口径来自实机 + Manifest（docs/plans/ARMOR_FORMAT_PLAN.md P7）：
-30 个方向型（+5/−5，零和）+ 平衡调整（六维 +1）+ 空插件；有调谐槽的护甲
+30 个方向型（+5/−5，零和）+ 平衡调整（**恰好三项并列最低时各 +1**）+ 空插件；有调谐槽的护甲
 件件都能装这 31 个非空插件。这里钉住四件事：
 
 1. 目录本身（数量、增量、hash）；
@@ -150,11 +150,45 @@ def test_directional_choices_move_exactly_five_points_between_two_stats() -> Non
         assert choice.increased is not None and choice.decreased is not None
 
 
-def test_balanced_choice_adds_one_to_every_stat() -> None:
-    catalog = tuning_catalog(_manager())
+def test_balanced_tuning_bonus_lands_on_the_three_lowest_stats() -> None:
+    """平衡调整给谁 +1：**恰好三项并列最低**的那三项 —— 真机实测（2026-09-22）。
 
+    光芒领主面具未调谐基值 武器30/生命5/职业5/手雷30/超能25/近战5，装上平衡调整后
+    武器30/生命6/职业6/手雷30/超能25/近战6：只有最低的三项各 +1，30 的那三项一动不动。
+    Manifest 的 `investmentStats` 写的是"六维各 +1"，照它建模每项都会多算 1。
+    证据脚本：`scripts/verify_tuning_write.py --apply --to 3122197216`（写进去 → 回读
+    插槽 → 回读组件 304 的六维 → 换回原样）。
+    """
+    catalog = tuning_catalog(_manager())
     balanced = next(choice for choice in catalog if choice.kind == "balanced")
-    assert balanced.delta == (1, 1, 1, 1, 1, 1)
+
+    # 目录里那份是**占位**（真实增量得看这件的基础六维才定得下来），所以它必须是全 0，
+    # 而不是"六维各 +1"；同时它不能被当成空操作，否则求解器会直接跳过它。
+    assert balanced.delta == (0, 0, 0, 0, 0, 0)
+    assert balanced.is_noop is False
+
+    # 真机那一件的现装调谐是 +超能/−生命值，观测六维是含它的值。
+    piece = _piece(
+        "面具",
+        _stats(weapons=30, health=0, class_stat=5, grenade=30, super_stat=30, melee=5),
+        tuning=directional_tuning_hash("super_stat", "health"),
+    )
+
+    # STAT_NAMES 顺序：武器/生命/职业/手雷/近战/超能
+    assert piece.base == (30, 5, 5, 30, 5, 25)  # 生命 0 − (−5) = 5，超能 30 − 5 = 25
+    assert piece.choice_delta(balanced) == (0, 1, 1, 0, 1, 0)  # 最低的三项：生命/职业/近战
+    assert piece.stats_with(balanced) == (30, 6, 6, 30, 6, 25)  # 真机读到的就是这六个
+
+
+def test_balanced_tuning_does_nothing_without_exactly_three_lowest() -> None:
+    """并列最低不是恰好三项时平衡调整一项都不加（真机只验了"三项"这一档）。"""
+    catalog = tuning_catalog(_manager())
+    balanced = next(choice for choice in catalog if choice.kind == "balanced")
+
+    piece = _piece("腿甲", _stats(weapons=30, grenade=30, health=0, super_stat=0))
+
+    assert piece.choice_delta(balanced) == (0, 0, 0, 0, 0, 0)
+    assert piece.stats_with(balanced) == piece.base
 
 
 def test_catalog_uses_manifest_names_and_falls_back_for_unknown_plugs() -> None:
@@ -396,7 +430,11 @@ def test_plan_reports_a_cap_instead_of_claiming_infeasible() -> None:
 
 
 def test_plan_uses_balanced_tuning_for_a_one_point_gap() -> None:
-    """六维都非零、又都卡在目标上：只有平衡调整（六维 +1）不伤任何一项。"""
+    """缺口正好落在"最低三项"之一、别的项又都卡在目标上：只有平衡调整不伤任何一项。
+
+    （缺口必须在最低三项上：平衡调整只给那三项 +1。缺口在 20 那一档上是补不了的 ——
+    这条就是被真机数据纠正过的旧夹具。）
+    """
     piece = _piece(
         "腿甲",
         _stats(weapons=20, health=20, class_stat=1, grenade=20, melee=1, super_stat=1),
@@ -406,8 +444,8 @@ def test_plan_uses_balanced_tuning_for_a_one_point_gap() -> None:
         [piece],
         stats_now=(20, 20, 1, 20, 1, 1),
         targets={
-            "weapons": 20, "health": 20, "class_stat": 1,
-            "grenade": 21, "melee": 1, "super_stat": 1,
+            "weapons": 20, "health": 20, "class_stat": 2,
+            "grenade": 20, "melee": 1, "super_stat": 1,
         },
     )
 

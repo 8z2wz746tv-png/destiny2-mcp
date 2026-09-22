@@ -125,6 +125,9 @@ def test_no_single_piece_tuning_can_improve_the_result_any_further() -> None:
     context = prepare_fixed_set_context(snapshot, constraints)
     improved_set, plan = local_tuning_improvement(solved.sets[0], context, manifest)
     assert plan.changes, "免费额度没吃：这套明明还能靠调谐涨手雷"
+    # 贪心必须是"没有改进了"停的，不能是"步数上限到了"停的 —— 这条断言就是被真事咬出来的：
+    # 上限还是 12 的时候它在这里变红（第 13 步本来还能用平衡调整再涨 3 点）。
+    assert plan.exhausted is False, "碰了步数上限：返回的这套算不上局部最优"
 
     after = _final_stats(improved_set)
     before = _final_stats(solved.sets[0])
@@ -150,6 +153,24 @@ def test_no_single_piece_tuning_can_improve_the_result_any_further() -> None:
             assert verified.rank_key <= improved_set.rank_key, (
                 f"第 {index} 件换成 {choice.name} 还能更好 —— 说明没吃干净"
             )
+
+
+def test_hitting_the_step_cap_is_reported_not_hidden() -> None:
+    """跑到步数上限时如实标出来（上限只是成本护栏，不是"已经最优"的意思）。
+
+    这条是可注入的：把上限压到 1，标记必须翻成 True；默认上限下必须是 False。
+    """
+    manifest = _FakeManifest()
+    snapshot = _snapshot(_five(grenade=19, melee=20, health=20))
+    constraints = BuildConstraints(grenade_min=95, melee_min=100)
+    solved = solve(snapshot, constraints)
+    context = prepare_fixed_set_context(snapshot, constraints)
+
+    _, tight = local_tuning_improvement(solved.sets[0], context, manifest, max_steps=1)
+    assert tight.exhausted is True
+
+    _, loose = local_tuning_improvement(solved.sets[0], context, manifest)
+    assert loose.exhausted is False
 
 
 def test_local_tuning_never_breaks_a_constraint() -> None:

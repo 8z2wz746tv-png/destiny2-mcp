@@ -4,7 +4,7 @@
 
 - 调谐槽的 plug set 是 `1155052024`，里面正好 32 个插件：30 个方向型
   （+5 某一项 / −5 另一项，六维的 30 个有序组合一个不少）、1 个「平衡调整」
-  （六维各 +1）、1 个「空调整模组插槽」（什么都不加）。
+  （**恰好三项并列最低时各 +1**）、1 个「空调整模组插槽」（什么都不加）。
 - 有调谐槽的护甲定义里 `socketEntries[].reusablePlugSetHash == 1155052024`，
   没有 `randomizedPlugSetHash` —— 也就是说这 31 个非空调谐**件件都能装**，
   不存在"这件只能选某几项"的限制。
@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import combinations
 from typing import Any, Iterable, Literal, Mapping, Sequence
 
 from .armor_rules import (
@@ -29,6 +30,7 @@ from .armor_rules import (
     BALANCED_TUNING_LOWEST_STAT_BONUS,
     DIRECTIONAL_TUNING_HASHES,
     DIRECTIONAL_TUNING_STAT_BONUS,
+    balanced_tuning_bonus,
 )
 from ..vocabulary import STAT_LABELS_ZH  # 六维中文名的单一出处
 from .constants import STAT_NAMES
@@ -66,7 +68,9 @@ class TuningChoice:
 
     @property
     def is_noop(self) -> bool:
-        return self.kind == "empty" or not any(self.delta)
+        # 只认"空插槽"。**不能**用 `not any(delta)` 判：平衡调整的 delta 是按件现算的
+        # （见 `PieceTuning.choice_delta`），目录里那份是全 0，照 delta 判会把它当成空操作。
+        return self.kind == "empty"
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {
@@ -125,7 +129,11 @@ def _catalog(manifest: Any) -> tuple[TuningChoice, ...]:
             plug_hash=_canon(BALANCED_TUNING_HASH),
             name=plug_name(_canon(BALANCED_TUNING_HASH), "平衡调整"),
             kind="balanced",
-            delta=(BALANCED_TUNING_LOWEST_STAT_BONUS,) * len(STAT_NAMES),
+            # **不是常量增量**：它给"恰好三项并列最低"各 +1，得看这件的基础六维才定得下来
+            # （真机实测见 `armor_rules.balanced_tuning_bonus`）。所以这里放全 0 占位，
+            # 真正的增量由 `PieceTuning.choice_delta` 现算 —— 谁要是拿这个 delta 直接用，
+            # 就会把平衡调整算成"什么都没做"，这比算成"六维各 +1"安全。
+            delta=_zeros(),
         )
     )
     choices.append(
@@ -188,7 +196,16 @@ class PieceTuning:
     def stats_with(self, choice: TuningChoice | None) -> tuple[int, ...]:
         """装上 `choice`（None = 保持现状）之后这件护甲的六维。"""
         chosen = self.current if choice is None else choice
-        return self.base_with(chosen.delta)
+        return self.base_with(self.choice_delta(chosen))
+
+    def choice_delta(self, choice: TuningChoice) -> tuple[int, ...]:
+        """这个选择相对「没装调谐」的增量。
+
+        方向型是常量 ±5；**平衡调整要按这件的基础六维现算**（它只给最低的三项 +1）。
+        """
+        if choice.kind == "balanced":
+            return balanced_tuning_bonus(self.base)
+        return choice.delta
 
     def base_with(self, delta: Sequence[int]) -> tuple[int, ...]:
         return tuple(
@@ -216,6 +233,38 @@ class PieceTuning:
         return tuple(new - old for new, old in zip(after, now))
 
 
+def _invert_tuning(
+    observed: tuple[int, ...], current: TuningChoice
+) -> tuple[int, ...] | None:
+    """从"含当前调谐的观测六维"反推"没装调谐的基础六维"。
+
+    方向型直接减。平衡调整要解**不动点**：它的 +1 只落在"恰好三项并列最低"上，
+    所以要猜是哪三项、减掉之后再正着算一遍，能还原观测值才认。猜不出来返回 None ——
+    调用方宁可让这件保持现状，也不要拿一个错的基础值去算别的调谐。
+    """
+    if current.kind != "balanced":
+        return tuple(
+            value - current.delta[index] for index, value in enumerate(observed)
+        )
+    minimum = min(observed)
+    # 拿了 +1 的那三项在观测值里必然是并列最低（它们 = 基础最低值 + 1），
+    # 但可能有更多项并列，所以要在候选里试，再用"正着算一遍"筛。
+    for drop in combinations(range(len(observed)), 3):
+        if any(observed[index] != minimum for index in drop):
+            continue
+        candidate = tuple(
+            value - (1 if index in drop else 0)
+            for index, value in enumerate(observed)
+        )
+        restored = tuple(
+            max(0, value + bonus)
+            for value, bonus in zip(candidate, balanced_tuning_bonus(candidate))
+        )
+        if restored == observed:
+            return candidate
+    return None
+
+
 def piece_tuning(
     armor: Any,
     manifest: Any,
@@ -235,14 +284,12 @@ def piece_tuning(
     current = by_hash.get(current_hash, empty)
 
     stats = getattr(armor, "stats", None)
-    base = tuple(
-        int(getattr(stats, name, 0) or 0) - current.delta[index]
-        for index, name in enumerate(STAT_NAMES)
-    )
+    observed = tuple(int(getattr(stats, name, 0) or 0) for name in STAT_NAMES)
+    base = _invert_tuning(observed, current)
     note = ""
-    if any(value < 0 for value in base):
+    if base is None or any(value < 0 for value in base):
         # 反推不出来（理论上不会发生）：宁可只让这件保持现状，也不要编一个负的基础值。
-        base = tuple(max(0, value) for value in base)
+        base = tuple(max(0, value) for value in observed)
         note = "这件护甲反推不出未调谐的基础属性，只能保持当前调谐。"
 
     return PieceTuning(
@@ -274,12 +321,18 @@ def armor_with_tuning(armor: Any, piece: PieceTuning, choice: TuningChoice) -> A
     )
 
 
+#: 局部贪心的默认步数上限（**只写这一处**：池子包装函数以前自己抄了个 12，
+#: 于是"改了默认值"只改了单测直接调用的那条路，产品路径还是 12 —— 实测收敛点见
+#: `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 的 P5 记录，上限 12 时第 13 步本来还能再涨）。
+LOCAL_TUNING_MAX_STEPS = 24
+
+
 def local_tuning_improvement(
     armor_set: Any,
     context: Any,
     manifest: Any,
     *,
-    max_steps: int = 12,
+    max_steps: int = LOCAL_TUNING_MAX_STEPS,
 ) -> tuple[Any, TuningPlan]:
     """在"单件调谐"这个邻域里贪心提升一套**已经达标**的配装。
 
@@ -333,7 +386,9 @@ def local_tuning_improvement(
     # 当基线，于是"当前已经比任何单件替换都好，但仍然优于原始"时它会继续接受更差的走法
     # （守门测试 `test_no_single_piece_tuning_can_improve_the_result_any_further` 抓到的）。
     current_key = armor_set.rank_key
+    steps_used = 0
     for _ in range(max_steps):
+        steps_used += 1
         best: tuple[tuple[int, ...], int, TuningChoice] | None = None
         for piece_index, piece in enumerate(pieces):
             for choice in piece.options:
@@ -396,8 +451,11 @@ def local_tuning_improvement(
             decreased=final_choice.decreased,
         ))
 
+    exhausted = steps_used >= max_steps
     if not changes:
-        return armor_set, TuningPlan(feasible=True, reason="现状已经吃满了免费的调谐额度。")
+        return armor_set, TuningPlan(
+            feasible=True, reason="现状已经吃满了免费的调谐额度。", exhausted=exhausted
+        )
 
     verified = _evaluate(arms)
     if verified is None:  # pragma: no cover - 每一步都验过，走不到
@@ -417,7 +475,10 @@ def local_tuning_improvement(
         for index, value in enumerate(change.delta):
             delta[index] += value
     return final, TuningPlan(
-        feasible=True, changes=tuple(changes), final_delta=tuple(delta)
+        feasible=True,
+        changes=tuple(changes),
+        final_delta=tuple(delta),
+        exhausted=exhausted,
     )
 
 
@@ -426,7 +487,7 @@ def improve_pool_with_local_tuning(
     context: Any,
     manifest: Any,
     *,
-    max_steps: int = 12,
+    max_steps: int = LOCAL_TUNING_MAX_STEPS,
 ) -> list[tuple[Any, TuningPlan]]:
     """对一池候选逐个做局部调谐提升，返回 `[(提升后的集合, 计划)]`（顺序不变）。
 
@@ -499,6 +560,11 @@ class TuningPlan:
     final_delta: tuple[int, ...] = _zeros()
     reason: str = ""
     searched: int = 0
+    #: 局部贪心是**跑到步数上限**停的，不是"没有改进了"停的 —— 也就是"没吃干净"。
+    #: 真机上这不是理论问题：默认上限 12 时，合成夹具里第 13 步本来还能再涨 3 点
+    #: （`tests/test_build_local_tuning.py` 的局部最优不变量抓到的）。默认上限已按
+    #: "实测收敛点 20 步"调到 24，但**碰上限必须说出来**，不能默默少给。
+    exhausted: bool = False
     #: 次优方案（同序，已去重）。复核用它兜底：排序只是启发式，能不能过由复核说了算。
     alternatives: tuple[tuple[TuningChange, ...], ...] = ()
 
@@ -517,6 +583,7 @@ class TuningPlan:
                 if value
             },
             "reason": self.reason,
+            "exhausted": self.exhausted,
         }
 
 
@@ -596,7 +663,8 @@ def plan_tuning(
             reason=f"缺口超出调谐能力：{detail}。",
         )
 
-    # 平衡调整只在缺口 ≤1（它给六维各 +1）时才有意义，其余情况不入选，免得白翻。
+    # 平衡调整只在缺口 ≤1（它给最低那三项各 +1，单项最多 +1）时才有意义，其余情况不入选，
+    # 免得白翻。这是**粗筛**：真的够不够由下面的 `helps`（按件现算的 delta）说了算。
     allow_balanced = any(gap <= BALANCED_TUNING_LOWEST_STAT_BONUS for gap in deficits.values())
     candidate_options: list[list[TuningChoice]] = []
     for piece in usable:

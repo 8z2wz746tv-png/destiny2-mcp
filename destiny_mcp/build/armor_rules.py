@@ -10,6 +10,7 @@ not read the Manifest or call the Bungie API.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from collections.abc import Sequence
 from typing import Literal, cast
 
 from .constants import STAT_NAMES
@@ -237,6 +238,30 @@ def tuning_options(template: object) -> tuple[ArmorTuningOption, ...]:
     return (*directional, ArmorTuningOption(BALANCED_TUNING_HASH, "balanced"))
 
 
+def balanced_tuning_bonus(stats: Sequence[int]) -> tuple[int, ...]:
+    """平衡调整给谁 +1：**恰好三项并列最低**时是这三项，否则一项都不给。
+
+    真机证据（2026-09-22，`scripts/verify_tuning_write.py --apply --to 3122197216`）：
+    光芒领主面具未调谐基值 武器30/生命5/职业5/手雷30/超能25/近战5，装上平衡调整后
+    武器30/生命6/职业6/手雷30/超能25/近战6 —— 只有最低的三项各 +1；30 的那三项一动不动。
+    Manifest 的 `investmentStats` 把平衡调整写成"六维各 +1"，照那个建模每项都会多算
+    （`build/tuning.py` 以前就是），而且换成方向型调谐时基础值也会反推错。
+    """
+    # 返回的**永远是与输入等长的增量**（不适用就是全 0）。第一版在不适用时返回空元组，
+    # 于是调用方 `delta[index]` 直接 IndexError —— "没有加成"和"长度不对"是两件事。
+    zeros = tuple(0 for _ in stats)
+    if len(stats) != len(STAT_NAMES):
+        return zeros
+    minimum = min(stats)
+    lowest = [index for index, value in enumerate(stats) if value == minimum]
+    if len(lowest) != 3:
+        return zeros
+    return tuple(
+        BALANCED_TUNING_LOWEST_STAT_BONUS if index in lowest else 0
+        for index in range(len(stats))
+    )
+
+
 def apply_tuning(template: object, option: object) -> StatsVector | None:
     """Apply one valid tuning plug to a fully masterworked Tier-5 template.
 
@@ -267,12 +292,11 @@ def apply_tuning(template: object, option: object) -> StatsVector | None:
         stats[increased_index] += DIRECTIONAL_TUNING_STAT_BONUS
         stats[decreased_index] -= DIRECTIONAL_TUNING_STAT_BONUS
     elif option.kind == "balanced":
-        minimum = min(stats)
-        lowest_indices = [index for index, value in enumerate(stats) if value == minimum]
-        if len(lowest_indices) != 3:
+        bonus = balanced_tuning_bonus(stats)
+        if not any(bonus):
             return None
-        for index in lowest_indices:
-            stats[index] += BALANCED_TUNING_LOWEST_STAT_BONUS
+        for index, value in enumerate(bonus):
+            stats[index] += value
     else:
         return None
 

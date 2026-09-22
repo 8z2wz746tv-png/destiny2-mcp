@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from typing import Any, Callable, Literal
 
+from ..build.armor_rules import balanced_tuning_bonus
+from ..build.constants import STAT_NAMES
 from ..utils.hash_utils import to_unsigned
 from ..vocabulary import CLASS_LABELS_ZH as CLASS_DISPLAY
 from ..vocabulary import class_key
@@ -375,6 +377,7 @@ def armor_payload(
     if include_stats_layers and final is not None:
         # 调谐的**实际生效**量：定向就是那两个 ±5；"平衡调整"只加在（满大师后）
         # 最低的三项上 —— plug 定义里写的是"六维各 +1"，照它算会多算。
+        # 规则本身只有一处实现：`build.armor_rules.balanced_tuning_bonus`（真机实测见 ADR-014）。
         tuning_delta: dict[str, int] = {}
         if tuning is not None and not tuning_plug_stats:
             tuning["kind"] = "empty"
@@ -385,8 +388,18 @@ def armor_payload(
                 after = {
                     key: roll_full[key] + masterwork_stats.get(key, 0) for key in STAT_KEYS
                 }
-                lowest = sorted(STAT_KEYS, key=lambda key: (after[key], key))[:3]
-                tuning_delta = {key: 1 for key in lowest}
+                # 注意两套键顺序不同：这里按载荷顺序存，规则函数按 `STAT_NAMES` 顺序收。
+                bonus = balanced_tuning_bonus([after[name] for name in STAT_NAMES])
+                tuning_delta = {
+                    name: value for name, value in zip(STAT_NAMES, bonus) if value
+                }
+                if not tuning_delta:
+                    # 并列最低的不是"恰好三项"：真机只验过三项那一档。**不猜** ——
+                    # 记 0 会让下面反推出的"大师增量"偏大，所以必须留一句话说清。
+                    notes.append(
+                        "这件护甲的「平衡调整」加成没算出来（并列最低的不是恰好三项），"
+                        "调谐增量按 0 记，大师增量可能因此偏大。"
+                    )
                 tuning["kind"] = "balanced"
             else:
                 tuning_delta = dict(tuning_plug_stats)
