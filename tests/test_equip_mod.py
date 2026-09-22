@@ -395,17 +395,21 @@ async def test_plan_can_change_tuning_by_its_full_name() -> None:
 async def test_tuning_plan_is_marked_not_writable() -> None:
     """调谐带 `writable=False` + 原因，工具层据此**不**走"确认后写入"那套。
 
-    理由**不能再引用 1663**：那句 "This action can only be done in-game." 出自 ADR-012 推翻的
-    字段名 bug（当时 `itemId` 缺失才被回 1663），拿它当"上游只允许游戏内改"的证据是错的。
-    实测免费接口能寻址调谐槽（原样重插回的是 1679 `DestinySocketAlreadyHasPlug`），
-    但"换一颗真的调谐"会改账号属性、本项目没做过，所以照旧只给方案 —— 措辞要如实。
+    理由的口径（2026-09-22 真机验证，ADR-014）：**换得动，但只能换成你已经拥有的那一颗** ——
+    换成身上别的护甲正装着的那颗成功（`ErrorCode=1`、回读插槽与六维都对、换回也成），
+    换成没有的一颗回 **1675** 要材料。本项目还没开替你写调谐这条路，所以照旧只给方案。
     """
     plan = await _service().plan("Tester#1234", "6917", "+职业 / -手雷", "hunter")
 
     assert plan["kind"] == "tuning"
     assert plan["writable"] is False
-    assert "还没验证过" in plan["writable_reason"]
-    assert "1663" not in plan["writable_reason"]
+    reason = plan["writable_reason"]
+    assert "只能换成你已经拥有的那一颗" in reason
+    assert "1675" in reason
+    # 被推翻的两代说法都不许回来（1663 出自字段名 bug；"还没验证过"已被真机验证取代）。
+    assert "1663" not in reason
+    assert "只允许游戏内改" not in reason
+    assert "还没验证过" not in reason
 
 
 async def test_apply_raises_when_bungie_returns_an_error_envelope() -> None:

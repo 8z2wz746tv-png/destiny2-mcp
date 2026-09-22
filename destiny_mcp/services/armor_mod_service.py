@@ -305,7 +305,6 @@ class ArmorModService(ModSocketMixin):
                 "调谐**换得动，但只能换成你已经拥有的那一颗**（换成没有的一颗，上游回 1675"
                 "「负担不起这个动作的材料要求」，换调谐是要材料的）。本项目还没开替你写调谐"
                 "这条路，所以这份方案告诉你要把哪一件改成什么，请进游戏手动改。"
-                "（旧说法「Bungie 只允许游戏内改」出自一个已被推翻的接口 bug，见 ADR-012。）"
                 if is_tuning
                 else (
                     f"「{_mod_label(self._manifest.get_item_definition(matched_hash), mod_name)}」"

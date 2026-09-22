@@ -572,7 +572,8 @@ def test_tuning_plan_flags_but_never_ships_plugs_as_writable_mods() -> None:
 
     1. 靠调谐才达标的方案，`requires_tuning` 必须是 True、`tuning_changes` 必须有内容
        （以前按"有没有插件要写"算，调谐不可写之后就恒为 False）；
-    2. `canonical_build.items[].mods` **不能**夹带调谐插件 —— Bungie 只允许游戏内改，
+    2. `canonical_build.items[].mods` **不能**夹带调谐插件 —— 换调谐要材料、而且只能换成
+       你已经拥有的那一颗（2026-09-22 真机验证，ADR-014），本项目还没开替你写这条路，
        写进去只会让 equip_build 失败或少做一步。
     """
     from destiny_mcp.build.constraints import parse as parse_constraints
@@ -619,6 +620,7 @@ def test_tuning_plan_flags_but_never_ships_plugs_as_writable_mods() -> None:
     top = results[0]
     assert top.requires_tuning is True
     assert top.tuning_changes and top.tuning_changes[0]["to"]["name"] == "+手雷 / -职业"
-    assert "只能在游戏内" in top.tuning_note
+    assert "只能换成你已经拥有的那一颗" in top.tuning_note
+    assert "只允许游戏内改" not in top.tuning_note
     mods = [mod for item in top.canonical_build.items for mod in item.mods]
     assert 1922571986 not in mods, "调谐插件不许进 canonical_build 的 mods"
