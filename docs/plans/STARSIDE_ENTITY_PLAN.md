@@ -368,3 +368,20 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
 
 **结果**：`scripts/run_corpus_starside_entities.py` 8 行 + 七个入口的实际调用全部 PASS；为此新增守门
 `test_perk_description_falls_back_when_the_manifest_lookup_raises`（用会抛的替身钉住回退路径）。
+
+### 发版前的独立复验（2026-09-23，主代理自己跑，子代理中途失败后补上）
+
+| 项 | 结果 |
+| --- | --- |
+| 全量语料 `run_corpus_all_rows.py` | **1 条 FAIL**，且正是信封违规（帧表的 camelCase 键）—— 修复后复验 **0 违规** |
+| 信封复验（用运行器自己的 `envelope_violations`） | `analyze` 三个样本（无感/无足雨燕/阴沉利爪）**全 0 违规** |
+| 全量单测 | **1764 passed** |
+| 数据审计 `audit_starside_entities.py` | 全部对得上 |
+| 实体语料 | **8/8 行** |
+| 武器章节语料 | **17 行 PASS / 0 FAIL** |
+
+复验过程中又抓到两处（都已修 + 有守门）：
+1. 帧表的站点 camelCase 键（`ammoType`/`itemSubType`）违反信封 snake_case 规则 → 统一 `_snake()`，哨兵值 `INF` 翻成 `∞`；
+2. 我的 `_snake()` 一开始用了"大写边界插下划线"那个正则 —— 它专属 `error_codes` 的类名→码推导，
+   `tests/test_error_codes.py` 判红；换成"小写/数字后接大写"的写法。`tags` 的 `isHolofoil`/`site_weaponTypes`
+   也一并归一（否则仍是信封违规）。

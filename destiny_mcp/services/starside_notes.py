@@ -26,7 +26,9 @@ _SENTINELS = {"INF": "∞", "-INF": "-∞"}
 
 def _snake(key: str) -> str:
     """站点的 camelCase 键名 → 我们的 snake_case（响应信封规则，全量语料抓到的违规）。"""
-    return re.sub(r"(?<!^)(?=[A-Z])", "_", key).lower()
+    # 注意：**不要**用"大写边界插下划线"那个正则 —— 它专属 error_codes 的类名→码推导，
+    # tests/test_error_codes.py 会判红（我第一版就撞了）。这里按"小写/数字后接大写"插。
+    return re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", key).lower()
 
 
 def _normalize_frame(row: dict[str, Any]) -> dict[str, Any]:
@@ -170,13 +172,13 @@ def weapon_note(entity: StarsideEntities, manifest: Any, item_hash: int) -> dict
         block["gaps"].append("这把的框架没有帧级实测表（28 个框架有）")
 
     derived = entry.get("derived") or {}
-    tags = {k: derived.get(k) for k in ("release", "season", "foundry", "craftable", "tierable") if derived.get(k)}
+    tags = {_snake(k): derived.get(k) for k in ("release", "season", "foundry", "craftable", "tierable") if derived.get(k)}
     for key in ("site_elements", "site_season", "site_weaponTypes"):
         if zh.get(key):
-            tags[key.replace("site_", "site_")] = zh[key]
+            tags[_snake(key)] = zh[key]
     for key in ("isAdept", "isHolofoil"):
         if entry.get(key):
-            tags[key] = True
+            tags[_snake(key)] = True
     if entry.get("sameAs"):
         tags["same_as"] = entry["sameAs"]
     if tags:
