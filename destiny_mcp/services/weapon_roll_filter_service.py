@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any
 
 from ..exceptions import ManifestError
 from ..manifest import class_type_name, resolve_character_name
+from ..utils.arg_text import split_items
 
 if TYPE_CHECKING:
     from ..manifest import ManifestManager
@@ -328,11 +329,14 @@ class WeaponRollFilterService:
 
     @staticmethod
     def _split_terms(values: list[str] | str | None) -> list[str]:
+        """词表归一 + 小写。怎么拆只由 `utils/arg_text` 说了算。
+
+        这里以前自己写了一份 `values.split(",")`：只有半角逗号，全角逗号/顿号/分号
+        一律拆不开，与工具层刚接的文本写法是两套规则 —— 同一个参数"换个写法就少筛一半"。
+        """
         if values is None:
             return []
-        if isinstance(values, str):
-            return [part.strip().lower() for part in values.split(",") if part.strip()]
-        return [str(part).strip().lower() for part in values if str(part).strip()]
+        return [term.lower() for term in split_items(values)]
 
     @staticmethod
     def _equipped_plugs(weapon: dict[str, Any]) -> list[dict[str, Any]]:

@@ -8,6 +8,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from pydantic import ValidationError
+
+from ..build_contracts import ExecutableBuild, canonical_build_error_message
+from ..error_codes import ErrorCode, write_failed
 from ._enrichment import community_enrichment
 from ..services.starside_notes import (
     class_item_pairs,
@@ -350,6 +354,78 @@ async def equip_mod(
             f"item_instance_id=\"{plan['item_instance_id']}\")。",
         ],
     )
+
+
+async def equip_build(
+    svc: Any,
+    player_name: str,
+    canonical_build: dict[str, Any] | None,
+    execution_id: str,
+    character: str,
+    confirmed: bool,
+) -> dict:
+    """`build_assistant(intent="equip_build")`：确认后装备服务端签发的整套候选。
+
+    收两种回传形态，语义完全相同：
+
+    - 完整的 `canonical_build`（能发结构化参数的宿主）；
+    - 它的 `execution_id`（只发标量的宿主，实测豆包 connector 发不出结构体）——
+      服务端凭 ID 取回自己签发的那份，方案内容不经过调用方。
+
+    两条路最后都走 `equip_build` 的服务端校验：玩家绑定、10 分钟 TTL、内容一致、
+    一次确认只能执行一次。
+    """
+    if canonical_build is None and execution_id:
+        candidate = svc["build_svc"].get_build_candidate(player_name, execution_id)
+        if not candidate.get("success"):
+            return error_response(
+                candidate.get("code") or ErrorCode.EXACT_BUILD_REQUIRED,
+                candidate.get("message") or "配装候选已失效，请重新求解并确认。",
+                next_actions=[{
+                    "label": "重新求解并确认配装",
+                    "tool": "build_assistant",
+                    "arguments": {"intent": "find", "character": character},
+                }],
+            )
+        canonical_build = candidate["build"]
+
+    if canonical_build is None:
+        return error_response(
+            ErrorCode.EXACT_BUILD_REQUIRED,
+            "装备配装要回传候选里的 canonical_build，或它的 execution_id"
+            "（只发标量的宿主用后者）。两者都不能自己拼。",
+        )
+
+    try:
+        exact_build = ExecutableBuild.model_validate(canonical_build)
+    except ValidationError as exc:
+        return error_response(ErrorCode.INVALID_CANONICAL_BUILD, canonical_build_error_message(exc))
+
+    if not confirmed:
+        return confirmation_required_response("equip_build", {
+            # execution_id 单独回显：只发标量的宿主靠它再发一次，不必搬运整块 JSON。
+            "execution_id": exact_build.execution_id,
+            "canonical_build": exact_build.model_dump(mode="json"),
+            "character": character,
+            # 逐件预览（光等/能量/模组）与 canonical 并列：canonical 要能原样回传
+            "items_preview": await equip_preview(
+                svc, player_name, exact_build.model_dump(mode="json")
+            ),
+        })
+
+    result = await svc["build_svc"].equip_build(player_name, exact_build, character)
+    if not result.get("success"):
+        return error_response(
+            result.get("code") or write_failed("build_equip"),
+            result.get("message") or "配装装备失败。",
+            candidates=[{"result": result}],
+            next_actions=[{
+                "label": "重新求解并确认配装",
+                "tool": "build_assistant",
+                "arguments": {"intent": "recommend", "character": character},
+            }],
+        )
+    return ok_response("配装装备流程已执行。", {"result": result})
 
 
 def with_slot_keys(payload: Any) -> Any:

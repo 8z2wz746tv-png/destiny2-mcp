@@ -116,6 +116,9 @@ OVERRIDES: dict[tuple[str, str, str], dict[str, Any]] = {
     ("subclass_assistant", "community", "community_section"): {"knowledge_id": "k1"},
     ("activity_assistant", "community", "community_section"): {"knowledge_id": "k1"},
     ("world_assistant", "community", "community_section"): {"knowledge_id": "k1"},
+    # execution_id 与 canonical_build 是二选一：要验证 ID 被读，就不能同时给整块候选
+    # （基线里两份 canonical_build 探针完全一样，同给的话 ID 走哪条路都看不出来）。
+    ("build_assistant", "equip_build", "execution_id"): {"canonical_build": None},
 }
 
 WRITE_INTENTS = set(_requests.WRITE_INTENTS) | {"equip_build"}

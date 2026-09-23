@@ -48,7 +48,9 @@ CEILINGS = {
     # 的壳去掉后 1401 → 1399（那些壳本身就让 0 走不进规则里）。
     # 性能六项：搜人分支搬去 `tools/_player_branches.py`（它有错误映射、两条话术与
     # 响应封装，本来就该按域放 `_*_branches.py`）→ 1407 → 1364，上限跟着收紧。
-    "destiny_mcp/tools/assistants.py": 1364,
+    # 1364 → 1319：equip_build 分支搬去 `tools/_armor_branches.py`（它旁边就是
+    # equip_preview），并把"标量宿主也能装备"的两种回传形态收在那里。
+    "destiny_mcp/tools/assistants.py": 1319,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留
@@ -59,7 +61,10 @@ CEILINGS = {
     # 调谐（tuning）的对外字段也落在那边的翻译层里，不再往这里堆。
     # 902 → 901：函数内那行冗余的 `from ..manifest import …`（顶层已经导入了同样两个
     # 名字）换成组件号单一出处 `from . import profile_components` —— 修 F821 的同时不涨行数。
-    "destiny_mcp/services/build_service.py": 901,
+    # 901 → 875：候选暂存（execution_id → 签发方案、TTL、玩家绑定、用完即焚）
+    # 整段搬去 `services/build_candidates.py` —— 它与求解流程无关，而且"只给候选 ID
+    # 也能装备"要在这里按 ID 取回签发的那份。上限跟着收紧。
+    "destiny_mcp/services/build_service.py": 875,
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升
@@ -113,6 +118,11 @@ CEILINGS = {
     "destiny_mcp/services/rotation_service.py": 313,
     # 同上：`intent="rotations"` 的载荷与话术（口径分离 / 未锚点说明 / {var:} 提醒）。
     "destiny_mcp/tools/_rotation_branches.py": 111,
+    # 只发标量的宿主（豆包 connector）把结构化参数写成文本时的还原：登记表 + 一次性还原。
+    # 分隔符规则不在这儿，在 `destiny_mcp/utils/arg_text.py`（工具层与服务层共用一份）。
+    "destiny_mcp/tools/_coerce.py": 118,
+    # 候选暂存（从 build_service 拆出）：登记即上限 —— 再往里加东西先回答"是不是该拆状态与话术"。
+    "destiny_mcp/services/build_candidates.py": 101,
     # 同上：`intent="patterns"` 的载荷与话术（总览 / 单把 / 变体 / 术语对照 /「未开始」措辞）。
     # 211 是加上"玩家说红框、游戏说模式"的术语块与变体话术（含强化插槽）之后的长度；
     # 215 = 211 + 载荷里的 by_tier 汇总。

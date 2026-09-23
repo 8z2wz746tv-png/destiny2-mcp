@@ -16,8 +16,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import time
-from collections import OrderedDict
 from difflib import SequenceMatcher
 from typing import Literal, cast
 
@@ -43,6 +41,7 @@ from .account_action_lock import account_action_lock, serialized_account_action
 from ..build.process_types import SearchDiagnostics
 from ..build.ranking import rank_results
 from .build_tuning import apply_local_tuning, solve_with_tuning
+from .build_candidates import BuildCandidateStore
 from .build_results import (
     LOADOUT_SLOT_NAMES as _LOADOUT_SLOT_NAMES,
     ResultContext,
@@ -55,8 +54,6 @@ logger = get_logger(__name__)
 
 
 _EXPECTED_ARMOR_SLOTS = {"helmet", "gauntlets", "chest", "legs", "class_item"}
-_MAX_BUILD_CANDIDATES = 200
-_BUILD_CANDIDATE_TTL_SECONDS = 10 * 60
 
 
 def _snapshot_version(snapshot) -> str:
@@ -142,40 +139,9 @@ class BuildService:
         self._inventory = InventoryService(bungie, manifest, resolver)
         self._equipment = LoadoutEquipmentService(bungie, manifest, resolver)
         self._compute = BuildCompute()
-        self._build_candidates: OrderedDict[str, CanonicalBuild] = OrderedDict()
-        self._build_candidate_issued_at: dict[str, float] = {}
-        self._build_candidate_players: dict[str, str] = {}
-
-    def _evict_expired_build_candidates(self, now: float) -> None:
-        """Drop expired or incomplete one-time execution candidates."""
-        for execution_id, issued_at in tuple(self._build_candidate_issued_at.items()):
-            if now - issued_at >= _BUILD_CANDIDATE_TTL_SECONDS:
-                self._build_candidate_issued_at.pop(execution_id, None)
-                self._build_candidate_players.pop(execution_id, None)
-                self._build_candidates.pop(execution_id, None)
-        for execution_id in tuple(self._build_candidates):
-            if execution_id not in self._build_candidate_issued_at:
-                self._build_candidate_players.pop(execution_id, None)
-                self._build_candidates.pop(execution_id, None)
-
-    def _register_build_candidate(
-        self,
-        build: CanonicalBuild,
-        player_name: str = "",
-    ) -> None:
-        """Store one exact build for a short, one-time execution window."""
-        if not build.execution_id:
-            return
-        now = time.monotonic()
-        self._evict_expired_build_candidates(now)
-        self._build_candidates[build.execution_id] = build.model_copy(deep=True)
-        self._build_candidates.move_to_end(build.execution_id)
-        self._build_candidate_issued_at[build.execution_id] = now
-        self._build_candidate_players[build.execution_id] = player_name.casefold()
-        while len(self._build_candidates) > _MAX_BUILD_CANDIDATES:
-            execution_id, _ = self._build_candidates.popitem(last=False)
-            self._build_candidate_issued_at.pop(execution_id, None)
-            self._build_candidate_players.pop(execution_id, None)
+        # 候选暂存（execution_id → 签发的那份方案）：怎么存、什么时候过期在
+        # services/build_candidates.py，这里只管签发与执行。
+        self._candidates = BuildCandidateStore()
 
     async def _get_subclass_and_fragment_stats(
         self, player_name: str, character_class: str | None = None
@@ -616,7 +582,7 @@ class BuildService:
 
         for result in results:
             if result.canonical_build:
-                self._register_build_candidate(result.canonical_build, player_name)
+                self._candidates.register(result.canonical_build, player_name)
 
         return results
 
@@ -724,6 +690,31 @@ class BuildService:
         analysis = await self.analyze_build(player_name, request)
         return BuildRecommendation(results=[], analysis=analysis)
 
+    def get_build_candidate(self, player_name: str, execution_id: str) -> dict:
+        """按候选 ID 取回服务端签发的那份方案（只读，不焚烧）。
+
+        给"只发标量的宿主"用（豆包 connector 实测发不出 `canonical_build` 这样的结构体）：
+        调用方回传 execution_id 就够了，方案内容由服务端自己取回来 ——
+        内容根本不经过调用方，反而比回传整块 JSON 更不可能被篡改。
+
+        真正的执行前校验仍在 `equip_build`（写之前再确认一次玩家绑定、TTL 与一次性），
+        这里只是把方案取出来做预览与回传。
+        """
+        build, status = self._candidates.resolve(execution_id, player_name)
+        if status == "expired":
+            return {
+                "success": False,
+                "code": "expired_execution_id",
+                "message": "该配装候选已过期，请重新求解并确认。",
+            }
+        if build is None:
+            return {
+                "success": False,
+                "code": "unknown_execution_id",
+                "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
+            }
+        return {"success": True, "build": build.model_dump(mode="json")}
+
     @serialized_account_action
     async def equip_build(
         self,
@@ -748,40 +739,27 @@ class BuildService:
                 "code": "missing_execution_id",
                 "message": "配装缺少服务端候选 ID，请重新运行 find_build 后再确认。",
             }
-        now = time.monotonic()
-        trusted = self._build_candidates.get(build.execution_id)
-        issued_at = self._build_candidate_issued_at.get(build.execution_id)
-        candidate_player = self._build_candidate_players.get(build.execution_id)
-        if (
-            trusted is None
-            or issued_at is None
-            or candidate_player is None
-            or (candidate_player and candidate_player != player_name.casefold())
-        ):
-            return {
-                "success": False,
-                "code": "unknown_execution_id",
-                "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
-            }
-        if now - issued_at >= _BUILD_CANDIDATE_TTL_SECONDS:
-            self._build_candidates.pop(build.execution_id, None)
-            self._build_candidate_issued_at.pop(build.execution_id, None)
-            self._build_candidate_players.pop(build.execution_id, None)
+        trusted, status = self._candidates.resolve(build.execution_id, player_name)
+        if status == "expired":
             return {
                 "success": False,
                 "code": "expired_execution_id",
                 "message": "该配装候选已过期，请重新求解并确认。",
             }
-        self._evict_expired_build_candidates(now)
+        if trusted is None:
+            # 别人的候选与不存在的候选回同一句话：不泄露"这个 ID 存在，只是不属于你"。
+            return {
+                "success": False,
+                "code": "unknown_execution_id",
+                "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
+            }
         if trusted.model_dump(mode="json") != build.model_dump(mode="json"):
             return {
                 "success": False,
                 "code": "canonical_build_mismatch",
                 "message": "确认后的配装内容发生变化，已拒绝执行。请重新选择候选。",
             }
-        self._build_candidates.pop(build.execution_id, None)
-        self._build_candidate_issued_at.pop(build.execution_id, None)
-        self._build_candidate_players.pop(build.execution_id, None)
+        self._candidates.consume(build.execution_id)
         build = trusted
         if build.class_type:
             build_character = class_type_name(

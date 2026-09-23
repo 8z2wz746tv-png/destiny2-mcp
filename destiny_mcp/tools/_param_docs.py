@@ -88,10 +88,11 @@ ItemInstanceId = Annotated[
 ]
 
 ItemInstanceIds = Annotated[
-    list[str] | None,
+    list[str] | str | None,
     Field(description=(
         '多个副本 instance ID，只被批量装备 intent="equip_many" 使用；'
         "单个副本用 item_instance_id。"
+        '只发标量的宿主可以写成 "id1,id2"（逗号、顿号、分号或换行分隔）。'
     )),
 ]
 
@@ -173,6 +174,17 @@ CanonicalBuild = Annotated[
         '服务端签发的完整配装候选（一次绑定、五个护甲部位齐全）。'
         '只能在用户确认后原样回传给 intent="equip_build"；'
         "禁止自己拼 hash、用 score，或把社区模板/build_template 当成它。"
+        "发不出结构体的宿主改用 execution_id（与它二选一，效果一样）。"
+    )),
+]
+
+ExecutionId = Annotated[
+    str,
+    Field(description=(
+        "服务端签发的配装候选 ID（在候选的 canonical_build.execution_id 里，"
+        "候选行上也单独给了一份）。**只发标量的宿主（如豆包 connector）用这个**："
+        'intent="equip_build" 传它就不必回传整个 canonical_build，服务端凭 ID 取回'
+        "自己签发的那份。与 canonical_build 二选一，10 分钟内、同一玩家、一次确认只能用一次。"
     )),
 ]
 
@@ -339,17 +351,26 @@ Tracked = Annotated[
 
 RequiredPerks = Annotated[
     list[str] | str | None,
-    Field(description="必须全部命中的 Perk（同栏任一即可满足其中一项）。只有 catalog 与 filter_rolls 支持。"),
+    Field(description=(
+        "必须全部命中的 Perk（同栏任一即可满足其中一项）。只有 catalog 与 filter_rolls 支持。"
+        '多个 Perk 写成 "亡者复仇,速射"；单个 Perk 直接写名字。'
+    )),
 ]
 
 AnyPerks = Annotated[
     list[str] | str | None,
-    Field(description="命中任意一个即可的 Perk。只有 catalog 与 filter_rolls 支持。"),
+    Field(description=(
+        "命中任意一个即可的 Perk。只有 catalog 与 filter_rolls 支持。"
+        '多个 Perk 写成 "亡者复仇,速射"。'
+    )),
 ]
 
 ExcludedPerks = Annotated[
     list[str] | str | None,
-    Field(description="命中就排除的 Perk。只有 catalog 与 filter_rolls 支持。"),
+    Field(description=(
+        "命中就排除的 Perk。只有 catalog 与 filter_rolls 支持。"
+        '多个 Perk 写成 "亡者复仇,速射"。'
+    )),
 ]
 
 SetBonusName = Annotated[
@@ -358,11 +379,12 @@ SetBonusName = Annotated[
 ]
 
 StatCaps = Annotated[
-    dict[str, int] | None,
+    dict[str, int] | str | None,
     Field(description=(
         "属性**上限**映射，键与 priority_stats 同一套词（weapons/health/class_stat/grenade/"
         "super_stat/melee，也认 武器/生命/职业/手雷/超能/近战）。例："
-        '{"grenade": 100} = 手雷别超过 100。语义：超上限算**违规** —— 会被排到没超上限的'
+        '{"grenade": 100} = 手雷别超过 100；只发标量的宿主写成 "grenade=100,melee=90"。'
+        "语义：超上限算**违规** —— 会被排到没超上限的"
         "方案后面、并在结果的 max_violations 里逐项标注，**但不阻止出解**（不会因此报无解）；"
         "同时求解器不再往已经到上限的属性上堆模组。不传 = 不限。上限低于下限会直接报错。"
     )),
@@ -435,9 +457,10 @@ ArtifactName = Annotated[
 ]
 
 Changes = Annotated[
-    dict[str, str] | None,
+    dict[str, str] | str | None,
     Field(description=(
-        "要改的组件 → 目标名称，例如 {\"super\": \"金色枪\"}。"
+        "要改的组件 → 目标名称，例如 {\"super\": \"金色枪\"}"
+        '（只发标量的宿主写成 "super=金色枪"）。'
         "键可用 super/melee/grenade/class_ability/movement/aspect/fragment，"
         "另外 subclass 用来换整套子职业（如 {\"subclass\": \"烈日\"}，也认\"火术\"或官方名破晓），值中英文皆可。"
         '只有 intent="modify" 读它，且必填。'

@@ -317,7 +317,10 @@ async def test_real_worker_returns_executable_build_and_farm_analysis(character)
     candidate = results[0].canonical_build
     assert candidate.class_type == "hunter"
     assert len(candidate.items) == 5
-    assert candidate.execution_id in service._build_candidates
+    # 签发出来的候选必须能被服务端凭 ID 取回（"只发标量的宿主"那条路也靠它）
+    issued = service.get_build_candidate("player", candidate.execution_id)
+    assert issued["success"] is True
+    assert issued["build"]["execution_id"] == candidate.execution_id
     ExecutableBuild.model_validate(candidate.model_dump())
     analysis = await service.infer_required_armor(
         "player", BuildRequest(character_class=character), baseline="inventory",

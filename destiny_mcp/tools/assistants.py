@@ -10,13 +10,13 @@ from __future__ import annotations
 from typing import Annotated, Any, Literal, cast
 
 from mcp.server.fastmcp import Context
-from pydantic import Field, ValidationError
+from pydantic import Field
 
 from ..build.models import BuildRequest
-from ..build_contracts import ExecutableBuild, canonical_build_error_message
 from ..error_codes import ErrorCode, write_failed
 from ..exceptions import DestinyMCPError
 from ._registry import mcp
+from ._coerce import coerce_scalar_arguments
 from ._build_confirmation import (
     issue_exotic_confirmation_token,
     verify_exotic_confirmation_token,
@@ -157,6 +157,7 @@ async def player_assistant(
 
 @mcp.tool()
 @handle_tool_error
+@coerce_scalar_arguments
 @validate_request(InventoryRequest)
 @check_intent_parameters
 async def inventory_assistant(
@@ -378,6 +379,7 @@ async def inventory_assistant(
 
 @mcp.tool()
 @handle_tool_error
+@coerce_scalar_arguments
 @check_intent_parameters
 async def weapon_assistant(
     intent: Annotated[WeaponIntent, Field(description=(
@@ -542,6 +544,7 @@ async def weapon_assistant(
 
 @mcp.tool()
 @handle_tool_error
+@coerce_scalar_arguments
 @check_intent_parameters
 async def build_assistant(
     intent: Annotated[BuildIntent, Field(description=(
@@ -585,17 +588,19 @@ async def build_assistant(
         "大招属性最低目标（0-200），属于硬约束；无解时不得自动降低。"
     ))] = None,
     stat_caps: fields.StatCaps = None,
-    fragment_names: Annotated[list[str] | None, Field(description=(
+    fragment_names: Annotated[list[str] | str | None, Field(description=(
         "要计入配装的碎片名称列表；重试和金装确认时必须原样保留。"
+        '只发标量的宿主写成 "保护之光,聚焦打击"。'
     ))] = None,
     include_subclass_fragment: Annotated[bool, Field(description=(
         "是否计入当前子职业和碎片属性；重试和金装确认时必须原样保留。"
     ))] = False,
     set_bonus_name: fields.SetBonusName = None,
     set_bonus_count: fields.SetBonusCount = None,
-    priority_stats: Annotated[list[str] | None, Field(description=(
+    priority_stats: Annotated[list[str] | str | None, Field(description=(
         "所有硬目标达标后才按顺序最大化的属性。使用 "
         "weapons/health/class/grenade/melee/super；力量/strength 必须写为 melee。"
+        '只发标量的宿主写成 "weapons,grenade"（顺序就是优先级）。'
     ))] = None,
     priority_stat: fields.PriorityStat = None,
     replacement_slot: Annotated[str | None, Field(description=(
@@ -613,6 +618,7 @@ async def build_assistant(
         "只有单件无解才返回两件方案。两件回退目前只支持 equipped 基线。"
     ))] = None,
     canonical_build: fields.CanonicalBuild = None,
+    execution_id: fields.ExecutionId = "",
     confirmed: fields.Confirmed = False,
     top_n: Annotated[int | None, Field(ge=1, le=20, description="返回的候选配装数量；null=没指定（按 5 处理）。")] = None,
     community_build_id: Annotated[str, Field(description=(
@@ -917,42 +923,9 @@ async def build_assistant(
         )
 
     if intent == "equip_build":
-        if canonical_build is None:
-            return error_response(
-                ErrorCode.EXACT_BUILD_REQUIRED,
-                "装备配装需要传回候选中的 canonical_build，不能使用 score。",
-            )
-        try:
-            exact_build = ExecutableBuild.model_validate(canonical_build)
-        except ValidationError as exc:
-            return error_response(ErrorCode.INVALID_CANONICAL_BUILD, canonical_build_error_message(exc))
-        if not confirmed:
-            return _confirmation_required(
-                intent,
-                {
-                    "canonical_build": exact_build.model_dump(mode="json"),
-                    "character": character,
-                    # 逐件预览（光等/能量/模组）与 canonical 并列：canonical 要能原样回传
-                    "items_preview": await armor_branches.equip_preview(
-                        svc, resolved, exact_build.model_dump(mode="json")
-                    ),
-                },
-            )
-        result = await svc["build_svc"].equip_build(
-            resolved, exact_build, character
+        return await armor_branches.equip_build(
+            svc, resolved, canonical_build, execution_id, character, confirmed
         )
-        if not result.get("success"):
-            return error_response(
-                result.get("code", write_failed("build_equip")),
-                result.get("message", "配装装备失败。"),
-                candidates=[{"result": _dump(result)}],
-                next_actions=[{
-                    "label": "重新求解并确认配装",
-                    "tool": "build_assistant",
-                    "arguments": {"intent": "recommend", "character": character},
-                }],
-            )
-        return ok_response("配装装备流程已执行。", {"result": _dump(result)})
 
     if intent == "armor_mods":
         return armor_branches.armor_mods(svc, priority_stat)
@@ -1095,6 +1068,7 @@ async def loadout_assistant(
 
 @mcp.tool()
 @handle_tool_error
+@coerce_scalar_arguments
 @validate_request(SubclassRequest)
 @check_intent_parameters
 async def subclass_assistant(

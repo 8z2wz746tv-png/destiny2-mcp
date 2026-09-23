@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Literal, cast
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 from ..logging_config import get_logger
 from ..models import ArmorStats
@@ -965,6 +965,18 @@ class BuildResult(BaseModel):
         default="",
         description="调谐改动的人话说明；不用动调谐时为空串",
     )
+
+    @computed_field
+    @property
+    def execution_id(self) -> str:
+        """候选 ID 单独露一份（标量）。
+
+        只发标量的宿主（豆包 connector 实测）拿不到嵌套结构体里的字段，
+        而"要装备就必须把候选 ID 带回来"这件事对每个宿主都成立 ——
+        放在结果行顶层，谁都能一眼取到。**派生字段**：不存一份，就不会与
+        `canonical_build.execution_id` 分叉。
+        """
+        return self.canonical_build.execution_id if self.canonical_build else ""
 
 
 class BuildAnalysis(BaseModel):

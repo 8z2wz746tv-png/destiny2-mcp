@@ -29,7 +29,7 @@ from destiny_mcp.models import (
     LoadoutOperationResult,
     MoveItemStep,
 )
-from destiny_mcp.services import build_service as build_service_module
+from destiny_mcp.services import build_candidates as build_candidates_module
 from destiny_mcp.services import loadout_equipment_service as equipment_module
 from destiny_mcp.services.build_service import BuildService, _snapshot_version
 from destiny_mcp.services.loadout_equipment_service import LoadoutEquipmentService
@@ -340,6 +340,53 @@ async def test_build_assistant_returns_structured_domain_errors() -> None:
     assert result["error"]["code"] == "build_validation_error"
 
 
+@pytest.mark.asyncio
+async def test_equip_build_by_execution_id_against_the_real_service(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """工具层"只给候选 ID"那条路对**真服务**跑一遍。
+
+    替身对替身的测试抓不到"工具 await 了一个同步方法"这类形状错配
+    （真机语料 ⑯b 抓到过：候选查询在进程内、是同步的，工具层却 await 它）。
+    """
+    from destiny_mcp.tools import _armor_branches as armor_branches
+
+    async def _no_preview(svc, player_name, canonical_build):
+        return []
+
+    monkeypatch.setattr(armor_branches, "equip_preview", _no_preview)
+    service = _build_service()
+    snapshot, build = _exact_contract()
+    service._candidates.register(build, "Alpha#0100")
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
+    service._equipment.equip_exact = AsyncMock(return_value=LoadoutOperationResult(
+        success=True,
+        loadout_name="Exact",
+        message="OK",
+    ))
+    services = {"build_svc": service}
+
+    confirm = await armor_branches.equip_build(
+        services, "Alpha#0100", None, build.execution_id, "hunter", False
+    )
+
+    assert confirm["error"]["code"] == "confirmation_required"
+    assert confirm["candidates"][0]["execution_id"] == build.execution_id
+    service._inventory.get_armor_snapshot.assert_not_awaited()
+
+    done = await armor_branches.equip_build(
+        services, "Alpha#0100", None, build.execution_id, "hunter", True
+    )
+
+    assert done["ok"] is True
+    service._equipment.equip_exact.assert_awaited_once()
+    # 一次确认只能用一次：同一个 ID 再来一次就是"不认识"
+    replay = await armor_branches.equip_build(
+        services, "Alpha#0100", None, build.execution_id, "hunter", True
+    )
+    assert replay["error"]["code"] == "unknown_execution_id"
+
+
 def test_priority_stats_keep_strict_order_and_remove_duplicates() -> None:
     parsed = parse_constraints(
         BuildRequest(
@@ -555,7 +602,7 @@ async def test_partial_batch_equip_stops_mods_and_rolls_back() -> None:
 async def test_build_candidate_is_player_bound_and_tamper_protected() -> None:
     service = _build_service()
     _, build = _exact_contract()
-    service._register_build_candidate(build, "Alpha#0100")
+    service._candidates.register(build, "Alpha#0100")
     service._inventory.get_armor_snapshot = AsyncMock()
     service._equipment.equip_exact = AsyncMock()
 
@@ -576,7 +623,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     _, incomplete_build = _exact_contract()
     incomplete_build.execution_id = "candidate-incomplete"
     incomplete_build.items.pop()
-    incomplete_service._register_build_candidate(
+    incomplete_service._candidates.register(
         incomplete_build, "Alpha#0100"
     )
     incomplete_service._inventory.get_armor_snapshot = AsyncMock()
@@ -595,7 +642,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     duplicate_build.items[1].item_instance_id = (
         duplicate_build.items[0].item_instance_id
     )
-    duplicate_service._register_build_candidate(
+    duplicate_service._candidates.register(
         duplicate_build, "Alpha#0100"
     )
     duplicate_service._inventory.get_armor_snapshot = AsyncMock()
@@ -611,7 +658,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     _, duplicate_slot_build = _exact_contract()
     duplicate_slot_build.execution_id = "candidate-duplicate-slot"
     duplicate_slot_build.items[1].slot = duplicate_slot_build.items[0].slot
-    slot_service._register_build_candidate(
+    slot_service._candidates.register(
         duplicate_slot_build, "Alpha#0100"
     )
     slot_service._inventory.get_armor_snapshot = AsyncMock()
@@ -625,7 +672,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
 
     service = _build_service()
     snapshot, build = _exact_contract()
-    service._register_build_candidate(build, "Alpha#0100")
+    service._candidates.register(build, "Alpha#0100")
     snapshot.helmets[0].energy_capacity = 9
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
     service._equipment.equip_exact = AsyncMock()
@@ -639,7 +686,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     missing_snapshot, missing_build = _exact_contract()
     missing_build.execution_id = "candidate-missing"
     missing_build.items[0].item_instance_id = "missing-instance"
-    missing_service._register_build_candidate(missing_build, "Alpha#0100")
+    missing_service._candidates.register(missing_build, "Alpha#0100")
     missing_service._inventory.get_armor_snapshot = AsyncMock(
         return_value=missing_snapshot
     )
@@ -655,7 +702,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     _, invalid_mod_build = _exact_contract()
     invalid_mod_build.execution_id = "candidate-invalid-mod"
     invalid_mod_build.items[0].mods = [0]
-    mod_service._register_build_candidate(invalid_mod_build, "Alpha#0100")
+    mod_service._candidates.register(invalid_mod_build, "Alpha#0100")
     mod_service._inventory.get_armor_snapshot = AsyncMock()
     mod_service._equipment.equip_exact = AsyncMock()
 
@@ -671,7 +718,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
 async def test_build_candidate_is_one_time_and_score_path_is_disabled() -> None:
     service = _build_service()
     snapshot, build = _exact_contract()
-    service._register_build_candidate(build, "Alpha#0100")
+    service._candidates.register(build, "Alpha#0100")
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
     service._equipment.equip_exact = AsyncMock(return_value=LoadoutOperationResult(
         success=True,
@@ -698,11 +745,12 @@ async def test_build_candidate_expires(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     now = 1_000.0
-    monkeypatch.setattr(build_service_module.time, "monotonic", lambda: now)
-    monkeypatch.setattr(build_service_module, "_BUILD_CANDIDATE_TTL_SECONDS", 10)
+    # 候选暂存的时钟与 TTL 都在 build_candidates 里（单一出处），换钟得打到那一边。
+    monkeypatch.setattr(build_candidates_module.time, "monotonic", lambda: now)
+    monkeypatch.setattr(build_candidates_module, "TTL_SECONDS", 10)
     service = _build_service()
     _, build = _exact_contract()
-    service._register_build_candidate(build, "Alpha#0100")
+    service._candidates.register(build, "Alpha#0100")
     now = 1_010.0
     service._inventory.get_armor_snapshot = AsyncMock()
 

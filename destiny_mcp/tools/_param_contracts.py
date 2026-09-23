@@ -385,6 +385,12 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint='canonical_build 只能回传给 intent="equip_build"，而且必须是服务端签发的候选。',
         suggestion=("build_assistant", "equip_build"),
     ),
+    ("build_assistant", "execution_id"): _contract(
+        _only("equip_build"),
+        hint='execution_id 只能回传给 intent="equip_build"，而且必须是服务端签发的那份候选的 ID'
+             "（与 canonical_build 二选一，给发不出结构体的宿主用）。",
+        suggestion=("build_assistant", "equip_build"),
+    ),
     ("build_assistant", "top_n"): _contract(
         _only(*_B_CRAFT, *_B_COMMUNITY), hint="求解返回几套、社区搜索返回几条。"
     ),
