@@ -14,10 +14,28 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from . import starside_markup as markup
 from .starside_entities import StarsideEntities
+
+#: 站点帧表里的哨兵值：`INF` = 无上限（真机语料里 boss_total/minor_total 就是它）
+_SENTINELS = {"INF": "∞", "-INF": "-∞"}
+
+
+def _snake(key: str) -> str:
+    """站点的 camelCase 键名 → 我们的 snake_case（响应信封规则，全量语料抓到的违规）。"""
+    return re.sub(r"(?<!^)(?=[A-Z])", "_", key).lower()
+
+
+def _normalize_frame(row: dict[str, Any]) -> dict[str, Any]:
+    """帧表一行：键名统一 snake_case + 哨兵值翻译（`INF` → `∞`）。"""
+    out: dict[str, Any] = {}
+    for key, value in (row or {}).items():
+        out[_snake(str(key))] = _SENTINELS.get(value, value) if isinstance(value, str) else value
+    return out
+
 
 #: 帧表是站点实测口径 —— 只给数字不给条件就是误导（用户拍板的口径之一）
 FRAME_CONDITION = (
@@ -136,15 +154,16 @@ def weapon_note(entity: StarsideEntities, manifest: Any, item_hash: int) -> dict
 
     frames = entity.frame_stats_for_weapon(item_hash)
     if frames:
-        row = frames[0]
+        rows = [_normalize_frame(row) for row in frames]
+        row = rows[0]
         block["frame"] = {
             "headline": {
                 key: row.get(key)
                 for key in ("typical_mdps", "typical_edps", "max_mdps", "body_mdps",
-                            "boss_total", "minor_total", "base_damage", "base_interval", "ammoType")
+                            "boss_total", "minor_total", "base_damage", "base_interval", "ammo_type")
                 if row.get(key) is not None
             },
-            "rows": [dict(row) for row in frames],
+            "rows": rows,
             "condition": FRAME_CONDITION,
         }
     else:

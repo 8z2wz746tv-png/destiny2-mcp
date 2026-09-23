@@ -196,3 +196,27 @@ def test_perk_description_falls_back_when_the_manifest_lookup_raises() -> None:
     assert block["available"] is True, block.get("reason")
     assert block["annotations"] or block["author_notes"], "回退命中就该有注记"
     assert response["data"]["perk"]["fallback"] == "starside_entity_name"
+
+
+def test_frame_block_uses_snake_case_and_translates_sentinels() -> None:
+    """帧表来自站点：键名必须 snake_case（信封规则），哨兵值 `INF` 要翻成 `∞`。
+
+    全量语料抓到的违规：`frame.rows[].ammoType` / `itemSubType` 是 camelCase；
+    同时 `boss_total`/`minor_total` 的 `"INF"` 直接露给玩家不好看。
+    """
+    import re as _re
+
+    entity = StarsideEntities()
+    manifest = _Manifest()
+    items = json.loads((ENTITIES / "items.json").read_text(encoding="utf-8"))["items"]
+    weapon = next(
+        k for k, v in items.items()
+        if (v.get("derived") or {}).get("archetype") and entity.frame_stats_for_weapon(k)
+    )
+    note = weapon_note(entity, manifest, int(weapon))
+    frame = note["frame"]
+    keys = set(frame["headline"]) | {k for row in frame["rows"] for k in row}
+    bad = {k for k in keys if _re.search(r"[A-Z]", k)}
+    assert not bad, f"帧表键名不是 snake_case：{sorted(bad)}"
+    blob = json.dumps(frame, ensure_ascii=False)
+    assert '"INF"' not in blob, "哨兵值必须翻译成 ∞"
