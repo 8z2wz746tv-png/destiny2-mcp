@@ -393,3 +393,19 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
 3.2 MB，sha256 `32e98d06…`），**不进 git 历史**：仓库里只留转换后的 3 MB 实体文件 + 源文件 sha256，
 配合确定性的 `scripts/import_starside_entities.py` 任何人都能核对与复现。授权口径写在
 `docs/community/COMMUNITY_DATA_NOTICE.md`。
+
+### 收尾代码审查（2026-09-23，按仓库"写代码的习惯"逐条过）
+
+跑规范类守门（架构分层/体量上限/错误码/结论路径/词表/文档索引/参数契约/skill 契约）**427 passed**，
+再对新文件做反模式扫描，抓到两处**真违反**并修掉：
+
+1. **三处 `except` 不留痕**（`starside_notes._name_resolver`、`_perk_branches` 的 Manifest 回退与归档回退）——
+   违反"不许静默降级、结论路径的 except 必须留痕"。已加 logger 警告；尤其是**"查名失败"与"库里没有这个名字"
+   是两件事**（前者会被 `unresolved_names` 误读成后者），必须打日志区分。
+2. **标记正则抄了第二份**：语料脚本自带 `PERK_TOKEN` / `PAREN_SUFFIX`，而 `starside_markup` 才是单一出处。
+   已把"去掉「（变体）」后缀"收成 `strip_variant_suffix()`，脚本改用 `perk_names()` + 它，删掉自带正则。
+
+判定为**可接受、不改**的：几处 `int(x.get("hash") or 0)` —— 后面都紧跟 `if hash` 守卫，没有把"缺值"当 0 用。
+
+一个结构性备注：`services/starside_notes.py` 现在约 400 行（武器/perk/神器/套装/碎片/双栏六个成形函数），
+没进体量上限表；若继续长，按域拆成 `starside_notes_weapon.py` / `_perk.py` 更合适。

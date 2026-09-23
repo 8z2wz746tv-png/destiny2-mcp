@@ -24,7 +24,6 @@
 from __future__ import annotations
 
 import asyncio
-import re
 import sys
 from pathlib import Path
 
@@ -34,14 +33,15 @@ if str(ROOT) not in sys.path:
 
 from destiny_mcp.server import app_lifespan, create_server  # noqa: E402
 from destiny_mcp.services.starside_entities import StarsideEntities  # noqa: E402
-from destiny_mcp.services.starside_markup import number as unwrap_number  # noqa: E402
+from destiny_mcp.services.starside_markup import (  # noqa: E402
+    number as unwrap_number,
+    perk_names,
+    strip_variant_suffix,
+)
 from destiny_mcp.tools._helpers import resolve_player_name  # noqa: E402
 
 RESULTS: list[tuple[str, bool, str]] = []
 TIERS = {"S", "A", "B", "C", "D", "E", "F"}
-PERK_TOKEN = re.compile(r"\{perk\|([^{}|]+)\}")
-#: 站点有些 perk 引用带武器名后缀（`{perk|Suros 协同（铭纹-41）}`）——查名时先去掉再试一次
-PAREN_SUFFIX = re.compile(r"（[^）]*）\s*$")
 
 
 def check(row: str, ok: bool, evidence: str) -> None:
@@ -101,10 +101,10 @@ async def main() -> int:
             if not (block.get("barrel") and (block.get("perk1") or block.get("perk2"))):
                 incomplete.append(name)
             for token in ("barrel", "magazine", "origin", "perk1", "perk2"):
-                for perk_name in PERK_TOKEN.findall(str(block.get(token) or "")):
+                for perk_name in perk_names(block.get(token)):
                     checked_names += 1
                     if not manifest.search(perk_name, limit=1) and not manifest.search(
-                        PAREN_SUFFIX.sub("", perk_name).strip(), limit=1
+                        strip_variant_suffix(perk_name), limit=1
                     ):
                         unresolved.append(perk_name)
         gap = len(unresolved) / max(checked_names, 1)
@@ -163,9 +163,9 @@ async def main() -> int:
         for h in aegis:
             block = entity.authors_of(h).get("Aegis") or {}
             for token in ("barrel", "perk1", "perk2"):
-                for perk_name in PERK_TOKEN.findall(str(block.get(token) or "")):
+                for perk_name in perk_names(block.get(token)):
                     found = manifest.search(perk_name, limit=1) or manifest.search(
-                        PAREN_SUFFIX.sub("", perk_name).strip(), limit=1
+                        strip_variant_suffix(perk_name), limit=1
                     )
                     if not found:
                         continue

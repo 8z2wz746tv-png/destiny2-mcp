@@ -11,13 +11,18 @@ from typing import Any
 from ..services.starside_notes import perk_note_for_plug_from_svc
 from ._enrichment import community_enrichment
 from ._responses import ok_response
+from ..logging_config import get_logger
 from ..services.weapon_payload import schema_block
+
+
+logger = get_logger(__name__)
 
 
 def perk_description_payload(svc: dict[str, Any], perk_name: str) -> dict[str, Any]:
     try:
         perk = svc["manifest_query_svc"].get_perk_description(perk_name)
-    except Exception:
+    except Exception as exc:
+        logger.warning("perk_description：Manifest 查 %r 失败，回退到归档名字：%s", perk_name, exc)
         # **查不到是抛异常（ManifestError），不是返回空** —— 真机调用测试才发现：
         # 套装 perk（集体之力这类）就落在这条路上，不接住的话整次调用直接报 manifest_error，
         # 下面那段"按归档名字回退"永远跑不到。
@@ -33,7 +38,8 @@ def perk_description_payload(svc: dict[str, Any], perk_name: str) -> dict[str, A
         if entity is not None:
             try:
                 hits = entity.perk_by_name(perk_name)
-            except Exception:  # 回退失败不该把整次调用打挂
+            except Exception as exc:  # 回退失败不该把整次调用打挂，但要留痕
+                logger.warning("perk_description：按归档名字回退 %r 失败：%s", perk_name, exc)
                 hits = ()
         if hits:
             retry = perk_note_for_plug_from_svc(svc, int(hits[0]))

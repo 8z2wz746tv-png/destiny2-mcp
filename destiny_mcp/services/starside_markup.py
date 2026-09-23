@@ -66,6 +66,15 @@ def number(value: object) -> tuple[str, bool]:
     return text, True
 
 
+#: 站点有些引用带武器/变体后缀（`{perk|Suros 协同（铭纹-41）}`）——查名时先去掉再试一次
+_VARIANT_SUFFIX = re.compile(r"（[^）]*）\s*$")
+
+
+def strip_variant_suffix(name: str) -> str:
+    """去掉站点引用里的「（武器名/变体）」后缀（单一出处，别在脚本里再抄一份正则）。"""
+    return _VARIANT_SUFFIX.sub("", str(name or "")).strip()
+
+
 def perk_names(text: object) -> tuple[str, ...]:
     """文本里 `{perk|…}` 引用的原始名字（成形层拿它记"我们库里查不到的名字"）。"""
     return tuple(m.group(2).strip() for m in TOKEN_PATTERN.finditer(str(text or "")) if m.group(1) == "perk")

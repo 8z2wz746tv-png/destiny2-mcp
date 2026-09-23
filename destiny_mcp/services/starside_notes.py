@@ -17,6 +17,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from ..logging_config import get_logger
+
 from . import starside_markup as markup
 from .starside_entities import StarsideEntities
 
@@ -40,6 +42,8 @@ def _normalize_frame(row: dict[str, Any]) -> dict[str, Any]:
 
 
 #: 帧表是站点实测口径 —— 只给数字不给条件就是误导（用户拍板的口径之一）
+logger = get_logger(__name__)
+
 FRAME_CONDITION = (
     "站点实测口径：数值来自作者的帧级测试（弹药类型、是否含增伤、打哪类目标见该帧表字段），"
     "不是我们对游戏机制的断言；换配装/换 perk 会变。"
@@ -56,7 +60,10 @@ def _name_resolver(manifest: Any):
     def resolve(name: str) -> str | None:
         try:
             found = manifest.search(name, limit=1)
-        except Exception:  # 结论路径不许静默：查名失败退回原名（下面 unresolved 会记）
+        except Exception as exc:  # 结论路径不许静默：退回原名，但**留下痕迹**
+            # 注意"查名失败"和"库里没有这个名字"是两件事：下面 unresolved_names 只会说明后者，
+            # 所以这里必须打日志，否则一次上游/索引故障会被读成"我们库里没有"。
+            logger.warning("Starside 注记：解析引用名 %r 失败：%s", name, exc)
             return None
         if not found:
             return None
