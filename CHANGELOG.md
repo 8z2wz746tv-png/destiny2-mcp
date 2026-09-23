@@ -4,6 +4,13 @@
 
 ## 未发布
 
+**修复：套装 perk 按名字查（`集体之力`）不再 `manifest_error`** —— 2026-09-23：
+
+- 真机调用测试抓到：`get_perk_description` 对套装 perk 是**抛异常**，整次 `perk_description` 直接失败，
+  社区注记的回退路径根本没跑（而集体之力正是用户那套配装的套装效果）。
+- 现在接住异常 → 按归档名字回退 → 用 sandbox perk hash 出注记，`fallback` 标出来；套装名查不到时写进 `gaps`，
+  不把裸 hash 当名字。守门：`tests/test_starside_markup.py` 里用"会抛的替身"钉住这条路径。
+
 **新增：碎片详情与异域职业物品双栏配对接入 Starside 社区层（P5 收尾）** —— 2026-09-23：
 
 - `subclass_assistant(intent="fragment_details")`：碎片属性变化（分职业）、效果、冷却、碎片槽位、来源。

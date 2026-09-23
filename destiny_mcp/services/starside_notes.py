@@ -229,7 +229,14 @@ def perk_note(entity: StarsideEntities, manifest: Any, perk_hash: int) -> dict[s
     set_names = []
     for set_hash in entity.sets_of_perk(perk_hash):
         info = manifest.get_set_bonus_by_hash(set_hash) if hasattr(manifest, "get_set_bonus_by_hash") else None
-        set_names.append((info or {}).get("name") or set_hash)
+        info = info or {}
+        # 套装名可能在几个键里；都拿不到时**别把裸 hash 当名字发出去**（那是把内部编号当答案），
+        # 说明"名字没查到"并留痕。
+        name = info.get("name") or info.get("set_name") or info.get("display_name")
+        if name:
+            set_names.append(str(name))
+        else:
+            block.setdefault("gaps", []).append(f"这套装的名字没查到（hash {set_hash}）")
     if set_names:
         block["sets"] = set_names
 

@@ -169,3 +169,30 @@ def test_fragment_and_class_item_notes_render_without_markup() -> None:
 
     missing = class_item_pairs(entity, manifest, 4294967295)
     assert missing["available"] is False and "没有异域职业物品的双栏数据" in missing["reason"]
+
+
+def test_perk_description_falls_back_when_the_manifest_lookup_raises() -> None:
+    """套装 perk 不在我们 Manifest 的名字索引里，`get_perk_description` 会**抛异常**而不是返回空。
+
+    真机调用测试抓到的回归：不接住这个异常，整次 `perk_description` 直接 `manifest_error`，
+    后面"按归档名字回退"永远跑不到 —— 而集体之力正是用户那套配装的套装效果。
+    """
+    from destiny_mcp.tools import _perk_branches as perk_branches
+
+    class _RaisingQuery:
+        def get_perk_description(self, name: str):
+            raise RuntimeError("找不到 perk：集体之力")
+
+    svc = {
+        "manifest_query_svc": _RaisingQuery(),
+        "manifest": _Manifest(),
+        "starside_entities_svc": StarsideEntities(),
+        "starside_svc": None,
+    }
+    response = perk_branches.perk_description_payload(svc, "集体之力")
+
+    assert response["ok"] is True, response
+    block = response["data"]["starside"]
+    assert block["available"] is True, block.get("reason")
+    assert block["annotations"] or block["author_notes"], "回退命中就该有注记"
+    assert response["data"]["perk"]["fallback"] == "starside_entity_name"

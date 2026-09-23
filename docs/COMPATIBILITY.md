@@ -30,6 +30,12 @@
 `BuildResult.score` 的**数值会整体变化**（量级从"1000+ 的加权分"变成"200~1200 的总和"）。
 只把它当"越大越好"读的调用方不受影响；把绝对值当阈值的要改。
 
+## 未发布：`perk_description` 支持套装 perk（2026-09-23，同日追加）
+
+套装 perk（集体之力这类）不在我们 Manifest 的名字索引里，`get_perk_description` 对它是**抛异常**而不是返回空，
+于是整次调用直接 `manifest_error`。现在：接住异常 → 按归档名字回退（`perk_by_name`）→ 用它的 sandbox perk hash
+出注记；`data.perk` 会带 `fallback: "starside_entity_name"`。套装名查不到时给 `gaps` 说明，**不把裸 hash 当名字**。
+
 ## 未发布：碎片详情与异域职业物品也带 `starside` 块（2026-09-23，同日追加）
 
 - `subclass_assistant(intent="fragment_details")`：`data.starside` = 碎片/星象的社区注记

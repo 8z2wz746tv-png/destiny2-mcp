@@ -352,3 +352,19 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
   2. 文本层 ↔ 实体层的自动交叉指路 —— 目前两边在同一响应里并存（`community_references` 与 `starside`），
      靠字段名就分得清，不需要额外指路字段；
   3. 帧级 DPS 的"配装联动"（换 perk/换弹药后的重算）—— 站点数据是固定条件下的实测值，联动会变成编造。
+
+### 真机调用测试（2026-09-23）：六个入口 + 一个回退
+
+拿 `app_lifespan` 的真服务跑六个入口，**当时六个全是空块**，逐条挖出并修掉：
+
+| 症状 | 真因 | 修法 |
+| --- | --- | --- |
+| 六个入口都查不到 perk 注记 | 我把 **plug 物品 hash 当 sandbox perk hash** 用 | `perk_note_for_plug()` 单一出处（沙盒查不到退回原 hash），五处共用 |
+| `analyze`/`set_bonus`/`exotic_armor` 空块 | 键名猜错：`weapon.item_hash`、`set_bonus.set_hash`、`armor.identity.item_hash` | 按真实载荷取键 |
+| 替身上下文里 `KeyError` 打挂整次调用 | 直接下标取 `svc["starside_entities_svc"]` | 改 `.get` + 缺服务降级 |
+| 入库 8 个字段没人用 | 忘了接：`site_tier`/`site_superTier`/`site_cooldown*`/`site_weapons`/`site_elements`/`site_season`/`site_weaponTypes` | 补进神器块/perk 块/标签；审计现在"没人用：无" |
+| `perk_description("集体之力")` 报 `manifest_error` | 套装 perk 不在名字索引里，`get_perk_description` **抛异常**而非返回空 → 回退没跑 | 接住异常 → 归档按名回退 → 沙盒 hash；套装名查不到给 `gaps` |
+| 归档 perk 名没入库 | 当时只收了注记字段，"按名字问一颗 perk"没有出处 | 导入保留 `zh.name` → perk 条目 2,676 → **4,506**，神器模组覆盖 21/35 → **35/35** |
+
+**结果**：`scripts/run_corpus_starside_entities.py` 8 行 + 七个入口的实际调用全部 PASS；为此新增守门
+`test_perk_description_falls_back_when_the_manifest_lookup_raises`（用会抛的替身钉住回退路径）。
