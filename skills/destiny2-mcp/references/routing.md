@@ -161,7 +161,7 @@ Manifest 侧（**不代表拥有**）：
 | `recommend` | 按分数排序的推荐（含 `completion_rate`）；**不带**可执行载荷，无解时会给 `ladder` | 同上 |
 | `analyze` | 无解时诊断差在哪 | 同上 |
 | `farm_target` | 反推该刷哪件护甲 | `replacement_slot`、`baseline`、`max_replacements`、`set_bonus_name`、`set_bonus_count`、`character` |
-| `equip_build` | 装备**服务端签发**的候选（写入） | `canonical_build`、`character`、`confirmed` |
+| `equip_build` | 装备**服务端签发**的候选（写入） | `canonical_build` **或** `execution_id`（二选一）、`character`、`confirmed` |
 | `armor_mods` | 护甲模组列表，带 `match` 说明本次筛选口径 | `priority_stat`（属性筛选：weapons/health/class_stat/grenade/super_stat/melee，或中文名） |
 | `exotic_armor` | 异域护甲列表或详情 | `exotic_name`、`character` |
 | `set_bonus` | 套装 2 件／4 件效果 | `set_bonus_name` |
@@ -295,6 +295,20 @@ Manifest 侧（**不代表拥有**）：
 
 **有没有传**只按「是不是空值」判断：`null`／`""`／`0`／`false`（也就是签名默认值）算没传，宿主把 schema 默认值一起发过来（`confirmed=false`、`offset=0`）不会被拒；**任何具体值都算传了**，在不读它的 intent 上会拿到 `ignored_parameter`。所以 `limit=12`、`locked=true`、`slot_number=1` 这些既是默认值又是合法请求的值不会被静默吞掉 —— 签名默认值统一是 `null`，真正的默认条数在工具内部补。
 
+**只发标量的宿主怎么写结构化参数**（实测：豆包 connector 转发工具调用时只序列化标量，`list[str]`／`dict` 参数根本送不到服务端）。这类宿主把同一件事写成文本即可，两种形态在 schema 里并列：
+
+| 参数 | 结构化形态 | 文本形态 |
+| --- | --- | --- |
+| `required_perks`／`any_perks`／`excluded_perks` | `["亡者复仇", "速射"]` | `"亡者复仇,速射"` |
+| `priority_stats` | `["weapons", "grenade"]` | `"weapons,grenade"` |
+| `fragment_names` | `["保护之光", "聚焦打击"]` | `"保护之光,聚焦打击"` |
+| `item_instance_ids` | `["6917…", "6918…"]` | `"6917…,6918…"` |
+| `stat_caps` | `{"grenade": 100}` | `"grenade=100,melee=90"` |
+| `changes` | `{"super": "金色枪"}` | `"super=金色枪"` |
+| `canonical_build` | 整块候选 | 改用 `execution_id`（候选行顶层就有这个标量） |
+
+分隔符认半角/全角逗号、顿号、分号与换行；键值之间认 `=`、`:`、`：`。写法不对会返回 `invalid_arguments` 并给出可照抄的例子（不会静默少一半条件）。空串按「没传」处理，与 `null` 同一条规则。
+
 下面这张表由 `destiny_mcp/tools/_param_contracts.py` 生成，测试保证文档与代码逐字一致：
 
 <!-- 参数归属表开始：由 _param_contracts.render_parameter_table() 生成，不要手改 -->
@@ -322,6 +336,7 @@ Manifest 侧（**不代表拥有**）：
 | `element` | `subclass_assistant`：`community`、`fragments`、`options` |
 | `equip` | `inventory_assistant`：`move` |
 | `excluded_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
+| `execution_id` | `build_assistant`：`equip_build` |
 | `exotic_confirmation_token` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `exotic_name` | `build_assistant`：`analyze`、`exotic_armor`、`farm_target`、`find`、`recommend` |
 | `fragment_name` | `subclass_assistant`：`community`、`fragment_details` |
@@ -447,7 +462,7 @@ Manifest 侧（**不代表拥有**）：
 
 - `confirmed=false` 时返回 `confirmation_required`，**服务层不会被调用**，游戏状态不变。确认必须来自用户的明确同意，不能由 Agent 自己推断——用户说「不用问了直接执行」也不行。
 - 展示确认时要给精确目标：实例 ID、槽位号、数值，而不是笼统描述。
-- `equip_build` 只接受服务端签发的 `canonical_build`（一次绑定、槽位齐全）。`build_template`、社区模板、`solver_handoff`、`farm_options`、`score` 都**不是**可执行方案，自己拼 hash 会被拒绝；改过库存后旧候选也会失效，需要重新求解。
+- `equip_build` 只接受服务端签发的候选（一次绑定、槽位齐全），回传 `canonical_build` 或它的 `execution_id` 都行（二选一，效果一样；发不出结构体参数的宿主用 ID，如豆包 connector）。`build_template`、社区模板、`solver_handoff`、`farm_options`、`score` 都**不是**可执行方案，自己拼 hash 会被拒绝；候选 10 分钟内有效、一次确认只能用一次，改过库存后旧候选也会失效，需要重新求解。
 - 执行后重新读取实际状态核对，不要凭调用成功就宣布结果。
 
 ## 七、引用与不确定

@@ -24,6 +24,7 @@
 | [ADR-013](013-armor-mod-insertability-is-per-character.md) | 护甲模组能不能插，看角色级可插入清单（组件 207 `characterPlugSets`）而不是 Manifest 的 plug set；1676 是"插入条件没满足"，不许说成"去游戏里装" | accepted |
 | [ADR-014](014-tuning-writes-need-ownership.md) | 调谐能用免费接口换，判据是**这件护甲允许的清单**（组件 310；不在里面的回 1675，1679 不是失败）；写入已开放为正式能力；`平衡调整` 是**最低三项各 +1**，不是六维各 +1 | accepted |
 | [ADR-015](015-solver-objective-and-ranking.md) | 配装求解口径：上限是**软**的（排名 + 标注，不剪枝）、排序只有 `goodness_key` 一把尺子、调谐吃干净但是**局部**最优、`reachable` 是**保守下界**、没算完不许说不可行 | accepted |
+| [ADR-016](016-host-compat-scalar-arguments.md) | 只发标量的宿主（豆包 connector）：结构化参数额外收文本写法（规则唯一出处 `utils/arg_text.py`），`equip_build` 也收 `execution_id` 代替整块 `canonical_build`；不许放宽 schema、不许给 `canonical_build` 开 JSON 字符串通道 | accepted |
 
 ## 编号规矩
 

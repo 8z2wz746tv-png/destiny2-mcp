@@ -13,6 +13,31 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：只发标量的宿主也能送结构化参数（2026-09-23，同日追加）
+
+豆包 connector 转发工具调用时只序列化标量，`list[str]` / `dict` 参数送不到服务端
+（真机：`required_perks` 变成 `[[]]`、`changes` 直接消失）。现在这些参数**多收一种文本写法**：
+列表 `"A,B"`、映射 `"k=v,k2=v2"`。原生形态仍是一等公民，两种形态走同一段解析
+（`destiny_mcp/utils/arg_text.py` 是分隔符的唯一出处）。**没有删任何东西、也没有双写**：
+schema 里 `array`/`object` 与 `string` 并列，写法不对回 `invalid_arguments` + 可照抄的例子。
+
+| 参数 | 新增的文本写法 |
+| --- | --- |
+| `required_perks` / `any_perks` / `excluded_perks` | `"亡者复仇,速射"` |
+| `priority_stats` / `fragment_names` / `item_instance_ids` | `"weapons,grenade"` / `"保护之光,聚焦打击"` / `"id1,id2"` |
+| `stat_caps` / `changes` | `"grenade=100,melee=90"` / `"super=金色枪"` |
+
+分隔符认半角/全角逗号、顿号、分号与换行；键值之间认 `=`、`:`、`：`；空串按「没传」处理。
+
+## 未发布：`build_assistant` 多一个 `execution_id` 参数（2026-09-23，同日追加）
+
+`equip_build` 以前只能回传整块 `canonical_build`（结构体）—— 只发标量的宿主因此**整个用不了装备功能**。
+现在 `canonical_build` 与 `execution_id` 二选一：给 ID 时服务端凭它取回**自己签发的那份**，
+内容根本不经过调用方。配套两处新增字段：候选行顶层的派生 `execution_id`（标量，与
+`canonical_build.execution_id` 同源）与确认回显里的 `execution_id`。
+
+**新增参数与新增字段，旧键一个没少**；候选的 10 分钟 TTL、绑定玩家、一次确认只能用一次这些语义不变。
+
 ## 未发布：候选排序口径统一（**破坏性**，见计划文档决定 2）
 
 求解器内部堆、展示排序、`score` 以前是**三套口径**，现在只有一套

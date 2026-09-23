@@ -31,7 +31,8 @@ Read only the relevant reference before a complex request:
 2. Never call `loadout_assistant` to answer a community-build question.
 3. Never call `catalog` to answer what the player owns; use `filter_rolls` or an account inventory query.
 4. `build_template`, community records, `farm_options`, and `solver_handoff` are not executable builds.
-5. Only a server-returned, instance-bound `canonical_build` may be sent to `equip_build`.
+5. Only a server-returned, instance-bound candidate may be sent to `equip_build`: either its
+   `canonical_build` or its scalar `execution_id`. Never assemble hashes or instance IDs yourself.
    A build that needs tuning carries the tuning plugs inside `canonical_build.items[].mods`
    (only the tunings that piece allows), so a confirmed `equip_build` changes them together
    with the armor and mods — tell the player what `tuning_changes` says before they confirm,
@@ -39,6 +40,10 @@ Read only the relevant reference before a complex request:
 6. If a response is incomplete, failed, or has an uncertainty/coverage warning, report that limitation instead of filling it from model memory.
 7. A parameter the chosen `intent` does not read is rejected with `ignored_parameter`; switch to the intent named in the message instead of retrying the same call.
 8. The `community` intent of `weapon`, `build`, `subclass` and `activity` searches only its own category. A zero result there does not mean the archive lacks the topic; retry with `world_assistant(intent="community")` and name the category searched.
+9. Hosts that can only send scalar arguments (the Doubao connector does this) write list and map
+   parameters as text (`"亡者复仇,速射"`, `"grenade=100"`) and use `execution_id` instead of the
+   nested `canonical_build`. The shapes are listed in `references/routing.md`; a wrong shape comes
+   back as `invalid_arguments` with an example, never as a silently narrowed request.
 
 ## Installation handoff
 
