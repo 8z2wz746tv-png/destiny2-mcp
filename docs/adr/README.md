@@ -25,6 +25,8 @@
 | [ADR-014](014-tuning-writes-need-ownership.md) | 调谐能用免费接口换，判据是**这件护甲允许的清单**（组件 310；不在里面的回 1675，1679 不是失败）；写入已开放为正式能力；`平衡调整` 是**最低三项各 +1**，不是六维各 +1 | accepted |
 | [ADR-015](015-solver-objective-and-ranking.md) | 配装求解口径：上限是**软**的（排名 + 标注，不剪枝）、排序只有 `goodness_key` 一把尺子、调谐吃干净但是**局部**最优、`reachable` 是**保守下界**、没算完不许说不可行 | accepted |
 | [ADR-016](016-host-compat-scalar-arguments.md) | 只发标量的宿主（豆包 connector）：结构化参数额外收文本写法（规则唯一出处 `utils/arg_text.py`），`equip_build` 也收 `execution_id` 代替整块 `canonical_build`；不许放宽 schema、不许给 `canonical_build` 开 JSON 字符串通道 | accepted |
+| [ADR-017](017-exact-exotic-name-skips-a-round.md) | 金装名字**唯一精确匹配**时直接求解（响应 `query.exotic_resolution` 交代用的哪件），模糊/多件仍然必须停下来确认；`resolve_exotic_armor` 的 `status` 语义成为对外契约 | accepted |
+| [ADR-018](018-already-there-is-not-a-failure.md) | 1679「这个槽已经装着它」= 状态已成立（三条写入路径共用一条判据）；预检里「这一位装不上」的模组标 `blocked` 并跳过，**不许**把整条配装打成失败 + 回退 | accepted |
 
 ## 编号规矩
 

@@ -13,6 +13,21 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：`equip_build` 的成败口径更细了（2026-09-23）
+
+三个 bug 一起修（详见 ADR-018）：1679「这个槽已经装着它」以前被当成失败 → 整条配装回退；
+子职业插槽每次都重写一遍（必然回退）；预检遇到"这一位装不上"的模组直接抛错（也回退）。
+现在：
+
+- 「已经装着」算成功，回执写 `已经装着 '模组名'，未改动`，**不调用上游**；
+- 「这一位装不上」标成 `steps[].action="mod_blocked"`，**跳过这一颗、不回退**，
+  摘要在这种情况下是「配装已装备，但有 N 颗模组装不上（原因见 warnings 与 steps）」；
+- `steps` 里的模组写**中文名**（以前是 hash），`verify` 步骤在"只因模组没装上而对不上"时
+  会直说，不再笼统写"执行结果与确认的配装不一致"。
+
+**读法变了，键没变**：`ok=true` 不再自动等于"每颗模组都装上了"—— 看 `steps`/`warnings`。
+真机同日实测：一次装备 335 秒（失败+回退）→ **64.7 秒（成功）**。
+
 ## 未发布：只发标量的宿主也能送结构化参数（2026-09-23，同日追加）
 
 豆包 connector 转发工具调用时只序列化标量，`list[str]` / `dict` 参数送不到服务端

@@ -11,7 +11,7 @@
 | **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 26 行）／`scripts/run_corpus_starside_entities.py`（Starside 实体层 8 行，见文末那一章）／**
 - `scripts/run_corpus_pvp_rows.py` —— PvP/生涯**口径**的真机语料（19 行，冷启约 1 分钟）：游戏内 ID、生涯三档（现存/已删/账号级）、计数器 124,495、试炼/铁旗/赛季、`period=season` 如实失败、武器榜 `all_modes`、模式词表外报错、equip 只给计划、**PGCR 参与者名一律游戏内 ID**、**排行榜空响应如实上报**、**PvP 武器榜（`pvp_weapons`）的窗口/口径/模式过滤与智谋 PvPvE 标记**、**PvE 模式词被拒**、**`count=0` 与不传等价（哨兵规则）**。
    真机提示：这批行会真的打上游，偶发上游读抖动（profile 类读失败）会让个别行红；先重跑一次再判断是不是回归 —— 连续两次红才是回归。盯的是**口径**，信封与形状仍归 `run_corpus_all_rows.py`。
-`scripts/run_corpus_all_rows.py`（八工具面全 intent + 字段级 + 协议层，见 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)）**／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线） | 改动任一工具面后 |
+`scripts/run_corpus_all_rows.py`（八工具面全 intent + 字段级 + 协议层，见 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)）**／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线）／`benchmark_equip_chain.py`（装备链条**分段计时**：默认只读，`--write` 才真写账号；动装备流程时用它留改前/改后数字） | 改动任一工具面后 |
 | **L2 冒烟**（本文件带 ⭐ 的行，25 条） | 真机逐条调用 | 每轮回归开始时跑一遍 |
 | **L3 补测**（本文件其余行） | 真机逐条调用 | **只在该工具被改动时**跑它那一章 |
 
@@ -138,7 +138,8 @@
 | --- | --- | --- |
 | 用我的 `<职业>` 现有护甲找三套方案，生命/手雷至少 100，只列候选不装备 | `find` 或 `recommend` | 五个护甲部位齐全，含实际实例 ID 与最终六维。`*_target` 是**硬约束**，无解要说无解（**不得擅自放宽**）。实测耗时：泰坦 ~2s、猎人 ~5s、术士 ~190s；超预算返回 `build_validation_error`（`DESTINY_BUILD_TIMEOUT_SECONDS` 可调）。 |
 | ⭐ 帮我分析一下为什么配不出 `<职业>` 的这套 | `analyze` | 规模在阈值内 → **精确**上限（`max_possible` + `precision="exact"`，泰坦 ~15s）；**超规模立刻返回**（术士 4.5s，以前干等 300s）：`precision="not_computed"`、`max_possible={}`（**不是"上限为零"**）、`reason` 给组合数与收窄手段（指定金装／减少目标／`farm_target`／调 `DESTINY_BUILD_MAX_COMBINATIONS`）。 |
-| 指定金装 `<异域护甲原名>` | 先返回候选 | **首次查询必须返回金装候选并等确认**，不得自行选定；重试要原样回传 `confirmed_exotic_hash` + token，职业/目标/优先级/碎片不得丢失。 |
+| 指定金装 `<异域护甲原名>` | 直接出解 | 名字**唯一精确匹配**时不再多问一轮：响应 `query.exotic_resolution.status="exact_match"` 说明用的是哪件（写入仍要 `confirmed=true`）。 |
+| 金装名字模糊/匹配到多件（如只说「卡利班手」） | 先返回候选 | 必须返回候选并等确认，**不得自行选定**；重试要原样回传 `confirmed_exotic_hash` + token，职业/目标/优先级/碎片不得丢失。 |
 | 不降目标，反推我该刷哪件护甲 | `farm_target`（可加 `baseline="equipped"`、`replacement_slot`） | 先查单件、再两件；待刷数值来自工具，**不能自己相减拼出来**；待刷目标不能当成已拥有。 |
 | 有哪些护甲模组／`<套装名>` 的套装效果 | `armor_mods`／`set_bonus` | 中英词表都认；词表外且一条都没命中 → `invalid_argument_error` 并列出词表；词表外但**蒙中**（如「速度」）→ 带 `match.kind="keyword"` + warning，说清这些模组并不加该属性；词表内 0 条 → `match.kind="stat"` + 「本地数据里没有」的 warning（**三种都不能读成「没有这种模组」**）；不存在的套装 → `definition_not_found_error`。 |
 | ⭐ 这套方案穿上去 | `equip_build`，`confirmed=false` | **必须传回服务端签发的候选**：`canonical_build` 或它的 `execution_id` 二选一（只发标量的宿主用后者，一次确认只能用一次、10 分钟内有效）；用 `score` 或自己拼 hash 会被拒；改过库存后旧候选要重新求解。 |
@@ -198,7 +199,7 @@
 | --- | --- | --- |
 | ⭐ （任选一个写入动作）帮我把 `<物品>` 移到仓库 | 对应写入 intent，`confirmed=false` | 返回确认请求而不是执行结果；**服务层未被调用**，账号状态不变；展示精确目标（实例 ID、槽位、数值）。 |
 | 不用问了，直接执行 | 同上 | 仍应停下：**确认必须来自用户的明确同意**，不能由 Agent 自己推断。 |
-| 好，确认执行 | `confirmed=true` | 用服务端原候选执行；完成后**重新读取实际状态核对**。改过库存后旧候选（如 `equip_build`）应被拒绝并要求重新求解。 |
+| 好，确认执行 | `confirmed=true` | 用服务端原候选执行；**写后证据就是响应 `steps[]` 里的 `verify`（服务端已回读核对实例/模组/子职业）**，不要逐件再查 `intent="item"`。改过库存后旧候选（如 `equip_build`）应被拒绝并要求重新求解。 |
 
 ## 十、横切：证据边界与不可信资料
 
@@ -315,7 +316,7 @@
 
 ### 写入测试（可选，默认不做）
 
-需要真跑写入时：先 `confirmed=false` 看确认信息 → 用户明确同意后 `confirmed=true` → **重新读取实际状态核对**。
+需要真跑写入时：先 `confirmed=false` 看确认信息 → 用户明确同意后 `confirmed=true` → 看响应 `steps[]` 里的 `verify` 回执（**不要**再逐件查一遍）。
 一轮回归里默认**不做任何写入**。
 
 ---
