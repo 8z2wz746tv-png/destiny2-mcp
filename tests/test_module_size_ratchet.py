@@ -66,7 +66,10 @@ CEILINGS = {
     # 901 → 875：候选暂存（execution_id → 签发方案、TTL、玩家绑定、用完即焚）
     # 整段搬去 `services/build_candidates.py` —— 它与求解流程无关，而且"只给候选 ID
     # 也能装备"要在这里按 ID 取回签发的那份。上限跟着收紧。
-    "destiny_mcp/services/build_service.py": 875,
+    # 875 → 880：`analyze_build` 改走"六项单项上限并发探测"（另起 `_probe_compute`，
+    # 档位 4，只读）；为此把 `_canonical_subclass`（25 行）搬去 `services/build_results.py`
+    # —— 净增 5 行，上限跟着定在当前长度。
+    "destiny_mcp/services/build_service.py": 880,
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升

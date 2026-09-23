@@ -14,12 +14,18 @@ Workflow:
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 from difflib import SequenceMatcher
-from typing import Literal, cast
+from typing import Any, Literal, cast
 
-from ..build.analyzer import analyze, ensure_within_combination_limit
+from ..build.analyzer import (
+    analyze_from_probes,
+    ensure_within_combination_limit,
+    oversized_reason,
+    probe_stat,
+)
 from ..build.constants import MAIN_STAT_HASHES, STAT_NAMES, SUBCLASS_BONUSES
 from ..build.constraints import parse as _parse_constraints
 from ..build.farm_target import find_farm_targets
@@ -28,6 +34,7 @@ from ..build.models import (
     BuildRecommendation,
     BuildRequest,
     BuildResult,
+    InventorySnapshot,
 )
 from ..bungie_client import BungieClient
 from ..build_contracts import CanonicalBuild, ExecutableBuild
@@ -43,12 +50,16 @@ from ..build.ranking import rank_results
 from .build_tuning import apply_local_tuning, solve_with_tuning
 from .build_candidates import BuildCandidateStore
 from .build_results import (
+    canonical_subclass,
     LOADOUT_SLOT_NAMES as _LOADOUT_SLOT_NAMES,
     ResultContext,
     build_results as _build_results,
 )
 from .loadout_equipment_service import LoadoutEquipmentService
 from .build_compute import BuildCompute
+
+# 单项上限探测的并发档：纯 CPU、只读，4 个够用且不会把机器压满
+_PROBE_CONCURRENCY = 4
 
 logger = get_logger(__name__)
 
@@ -96,32 +107,6 @@ def _snapshot_version(snapshot) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def _canonical_subclass(build: CanonicalBuild) -> LoadoutSubclassConfig | None:
-    values = {
-        "subclass_item_hash": build.subclass_item_hash or 0,
-        "subclass_instance_id": build.subclass_instance_id,
-        "super_hash": build.super_hash or 0,
-        "grenade_hash": build.grenade_hash or 0,
-        "melee_hash": build.melee_hash or 0,
-        "class_ability_hash": build.class_ability_hash or 0,
-        "movement_hash": build.movement_hash or 0,
-        "aspect_hashes": build.aspect_hashes,
-        "fragment_hashes": build.fragment_hashes,
-        "plug_sockets": build.subclass_plug_sockets,
-    }
-    if not any([
-        values["super_hash"],
-        values["grenade_hash"],
-        values["melee_hash"],
-        values["class_ability_hash"],
-        values["movement_hash"],
-        values["aspect_hashes"],
-        values["fragment_hashes"],
-        values["plug_sockets"],
-    ]):
-        return None
-    return LoadoutSubclassConfig(**values)
-
 class BuildService:
     """Orchestrates the full Build Engine pipeline.
 
@@ -139,6 +124,8 @@ class BuildService:
         self._inventory = InventoryService(bungie, manifest, resolver)
         self._equipment = LoadoutEquipmentService(bungie, manifest, resolver)
         self._compute = BuildCompute()
+        # 只读诊断探测走这条：允许 4 个并发（见 _probe_single_stat_ceilings）
+        self._probe_compute = BuildCompute(capacity=_PROBE_CONCURRENCY)
         # 候选暂存（execution_id → 签发的那份方案）：怎么存、什么时候过期在
         # services/build_candidates.py，这里只管签发与执行。
         self._candidates = BuildCandidateStore()
@@ -614,7 +601,25 @@ class BuildService:
             )
             parsed.subclass_stats = subclass_stats
             parsed.fragment_stats = fragment_stats
-        return await self._compute.run(analyze, snapshot, parsed)
+        oversized = oversized_reason(snapshot, parsed)
+        if oversized:
+            return BuildAnalysis(reason=oversized, precision="not_computed")
+        return analyze_from_probes(parsed, await self._probe_single_stat_ceilings(snapshot, parsed))
+
+    async def _probe_single_stat_ceilings(
+        self, snapshot: InventorySnapshot, parsed: Any
+    ) -> dict[str, int]:
+        """六项单项上限：**并发**跑（互不依赖、都是只读纯计算）。
+
+        真机实测（2026-09-23，真无解请求）：串行 6 次 = **227 秒**，占了整张阶梯 427 秒的
+        一半；并发后 wall 时间约等于其中最慢的一次。写入路径一个字没碰 —— 并发只给这种
+        只读探测用（`_probe_compute` 的档位固定 4，主链路仍是 `_compute` 的串行档）。
+        """
+        probes = await asyncio.gather(*[
+            self._probe_compute.run(probe_stat, snapshot, parsed, index)
+            for index in range(len(STAT_NAMES))
+        ])
+        return dict(probes)
 
     async def infer_required_armor(
         self,
@@ -842,7 +847,7 @@ class BuildService:
             name="已确认的精确配装",
             character=normalized_character,
             items=build.items,
-            subclass=_canonical_subclass(build),
+            subclass=canonical_subclass(build),
             source="build",
         )
         result = await self._equipment.equip_exact(player_name, loadout)

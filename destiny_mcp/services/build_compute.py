@@ -21,11 +21,19 @@ class BuildCompute:
     与真实原因无关的建议。现在先拿限流器（排队不设时限），再给计算计时。
     """
 
-    def __init__(self, timeout_seconds: float | None = None) -> None:
+    def __init__(
+        self, timeout_seconds: float | None = None, *, capacity: int = 1
+    ) -> None:
+        """`capacity` = 同时最多跑几个求解。
+
+        默认 1（主链路一次只算一个：CPU 密集，串行最省心）。**只读的诊断探测**
+        （`analyze` 的六项单项上限）用 4 —— 它们互不依赖，串行跑一次要 227 秒
+        （2026-09-23 真机实测），并发后 wall 时间约等于其中最慢的那一个。
+        """
         self._timeout_seconds = (
             config.BUILD_TIMEOUT_SECONDS if timeout_seconds is None else timeout_seconds
         )
-        self._limiter = anyio.CapacityLimiter(1)
+        self._limiter = anyio.CapacityLimiter(max(1, int(capacity)))
 
     async def run(self, function: Callable[..., _T], *args, **kwargs) -> _T:
         # 排队：不设时限。run_sync 不再传 limiter —— 这里已经串行化了，

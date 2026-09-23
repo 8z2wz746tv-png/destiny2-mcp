@@ -27,7 +27,7 @@ from ..build.models import (
 )
 from ..build.scorer import score as _score
 from ..build.tuning import TuningPlan
-from ..build_contracts import ExecutableBuild
+from ..build_contracts import CanonicalBuild, ExecutableBuild
 from ..models import LoadoutItem, LoadoutSubclassConfig
 from ..vocabulary import STAT_LABELS_ZH
 
@@ -363,3 +363,31 @@ __all__ = [
     "set_key",
     "tuning_note",
 ]
+
+
+def canonical_subclass(build: CanonicalBuild) -> LoadoutSubclassConfig | None:
+    """`CanonicalBuild` 的子职业字段 → 装备流程要的 `LoadoutSubclassConfig`（空则 None）。"""
+    values = {
+        "subclass_item_hash": build.subclass_item_hash or 0,
+        "subclass_instance_id": build.subclass_instance_id,
+        "super_hash": build.super_hash or 0,
+        "grenade_hash": build.grenade_hash or 0,
+        "melee_hash": build.melee_hash or 0,
+        "class_ability_hash": build.class_ability_hash or 0,
+        "movement_hash": build.movement_hash or 0,
+        "aspect_hashes": build.aspect_hashes,
+        "fragment_hashes": build.fragment_hashes,
+        "plug_sockets": build.subclass_plug_sockets,
+    }
+    if not any([
+        values["super_hash"],
+        values["grenade_hash"],
+        values["melee_hash"],
+        values["class_ability_hash"],
+        values["movement_hash"],
+        values["aspect_hashes"],
+        values["fragment_hashes"],
+        values["plug_sockets"],
+    ]):
+        return None
+    return LoadoutSubclassConfig(**values)
