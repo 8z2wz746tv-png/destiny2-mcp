@@ -70,7 +70,9 @@ async def recommend(
     if not _has_hard_targets(request):
         _mark_completion_rate_na(recommendation)
     if not recommendation.get("results"):
-        ladder = await armor_ladder.no_solution_ladder(svc, player_name, request)
+        ladder = await armor_ladder.no_solution_ladder(
+            svc, player_name, request, base_order_empty=True
+        )
         return ok_response(
             "真实库存中没有满足原始硬约束的配装；金装和全部属性目标都保持不变。",
             {"recommendation": recommendation, "query": query, "ladder": ladder},
@@ -155,7 +157,7 @@ async def find(
     tuning = _tuning_summary(builds)
     if not builds:
         ladder = await armor_ladder.no_solution_ladder(
-            svc, player_name, request, coverage=search
+            svc, player_name, request, coverage=search, base_order_empty=True
         )
         return ok_response(
             _empty_message(search),

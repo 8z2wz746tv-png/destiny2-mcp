@@ -130,6 +130,47 @@ async def test_ladder_finds_the_smallest_relaxation_that_works() -> None:
 
 
 @pytest.mark.asyncio
+async def test_base_order_hint_skips_only_the_solve_the_caller_already_did() -> None:
+    """`base_order_empty=True` = 调用方刚用原始请求 + 原始优先级解过一次且 0 候选。
+
+    那一档的解不重复跑（真机一次省 ~34 秒），但**输出必须一模一样**：
+    换优先级的采样照跑，trials/ceiling/shortfall 与不传这个提示时逐字相同。
+    """
+    analysis = SimpleNamespace(max_possible={"weapons": 200}, precision="exact", reason="no_solution")
+
+    class _Build:
+        def __init__(self, working: bool) -> None:
+            self.seen: list[tuple] = []
+            self.working = working
+
+        async def analyze_build(self, player_name, request):
+            return analysis
+
+        async def find_build(self, player_name, request, coverage=None):
+            self.seen.append((request.melee_target, tuple(request.priority_stats or ())))
+            if self.working and request.melee_target is None:
+                return [SimpleNamespace(build=SimpleNamespace(weapons=200, grenade=41, melee=26))]
+            return []
+
+    def _request():
+        return _Request(weapons_target=150, grenade_target=70, melee_target=70,
+                        priority_stats=["weapons", "grenade", "melee"])
+
+    plain, hinted = _Build(working=True), _Build(working=True)
+    without = await ladder.no_solution_ladder({"build_svc": plain}, "Tester#1234", _request())
+    with_hint = await ladder.no_solution_ladder(
+        {"build_svc": hinted}, "Tester#1234", _request(), base_order_empty=True
+    )
+
+    assert len(hinted.seen) == len(plain.seen) - 1, (plain.seen, hinted.seen)
+    assert plain.seen[0][0] == 70, "原样那一档（近战 70 仍在目标里）"
+    assert plain.seen[0][1][:3] == ("weapons", "grenade", "melee"), "被跳过的是基础顺序那一次"
+    assert with_hint["trials"] == without["trials"]
+    assert with_hint["ceiling"] == without["ceiling"]
+    assert with_hint["shortfall"] == without["shortfall"]
+
+
+@pytest.mark.asyncio
 async def test_single_stat_maximum_is_not_used_as_the_simultaneous_ceiling() -> None:
     """`analyze` 的 max_possible 是单项上限：不能当成"同时能达到"（实机踩过）。"""
     analysis = SimpleNamespace(

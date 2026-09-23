@@ -343,6 +343,7 @@ async def no_solution_ladder(
     *,
     max_probes: int = 4,
     coverage: dict[str, Any] | None = None,
+    base_order_empty: bool = False,
 ) -> dict[str, Any]:
     """无解时算这张表：逐级放松目标再解，把"降哪一档就能穿"摊开。
 
@@ -355,6 +356,10 @@ async def no_solution_ladder(
       而且当目标是互斥的时候，光换优先级每一种都是 0 候选，得**把目标放下来**再解。
 
     采样只在无解时发生（有解时一次都不用多跑）。
+
+    `base_order_empty=True` 表示"调用方刚刚用**原始请求 + 原始优先级**解过一次，0 候选"——
+    那一次的解不必再跑一遍（第一档的"原样"探测就是它），直接按已知结果记账。
+    协议输出一模一样：那一档本来也只会记成 `ok=false`。
     """
     analysis = await svc["build_svc"].analyze_build(player_name, request)
     single_stat = {
@@ -366,10 +371,16 @@ async def no_solution_ladder(
 
     trials: list[dict[str, Any]] = []
     samples: list[dict[str, int]] = []
-    for probe in relaxation_probes(request, max_probes=max_probes):
+    probes = relaxation_probes(request, max_probes=max_probes)
+    for probe_index, probe in enumerate(probes):
         relaxed = apply_drops(request, probe["drop"])
         probe_error = ""
-        for order in sample_orders(relaxed, max_orders=2):
+        orders = sample_orders(relaxed, max_orders=2)
+        if base_order_empty and probe_index == 0:
+            # 第一档的"原样"就是调用方刚跑过的那次解（0 候选）：不重复求解，只跳过第一个顺序。
+            # 后面那个"换优先级顺序"的采样照旧 —— 那是新信息。
+            orders = orders[1:]
+        for order in orders:
             candidate = relaxed.model_copy(update={"priority_stats": order})
             try:
                 results = await svc["build_svc"].find_build(player_name, candidate)
