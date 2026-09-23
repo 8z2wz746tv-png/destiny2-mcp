@@ -463,7 +463,8 @@ Manifest 侧（**不代表拥有**）：
 - `confirmed=false` 时返回 `confirmation_required`，**服务层不会被调用**，游戏状态不变。确认必须来自用户的明确同意，不能由 Agent 自己推断——用户说「不用问了直接执行」也不行。
 - 展示确认时要给精确目标：实例 ID、槽位号、数值，而不是笼统描述。
 - `equip_build` 只接受服务端签发的候选（一次绑定、槽位齐全），回传 `canonical_build` 或它的 `execution_id` 都行（二选一，效果一样；发不出结构体参数的宿主用 ID，如豆包 connector）。`build_template`、社区模板、`solver_handoff`、`farm_options`、`score` 都**不是**可执行方案，自己拼 hash 会被拒绝；候选 10 分钟内有效、一次确认只能用一次，改过库存后旧候选也会失效，需要重新求解。
-- 执行后重新读取实际状态核对，不要凭调用成功就宣布结果。
+- **装备链路最短走法**（写也是一样，别拆成更多轮）：`find` 拿候选（金装名字**唯一精确匹配**时直接出解，模糊/多件才多一轮确认）→ 把逐件预览 / `tuning_changes` 给玩家看并等明确同意 → `equip_build`（`canonical_build` 或 `execution_id` + `confirmed=true`）→ 看 `steps` 回执汇报。确认阶段可以先调一次 `confirmed=false` 拿 `items_preview`，但那不是必须的第三轮。
+- **写后证据在响应里，不要再逐件复查**：`equip_build`/`equip_loadout` 成功后，`steps[]` 里那条 `verify` 就是服务端**已经回读核对**过的结果（装备实例、模组、子职业都对过），`mod` 步骤按名字给出装了哪颗模组。要给人看逐件状态，把确认阶段的 `items_preview` 与这份 `steps` 一起报即可；**不要逐件 `intent="item"` 查一遍**（实测有调用方一次链路查 5 次，纯属重复往返），最多补一次汇总查询。失败时同样看 `steps` 里哪一步 `success=false` 与上游原文，别凭"调用成功"宣布结果。
 
 ## 七、引用与不确定
 
