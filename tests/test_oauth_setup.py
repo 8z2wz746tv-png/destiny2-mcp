@@ -121,3 +121,42 @@ def test_openssl_failure_reports_its_output(tmp_path, monkeypatch):
     message = str(excinfo.value)
     assert "--manual" in message
     assert "synthetic openssl failure" in message
+
+
+# ── 2026-09-23 真机反转：授权 URL 不许带 scope ──────────────────────────────
+
+
+def test_auth_url_never_carries_scope() -> None:
+    """Bungie 现在明确拒绝：`Scope is always configured value. Do not specify scope parameter.`
+
+    真机回包（Windows / client_id=54207）：回调带 `error=invalid_scope`，登录 100% 失败。
+    scope 改由 Developer Portal 的应用配置决定，URL 上一个字符都不能带。
+    """
+    from destiny_mcp.oauth_setup import _auth_url
+
+    url = _auth_url("12345", "https://localhost:8765/callback", "STATE")
+    assert "scope" not in url.lower(), f"授权 URL 里不许出现 scope：{url}"
+    for part in ("client_id=12345", "response_type=code", "state=STATE", "redirect_uri="):
+        assert part in url
+
+
+def test_callback_surfaces_bungie_error_before_state_check() -> None:
+    """Bungie 已明确回 error 时先透出它 —— 以前 state 在前，`invalid_scope` 被吞成 `invalid_state`。"""
+    from destiny_mcp import oauth_setup
+
+    handler = object.__new__(oauth_setup.OAuthCallbackHandler)
+    handler.path = "/callback?error=invalid_scope&error_description=Do%20not%20specify&state=WRONG"
+    handler.expected_state = "RIGHT"
+    sent: list[tuple] = []
+    handler._send_html = lambda status, title, message, **kw: sent.append((status, title, message))
+    handler._shutdown_soon = lambda: None
+    oauth_setup.OAuthCallbackHandler.captured_error = None
+    oauth_setup.OAuthCallbackHandler.captured_code = None
+
+    handler.do_GET()
+
+    assert oauth_setup.OAuthCallbackHandler.captured_error == "invalid_scope"
+    assert oauth_setup.OAuthCallbackHandler.captured_code is None
+    text = " ".join(str(x) for row in sent for x in row)
+    assert "invalid_scope" in text and "Do not specify" in text
+    assert "state 校验失败" not in text, "真错误不许被 state 文案盖住"

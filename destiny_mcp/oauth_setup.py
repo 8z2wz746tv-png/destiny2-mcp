@@ -56,14 +56,23 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
         error = params.get("error", [""])[0]
         code = params.get("code", [""])[0]
         state = params.get("state", [""])[0]
+        # 顺序要紧：Bungie 已经明确回了 error 时**先透出它**（附 error_description），
+        # 再做 state 校验。以前 state 在前，`invalid_scope` 被吞成 `invalid_state`，
+        # 用户和程序都看不到真原因（连"退回不带 scope"那段降级也因此永远不触发）。
+        if error:
+            detail = params.get("error_description", [""])[0].strip()
+            OAuthCallbackHandler.captured_error = error
+            self._send_html(
+                400,
+                "授权失败",
+                f"Bungie 返回错误：{error}" + (f"（{detail}）" if detail else ""),
+                success=False,
+            )
+            self._shutdown_soon()
+            return
         if self.expected_state and state != self.expected_state:
             OAuthCallbackHandler.captured_error = "invalid_state"
             self._send_html(400, "授权失败", "OAuth state 校验失败，请重新运行登录命令。", success=False)
-            self._shutdown_soon()
-            return
-        if error:
-            OAuthCallbackHandler.captured_error = error
-            self._send_html(400, "授权失败", f"Bungie 返回错误：{error}", success=False)
             self._shutdown_soon()
             return
         if not code:
@@ -165,23 +174,20 @@ def _redirect_uri(args: argparse.Namespace, config) -> str:
     return DEFAULT_REDIRECT_URI
 
 
-# 想申请的 scope。**必须显式申请**，否则令牌里就没有它。
-# `AdvancedWriteActions` 覆盖"带消耗/不可逆"的写入（例如付费插槽接口 `InsertSocketPlug`）。
-# **注意：这个 scope 是按应用审批的** —— 应用没被授予时，Bungie 的授权页会直接回
-# `invalid_scope`，连登录都做不成（真机踩过）。所以它只是"想要"，不是"必须有"：
-# 授权失败于 invalid_scope 时自动退回不带 scope 登录，功能上只有那几条路不可用。
-_WANTED_SCOPES = "AdvancedWriteActions"
+# **不要往授权 URL 里塞 `scope`**（2026-09-23 真机反转）：
+#   `.../callback?error=invalid_scope&error_description=Scope is always configured value.
+#    Do not specify scope parameter.`
+# 也就是说令牌里的 scope **由 Bungie Developer Portal 上的应用配置决定**，URL 上带一个就
+# 100% 登录失败（旧行为是"带了但应用没批"才失败，错误码一样、语义已经变了）。
+# 想要 `AdvancedWriteActions`（付费/不可逆写入用）就去
+# https://www.bungie.net/en/Application 勾选应用权限，别在 URL 上传。
 
 
-def _auth_url(
-    client_id: str, redirect_uri: str, state: str, *, scope: str = _WANTED_SCOPES
-) -> str:
+def _auth_url(client_id: str, redirect_uri: str, state: str) -> str:
     parts = [
         f"{AUTHORIZE_ENDPOINT}?client_id={quote(str(client_id), safe='')}",
         "response_type=code",
     ]
-    if scope:
-        parts.append(f"scope={quote(scope, safe='')}")
     parts.append(f"state={quote(state, safe='')}")
     parts.append(f"redirect_uri={quote(redirect_uri, safe='')}")
     return "&".join(parts)
@@ -352,27 +358,11 @@ def main(argv: list[str] | None = None) -> None:
             webbrowser.open(login_url)
         try:
             code = _serve_for_code(redirect_uri, args.timeout, state)
-        except SystemExit as exc:
-            # `AdvancedWriteActions` 是**按应用审批**的 scope：应用没被授予时，Bungie 的授权页
-            # 直接回 `invalid_scope`，连登录都做不成（真机踩过）。这里退回"不带 scope"再登一次 ——
-            # 功能上只少了"付费/不可逆写入"那几条路，其余照常。
-            if "invalid_scope" not in str(exc):
-                raise
-            print(
-                "\n⚠️ 这个应用没有被授予 AdvancedWriteActions（Bungie 回 invalid_scope）。\n"
-                "   不影响登录与绝大部分功能；只有「带消耗/不可逆的插槽写入」需要在游戏里做。\n"
-                "   想让 API 也能做：到 https://www.bungie.net/en/Application 给这个应用申请\n"
-                "   AdvancedWriteActions，批准后重新登录。\n"
-                "   现在按不带 scope 的方式重新登录一次：\n"
-            )
-            state = secrets.token_urlsafe(18)
-            login_url = _auth_url(config.BUNGIE_CLIENT_ID, redirect_uri, state, scope="")
-            print(login_url)
-            print()
-            sys.stdout.flush()
-            if not args.no_open:
-                webbrowser.open(login_url)
-            code = _serve_for_code(redirect_uri, args.timeout, state)
+        except SystemExit:
+            # 不再有"带 scope 失败 → 退回不带 scope"的降级：授权 URL 现在**不带** scope，
+            # 真出问题就如实抛（回调页与终端都会给出 Bungie 的原文）。
+            raise
+        code = _serve_for_code(redirect_uri, args.timeout, state)
 
     print("正在交换并保存 token...")
     token_data = _exchange_code(config, code, redirect_uri)

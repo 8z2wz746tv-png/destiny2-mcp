@@ -72,13 +72,12 @@
 - 出处：<https://bungie-net.github.io/>（文档版本 2.21.8，2026-09-17 查阅）
 - 实测：2026-09-16 把令牌解出来看，`scope` 字段**没有**任何 scope（授权 URL 一个 `scope` 都没带）；
   写入因此被上游拒成 403 `AccessNotPermittedByApplicationScope`。
-- 结论：**令牌里有哪个 scope，取决于授权 URL 上显式申请了什么**，不是"应用有权限就自动带"。
-
-### 本项目申请了哪些、为什么
-- 事实：`AdvancedWriteActions` 是**按应用审批**的 scope —— 应用没被 Bungie 授予时，授权页会直接回
-  `invalid_scope`。
-- 出处：<https://bungie-net.github.io/>（文档版本 2.21.8，2026-09-17 查阅）；申请入口
-  <https://www.bungie.net/en/Application>
+- **授权 URL 上不许带 `scope`**（2026-09-23 真机反转）：带上就 100% 登录失败，Bungie 回
+  `invalid_scope` + `Scope is always configured value. Do not specify scope parameter.`。
+  令牌里的 scope **由 Developer Portal 的应用配置决定**（`https://www.bungie.net/en/Application` 勾选），
+  旧结论"取决于授权 URL 上显式申请了什么"（09-16 场景是"带了但应用没批"）已作废。
+  代码见 `destiny_mcp/oauth_setup.py`：`_auth_url` 不再输出 `scope`，也不再有"退回不带 scope"的降级；
+  回调页面会先透出 Bungie 的 `error`/`error_description`，不再把它吞成 `invalid_state`。
 - 实测：2026-09-16 真机 —— 0.4.6 刚在授权 URL 上加了 `scope=AdvancedWriteActions`，**连登录都做不成**
   （授权页回 `invalid_scope`），因为该应用没被授予。0.4.7 改成：先按"带 scope"试一次，撞到
   `invalid_scope` 就打印说明并自动退回"不带 scope"再登一次。
