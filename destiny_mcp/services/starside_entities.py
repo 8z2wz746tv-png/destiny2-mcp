@@ -135,6 +135,17 @@ class StarsideEntities:
         artifact = entry.get("site_artifact")
         return to_unsigned(int(artifact)) if artifact else None
 
+    def perk_by_name(self, name: str) -> tuple[int, ...]:
+        """按名字（归档里的中文名）找 perk —— 我们 Manifest 的名字索引不含套装 perk，靠这份补。"""
+        wanted = (name or "").strip()
+        if not wanted:
+            return ()
+        return tuple(
+            int(perk_hash)
+            for perk_hash, entry in (self._perks_data() or {}).items()
+            if ((entry.get("zh") or {}).get("name") or "").strip() == wanted
+        )
+
     def perks_of_set(self, set_hash: int | str) -> tuple[int, ...]:
         """这套装（`onSets`）关联着哪些 perk —— 套装评语挂在 perk 上。"""
         wanted = to_unsigned(int(set_hash))

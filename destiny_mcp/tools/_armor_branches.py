@@ -11,7 +11,7 @@ from typing import Any
 from ._enrichment import community_enrichment
 from ..services.starside_notes import (
     class_item_pairs,
-    perk_note,
+    perk_note_for_plug,
     set_notes,
 )
 from ._responses import confirmation_required_response, error_response, ok_response
@@ -117,8 +117,10 @@ def exotic_armor(svc: Any, character: str, exotic_name: str) -> dict:
         armor = svc["manifest_query_svc"].get_exotic_armor_details(exotic_name) or {}
         # 异域职业物品（"之灵"）有双栏配对的组合说明，数据在 perk 层的右栏与 realgame_details#2；
         # 非职业物品时这份块是 available=false + 原因。
+        # 键名以真实载荷为准：异域护甲详情把定义放在 `identity` 里
+        identity = armor.get("identity") or {}
         starside = class_item_pairs(
-            svc["starside_entities_svc"], svc["manifest"], int(armor.get("item_hash") or 0)
+            svc["starside_entities_svc"], svc["manifest"], int(identity.get("item_hash") or 0)
         )
         return ok_response("已读取异域护甲详情。", {
             "armor": armor,
@@ -137,7 +139,7 @@ def set_bonus(svc: Any, set_bonus_name: str) -> dict:
     if set_bonus_name:
         found = svc["set_bonus_svc"].lookup_armor_set(set_bonus_name) or {}
         starside = set_notes(
-            svc["starside_entities_svc"], svc["manifest"], int(found.get("hash") or 0), set_bonus_name
+            svc["starside_entities_svc"], svc["manifest"], int(found.get("set_hash") or 0), set_bonus_name
         )
         return ok_response("已读取套装效果。", {
             "set_bonus": found,
@@ -163,7 +165,7 @@ def armor_mods(svc: Any, priority_stat: str) -> dict:
     for mod in picked["mods"]:
         if len(notes) >= 20:  # 上限：一份列表响应不该塞进几十颗模组的全文
             break
-        note = perk_note(svc["starside_entities_svc"], svc["manifest"], int(mod.get("hash") or 0))
+        note = perk_note_for_plug(svc["starside_entities_svc"], svc["manifest"], int(mod.get("hash") or 0))
         if not note.get("available"):
             continue
         annotations = note.get("annotations") or {}

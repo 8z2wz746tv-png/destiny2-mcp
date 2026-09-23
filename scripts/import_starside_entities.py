@@ -62,7 +62,9 @@ KEEP_ITEM_ZH = (
 KEEP_PERK = ("onItems", "onSets", "authors", "damageTypeHash")
 #: perk 的中文社区文本（键名原文照留：`效果`/`属性变化`… 是站点自己的栏目名）
 KEEP_PERK_ZH = (
-    "realgame_details", "realgame_details#2", "效果", "属性变化", "冷却与槽位",
+    # 名字也留着：我们 Manifest 的名字索引**不含套装 perk**（真机调用测试：搜「集体之力」是空的），
+    # 而归档有名字 —— 这是"按名字问一颗 perk"的唯一出处。
+    "name", "realgame_details", "realgame_details#2", "效果", "属性变化", "冷却与槽位",
     "基础冷却", "冷却", "费用", "来源", "碎片槽位", "异域 PERK", "右栏",
 )
 

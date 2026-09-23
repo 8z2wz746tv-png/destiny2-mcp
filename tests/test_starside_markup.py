@@ -107,7 +107,7 @@ def test_analyze_payload_carries_the_community_block(monkeypatch) -> None:
 
     def payload(weapon_hash: int) -> dict:
         result = {
-            "weapon": {"hash": weapon_hash, "name": "测试武器"},
+            "weapon": {"item_hash": weapon_hash, "name": "测试武器"},  # 键名以真实载荷为准
             "sockets": {}, "stats": {}, "god_roll": {}, "inventory": {},
             "inventory_status": {}, "summary": "x", "next_actions": [], "warnings": [],
         }

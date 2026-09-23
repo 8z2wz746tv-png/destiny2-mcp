@@ -9,7 +9,7 @@
    "items_with_author": 1038,
    "onItems_edges": 6134,
    "onItems_edges_in_file": 5212,
-   "perks": 2676,
+   "perks": 4506,
    "perks_with_reverse_index": 2541,
    "sameAs_in_file": 627
   },
@@ -46,6 +46,7 @@
    "perks": {
     "authors": 29,
     "damageTypeHash": 20,
+    "name": 3868,
     "onItems": 2541,
     "onSets": 112,
     "realgame_details": 2217,

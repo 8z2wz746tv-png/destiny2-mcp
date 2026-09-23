@@ -35816,13 +35816,13 @@
       "items_with_author": 1038,
       "onItems_edges": 6134,
       "onItems_edges_in_file": 5212,
-      "perks": 2676,
+      "perks": 4506,
       "perks_with_reverse_index": 2541,
       "sameAs_in_file": 627
     },
     "files": {
-      "items.json": 1715782,
-      "perks.json": 1198933
+      "items.json": 1715800,
+      "perks.json": 1390873
     },
     "note": "Starside 站点作者给的导出，经 scripts/import_starside_entities.py 转换；非 Bungie 官方数据。",
     "snapshot_at": "2026-09-21T07:30:01+00:00",

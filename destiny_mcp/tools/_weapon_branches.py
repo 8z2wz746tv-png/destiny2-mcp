@@ -128,7 +128,7 @@ async def perk_pool_payload(svc: dict[str, Any], weapon_name: str) -> dict[str, 
 
 def analyze_payload(svc: dict[str, Any], result: dict[str, Any], weapon_name: str) -> dict[str, Any]:
     local = _local(svc, weapon_name)
-    starside = weapon_note_from_svc(svc, int((result.get("weapon") or {}).get("hash") or 0))
+    starside = weapon_note_from_svc(svc, int((result.get("weapon") or {}).get("item_hash") or 0))
     warnings = _attach_local(
         svc, local, weapon=result["weapon"], sockets=result["sockets"], weapon_name=weapon_name
     )

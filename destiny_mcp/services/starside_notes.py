@@ -152,6 +152,9 @@ def weapon_note(entity: StarsideEntities, manifest: Any, item_hash: int) -> dict
 
     derived = entry.get("derived") or {}
     tags = {k: derived.get(k) for k in ("release", "season", "foundry", "craftable", "tierable") if derived.get(k)}
+    for key in ("site_elements", "site_season", "site_weaponTypes"):
+        if zh.get(key):
+            tags[key.replace("site_", "site_")] = zh[key]
     for key in ("isAdept", "isHolofoil"):
         if entry.get(key):
             tags[key] = True
@@ -230,6 +233,10 @@ def perk_note(entity: StarsideEntities, manifest: Any, perk_hash: int) -> dict[s
     if set_names:
         block["sets"] = set_names
 
+    weapon_types = (entry.get("site_weapons") or {}).get("itemSubType") if isinstance(entry.get("site_weapons"), dict) else None
+    if weapon_types:
+        block["weapon_types"] = weapon_types
+
     owners = entity.items_with_perk(perk_hash)
     if owners:
         examples = []
@@ -247,9 +254,15 @@ def perk_note(entity: StarsideEntities, manifest: Any, perk_hash: int) -> dict[s
     return block
 
 
+def _entity_of(svc: Any) -> StarsideEntities | None:
+    """从服务上下文取实体层；**装配里没有它时不要炸**（替身/老上下文），交给调用方降级。"""
+    return svc.get("starside_entities_svc") if hasattr(svc, "get") else None
+
+
 def weapon_note_from_svc(svc: Any, item_hash: int) -> dict[str, Any] | None:
     """工具层一行调用：从服务上下文取实体层与 Manifest（`hash` 为 0 时给 `None`）。"""
-    return weapon_note(svc["starside_entities_svc"], svc["manifest"], item_hash) if item_hash else None
+    entity = _entity_of(svc)
+    return weapon_note(entity, svc["manifest"], item_hash) if (entity and item_hash) else None
 
 
 def perk_note_from_svc(svc: Any, perk_hash: int) -> dict[str, Any] | None:
@@ -271,15 +284,21 @@ def artifact_mod_notes(entity: StarsideEntities, manifest: Any, artifact: dict[s
             if not isinstance(mod, dict) or not mod.get("hash"):
                 continue
             total += 1
-            note = perk_note(entity, manifest, int(mod["hash"]))
+            note = perk_note_for_plug(entity, manifest, int(mod["hash"]))
             if not note.get("available"):
                 continue
             annotations = note.get("annotations") or {}
+            entry = entity.item(int(mod["hash"])) or {}
             mods.append({
                 "tier": tier_index,
                 "hash": int(mod["hash"]),
                 "name": mod.get("name") or names(str(mod.get("name") or "")) or str(mod["hash"]),
                 "tier_label": mod.get("tier_label"),
+                # 站点对神器模组的档位与冷却（入库时保留的字段，这里补进响应）
+                "community_tier": entry.get("site_tier"),
+                "community_super_tier": entry.get("site_superTier"),
+                "cooldown_seconds": entry.get("site_cooldownSeconds"),
+                "recovery_multiplier": entry.get("site_recoveryMultiplier"),
                 "effect": annotations.get("效果") or annotations.get("realgame_details"),
                 "cooldown": annotations.get("冷却与槽位") or annotations.get("基础冷却") or annotations.get("冷却"),
                 "source": annotations.get("来源"),
@@ -334,7 +353,11 @@ def fragment_note(entity: StarsideEntities, manifest: Any, fragment_name: str, f
     if not target and fragment_name:
         found = manifest.search(fragment_name, limit=1)
         target = int(found[0].get("itemHash") or 0) if found else 0
-    note = perk_note(entity, manifest, target) if target else {"available": False, "reason": "没找到这个碎片的 hash。"}
+    note = (
+        perk_note_for_plug(entity, manifest, target)
+        if target
+        else {"available": False, "reason": "没找到这个碎片的 hash。"}
+    )
     if not note.get("available"):
         return {**note, "attribution": entity.attribution()}
     annotations = note.get("annotations") or {}
@@ -368,7 +391,7 @@ def class_item_pairs(entity: StarsideEntities, manifest: Any, item_hash: int) ->
     if columns:
         for column in columns:
             for perk_hash in column:
-                note = perk_note(entity, manifest, int(perk_hash))
+                note = perk_note_for_plug(entity, manifest, int(perk_hash))
                 zh_notes = note.get("annotations") or {}
                 definition = manifest.get_item_definition(int(perk_hash)) or {}
                 perks.append({
@@ -384,3 +407,45 @@ def class_item_pairs(entity: StarsideEntities, manifest: Any, item_hash: int) ->
         "perks": perks,
         "reason": "" if perks else "这件物品没有异域职业物品的双栏数据。",
     }
+
+
+def sandbox_perk_hash(manifest: Any, plug_hash: int) -> int | None:
+    """plug（插槽物品）hash → 它背后那颗 **sandbox perk** 的 hash。
+
+    语料挖出来的关键区分：`manifest.search`／插槽池给的是 **plug 物品**，而归档 `sandbox-perks.json`
+    的键在 `DestinySandboxPerkDefinition` 空间里，plug 的 `perks[].perkHash` 才是后者。
+    第一版把它们当一回事，六个入口全查不到 —— 这条函数就是那个坑的单一出处。
+    """
+    definition = manifest.get_item_definition(int(plug_hash)) or {}
+    for perk in definition.get("perks") or []:
+        if isinstance(perk, dict) and perk.get("perkHash"):
+            return int(perk["perkHash"])
+    return None
+
+
+def perk_note_for_plug(entity: StarsideEntities, manifest: Any, plug_hash: int) -> dict[str, Any]:
+    """按 **plug hash** 拿 perk 注记：先解成 sandbox perk hash，解不出就退回 plug hash 本身。"""
+    sandbox = sandbox_perk_hash(manifest, plug_hash)
+    if sandbox and entity.perk(sandbox):
+        return perk_note(entity, manifest, sandbox)
+    return perk_note(entity, manifest, plug_hash)
+
+
+def sandbox_of_plug_from_svc(svc: Any, plug_hash: int) -> int:
+    """给工具层：plug hash → sandbox perk hash（拿不到就给原值，让查不到如实发生）。"""
+    manifest = svc.get("manifest") if hasattr(svc, "get") else None
+    return (sandbox_perk_hash(manifest, plug_hash) if manifest else None) or int(plug_hash)
+
+
+def perk_note_for_plug_from_svc(svc: Any, plug_hash: int) -> dict[str, Any] | None:
+    """工具层一行调用：**plug hash 或 sandbox hash 混着给都行**（沙盒查不到就退回原 hash）。
+
+    这是那条坑的单一出处：`analyze`/`perk_description`/神器模组/护甲模组/碎片 都走它，
+    别各自再写一遍"先解沙盒再查"。
+    """
+    entity = _entity_of(svc)
+    return (
+        perk_note_for_plug(entity, svc["manifest"], int(plug_hash))
+        if (entity and plug_hash)
+        else None
+    )
