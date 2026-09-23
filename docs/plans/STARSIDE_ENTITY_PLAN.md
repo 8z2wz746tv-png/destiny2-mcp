@@ -385,3 +385,11 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
 2. 我的 `_snake()` 一开始用了"大写边界插下划线"那个正则 —— 它专属 `error_codes` 的类名→码推导，
    `tests/test_error_codes.py` 判红；换成"小写/数字后接大写"的写法。`tags` 的 `isHolofoil`/`site_weaponTypes`
    也一并归一（否则仍是信封违规）。
+
+
+### 归档的公开方式（2026-09-23）
+
+作者同意再分发后，整包以 **Release 附件**公开（`v0.6.0` 的 `starside-entity-archive-2026-09-21.zip`，
+3.2 MB，sha256 `32e98d06…`），**不进 git 历史**：仓库里只留转换后的 3 MB 实体文件 + 源文件 sha256，
+配合确定性的 `scripts/import_starside_entities.py` 任何人都能核对与复现。授权口径写在
+`docs/community/COMMUNITY_DATA_NOTICE.md`。
