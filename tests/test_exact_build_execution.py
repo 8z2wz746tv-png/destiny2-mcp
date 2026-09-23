@@ -387,6 +387,76 @@ async def test_equip_build_by_execution_id_against_the_real_service(
     assert replay["error"]["code"] == "unknown_execution_id"
 
 
+@pytest.mark.asyncio
+async def test_exact_exotic_name_solves_without_a_confirmation_round() -> None:
+    """唯一**精确**匹配不再多问一轮（ADR-017）：直接求解，并说明用的是哪件。
+
+    模糊/多个命中仍然要确认（下一条测试钉住），这条只管"没有选择可做"的那种。
+    """
+    build_service = SimpleNamespace(
+        resolve_exotic_armor=MagicMock(return_value={
+            "status": "exact",
+            "query": "快速装弹松身裤",
+            "canonical_name": "快速装弹松身裤",
+            "matches": [{
+                "name": "快速装弹松身裤",
+                "name_en": "St0mp-EE5",
+                "item_hash": 456,
+                "icon_url": "",
+                "class_type": 0,
+                "score": 1.0,
+            }],
+        }),
+        recommend_build=AsyncMock(return_value={"results": [{"id": "build-1"}]}),
+    )
+
+    result = await build_assistant(
+        intent="recommend",
+        player_name="Alpha#0100",
+        character="hunter",
+        exotic_name="快速装弹松身裤",
+        class_target=200,
+        ctx=_tool_context({"build_svc": build_service}),
+    )
+
+    assert result["ok"] is True, result.get("error")
+    build_service.recommend_build.assert_awaited_once()
+    resolution = (result["data"]["query"] or {}).get("exotic_resolution") or {}
+    assert resolution.get("status") == "exact_match"
+    assert resolution.get("item_hash") == 456
+    assert (result["data"]["query"] or {}).get("exotic_name") == "快速装弹松身裤"
+
+
+@pytest.mark.asyncio
+async def test_fuzzy_exotic_name_still_requires_confirmation() -> None:
+    """模糊命中（要挑一件）仍然停一轮：不替玩家选定，并给出每个候选的 arguments。"""
+    build_service = SimpleNamespace(
+        resolve_exotic_armor=MagicMock(return_value={
+            "status": "confirmation_required",
+            "query": "卡利班手",
+            "matches": [
+                {"name": "卡利班之手", "name_en": "Caliban's Hand", "item_hash": 1,
+                 "icon_url": "", "class_type": 1, "score": 0.8},
+                {"name": "卡利班之握", "name_en": "Caliban's Grips", "item_hash": 2,
+                 "icon_url": "", "class_type": 1, "score": 0.7},
+            ],
+        }),
+        recommend_build=AsyncMock(return_value={"results": []}),
+    )
+
+    result = await build_assistant(
+        intent="recommend",
+        player_name="Alpha#0100",
+        character="hunter",
+        exotic_name="卡利班手",
+        ctx=_tool_context({"build_svc": build_service}),
+    )
+
+    assert result["error"]["code"] == "exotic_confirmation_required"
+    assert [row["item_hash"] for row in result["candidates"]] == [1, 2]
+    build_service.recommend_build.assert_not_awaited()
+
+
 def test_priority_stats_keep_strict_order_and_remove_duplicates() -> None:
     parsed = parse_constraints(
         BuildRequest(

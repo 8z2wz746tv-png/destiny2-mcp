@@ -50,7 +50,9 @@ CEILINGS = {
     # 响应封装，本来就该按域放 `_*_branches.py`）→ 1407 → 1364，上限跟着收紧。
     # 1364 → 1319：equip_build 分支搬去 `tools/_armor_branches.py`（它旁边就是
     # equip_preview），并把"标量宿主也能装备"的两种回传形态收在那里。
-    "destiny_mcp/tools/assistants.py": 1319,
+    # 1319 → 1263：金装解析/确认整段搬去 `tools/_build_confirmation.py`（与确认凭据同一件事），
+    # 且"唯一精确匹配不再多问一轮"（ADR-017）。上限跟着收紧到当前长度。
+    "destiny_mcp/tools/assistants.py": 1263,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留

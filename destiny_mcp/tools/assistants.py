@@ -17,10 +17,7 @@ from ..error_codes import ErrorCode, write_failed
 from ..exceptions import DestinyMCPError
 from ._registry import mcp
 from ._coerce import coerce_scalar_arguments
-from ._build_confirmation import (
-    issue_exotic_confirmation_token,
-    verify_exotic_confirmation_token,
-)
+from ._build_confirmation import resolve_exotic, verify_exotic_confirmation_token
 from ._farm_target_response import serialize_farm_target_analysis
 from ._formatters import inventory_search_summary
 from ._helpers import get_ctx, handle_tool_error, positive_or_default, resolve_player_name
@@ -557,8 +554,8 @@ async def build_assistant(
         "目标职业：hunter/warlock/titan，或猎人/术士/泰坦。"
     ))] = "",
     exotic_name: Annotated[str | None, Field(description=(
-        "逐字传入玩家说出的异域护甲（金装）名称，禁止翻译、补全或改写。"
-        "它属于硬约束；首次查询总会返回候选，必须先让玩家确认。"
+        "逐字传入玩家说出的异域护甲（金装）名称，禁止翻译、补全或改写。它属于硬约束：唯一精确匹配"
+        "时直接求解（响应 query.exotic_resolution 说明用了哪件）；模糊/多件时返回候选，必须先确认。"
     ))] = None,
     confirmed_exotic_hash: Annotated[int | None, Field(description=(
         "金装候选确认哈希。首次查询不得填写；只有玩家明确选择候选后，"
@@ -760,6 +757,7 @@ async def build_assistant(
         build_arguments["baseline"] = baseline
         build_arguments["max_replacements"] = max_replacements
 
+    exotic_resolution: dict[str, Any] | None = None
     if intent in {"recommend", "find", "analyze", "farm_target"}:
         confirmation_requested = (
             confirmed_exotic_hash is not None
@@ -781,74 +779,18 @@ async def build_assistant(
                 )
 
     if intent in {"recommend", "find", "analyze", "farm_target"} and exotic_name:
-        resolution = _dump(
-            svc["build_svc"].resolve_exotic_armor(
-                exotic_name,
-                character,
-                limit=5,
-            )
+        step = resolve_exotic(
+            svc,
+            exotic_name=exotic_name,
+            character=character,
+            player_name=resolved,
+            build_arguments=build_arguments,
+            confirmed_exotic_hash=confirmed_exotic_hash,
         )
-        status = resolution.get("status")
-        matches = resolution.get("matches") or []
-        if status in {"exact", "confirmation_required"} and confirmed_exotic_hash is None:
-            candidates = []
-            for index, match in enumerate(matches, 1):
-                arguments = dict(build_arguments)
-                arguments["exotic_name"] = match.get("name")
-                arguments["confirmed_exotic_hash"] = match.get("item_hash")
-                arguments["exotic_confirmation_token"] = (
-                    issue_exotic_confirmation_token(
-                        arguments,
-                        user_id=None,
-                        player_name=resolved,
-                    )
-                )
-                candidates.append({
-                    "selection": index,
-                    "name": match.get("name"),
-                    "name_en": match.get("nameEn"),
-                    "item_hash": match.get("item_hash"),
-                    "icon_url": match.get("icon_url"),
-                    "character": match.get("character") or character,
-                    "arguments": arguments,
-                })
-            return error_response(
-                ErrorCode.EXOTIC_CONFIRMATION_REQUIRED,
-                f"“{exotic_name}”匹配到以下金装。请确认你指的是哪件。"
-                "确认后我会保留原来的职业、属性目标、优先级和碎片设置继续配装。",
-                candidates=candidates,
-            )
-        if status == "not_found":
-            return error_response(
-                ErrorCode.EXOTIC_NOT_FOUND,
-                f"没有找到与“{exotic_name}”匹配的{character or '目标职业'}金装。"
-                "请换一个更短或更完整的名称后重试，原属性目标不会被降低。",
-            )
-        if status not in {"exact", "confirmation_required"}:
-            return error_response(
-                ErrorCode.EXOTIC_RESOLUTION_FAILED,
-                "金装名称解析失败，未启动配装求解。请稍后重试。",
-            )
-        confirmed_match = next(
-            (
-                match
-                for match in matches
-                if int(match.get("item_hash") or 0) == confirmed_exotic_hash
-            ),
-            None,
-        )
-        if confirmed_match is None:
-            return error_response(
-                ErrorCode.INVALID_EXOTIC_CONFIRMATION,
-                "金装确认信息无效或已与当前候选不一致，未启动配装求解。"
-                "请重新搜索并让玩家确认候选。",
-            )
-        exotic_name = confirmed_match.get("name") or resolution.get("canonical_name")
-        if not exotic_name:
-            return error_response(
-                ErrorCode.EXOTIC_RESOLUTION_FAILED,
-                "金装名称解析失败，未启动配装求解。请稍后重试。",
-            )
+        if step.error is not None:
+            return step.error
+        exotic_name = step.exotic_name
+        exotic_resolution = step.resolution
 
     request = BuildRequest(
         character_class=character,
@@ -869,6 +811,8 @@ async def build_assistant(
         top_n=top_n,
     )
     query: dict[str, Any] = {
+        # 金装是"唯一精确匹配"时这里多一项 exotic_resolution：说明用的是哪件、为什么不确认。
+        **({"exotic_resolution": exotic_resolution} if exotic_resolution else {}),
         "character": request.character_class,
         "exotic_name": request.exotic_name,
         "targets": {
