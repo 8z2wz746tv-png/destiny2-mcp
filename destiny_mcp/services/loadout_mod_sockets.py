@@ -6,16 +6,87 @@
 
 from __future__ import annotations
 
+from typing import NamedTuple
+
 from ..exceptions import TransferError
 from ..manifest import ManifestManager
-from ..models import LoadoutItem
+from ..models import LoadoutItem, MoveItemStep
 from ..utils.hash_utils import to_unsigned
 from . import profile_components, write_readback
 from .loadout_plug_lookup import PlugLookupMixin
 
 
+class ModOperation(NamedTuple):
+    """一条要执行的模组操作（或"不执行"的理由）。
+
+    `action`：`mod` 要写 / `clear` 腾能量 / `keep` 已经装着 / `blocked` 这一位装不上。
+    带 `reason` 是为了让"装不上"能一路传到回执里 —— 以前预检遇到不可插入的模组直接抛错，
+    整条配装失败并回退（真机实测一次白烧 4 分钟），而正确做法是**跳过这一颗、如实汇报**。
+    """
+
+    action: str
+    plug_hash: int
+    socket_index: int
+    reason: str = ""
+
+    def as_tuple(self) -> tuple[str, int, int]:
+        """旧的三元组视图（测试与日志里比形状时更省字）。"""
+        return (self.action, self.plug_hash, self.socket_index)
+
+
+def plug_already_installed(result: dict | None) -> bool:
+    """1679 `DestinySocketAlreadyHasPlug`：这个槽**已经装着这颗**了。
+
+    上游却把它包在 HTTP 500 里回（"The request to modify an item failed. Refresh the item
+    and try again."），照字面读会当成失败。真相是**想要的状态已经成立**，不是错误。
+
+    为什么必须单独判：`equip_build` 的模组循环把 `ErrorCode != 1` 当失败，一颗"已经装着"
+    就会让整条配装回退 —— 2026-09-23 真机实测那次回退花了 **3.5 分钟**（5 件搬回仓库 +
+    重新装回原来的护甲 + 回读核对），而账号其实一直是好的。`equip_mod` 那条路早就是这么判的，
+    这次把它抽成两处共用的一条判据。
+    """
+    if not result:
+        return False
+    text = f"{result.get('Message', '')} {result.get('ErrorStatus', '')}"
+    return result.get("ErrorCode") == 1679 or "DestinySocketAlreadyHasPlug" in text
+
+
 class ModSocketMixin(PlugLookupMixin):
     """护甲模组一侧的读取与写入规划。"""
+
+    def keep_mod_step(self, item: LoadoutItem, mod_hash: int, socket_index: int) -> MoveItemStep:
+        """"已经装着、未改动"的回执步骤（预检认出来的那种，没调用上游）。"""
+        return MoveItemStep(
+            action="mod",
+            detail=(
+                f"'{item.name}' 插槽 {socket_index} 已经装着 "
+                f"'{self.mod_label(mod_hash)}'，未改动"
+            ),
+            success=True,
+        )
+
+    def blocked_mod_step(
+        self, item: LoadoutItem, mod_hash: int, socket_index: int, reason: str
+    ) -> MoveItemStep:
+        """这一位装不上这颗的回执：写不了就说清为什么，且**不连累整条配装**。"""
+        return MoveItemStep(
+            action="mod_blocked",
+            detail=(
+                f"'{item.name}' 插槽 {socket_index} 的模组 "
+                f"'{self.mod_label(mod_hash)}' 装不上：{reason}"
+            ),
+            success=False,
+        )
+
+    def mod_label(self, mod_hash: int) -> str:
+        """模组 hash → 中文名（查不到就退回 hash 本身）。
+
+        回执是给人看的：写 hash 等于让调用方再查一次 Manifest，或者干脆再逐件查一遍护甲 ——
+        后者实测会让一次装备链路多 5 次往返。
+        """
+        definition = self._manifest.get_item_info(mod_hash) or {}
+        name = (definition.get("displayProperties") or {}).get("name")
+        return str(name) if name else str(mod_hash)
 
     _MOD_CATEGORY_HASHES = set(ManifestManager._ARMOR_MOD_CATEGORIES) | {
         595201146,   # Legacy EnhancementsArtifice
@@ -202,6 +273,8 @@ class ModSocketMixin(PlugLookupMixin):
         )
 
         assigned_sockets: set[int] = set()
+        keep_operations: list[ModOperation] = []
+        blocked_operations: list[ModOperation] = []
         target_operations: list[tuple[int, int, int]] = []
         for mod_hash, exact_socket_index in requested:
             socket_index = (
@@ -229,6 +302,14 @@ class ModSocketMixin(PlugLookupMixin):
 
             target_cost = self._plug_energy_cost(mod_hash)
             current_hash = sockets[socket_index].get("plugHash", 0)
+            if current_hash and to_unsigned(int(current_hash)) == to_unsigned(mod_hash):
+                # 这个槽**已经装着这颗**：想要的状态已经成立，不排写入。
+                # 上游对"再装一次"回的是 HTTP 500 + 1679（客户端还会退避重试四次，
+                # 真机实测每颗白花约 10 秒），而 1679 一旦被当成失败，整条配装还会回退
+                # 3.5 分钟。这里提前认出来，回执里仍然如实说"已装着、未改动"。
+                assigned_sockets.add(socket_index)
+                keep_operations.append(ModOperation("keep", mod_hash, socket_index))
+                continue
             if insertable is not None:
                 state = self.plug_is_insertable(
                     insertable,
@@ -238,14 +319,16 @@ class ModSocketMixin(PlugLookupMixin):
                     int(current_hash or 0),
                 )
                 if state is False:
+                    # 这一位装不上这颗（组件 207 的清单里没有）。**不抛错、不回退整条配装**：
+                    # 装备照换，这一颗如实报"装不上"并给出插入条件（ADR-013 的口径）。
                     conditions = self.plug_insertion_conditions(mod_hash)
-                    raise TransferError(
-                        "模组预检",
-                        f"'{item.name}' 插槽 {socket_index} 的模组 {mod_hash} 不在 Bungie 给"
-                        "这一位角色的可插入清单里（实测这种写入会被回 1676，游戏里同样装不上）。"
-                        "它的插入条件是："
+                    assigned_sockets.add(socket_index)
+                    blocked_operations.append(ModOperation(
+                        "blocked", mod_hash, socket_index,
+                        "不在 Bungie 给这一位角色的可插入清单里（游戏里同样装不上）。插入条件是："
                         + ("；".join(conditions) if conditions else "上游没给条件文本"),
-                    )
+                    ))
+                    continue
             current_cost = self._plug_energy_cost(current_hash) if current_hash else 0
             if target_cost is None or current_cost is None:
                 raise TransferError(
@@ -283,7 +366,7 @@ class ModSocketMixin(PlugLookupMixin):
             delta for delta, _, _ in target_operations
         )
         deficit = max(0, projected_used - capacity)
-        clear_operations: list[tuple[str, int, int]] = []
+        clear_operations: list[ModOperation] = []
         if deficit:
             item_definition = self._manifest.get_item_definition(item.item_hash)
             socket_entries = (
@@ -339,13 +422,15 @@ class ModSocketMixin(PlugLookupMixin):
                 chosen = min(sufficient) if sufficient else remaining[0]
                 remaining.remove(chosen)
                 freed, socket_index, default_hash = chosen
-                clear_operations.append(("clear", default_hash, socket_index))
+                clear_operations.append(ModOperation("clear", default_hash, socket_index))
                 deficit -= freed
 
         return [
             *clear_operations,
+            *keep_operations,
+            *blocked_operations,
             *[
-                ("mod", mod_hash, socket_index)
+                ModOperation("mod", mod_hash, socket_index)
                 for _, mod_hash, socket_index in sorted(target_operations)
             ],
         ]

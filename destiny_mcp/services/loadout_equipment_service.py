@@ -24,7 +24,7 @@ from ..models import (
 from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
 from .account_action_lock import account_action_lock
-from .loadout_mod_sockets import ModSocketMixin
+from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
 from .loadout_recovery import RecoveryStateMixin
 from .loadout_subclass_sockets import SubclassSocketMixin
 
@@ -212,9 +212,16 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
 
         blocked_mods: list[tuple[str, int, str]] = []
         for lo_item in loadout.items:
-            for operation, mod_hash, socket_idx in mod_operations.get(
+            for operation, mod_hash, socket_idx, reason in mod_operations.get(
                 lo_item.item_instance_id, []
             ):
+                if operation == "keep":
+                    steps.append(self.keep_mod_step(lo_item, mod_hash, socket_idx))
+                    continue
+                if operation == "blocked":
+                    # 装不上的那一颗：不写、也不回退整条配装，如实报给玩家（ADR-013）。
+                    steps.append(self.blocked_mod_step(lo_item, mod_hash, socket_idx, reason))
+                    continue
                 try:
                     mod_result = await self._insert_armor_mod(
                         lo_item.item_instance_id,
@@ -223,17 +230,32 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                         char_id,
                         mtype,
                     )
-                    ok = mod_result.get("ErrorCode", 0) == 1
                     upstream = str(mod_result.get("Message") or "").strip()
-                    steps.append(MoveItemStep(
-                        action="mod_clear" if operation == "clear" else "mod",
-                        detail=(
-                            f"为属性模组腾出能量：'{lo_item.name}' 插槽 {socket_idx}"
+                    # 1679 = 这个槽已经装着它了：状态已成立，不算失败（当成失败会让整条配装
+                    # 回退，真机实测 3.5 分钟）。判据与 equip_mod 那条路共用一份。
+                    already = plug_already_installed(mod_result)
+                    ok = mod_result.get("ErrorCode", 0) == 1 or already
+                    # 回执写**模组名字**：这份 steps 是调用方唯一的写后证据，写 hash 会逼它
+                    # 再逐件查护甲（实测一次链路因此多 5 次往返）。
+                    mod_label = self.mod_label(mod_hash)
+                    if already:
+                        detail = (
+                            f"'{lo_item.name}' 插槽 {socket_idx} 已经空着"
                             if operation == "clear"
-                            else f"模组 {mod_hash} → '{lo_item.name}'"
+                            else f"'{lo_item.name}' 插槽 {socket_idx} 已经装着 '{mod_label}'，未改动"
+                        )
+                    else:
+                        detail = (
+                            f"为 '{mod_label}' 腾出能量：'{lo_item.name}' 插槽 {socket_idx}"
+                            if operation == "clear"
+                            else f"模组 '{mod_label}' → '{lo_item.name}'"
                         )
                         # 失败要带上游原文（以前只写"为…腾出能量"，真因看不到）
-                        + ("" if ok else f" 失败：{upstream or '上游没给原因'}"),
+                        if not ok:
+                            detail += f" 失败：{upstream or '上游没给原因'}"
+                    steps.append(MoveItemStep(
+                        action="mod_clear" if operation == "clear" else "mod",
+                        detail=detail,
                         success=ok,
                     ))
                     if not ok:
@@ -355,7 +377,12 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
             )
         verified = False
         if applied.success:
-            verification_detail = "执行结果与确认的配装不一致。"
+            # 有模组被上游挡住时，"对不上"的原因就是它 —— 别让调用方以为整个装备都没生效。
+            blocked = [step for step in applied.steps if step.action == "mod_blocked"]
+            verification_detail = (
+                f"有 {len(blocked)} 颗模组没装上（见 mod_blocked 步骤），其余已按确认内容写入。"
+                if blocked else "执行结果与确认的配装不一致。"
+            )
             try:
                 verified = await self._verify_loadout(player_name, loadout)
             except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:
@@ -490,3 +517,4 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                 return False
 
         return True
+

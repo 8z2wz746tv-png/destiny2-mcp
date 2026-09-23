@@ -374,6 +374,10 @@ async def equip_build(
 
     两条路最后都走 `equip_build` 的服务端校验：玩家绑定、10 分钟 TTL、内容一致、
     一次确认只能执行一次。
+
+    写后证据就在响应里：`result.steps[]` 的 `verify` 步骤是服务端**回读核对**过的结论
+    （实例、模组、子职业），`mod` 步骤按名字给出装了哪颗模组。调用方不必再逐件查
+    `inventory_assistant(intent="item")` —— 实测那样一次链路要多 5 次往返。
     """
     if canonical_build is None and execution_id:
         candidate = svc["build_svc"].get_build_candidate(player_name, execution_id)
@@ -424,6 +428,18 @@ async def equip_build(
                 "tool": "build_assistant",
                 "arguments": {"intent": "recommend", "character": character},
             }],
+        )
+    blocked = [
+        step for step in (result.get("steps") or [])
+        if step.get("action") == "mod_blocked"
+    ]
+    if blocked:
+        # 装备生效了、验货却对不上，原因就是这几颗 —— 摘要要这么说，
+        # 别让"已装备"盖过它们（口径：写不进去不回退，但要如实汇报）。
+        return ok_response(
+            f"配装已装备，但有 {len(blocked)} 颗模组装不上（原因见 warnings 与 steps）。",
+            {"result": result},
+            warnings=[str(step.get("detail") or "") for step in blocked],
         )
     return ok_response("配装装备流程已执行。", {"result": result})
 

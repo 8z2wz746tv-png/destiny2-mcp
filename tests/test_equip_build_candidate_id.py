@@ -48,8 +48,9 @@ def _candidate(execution_id: str = "cand-1") -> dict[str, Any]:
 class _BuildService:
     """记录"取候选"与"真装备"两次调用，顺序也记下来。"""
 
-    def __init__(self, candidate: dict[str, Any]) -> None:
+    def __init__(self, candidate: dict[str, Any], equip_result: dict[str, Any] | None = None) -> None:
         self.candidate = candidate
+        self.equip_result = equip_result or {"success": True, "message": "已装备", "steps": []}
         self.calls: list[tuple] = []
 
     # 同步方法：候选暂存在进程内，不碰网络（真机语料 ⑯b 抓到过工具层误 await）
@@ -59,7 +60,7 @@ class _BuildService:
 
     async def equip_build(self, player_name: str, build: Any, character: str) -> dict[str, Any]:
         self.calls.append(("equip_build", player_name, build, character))
-        return {"success": True, "message": "已装备", "steps": []}
+        return self.equip_result
 
 
 @pytest.fixture
@@ -184,3 +185,33 @@ def test_result_rows_expose_the_candidate_id_as_a_scalar() -> None:
         score=0.0, completion_rate=0.0, build=BuildCandidate(class_type="hunter", items=armor)
     )
     assert without_canonical.model_dump()["execution_id"] == "", "没候选时给空串，不编一个 ID"
+
+
+async def test_blocked_mods_are_reported_not_hidden_behind_success(
+    preview_stub: list[dict[str, Any]],
+) -> None:
+    """装备生效但有一颗模组装不上时，摘要不许只说「已装备」——原因要露出来。
+
+    口径（ADR-013/014）：写不进去不回退，但要如实汇报。这条钉住工具层的话术，
+    别让 ok=true 盖过 mod_blocked。
+    """
+    reason = "'至高狂徒面具' 插槽 11 的模组 'XXX' 装不上：不在 Bungie 给这一位角色的可插入清单里"
+    service = _BuildService(
+        {"success": True, "build": _candidate()},
+        equip_result={
+            "success": True,
+            "message": "已装备",
+            "steps": [
+                {"action": "mod_blocked", "detail": reason, "success": False},
+                {"action": "verify", "detail": "有 1 颗模组没装上（见 mod_blocked 步骤）。", "success": False},
+            ],
+        },
+    )
+
+    result = await _armor_branches.equip_build(
+        {"build_svc": service}, "Tester#1234", None, "cand-1", "hunter", True
+    )
+
+    assert result["ok"] is True
+    assert "1 颗模组装不上" in result["summary"]
+    assert reason in result["warnings"]

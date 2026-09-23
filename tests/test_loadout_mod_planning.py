@@ -264,7 +264,7 @@ async def test_prepare_mod_operations_uses_explicit_socket_map_in_order() -> Non
         {"item-1": {"energy": {"energyCapacity": 10, "energyUsed": 0}}},
     )
 
-    assert operations == [("mod", 600, 1), ("mod", 601, 3)]
+    assert [op.as_tuple() for op in operations] == [("mod", 600, 1), ("mod", 601, 3)]
 
 
 async def test_prepare_mod_operations_rejects_a_mod_without_a_unique_socket() -> None:
@@ -321,7 +321,9 @@ async def test_prepare_mod_operations_derives_used_energy_from_sockets() -> None
     )
 
     # 推导出的已用能量是 5 + 5 = 10；加目标 4 点后超 6 点上限，必须腾出两个插槽。
-    assert operations == [("clear", 800, 0), ("clear", 800, 1), ("mod", 600, 2)]
+    assert [op.as_tuple() for op in operations] == [
+        ("clear", 800, 0), ("clear", 800, 1), ("mod", 600, 2)
+    ]
 
 
 async def test_prepare_mod_operations_clears_minimum_energy_first() -> None:
@@ -350,7 +352,7 @@ async def test_prepare_mod_operations_clears_minimum_energy_first() -> None:
         {"item-1": {"energy": {"energyCapacity": 6, "energyUsed": 3}}},
     )
 
-    assert operations == [("clear", 800, 1), ("mod", 600, 0)]
+    assert [op.as_tuple() for op in operations] == [("clear", 800, 1), ("mod", 600, 0)]
 
 
 async def test_prepare_mod_operations_refuses_when_energy_cannot_be_freed() -> None:

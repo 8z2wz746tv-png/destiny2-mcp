@@ -21,7 +21,7 @@ from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
 from ..vocabulary import LEGACY_STAT_ALIASES
 from . import profile_components
-from .loadout_mod_sockets import ModSocketMixin
+from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
 
 # 属性模组（+5/+10 六维）与部位功能模组在插槽里分属不同 plug 类别，名字可能撞车，
 # 所以解析模组名时只在"护甲模组"这一类里找。
@@ -433,7 +433,7 @@ class ArmorModService(ModSocketMixin):
         if code != 1:
             message = str((result or {}).get("Message") or "Bungie 没有说明原因")
             status = str((result or {}).get("ErrorStatus") or "")
-            if "DestinySocketAlreadyHasPlug" in f"{status} {message}":
+            if plug_already_installed(result if isinstance(result, dict) else None):
                 # 1679：这个槽**已经装着**这颗了。用户要的状态已经成立，不是失败 ——
                 # 报成失败会让人以为要重试。以前"已装的那颗认不出来"是因为 `_find_mod_socket`
                 # 拿有符号 hash 比无符号的实时 plugHash（ADR-013），现在两边都转无符号了，

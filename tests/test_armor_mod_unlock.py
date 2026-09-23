@@ -16,7 +16,9 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from typing import Any
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -28,6 +30,7 @@ from destiny_mcp.services.armor_payload import (
     slot_key_from_bucket,
 )
 from destiny_mcp.services.loadout_equipment_service import LoadoutEquipmentService
+from destiny_mcp.services.loadout_mod_sockets import ModOperation
 
 HELMET_BUCKET = 3448274439          # 无符号（真机 Manifest 里就是这个值）
 HELMET_BUCKET_SIGNED = -846692857   # 老代码抄的那个有符号值
@@ -479,9 +482,14 @@ def test_mod_write_blocker_separates_scope_and_in_game() -> None:
 # ── 配装预检：写之前就说清，别写一半才让上游拒 ──────────────────────────
 
 
-async def test_prepare_mod_operations_refuses_a_locked_mod_before_writing(
+async def test_prepare_mod_operations_blocks_a_locked_mod_without_failing_the_build(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """不在这一位的可插入清单里 → 标成 `blocked` 并带上插入条件，**不抛错**。
+
+    2026-09-23 真机：以前这里抛错 → 整条 equip_build 失败并回退（一次白烧 4 分钟），
+    而正确口径是"装备照换、这一颗如实报装不上"（ADR-013）。
+    """
     manifest = _plan_manifest()
     _patch_plug_set(monkeypatch, manifest)
     service = _equipment(manifest)
@@ -490,12 +498,15 @@ async def test_prepare_mod_operations_refuses_a_locked_mod_before_writing(
                        item_instance_id="item-1", mods=[LOCKED_MOD],
                        mod_sockets={0: LOCKED_MOD})
 
-    with pytest.raises(TransferError, match="必须在赛季神器中选择"):
-        await service._prepare_mod_operations(
-            item, "1", 3, {"item-1": [{"plugHash": EMPTY_PLUG}]},
-            {"item-1": {"energy": {"energyCapacity": 11, "energyUsed": 0}}},
-            {PLUG_SET: {UNLOCKED_MOD}},
-        )
+    operations = await service._prepare_mod_operations(
+        item, "1", 3, {"item-1": [{"plugHash": EMPTY_PLUG}]},
+        {"item-1": {"energy": {"energyCapacity": 11, "energyUsed": 0}}},
+        {PLUG_SET: {UNLOCKED_MOD}},
+    )
+
+    assert [operation.action for operation in operations] == ["blocked"]
+    assert operations[0].plug_hash == LOCKED_MOD
+    assert "必须在赛季神器中选择" in operations[0].reason
 
 
 async def test_prepare_mod_operations_skips_the_check_without_a_list(
@@ -514,10 +525,83 @@ async def test_prepare_mod_operations_skips_the_check_without_a_list(
         None,
     )
 
-    assert operations == [("mod", LOCKED_MOD, 0)]
+    assert [op.as_tuple() for op in operations] == [("mod", LOCKED_MOD, 0)]
 
 
 # ── 1679：这个槽已经装着它了 ────────────────────────────────────────────
+
+
+async def test_preflight_never_queues_a_write_for_an_installed_plug() -> None:
+    """预检发现"这个槽已经装着这颗"时**不排写入**：省掉上游那四次 500 重试。
+
+    真机实测每颗白花约 10 秒（HTTP 500 + 退避重试），而它本来只是个 no-op。
+    这里用「有符号/无符号」写法不同、实为同一颗来验（hash 比较必须过 `to_unsigned`）。
+    """
+    service = _equipment(_plan_manifest())
+    sockets = [{"plugHash": UNSIGNED_MOD}, {"plugHash": EMPTY_PLUG}]
+    item = LoadoutItem(
+        item_hash=HELMET_ITEM, name="光芒领主面具", slot="helmet",
+        item_instance_id="item-1", mod_sockets={0: SIGNED_MOD},
+    )
+
+    operations = await service._prepare_mod_operations(
+        item, "mid", 3, {"item-1": sockets},
+        {"item-1": {"energy": {"energyCapacity": 11, "energyUsed": 3}}},
+    )
+
+    assert [op.as_tuple() for op in operations] == [("keep", SIGNED_MOD, 0)], operations
+
+
+async def test_equip_build_treats_an_already_installed_plug_as_success() -> None:
+    """`equip_build` 的模组循环也要把 1679 当"状态已成立"。
+
+    真机（2026-09-23，性能基线那次）：一颗模组回 1679 被当成失败 → 整条配装回退，
+    5 件搬回仓库 + 装回原护甲 + 回读核对，实测 **331 秒**，而账号一直是好的。
+    这条钉住"不许回退、也不许报失败"。
+    """
+    from destiny_mcp.models import Loadout
+
+    class _Transfer:
+        async def transfer_item(self, *args: Any, **kwargs: Any) -> Any:
+            return SimpleNamespace(success=True)
+
+        async def equip_items(self, *args: Any, **kwargs: Any) -> dict:
+            return {"success": True}
+
+    service = _equipment(_plan_manifest())
+    service._resolver = SimpleNamespace(
+        resolve_player=AsyncMock(return_value={"membership_id": "mid", "membership_type": 3}),
+        get_profile=AsyncMock(return_value={
+            "characters": {"data": {"char-1": {"classType": 1}}},
+            "itemComponents": {"instances": {"data": {}}, "sockets": {"data": {}}},
+        }),
+    )
+    service._transfer = _Transfer()
+    service._prepare_mod_operations = AsyncMock(
+        return_value=[ModOperation("mod", LOCKED_MOD, 1)]
+    )
+    service._insert_armor_mod = AsyncMock(return_value={
+        "ErrorCode": 1679,
+        "Message": "The request to modify an item failed. Refresh the item and try again.",
+        "ErrorStatus": "DestinySocketAlreadyHasPlug",
+    })
+
+    loadout = Loadout(
+        id="exact",
+        name="Exact",
+        character="hunter",
+        items=[LoadoutItem(
+            item_hash=HELMET_ITEM, name="光芒领主面具", slot="helmet",
+            item_instance_id="item-1", mods=[LOCKED_MOD],
+        )],
+    )
+    result = await service._equip_local_unlocked("Alpha#0100", loadout)
+
+    mod_steps = [step for step in result.steps if step.action == "mod"]
+    assert mod_steps, result.steps
+    assert mod_steps[0].success is True, mod_steps[0].detail
+    assert "已经装着" in mod_steps[0].detail
+    assert result.success is True, result.message
 
 
 async def test_apply_treats_an_already_installed_plug_as_a_no_op() -> None:
