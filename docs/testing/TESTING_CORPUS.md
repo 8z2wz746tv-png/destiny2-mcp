@@ -11,7 +11,7 @@
 | **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 26 行）／`scripts/run_corpus_starside_entities.py`（Starside 实体层 8 行，见文末那一章）／**
 - `scripts/run_corpus_pvp_rows.py` —— PvP/生涯**口径**的真机语料（19 行，冷启约 1 分钟）：游戏内 ID、生涯三档（现存/已删/账号级）、计数器 124,495、试炼/铁旗/赛季、`period=season` 如实失败、武器榜 `all_modes`、模式词表外报错、equip 只给计划、**PGCR 参与者名一律游戏内 ID**、**排行榜空响应如实上报**、**PvP 武器榜（`pvp_weapons`）的窗口/口径/模式过滤与智谋 PvPvE 标记**、**PvE 模式词被拒**、**`count=0` 与不传等价（哨兵规则）**。
    真机提示：这批行会真的打上游，偶发上游读抖动（profile 类读失败）会让个别行红；先重跑一次再判断是不是回归 —— 连续两次红才是回归。盯的是**口径**，信封与形状仍归 `run_corpus_all_rows.py`。
-`scripts/run_corpus_all_rows.py`（八工具面全 intent + 字段级 + 协议层，见 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)）**／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线）／`benchmark_equip_chain.py`（装备链条**分段计时**：默认只读，`--write` 才真写账号；动装备流程时用它留改前/改后数字） | 改动任一工具面后 |
+`scripts/run_corpus_all_rows.py`（八工具面全 intent + 字段级 + 协议层，见 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)）**／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线）／`benchmark_equip_chain.py`（装备链条**分段计时**：默认只读，`--write` 才真写账号）／`benchmark_ladder.py`（无解阶梯分段计时，只读）—— 动装备流程或阶梯时用它们留改前/改后数字 | 改动任一工具面后 |
 | **L2 冒烟**（本文件带 ⭐ 的行，25 条） | 真机逐条调用 | 每轮回归开始时跑一遍 |
 | **L3 补测**（本文件其余行） | 真机逐条调用 | **只在该工具被改动时**跑它那一章 |
 
