@@ -277,16 +277,26 @@ async def main():
             f"code={(again.get('error') or {}).get('code')} 预览件数={len((again.get('candidates') or [{}])[0].get('items_preview') or [])}",
         )
 
-        # 10b. 只发标量的宿主：给候选 ID 等于给整块 canonical_build（豆包 connector 那条路）
-        by_id = await build(intent="equip_build",
-                            execution_id=canonical.get("execution_id", ""), confirmed=False)
+        # 10b. 只发标量的宿主：给候选 ID 等于给整块 canonical_build（豆包 connector 那条路）。
+        # **必须现解一次**：候选 10 分钟过期，而这一行离上面那次求解已经十几分钟了
+        # （2026-09-23 实跑抓到：拿旧 ID 只会得到 unknown_execution_id，那是行的错不是代码的错）。
+        # 顺便验证候选行顶层那个标量 execution_id —— 标量宿主就是靠它取 ID 的。
+        fresh = await build(intent="find", character="hunter", exotic_name="快速装弹松身裤",
+                            weapons_target=150, class_target=100,
+                            grenade_target=70, melee_target=70, super_target=80)
+        if (fresh.get("error") or {}).get("code") == "exotic_confirmation_required":
+            fresh = await build(**dict(fresh["candidates"][0]["arguments"]))
+        fresh_top = ((fresh.get("data") or {}).get("builds") or [{}])[0]
+        fresh_id = fresh_top.get("execution_id") or ""
+        by_id = await build(intent="equip_build", execution_id=fresh_id, confirmed=False)
         by_id_echo = (by_id.get("candidates") or [{}])[0]
         check(
             "⑯b 只给 execution_id 也能确认：回显同一个 ID + 五件预览（标量宿主不被卡住）",
-            by_id.get("error", {}).get("code") == "confirmation_required"
-            and by_id_echo.get("execution_id") == canonical.get("execution_id")
+            bool(fresh_id)
+            and by_id.get("error", {}).get("code") == "confirmation_required"
+            and by_id_echo.get("execution_id") == fresh_id
             and len(by_id_echo.get("items_preview") or []) == 5,
-            f"code={(by_id.get('error') or {}).get('code')} "
+            f"顶层 ID={fresh_id!r} code={(by_id.get('error') or {}).get('code')} "
             f"回显 ID={by_id_echo.get('execution_id')!r} "
             f"预览件数={len(by_id_echo.get('items_preview') or [])}",
         )
