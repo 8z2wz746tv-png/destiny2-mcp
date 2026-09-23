@@ -2,6 +2,44 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.7.0 — 2026-09-23
+
+**发版前复验**：全量测试 1794 passed；护甲语料真机 26/26 PASS（含新增的 ⑯b「只给
+`execution_id` 也能确认」，并更正了 3 条过期行）；ruff 干净。
+
+**为什么发这一版**：用户在豆包上连同一个服务端，官方 SDK 能通、宿主 connector 不通 ——
+connector 转发工具调用时只序列化标量，`list[str]` / `dict` 参数根本送不到服务端
+（`required_perks` 变 `[[]]`、`changes` 直接消失），perk 筛选、批量装备、子职业修改、
+配装硬约束与整条「确认后装备」都用不了。这一版把这条路补上（ADR-016）：
+
+**新增：只发标量的宿主也能送结构化参数（文本写法）** —— 2026-09-23：
+
+- `required_perks`/`any_perks`/`excluded_perks`/`priority_stats`/`fragment_names`/
+  `item_instance_ids` 收 `"亡者复仇,速射"`，`stat_caps`/`changes` 收 `"grenade=100,melee=90"`；
+  分隔符认半角/全角逗号、顿号、分号与换行，键值认 `=`、`:`、`：`。原生 `list`/`dict` 仍是一等公民，
+  schema 里两种形态并列。空串按「没传」；写法不对回 `invalid_arguments` + 可照抄的例子。
+- 规则唯一出处 `destiny_mcp/utils/arg_text.py`；`destiny_mcp/tools/_coerce.py` 登记类型并在
+  `@handle_tool_error` 之内、模型校验与参数归属检查之前还原一次。
+  顺带清掉历史上 `weapon_roll_filter_service._split_terms` 自己那份 `split(",")`（只认半角逗号）。
+
+**新增：`equip_build` 也收 `execution_id`（代替整块 `canonical_build`）** —— 2026-09-23：
+
+- 装备凭据本来就是「服务端签发」，不是「调用方回传的内容」：服务端把候选存在进程内，
+  执行前按 ID 取回并核对玩家绑定、10 分钟 TTL、内容一致、一次确认只能用一次。
+  给 ID 时**内容不经过调用方**，比回传整块 JSON 更不可能被篡改。
+- 候选行顶层新增派生字段 `execution_id`（标量，与 `canonical_build.execution_id` 同源），
+  确认回显里也带一份。旧路径（整块 `canonical_build`）一个字节没变。
+- 候选暂存从 `build_service.py` 拆到 `services/build_candidates.py`（那边贴着体积上限）；
+  `resolve()` 用 `ok`/`unknown`/`expired`/`player_mismatch` 状态表达失败，话术才对得上。
+
+**修复：护甲语料 3 条过期行按现状更正** —— 2026-09-23（改护甲响应前请照旧跑 `run_corpus_armor_rows.py`）：
+
+- ⑲ 拿 `紫装` 当「乱填」：它是登记过的玩家口语别名（= 传说），改成真不认识的词才测得出报错；
+- ㉑ 还写着「调谐只能游戏内改」：ADR-014 起调谐可写，且 `equip_mod` 是自守卫写入
+  （方案在 `candidates[0]`，不在 `data.armor_mod`）；
+- ㉔ 断言「没有 AdvancedWriteActions 必须失败」：权限取决于应用配置，不能当行为断言 ——
+  改成「成功要有 `installed` 回执、失败要如实说原因，两边都不许反着说」。
+
 ## 0.6.0 — 2026-09-23
 
 **发版前复验**：全量测试 1764 passed；数据审计全对得上；实体语料 8/8、武器章节语料 17/17；
