@@ -277,6 +277,20 @@ async def main():
             f"code={(again.get('error') or {}).get('code')} 预览件数={len((again.get('candidates') or [{}])[0].get('items_preview') or [])}",
         )
 
+        # 10b. 只发标量的宿主：给候选 ID 等于给整块 canonical_build（豆包 connector 那条路）
+        by_id = await build(intent="equip_build",
+                            execution_id=canonical.get("execution_id", ""), confirmed=False)
+        by_id_echo = (by_id.get("candidates") or [{}])[0]
+        check(
+            "⑯b 只给 execution_id 也能确认：回显同一个 ID + 五件预览（标量宿主不被卡住）",
+            by_id.get("error", {}).get("code") == "confirmation_required"
+            and by_id_echo.get("execution_id") == canonical.get("execution_id")
+            and len(by_id_echo.get("items_preview") or []) == 5,
+            f"code={(by_id.get('error') or {}).get('code')} "
+            f"回显 ID={by_id_echo.get('execution_id')!r} "
+            f"预览件数={len(by_id_echo.get('items_preview') or [])}",
+        )
+
         # 11. 只给优先级时 completion_rate 不是 0.0
         only_priority = await build(intent="recommend", character="hunter",
                                     exotic_name="快速装弹松身裤",
@@ -305,10 +319,12 @@ async def main():
             f"副本={[(row.get('item_instance_id'), row.get('power')) for row in copies[:3]]}",
         )
 
-        # 13. 稀有度：中英必须同结果；乱填必须报错（以前中文被静默忽略）
+        # 13. 稀有度：中英必须同结果；乱填必须报错（以前中文被静默忽略）。
+        # 乱填用**确实不认识**的词：`紫装`/`金枪` 是登记过的玩家口语别名（= 传说/异域），
+        # 拿它们当乱填会让这一行判错（2026-09-23 实跑抓到这条过期期望）。
         zh = await inv(intent="get", armor_slot="legs", rarity="异域", limit=50)
         en = await inv(intent="get", armor_slot="legs", rarity="exotic", limit=50)
-        bad = await inv(intent="get", armor_slot="legs", rarity="紫装", limit=5)
+        bad = await inv(intent="get", armor_slot="legs", rarity="彩虹", limit=5)
         zh_total = ((zh.get("data") or {}).get("inventory") or {}).get("total_items")
         en_total = ((en.get("data") or {}).get("inventory") or {}).get("total_items")
         all_total = (((await inv(intent="get", armor_slot="legs", limit=1)).get("data") or {})
@@ -333,28 +349,27 @@ async def main():
             f"next_actions={len(heavy.get('next_actions') or [])}",
         )
 
-        # 15. 调谐（P7）：写路径认得调谐插件名，歧义说法让调用方挑，且确认前不写
+        # 15. 调谐：写路径认得调谐插件名（2026-09-22 起可写，见 ADR-014），
+        # 方案在 candidates[0]（equip_mod 是自守卫写入：confirmed=false 只出方案，不写账号）
         legs_id = T5_LEGS
         plan_tuning = await inv(intent="equip_mod", item_instance_id=legs_id,
                                 mod_name="+武器 / -生命值", character="hunter",
                                 confirmed=False)
-        pending = (plan_tuning.get("data") or {}).get("armor_mod") or {}
+        pending = (plan_tuning.get("candidates") or [{}])[0]
         bonus = (pending.get("to") or {}).get("stat_bonus") or {}
         energy = pending.get("energy") or {}
         check(
-            "㉑ 调谐写不进去：equip_mod 给方案 + 明说「只能在游戏内改」，一个字节都不写",
-            plan_tuning["ok"] is True
+            "㉑ 调谐可写：equip_mod 给方案 + writable=true + 零能量 + 确认前一个字节都不写",
+            (plan_tuning.get("error") or {}).get("code") == "confirmation_required"
             and pending.get("kind") == "tuning"
-            and pending.get("writable") is False
-            and pending.get("written") is False
-            and "游戏" in str((plan_tuning.get("warnings") or [""])[0])
-            and "in-game" in str((plan_tuning.get("warnings") or [""])[0])
+            and pending.get("writable") is True
+            and "written" not in pending
             and (pending.get("to") or {}).get("energy_cost") == 0
             and energy.get("after") == energy.get("used")
             and any(value < 0 for value in bonus.values()),
-            f"ok={plan_tuning.get('ok')} kind={pending.get('kind')} "
-            f"writable={pending.get('writable')} written={pending.get('written')} "
-            f"to={(pending.get('to') or {}).get('name')!r} stat_bonus={bonus}",
+            f"code={(plan_tuning.get('error') or {}).get('code')} kind={pending.get('kind')} "
+            f"writable={pending.get('writable')} 计划里带 written={'written' in pending} "
+            f"to={(pending.get('to') or {}).get('name')!r} stat_bonus={bonus} energy={energy}",
         )
 
         # 16. 调谐是零和的：歧义说法（只说加哪一项）必须让调用方挑一个
@@ -395,17 +410,26 @@ async def main():
             evidence,
         )
 
-        # 18. 付费写入（要 AdvancedWriteActions 权限）：失败必须如实报，不能说"已装上"
+        # 18. 真写一次模组：**成功要有回执，失败要如实说原因**，两边都不许反着说。
+        # 旧行钉的是"没有 AdvancedWriteActions 就必须失败"，而权限取决于应用配置；
+        # 这句话不能当成行为断言（2026-09-23 实跑：写入成功，旧行反而红）。
         paid = await inv(intent="equip_mod", item_instance_id=legs_id,
                          mod_name="手雷模组", character="hunter", confirmed=True)
         paid_msg = str((paid.get("error") or {}).get("message") or "")
+        paid_data = (paid.get("data") or {}).get("armor_mod") or {}
+        paid_summary = str(paid.get("summary") or "")
+        echoed = bool(paid_data.get("installed") or paid_data.get("already_installed"))
+        wrote_honestly = paid.get("ok") is True and echoed and (
+            "已把" in paid_summary or "已经装着" in paid_summary
+        )
+        failed_honestly = (
+            paid.get("ok") is False and bool(paid_msg) and "已把" not in paid_summary
+        )
         check(
-            "㉔ 付费模组写入：权限不足时如实报错（不把失败说成成功）",
-            (paid.get("ok") is False
-             and "AdvancedWriteActions" in paid_msg
-             and "已把" not in str(paid.get("summary"))),
+            "㉔ 模组写入：成功要有回执（installed/energy），失败要如实说原因（不许反着说）",
+            wrote_honestly or failed_honestly,
             f"ok={paid.get('ok')} code={(paid.get('error') or {}).get('code')} "
-            f"msg={paid_msg[:90]!r}",
+            f"回执={echoed} summary={paid_summary[:40]!r} msg={paid_msg[:70]!r}",
         )
 
     print("\n=== 汇总 ===")

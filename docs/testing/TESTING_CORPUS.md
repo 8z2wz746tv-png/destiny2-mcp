@@ -8,7 +8,7 @@
 | 层 | 跑什么 | 什么时候跑 |
 | --- | --- | --- |
 | **L1 自动化**（不需要账号） | `pytest -q`（1272 条）／`scripts/verify_mcp.py`／`tests/agent_behavior_cases.yaml`（路由） | 每次提交 |
-| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 25 行）／`scripts/run_corpus_starside_entities.py`（Starside 实体层 8 行，见文末那一章）／**
+| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 26 行）／`scripts/run_corpus_starside_entities.py`（Starside 实体层 8 行，见文末那一章）／**
 - `scripts/run_corpus_pvp_rows.py` —— PvP/生涯**口径**的真机语料（19 行，冷启约 1 分钟）：游戏内 ID、生涯三档（现存/已删/账号级）、计数器 124,495、试炼/铁旗/赛季、`period=season` 如实失败、武器榜 `all_modes`、模式词表外报错、equip 只给计划、**PGCR 参与者名一律游戏内 ID**、**排行榜空响应如实上报**、**PvP 武器榜（`pvp_weapons`）的窗口/口径/模式过滤与智谋 PvPvE 标记**、**PvE 模式词被拒**、**`count=0` 与不传等价（哨兵规则）**。
    真机提示：这批行会真的打上游，偶发上游读抖动（profile 类读失败）会让个别行红；先重跑一次再判断是不是回归 —— 连续两次红才是回归。盯的是**口径**，信封与形状仍归 `run_corpus_all_rows.py`。
 `scripts/run_corpus_all_rows.py`（八工具面全 intent + 字段级 + 协议层，见 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)）**／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线） | 改动任一工具面后 |
@@ -141,7 +141,7 @@
 | 指定金装 `<异域护甲原名>` | 先返回候选 | **首次查询必须返回金装候选并等确认**，不得自行选定；重试要原样回传 `confirmed_exotic_hash` + token，职业/目标/优先级/碎片不得丢失。 |
 | 不降目标，反推我该刷哪件护甲 | `farm_target`（可加 `baseline="equipped"`、`replacement_slot`） | 先查单件、再两件；待刷数值来自工具，**不能自己相减拼出来**；待刷目标不能当成已拥有。 |
 | 有哪些护甲模组／`<套装名>` 的套装效果 | `armor_mods`／`set_bonus` | 中英词表都认；词表外且一条都没命中 → `invalid_argument_error` 并列出词表；词表外但**蒙中**（如「速度」）→ 带 `match.kind="keyword"` + warning，说清这些模组并不加该属性；词表内 0 条 → `match.kind="stat"` + 「本地数据里没有」的 warning（**三种都不能读成「没有这种模组」**）；不存在的套装 → `definition_not_found_error`。 |
-| ⭐ 这套方案穿上去 | `equip_build`，`confirmed=false` | **必须传回服务端签发的 `canonical_build`**；用 `score` 或自己拼 hash 会被拒；改过库存后旧候选要重新求解。 |
+| ⭐ 这套方案穿上去 | `equip_build`，`confirmed=false` | **必须传回服务端签发的候选**：`canonical_build` 或它的 `execution_id` 二选一（只发标量的宿主用后者，一次确认只能用一次、10 分钟内有效）；用 `score` 或自己拼 hash 会被拒；改过库存后旧候选要重新求解。 |
 | 有什么热门的 `<职业>` 配装／就用第一套看我缺什么 | `community`（+ `community_build_id` + `include_inventory`） | 走**社区**模板，**不得用 `loadout_assistant`**；指定 `community_build_id` 后响应**不应再带** `results`/`next_offset`（那会把响应撑到上百 KB），只留 `selected_build` + `matched_count`；缺件来源看 `sourcing` 字段（没有 sourcing intent）；`build_template`/`solver_handoff`/`farm_options` **都不是可执行方案**。 |
 
 > 求解/校验细节由 `tests/test_build_*.py`、`test_architecture_boundaries.py` 覆盖。
@@ -322,7 +322,7 @@
 
 ## 十六、护甲：槽位、T 级、换模组与无解阶梯
 
-护甲的字段级断言由 `scripts/run_corpus_armor_rows.py` 逐行实跑（18 行，改护甲响应后必跑）；
+护甲的字段级断言由 `scripts/run_corpus_armor_rows.py` 逐行实跑（26 行，改护甲响应后必跑）；
 这一章写"该看到什么"。护甲分**两族**，规则完全不同，回答前先认清是哪一族：
 
 | | Armor 3.0（有 T 级） | 老护甲（无 T 级） |
@@ -373,6 +373,7 @@
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | ⭐ 这套穿上会换成什么 | `build_assistant(intent="equip_build")`，`confirmed=false` | `candidates[0].items_preview` 五件齐全，逐件给 `slot`/`slot_display`/`name`/`power`/`energy`/`current_mods`（现在装着什么）/`mods`（要装什么、是否已装）；`canonical_build` **保持可原样回传**（展示字段不许塞进去，否则回传会被拒） |
+| 只给候选 ID 能不能装（只发标量的宿主） | `equip_build` + `execution_id`（不给 `canonical_build`），`confirmed=false` | 与给整块候选**同一个结果**：`confirmation_required` + `candidates[0].execution_id` 回显同一个 ID + 五件 `items_preview`；候选行顶层的 `execution_id` 与 `canonical_build.execution_id` 同源。ID 过期/不是自己的 → `expired_execution_id`/`unknown_execution_id` + 重新求解的下一步 |
 
 ### E. 无解时的六维阶梯
 
