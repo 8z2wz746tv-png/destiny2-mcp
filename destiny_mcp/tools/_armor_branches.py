@@ -10,6 +10,7 @@ from typing import Any
 
 from ._enrichment import community_enrichment
 from ..services.starside_notes import (
+    class_item_pairs,
     perk_note,
     set_notes,
 )
@@ -113,8 +114,15 @@ async def armor_item(svc: Any, player_name: str, item_instance_id: str) -> dict:
 def exotic_armor(svc: Any, character: str, exotic_name: str) -> dict:
     """异域护甲列表或详情（原来在 `assistants.py` 里的分支）。"""
     if exotic_name:
+        armor = svc["manifest_query_svc"].get_exotic_armor_details(exotic_name) or {}
+        # 异域职业物品（"之灵"）有双栏配对的组合说明，数据在 perk 层的右栏与 realgame_details#2；
+        # 非职业物品时这份块是 available=false + 原因。
+        starside = class_item_pairs(
+            svc["starside_entities_svc"], svc["manifest"], int(armor.get("item_hash") or 0)
+        )
         return ok_response("已读取异域护甲详情。", {
-            "armor": svc["manifest_query_svc"].get_exotic_armor_details(exotic_name),
+            "armor": armor,
+            "starside": starside,
             "community_references": community_enrichment(
                 svc.get("starside_svc"), exotic_name, "armor"
             ),

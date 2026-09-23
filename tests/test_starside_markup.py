@@ -144,3 +144,28 @@ def test_perk_note_renders_annotations_and_reverse_index() -> None:
 
     missing = perk_note(entity, manifest, 4294967295)
     assert missing["available"] is False and "没有这颗 perk" in missing["reason"]
+
+
+def test_fragment_and_class_item_notes_render_without_markup() -> None:
+    """P5 两条接线：碎片注记（属性变化/冷却）与异域职业物品双栏配对，都不许残留站点标记。"""
+    from destiny_mcp.services.starside_notes import class_item_pairs, fragment_note
+
+    entity = StarsideEntities()
+    manifest = _Manifest()
+    perks = json.loads((ENTITIES / "perks.json").read_text(encoding="utf-8"))["perks"]
+    items = json.loads((ENTITIES / "items.json").read_text(encoding="utf-8"))["items"]
+
+    frag = next(k for k, v in perks.items() if (v.get("zh") or {}).get("属性变化"))
+    note = fragment_note(entity, manifest, "测试碎片", int(frag))
+    assert note["available"] is True and note["stat_changes"], "属性变化要给出来"
+
+    pair_item = next(k for k, v in items.items() if v.get("site_perkColumns"))
+    pairs = class_item_pairs(entity, manifest, int(pair_item))
+    assert pairs["available"] is True and pairs["columns"] >= 1 and pairs["perks"]
+
+    blob = json.dumps({"frag": note, "pairs": pairs}, ensure_ascii=False)
+    for token in ("{perk|", "{num|", "{el-", "{unsure|", "{cd|", "{spirit|", "{slot|"):
+        assert token not in blob, f"不许残留站点标记：{token}"
+
+    missing = class_item_pairs(entity, manifest, 4294967295)
+    assert missing["available"] is False and "没有异域职业物品的双栏数据" in missing["reason"]

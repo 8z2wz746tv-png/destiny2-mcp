@@ -1158,13 +1158,11 @@ async def subclass_assistant(
         return ok_response("已读取碎片列表。", {"fragments": result})
 
     if intent == "fragment_details":
-        result = svc["fragment_svc"].get_fragment_details(fragment_name)
-        return ok_response("已读取碎片详情。", {
-            "fragment": result,
-            "community_references": _community_enrichment(
-                svc.get("starside_svc"), fragment_name, "subclass"
-            ),
-        })
+        return subclass_branches.fragment_details_payload(
+            svc,
+            fragment_name,
+            _community_enrichment(svc.get("starside_svc"), fragment_name, "subclass"),
+        )
 
     artifact_result = await subclass_branches.artifact_branch(
         svc, intent, resolved, character, artifact_name, artifact_mod_hash, _action_response

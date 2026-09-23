@@ -230,7 +230,7 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
 | **P2** ✅ | perk 层接线（`perk_description` 的注记 + `onItems` 反查 + `onSets` 套装 + 异域 PERK） | perk 详情与反查（2026-09-23 落地；`perk_pool` 未接，见文末） |
 | **P3** ✅ | 神器/模组/套装层（`artifact`/`armor_mods`/`set_bonus`；`fragment_details` 见文末） | 神器关联与数值注记（2026-09-23 落地） |
 | **P4** ✅ | 帧级 DPS 模型（`derived.archetype` → 帧表）：`headline` + 完整 `rows` + 口径 | "这把枪打多少"（2026-09-23 落地） |
-| **P5** | 交叉指路（文本层 ↔ 实体层）、语料行、性能实测与体积登记 | 收尾 |
+| **P5** ✅ | 碎片详情 / 异域职业物品双栏配对 / 语料行 / 文档同步（文本层↔实体层交叉指路与 `perk_pool` 逐颗注记仍不做，理由见文末） | 收尾（2026-09-23） |
 
 ---
 
@@ -339,3 +339,16 @@ hash 一律按**无符号 32 位**比对（我们库里存的是有符号写法�
   `docs/testing/TESTING_CORPUS.md` 第 ⑨⑩ 行。**未做**：`fragment_details` 的碎片属性变化/冷却接线
   （数据与成形都已具备，挂上去是下一步）、异域职业物品双栏配对的独立展示、`perk_pool` 的逐颗注记
   （避免一次响应塞进几十颗 perk 全文）、以及"文本层 ↔ 实体层"的交叉指路。
+
+### P5 收尾（2026-09-23，第二批）
+
+- `subclass_assistant(intent="fragment_details")`：`starside` = 属性变化（分职业）/效果/冷却/碎片槽位/来源；
+  `assistants.py` 的分支收敛成 `subclass_branches.fragment_details_payload` 薄转发。
+- `build_assistant(intent="exotic_armor", exotic_name=…)`：`starside` = 异域职业物品双栏配对
+  （`右栏` + `realgame_details#2`，物品自己的 `site_perkColumns` 给栏位分组）。
+- 守门：`tests/test_starside_markup.py::test_fragment_and_class_item_notes_render_without_markup`。
+- **仍不做**（写明理由，免得以后被当成漏掉）：
+  1. `perk_pool` 逐颗注记 —— 一次响应会塞进几十颗 perk 的全文，等"按池内逐颗带注记"的需求明确再做；
+  2. 文本层 ↔ 实体层的自动交叉指路 —— 目前两边在同一响应里并存（`community_references` 与 `starside`），
+     靠字段名就分得清，不需要额外指路字段；
+  3. 帧级 DPS 的"配装联动"（换 perk/换弹药后的重算）—— 站点数据是固定条件下的实测值，联动会变成编造。

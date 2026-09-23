@@ -322,3 +322,65 @@ def set_notes(entity: StarsideEntities, manifest: Any, set_hash: int, set_name: 
         "perks": items,
         "reason": "" if items else "这套装的 perk 没有社区评语。",
     }
+
+
+def fragment_note(entity: StarsideEntities, manifest: Any, fragment_name: str, fragment_hash: int = 0) -> dict[str, Any]:
+    """碎片/星象：属性变化（分职业）、效果、冷却、碎片槽位。
+
+    碎片按**名字**给（`subclass_assistant(intent="fragment_details")` 就是这么收的），所以这里先按名
+    找 hash（找不到就用调用方给的），再查归档 —— 查不到就说查不到。
+    """
+    target = int(fragment_hash or 0)
+    if not target and fragment_name:
+        found = manifest.search(fragment_name, limit=1)
+        target = int(found[0].get("itemHash") or 0) if found else 0
+    note = perk_note(entity, manifest, target) if target else {"available": False, "reason": "没找到这个碎片的 hash。"}
+    if not note.get("available"):
+        return {**note, "attribution": entity.attribution()}
+    annotations = note.get("annotations") or {}
+    out: dict[str, Any] = {
+        "attribution": note["attribution"],
+        "available": True,
+        "stat_changes": annotations.get("属性变化"),
+        "effect": annotations.get("效果") or annotations.get("realgame_details"),
+        "cooldown": annotations.get("冷却与槽位") or annotations.get("基础冷却") or annotations.get("冷却"),
+        "slot": annotations.get("碎片槽位"),
+        "source": annotations.get("来源"),
+        "gaps": note.get("gaps") or [],
+    }
+    if not out["stat_changes"]:
+        out["gaps"].append("这颗碎片没有社区整理的属性变化（按职业分列的那种）")
+    for key in ("unresolved_tokens", "unresolved_names"):
+        if note.get(key):
+            out[key] = note[key]
+    return out
+
+
+def class_item_pairs(entity: StarsideEntities, manifest: Any, item_hash: int) -> dict[str, Any]:
+    """异域职业物品的**双栏配对**（"之灵"两条一组的组合说明）。
+
+    数据在 perk 层的 `右栏`（配对的另一条）与 `realgame_details#2`（组合后的实际效果）上；
+    物品自己的 `site_perkColumns` 给出栏位分组。
+    """
+    entry = entity.item(item_hash) or {}
+    columns = entry.get("site_perkColumns") or []
+    perks: list[dict[str, Any]] = []
+    if columns:
+        for column in columns:
+            for perk_hash in column:
+                note = perk_note(entity, manifest, int(perk_hash))
+                zh_notes = note.get("annotations") or {}
+                definition = manifest.get_item_definition(int(perk_hash)) or {}
+                perks.append({
+                    "hash": int(perk_hash),
+                    "name": (definition.get("displayProperties") or {}).get("name") or int(perk_hash),
+                    "paired_with": zh_notes.get("右栏"),
+                    "effect": zh_notes.get("realgame_details#2") or zh_notes.get("realgame_details"),
+                })
+    return {
+        "attribution": entity.attribution(),
+        "available": bool(perks),
+        "columns": len(columns),
+        "perks": perks,
+        "reason": "" if perks else "这件物品没有异域职业物品的双栏数据。",
+    }

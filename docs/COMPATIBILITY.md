@@ -30,6 +30,14 @@
 `BuildResult.score` 的**数值会整体变化**（量级从"1000+ 的加权分"变成"200~1200 的总和"）。
 只把它当"越大越好"读的调用方不受影响；把绝对值当阈值的要改。
 
+## 未发布：碎片详情与异域职业物品也带 `starside` 块（2026-09-23，同日追加）
+
+- `subclass_assistant(intent="fragment_details")`：`data.starside` = 碎片/星象的社区注记
+  （**属性变化**（分职业）、效果、冷却、碎片槽位、来源）；`community_references` 仍是页面正文检索。
+- `build_assistant(intent="exotic_armor")` 带 `exotic_name` 时：`data.starside` = 异域职业物品的
+  **双栏配对**（每条"之灵"配到谁、组合后的实际效果，来自 perk 层的 `右栏` / `realgame_details#2`）；
+  非职业物品时 `available=false` + `reason`。
+
 ## 未发布：神器/套装/护甲模组也带 `starside` 块（2026-09-23，同日追加）
 
 - `subclass_assistant(intent="artifact")`：`data.starside` = 这件神器各模组的社区注记（档位/效果/实机细节/

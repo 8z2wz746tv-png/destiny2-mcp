@@ -4,6 +4,12 @@
 
 ## 未发布
 
+**新增：碎片详情与异域职业物品双栏配对接入 Starside 社区层（P5 收尾）** —— 2026-09-23：
+
+- `subclass_assistant(intent="fragment_details")`：碎片属性变化（分职业）、效果、冷却、碎片槽位、来源。
+- `build_assistant(intent="exotic_armor", exotic_name=…)`：异域职业物品的双栏配对（配到谁 + 组合效果）。
+- 两条都带出处四件套、缺数据给原因；`assistants.py` 的 fragment 分支改成薄转发（净减行，别顶 1364 上限）。
+
 **新增：神器/套装/护甲模组接入 Starside 社区层 + 帧表头条** —— 2026-09-23：
 
 - 神器：模组注记（档位/效果/实机细节/冷却）+ 覆盖率（**当季不全要明说**）。

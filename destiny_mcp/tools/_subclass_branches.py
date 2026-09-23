@@ -17,7 +17,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..error_codes import ErrorCode
-from ..services.starside_notes import artifact_mod_notes
+from ..services.starside_notes import artifact_mod_notes, fragment_note
 from ._responses import error_response, ok_response
 
 
@@ -80,3 +80,15 @@ async def artifact_branch(
         return action_response(intent, "换神器已执行。", result)
 
     return None
+
+
+def fragment_details_payload(svc: dict[str, Any], fragment_name: str, community: dict[str, Any]) -> dict[str, Any]:
+    """`subclass_assistant(intent="fragment_details")`：碎片说明 + 页面正文检索 + 社区结构化注记。"""
+    return ok_response(
+        "已读取碎片详情。",
+        {
+            "fragment": svc["fragment_svc"].get_fragment_details(fragment_name),
+            "community_references": community,
+            "starside": fragment_note(svc["starside_entities_svc"], svc["manifest"], fragment_name),
+        },
+    )
