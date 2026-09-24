@@ -56,6 +56,15 @@ async def main() -> int:
         _wrap(build_svc._equipment, "_capture_recovery_state", "   回滚快照")
         _wrap(build_svc._equipment, "_equip_local_unlocked", "   搬运+模组")
         _wrap(build_svc._equipment, "_verify_loadout", "   回读核对")
+        # 细分：每一次网络往返都单独计时，才能说出 52.8 秒花在哪
+        _wrap(build_svc._equipment, "_apply_subclass_config", "     └ 子职业")
+        _wrap(build_svc._equipment, "_prepare_mod_operations", "     └ 模组预检(每件)")
+        _wrap(build_svc._equipment, "_insert_armor_mod", "     └ 写一颗模组")
+        _wrap(build_svc._equipment, "_restore_exact_state", "   回滚执行")
+        # `_transfer` 挂在 equipment 服务上（不是 BuildService）
+        _wrap(build_svc._equipment._transfer, "transfer_item", "     └ 搬一件")
+        _wrap(build_svc._equipment._transfer, "equip_items", "     └ 批量装备")
+        _wrap(build_svc._equipment._resolver, "get_profile", "  profile 抓取")
 
         started = time.perf_counter()
         found = await build_assistant(ctx=ctx, intent="find", **TARGETS)

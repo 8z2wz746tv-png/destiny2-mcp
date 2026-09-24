@@ -127,7 +127,9 @@ CEILINGS = {
     # 分隔符规则不在这儿，在 `destiny_mcp/utils/arg_text.py`（工具层与服务层共用一份）。
     "destiny_mcp/tools/_coerce.py": 118,
     # 候选暂存（从 build_service 拆出）：登记即上限 —— 再往里加东西先回答"是不是该拆状态与话术"。
-    "destiny_mcp/services/build_candidates.py": 101,
+    # 101 → 126：`get_build_candidate` 的判定与话术（expired/unknown 两种下一步）搬了进来，
+    # 与暂存同一处；换出来的是 build_service 的行数（那边要放"阶梯试解走并发档"）。
+    "destiny_mcp/services/build_candidates.py": 126,
     # 同上：`intent="patterns"` 的载荷与话术（总览 / 单把 / 变体 / 术语对照 /「未开始」措辞）。
     # 211 是加上"玩家说红框、游戏说模式"的术语块与变体话术（含强化插槽）之后的长度；
     # 215 = 211 + 载荷里的 by_tier 汇总。

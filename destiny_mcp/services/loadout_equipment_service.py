@@ -25,6 +25,7 @@ from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
 from .account_action_lock import account_action_lock
 from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
+from .loadout_transfer_step import TransferStepMixin
 from .loadout_recovery import RecoveryStateMixin
 from .loadout_subclass_sockets import SubclassSocketMixin
 
@@ -33,7 +34,9 @@ logger = get_logger(__name__)
 _CANCEL_ROLLBACK_TIMEOUT_SECONDS = 60
 
 
-class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocketMixin):
+class LoadoutEquipmentService(
+    RecoveryStateMixin, ModSocketMixin, SubclassSocketMixin, TransferStepMixin
+):
     """Apply loadout equipment: transfer, equip, mods, subclass config."""
 
     def __init__(
@@ -92,39 +95,13 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                 message=f"找不到角色 '{loadout.character}'。",
             )
 
-        # Step 1: Transfer every item before one batch equip. Equipping piece by
-        # piece can fail for valid exotic swaps while the old exotic is active.
-        transferred_ids: list[str] = []
-        for lo_item in loadout.items:
-            if not lo_item.item_instance_id:
-                steps.append(MoveItemStep(
-                    action="skip",
-                    detail=f"跳过 '{lo_item.name}'（无实例 ID）",
-                    success=False,
-                ))
-                all_ok = False
-                continue
-
-            try:
-                transfer_result = await self._transfer.transfer_item(
-                    player_name, lo_item.item_instance_id, loadout.character,
-                )
-                steps.append(MoveItemStep(
-                    action="transfer",
-                    detail=f"转移 '{lo_item.name}' → {loadout.character}",
-                    success=transfer_result.success,
-                ))
-                if transfer_result.success:
-                    transferred_ids.append(lo_item.item_instance_id)
-                else:
-                    all_ok = False
-            except (ItemNotFoundError, TransferError) as e:
-                steps.append(MoveItemStep(
-                    action="error",
-                    detail=f"'{lo_item.name}' 装备失败: {e}",
-                    success=False,
-                ))
-                all_ok = False
+        # Step 1: 搬运（有界并发）。顺序不能动：先都搬过来、再一起装，见 loadout_transfer_step。
+        transfer_steps, transferred_ids, transfers_ok = await self.transfer_loadout_items(
+            player_name, loadout
+        )
+        steps.extend(transfer_steps)
+        if not transfers_ok:
+            all_ok = False
 
         if loadout.items and len(transferred_ids) == len(loadout.items):
             try:
