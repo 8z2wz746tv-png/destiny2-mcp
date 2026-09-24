@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 from typing import Any, Sequence
 
 from ..build.constants import REQUEST_TARGET_FIELDS
@@ -369,10 +371,10 @@ async def no_solution_ladder(
     reason = str(getattr(analysis, "reason", ""))
     analysis_precision = str(getattr(analysis, "precision", "exact"))
 
-    trials: list[dict[str, Any]] = []
-    samples: list[dict[str, int]] = []
     probes = relaxation_probes(request, max_probes=max_probes)
-    for probe_index, probe in enumerate(probes):
+
+    async def run_probe(probe_index: int, probe: dict[str, Any]) -> dict[str, Any]:
+        """跑一档：档内按顺序试优先级顺序（换顺序要拿到结果才能决定停不停），档与档之间并发。"""
         relaxed = apply_drops(request, probe["drop"])
         probe_error = ""
         orders = sample_orders(relaxed, max_orders=2)
@@ -383,26 +385,24 @@ async def no_solution_ladder(
         for order in orders:
             candidate = relaxed.model_copy(update={"priority_stats": order})
             try:
-                results = await svc["build_svc"].find_build(player_name, candidate)
+                results = await svc["build_svc"].probe_find_build(player_name, candidate)
             except Exception as exc:  # noqa: BLE001 - 探测失败要留痕，不能算"试过没成"
                 probe_error = f"{type(exc).__name__}: {exc}"
                 logger.warning("阶梯探测 %s 失败：%s", probe["label"], exc)
                 continue
             if results:
                 stats = _stats_of(results[0])
-                samples.append(stats)
-                trials.append({
+                return {
                     "label": probe["label"],
                     "dropped": list(probe["drop"]),
                     "priority": list(order),
                     "reached": stats,
                     "ok": True,
-                })
-                break
+                }
         else:
             if probe_error:
                 # 一次都没探成：**不能**记成"试过没有解"，那会把没测过的档说成否定结论。
-                trials.append({
+                return {
                     "label": probe["label"],
                     "dropped": list(probe["drop"]),
                     "priority": None,
@@ -410,16 +410,22 @@ async def no_solution_ladder(
                     "ok": None,
                     "not_probed": True,
                     "reason": probe_error,
-                })
+                }
             else:
-                trials.append({
+                return {
                     "label": probe["label"],
                     "dropped": list(probe["drop"]),
                     "priority": None,
                     "reached": {},
                     "ok": False,
-                })
+                }
 
+    # 档与档之间**并发**：每档 1–2 次求解、每次真机实测 ~35 秒，串行五次要 187 秒；
+    # 档内仍严格顺序（试完一个优先级顺序才决定要不要换下一个），所以结果与串行逐字相同。
+    trials = list(await asyncio.gather(*(
+        run_probe(index, probe) for index, probe in enumerate(probes)
+    )))
+    samples = [trial["reached"] for trial in trials if trial.get("ok") is True]
     ceiling = ceiling_from_samples(samples)
     precision = "sampled" if samples else "not_computed"
     tuning_evidence, tuning_unavailable = await _tuning_evidence(svc, player_name, request)

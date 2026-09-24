@@ -11,6 +11,17 @@ import pytest
 from destiny_mcp.tools import _armor_ladder as ladder
 
 
+class _ProbeEntry:
+    """测试替身：阶梯走 `probe_find_build`（只读并发档）。
+
+    真实服务里它是 `find_build(compute=_probe_compute, register=False)` 的薄入口；
+    替身只需把它接到自己的 `find_build` 上。
+    """
+
+    async def probe_find_build(self, player_name, request):
+        return await self.find_build(player_name, request)
+
+
 class _Request:
     """最小 BuildRequest 替身：只要工具读得到的字段。"""
 
@@ -104,7 +115,7 @@ async def test_ladder_finds_the_smallest_relaxation_that_works() -> None:
     analysis = SimpleNamespace(max_possible={"weapons": 200}, precision="exact", reason="no_solution")
     seen: list[Any] = []
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
@@ -138,7 +149,7 @@ async def test_base_order_hint_skips_only_the_solve_the_caller_already_did() -> 
     """
     analysis = SimpleNamespace(max_possible={"weapons": 200}, precision="exact", reason="no_solution")
 
-    class _Build:
+    class _Build(_ProbeEntry):
         def __init__(self, working: bool) -> None:
             self.seen: list[tuple] = []
             self.working = working
@@ -177,7 +188,7 @@ async def test_single_stat_maximum_is_not_used_as_the_simultaneous_ceiling() -> 
         max_possible={"weapons": 200, "melee": 150}, precision="exact", reason="no_solution"
     )
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
@@ -206,7 +217,7 @@ async def test_completion_rate_becomes_na_without_hard_targets() -> None:
     """只给优先级时 completion_rate 没有意义：标 None + 说明，而不是 0.0。"""
     from destiny_mcp.tools import _build_flow
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def recommend_build(self, player_name, request):
             return {"results": [{"score": 50.3, "completion_rate": 0.0,
                                  "build": {"items": [{"slot": "helmets"}]}}]}
@@ -226,7 +237,7 @@ async def test_completion_rate_becomes_na_without_hard_targets() -> None:
 async def test_completion_rate_stays_when_targets_are_given() -> None:
     from destiny_mcp.tools import _build_flow
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def recommend_build(self, player_name, request):
             return {"results": [{"score": 51.2, "completion_rate": 1.0, "build": {}}]}
 
@@ -318,7 +329,7 @@ async def test_too_large_requests_are_refused_with_narrowing_advice() -> None:
 
     reason = too_large_reason(243_400_640, [38, 56, 38, 70, 43], 20_000_000)
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def recommend_build(self, player_name, request):
             raise BuildTooLargeError(reason)
 
@@ -400,7 +411,7 @@ async def test_ladder_pulls_tuning_evidence_from_the_inventory_service() -> None
     """有库存服务时，阶梯要说"已经试过调谐"并给出每项额度，而不是老口径的提示。"""
     analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
@@ -433,7 +444,7 @@ async def test_ladder_survives_a_failing_inventory_lookup() -> None:
     """拿不到额度数据时退回"杠杆提示"，不能让诊断跟着崩。"""
     analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
@@ -475,7 +486,7 @@ async def test_find_reports_which_candidates_need_tuning() -> None:
         "delta": {"grenade": 5, "class_stat": -5},
     }
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def find_build(self, player_name, request, coverage=None):
             return [
                 {
@@ -505,7 +516,7 @@ async def test_find_reports_which_candidates_need_tuning() -> None:
 async def test_find_hides_the_tuning_block_when_nothing_needs_it() -> None:
     from destiny_mcp.tools import _build_flow
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def find_build(self, player_name, request, coverage=None):
             return [
                 {
@@ -532,7 +543,7 @@ async def test_ladder_says_when_the_original_targets_are_impossible() -> None:
     """「原样」实测 0 候选时必须给 verdict，别让 ceiling 的逐项最大值看起来像"其实能满足"。"""
     analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
@@ -554,7 +565,7 @@ async def test_ladder_reports_insufficient_tuning_headroom_instead_of_silence() 
     """缺口比调谐额度大：也要有一档说明"补不上"，不能什么都不给。"""
     analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 

@@ -48,7 +48,7 @@ from .account_action_lock import account_action_lock, serialized_account_action
 from ..build.process_types import SearchDiagnostics
 from ..build.ranking import rank_results
 from .build_tuning import apply_local_tuning, solve_with_tuning
-from .build_candidates import BuildCandidateStore
+from .build_candidates import BuildCandidateStore, describe_candidate
 from .build_results import (
     canonical_subclass,
     LOADOUT_SLOT_NAMES as _LOADOUT_SLOT_NAMES,
@@ -443,7 +443,15 @@ class BuildService:
         player_name: str,
         request: BuildRequest,
         diagnostics: list[SearchDiagnostics] | None = None,
+        *,
+        compute: BuildCompute | None = None,
+        register: bool = True,
     ) -> list[BuildResult]:
+        """`compute` / `register` 只给**只读探测**用（阶梯的逐档试解）：
+
+        - `compute=self._probe_compute` → 走并发档；`register=False` → 不把探测出的方案
+          塞进候选暂存（一次求解 200 套，会把调用方真正要装备的那份挤出去）。
+        """
         """Find the best armor builds for the given request.
 
         Uses the DIM algorithm: 5-level nested loop + mod assignment.
@@ -528,7 +536,7 @@ class BuildService:
 
         # Step 3: Solve（含调谐补齐，见 services/build_tuning.py）——达标就原样返回；
         # 没达标才用调谐额度复解一遍（把"差 5 点"变成可执行方案）并逐套精确复核。
-        solved = await solve_with_tuning(self._compute, snapshot, parsed, self._manifest)
+        solved = await solve_with_tuning(compute or self._compute, snapshot, parsed, self._manifest)
         pool, tuning_map = solved.pool, solved.tuning_map
         # P4 便宜路径：达标之后把免费的调谐额度吃干净（0 能量、+5/−5）。局部搜索、每步过权威复核；
         # 只对进池的候选做，所以**不是全局最优的证明**（边界写在 build/tuning.local_tuning_improvement）。
@@ -567,9 +575,10 @@ class BuildService:
         # "超一点就扣分"就是加权那套写出来的。
         results = rank_results(results, parsed)
 
-        for result in results:
-            if result.canonical_build:
-                self._candidates.register(result.canonical_build, player_name)
+        if register:
+            for result in results:
+                if result.canonical_build:
+                    self._candidates.register(result.canonical_build, player_name)
 
         return results
 
@@ -605,6 +614,14 @@ class BuildService:
         if oversized:
             return BuildAnalysis(reason=oversized, precision="not_computed")
         return analyze_from_probes(parsed, await self._probe_single_stat_ceilings(snapshot, parsed))
+
+    async def probe_find_build(
+        self, player_name: str, request: BuildRequest
+    ) -> list[BuildResult]:
+        """阶梯的逐档试解：与 `find_build` 同一条路，走只读并发档、不登记候选。"""
+        return await self.find_build(
+            player_name, request, compute=self._probe_compute, register=False
+        )
 
     async def _probe_single_stat_ceilings(
         self, snapshot: InventorySnapshot, parsed: Any
@@ -696,29 +713,12 @@ class BuildService:
         return BuildRecommendation(results=[], analysis=analysis)
 
     def get_build_candidate(self, player_name: str, execution_id: str) -> dict:
-        """按候选 ID 取回服务端签发的那份方案（只读，不焚烧）。
+        """按候选 ID 取回服务端签发的那份方案（只读，不焚烧）—— 给只发标量的宿主用。
 
-        给"只发标量的宿主"用（豆包 connector 实测发不出 `canonical_build` 这样的结构体）：
-        调用方回传 execution_id 就够了，方案内容由服务端自己取回来 ——
-        内容根本不经过调用方，反而比回传整块 JSON 更不可能被篡改。
-
-        真正的执行前校验仍在 `equip_build`（写之前再确认一次玩家绑定、TTL 与一次性），
-        这里只是把方案取出来做预览与回传。
+        判定与话术在 `services/build_candidates.describe_candidate`（那边与暂存同一处），
+        这里只转发。
         """
-        build, status = self._candidates.resolve(execution_id, player_name)
-        if status == "expired":
-            return {
-                "success": False,
-                "code": "expired_execution_id",
-                "message": "该配装候选已过期，请重新求解并确认。",
-            }
-        if build is None:
-            return {
-                "success": False,
-                "code": "unknown_execution_id",
-                "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
-            }
-        return {"success": True, "build": build.model_dump(mode="json")}
+        return describe_candidate(self._candidates, player_name, execution_id)
 
     @serialized_account_action
     async def equip_build(

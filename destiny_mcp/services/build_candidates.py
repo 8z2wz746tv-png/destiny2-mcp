@@ -99,3 +99,28 @@ class BuildCandidateStore:
         self._builds.pop(execution_id, None)
         self._issued_at.pop(execution_id, None)
         self._players.pop(execution_id, None)
+
+
+def describe_candidate(
+    store: "BuildCandidateStore", player_name: str, execution_id: str
+) -> dict:
+    """按候选 ID 取回签发的那份方案（只读、不焚烧），转成工具层要的 dict。
+
+    话术在这儿而不在服务里：`expired` 与 `unknown` 是**两件事**
+    （"这次确认超时了，重新确认一次" ≠ "这不是你的候选"），调用方按它给下一步。
+    """
+    build, status = store.resolve(execution_id, player_name)
+    if status == "expired":
+        return {
+            "success": False,
+            "code": "expired_execution_id",
+            "message": "该配装候选已过期，请重新求解并确认。",
+        }
+    if build is None:
+        return {
+            "success": False,
+            "code": "unknown_execution_id",
+            "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
+        }
+    return {"success": True, "build": build.model_dump(mode="json")}
+
