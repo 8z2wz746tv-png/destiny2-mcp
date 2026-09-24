@@ -18,7 +18,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..error_codes import ErrorCode
-from ._responses import confirmation_required_response, error_response, ok_response
+from ._responses import confirmation_required_response, failure_response, ok_response
 
 
 async def equip_branch(
@@ -37,9 +37,15 @@ async def equip_branch(
 
     if plan.status == "blocked":
         # 上游铁律挡住（另一个槽的金装、背包满、正装备着、实例不在身上）：
-        # 如实说清缺什么与下一步，不是"写入失败"。
-        return error_response(
-            ErrorCode.EQUIP_BLOCKED, plan.message, candidates=[payload]
+        # 如实说清缺什么与下一步，不是"写入失败"（没写、也不是失败族）。
+        # 计划整包进 `data.result`（与其它写入路径同一条读法），`candidates` 只留真候选。
+        return failure_response(
+            ErrorCode.EQUIP_BLOCKED, plan.message, payload,
+            next_actions=[
+                "blockers 里每条都是游戏规则（同类异域只能穿一件 / 目标正装备在身上 / "
+                "不在该角色身上 / 背包满），按它说的先解决，再重发同一个调用；"
+                "这一次没有写入账号。",
+            ],
         )
 
     if plan.status == "already_equipped":

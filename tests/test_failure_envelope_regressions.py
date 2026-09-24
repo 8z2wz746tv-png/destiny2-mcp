@@ -302,3 +302,41 @@ def test_weapon_stats_resolves_the_weapon_not_the_same_named_item() -> None:
     assert result["weapon"]["weapon_type"] == "霰弹枪"
     # 901 = 武器那条；900 是同名的非武器条目
     assert result["weapon"]["item_hash"] == 901
+
+
+# ── 5. 写入失败：详情只许放 `data.result`（2026-09-24 收口）────────────────────
+
+
+def test_failure_response_keeps_the_payload_in_data_result() -> None:
+    """同一个"写不成"以前有三套读法：`data.result` / `candidates[0].result` / `candidates[0]`。
+
+    调用方得按 intent 记三种找法，`scripts/benchmark_equip_chain.py` 里那句
+    "失败时 steps 在 candidates[0].result 里"就是这个坑的化石。
+    """
+    from destiny_mcp.tools._responses import failure_response
+
+    response = failure_response(
+        "equip_failed", "第 1 步没做成", {"success": False, "stopped_at": 1},
+        next_actions=["先解决 blockers 里的规则"],
+    )
+
+    assert response["ok"] is False
+    assert response["data"]["result"]["stopped_at"] == 1
+    assert response["candidates"] == [], "candidates 只留给真候选（多件同名、可选方案、确认载荷）"
+    assert response["next_actions"] == ["先解决 blockers 里的规则"]
+
+
+def test_no_write_path_hides_its_payload_in_candidates() -> None:
+    """扫描闸：不许再出现 `candidates=[{"result": …}]` 这种"详情藏在候选里"的写法。"""
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).parents[1] / "destiny_mcp"
+    offenders = [
+        str(path.relative_to(root.parent))
+        for path in sorted(root.rglob("*.py"))
+        if "__pycache__" not in path.parts
+        and re.search(r'candidates=\[\s*\{\s*"result"', path.read_text(encoding="utf-8"))
+    ]
+
+    assert not offenders, f"失败详情要放 data.result，这些文件还在往 candidates 里塞整包结果：{offenders}"

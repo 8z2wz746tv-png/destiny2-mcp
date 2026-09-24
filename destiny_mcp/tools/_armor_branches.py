@@ -18,7 +18,7 @@ from ..services.starside_notes import (
     perk_note_for_plug,
     set_notes,
 )
-from ._responses import confirmation_required_response, error_response, ok_response
+from ._responses import confirmation_required_response, error_response, failure_response, ok_response
 from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..services.armor_payload import armor_payload
 from ..vocabulary import STAT_LABELS_ZH as _STAT_LABELS  # 六维中文名的单一出处
@@ -454,10 +454,10 @@ async def equip_build(
 
     result = await svc["build_svc"].equip_build(player_name, exact_build, character)
     if not result.get("success"):
-        return error_response(
+        return failure_response(
             result.get("code") or write_failed("build_equip"),
             result.get("message") or "配装装备失败。",
-            candidates=[{"result": result}],
+            result,
             next_actions=[{
                 "label": "重新求解并确认配装",
                 "tool": "build_assistant",
@@ -476,7 +476,8 @@ async def equip_build(
             {"result": result},
             warnings=[str(step.get("detail") or "") for step in blocked],
         )
-    return ok_response("配装装备流程已执行。", {"result": result})
+    # 成功摘要用服务层那句：它写着"回读核对通过"这类结论，固定话术会把它埋进 data.result。
+    return ok_response(str(result.get("message") or "配装装备流程已执行。"), {"result": result})
 
 
 def with_slot_keys(payload: Any) -> Any:

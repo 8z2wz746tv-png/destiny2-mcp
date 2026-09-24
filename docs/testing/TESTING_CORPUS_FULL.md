@@ -123,9 +123,9 @@
 
 | 行 | 断言 |
 | --- | --- |
-| list 默认 | 最多 5 套 + 四个分页字段 + 每套带 `build_template` |
-| list 翻页 | `offset` 两页不重叠 |
-| get 传 `loadout_id` | `ignored_parameter`（要 Agent 自己从全部里挑） |
+| list 默认 | 只给**清单行**（`loadout_id`/件数/`execution_supported`/`detail_hint`，**不带** `build_template`）+ 四个分页字段；整包 < 20 KB（121 KB → 2.8 KB 之后不许回涨） |
+| list 翻页 | `offset` 两页不重叠（行里的实例键是 **`loadout_id`**，不是 `id`） |
+| get 传 `loadout_id` | 只给那一套的**完整模板**（0.7.6 起 `get` 与 `list` 是两件事，不再互为别名） |
 | search_identifiers | 按 `kind` 给标识（含 hash） |
 | search_identifiers 乱填 | `invalid_argument_error` 列词表 |
 | save 缺名字 | `invalid_arguments` |

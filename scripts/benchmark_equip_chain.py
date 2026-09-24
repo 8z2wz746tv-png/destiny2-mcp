@@ -94,10 +94,8 @@ async def main() -> int:
             ctx=ctx, intent="equip_build", execution_id=execution_id, character="hunter", confirmed=True
         )
         total = time.perf_counter() - started
+        # 失败与成功的详情都在 `data.result`（2026-09-24 收口：以前失败时藏在 candidates[0].result）
         result = (done.get("data") or {}).get("result") or {}
-        if not result:
-            # 失败时 steps 在 candidates[0].result 里（错误信封把整包结果放在那儿）
-            result = ((done.get("candidates") or [{}])[0] or {}).get("result") or {}
         print(f"\n真写：{total:.1f}s ok={done.get('ok')} code={(done.get('error') or {}).get('code')}")
         print(f"  消息：{str(done.get('error', {}).get('message') or result.get('message'))[:200]}")
         print(f"  摘要：{str(done.get('summary'))[:120]}")

@@ -133,7 +133,7 @@ async def test_equipped_item_failure_carries_a_next_step() -> None:
 
 
 def test_write_failure_hints_ignore_unrelated_failures() -> None:
-    from destiny_mcp.tools._responses import write_failure_hints
+    from destiny_mcp.tools._write_failure_hints import write_failure_hints
 
     assert write_failure_hints({"code": "transfer_failed", "message": "网络超时"}) == []
     assert write_failure_hints({"message": "Cannot perform this action on an equipped item."})
@@ -158,3 +158,21 @@ async def test_timeout_becomes_an_envelope_instead_of_an_empty_message() -> None
     assert response["error"]["code"] == "a_p_i_error"
     assert response["error"]["message"].strip(), "不许是空消息"
     assert "超时" in response["error"]["message"]
+
+
+def test_success_summary_uses_the_service_message() -> None:
+    """成功摘要要用服务层那句 `message`（带着"改了什么/核对结果"）。
+
+    固定话术（"…流程已执行。"）会把真正有用的信息埋进 `data.result`，模型常常只念摘要 ——
+    那回读核对、六维变化这些就白加了。
+    """
+    from destiny_mcp.tools._responses import action_response
+
+    response = action_response(
+        "equip_loadout", "配装装备流程已执行。",
+        {"success": True, "message": "配装 '猎套' 已装备，回读核对通过。"},
+    )
+
+    assert response["summary"] == "配装 '猎套' 已装备，回读核对通过。"
+    # 服务层没给 message 时，退回调用方那句（比如 already_equipped 这类简写）
+    assert action_response("move", "移动流程已执行。", {"success": True})["summary"] == "移动流程已执行。"

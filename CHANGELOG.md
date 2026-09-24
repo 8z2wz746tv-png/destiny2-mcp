@@ -2,6 +2,33 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.7.8 — 2026-09-25
+
+**收口：写入信封一套读法、语料 260 行真机 0 FAIL**（2026-09-24 的"没解决干净"清单第 1、8 项）：
+
+- **失败详情只放 `data.result`**（**破坏性**）：以前同一个"写不成"有三套读法 —— 通用写入路径放
+  `data.result`、`equip_build` 放 `candidates[0].result`、`equip` 被挡住时把整份计划放
+  `candidates[0]`。现在统一走 `_responses.failure_response()`（`equip` 被挡住时还补了 `next_actions`），
+  `candidates` 只留给**真候选**（多件同名、确认载荷）。守门：`failure_response` 契约 +
+  扫描闸"不许再出现 `candidates=[{"result": …}]`"（注入违规验证过会红）。
+- **成功摘要用服务层那句 `message`**：`equip_loadout` 的顶层摘要从"配装装备流程已执行。"
+  变成"配装 'X' 已装备，回读核对通过。"，`save` 变成"配装 'X' 已保存（5 件装备，25 个模组 + 子职业配置）。"
+  —— 以前真正的结论（回读核对、存了什么）只写在 `data.result.message` 里，模型常常只念顶层摘要。
+- **失败话术表拆去 `tools/_write_failure_hints.py`**：加完 `failure_response` 后信封模块涨到 213 行、
+  撞了体量闸；形状与措辞分开（信封 180 行，话术 43 行，两个都登记了上限）。
+- **`list` / `get` 不再是别名**（0.7.6 拆分留下的账）：别名表还写着"`get` = `list` 的近义别名"，
+  而语料里"别名同参必须返回相同 data"那行照抄了一份 `_ALIAS_GROUPS`，于是每轮真机语料都在报
+  "list/get 不同 data"。现在两者都是独立 intent，并加了"语料的别名组必须来自别名表"的扫描闸
+  （按工具的 Literal 查，避开跨工具重名的 `find`/`get`/`list`/`type`/`stats`）。
+- **语料三行按 0.7.6 后的读法重写** + 一处静默 bug：语料 live 快照读的是清单行的 `id`（0.7.6 起是
+  `loadout_id`）→ 静默变 `None`，于是 `get` / `equip_loadout` 两行一直在测"不存在的 ID"（前者还因此
+  通过）；现在读 `loadout_id`，并加了 `list` 体积闸（< 20 KB）。
+- **语料新增"调用层失败"记录**：上游抖动（空响应、超时）以前只表现为一堆 `实际=None` 的 FAIL，
+  看不出是产品坏了还是上游抽风；现在汇总里单列一段，报告 JSON 里也有 `call_failures`。
+- 真机收口证据：全量语料 **260 行 FAIL 0**（第一次跑时 5 条 `patterns` 红是那次调用抖动，重跑全绿）；
+  `save → get(id) → equip_loadout → delete` 整链真机走通（save 1.3s / equip 34.1s，
+  摘要与 `verify` 步骤如设计；临时配装已删除，账号回到原样）。
+
 ## 0.7.7 — 2026-09-24
 
 **体验：写入类回执的措辞与证据**（真机做改账号调用时一条条挑出来的）：

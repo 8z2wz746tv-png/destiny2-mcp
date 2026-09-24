@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..error_codes import ErrorCode, write_failed
+from ._write_failure_hints import write_failure_hints
 
 
 def dump(value: Any) -> Any:
@@ -22,27 +23,54 @@ def dump(value: Any) -> Any:
     return value
 
 
+def failure_response(
+    code: str,
+    message: str,
+    result: Any,
+    *,
+    candidates: list[dict[str, Any]] | None = None,
+    next_actions: list[dict[str, Any] | str] | None = None,
+    warnings: list[str] | None = None,
+) -> dict[str, Any]:
+    """写入失败（或"这一步做不了"）的统一形状：**详情永远在 `data.result`**。
+
+    真机 2026-09-24 收口：以前同一个"写不成"有三套读法 —— 通用写入路径把整包结果放
+    `data.result`、`equip_build` 放 `candidates[0].result`、`equip` 被挡住时把计划放
+    `candidates[0]`。调用方得按 intent 记三种找法（`scripts/benchmark_equip_chain.py` 里
+    那句"失败时 steps 在 candidates[0].result 里"就是这个坑的化石）。
+    `candidates` 从此只放**真候选**：多件同名让你选、可选方案、确认载荷。
+    """
+    response = error_response(
+        code, message, candidates=candidates, next_actions=next_actions, warnings=warnings,
+    )
+    response["data"] = {"result": dump(result)}
+    return response
+
+
 def action_response(intent: str, summary: str, result: Any) -> dict:
     """写入类服务的统一信封：`success` 归顶层，失败给码 + 原因 + 下一步。
 
-    `candidates` 只在信封里发一份：以前信封与 `data.result` 各发一份，同一个清单读两遍。
-    「同名多件先选一件」不是失败，走 `disambiguation_response`（写入没发生）。
+    - 失败走 `failure_response`（详情在 `data.result`）；
+    - `candidates` 只在信封里发一份：以前信封与 `data.result` 各发一份，同一个清单读两遍；
+    - 「同名多件先选一件」不是失败，走 `disambiguation_response`（写入没发生）；
+    - **成功摘要优先用服务层那句 `message`**：它带着"改了什么/核对结果"（如"已装备，回读核对通过"），
+      固定话术（"…流程已执行。"）会把真正有用的信息埋在 `data.result` 里，模型常常只念摘要。
     """
     payload = dump(result)
     if payload.get("success") is not True:
         candidates = payload.pop("candidates", None) or []
         if payload.get("needs_disambiguation"):
             response = disambiguation_response(payload, candidates)
-        else:
-            response = error_response(
-                payload.get("code") or write_failed(intent),
-                payload.get("message") or f"{intent} 执行失败。",
-                candidates=candidates,
-                next_actions=write_failure_hints(payload),
-            )
-        response["data"] = {"result": payload}
-        return response
-    return ok_response(summary, {"result": payload})
+            response["data"] = {"result": payload}
+            return response
+        return failure_response(
+            payload.get("code") or write_failed(intent),
+            payload.get("message") or f"{intent} 执行失败。",
+            payload,
+            candidates=candidates,
+            next_actions=write_failure_hints(payload),
+        )
+    return ok_response(str(payload.get("message") or summary), {"result": payload})
 
 
 def ok_response(
@@ -136,34 +164,6 @@ def disambiguation_response(
         ],
     )
 
-
-# 写入失败时，游戏给的原因往往配得上一句「那就这么做」。这里按原因的关键词补
-# next_actions —— 以前失败分支只有 candidates（多数是空的），调用方拿不到下一步，
-# 只能自己想到「先换下来再搬」。
-_WRITE_FAILURE_HINTS: tuple[tuple[tuple[str, ...], str], ...] = (
-    (
-        ("UniqueEquipRestricted", "只能装备一件", "一件异域"),
-        "同类的异域只能穿一件（异域**武器**一件 + 异域**护甲**一件，两类互不冲突）：目标与已经"
-        "穿着的那件同属一类，先从该角色背包里挑一件**非异域的同部位**装备穿上去顶下它，再装目标"
-        '（`inventory_assistant` 的 `intent="get"`：武器用 `item_type="武器"`，护甲用 `armor_slot=…`）。',
-    ),
-    (
-        ("equipped item", "CannotPerformActionOnEquippedItem", "已装备"),
-        "目标正装备在身上：先用 intent=\"equip\" 把同槽位的另一件换上（或 equip 到别的角色），再对它执行 transfer/move。",
-    ),
-    (
-        ("not found in the character's inventory", "ItemNotFound", "不在该角色身上"),
-        "`EquipItem` 只接受**在该角色身上**的实例：仓库或别的角色身上的要先搬过来"
-        '（`intent="move"`，destination 传角色名；他背包满了会撞 NoRoomInDestination），'
-        "或者直接换用他背包里已有的那件。",
-    ),
-    (
-        ("No space", "空间不足", "InventoryFull", "NoRoomInDestination"),
-        "目标位置空间不足：先清出位置，或换一个目标角色/仓库。",
-    ),
-)
-
-
 def data_only(payload: dict[str, Any]) -> dict[str, Any]:
     """摘掉领域结果里的状态字段：状态归顶层信封（ok/summary），`data` 里不再来一套。"""
     return {
@@ -178,9 +178,3 @@ def missing_weapon_name(intent: str) -> dict[str, Any]:
     return error_response(
         ErrorCode.MISSING_WEAPON_NAME, f"{intent} 需要提供 weapon_name。"
     )
-
-
-def write_failure_hints(payload: dict[str, Any]) -> list[str]:
-    """从写入失败的 payload 里挑出可用的下一步建议（挑不到就返回空）。"""
-    haystack = f"{payload.get('code', '')} {payload.get('message', '')}"
-    return [hint for keywords, hint in _WRITE_FAILURE_HINTS if any(k in haystack for k in keywords)]

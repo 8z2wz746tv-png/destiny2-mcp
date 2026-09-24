@@ -149,8 +149,11 @@ CEILINGS = {
     "destiny_mcp/tools/_build_confirmation.py": 230,
     # 护甲阶梯试解（从 _armor_branches 拆出）：探针并发 + 逐步收窄的话术。
     "destiny_mcp/tools/_armor_ladder.py": 506,
-    # 响应信封的唯一住处（ok/error/confirmation/disambiguation + `dump`）。
-    "destiny_mcp/tools/_responses.py": 186,
+    # 响应信封的唯一住处（ok/error/confirmation/disambiguation/failure + `dump`）。
+    # 186 → 180：失败话术表拆去 `_write_failure_hints.py`（形状与措辞分开）。
+    "destiny_mcp/tools/_responses.py": 180,
+    # 上游原文关键词 → 下一步话术（会随实测加条目，所以单独登记，别挤回信封模块）。
+    "destiny_mcp/tools/_write_failure_hints.py": 43,
     # 执行前状态快照与回滚（从 loadout_equipment_service 拆出）。
     "destiny_mcp/services/loadout_recovery.py": 385,
     # 模组插槽读写/预检/能量腾挪（三条写入路径共用 `plug_already_installed`）。

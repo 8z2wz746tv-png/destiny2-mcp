@@ -187,6 +187,14 @@ def first_row(value: Any) -> dict:
     return value if isinstance(value, dict) else {}
 
 
+# 调用层失败（抛异常 / 上游类错误信封）。**不是断言失败**，但会让依赖这次调用的行变红 ——
+# 真机 2026-09-24：上游抖动时 10 行同时红，证据里只有 `实际=None`，看不出是抖动还是产品坏了。
+CALL_FAILURES: list[str] = []
+# 只收"真抖动"：异常（超时/取消）与上游空响应。语料自己的反面用例（假名字、不存在的 ID）
+# 也会走 a_p_i_error/not_found，所以这里只是**提示**，别当断言失败读。
+_UPSTREAM_CODES = {"a_p_i_error", "upstream_unavailable_error"}
+
+
 class Runner:
     def __init__(self, timeout: float, slow_timeout: float) -> None:
         self.timeout = timeout
@@ -216,6 +224,14 @@ class Runner:
             SIZES.append(
                 (len(json.dumps(payload, ensure_ascii=False, default=str)), tag)
             )
+        if error is not None:
+            CALL_FAILURES.append(f"{tag}: {type(error).__name__}: {error}")
+        elif isinstance(payload, dict) and payload.get("ok") is False:
+            err = payload.get("error") or {}
+            if err.get("code") in _UPSTREAM_CODES:
+                CALL_FAILURES.append(
+                    f"{tag}: ok=false {err.get('code')}: {str(err.get('message'))[:120]}"
+                )
         return payload, elapsed, error
 
     @staticmethod
@@ -338,8 +354,10 @@ async def discover(runner: Runner) -> dict[str, Any]:
 
     loadouts, _, _ = await runner.call("loadout_assistant", intent="list", limit=2)
     live["loadouts"] = loadouts or {}
+    # 清单行的实例键是 `loadout_id`（0.7.6 起；以前是 `id`，改完这里必须跟着改，
+    # 否则 live["loadout_id"] 静默变成 None，下面 get/equip_loadout 两行就都在测"不存在的 ID"）
     live["loadout_id"] = first_row(((loadouts or {}).get("data") or {}).get("loadouts") or []).get(
-        "id"
+        "loadout_id"
     )
 
     names, _, _ = await runner.call(
@@ -1358,19 +1376,31 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     rows_l = ldata.get("loadouts") or []
     check(
         "rows",
-        "loadout：list 默认最多 5 套 + 四个分页字段 + 每套带 build_template",
+        "loadout：list 只给清单行（每行有 loadout_id/件数/能不能执行），完整模板归 get",
         loadouts.get("ok") is True and len(rows_l) <= 5
         and {"total_loadouts", "returned_loadouts", "truncated", "next_offset"} <= set(ldata)
-        and all("build_template" in row for row in rows_l),
+        and all(
+            {"loadout_id", "item_count", "execution_supported", "detail_hint"} <= set(row)
+            and "build_template" not in row
+            for row in rows_l
+        ),
         f"total={ldata.get('total_loadouts')} returned={ldata.get('returned_loadouts')} "
         f"truncated={ldata.get('truncated')} next_offset={ldata.get('next_offset')} "
         f"首套键={keys_of(first_row(rows_l))}",
     )
+    # 清单行真机 121 KB → 2.8 KB（5 套）；行里塞回模板就会顶破这里
+    body = len(json.dumps(loadouts, ensure_ascii=False).encode("utf-8"))
+    check(
+        "rows",
+        "loadout：list 的载荷守在 20 KB 以内（121 KB → 2.8 KB 之后不许回涨）",
+        body < 20_000,
+        f"{body}B returned={ldata.get('returned_loadouts')}",
+    )
 
     page_a, dt, err = await call("loadout_assistant", intent="list", limit=2, offset=0)
     page_b, dt2, err2 = await call("loadout_assistant", intent="list", limit=2, offset=2)
-    ids_a = {row.get("id") for row in (((page_a or {}).get("data") or {}).get("loadouts") or [])}
-    ids_b = {row.get("id") for row in (((page_b or {}).get("data") or {}).get("loadouts") or [])}
+    ids_a = {row.get("loadout_id") for row in (((page_a or {}).get("data") or {}).get("loadouts") or [])}
+    ids_b = {row.get("loadout_id") for row in (((page_b or {}).get("data") or {}).get("loadouts") or [])}
     check(
         "rows",
         "loadout：offset 翻页不重叠",
@@ -1382,13 +1412,16 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     got, dt, err = await call(
         "loadout_assistant", intent="get", loadout_id=live.get("loadout_id") or "x"
     )
+    gdata = (got or {}).get("data") or {}
+    grows = gdata.get("loadouts") or []
     check(
         "rows",
-        "loadout：get 不接受 loadout_id（要 Agent 自己从全部里挑）",
-        err is None and (got or {}).get("ok") is False
-        and ((got or {}).get("error") or {}).get("code") == "ignored_parameter",
-        f"code={((got or {}).get('error') or {}).get('code')} "
-        f"msg={short(((got or {}).get('error') or {}).get('message'), 160)}",
+        "loadout：get + loadout_id 只给那一套的完整模板（0.7.6 后的读法）",
+        err is None and (got or {}).get("ok") is True and len(grows) == 1
+        and grows[0].get("id") == (live.get("loadout_id") or "x")
+        and "build_template" in grows[0],
+        f"code={((got or {}).get('error') or {}).get('code')} 返回={len(grows)} "
+        f"id={first_row(grows).get('id') if grows else None}",
         seconds=dt,
     )
 
@@ -2173,7 +2206,9 @@ _ALIAS_GROUPS: list[tuple[str, dict[str, Any], list[str], bool]] = [
     ("subclass_assistant", {"character": "hunter"}, ["get", "subclass"], False),
     ("activity_assistant", {"character": "hunter"}, ["stats", "career", "historical_stats"], False),
     ("activity_assistant", {"count": 2}, ["weapon_history", "weapons", "weapon_usage", "weapon_leaderboard"], False),
-    ("loadout_assistant", {"limit": 2}, ["list", "get"], False),
+    # `list` / `get` 自 0.7.6 起是两件事（list 只给清单行、get 给完整模板），**不再是别名** ——
+    # 这一行以前一直红（同参不同 data），2026-09-24 收口时删掉，并在 tests/test_intent_aliases.py
+    # 加了"语料的别名组必须来自别名表"的扫描闸，防止再抄一份表。
 ]
 
 
@@ -2454,6 +2489,11 @@ async def main() -> int:
     print("最大 8 个响应：")
     for size, tag in sorted(SIZES, reverse=True)[:8]:
         print(f"  {size / 1024:8.1f} KB  {tag}")
+    if CALL_FAILURES:
+        print(f"\n调用层失败 {len(CALL_FAILURES)} 次（上游抖动/超时；不是断言失败，"
+              "但依赖它的行会红 —— 先重跑再判断）：")
+        for line in CALL_FAILURES[:12]:
+            print(f"  ! {line}")
     failures = [row for row in RESULTS if row["status"] == "FAIL"]
     if failures:
         print(f"\nFAIL {len(failures)} 条：")
@@ -2469,6 +2509,7 @@ async def main() -> int:
                     "timings": TIMINGS,
                     "sizes": SIZES,
                     "counts": counts,
+                    "call_failures": CALL_FAILURES,
                     "live": {k: v for k, v in live.items() if k != "profile"},
                 },
                 ensure_ascii=False,

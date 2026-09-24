@@ -13,6 +13,30 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：`loadout_assistant` 的 `list` / `get` 不再是别名（**破坏性**，2026-09-24）
+
+0.7.6 把两者拆成了**两件事**：`list` 只给清单行、`get` 给完整模板且可按 `loadout_id` 取一套。
+别名表里"`get` = `list` 的近义别名"这一行随之作废 —— 语料里"别名同参必须返回相同 data"那行
+因此一直是红的（真机实测抓到）。现在 `get` 与 `list` 都是独立 intent（`tests/test_intent_aliases.py`
+的 `STANDALONE`），`intent="get"` 不传 `loadout_id` 时给全部套的完整模板、传了只给那一套。
+
+## 未发布：写入信封收口 —— 失败读一处、成功摘要是服务层那句（**破坏性**，2026-09-24）
+
+真机走查发现同一个"写不成"有**三套读法**，调用方得按 intent 记三种找法：
+
+| 入口 | 以前 | 现在 |
+| --- | --- | --- |
+| `move`/`transfer`/`save`/`equip`/`lock`… （通用写入路径） | 详情在 `data.result`；失败时候选清单在 `candidates` | 不变（`candidates` 里不再有重复的第二份） |
+| `equip_build` 失败 | 详情在 `candidates[0].result`，**没有** `data.result` | 详情在 `data.result`，`candidates` 为空 |
+| `equip` 被游戏规则挡住（`equip_blocked`） | 整份计划放在 `candidates[0]` | 计划在 `data.result`，并补上 `next_actions`（按 `blockers` 先解决） |
+
+另一条：**成功信封的 `summary` 现在用服务层那句 `message`**（如"配装 '猎套' 已装备，回读核对通过。"、
+"配装 'X' 已保存（5 件装备，5 个模组）"），固定话术（"…流程已执行。"）只在服务层没给 message 时兜底。
+理由：真正的结论（回读核对、六维变化、存了什么）以前只写在 `data.result.message` 里，模型常常只念顶层摘要。
+
+守门：`tests/test_failure_envelope_regressions.py`（`failure_response` 契约 + 扫描闸：
+不许再出现 `candidates=[{"result": …}]`）、`tests/test_equip_plan_path.py`、`tests/test_assistant_action_results.py`。
+
 ## 未发布：写入类信封的三处口径（2026-09-24）
 
 真机做改账号调用（搬东西、换模组、存配装）时从**回执本身**发现的问题：
@@ -335,7 +359,6 @@ Starside 作者给的新归档（按 hash 的实体数据）接进来了：`anal
 | | `perk_pool` | `perks` |
 | | `popularity` | `selection_rates`、`perk_selection`、`selection`、`usage_rates` |
 | | `patterns` | `pattern`、`craft`、`锻造`、`锻造武器`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`（永久中文说法：玩家说「红框」「锻造武器」，游戏官方中文叫「模式」；`pattern`/`craft` 是英文近义，只登记不宣传） |
-| `loadout_assistant` | `list` | `get` |
 | `subclass_assistant` | `get` | `subclass` |
 | `activity_assistant` | `stats` | `career`、`historical_stats` |
 | | `weapon_history` | `weapons`、`weapon_usage`、`weapon_leaderboard` |
