@@ -29,6 +29,7 @@ from ..models import (
 from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
 from .account_action_lock import account_action_lock
+from .write_readback import read_until
 from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
 from .loadout_transfer_step import TransferStepMixin
 from .loadout_recovery import RecoveryStateMixin
@@ -289,15 +290,28 @@ class LoadoutEquipmentService(
             if not subclass_ok:
                 all_ok = False
 
+        # Step 4: 回读核对 —— 与 `equip_exact` 同一条纪律：没核对过就不能说"已装备"。
+        # 真机 2026-09-24：这条路以前直接以"已装备"收尾，回执里没有任何一步证明装备真在身上。
+        # 写入有 3～10 秒同步窗口，所以按 `write_readback` 重试；核对不上只报"没确认"，
+        # **不改写入结论**（"没读到"和"没写上"是两件事）。
+        detail, verified = "已回读核对：装备实例、模组与子职业配置都对得上。", False
+        try:
+            verified = await read_until(lambda: self._verify_loadout(player_name, loadout), bool)
+            if not verified:
+                detail = "写入步骤都成功了，但回读重试后仍对不上（可能是同步窗口）——过十几秒再看一次，别当成没装上。"
+        except Exception as exc:  # noqa: BLE001 —— 回读是**可选证据**：它自己炸了不能把写成功报成失败
+            logger.exception("Local loadout verification failed: %s", exc)
+            detail = f"回读核对没做成：{describe_exception(exc)}"
+        steps.append(MoveItemStep(action="verify", detail=detail, success=verified))
+
+        if not all_ok:
+            message = f"配装 '{loadout.name}' 未完全生效（原因见 steps）。"
+        elif verified:
+            message = f"配装 '{loadout.name}' 已装备，回读核对通过。"
+        else:
+            message = f"配装 '{loadout.name}' 的写入都成功了，但回读没确认：{detail}"
         return LoadoutOperationResult(
-            success=all_ok,
-            loadout_name=loadout.name,
-            message=(
-                f"配装 '{loadout.name}' 已装备。"
-                if all_ok
-                else f"配装 '{loadout.name}' 部分装备失败。"
-            ),
-            steps=steps,
+            success=all_ok, loadout_name=loadout.name, message=message, steps=steps,
         )
 
     async def equip_exact(

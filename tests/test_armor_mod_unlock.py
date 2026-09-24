@@ -66,6 +66,11 @@ class _Manifest:
     def get_item_info(self, item_hash: int):
         return None
 
+    def get_item_name(self, item_hash: int) -> str:
+        """真 Manifest 的取名义口：名字在**原始定义**的 `displayProperties` 里。"""
+        name = ((self._definitions.get(item_hash) or {}).get("displayProperties") or {}).get("name")
+        return str(name) if name else f"#{item_hash}"
+
     def get_definition(self, table: str, key: int):
         return None
 
@@ -602,6 +607,67 @@ async def test_equip_build_treats_an_already_installed_plug_as_success() -> None
     assert mod_steps[0].success is True, mod_steps[0].detail
     assert "已经装着" in mod_steps[0].detail
     assert result.success is True, result.message
+    # 写完必须有一步回读核对（真机 2026-09-24 之前 `equip_loadout` 直接以"已装备"收尾）
+    verify = [step for step in result.steps if step.action == "verify"]
+    assert verify and verify[0].success is False, "这个替身没给装备数据，核对不上要如实记"
+
+
+async def test_local_loadout_reports_the_readback_verdict(monkeypatch) -> None:
+    """回读核对三种结果：对得上 / 对不上不算写失败 / 核对本身炸了也不改写入结论。
+
+    写入有 3～10 秒同步窗口（`write_readback` 的实采），所以"没读到"只会削弱话术，
+    不能把写成功报成失败。这里把重试次数压到 1，免得测试真等 10 秒。
+    """
+    from destiny_mcp.models import Loadout
+    from destiny_mcp.services import write_readback
+
+    class _Transfer:
+        async def transfer_item(self, *args: Any, **kwargs: Any) -> Any:
+            return SimpleNamespace(success=True)
+
+        async def equip_items(self, *args: Any, **kwargs: Any) -> dict:
+            return {"success": True}
+
+    def _service() -> Any:
+        service = _equipment(_plan_manifest())
+        service._resolver = SimpleNamespace(
+            resolve_player=AsyncMock(return_value={"membership_id": "mid", "membership_type": 3}),
+            get_profile=AsyncMock(return_value={
+                "characters": {"data": {"char-1": {"classType": 1}}},
+                "itemComponents": {"instances": {"data": {}}, "sockets": {"data": {}}},
+            }),
+        )
+        service._transfer = _Transfer()
+        service._prepare_mod_operations = AsyncMock(return_value=[])
+        return service
+
+    loadout = Loadout(
+        id="loc", name="猎套", character="hunter",
+        items=[LoadoutItem(
+            item_hash=HELMET_ITEM, name="光芒领主面具", slot="helmet",
+            item_instance_id="item-1", mods=[], mod_sockets={},
+        )],
+    )
+    monkeypatch.setattr(write_readback, "ATTEMPTS", 1)
+
+    service = _service()
+    service._verify_loadout = AsyncMock(return_value=True)
+    verified = await service._equip_local_unlocked("Alpha#0100", loadout)
+    assert verified.success is True
+    assert "回读核对通过" in verified.message, verified.message
+    assert [s.action for s in verified.steps][-1] == "verify"
+
+    service = _service()
+    service._verify_loadout = AsyncMock(return_value=False)
+    unverified = await service._equip_local_unlocked("Alpha#0100", loadout)
+    assert unverified.success is True, "写入都成功了，核对不上不许改写入结论"
+    assert "回读没确认" in unverified.message, unverified.message
+
+    service = _service()
+    service._verify_loadout = AsyncMock(side_effect=RuntimeError("manifest 挂了"))
+    crashed = await service._equip_local_unlocked("Alpha#0100", loadout)
+    assert crashed.success is True
+    assert "回读核对没做成" in crashed.message, crashed.message
 
 
 async def test_apply_treats_an_already_installed_plug_as_a_no_op() -> None:

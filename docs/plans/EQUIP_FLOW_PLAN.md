@@ -279,3 +279,16 @@ MCP 服务是宿主拉起的**常驻子进程**，改了代码要重启宿主才
 §七 开头那两行症状至此**都反过来了**。
 
 **还剩**：`equip` 两段式语料行（`docs/testing/TESTING_CORPUS_FULL.md` 至今只登记了断言、没有行）。
+
+## 八、回读核对覆盖到 `equip_loadout`，步骤写中文名（2026-09-24）
+
+拿真账号把 `loadout_assistant(intent="equip_loadout")` 整条链路走了一遍（先确认、再 `confirmed=true`），
+顺带发现两个"文档说做了、实际没做"的地方：
+
+| 症状（真机回执） | 根因 | 现在 |
+| --- | --- | --- |
+| 写入 29 秒、`steps` 最后一幕是子职业 plug，**没有任何一步证明装备真在身上** | `_equip_local_unlocked` 走的是"搬运 → 批量装备 → 模组 → 子职业"就收尾；回读核对只在 `equip_exact`（`equip_build`）那条路上 | 补 Step 4 `verify`：与 `equip_exact` 共用 `_verify_loadout`，按 `write_readback` 的 8×1.5 秒重试；真机复验 `verify success=True 已回读核对：装备实例、模组与子职业配置都对得上` |
+| 30 条步骤全是 hash：`已经装着 '1435557120'`，子职业 `plug '3636300855'` | `mod_label` 从 `get_item_info()` 的返回值里读 `displayProperties`，而那个访问器给的是规范化小字典（键叫 `name`）→ 每次取空、退回 hash。0.7.4 的 CHANGELOG 与 `docs/COMPATIBILITY.md` 写着"steps 里的模组写中文名"，**实际从未生效**（单测替身返回的是原始定义，所以一路绿） | 名字只从 `get_item_name()` 取；真机复验 `已经装着 '手雷模组'`、`plug '赌徒闪身'`。守门加在 `tests/test_loadout_mod_planning.py`（替身按真 Manifest 的形状给 `name`） |
+
+两条纪律写进代码注释：**回读是可选证据** —— 它读不到（同步窗口）只说"回读没确认"，
+**不改写入结论**；它自己抛异常也不许把写成功报成失败（`logger.exception` 留痕 + 步骤里写原因）。

@@ -59,6 +59,7 @@ _EXPECTED_LITERAL_CODES = {
     "invalid_exotic_confirmation",
     "invalid_max_replacements",
     "inventory_summary_failed",
+    "item_disambiguation_required",
     "missing_artifact_mod_hash",
     "missing_artifact_name",
     "equip_blocked",

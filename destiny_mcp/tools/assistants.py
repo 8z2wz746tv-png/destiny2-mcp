@@ -13,14 +13,14 @@ from mcp.server.fastmcp import Context
 from pydantic import Field
 
 from ..build.models import BuildRequest
-from ..error_codes import ErrorCode, write_failed
+from ..error_codes import ErrorCode
 from ..exceptions import DestinyMCPError
 from ._registry import mcp
 from ._coerce import coerce_scalar_arguments
 from ._build_confirmation import resolve_exotic, verify_exotic_confirmation_token
 from ._farm_target_response import serialize_farm_target_analysis
 from ._formatters import inventory_search_summary
-from ._helpers import dump as _dump, get_ctx, handle_tool_error, positive_or_default, resolve_player_name
+from ._helpers import get_ctx, handle_tool_error, positive_or_default, resolve_player_name
 from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
 from . import _counters_branches as counters_branches
@@ -49,7 +49,8 @@ from ._requests import (
     InventoryRequest, LoadoutRequest, SubclassRequest, validate_request,
 )
 from ._responses import (
-    write_failure_hints,
+    action_response,
+    dump,
     missing_weapon_name,
     confirmation_required_response,
     error_response, ok_response, data_only,
@@ -66,20 +67,6 @@ _LOADOUT_DEFAULT_LIMIT = 5
 # 而"我手炮都有哪些"这个问题通常只要看头几件；默认 10 件 + next_offset 翻页。
 _WEAPON_TYPE_DEFAULT_LIMIT = 10
 _WEAPON_PATTERN_DEFAULT_LIMIT = 20
-
-
-def _action_response(intent: str, summary: str, result: Any) -> dict:
-    payload = _dump(result)
-    if payload.get("success") is not True:
-        response = error_response(
-            payload.get("code") or write_failed(intent),
-            payload.get("message") or f"{intent} 执行失败。",
-            candidates=payload.get("candidates") or [],
-            next_actions=write_failure_hints(payload),
-        )
-        response["data"] = {"result": payload}
-        return response
-    return ok_response(summary, {"result": payload})
 
 
 # 社区富集与读取实现在 _enrichment（武器分支已搬到 _weapon_branches，避免反向依赖）
@@ -128,13 +115,13 @@ async def player_assistant(
     if intent in {"profile", "get_profile", "角色", "档案"}:
         resolved = resolve_player_name(player_name)
         result = await player_svc.get_profile(resolved)
-        return ok_response("已读取玩家档案。", {"profile": _dump(result)})
+        return ok_response("已读取玩家档案。", {"profile": dump(result)})
 
     if intent in {"search", "search_player"}:
         if not player_name:
             return error_response(ErrorCode.MISSING_PLAYER_NAME, "必须提供 player_name。")
         result = await player_svc.search_player(player_name)
-        return ok_response("已搜索玩家。", {"players": _dump(result)})
+        return ok_response("已搜索玩家。", {"players": dump(result)})
 
     if intent in {"find", "find_players", "fuzzy"}:
         return await player_branches.find_response(svc, name_prefix, bool(include_profile))
@@ -189,6 +176,7 @@ async def inventory_assistant(
 
     if _requires_confirmation(intent) and not confirmed:
         return _confirmation_required(intent, {
+            "intent": intent,
             "player_name": resolved,
             "item_name": item_name,
             "item_instance_id": item_instance_id,
@@ -258,7 +246,7 @@ async def inventory_assistant(
             limit=page_limit,
             offset=offset,
         )
-        inventory = _dump(result)
+        inventory = dump(result)
         warnings = []
         if inventory.get("truncated"):
             warnings.append(
@@ -281,7 +269,7 @@ async def inventory_assistant(
 
     if intent in {"search", "find_item"}:
         result = await svc["inventory_svc"].search_items(resolved, item_name, location)
-        searched = _dump(result)
+        searched = dump(result)
         hits = searched.get("items") if isinstance(searched, dict) else None
         return ok_response(inventory_search_summary(item_name, hits), {
             "result": searched,
@@ -311,7 +299,7 @@ async def inventory_assistant(
             source=from_character,
             item_instance_id=item_instance_id or None,
         )
-        return _action_response(intent, "移动流程已执行。", result)
+        return action_response(intent, "移动流程已执行。", result)
 
     if intent == "transfer":
         result = await svc["transfer_svc"].transfer_item(
@@ -320,11 +308,11 @@ async def inventory_assistant(
             to_character,
             from_character,
         )
-        return _action_response(intent, "转移已执行。", result)
+        return action_response(intent, "转移已执行。", result)
 
     if intent == "equip":
         equipped = await equip_branches.equip_branch(
-            svc, resolved, item_instance_id, character, confirmed, _action_response
+            svc, resolved, item_instance_id, character, confirmed, action_response
         )
         if equipped is not None:
             return equipped
@@ -333,7 +321,7 @@ async def inventory_assistant(
         if not item_instance_ids:
             return error_response(ErrorCode.MISSING_ITEM_INSTANCE_IDS, "批量装备需要提供 item_instance_ids。")
         result = await svc["transfer_svc"].equip_items(resolved, item_instance_ids, character)
-        return _action_response(intent, "批量装备已执行。", result)
+        return action_response(intent, "批量装备已执行。", result)
 
     if intent == "pull_postmaster":
         result = await svc["transfer_svc"].pull_from_postmaster(
@@ -341,7 +329,7 @@ async def inventory_assistant(
             item_instance_id,
             character or None,
         )
-        return _action_response(intent, "邮政官取回已执行。", result)
+        return action_response(intent, "邮政官取回已执行。", result)
 
     if intent == "lock":
         result = await svc["transfer_svc"].set_item_lock_state(
@@ -350,7 +338,7 @@ async def inventory_assistant(
             locked,
             character or None,
         )
-        return _action_response(intent, "锁定状态已更新。", result)
+        return action_response(intent, "锁定状态已更新。", result)
 
     if intent in {"track_quest", "quest_tracking"}:
         result = await svc["transfer_svc"].set_quest_tracked_state(
@@ -359,7 +347,7 @@ async def inventory_assistant(
             tracked,
             character or None,
         )
-        return _action_response(intent, "任务追踪状态已更新。", result)
+        return action_response(intent, "任务追踪状态已更新。", result)
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"inventory_assistant 不支持 intent={intent!r}。")
 
@@ -824,13 +812,13 @@ async def build_assistant(
         query["set_bonus_count"] = request.set_bonus_count
 
     if intent == "recommend":
-        return await build_flow.recommend(svc, resolved, request, query, _dump)
+        return await build_flow.recommend(svc, resolved, request, query, dump)
 
     if intent == "find":
-        return await build_flow.find(svc, resolved, request, query, _dump)
+        return await build_flow.find(svc, resolved, request, query, dump)
 
     if intent == "analyze":
-        return await build_flow.analyze(svc, resolved, request, query, _dump)
+        return await build_flow.analyze(svc, resolved, request, query, dump)
 
 
     if intent == "farm_target":
@@ -915,12 +903,11 @@ async def loadout_assistant(
     resolved = resolve_player_name(player_name)
 
     if _requires_confirmation(intent) and not confirmed:
-        return _confirmation_required(intent, {
-            "loadout_id": loadout_id,
-            "character": character,
-            "slot_number": slot_number,
-            "name": name,
-        })
+        return await loadout_branches.confirm_write(
+            svc, resolved, intent=intent, character=character, loadout_id=loadout_id,
+            slot_number=slot_number, name=name, notes=notes,
+            name_hash=name_hash, icon_hash=icon_hash, color_hash=color_hash,
+        )
 
     if intent in {"list", "get"}:
         return await loadout_branches.list_or_get(
@@ -931,15 +918,15 @@ async def loadout_assistant(
 
     if intent == "save":
         result = await svc["loadout_svc"].save_loadout(resolved, name, character, notes)
-        return _action_response(intent, "本地配装已保存。", result)
+        return action_response(intent, "本地配装已保存。", result)
 
     if intent == "delete":
         result = await svc["loadout_svc"].delete_loadout(loadout_id)
-        return _action_response(intent, "本地配装已删除。", result)
+        return action_response(intent, "本地配装已删除。", result)
 
     if intent == "equip_loadout":
         result = await svc["loadout_svc"].equip_loadout(resolved, loadout_id)
-        return _action_response(intent, "配装装备流程已执行。", result)
+        return action_response(intent, "配装装备流程已执行。", result)
 
     if intent == "search_identifiers":
         result = svc["loadout_svc"].search_official_loadout_identifiers(kind, query)
@@ -949,17 +936,17 @@ async def loadout_assistant(
         result = await svc["loadout_svc"].snapshot_official_loadout(
             resolved, character, slot_number, name_hash, icon_hash, color_hash
         )
-        return _action_response(intent, "官方配装槽已保存。", result)
+        return action_response(intent, "官方配装槽已保存。", result)
 
     if intent == "update_official_identifiers":
         result = await svc["loadout_svc"].update_official_loadout_identifiers(
             resolved, character, slot_number, name_hash, icon_hash, color_hash
         )
-        return _action_response(intent, "官方配装槽标识已更新。", result)
+        return action_response(intent, "官方配装槽标识已更新。", result)
 
     if intent == "clear_official":
         result = await svc["loadout_svc"].clear_official_loadout(resolved, character, slot_number)
-        return _action_response(intent, "官方配装槽已清空。", result)
+        return action_response(intent, "官方配装槽已清空。", result)
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"loadout_assistant 不支持 intent={intent!r}。")
 
@@ -1011,15 +998,17 @@ async def subclass_assistant(
         ])
 
     if _requires_confirmation(intent) and not confirmed:
-        return _confirmation_required(intent, {"character": character, "changes": changes or {}})
+        return _confirmation_required(intent, {
+            "intent": intent, "character": character, "changes": changes or {},
+        })
 
     if intent in {"get", "subclass"}:
         result = await svc["subclass_svc"].get_subclass(resolved, character)
-        return ok_response("已读取子职业配置。", {"subclass": _dump(result)})
+        return ok_response("已读取子职业配置。", {"subclass": dump(result)})
 
     if intent == "modify":
         result = await svc["subclass_svc"].modify_subclass(resolved, character, changes or {})
-        return _action_response(intent, "子职业修改已执行。", result)
+        return action_response(intent, "子职业修改已执行。", result)
 
     if intent == "options":
         result = svc["fragment_svc"].list_subclass_options(character, element, component)
@@ -1037,7 +1026,7 @@ async def subclass_assistant(
         )
 
     artifact_result = await subclass_branches.artifact_branch(
-        svc, intent, resolved, character, artifact_name, artifact_mod_hash, _action_response
+        svc, intent, resolved, character, artifact_name, artifact_mod_hash, action_response
     )
     if artifact_result is not None:
         return artifact_result
@@ -1181,7 +1170,7 @@ async def world_assistant(
 
     if intent == "weekly_full":
         result = await svc["weekly_svc"].get_weekly_reset()
-        return ok_response("已读取完整周常。", {"weekly": _dump(result)})
+        return ok_response("已读取完整周常。", {"weekly": dump(result)})
 
     if intent == "vendor":
         resolved = resolve_player_name(player_name)
@@ -1191,7 +1180,7 @@ async def world_assistant(
             vendor_name,
             limit=limit,
         )
-        vendors = _dump(result)
+        vendors = dump(result)
         payload: dict[str, Any] = {"vendors": vendors}
         if result.mode == "detail":
             payload["farming_list"] = _farming_reference(svc.get("starside_svc"), _sale_item_names(vendors))

@@ -12,11 +12,61 @@ from __future__ import annotations
 
 from typing import Any
 
-from ._helpers import dump, positive_or_default
-from ._responses import ok_response
+from ._helpers import positive_or_default
+from ._responses import confirmation_required_response, dump, ok_response
 
 # 列表默认给几套（切片在服务层做，工具层只负责把"被截断"讲清楚）
 _LOADOUT_DEFAULT_LIMIT = 5
+
+
+async def save_preview(svc: Any, resolved: str, character: str, name: str) -> dict:
+    """`save` 的确认信封里那块"这次存什么"。
+
+    真机 2026-09-24：`save` 的确认只有 `{loadout_id:"", character, slot_number, name}`——
+    没有一处能看出"存下来是哪套"，玩家只能凭名字点头。预览取自账号（与 save 同一段采集），
+    是可选数据：读不到就给 `available=false` + reason，确认本身照常能给。
+    """
+    from ..services.armor_payload import SLOT_DISPLAY
+
+    preview = await svc["loadout_svc"].describe_save(resolved, character, name)
+    for item in preview.get("armor") or []:
+        item["slot_display"] = SLOT_DISPLAY.get(item.get("slot", ""), "")
+    return preview
+
+
+async def confirm_write(
+    svc: Any,
+    resolved: str,
+    *,
+    intent: str,
+    character: str,
+    loadout_id: str,
+    slot_number: int,
+    name: str,
+    notes: str,
+    name_hash: int | None,
+    icon_hash: int | None,
+    color_hash: int | None,
+) -> dict:
+    """`loadout_assistant` 写入前的确认信封：只装这个 intent 真会用到的东西。
+
+    以前所有写入 intent 共用一坨 `{loadout_id, character, slot_number, name}`：`save` 也带着
+    它根本不读的 `loadout_id`/`slot_number`，而 `save` 最该说清的"这次存的是哪一套"没有。
+    """
+    payload: dict[str, Any] = {"intent": intent}
+    if intent == "save":
+        payload.update({"character": character, "name": name, "notes": notes})
+        payload["save_preview"] = await save_preview(svc, resolved, character, name)
+    elif intent in {"delete", "equip_loadout"}:
+        # 这两个不读 character（delete 按 id、equip 用配装自己的职业），别塞空键进信封
+        payload["loadout_id"] = loadout_id
+    elif intent in {"snapshot_official", "update_official_identifiers", "clear_official"}:
+        payload.update({
+            "character": character,
+            "slot_number": slot_number,
+            "name_hash": name_hash, "icon_hash": icon_hash, "color_hash": color_hash,
+        })
+    return confirmation_required_response(intent, payload)
 
 
 async def list_or_get(

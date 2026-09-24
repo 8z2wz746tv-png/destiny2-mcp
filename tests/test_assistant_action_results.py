@@ -52,12 +52,18 @@ async def test_write_assistants_propagate_service_status(
     payload = {"success": success, "message": "domain result", "steps": []}
     result = LoadoutOperationResult(**payload) if service_name == "loadout_svc" else payload
     action = AsyncMock(return_value=result)
+    preview = AsyncMock(return_value={"available": False, "reason": "stub"})
     ctx = SimpleNamespace(request_context=SimpleNamespace(lifespan_context={
-        service_name: SimpleNamespace(**{method: action}),
+        service_name: SimpleNamespace(**{method: action}, describe_save=preview),
     }))
 
     confirmation = await tool(intent=intent, confirmed=False, ctx=ctx, **kwargs)
     assert not confirmation["ok"]
+    assert confirmation["next_actions"], "确认信封也要说下一步（得到同意后 confirmed=true 重发）"
+    assert confirmation["candidates"][0]["intent"] == intent
+    if intent == "save":
+        # 保存的确认要带上"这次存的是哪一套"（拿不到预览也要有原因，且不阻断确认）
+        assert confirmation["candidates"][0]["save_preview"]["reason"] == "stub"
     action.assert_not_awaited()
 
     response = await tool(intent=intent, confirmed=True, ctx=ctx, **kwargs)
@@ -72,6 +78,11 @@ async def test_write_assistants_propagate_service_status(
 
 @pytest.mark.asyncio
 async def test_failed_move_preserves_disambiguation_candidates() -> None:
+    """「同名多件，先选一件」不是写入失败：码要说"要你选"，候选只发一份。
+
+    真机 2026-09-24：以前回 `move_failed`，而且同一份候选在信封与 `data.result` 各发一遍，
+    调用方会以为"搬失败了"去重试。
+    """
     result = MoveItemResult(
         success=False,
         needs_disambiguation=True,
@@ -88,8 +99,11 @@ async def test_failed_move_preserves_disambiguation_candidates() -> None:
     )
 
     assert not response["ok"]
+    assert response["error"]["code"] == "item_disambiguation_required"
     assert response["candidates"][0]["item_instance_id"] == "123"
     assert response["data"]["result"]["question"] == "Which instance?"
+    assert "candidates" not in response["data"]["result"], "候选清单只在信封里发一份"
+    assert response["next_actions"], "要让调用方把 question 原样给玩家、拿到编号后重发"
 
 
 @pytest.mark.asyncio

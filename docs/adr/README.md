@@ -27,6 +27,7 @@
 | [ADR-016](016-host-compat-scalar-arguments.md) | 只发标量的宿主（豆包 connector）：结构化参数额外收文本写法（规则唯一出处 `utils/arg_text.py`），`equip_build` 也收 `execution_id` 代替整块 `canonical_build`；不许放宽 schema、不许给 `canonical_build` 开 JSON 字符串通道 | accepted |
 | [ADR-017](017-exact-exotic-name-skips-a-round.md) | 金装名字**唯一精确匹配**时直接求解（响应 `query.exotic_resolution` 交代用的哪件），模糊/多件仍然必须停下来确认；`resolve_exotic_armor` 的 `status` 语义成为对外契约 | accepted |
 | [ADR-018](018-already-there-is-not-a-failure.md) | 1679「这个槽已经装着它」= 状态已成立（三条写入路径共用一条判据）；预检里「这一位装不上」的模组标 `blocked` 并跳过，**不许**把整条配装打成失败 + 回退 | accepted |
+| [ADR-019](019-disambiguation-is-not-a-failure.md) | 「同名多件，先选一件」回 `item_disambiguation_required`（没写也没失败），不是 `move_failed`；候选只在信封里发一份，`next_actions` 告诉调用方拿 `question` 去问 | accepted |
 
 ## 编号规矩
 

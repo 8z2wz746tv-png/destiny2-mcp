@@ -9,7 +9,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock
 
 from destiny_mcp.tools._equip_branches import equip_branch
-from destiny_mcp.tools.assistants import _action_response
+from destiny_mcp.tools._responses import action_response as _action_response
 from destiny_mcp.models import EquipPlan
 
 STEP = {

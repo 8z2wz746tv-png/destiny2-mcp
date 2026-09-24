@@ -148,6 +148,10 @@ class _Reply:
     def items(self):  # 让按映射处理的代码（_responses.data_only）也能跑
         return []
 
+    def pop(self, key: object, default: object = None) -> object:
+        """`action_response` 会把 `candidates` 从结果里摘出来（只在信封里发一份）。"""
+        return default
+
     def __setitem__(self, key: object, value: object) -> None:
         pass
 

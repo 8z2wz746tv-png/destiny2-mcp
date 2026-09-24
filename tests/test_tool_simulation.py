@@ -100,7 +100,7 @@ class _Reply:
         return None
 
     def model_dump(self, *args: object, **kwargs: object) -> "_Reply":
-        """让 `_dump()` 原样返回本对象，从而保留对缺失键的宽容。"""
+        """让 `dump()` 原样返回本对象，从而保留对缺失键的宽容。"""
         return self
 
     def __await__(self):

@@ -34,6 +34,10 @@ class _Manifest:
     def get_item_info(self, item_hash: int):
         return self._infos.get(item_hash)
 
+    def get_item_name(self, item_hash: int) -> str:
+        """真 Manifest 的取名义口。替身也按真形状给（键是 `name`，不是 `displayProperties`）。"""
+        return str((self._infos.get(item_hash) or {}).get("name") or f"#{item_hash}")
+
     def get_definition(self, table: str, hash_id: int):
         if table == "DestinyPlugSetDefinition":
             return self._plug_sets.get(hash_id)
@@ -95,6 +99,21 @@ def test_plug_category_hash_falls_back_to_item_summary() -> None:
     service = _service(manifest)
 
     assert service._plug_category_hash(500) == GENERAL_MOD_CATEGORY
+
+
+def test_mod_label_reads_the_name_the_way_the_real_manifest_gives_it() -> None:
+    """回执里的模组名要真的取到 —— 模板是照**真 Manifest** 的形状给的。
+
+    真机 2026-09-24：`mod_label` 从 `get_item_info()` 的返回值里读 `displayProperties`，
+    而那个访问器给的是规范化小字典（键叫 `name`，没有 `displayProperties`）→ 每次都取空、
+    一路退回 hash：文档写着"steps 里的模组写中文名"，实际发出去的 30 条步骤全是 hash。
+    单测当时没抓到，是因为替身返回的是原始定义。
+    """
+    manifest = _Manifest(infos={600: {"name": "手雷模组"}})
+    service = _service(manifest)
+
+    assert service.mod_label(600) == "手雷模组"
+    assert service.mod_label(999) == "#999", "查不到时退回 hash，别编一个名字"
 
 
 def test_plug_category_hash_is_zero_for_unknown_plug() -> None:

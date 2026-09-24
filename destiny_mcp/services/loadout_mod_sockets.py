@@ -83,9 +83,13 @@ class ModSocketMixin(PlugLookupMixin):
 
         回执是给人看的：写 hash 等于让调用方再查一次 Manifest，或者干脆再逐件查一遍护甲 ——
         后者实测会让一次装备链路多 5 次往返。
+
+        **名字只从 `get_item_name()` 取**：`get_item_info()` 给的是规范化过的小字典（键是 `name`，
+        没有 `displayProperties`），从它身上读 `displayProperties` 永远读空、一路退回 hash ——
+        真机 2026-09-24 撞见：文档写着"steps 里的模组写中文名"，实际发出去的全是 hash
+        （单测没抓到是因为替身返回的是原始定义）。
         """
-        definition = self._manifest.get_item_info(mod_hash) or {}
-        name = (definition.get("displayProperties") or {}).get("name")
+        name = self._manifest.get_item_name(mod_hash)
         return str(name) if name else str(mod_hash)
 
     _MOD_CATEGORY_HASHES = set(ManifestManager._ARMOR_MOD_CATEGORIES) | {

@@ -6,7 +6,7 @@
 
 规矩：
 - 数据形状来自 `services.artifact_service`；这里只管前置校验与信封；
-- 写入一律走 `_action_response`（失败 = `ok:false` + `write_failed(intent)`），
+- 写入一律走 `_responses.action_response`（失败 = `ok:false` + `write_failed(intent)`），
   调用方给错目标（名字不在身上）由服务层抛 `invalid_argument_error`；
 - 读 `artifact` 带 `character` 时附带**他身上那件**：目录里的"当前神器"按赛季算，
   与角色实际装着的那件可以不同（实采：三角色分别装着 s26/s21/s25，目录报 s27）。

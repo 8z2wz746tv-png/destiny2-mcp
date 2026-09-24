@@ -32,6 +32,9 @@ class FakeManifest:
     def get_item_name(self, item_hash: int) -> str:
         return (self.items.get(item_hash) or {}).get("name", f"#{item_hash}")
 
+    def get_item_definition(self, item_hash: int) -> dict | None:
+        return {"sockets": {"socketEntries": []}}
+
     def get_plug_category_identifier(self, plug_hash: int) -> str:
         return "enhancements.v2_chest" if plug_hash == 401 else "weapon.frame"
 
@@ -160,6 +163,75 @@ def test_legacy_local_loadout_is_migrated_to_build_template(tmp_path) -> None:
     assert template["armor"]["exotic"] == "猎鹰胸甲"
     assert template["armor"]["mods"]["chest"] == ["护甲模组"]
     assert template["source"]["provider"] == "local"
+
+
+@pytest.mark.asyncio
+async def test_save_preview_lists_the_armor_that_will_be_saved() -> None:
+    """`save` 的预览必须与 `save_loadout` 同一段采集：预览里列的就是真存下来的那套。
+
+    以前确认信封只有 `{loadout_id:"", character, slot_number, name}`，玩家只能凭名字点头。
+    """
+    profile = {
+        "characters": {"data": {"character-1": {"classType": 1}}},
+        "characterEquipment": {"data": {"character-1": {"items": [
+            {"itemInstanceId": "armor-1", "itemHash": 101, "bucketHash": 14239492},
+            {"itemInstanceId": "weapon-1", "itemHash": 201, "bucketHash": 1498876634},
+            {"itemInstanceId": "subclass-1", "itemHash": 301, "bucketHash": 3284755031},
+        ]}}},
+        "itemComponents": {"sockets": {"data": {"armor-1": {"sockets": [{"plugHash": 401}]}}}},
+    }
+    resolver = SimpleNamespace(
+        resolve_player=AsyncMock(return_value={"membership_id": "player", "membership_type": 3}),
+        get_profile=AsyncMock(return_value=profile),
+    )
+    service = LoadoutService(FakeClient(), FakeManifest(), resolver)
+
+    preview = await service.describe_save("player", "hunter", "猎套")
+
+    assert preview["available"] is True
+    assert preview["character"] == "hunter"
+    assert preview["armor"] == [{"slot": "chest", "name": "猎鹰胸甲", "mods": ["护甲模组"]}]
+    assert preview["weapons"] == ["测试手炮"]
+    assert preview["subclass"] == "棱镜"
+    assert preview["exotic_armor"] == "猎鹰胸甲"
+    assert preview["mod_count"] == 1
+    # 件数只算进配装的三类（真机 17 件里 8 件是幽灵/载具/飞船）
+    assert preview["item_count"] == 3
+    assert preview["ignored_count"] == 0
+
+    # 预览是可选数据：没有这个角色时给原因，别把确认流程弄挂
+    missing = await service.describe_save("player", "warlock", "猎套")
+    assert missing["available"] is False and missing["reason"]
+
+
+@pytest.mark.asyncio
+async def test_save_confirmation_shows_a_preview_and_a_next_step() -> None:
+    """确认信封要能自证"这次存什么"与"接下来怎么做"（真机 2026-09-24 实测两样都没有）。"""
+    profile = {
+        "characters": {"data": {"character-1": {"classType": 1}}},
+        "characterEquipment": {"data": {"character-1": {"items": [
+            {"itemInstanceId": "armor-1", "itemHash": 101, "bucketHash": 14239492},
+        ]}}},
+        "itemComponents": {"sockets": {"data": {"armor-1": {"sockets": [{"plugHash": 401}]}}}},
+    }
+    resolver = SimpleNamespace(
+        resolve_player=AsyncMock(return_value={"membership_id": "player", "membership_type": 3}),
+        get_profile=AsyncMock(return_value=profile),
+    )
+    service = LoadoutService(FakeClient(), FakeManifest(), resolver)
+    ctx = SimpleNamespace(request_context=SimpleNamespace(lifespan_context={"loadout_svc": service}))
+
+    response = await loadout_assistant(
+        intent="save", name="猎套", character="hunter", ctx=ctx,
+    )
+
+    assert response["ok"] is False
+    assert response["error"]["code"] == "confirmation_required"
+    payload = response["candidates"][0]
+    assert payload["intent"] == "save"
+    assert "loadout_id" not in payload, "save 不读 loadout_id，别塞进确认信封"
+    assert payload["save_preview"]["armor"][0]["slot_display"] == "胸部护甲"
+    assert response["next_actions"], "确认时也要给下一步（得到同意后 confirmed=true 重发）"
 
 
 @pytest.mark.asyncio

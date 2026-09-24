@@ -53,8 +53,10 @@ CEILINGS = {
     # 1319 → 1263：金装解析/确认整段搬去 `tools/_build_confirmation.py`（与确认凭据同一件事），
     # 且"唯一精确匹配不再多问一轮"（ADR-017）。上限跟着收紧到当前长度。
     # 1263 → 1217：`loadout_assistant` 的清单/详情分支搬去 `tools/_loadout_branches.py`
-    # （list 只给清单行、get 才给完整模板），`_dump` 也搬去 `_helpers.dump` 共用。
-    "destiny_mcp/tools/assistants.py": 1217,
+    # （list 只给清单行、get 才给完整模板），`_dump` 也搬去 `_responses.dump` 共用。
+    # 1217 → 1206：写入类信封（原本地 `_action_response`）与配装写入的确认载荷也各归各家
+    # —— 前者去 `_responses.action_response`，后者去 `_loadout_branches.confirm_write`。
+    "destiny_mcp/tools/assistants.py": 1206,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留
@@ -75,7 +77,8 @@ CEILINGS = {
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升
-    "destiny_mcp/services/loadout_equipment_service.py": 520,
+    # 520 → 519：`equip_loadout` 补上回读核对（同一条纪律，与 equip_exact 一致）。
+    "destiny_mcp/services/loadout_equipment_service.py": 519,
     "destiny_mcp/services/starside_service.py": 769,
     # 新增登记（PvP 武器榜）：不登记就等于没有闸 —— 仓库的规矩是"要在这里加代码
     # 得先做一次有意识的决定"，而不是等它长成下一个上帝模块。当前 529 行即上限。
