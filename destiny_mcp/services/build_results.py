@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from typing import Any, Sequence
 
 from ..build.constants import STAT_NAMES
+from ..build.functional_mods import FunctionalModPlan
 from ..build.models import (
     BuildCandidate,
     BuildConstraints,
@@ -58,6 +59,8 @@ class ResultContext:
     execution_subclass: LoadoutSubclassConfig | None = None
     #: 护甲实例 ID 组合（排序后）→ 这套的调谐改动；空表示这套不用动调谐。
     tuning: dict[tuple[str, ...], TuningPlan] = field(default_factory=dict)
+    #: 社区配装里照抄来的功能模组（按部位成组）；None = 这次没有要照抄的。
+    functional_mods: FunctionalModPlan | None = None
 
 
 def set_key(items: Sequence[Any]) -> tuple[str, ...]:
@@ -160,6 +163,11 @@ def build_results(
                     if plan is not None and plan.feasible
                     else []
                 ),
+                functional_mods=(
+                    context.functional_mods.as_payload()
+                    if context.functional_mods and context.functional_mods.mods
+                    else {}
+                ),
                 requires_tuning=has_plan,
                 tuning_note=tuning_note(plan, item_names),
                 canonical_build=ExecutableBuild(
@@ -238,6 +246,13 @@ def build_results(
                             item_instance_id=armor.item_instance_id,
                             # 属性模组 +（如果这套要改调谐）调谐插件：执行器按类别找槽，
                             # 调谐槽本来就是插槽，回读一视同仁。
+                            # 照抄来的功能模组（社区作者写的流派取向）：与属性模组分开放，
+                            # 因为它们的失败口径不同 —— 装不上只跳过并点名，不许整条回退。
+                            functional_mod_groups=(
+                                (context.functional_mods.groups_by_slot().get(
+                                    LOADOUT_SLOT_NAMES.get(armor.slot, armor.slot), []
+                                ) if context.functional_mods else [])
+                            ),
                             mods=[
                                 *armor_set.stat_mod_assignments.get(
                                     armor.item_instance_id, []

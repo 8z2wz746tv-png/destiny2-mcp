@@ -28,6 +28,7 @@
 | [ADR-017](017-exact-exotic-name-skips-a-round.md) | 金装名字**唯一精确匹配**时直接求解（响应 `query.exotic_resolution` 交代用的哪件），模糊/多件仍然必须停下来确认；`resolve_exotic_armor` 的 `status` 语义成为对外契约 | accepted |
 | [ADR-018](018-already-there-is-not-a-failure.md) | 1679「这个槽已经装着它」= 状态已成立（三条写入路径共用一条判据）；预检里「这一位装不上」的模组标 `blocked` 并跳过，**不许**把整条配装打成失败 + 回退 | accepted |
 | [ADR-019](019-disambiguation-is-not-a-failure.md) | 「同名多件，先选一件」回 `item_disambiguation_required`（没写也没失败），不是 `move_failed`；候选只在信封里发一份，`next_actions` 告诉调用方拿 `question` 去问 | accepted |
+| [ADR-020](020-functional-mods-are-copied.md) | 社区配装的**功能模组照抄**（抗性/搜寻/回收这类流派取向，不进求解器）；求解器只让出它们占的能量，插不进/装不下就跳过并点名 | accepted |
 
 ## 编号规矩
 

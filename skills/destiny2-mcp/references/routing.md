@@ -342,6 +342,7 @@ Manifest 侧（**不代表拥有**）：
 | `fragment_name` | `subclass_assistant`：`community`、`fragment_details` |
 | `fragment_names` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `from_character` | `inventory_assistant`：`move`、`transfer` |
+| `functional_mods` | `build_assistant`：`find`、`recommend` |
 | `grenade_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `group_id` | `activity_assistant`：`clan_leaderboards` |
 | `health_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |

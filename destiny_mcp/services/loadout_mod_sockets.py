@@ -6,32 +6,13 @@
 
 from __future__ import annotations
 
-from typing import NamedTuple
-
 from ..exceptions import TransferError
 from ..manifest import ManifestManager
-from ..models import LoadoutItem, MoveItemStep
+from ..models import LoadoutItem, ModOperation, MoveItemStep
 from ..utils.hash_utils import to_unsigned
 from . import profile_components, write_readback
+from .loadout_energy_budget import plan_energy_clearing
 from .loadout_plug_lookup import PlugLookupMixin
-
-
-class ModOperation(NamedTuple):
-    """一条要执行的模组操作（或"不执行"的理由）。
-
-    `action`：`mod` 要写 / `clear` 腾能量 / `keep` 已经装着 / `blocked` 这一位装不上。
-    带 `reason` 是为了让"装不上"能一路传到回执里 —— 以前预检遇到不可插入的模组直接抛错，
-    整条配装失败并回退（真机实测一次白烧 4 分钟），而正确做法是**跳过这一颗、如实汇报**。
-    """
-
-    action: str
-    plug_hash: int
-    socket_index: int
-    reason: str = ""
-
-    def as_tuple(self) -> tuple[str, int, int]:
-        """旧的三元组视图（测试与日志里比形状时更省字）。"""
-        return (self.action, self.plug_hash, self.socket_index)
 
 
 def plug_already_installed(result: dict | None) -> bool:
@@ -369,66 +350,36 @@ class ModSocketMixin(PlugLookupMixin):
         projected_used = current_used + sum(
             delta for delta, _, _ in target_operations
         )
-        deficit = max(0, projected_used - capacity)
-        clear_operations: list[ModOperation] = []
-        if deficit:
-            item_definition = self._manifest.get_item_definition(item.item_hash)
-            socket_entries = (
-                (item_definition.get("sockets") or {}).get("socketEntries", [])
-                if isinstance(item_definition, dict)
-                else []
+        clear_operations = plan_energy_clearing(
+            self, item, sockets, assigned_sockets,
+            deficit=max(0, projected_used - capacity),
+        )
+
+        # 照抄来的功能模组（社区模板写的流派取向）：只在**属性模组安排完之后的剩余能量**里装，
+        # 装不下/插不进就跳过并点名（见 `loadout_functional_mods.py` 的口径）。
+        if item.functional_mod_groups:
+            # 属性模组为了装下自己而腾出来的能量，照抄模组也能用 —— 所以预算是"腾完之后"的，
+            # 不是 `projected_used`（那个还是腾之前、带着 deficit 的数）。
+            cleared_energy = sum(
+                (self._plug_energy_cost(sockets[op.socket_index].get("plugHash", 0)) or 0)
+                - (self._plug_energy_cost(op.plug_hash) or 0)
+                for op in clear_operations
             )
-            candidates: list[tuple[int, int, int]] = []
-            for socket_index, socket in enumerate(sockets):
-                if (
-                    socket_index in assigned_sockets
-                    or socket_index >= len(socket_entries)
-                ):
-                    continue
-                current_hash = socket.get("plugHash", 0)
-                default_hash = socket_entries[socket_index].get(
-                    "singleInitialItemHash", 0
-                )
-                if not current_hash or not default_hash or current_hash == default_hash:
-                    continue
-                current_category = self._plug_category_hash(current_hash)
-                default_category = self._plug_category_hash(default_hash)
-                if current_category == self._PLUG_CAT_TUNING:
-                    continue
-                if (
-                    current_category not in self._MOD_CATEGORY_HASHES
-                    and default_category not in self._MOD_CATEGORY_HASHES
-                ):
-                    continue
+            functional_operations = await self._plan_functional_mods(
+                item,
+                sockets,
+                sockets_cache,
+                insertable,
+                assigned_sockets,
+                membership_id,
+                membership_type,
+                used_energy=projected_used - max(cleared_energy, 0),
+                capacity=capacity,
+            )
+        else:
+            functional_operations = []
 
-                current_cost = self._plug_energy_cost(current_hash)
-                default_cost = self._plug_energy_cost(default_hash)
-                if current_cost is None or default_cost is None:
-                    raise TransferError(
-                        "模组预检",
-                        f"无法计算 '{item.name}' 插槽 {socket_index} 的能量。",
-                    )
-                freed = current_cost - default_cost
-                if freed > 0:
-                    candidates.append((freed, socket_index, default_hash))
-
-            if sum(freed for freed, _, _ in candidates) < deficit:
-                raise TransferError(
-                    "模组预检",
-                    f"'{item.name}' 没有足够的可替换模组来腾出 {deficit} 点能量。",
-                )
-
-            remaining = sorted(candidates)
-            while deficit > 0:
-                sufficient = [
-                    candidate for candidate in remaining if candidate[0] >= deficit
-                ]
-                chosen = min(sufficient) if sufficient else remaining[0]
-                remaining.remove(chosen)
-                freed, socket_index, default_hash = chosen
-                clear_operations.append(ModOperation("clear", default_hash, socket_index))
-                deficit -= freed
-
+        functional_writes = [op for op in functional_operations if op.action == "mod"]
         return [
             *clear_operations,
             *keep_operations,
@@ -437,6 +388,11 @@ class ModSocketMixin(PlugLookupMixin):
                 ModOperation("mod", mod_hash, socket_index)
                 for _, mod_hash, socket_index in sorted(target_operations)
             ],
+            *[
+                op for op in functional_operations
+                if op.action in {"keep", "blocked"}
+            ],
+            *functional_writes,
         ]
 
     async def _find_mod_socket(

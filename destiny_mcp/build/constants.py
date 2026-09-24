@@ -141,3 +141,18 @@ SUBCLASS_BONUSES: dict[int, list[int]] = {
     1616346845:  [0, 0, -10, 10, 10, 0],   # Prismatic Titan (current)
     -12375465:   [0, 0, -10, 10, 10, 0],   # Prismatic Hunter (current)
 }
+
+
+#: 求解器/快照里的槽位键（复数：`helmets`/`chests`/`class_items`）→ 配装与模组清单里的部位名
+#: （单数：`helmet`/`chest`/`class_item`）。两套键都存在是有历史原因的，但**换算只此一处**：
+#: 照抄模组的能量预留按部位名给，快照按求解器槽位查，靠这张表对上。
+SOLVER_SLOT_TO_LOADOUT: dict[str, str] = {
+    "helmets": "helmet",
+    "helmet": "helmet",
+    "gauntlets": "gauntlets",
+    "chests": "chest",
+    "chest": "chest",
+    "legs": "legs",
+    "class_items": "class_item",
+    "class_item": "class_item",
+}

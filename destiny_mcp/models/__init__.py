@@ -14,7 +14,14 @@ from .equip_plan import (
     EquipStepAction,
 )
 from .inventory import InventoryItem, InventoryResponse, SearchItemsResponse
-from .loadout import Loadout, LoadoutItem, LoadoutListResponse, LoadoutOperationResult, LoadoutSubclassConfig
+from .loadout import (
+    Loadout,
+    LoadoutItem,
+    LoadoutListResponse,
+    LoadoutOperationResult,
+    LoadoutSubclassConfig,
+    ModOperation,
+)
 from .player import CharacterInfo, PlayerInfo, ProfileResponse
 from .subclass import (
     ModifySubclassPlug,
@@ -47,6 +54,7 @@ from .weekly import WeeklyActivity, WeeklyMilestone, WeeklyResetResponse
 __all__ = [
     # base
     "ArmorStats",
+    "ModOperation",
     "MoveItemStep",
     "PerkInfo",
     # player

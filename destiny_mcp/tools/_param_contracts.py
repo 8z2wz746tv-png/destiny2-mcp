@@ -364,6 +364,14 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint='查套装效果用 intent="set_bonus"；把套装当求解约束用 intent="farm_target"/"recommend"。',
         suggestion=("build_assistant", "set_bonus"),
     ),
+    ("build_assistant", "functional_mods"): _contract(
+        _only("recommend", "find"),
+        hint=(
+            '照抄社区配装的功能模组只在求解类 intent（recommend/find）上生效：'
+            '它们的能量会从六维求解里扣掉，analyze/farm_target 不带执行计划。'
+        ),
+        suggestion=("build_assistant", "find"),
+    ),
     ("build_assistant", "set_bonus_count"): _contract(
         _only(*_B_CRAFT), hint='套装件数是求解约束，只在求解类 intent 上生效。',
         suggestion=("build_assistant", "recommend"),

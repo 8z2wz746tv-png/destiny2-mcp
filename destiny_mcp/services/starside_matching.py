@@ -318,10 +318,17 @@ def validate_build(manifest: ManifestManager, build: dict) -> dict:
         if value.get("kind") == "minimum"
     }
     set_requirements = build.get("armor", {}).get("set_requirements", [])
+    #: 作者写的部位功能模组：照抄用（`find`/`recommend` 的 `functional_mods` 参数）。
+    copied_mods = [
+        f"{slot}:{name}"
+        for slot, names in (build.get("armor", {}).get("mods") or {}).items()
+        for name in names or []
+    ]
     solver_handoff = {
         "intent": "find",
         "character": class_id,
         "exotic_name": exotic or None,
+        "functional_mods": copied_mods,
         **{f"{key}_target": value for key, value in candidate_targets.items()},
         "set_bonus_name": set_requirements[0]["name"]
         if len(set_requirements) == 1
@@ -345,7 +352,9 @@ def validate_build(manifest: ManifestManager, build: dict) -> dict:
             "scope": "partial_armor_requirements_only",
             "limitations": [
                 "仅转换带 + 的明确最低值；裸数值、范围、未指定值不自动改成下限，用户须确认后补充。",
-                "现有求解器一次只能表达一个套装；未转换多个套装、武器、技能、模组、神器及注解。",
+                "现有求解器一次只能表达一个套装；未转换多个套装、武器、技能、神器及注解。",
+                "`functional_mods` 是**照抄**作者写的部位功能模组（流派取向，不进求解器）："
+                "只把它们占掉的能量从六维求解里扣掉，装不上/插不进的会跳过并在回执里点名。",
                 "不要把这些部分参数用于整套复现；只能经用户同意作为单独护甲求解的起点。",
             ],
             "not_converted_stat_targets": {

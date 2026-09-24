@@ -23,6 +23,7 @@ from .armor_rules import (
     tier5_templates,
     tuning_options,
 )
+from .constants import SOLVER_SLOT_TO_LOADOUT
 from .constants import (
     REQUEST_TARGET_FIELDS,
     ARMOR_SLOT_MAP,
@@ -307,6 +308,7 @@ class InventorySnapshot(BaseModel):
         profile: dict,
         manifest: "ManifestManager",
         character_class: str = "",
+        reserved_mod_energy: dict[str, int] | None = None,
     ) -> "InventorySnapshot":
         """Build an InventorySnapshot from a raw GetProfile response.
 
@@ -319,6 +321,8 @@ class InventorySnapshot(BaseModel):
             manifest: ManifestManager for item name/type/tier lookups.
             character_class: Target class filter — "hunter"/"warlock"/"titan" (or Chinese).
                            If empty, includes all classes.
+            reserved_mod_energy: 部位 → "照抄来的功能模组要占掉的能量"。给了就保证求解器
+                           给属性模组只留**剩下的**能量（照抄模组不进求解，但它的成本要算进去）。
 
         Returns:
             InventorySnapshot with armor grouped by slot.
@@ -651,7 +655,13 @@ class InventorySnapshot(BaseModel):
                 tuning_mod_hash=tuning_hash,
                 tuning_name=tuning_name,
                 tuning_option_hashes=tuning_options,
-                energy_used_by_other_mods=other_mod_energy,
+                # 照抄来的功能模组要占的能量：取 `max(已装的部位模组, 预留额度)`。
+                # 为什么是 max：只替换得掉**同类**的那几颗，抄不满的旧模组还占着能量 ——
+                # 少算的后果是属性模组装不下（12/11 预检失败并回退），多算只是少用一点能量。
+                energy_used_by_other_mods=max(
+                    other_mod_energy,
+                    int((reserved_mod_energy or {}).get(SOLVER_SLOT_TO_LOADOUT.get(slot, slot), 0) or 0),
+                ),
                 armor3_roll_verified=armor3_roll_verified,
                 roll_parse_error=roll_parse_error,
                 is_artifice=is_artifice,
@@ -941,6 +951,13 @@ class BuildResult(BaseModel):
     fragment_details: list[dict] = Field(
         default_factory=list,
         description="Fragment stat details: [{name, stats: {stat: bonus}}]",
+    )
+    functional_mods: dict = Field(
+        default_factory=dict,
+        description=(
+            "这次照抄社区配装的部位功能模组（空 = 没照抄）：{mods, energy_by_slot, unresolved}。"
+            "它们是流派取向、不进求解器，但占掉的能量已经从六维求解里扣掉"
+        ),
     )
     active_set_bonuses: list[dict] = Field(
         default_factory=list,

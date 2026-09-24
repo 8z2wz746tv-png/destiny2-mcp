@@ -373,6 +373,18 @@ ExcludedPerks = Annotated[
     )),
 ]
 
+FunctionalMods = Annotated[
+    list[str] | str | None,
+    Field(description=(
+        "照抄社区配装作者写的**部位功能模组**（抗性/搜寻/回收/吸引这类流派取向，不是六维属性模组）："
+        '传模组名列表，如 ["充沛", "特殊武器弹药搜寻者"]；重名的两颗就写两遍'
+        "（如两个「火力无限」）；认不出部位时写成「部位:名字」（helmet:充沛）。"
+        "它们**不进求解器**，但要占能量 —— 求解器会把这部分能量先扣掉，只给属性模组留剩下的。"
+        "插不进这一位角色或能量不够的会跳过并在回执里点名，不会让整条配装失败。"
+        "社区模板给的清单可以直接照传（见 community 响应的 solver_handoff.functional_mods）。"
+    )),
+]
+
 SetBonusName = Annotated[
     str | None,
     Field(description='套装名。intent="set_bonus" 查它的 2/4 件效果；求解类 intent 把它当硬约束。'),

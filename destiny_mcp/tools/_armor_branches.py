@@ -241,6 +241,24 @@ async def equip_preview(svc: Any, player_name: str, canonical_build: dict[str, A
         slot_key = slot_key_from_solver(str(item.get("slot") or ""))
         socket_entries = raw.get("sockets") or []
         mods: list[dict[str, Any]] = []
+        # 照抄社区配装来的功能模组：与属性模组一起列出来，但标清来源 ——
+        # 确认阶段要能看出"哪几颗是作者写的、哪几颗是我们算的"（写不进去的会跳过并点名）。
+        for group in item.get("functional_mod_groups") or []:
+            for mod_hash in group[:1]:
+                copied_definition = manifest.get_item_definition(int(mod_hash)) or {}
+                mods.append({
+                    "hash": int(mod_hash),
+                    "name": (copied_definition.get("displayProperties") or {}).get("name", ""),
+                    "copied_from_template": True,
+                    "alternatives": [int(value) for value in group[1:]],
+                    "energy_cost": ((copied_definition.get("plug") or {}).get("energyCost") or {}).get(
+                        "energyCost", 0
+                    ),
+                    "currently_installed": any(
+                        int(entry.get("plugHash", 0) or 0) == int(mod_hash)
+                        for entry in socket_entries
+                    ),
+                })
         for mod_hash in item.get("mods") or []:
             mod_definition = manifest.get_item_definition(int(mod_hash)) or {}
             mods.append({

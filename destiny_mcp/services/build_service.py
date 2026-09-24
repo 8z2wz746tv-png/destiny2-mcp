@@ -27,6 +27,7 @@ from ..build.analyzer import (
     probe_stat,
 )
 from ..build.constants import MAIN_STAT_HASHES, STAT_NAMES, SUBCLASS_BONUSES
+from ..build.functional_mods import resolve_functional_mods
 from ..build.constraints import parse as _parse_constraints
 from ..build.farm_target import find_farm_targets
 from ..build.models import (
@@ -41,6 +42,7 @@ from ..build_contracts import CanonicalBuild, ExecutableBuild
 from . import profile_components
 from ..exceptions import BuildValidationError
 from ..logging_config import get_logger
+from ..utils.arg_text import split_items
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..models import Loadout, LoadoutSubclassConfig
 from ..player_resolver import PlayerResolver
@@ -446,6 +448,7 @@ class BuildService:
         *,
         compute: BuildCompute | None = None,
         register: bool = True,
+        functional_mods: list[str] | str | None = None,
     ) -> list[BuildResult]:
         """`compute` / `register` 只给**只读探测**用（阶梯的逐档试解）：
 
@@ -478,8 +481,12 @@ class BuildService:
             player_name, request.exotic_name, request.target_vector(),
         )
 
+        # 照抄来的功能模组（流派取向，不进求解器）只影响一件事：这件护甲还剩多少能量能给属性模组。
+        plan = resolve_functional_mods(
+            self._manifest, [] if functional_mods is None else split_items(functional_mods))
         # Step 1: Fetch armor data (filtered by character class)
-        snapshot = await self._inventory.get_armor_snapshot(player_name, request.character_class)
+        snapshot = await self._inventory.get_armor_snapshot(
+            player_name, request.character_class, reserved_mod_energy=plan.energy_by_slot() or None)
         snapshot_version = _snapshot_version(snapshot)
         logger.info("Snapshot: %d pieces across 5 slots", snapshot.total_pieces)
 
@@ -566,6 +573,7 @@ class BuildService:
                 fragment_details=fragment_details,
                 execution_subclass=execution_subclass,
                 tuning=tuning_map,
+                functional_mods=plan,
             ),
         )
 
@@ -703,9 +711,10 @@ class BuildService:
         self,
         player_name: str,
         request: BuildRequest,
+        functional_mods: list[str] | str | None = None,
     ) -> BuildRecommendation:
         """Find builds and include diagnostics when no candidate is available."""
-        results = await self.find_build(player_name, request)
+        results = await self.find_build(player_name, request, functional_mods=functional_mods)
         if results:
             return BuildRecommendation(results=results)
 

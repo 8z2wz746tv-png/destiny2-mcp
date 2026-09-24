@@ -30,6 +30,7 @@ from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
 from .account_action_lock import account_action_lock
 from .write_readback import read_until
+from .loadout_functional_mods import FunctionalModMixin
 from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
 from .loadout_transfer_step import TransferStepMixin
 from .loadout_recovery import RecoveryStateMixin
@@ -41,7 +42,7 @@ _CANCEL_ROLLBACK_TIMEOUT_SECONDS = 60
 
 
 class LoadoutEquipmentService(
-    RecoveryStateMixin, ModSocketMixin, SubclassSocketMixin, TransferStepMixin
+    RecoveryStateMixin, ModSocketMixin, FunctionalModMixin, SubclassSocketMixin, TransferStepMixin
 ):
     """Apply loadout equipment: transfer, equip, mods, subclass config."""
 
@@ -164,7 +165,8 @@ class LoadoutEquipmentService(
         # 上游没给这份数据时，"装不了"与"没查到"必须分开（本项目的老毛病）。
         insertable = self.insertable_plugs(profile, char_id)
         for lo_item in loadout.items:
-            if (not lo_item.mods and not lo_item.mod_sockets) or not lo_item.item_instance_id:
+            has_work = lo_item.mods or lo_item.mod_sockets or lo_item.functional_mod_groups
+            if not has_work or not lo_item.item_instance_id:
                 continue
             try:
                 mod_operations[lo_item.item_instance_id] = (

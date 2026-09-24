@@ -28,8 +28,7 @@ from ..error_codes import ErrorCode
 from ..utils.arg_text import split_items, split_pairs
 from ._responses import error_response
 
-_ITEMS = "items"  # list[str]
-_INTS = "ints"  # dict[str, int]
+_ITEMS, _INTS = "items", "ints"  # list[str] / dict[str, int]
 _TEXTS = "texts"  # dict[str, str]
 
 
@@ -49,6 +48,7 @@ SCALAR_PARAMETERS: dict[str, ScalarParameter] = {
     "excluded_perks": ScalarParameter(_ITEMS, "亡者复仇,速射"),
     "priority_stats": ScalarParameter(_ITEMS, "weapons,grenade"),
     "fragment_names": ScalarParameter(_ITEMS, "保护之光,聚焦打击"),
+    "functional_mods": ScalarParameter(_ITEMS, "充沛,特殊武器弹药搜寻者"),
     "item_instance_ids": ScalarParameter(_ITEMS, "6917530188460608169,6917530188460608170"),
     "stat_caps": ScalarParameter(_INTS, "grenade=100,melee=90"),
     "changes": ScalarParameter(_TEXTS, "super=金色枪"),

@@ -572,6 +572,7 @@ async def build_assistant(
     ))] = False,
     set_bonus_name: fields.SetBonusName = None,
     set_bonus_count: fields.SetBonusCount = None,
+    functional_mods: fields.FunctionalMods = None,
     priority_stats: Annotated[list[str] | str | None, Field(description=(
         "所有硬目标达标后才按顺序最大化的属性。使用 "
         "weapons/health/class/grenade/melee/super；力量/strength 必须写为 melee。"
@@ -811,11 +812,12 @@ async def build_assistant(
         query["set_bonus_name"] = request.set_bonus_name
         query["set_bonus_count"] = request.set_bonus_count
 
+    # 照抄社区配装的功能模组：清单原样交给服务层（解析与"没抄上哪几颗"都在那边做）
     if intent == "recommend":
-        return await build_flow.recommend(svc, resolved, request, query, dump)
+        return await build_flow.recommend(svc, resolved, request, query, dump, functional_mods)
 
     if intent == "find":
-        return await build_flow.find(svc, resolved, request, query, dump)
+        return await build_flow.find(svc, resolved, request, query, dump, functional_mods)
 
     if intent == "analyze":
         return await build_flow.analyze(svc, resolved, request, query, dump)

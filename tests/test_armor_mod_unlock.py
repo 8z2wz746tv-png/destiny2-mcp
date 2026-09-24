@@ -30,7 +30,7 @@ from destiny_mcp.services.armor_payload import (
     slot_key_from_bucket,
 )
 from destiny_mcp.services.loadout_equipment_service import LoadoutEquipmentService
-from destiny_mcp.services.loadout_mod_sockets import ModOperation
+from destiny_mcp.models import ModOperation
 
 HELMET_BUCKET = 3448274439          # 无符号（真机 Manifest 里就是这个值）
 HELMET_BUCKET_SIGNED = -846692857   # 老代码抄的那个有符号值

@@ -13,6 +13,23 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：`build_assistant` 多一个 `functional_mods`（照抄社区配装的功能模组，2026-09-25）
+
+社区模板里作者写的部位功能模组（每件 3 颗：抗性/搜寻/回收/吸引…）现在能跟着配装一起装：
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `build_assistant(intent="find"/"recommend")` | 没有"功能模组"这个入参 | 新增 `functional_mods`：模组名列表（`["充沛", "特殊武器弹药搜寻者"]`，重名的写两遍；认不出部位时写 `部位:名字`）。只发标量的宿主写 `"充沛,特殊武器弹药搜寻者"` |
+| 这些模组的定位 | 只出现在模板展示里（`armor.mods`），**既不核对也不代装** | **照抄**：不进求解器，但占掉的能量先从六维求解里扣掉（`reserved_mod_energy`） |
+| 社区模板的 `solver_handoff` | 只给角色/金装/套装/六维下限 | 多一项 `functional_mods`（照抄清单），可原样传给 `find` |
+| 回执 | — | `functional_mods`（`{mods, energy_by_slot, unresolved}`）+ 摘要里"含照抄社区配装的 N 颗功能模组"；确认信封的 `items_preview[].mods` 用 `copied_from_template: true` 标出来源 |
+| 装不下 / 插不进 | — | **跳过 + 点名**（`steps[].action="mod_blocked"` 与 warnings），不许让整条配装失败或回退；已经装着的不写 |
+
+照抄的边界：**只有功能模组可以照抄**。武器、六维、装备、子职业仍然必须走我们的求解与核对，
+社区模板依旧不是可执行凭据（`COMMUNITY_TEMPLATE_NOT_EXECUTABLE` 不变）。
+真机实测：作者那套 15 颗（每件 7–9 点 / 上限 11）会让原来能达标的六维目标变成无解 ——
+这是护甲 3.0 的能量规则，不是 bug；回执要如实说"是照抄模组吃掉了能量"，由玩家决定砍哪一头。
+
 ## 未发布：`loadout_assistant` 的 `list` / `get` 不再是别名（**破坏性**，2026-09-24）
 
 0.7.6 把两者拆成了**两件事**：`list` 只给清单行、`get` 给完整模板且可按 `loadout_id` 取一套。

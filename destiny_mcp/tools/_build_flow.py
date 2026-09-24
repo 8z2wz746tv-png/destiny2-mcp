@@ -16,6 +16,33 @@ from ..build.analyzer import narrowing_actions
 from ..exceptions import BuildTooLargeError
 
 
+def _functional_mods_payload(payload: Any) -> dict[str, Any] | None:
+    """回执里的照抄清单：服务层已经挂在每套候选上（`functional_mods`），这里只取一份。
+
+    挂的是**清单**不是可执行计划：可执行的那份在服务端签发的候选里（`items[].functional_mod_groups`）。
+    """
+    rows = payload if isinstance(payload, list) else (payload or {}).get("results")
+    for build in rows or []:
+        if isinstance(build, dict) and build.get("functional_mods"):
+            return build["functional_mods"]
+    return None
+
+
+def _summary_with_functional_mods(message: str, payload: dict[str, Any] | None) -> str:
+    """摘要里点一句"带上了社区作者的功能模组"，并说清没抄上的几颗。"""
+    if not payload:
+        return message
+    copied = len(payload.get("mods") or [])
+    if not copied:
+        return message
+    text = f"{message}（含照抄社区配装的 {copied} 颗功能模组，已从六维求解里扣掉它们的能量）"
+    unresolved = payload.get("unresolved") or []
+    if unresolved:
+        names = "、".join(str(row.get("entry")) for row in unresolved)
+        text += f"；{len(unresolved)} 颗没抄上：{names}"
+    return text
+
+
 def _has_hard_targets(request: Any) -> bool:
     return any(
         getattr(request, field, None) is not None
@@ -61,12 +88,16 @@ async def recommend(
     request: Any,
     query: dict[str, Any],
     dump: Callable[[Any], Any],
+    functional_mods: Any = None,
 ) -> dict[str, Any]:
     try:
-        result = await svc["build_svc"].recommend_build(player_name, request)
+        result = await svc["build_svc"].recommend_build(
+            player_name, request, functional_mods=functional_mods
+        )
     except BuildTooLargeError as exc:
         return _not_computed(str(exc), query, key="recommendation")
     recommendation = with_slot_keys(dump(result))
+    copied_mods = _functional_mods_payload(recommendation)
     if not _has_hard_targets(request):
         _mark_completion_rate_na(recommendation)
     if not recommendation.get("results"):
@@ -87,7 +118,7 @@ async def recommend(
             ],
         )
     return ok_response(
-        "已生成配装推荐。",
+        _summary_with_functional_mods("已生成配装推荐。", copied_mods),
         {"recommendation": recommendation, "query": query},
     )
 
@@ -141,10 +172,13 @@ async def find(
     request: Any,
     query: dict[str, Any],
     dump: Callable[[Any], Any],
+    functional_mods: Any = None,
 ) -> dict[str, Any]:
     diagnostics: list[Any] = []
     try:
-        result = await svc["build_svc"].find_build(player_name, request, diagnostics)
+        result = await svc["build_svc"].find_build(
+            player_name, request, diagnostics, functional_mods=functional_mods
+        )
     except BuildTooLargeError as exc:
         return _not_computed(str(exc), query, key="builds")
     report = diagnostics[0].to_dict() if diagnostics else None
@@ -154,6 +188,7 @@ async def find(
         else None
     )
     builds = with_slot_keys(dump(result))
+    copied_mods = _functional_mods_payload(builds)
     tuning = _tuning_summary(builds)
     if not builds:
         ladder = await armor_ladder.no_solution_ladder(
@@ -176,7 +211,11 @@ async def find(
                     "没有硬目标时这个比例没有意义（不是 0%）。",
                 )
     payload: dict[str, Any] = {"builds": builds, "query": query}
-    message = f"找到 {len(builds)} 个候选配装。"
+    if copied_mods is not None:
+        payload["functional_mods"] = copied_mods
+    message = _summary_with_functional_mods(
+        f"找到 {len(builds)} 个候选配装。", copied_mods
+    )
     if tuning is not None:
         payload["tuning"] = tuning
         message += (

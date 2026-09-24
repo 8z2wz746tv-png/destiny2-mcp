@@ -56,7 +56,9 @@ CEILINGS = {
     # （list 只给清单行、get 才给完整模板），`_dump` 也搬去 `_responses.dump` 共用。
     # 1217 → 1206：写入类信封（原本地 `_action_response`）与配装写入的确认载荷也各归各家
     # —— 前者去 `_responses.action_response`，后者去 `_loadout_branches.confirm_write`。
-    "destiny_mcp/tools/assistants.py": 1206,
+    # 1206 → 1208（0.7.9）：`build_assistant` 多一个入参 `functional_mods`（照抄社区配装的功能模组）
+    # —— 签名一行 + 两处分派各多一个实参。真正的解析与执行都不在这儿。
+    "destiny_mcp/tools/assistants.py": 1208,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留
@@ -73,12 +75,17 @@ CEILINGS = {
     # 875 → 880：`analyze_build` 改走"六项单项上限并发探测"（另起 `_probe_compute`，
     # 档位 4，只读）；为此把 `_canonical_subclass`（25 行）搬去 `services/build_results.py`
     # —— 净增 5 行，上限跟着定在当前长度。
-    "destiny_mcp/services/build_service.py": 880,
+    # 880 → 889（0.7.9）：照抄来的功能模组是**求解的一项输入**（它占掉的能量必须先扣掉），
+    # 工具层 → 快照的透传（含标量写法归一）就地加在这里。要再压请先拆碎片属性那两块
+    # （`_get_fragment_stats_by_names` 42 行 + `_replace_fragment_config` 58 行）。
+    "destiny_mcp/services/build_service.py": 889,
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升
     # 520 → 519：`equip_loadout` 补上回读核对（同一条纪律，与 equip_exact 一致）。
-    "destiny_mcp/services/loadout_equipment_service.py": 519,
+    # 519 → 521（0.7.9）：模组预检的入口条件要认"只有照抄模组"的件（+1），以及多继承一个
+    # `FunctionalModMixin`（+1）。决策逻辑本身在 `loadout_functional_mods.py`。
+    "destiny_mcp/services/loadout_equipment_service.py": 521,
     "destiny_mcp/services/starside_service.py": 769,
     # 新增登记（PvP 武器榜）：不登记就等于没有闸 —— 仓库的规矩是"要在这里加代码
     # 得先做一次有意识的决定"，而不是等它长成下一个上帝模块。当前 529 行即上限。
@@ -156,8 +163,16 @@ CEILINGS = {
     "destiny_mcp/tools/_write_failure_hints.py": 43,
     # 执行前状态快照与回滚（从 loadout_equipment_service 拆出）。
     "destiny_mcp/services/loadout_recovery.py": 385,
-    # 模组插槽读写/预检/能量腾挪（三条写入路径共用 `plug_already_installed`）。
-    "destiny_mcp/services/loadout_mod_sockets.py": 562,
+    # 模组插槽读写/预检（三条写入路径共用 `plug_already_installed`）。
+    # 562 → 518：能量腾挪那段搬去 `loadout_energy_budget.py`（预算是一道算术 + 挑选规则，
+    # 与"这颗该进哪个槽"是两件事），腾出来的位置给照抄模组的调用点。
+    "destiny_mcp/services/loadout_mod_sockets.py": 518,
+    # 0.7.9 新增：社区配装的功能模组（名字 → 部位/版本/能量；不进求解器，只算它占多少能量）。
+    "destiny_mcp/build/functional_mods.py": 159,
+    # 0.7.9 新增：照抄模组在执行时的现场决策（挑版本、插不进/装不下就跳过并点名）。
+    "destiny_mcp/services/loadout_functional_mods.py": 127,
+    # 0.7.9 新增（从 loadout_mod_sockets 拆出）：模组的能量预算与"拿谁去腾能量"。
+    "destiny_mcp/services/loadout_energy_budget.py": 85,
     # 配装服务本体：清单/详情/存档/预览/官方槽都在这。真机走查连加了两块（`describe_save`
     # 与抽出的 `_read_equipment`），登记在 1030 就是"下次先想清楚放哪儿"。
     "destiny_mcp/services/loadout_service.py": 1030,

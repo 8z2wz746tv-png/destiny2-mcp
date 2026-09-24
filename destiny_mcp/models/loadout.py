@@ -2,11 +2,29 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, NamedTuple
 
 from pydantic import BaseModel, Field
 
 from .base import MoveItemStep
+
+
+class ModOperation(NamedTuple):
+    """一条要执行的模组操作（或"不执行"的理由）。
+
+    `action`：`mod` 要写 / `clear` 腾能量 / `keep` 已经装着 / `blocked` 这一位装不上。
+    带 `reason` 是为了让"装不上"能一路传到回执里 —— 以前预检遇到不可插入的模组直接抛错，
+    整条配装失败并回退（真机实测一次白烧 4 分钟），而正确做法是**跳过这一颗、如实汇报**。
+    """
+
+    action: str
+    plug_hash: int
+    socket_index: int
+    reason: str = ""
+
+    def as_tuple(self) -> tuple[str, int, int]:
+        """旧的三元组视图（测试与日志里比形状时更省字）。"""
+        return (self.action, self.plug_hash, self.socket_index)
 
 
 class LoadoutItem(BaseModel):
@@ -21,6 +39,14 @@ class LoadoutItem(BaseModel):
     mod_sockets: dict[int, int] = Field(
         default_factory=dict,
         description="Exact armor mod socket index to equipped plug hash",
+    )
+    functional_mod_groups: list[list[int]] = Field(
+        default_factory=list,
+        description=(
+            "照抄社区配装来的部位功能模组（每组 = 同名插件版本，装哪个都行）；"
+            "它们不是求解出来的：插不进这一位角色或能量不够时**跳过并点名**，"
+            "不许因此让整条配装失败或回退"
+        ),
     )
     source_location: str = Field(
         default="",

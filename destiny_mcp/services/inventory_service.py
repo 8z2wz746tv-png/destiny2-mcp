@@ -442,6 +442,7 @@ class InventoryService:
         character_class: str = "",
         *,
         with_tuning_options: bool = True,
+        reserved_mod_energy: dict[str, int] | None = None,
     ) -> InventorySnapshot:
         """Fetch all armor pieces with stats, grouped by slot.
 
@@ -474,7 +475,10 @@ class InventoryService:
         )
         _, profile = await self._resolve_and_fetch(player_name, components)
         self._validate_armor_snapshot_components(profile, character_class)
-        snapshot = InventorySnapshot.from_profile(profile, self._manifest, character_class)
+        snapshot = InventorySnapshot.from_profile(
+            profile, self._manifest, character_class,
+            reserved_mod_energy=reserved_mod_energy,
+        )
         logger.info(
             "Armor snapshot ready: %d pieces across 5 slots",
             snapshot.total_pieces,

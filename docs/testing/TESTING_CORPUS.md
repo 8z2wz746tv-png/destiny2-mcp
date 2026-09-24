@@ -253,6 +253,7 @@
 | 账号里找不到 | 分解掉的物品、不存在的副本 | `item_not_found_error` | 曾经拥有或以为拥有，实际不在账号里 |
 | 上游说「没这个对象」 | `pgcr` 传数字但不存在的活动 ID、`clan_leaderboards` 传不存在的 group_id | `upstream_not_found_error` | ID 打错/过期 —— **改 ID**，不是重试 |
 | 上游其它 HTTP 错误 | 4xx（非 404）／无法归类的上游响应 | `a_p_i_error` | 上游问题；消息里带 HTTP 状态与 Bungie 原文 |
+| 照抄社区配装的功能模组 | `build_assistant(intent="find")` + `functional_mods=["充沛", …]` | 回执带 `functional_mods.mods`（部位/同名版本/能量）与 `unresolved`（对不上名的点名）；候选的 `items[].functional_mod_groups` 按部位就位；摘要写明"含照抄社区配装的 N 颗功能模组"。**属性模组不照抄**（传了会进 `unresolved` 并说明原因） |
 | 写入失败/被挡住时去哪找原因 | 任意写入 intent 的失败，或 `equip` 的 `equip_blocked` | **只看 `data.result`**（`steps` / `blockers` / `message` 都在那儿）；`candidates` 只放真候选（多件同名、确认载荷）。成功时顶层 `summary` 就是服务层那句结论 |
 | 同名多件要玩家选一件 | `move` 只说名字，而账号里有 5 件同名护甲 | `item_disambiguation_required`（**不是** `move_failed`） | **没写、也没失败**：候选在信封 `candidates`（`data.result` 里不再重复一份），`data.result.question` 原样展示给玩家；拿到编号后带 `item_instance_id` 重发同一个 intent |
 

@@ -30,7 +30,7 @@ from destiny_mcp.utils.arg_text import split_items, split_pairs
 # 有意识的改动：schema 守门会拿它和实际 schema 逐字对。
 EXPECTED = {
     "weapon_assistant": {"required_perks", "any_perks", "excluded_perks"},
-    "build_assistant": {"priority_stats", "fragment_names", "stat_caps"},
+    "build_assistant": {"priority_stats", "fragment_names", "functional_mods", "stat_caps"},
     "inventory_assistant": {"item_instance_ids"},
     "subclass_assistant": {"changes"},
 }
