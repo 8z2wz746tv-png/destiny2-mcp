@@ -12,6 +12,7 @@
 
 import asyncio
 import sys
+import time
 
 from destiny_mcp.server import create_server, app_lifespan
 from destiny_mcp.tools.assistants import build_assistant, inventory_assistant
@@ -23,9 +24,17 @@ T5_LEGS = "6917530198796768597"
 LEGACY_PIECE = "6917529740500777594"
 
 
+# 每一行"花了多久"：从上一行结束到现在。脚本直调工具，所以这是**服务端口径**
+# （不含 agent 的模型回合与用户确认）；要那个口径看 scripts/audit_chain_timing.py。
+_SINCE = [time.perf_counter()]
+
+
 def check(row: str, ok: bool, evidence: str) -> None:
-    RESULTS.append((row, ok, evidence))
-    print(f"{'PASS' if ok else 'FAIL'} | {row}\n       {evidence}")
+    now = time.perf_counter()
+    elapsed = now - _SINCE[0]
+    _SINCE[0] = now
+    RESULTS.append((row, ok, evidence, elapsed))
+    print(f"{'PASS' if ok else 'FAIL'} | {row}  [{elapsed:6.1f}s]\n       {evidence}")
 
 
 async def main():
@@ -207,8 +216,11 @@ async def main():
             "⑫ 社区核对：护甲需求的已拥有副本带 slot/slot_display",
             r["ok"] and bool(armor_reqs)
             and (not owned or all("slot" in inst for inst in owned)),
+            # 调用失败时把错误码写进证据：否则"0 需求"看起来像回归，其实是上游读抖动
+            # （2026-09-24 实测：同一条调用单独重跑就正常，脚本自己也写着"先重跑一次"）。
             f"护甲需求={len(armor_reqs)} 已拥有副本={len(owned)} "
-            f"样例={owned[0] if owned else None}",
+            f"样例={owned[0] if owned else None} "
+            f"error={(r.get('error') or {}).get('code')}",
         )
 
         # 7. 列表保持轻量：不带插槽/能量（要看这些走 intent=item）
@@ -443,10 +455,15 @@ async def main():
         )
 
     print("\n=== 汇总 ===")
-    failed = [row for row, ok, _ in RESULTS if not ok]
+    failed = [row for row, ok, _, _ in RESULTS if not ok]
     print(f"共 {len(RESULTS)} 行，PASS {len(RESULTS) - len(failed)}，FAIL {len(failed)}")
     for row in failed:
         print("  FAIL:", row)
+
+    total = sum(row[3] for row in RESULTS)
+    print(f"\n=== 每行反馈时间（服务端口径，合计 {total:.1f}s / {total / 60:.1f} 分钟）===")
+    for row, _ok, _evidence, elapsed in sorted(RESULTS, key=lambda item: -item[3]):
+        print(f"  {elapsed:7.1f}s  {row}")
     return 1 if failed else 0
 
 
