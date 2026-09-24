@@ -12,7 +12,12 @@ import aiobungie
 import anyio
 
 from ..bungie_client import BungieClient
-from ..exceptions import DestinyMCPError, ItemNotFoundError, TransferError
+from ..exceptions import (
+    DestinyMCPError,
+    ItemNotFoundError,
+    TransferError,
+    describe_exception,
+)
 from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager
@@ -345,12 +350,15 @@ class LoadoutEquipmentService(
         try:
             applied = await self._equip_local_unlocked(player_name, loadout)
         except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:
-            logger.error("Exact loadout application failed: %s", exc)
+            # `describe_exception`：`TimeoutError()` 的 str 是空的，直接写会留下"失败但没有原因"
+            # （真机 2026-09-23：apply 步骤 detail 为空，谁也看不出发生了什么）。
+            logger.exception("Exact loadout application failed: %s", describe_exception(exc))
+            reason = describe_exception(exc)
             applied = LoadoutOperationResult(
                 success=False,
                 loadout_name=loadout.name,
-                message=str(exc),
-                steps=[MoveItemStep(action="apply", detail=str(exc), success=False)],
+                message=reason,
+                steps=[MoveItemStep(action="apply", detail=reason, success=False)],
             )
         verified = False
         if applied.success:

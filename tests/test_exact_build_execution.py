@@ -457,6 +457,33 @@ async def test_fuzzy_exotic_name_still_requires_confirmation() -> None:
     build_service.recommend_build.assert_not_awaited()
 
 
+@pytest.mark.asyncio
+async def test_apply_failure_always_carries_a_reason() -> None:
+    """写入失败的回执**不许留白**：`TimeoutError()` 的 str 是空的（真机 2026-09-23 踩到）。
+
+    那次 `apply` 步骤 detail 为空，谁也看不出发生了什么；现在至少给出异常类型与"状态未知"。
+    """
+    service = _build_service()
+    snapshot, build = _exact_contract()
+    service._candidates.register(build, "Alpha#0100")
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
+    service._equipment._capture_recovery_state = AsyncMock(return_value={})
+    service._equipment._restore_exact_state = AsyncMock(return_value=True)
+
+    async def _boom(*args, **kwargs):
+        raise TimeoutError()
+
+    service._equipment._equip_local_unlocked = _boom
+
+    result = await service.equip_build("Alpha#0100", build, "hunter")
+
+    assert result["success"] is False
+    apply_step = next(step for step in result["steps"] if step["action"] == "apply")
+    assert apply_step["detail"].strip(), "失败必须带原因，不能是空串"
+    assert "超时" in apply_step["detail"]
+    assert "未知" in apply_step["detail"], "超时后写入是否生效是未知的，要说清"
+
+
 def test_priority_stats_keep_strict_order_and_remove_duplicates() -> None:
     parsed = parse_constraints(
         BuildRequest(

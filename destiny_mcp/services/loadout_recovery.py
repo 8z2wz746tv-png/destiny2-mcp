@@ -11,7 +11,12 @@ from __future__ import annotations
 
 import aiobungie
 
-from ..exceptions import DestinyMCPError, ItemNotFoundError, TransferError
+from ..exceptions import (
+    DestinyMCPError,
+    ItemNotFoundError,
+    TransferError,
+    describe_exception,
+)
 from ..logging_config import get_logger
 from ..models import (
     Loadout,
@@ -22,6 +27,7 @@ from ..models import (
 )
 from . import profile_components
 from .item_parser import armor_slot_from_bucket, parse_items_from_profile
+from .loadout_mod_sockets import plug_already_installed
 
 logger = get_logger(__name__)
 
@@ -220,17 +226,25 @@ class RecoveryStateMixin:
                         char_id,
                         mtype,
                     )
-                    ok = response.get("ErrorCode", 0) == 1
+                    # 1679「这个槽已经装着它」= 执行前状态已经成立，不算失败。
+                    # 真机 2026-09-23：这里漏了这条判据 → 26 条"恢复模组"全被记成失败 →
+                    # all_ok=False → 连验证都没跑就报"自动恢复不完整"，而账号其实是好的。
+                    already = plug_already_installed(response)
+                    ok = response.get("ErrorCode", 0) == 1 or already
                     steps.append(MoveItemStep(
                         action="rollback_mod",
-                        detail=f"恢复 '{original.name}' 的模组 {mod_hash}",
+                        detail=(
+                            f"恢复 '{original.name}' 的模组 {mod_hash}：已经装着，未改动"
+                            if already
+                            else f"恢复 '{original.name}' 的模组 {mod_hash}"
+                        ),
                         success=ok,
                     ))
                     all_ok = all_ok and ok
                 except (aiobungie.HTTPError, ItemNotFoundError, TransferError) as exc:
                     logger.error("Failed to restore mod %s on %s: %s", mod_hash, original.name, exc)
                     steps.append(MoveItemStep(
-                        action="rollback_mod", detail=str(exc), success=False
+                        action="rollback_mod", detail=describe_exception(exc), success=False
                     ))
                     all_ok = False
 
@@ -242,7 +256,7 @@ class RecoveryStateMixin:
             previous_result = LoadoutOperationResult(
                 success=False,
                 loadout_name=previous.name,
-                message=str(exc),
+                message=describe_exception(exc),
                 steps=[MoveItemStep(
                     action="error", detail=f"恢复执行前配装失败：{exc}", success=False
                 )],
@@ -308,7 +322,7 @@ class RecoveryStateMixin:
             except (ItemNotFoundError, TransferError) as exc:
                 logger.error("Failed to restore location for %s: %s", original.name, exc)
                 steps.append(MoveItemStep(
-                    action="rollback_location", detail=str(exc), success=False
+                    action="rollback_location", detail=describe_exception(exc), success=False
                 ))
                 all_ok = False
 

@@ -169,3 +169,21 @@ class BuildTooLargeError(DestinyMCPError):
     def __init__(self, reason: str) -> None:
         self.reason = reason
         super().__init__(reason)
+
+
+def describe_exception(exc: BaseException) -> str:
+    """异常 → 给人看的一句话（**空消息也要能读**）。
+
+    真机（2026-09-23）：`equip_build` 的回执里 `apply` 步骤 `detail=""` ——
+    失败却没有任何原因。根因是 `TimeoutError()` 这类异常的 `str()` 就是空串，
+    而回执直接写 `str(exc)`。这里统一兜底，别再让"失败"变成一片空白。
+    """
+    text = str(exc).strip()
+    if text:
+        return text
+    if isinstance(exc, TimeoutError):
+        return "上游超时（这次写入是否生效未知，回滚会按执行前状态核对）"
+    if isinstance(exc, OSError):
+        return f"{type(exc).__name__}：连接层错误，上游没有给原因"
+    return f"{type(exc).__name__}：异常没有带消息（看服务端日志的 traceback）"
+
