@@ -139,6 +139,25 @@ CEILINGS = {
     # 211 是加上"玩家说红框、游戏说模式"的术语块与变体话术（含强化插槽）之后的长度；
     # 215 = 211 + 载荷里的 by_tier 汇总。
     "destiny_mcp/tools/_patterns_branches.py": 215,
+    # —— 2026-09-24 补登记：这几块都是**拆出来的产物**（assistants / loadout_equipment_service
+    # 的上限一路下调，靠的就是把代码挪进它们）。拆出来的模块不登记，等于给上限开了后门：
+    # 往 `_loadout_branches.py` 堆代码时 `assistants.py` 仍然"达标"，总量却在涨
+    # （这一轮它就从 101 涨到 151）。登记即上限，再往里加先回答"是不是该拆"。
+    # `loadout_assistant` 的清单/详情/确认三个分支（list 只给清单行、get 才给完整模板）。
+    "destiny_mcp/tools/_loadout_branches.py": 151,
+    # 金装解析/确认/一次性凭据（从 assistants 拆出，ADR-017）。
+    "destiny_mcp/tools/_build_confirmation.py": 230,
+    # 护甲阶梯试解（从 _armor_branches 拆出）：探针并发 + 逐步收窄的话术。
+    "destiny_mcp/tools/_armor_ladder.py": 506,
+    # 响应信封的唯一住处（ok/error/confirmation/disambiguation + `dump`）。
+    "destiny_mcp/tools/_responses.py": 186,
+    # 执行前状态快照与回滚（从 loadout_equipment_service 拆出）。
+    "destiny_mcp/services/loadout_recovery.py": 385,
+    # 模组插槽读写/预检/能量腾挪（三条写入路径共用 `plug_already_installed`）。
+    "destiny_mcp/services/loadout_mod_sockets.py": 562,
+    # 配装服务本体：清单/详情/存档/预览/官方槽都在这。真机走查连加了两块（`describe_save`
+    # 与抽出的 `_read_equipment`），登记在 1030 就是"下次先想清楚放哪儿"。
+    "destiny_mcp/services/loadout_service.py": 1030,
 }
 
 
