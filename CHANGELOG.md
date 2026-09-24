@@ -22,6 +22,19 @@
 - `loadout_assistant(intent="save")` 的回执带 `loadout_id`：以前存完想穿还得再查一次列表
   （而列表一次 121 KB），现在可以直接 `equip_loadout`。
 
+## 0.7.6 — 2026-09-24
+
+**体验：配装列表从 121 KB 降到 2.8 KB，`get` 可按 id 取一套** —— 2026-09-24（真机走查抓到）：
+
+- `loadout_assistant(intent="list")` 现在只给**清单行**：`loadout_id`、名字、角色、槽位号、件数、
+  金装/套装、`subclass`、`execution_supported`、`detail_hint`。真机同账号实测
+  **121,128 → 2,818 字节（5 套）**；以前每件装备把插槽数据发三遍（`plugs`/`perk_hashes`/`perks`），
+  列表里还塞着完整 `build_template`。
+- `intent="get"` 给完整模板，并且**新增按 `loadout_id` 只取一套**（以前没有"按 id 取一套"的入口，
+  唯一办法是把 20 套模板全拉下来自己找）。真机：单套 18.4 KB。
+- 契约同步：`loadout_id` 的认领者加上 `get`/`list`（参数归属表重新生成），路由文档写明
+  "list 是清单、get 是详情"；分支整段搬去 `tools/_loadout_branches.py`（`assistants.py` 上限跟着收紧到 1217）。
+
 # Changelog
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。

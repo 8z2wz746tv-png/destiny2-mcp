@@ -210,8 +210,8 @@ Manifest 侧（**不代表拥有**）：
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
-| `list` | 我的配装列表（官方槽位＋本地配装分开标注） | `character` |
-| `get` | 配装列表，和 `list` 走同一个分支、返回同样内容 | `character` |
+| `list` | 我的配装**清单行**（官方槽位＋本地配装分开标注；每行给 `loadout_id`、角色、槽位号、件数、金装、套装、`execution_supported`）。**不带完整模板**（以前一次 121 KB） | `character`、`limit`、`offset` |
+| `get` | 一套或一页配装的**完整模板**（逐件装备/模组/子职业） | `character`、`loadout_id`（只取那一套）、`limit`、`offset` |
 | `save` | 保存配装（写入） | `name`、`character`、`notes` |
 | `delete` | 删除配装（写入） | `loadout_id` |
 | `equip_loadout` | 换上已存配装（写入） | `loadout_id` |
@@ -357,7 +357,7 @@ Manifest 侧（**不代表拥有**）：
 | `kind` | `loadout_assistant`：`search_identifiers` |
 | `knowledge_id` | `activity_assistant`：`community`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
 | `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`summarize`、`summary`、`概况`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`craft`、`filter_rolls`、`global`、`pattern`、`patterns`、`search_all`、`search_catalog`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：除 `weekly_full` 外全部 |
-| `loadout_id` | `loadout_assistant`：`delete`、`equip_loadout` |
+| `loadout_id` | `loadout_assistant`：`delete`、`equip_loadout`、`get`、`list` |
 | `location` | `inventory_assistant`：`find_item`、`get`、`inventory`、`list`、`search`、`search_type`、`summarize`、`summary`、`type`、`概况`；`weapon_assistant`：`filter_rolls` |
 | `locked` | `inventory_assistant`：`lock` |
 | `max_replacements` | `build_assistant`：`farm_target` |

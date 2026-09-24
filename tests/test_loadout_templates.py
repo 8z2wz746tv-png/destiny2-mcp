@@ -177,7 +177,18 @@ async def test_loadout_assistant_labels_account_scope_and_community_route() -> N
         )
     )
 
-    response = await loadout_assistant(intent="list", character="hunter", ctx=ctx)
+    # `list` 给清单行（真机 121 KB → 几 KB）：能力字段与详情指引必须在行里；
+    # 完整模板与 community_route 归 `get`。
+    listed = await loadout_assistant(intent="list", character="hunter", ctx=ctx)
+    row = listed["data"]["loadouts"][0]
+
+    assert listed["ok"] is True
+    assert listed["data"]["scope"] == "account_saved_loadouts"
+    assert row["loadout_id"] == "local-1"
+    assert "execution_supported" in row and "detail_hint" in row
+    assert "build_template" not in row, "清单行不许带完整模板（那正是 121 KB 的来源）"
+
+    response = await loadout_assistant(intent="get", character="hunter", ctx=ctx)
 
     assert response["ok"] is True
     assert response["data"]["scope"] == "account_saved_loadouts"

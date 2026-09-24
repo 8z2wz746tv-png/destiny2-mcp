@@ -20,7 +20,7 @@ from ._coerce import coerce_scalar_arguments
 from ._build_confirmation import resolve_exotic, verify_exotic_confirmation_token
 from ._farm_target_response import serialize_farm_target_analysis
 from ._formatters import inventory_search_summary
-from ._helpers import get_ctx, handle_tool_error, positive_or_default, resolve_player_name
+from ._helpers import dump as _dump, get_ctx, handle_tool_error, positive_or_default, resolve_player_name
 from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
 from . import _counters_branches as counters_branches
@@ -30,6 +30,7 @@ from . import _stats_branches as stats_branches
 from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
 from . import _leaderboard_branches as leaderboard_branches
+from . import _loadout_branches as loadout_branches
 from . import _player_branches as player_branches
 from . import _patterns_branches as patterns_branches
 from . import _rotation_branches as rotation_branches
@@ -65,17 +66,6 @@ _LOADOUT_DEFAULT_LIMIT = 5
 # 而"我手炮都有哪些"这个问题通常只要看头几件；默认 10 件 + next_offset 翻页。
 _WEAPON_TYPE_DEFAULT_LIMIT = 10
 _WEAPON_PATTERN_DEFAULT_LIMIT = 20
-
-
-def _dump(value: Any) -> Any:
-    """Recursively convert Pydantic/domain objects into plain JSON-ish data."""
-    if hasattr(value, "model_dump"):
-        return value.model_dump()
-    if isinstance(value, list):
-        return [_dump(item) for item in value]
-    if isinstance(value, dict):
-        return {key: _dump(item) for key, item in value.items()}
-    return value
 
 
 def _action_response(intent: str, summary: str, result: Any) -> dict:
@@ -933,46 +923,10 @@ async def loadout_assistant(
         })
 
     if intent in {"list", "get"}:
-        # 每套配装带完整 build_template（约 11 KB），整套账号 20 套 ≈ 227 KB：
-        # 默认只给 5 套（切片在服务层做，工具层只负责把"被截断"讲清楚）。
-        page_limit = positive_or_default(limit, _LOADOUT_DEFAULT_LIMIT)
-        _ = page_limit
-        result = await svc["loadout_svc"].get_loadouts(
-            resolved, character or None, page_limit, offset
-        )
-        payload = _dump(result)
-        cut = bool(payload.get("truncated"))
-        warnings = []
-        if cut:
-            warnings.append(
-                f"只返回了 {payload['returned_loadouts']} / {payload['total_loadouts']} 套"
-                f"（按 limit={page_limit} 截断）；继续读传 offset={payload['next_offset']}，"
-                "或用 character 收窄。"
-            )
-        return ok_response(
-            "已读取玩家已存配装（统一模板格式）"
-            + (f"，{payload['returned_loadouts']}/{payload['total_loadouts']} 套。" if cut else "。"),
-            {
-                "player_name": payload["player_name"],
-                "loadouts": payload["loadouts"],
-                # 列表类响应都要能自证是否全量
-                "total_loadouts": payload["total_loadouts"],
-                "returned_loadouts": payload["returned_loadouts"],
-                "truncated": cut,
-                "next_offset": payload["next_offset"],
-                "scope": payload["scope"],
-                "loadout_format": payload["loadout_format"],
-                "community_route": {
-                    "tool": "build_assistant",
-                    "arguments": {
-                        "intent": "community",
-                        "character": character or "",
-                    },
-                },
-            },
-            warnings=warnings + [
-                "这里仅包含玩家本地配装和 Bungie 官方槽位，不代表社区热门或推荐排序。",
-            ],
+        return await loadout_branches.list_or_get(
+            svc, resolved,
+            character=character, limit=limit, offset=offset,
+            loadout_id=loadout_id, intent=intent,
         )
 
     if intent == "save":

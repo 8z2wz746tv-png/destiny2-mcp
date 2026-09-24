@@ -583,6 +583,7 @@ class LoadoutService:
         character: str | None = None,
         limit: int | None = None,
         offset: int = 0,
+        loadout_id: str = "",
     ) -> LoadoutListResponse:
         """List saved account loadouts in the normalized build-template format.
 
@@ -596,6 +597,11 @@ class LoadoutService:
         else:
             await self._refresh_cache(player_name)
             all_loadouts = self._cache[player_name]
+
+        if loadout_id:
+            # 按 id 取一套：`list` 只给清单行，要看某一套的完整模板走这里
+            # （以前没有这个入口，唯一办法是把 20 套模板全拉下来自己找）。
+            all_loadouts = [lo for lo in all_loadouts if lo.id == loadout_id]
 
         if character:
             char_lower = {
@@ -900,3 +906,43 @@ class LoadoutService:
                 else f"清空官方配装失败：{result.get('Message', '未知错误')}"
             ),
         )
+
+
+def loadout_rows(loadouts: list[dict]) -> list[dict]:
+    """配装**清单行**：列表页只该给这些，完整 `build_template` 走 `get`。
+
+    真机（2026-09-24）：`intent="list"` 一次回 **121 KB**（5 套，截断状态；共 21 套，全量约 500 KB）——
+    每件装备把同一份插槽数据发了三遍（`plugs` / `perk_hashes` / `perks`），而且列表里塞了完整模板。
+    这里只留"让人挑一套"需要的字段，外加**能不能执行**（`execution_supported`）与**怎么取详情**
+    （`detail_hint`，工具层再补 next_action）——能力字段不能省，省了模型就会开始说"我做不到"。
+
+    入参是**已经 dump 过的字典**（工具层拿到 payload 后调用，不再解析 pydantic 对象）。
+    """
+    rows: list[dict] = []
+    for loadout in loadouts:
+        template = loadout.get("build_template") or {}
+        armor = template.get("armor") or {}
+        class_block = template.get("class") or {}
+        rows.append({
+            "loadout_id": loadout.get("id", ""),
+            "name": loadout.get("name", ""),
+            "character": loadout.get("character", ""),
+            "source": loadout.get("source", ""),
+            "slot_number": loadout.get("slot_number"),
+            "item_count": len(loadout.get("items") or []),
+            "exotic_armor": str(armor.get("exotic") or "").strip(),
+            "armor_set": str(armor.get("set") or "").strip(),
+            "subclass": str(template.get("subclass") or "").strip(),
+            "weapon_count": len(template.get("weapons") or []),
+            "mod_count": sum(
+                len(mods or []) for mods in (armor.get("mods") or {}).values()
+            ),
+            "subclass_plug_count": len(class_block.get("plugs") or []),
+            "created_at": loadout.get("created_at", ""),
+            "execution_supported": bool((template.get("execution") or {}).get("supported")),
+            "detail_hint": (
+                '要看这一套的逐件装备/模组/子职业：loadout_assistant(intent="get", '
+                f'loadout_id="{loadout.get("id", "")}")'
+            ),
+        })
+    return rows

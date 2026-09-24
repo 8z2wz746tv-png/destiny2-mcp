@@ -496,17 +496,19 @@ async def test_real_session_failures_are_now_rejected() -> None:
     assert 'intent="search"' in result["error"]["message"]
 
 
-async def test_loadout_get_no_longer_swallows_loadout_id() -> None:
-    """loadout 的 get 与 list 是同一个分支，只按 character 过滤。
+async def test_loadout_get_accepts_an_id_and_non_owners_reject_it() -> None:
+    """`get` 现在**接受** loadout_id（只取那一套）；不接受的是不读它的 intent。
 
-    传 loadout_id 想取单套，以前会安静地返回全部配装 —— 模型很容易把第一条
-    当成用户说的那套。现在会被拒绝，并说明要自己从结果里挑。
+    2026-09-24 反转：以前 list/get 都返回全部模板，传 id 会被拒（"自己从结果里挑"）；
+    真机实测 list 一次 121 KB，所以改成"list 给清单行、get 给详情（可按 id 取一套）"。
     """
     result, calls = await _guarded("loadout_assistant", "get", loadout_id="local:1")
+    assert result.get("error") is None, result.get("error")
+    assert calls, "get 必须真的把 id 传给服务层"
 
-    assert result["error"]["code"] == "ignored_parameter"
-    assert not calls
-    assert "全部配装" in result["error"]["message"]
+    rejected, rejected_calls = await _guarded("loadout_assistant", "save", loadout_id="local:1")
+    assert rejected["error"]["code"] == "ignored_parameter"
+    assert not rejected_calls
 
 
 def _description(annotation: object) -> str:

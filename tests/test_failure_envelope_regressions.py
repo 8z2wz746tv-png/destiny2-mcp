@@ -223,7 +223,8 @@ async def test_compare_difference_names_the_instance_not_the_location() -> None:
 
 class _LoadoutStub:
     async def get_loadouts(
-        self, player_name: str, character: str | None, limit: int | None = None, offset: int = 0
+        self, player_name: str, character: str | None, limit: int | None = None,
+        offset: int = 0, loadout_id: str = "",
     ) -> dict:
         """P4/D4 起服务层负责切片，所以替身也要照实按 limit/offset 返回计数。"""
         all_loadouts = [{"id": "local:1"}, {"id": "local:2"}]

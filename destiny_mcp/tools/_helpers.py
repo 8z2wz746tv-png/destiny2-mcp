@@ -92,3 +92,18 @@ def positive_or_default(value: int | None, default: int) -> int:
     if value is None or value <= 0:
         return default
     return value
+
+
+def dump(value: Any) -> Any:
+    """Pydantic/领域对象 → 纯 JSON 数据（递归）。
+
+    以前只有 `assistants.py` 有这一份，`_*_branches` 想要就得从上层 import（会成环）。
+    """
+    if hasattr(value, "model_dump"):
+        return value.model_dump()
+    if isinstance(value, list):
+        return [dump(item) for item in value]
+    if isinstance(value, dict):
+        return {key: dump(item) for key, item in value.items()}
+    return value
+

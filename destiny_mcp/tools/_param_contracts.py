@@ -444,10 +444,10 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint="按 ID 删配装/装备配装，以及搜标识，都不按角色过滤。",
     ),
     ("loadout_assistant", "loadout_id"): _contract(
-        _only("delete", "equip_loadout"),
+        _only("get", "list", "delete", "equip_loadout"),
         hint=(
-            'list/get 只按 character 过滤并返回全部配装，不接受 loadout_id；'
-            "要哪一套请从返回结果里按 ID 或名字挑出来。"
+            'get/list 用它可以只取一套（不给就按 character 过滤后整页返回）；'
+            "delete/equip_loadout 用它指定操作对象。全部配装的 ID 在 list 的每一行里。"
         ),
     ),
     ("loadout_assistant", "name"): _contract(
