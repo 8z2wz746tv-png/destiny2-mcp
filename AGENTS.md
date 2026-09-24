@@ -136,6 +136,10 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - 标题写"做了什么"，不写「抓出的 XXX」这类腔调；不用 emoji、结尾不加句号。
 - **一次提交只做一件事**：跨主题的改动拆成多条；发布提交也一样——内容照发，标题只留一行。
 - 破坏性变更在标题里点明（例：`活动统计改为行式（破坏性）`），影响面写进 CHANGELOG。
+- **推到哪**：工作分支是 `codex/bundle-starside-markdown`，`origin/main` 与它同源。发布用
+  `git push origin HEAD:main HEAD:codex/bundle-starside-markdown --tags` —— 本地那个 `main` 是
+  2026-09 的旧分支，`git push origin main` 会被非快进拒绝（2026-09-24 踩过）。
+  GitHub 直连常超时（SSL / 443），加 `-c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20` 重试几轮即可。
 
 ## 代码地图
 
