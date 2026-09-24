@@ -735,7 +735,7 @@ class LoadoutService:
             name, char_lower, len(equipped_items), mod_count, sub_info,
         )
         return LoadoutOperationResult(
-            success=True, loadout_name=name,
+            success=True, loadout_name=name, loadout_id=loadout_id,
             message=f"配装 '{name}' 已保存（{len(equipped_items)} 件装备，{mod_count} 个模组{sub_info}）。",
         )
 

@@ -22,6 +22,7 @@ from ..player_resolver import PlayerResolver
 from ..vocabulary import LEGACY_STAT_ALIASES
 from . import profile_components
 from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
+from ..utils.hash_utils import to_unsigned
 
 # 属性模组（+5/+10 六维）与部位功能模组在插槽里分属不同 plug 类别，名字可能撞车，
 # 所以解析模组名时只在"护甲模组"这一类里找。
@@ -375,6 +376,11 @@ class ArmorModService(ModSocketMixin):
                 if current_hash
                 else None,
                 "energy_cost": current_cost,
+                # 与 `to.stat_bonus` 同一套键：换模组是**有代价**的（−10 武器 / +10 手雷），
+                # 只给 `to` 的话调用方只会说"加了 10 点"，永远不说减了什么。
+                "stat_bonus": _stat_bonus_of(
+                    self._manifest.get_item_definition(current_hash)
+                ) if current_hash else {},
             },
             "to": {
                 "hash": matched_hash,
@@ -404,6 +410,29 @@ class ArmorModService(ModSocketMixin):
         return slot_key_from_bucket_hash(bucket_hash)
 
     # ── 执行 ─────────────────────────────────────────────────────────
+
+    async def verify(self, plan: dict[str, Any]) -> dict[str, Any]:
+        """写后回读这个槽，确认目标模组真的在里面。
+
+        返回 `{"verified": True}` 或 `{"verified": None, "reason": ...}` —— **读不到不等于没装上**：
+        上游 profile 有 3–10 秒同步窗口，而写入本身已经被上游确认过（`ErrorCode=1`）。
+        没探成记 null + 原因，不记 false（本项目的老规矩）。
+        """
+        sockets = await self._read_sockets(
+            plan["item_instance_id"], plan["membership_id"], plan["membership_type"],
+            attempts=3,
+        )
+        target = plan["to"]["hash"]
+        index = plan["socket_index"]
+        if not sockets:
+            return {"verified": None, "reason": "回读时读不到插槽数据（上游还没同步），未核对"}
+        current = int(sockets[index].get("plugHash", 0) or 0) if index < len(sockets) else 0
+        if to_unsigned(current) == to_unsigned(int(target)):
+            return {"verified": True}
+        return {
+            "verified": None,
+            "reason": "同步窗口内还没读回目标模组（上游已确认写入，稍后自会生效）",
+        }
 
     async def apply(self, plan: dict[str, Any]) -> dict[str, Any]:
         """按方案写入。失败时把 Bungie 的原文一并带出来（不吞错）。

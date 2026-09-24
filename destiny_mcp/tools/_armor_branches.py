@@ -332,9 +332,18 @@ async def equip_mod(
         return confirmation_required_response("equip_mod", plan)
 
     result = await svc["armor_mod_svc"].apply(plan)
-    armor_mod: dict[str, Any] = {"summary": plan["summary"]}
+    # 六维净变化：换模组是**有代价**的（−10 武器 / +10 手雷）。以前只说"加了什么"，
+    # 用户以为白赚 10 点；`from.stat_bonus` 现在也给了，这里算成一句话。
+    delta = _mod_stat_delta(plan.get("from"), plan.get("to"))
+    if delta:
+        plan["summary"] = f"{plan['summary']}；六维 {delta['text']}"
+    armor_mod: dict[str, Any] = {"summary": plan["summary"], "delta": delta or None}
     if isinstance(result, dict):
         armor_mod.update(result)
+    # 写后回读（与 equip_build 同一口径）：读到了说"已核对"，同步窗口内没读到说清"未核对"，
+    # 不把它写成失败，也不再让调用方自己去看。
+    verification = await svc["armor_mod_svc"].verify(plan)
+    armor_mod["verification"] = verification
     if isinstance(result, dict) and result.get("already_installed"):
         # 槽里已经是它了（上游 1679）：说成"换上"会让人以为改过东西，也会让人以为失败要重试。
         headline = (
@@ -346,14 +355,40 @@ async def equip_mod(
             f"已把 {plan['item_name']} 的槽 {plan['socket_index']} 换成 "
             f"{plan['to']['name']}（能量 {plan['energy']['after']}/{plan['energy']['capacity']}）。"
         )
+    if verification.get("verified") is True:
+        headline = f"{headline}（已回读核对）"
+    elif verification.get("verified") is None:
+        headline = f"{headline}（{verification.get('reason') or '回读未核对'}）"
     return ok_response(
         headline,
         {"armor_mod": armor_mod},
+        # 复查是**可选**的：回执里已经有回读结论，不要再把它写成"你必须自己去看"。
         next_actions=[
-            "要看这件护甲现在的完整状态，用 inventory_assistant(intent=\"item\", "
-            f"item_instance_id=\"{plan['item_instance_id']}\")。",
+            "想看这件护甲的完整状态（词条/能量/全部槽）时，再用 "
+            f"inventory_assistant(intent=\"item\", item_instance_id=\"{plan['item_instance_id']}\")。",
         ],
     )
+
+
+def _mod_stat_delta(from_plug: dict[str, Any] | None, to_plug: dict[str, Any] | None) -> dict[str, Any]:
+    """两个模组的六维差 → `{"text": "−10 武器 / +10 手雷", "stats": {...}}`。
+
+    只列**真的变了**的项；两边都没有加成时给空（不编 0 变化）。正负号用中文习惯的 −/+。
+    """
+    before = dict((from_plug or {}).get("stat_bonus") or {})
+    after = dict((to_plug or {}).get("stat_bonus") or {})
+    stats = {
+        key: int(after.get(key, 0)) - int(before.get(key, 0))
+        for key in set(before) | set(after)
+    }
+    stats = {key: value for key, value in stats.items() if value}
+    if not stats:
+        return {}
+    parts = [
+        f"{'+' if value > 0 else '−'}{abs(value)} {_STAT_LABELS.get(key, key)}"
+        for key, value in stats.items()
+    ]
+    return {"text": " / ".join(parts), "stats": stats}
 
 
 async def equip_build(

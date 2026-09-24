@@ -128,3 +128,10 @@ class LoadoutOperationResult(BaseModel):
     loadout_name: str = Field(default="")
     message: str = Field(default="")
     steps: list[MoveItemStep] = Field(default_factory=list, description="Equip steps (for equip_loadout)")
+    loadout_id: str = Field(
+        default="",
+        description=(
+            "这次操作涉及的配装 ID：`save` 回新存的那套（**不给的话调用方要再查一次列表才能穿**），"
+            "`delete`/`equip_loadout` 回操作对象。"
+        ),
+    )

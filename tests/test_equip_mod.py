@@ -616,3 +616,23 @@ async def test_tuning_shows_up_in_mod_snapshots_like_any_other_plug() -> None:
         "调谐的 plug 类别 3481777685 属于 _ARMOR_MOD_CATEGORIES，"
         "所以 read_armor_mods 会像其它插件一样读出来"
     )
+
+
+def test_mod_stat_delta_spells_out_both_sides() -> None:
+    """换模组的六维变化必须**两边都说**：只说"+10 手雷"会让人以为白赚 10 点。
+
+    真机（2026-09-24）：`武器模组(+10 武器) → 手雷模组(+10 手雷)` 的确认与回执都只提手雷，
+    用户看不到代价。这里钉住话术与统计口径（`from.stat_bonus` 现在也由服务层给出）。
+    """
+    from destiny_mcp.tools._armor_branches import _mod_stat_delta
+
+    delta = _mod_stat_delta(
+        {"stat_bonus": {"weapons": 10}},
+        {"stat_bonus": {"grenade": 10}},
+    )
+
+    assert delta["stats"] == {"weapons": -10, "grenade": 10}
+    assert "−10 武器" in delta["text"] and "+10 手雷" in delta["text"]
+
+    assert _mod_stat_delta({"stat_bonus": {}}, {"stat_bonus": {}}) == {}, "没变化就不编一句话"
+
