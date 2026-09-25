@@ -142,7 +142,7 @@
 | 金装名字模糊/匹配到多件（如只说「卡利班手」） | 先返回候选 | 必须返回候选并等确认，**不得自行选定**；重试要原样回传 `confirmed_exotic_hash` + token，职业/目标/优先级/碎片不得丢失。 |
 | 不降目标，反推我该刷哪件护甲 | `farm_target`（可加 `baseline="equipped"`、`replacement_slot`） | 先查单件、再两件；待刷数值来自工具，**不能自己相减拼出来**；待刷目标不能当成已拥有。 |
 | 有哪些护甲模组／`<套装名>` 的套装效果 | `armor_mods`／`set_bonus` | 中英词表都认；词表外且一条都没命中 → `invalid_argument_error` 并列出词表；词表外但**蒙中**（如「速度」）→ 带 `match.kind="keyword"` + warning，说清这些模组并不加该属性；词表内 0 条 → `match.kind="stat"` + 「本地数据里没有」的 warning（**三种都不能读成「没有这种模组」**）；不存在的套装 → `definition_not_found_error`。 |
-| ⭐ 这套方案穿上去 | `equip_build`，`confirmed=false` | **必须传回服务端签发的候选**：`canonical_build` 或它的 `execution_id` 二选一（只发标量的宿主用后者，一次确认只能用一次、10 分钟内有效）；用 `score` 或自己拼 hash 会被拒；改过库存后旧候选要重新求解。 |
+| ⭐ 这套方案穿上去 | `equip_build`，`confirmed=false` | **必须传回服务端签发的候选**：`canonical_build`（只有确认信封里还给整块）或它的 `execution_id`（`find`/`recommend` 的候选行里就有）二选一（只发标量的宿主用后者，一次确认只能用一次、**30 分钟内有效**（0.7.10 起；`execution_id` 已是默认出口的唯一引用））；用 `score` 或自己拼 hash 会被拒；改过库存后旧候选要重新求解。 |
 | 有什么热门的 `<职业>` 配装／就用第一套看我缺什么 | `community`（+ `community_build_id` + `include_inventory`） | 走**社区**模板，**不得用 `loadout_assistant`**；指定 `community_build_id` 后响应**不应再带** `results`/`next_offset`（那会把响应撑到上百 KB），只留 `selected_build` + `matched_count`；缺件来源看 `sourcing` 字段（没有 sourcing intent）；`build_template`/`solver_handoff`/`farm_options` **都不是可执行方案**。 |
 
 > 求解/校验细节由 `tests/test_build_*.py`、`test_architecture_boundaries.py` 覆盖。
@@ -254,6 +254,8 @@
 | 上游说「没这个对象」 | `pgcr` 传数字但不存在的活动 ID、`clan_leaderboards` 传不存在的 group_id | `upstream_not_found_error` | ID 打错/过期 —— **改 ID**，不是重试 |
 | 上游其它 HTTP 错误 | 4xx（非 404）／无法归类的上游响应 | `a_p_i_error` | 上游问题；消息里带 HTTP 状态与 Bungie 原文 |
 | 照抄社区配装的功能模组 | `build_assistant(intent="find")` + `functional_mods=["充沛", …]` | 回执带 `functional_mods.mods`（部位/同名版本/能量）与 `unresolved`（对不上名的点名）；候选的 `items[].functional_mod_groups` 按部位就位；摘要写明"含照抄社区配装的 N 颗功能模组"。**属性模组不照抄**（传了会进 `unresolved` 并说明原因） |
+| ⭐ 这套配装是哪五件（默认出口） | `build_assistant(intent="find")` | 每套只给**候选行**：`execution_id`/`score`/`completion_rate`/`stats`（六维）/`exotic`/`set`/`requires_tuning`/`tuning_changes`/`items[]`（名字、部位、实例 ID、光等、能量、六维、调谐名）。**`build` 与 `canonical_build` 不在默认响应里**（真机 21.5 KB → 8.6 KB / 2 套）；要看逐件预览或装备它，用 `execution_id` 调 `equip_build` |
+| ⭐ 重复武器挑哪把 | `inventory_assistant(intent="duplicates")` | 每实例只给 `instance_id`/`location`/`power`/`equipped`/`perks_complete` + `perks[]`（**`{name, slot}`**，slot 是插件类别最后一段如 `barrels`/`traits`）；组级与 perk 级的 `icon_url`、`plug_hash` 不进默认响应（真机 50.9 KB → 15.8 KB / 5 组） |
 | 写入失败/被挡住时去哪找原因 | 任意写入 intent 的失败，或 `equip` 的 `equip_blocked` | **只看 `data.result`**（`steps` / `blockers` / `message` 都在那儿）；`candidates` 只放真候选（多件同名、确认载荷）。成功时顶层 `summary` 就是服务层那句结论 |
 | 同名多件要玩家选一件 | `move` 只说名字，而账号里有 5 件同名护甲 | `item_disambiguation_required`（**不是** `move_failed`） | **没写、也没失败**：候选在信封 `candidates`（`data.result` 里不再重复一份），`data.result.question` 原样展示给玩家；拿到编号后带 `item_instance_id` 重发同一个 intent |
 
@@ -396,7 +398,7 @@
 | 0 候选时凭什么说"配不出来" | `build_assistant(intent="find")` 跑到 0 候选（如把生命值推到 200） | 响应必须**自证枚举完了**：`summary` 写「枚举完了，没有任何一套能满足这些下限（枚举了 N 套组合）」、`data.search = {exhaustive: true, combos: N, truncated_by: null}`；`ladder.verdict.satisfiable=false`。**没搜完时（`exhaustive=false`）必须是 `satisfiable=null` + 「这次没搜完」**，不许把预算/配额截断写成不可行（P1 守门见 `tests/test_build_budget_honesty.py`） |
 | 这个"上限"是什么上限 | `ladder.single_stat_ceiling` | 那是**单项**上限（把点全堆一项）；拿它当"同时能达到"会得出"你什么都够"。两个字段都在，回答时不能混 |
 | 只差几点，非降目标不可吗 | `ladder.tuning_first` + `find` 的 `tuning_changes` | 求解器**真的试过调谐**（没达标时用调谐额度复解 + 逐套精确复核）：能补的直接给带 `tuning_changes` 的候选（`requires_tuning=true`）；补不上时这一档如实分三种口径（额度够但让不出来 / 额度不够 / 只差 ≤10 看属性模组），并带 `solver_attempted` |
-| 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` 的 `items[].mods` **含调谐插件**（只含这件允许的），`equip_build` 确认后一起写；别把调谐说成"只能在游戏内改"（那句出自 ADR-012 推翻的 1663），也别把 1675 说成"没材料"（它是"这颗装不到这件上"） |
+| 调谐到底改哪一件、改成什么 | `find` 候选行的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（**候选行里只留中文名与六维净变化**，hash 要执行时从确认信封的 `canonical_build` 拿）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` 的 `items[].mods` **含调谐插件**（只含这件允许的），`equip_build` 确认后一起写；别把调谐说成"只能在游戏内改"（那句出自 ADR-012 推翻的 1663），也别把 1675 说成"没材料"（它是"这颗装不到这件上"） |
 | 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | **能写**（2026-09-22 开放）：`writable=true` → `confirmed=false` 回 `confirmation_required`、`confirmed=true` 才写并回读核对；**清单外**的调谐 → `writable=false` + 1675 的含义，`confirmed=true` 也不写 |
 | 换一个真花能量的模组 | `intent="equip_mod"` + `confirmed=true` | 走**免费**插槽接口（护甲模组本来就属于它覆盖的范围，见 ADR-012），成功后回读核对；失败要核对 `ErrorCode` 并把上游原文带出来，不许报成功（0.1.8 实机修） |
 | 这颗模组这一位还没解锁 | 换一颗**不在** `characterPlugSets` 可插入清单里的模组（实测「重型弹药搜寻者」，条件里写着「必须在赛季神器中选择」） | **写之前**就返回 `writable=false` + `written=false`，`writable_reason` 带上 Manifest 的插入条件；`confirmed=true` 也不写。**不许**说成「Bungie 不允许 API 改护甲模组／请去游戏里手动装」—— 游戏里同样装不上（ADR-013） |
@@ -410,7 +412,7 @@
 | 目标根本配不出来时怎么说 | `ladder.verdict` | `satisfiable=false`（按原始优先级实测 0 候选）+ 说明 `ceiling` 是**逐项**最大值、不等于同一套能同时达到；`solved_after_rotation` 标出"换优先级能出解"这件事 |
 | 阶梯会不会偷偷改我的目标 | `ladder.targets` + 原始请求 | `targets` 里仍是用户给的数（如 近战70/手雷70）；降级只是提议，**未经确认不许改**；`recommend` 的无解响应继续带"不得自动降低"的 warning |
 | 只给优先级、不给硬目标 | `intent="recommend"` + 只有 `priority_stats` | `completion_rate` 是 `null` + `completion_rate_note`，**不是 0.0**（0.0 会被读成"一个都没满足"） |
-| 要装备该用哪个 intent | `find` vs `recommend` | **要装备走 `find`**（只有它的候选带 `canonical_build`）；`recommend` 只给排序建议，把它的结果丢给 `equip_build` 会被拒（`invalid_canonical_build`） |
+| 要装备该用哪个 intent | `find` vs `recommend` | 两个都能装备：0.7.10 起默认都只给**候选行**（含 `execution_id`），拿 `execution_id` 走 `equip_build` 即可。旧文档说「`recommend` 的候选会被拒」是**错的**（2026-09-25 真机实测：两个 intent 的 `execution_id` 都返回 `confirmation_required` + 五件 `items_preview`） |
 
 **已知边界与不要做的事**：
 

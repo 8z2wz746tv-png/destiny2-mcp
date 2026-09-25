@@ -190,9 +190,23 @@ def first_row(value: Any) -> dict:
 # 调用层失败（抛异常 / 上游类错误信封）。**不是断言失败**，但会让依赖这次调用的行变红 ——
 # 真机 2026-09-24：上游抖动时 10 行同时红，证据里只有 `实际=None`，看不出是抖动还是产品坏了。
 CALL_FAILURES: list[str] = []
+# 上游**超时**自动重试一次：2026-09-25 实测这类抖动会把正常行判红（`equip_mod` 的一次超时
+# 让"旧名/规范名走同一颗模组"那行变红，而同一行的另一次调用完全正常）。只重试"超时"，
+# 不重试"空响应/404"那种（它们往往是反面用例本身要断言的东西，重试只是白花时间）。
+CALL_RETRIES: list[str] = []
 # 只收"真抖动"：异常（超时/取消）与上游空响应。语料自己的反面用例（假名字、不存在的 ID）
 # 也会走 a_p_i_error/not_found，所以这里只是**提示**，别当断言失败读。
 _UPSTREAM_CODES = {"a_p_i_error", "upstream_unavailable_error"}
+
+
+def _is_timeout_flake(payload: Any, error: BaseException | None) -> bool:
+    """这次调用是"超时抖动"吗（值得原样重试一次）。"""
+    if isinstance(error, (TimeoutError, asyncio.TimeoutError)):
+        return True
+    if error is not None:
+        return "超时" in str(error) or "timeout" in str(error).lower()
+    message = str(((payload or {}).get("error") or {}).get("message") or "")
+    return "超时" in message or "timeout" in message.lower()
 
 
 class Runner:
@@ -214,10 +228,17 @@ class Runner:
         start = time.perf_counter()
         payload: dict | None = None
         error: BaseException | None = None
-        try:
-            payload = await asyncio.wait_for(TOOLS[tool](ctx=self.ctx, **kwargs), limit)
-        except BaseException as exc:  # noqa: BLE001 - 断言要看到具体异常类型
-            error = exc
+        for attempt in range(2):
+            payload, error = None, None
+            try:
+                payload = await asyncio.wait_for(TOOLS[tool](ctx=self.ctx, **kwargs), limit)
+            except BaseException as exc:  # noqa: BLE001 - 断言要看到具体异常类型
+                error = exc
+            if attempt == 0 and _is_timeout_flake(payload, error):
+                CALL_RETRIES.append(tag)
+                await asyncio.sleep(2)
+                continue
+            break
         elapsed = time.perf_counter() - start
         TIMINGS.append((elapsed, tag))
         if isinstance(payload, dict):
@@ -1281,16 +1302,28 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         recommendation = rdata.get("recommendation") or {}
         builds = recommendation.get("results") or []
         first = first_row(builds)
-        items = ((first.get("build") or {}).get("items")) or []
+        items = first.get("items") or []
         slots = [row.get("slot_key") for row in items if isinstance(row, dict)]
         check(
             "rows",
-            "build：recommend 给齐五件护甲（slot_key 是统一名）+ 实例 ID + 达标率",
+            "build：recommend 只给候选行（五件身份 + execution_id，不带求解器内部字段）",
             err is None and bool(builds) and len([s for s in slots if s]) >= 5
-            and all(row.get("item_instance_id") for row in items),
-            f"候选={len(builds)} 部位={slots} completion_rate={first.get('completion_rate')} "
-            f"（内部复数名 slot={[row.get('slot') for row in items if isinstance(row, dict)]}）",
+            and all(row.get("item_instance_id") for row in items)
+            and bool(first.get("execution_id"))
+            and "build" not in first and "canonical_build" not in first
+            and isinstance(first.get("stats"), dict),
+            f"候选={len(builds)} 部位={slots} execution_id={bool(first.get('execution_id'))} "
+            f"行键={sorted(first)[:9]}",
             seconds=dt,
+        )
+        # 投影闸：真机 2026-09-25 实测 recommend 7.3 KB / 2 套（投影前 43.1 KB / 5 套）。
+        # 按**每套**算，才不会被"这次解出几套"带偏；另加一条总量兜底防整体回涨。
+        rec_bytes = len(json.dumps(rec, ensure_ascii=False, default=str).encode("utf-8"))
+        check(
+            "rows",
+            "build：recommend 每套候选 ≤ 5 KB、总量 ≤ 15 KB（候选行投影之后不许回涨）",
+            rec_bytes <= 15_000 and rec_bytes / max(len(builds), 1) <= 5_000,
+            f"{rec_bytes}B / {len(builds)} 套 = {rec_bytes / max(len(builds), 1):.0f}B 每套",
         )
 
         gate, dt, err = await call(
@@ -1423,6 +1456,28 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         f"code={((got or {}).get('error') or {}).get('code')} 返回={len(grows)} "
         f"id={first_row(grows).get('id') if grows else None}",
         seconds=dt,
+    )
+
+    dup, dup_dt, dup_err = await call("inventory_assistant", intent="duplicates", limit=5)
+    dup_data = (dup or {}).get("data") or {}
+    dup_groups = dup_data.get("duplicate_weapons") or []
+    dup_first = first_row(dup_groups)
+    dup_inst = first_row(dup_first.get("instances") or [])
+    dup_bytes = len(json.dumps(dup, ensure_ascii=False, default=str).encode("utf-8"))
+    check(
+        "rows",
+        "inventory：duplicates 只给行（每实例 id/位置/光等 + perk 名字与栏位）",
+        dup_err is None and bool(dup_groups) and "icon_url" not in dup_first
+        and "icon_url" not in dup_inst
+        and all("plug_hash" not in perk for perk in (dup_inst.get("perks") or [])),
+        f"组={len(dup_groups)} 首组键={keys_of(dup_first)} 首实例键={keys_of(dup_inst)}",
+        seconds=dup_dt,
+    )
+    check(
+        "rows",
+        "inventory：duplicates 的载荷守在 20 KB 以内（50.9 KB → 行视图之后不许回涨）",
+        dup_bytes <= 20_000,
+        f"{dup_bytes}B 组={len(dup_groups)}",
     )
 
     ident, dt, err = await call(
@@ -2489,6 +2544,10 @@ async def main() -> int:
     print("最大 8 个响应：")
     for size, tag in sorted(SIZES, reverse=True)[:8]:
         print(f"  {size / 1024:8.1f} KB  {tag}")
+    if CALL_RETRIES:
+        print(f"\n上游超时自动重试过 {len(CALL_RETRIES)} 次（重试后仍有问题的才进下面的清单）：")
+        for line in CALL_RETRIES[:8]:
+            print(f"  ↻ {line}")
     if CALL_FAILURES:
         print(f"\n调用层失败 {len(CALL_FAILURES)} 次（上游抖动/超时；不是断言失败，"
               "但依赖它的行会红 —— 先重跑再判断）：")
@@ -2510,6 +2569,7 @@ async def main() -> int:
                     "sizes": SIZES,
                     "counts": counts,
                     "call_failures": CALL_FAILURES,
+                    "call_retries": CALL_RETRIES,
                     "live": {k: v for k, v in live.items() if k != "profile"},
                 },
                 ensure_ascii=False,

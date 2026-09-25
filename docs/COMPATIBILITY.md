@@ -13,6 +13,20 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：`find` / `recommend` 只给候选行，`duplicates` 只给判定依据（**破坏性**，2026-09-25）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `build_assistant(intent="find"/"recommend")` 的每套候选 | 整包：求解器内部模型 `build`（`tuning_option_hashes`/`base_roll_stats`/`archetype_*`/`roll_parse_error`/`icon_url`…）+ `canonical_build` | **候选行**：`execution_id`/`score`/`completion_rate`/`stats`/`exotic`/`set`/`requires_tuning`/`tuning_changes`（只留中文名与六维净变化）/`items[]`（名字、部位、实例 ID、光等、能量、六维、调谐名）。**`build` 与 `canonical_build` 消失**；详情与执行走 `equip_build(execution_id=…)`（先 `confirmed=false` 拿逐件预览，同意后 `confirmed=true`） |
+| `execution_id` | 10 分钟有效，是"只发标量宿主"的兼容路径 | **30 分钟**有效，是默认出口的**唯一**引用（行里自带五件身份，过期也能说清是哪套） |
+| `inventory_assistant(intent="duplicates")` 的每实例 | `{instance_id, location, power, equipped, perks_complete, perks:[{socket_index, plug_hash, name, plug_category, icon_url}]}` + 组级/ perk 级 `icon_url` | `{instance_id, location, power, equipped, perks_complete, perks:[{name, slot}]}`（`slot` = 插件类别最后一段，如 `barrels`/`traits`）；`icon_url`/`plug_hash`/`plug_category` 不进默认响应 |
+| `tuning_changes` | 每项带 `from/to` 的 hash 与完整 delta | `from/to` 只留中文名 + `delta`（六维净变化）；hash 要执行时从确认信封的 `canonical_build` 拿 |
+
+真机实测（同账号同参数）：`find` 21.5 → **8.6 KB**（2 套）、`recommend` 43.1 → **7.3 KB**（2 套）、
+`duplicates` 50.9 → **15.8 KB**（5 组）。语料新增两条体量闸（每套候选 ≤ 5 KB 且总量 ≤ 15 KB、
+`duplicates` ≤ 20 KB），并纠正一条旧断言：`recommend` 的 `execution_id` **可以**直接拿去 `equip_build`
+（旧文档说会被拒，实测不会）。
+
 ## 未发布：`build_assistant` 多一个 `functional_mods`（照抄社区配装的功能模组，2026-09-25）
 
 社区模板里作者写的部位功能模组（每件 3 颗：抗性/搜寻/回收/吸引…）现在能跟着配装一起装：

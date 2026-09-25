@@ -475,6 +475,49 @@ def _location_order(location: str) -> int:
     return {"猎人": 0, "泰坦": 1, "术士": 2, "仓库": 3}.get(location, 4)
 
 
+def duplicate_rows(groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """重复武器的**行视图**（默认出口）：只留"挑哪把留"需要的判定依据。
+
+    真机基线（2026-09-25）：`limit=5` 一次 50.9 KB，每实例 1.81 KB —— 其中 **`perks` 1.64 KB（91%）**，
+    装的是每个 perk 的 `plug_hash` + `icon_url` + `plug_category` 三件模型不需要的东西。
+    这里把 perk 压成 `{name, slot}`（slot 是插件类别的最后一段，如 `barrels`/`trait` ——
+    "三、四号位是什么"要靠它，名字本身不说明位置），并把组级 `icon_url` 去掉。
+
+    为什么不能压成"只剩 id/位置/光等"：这个 intent 的用途就是**判断留哪把**，
+    没有 perk 就没法判断 —— 那种"库存索引"式瘦身会把这个功能的业务价值砍掉。
+    """
+    rows: list[dict[str, Any]] = []
+    for group in groups or []:
+        instances = []
+        for instance in group.get("instances") or []:
+            instances.append({
+                "instance_id": instance.get("instance_id", ""),
+                "location": instance.get("location", ""),
+                "power": instance.get("power"),
+                "equipped": bool(instance.get("equipped")),
+                "perks_complete": bool(instance.get("perks_complete")),
+                "perks": [_perk_row(perk) for perk in instance.get("perks") or []],
+            })
+        rows.append({
+            "item_hash": group.get("item_hash"),
+            "name": group.get("name", ""),
+            "weapon_type": group.get("weapon_type", ""),
+            "instance_count": group.get("instance_count", len(instances)),
+            "instances": instances,
+        })
+    return rows
+
+
+def _perk_row(perk: dict[str, Any]) -> dict[str, Any]:
+    """一个 perk → `{name, slot}`（`slot` = 类别最后一段，"三、四号位"这类话靠它说清）。"""
+    category = str(perk.get("plug_category") or "")
+    slot = category.rsplit(".", 1)[-1] if category else ""
+    row = {"name": perk.get("name", "")}
+    if slot:
+        row["slot"] = slot
+    return row
+
+
 def _duplicate_page_limit(value: Any) -> int:
     try:
         limit = int(value)

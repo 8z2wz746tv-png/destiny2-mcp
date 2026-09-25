@@ -509,7 +509,13 @@ async def test_find_reports_which_candidates_need_tuning() -> None:
     assert data["tuning"]["change_count"] == 1
     assert data["tuning"]["changes"][0]["to"]["name"] == "+手雷 / -职业"
     assert "要先改调谐" in response["summary"]
-    assert data["builds"][0]["tuning_changes"] == [change]
+    # 投影后的调谐行：只留"哪一件、从什么换成什么、六维怎么动"（hash 不进默认响应）
+    tuning_row = data["builds"][0]["tuning_changes"][0]
+    assert tuning_row["item_name"] == "测试腿甲"
+    assert tuning_row["from"]["name"] == "空调整模组插槽"
+    assert tuning_row["to"]["name"] == "+手雷 / -职业"
+    assert tuning_row["delta"] == {"grenade": 5, "class_stat": -5}
+    assert "hash" not in tuning_row["to"]
 
 
 @pytest.mark.asyncio

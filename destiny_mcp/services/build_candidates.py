@@ -21,7 +21,7 @@ from ..build_contracts import CanonicalBuild
 
 # 200 条够一个人连着试配装；10 分钟够走完"看预览 → 确认"。
 MAX_CANDIDATES = 200
-TTL_SECONDS = 10 * 60
+TTL_SECONDS = 30 * 60  # 0.7.10 起 execution_id 是默认出口的唯一引用，"给玩家看→等回话"常超 10 分钟
 
 CandidateStatus = Literal["ok", "unknown", "expired", "player_mismatch"]
 

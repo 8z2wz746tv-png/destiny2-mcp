@@ -167,6 +167,10 @@ CEILINGS = {
     # 562 → 518：能量腾挪那段搬去 `loadout_energy_budget.py`（预算是一道算术 + 挑选规则，
     # 与"这颗该进哪个槽"是两件事），腾出来的位置给照抄模组的调用点。
     "destiny_mcp/services/loadout_mod_sockets.py": 518,
+    # 0.7.10：`find`/`recommend` 的候选行投影（默认出口只给行 + execution_id）。
+    "destiny_mcp/tools/_build_flow.py": 366,
+    # 0.7.10：重复武器的行视图（`duplicate_rows`；perk 从对象压成 {name, slot}）。
+    "destiny_mcp/services/inventory_analysis_service.py": 617,
     # 0.7.9 新增：社区配装的功能模组（名字 → 部位/版本/能量；不进求解器，只算它占多少能量）。
     "destiny_mcp/build/functional_mods.py": 159,
     # 0.7.9 新增：照抄模组在执行时的现场决策（挑版本、插不进/装不下就跳过并点名）。

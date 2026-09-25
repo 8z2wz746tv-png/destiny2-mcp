@@ -15,6 +15,7 @@ from pydantic import Field
 from ..build.models import BuildRequest
 from ..error_codes import ErrorCode
 from ..exceptions import DestinyMCPError
+from ..services.inventory_analysis_service import duplicate_rows
 from ._registry import mcp
 from ._coerce import coerce_scalar_arguments
 from ._build_confirmation import resolve_exotic, verify_exotic_confirmation_token
@@ -215,9 +216,8 @@ async def inventory_assistant(
         return ok_response(
             result["summary"],
             {
-                "duplicate_weapons": result["duplicates"],
-                "scan": result["scan"],
-                "filters": result["filters"],
+                "duplicate_weapons": duplicate_rows(result["duplicates"]),
+                "scan": result["scan"], "filters": result["filters"],
                 "pagination": result["pagination"],
                 "farming_list": _farming_reference(
                     svc.get("starside_svc"), _harvest_names(result["duplicates"])

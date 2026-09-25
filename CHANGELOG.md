@@ -2,6 +2,30 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.7.10 — 2026-09-25
+
+**响应投影收口：`find`/`recommend` 只给候选行，`duplicates` 只给判定依据**（见 ADR-021、`docs/plans/RESPONSE_PROJECTION_PLAN.md`）：
+
+- **配装候选不再整包**：默认响应里每套只有一行 —— `execution_id`、分数、达标率、六维、金装、套装、
+  是否要改调谐、`tuning_changes`（只留中文名与六维净变化）、以及**这套是哪五件**（名字、部位、实例 ID、
+  光等、能量、六维、调谐名）。求解器内部模型（`build`）与可执行载荷（`canonical_build`）都**不再出现**。
+  真机：`find` 21.5 → **8.6 KB**（2 套）、`recommend` 43.1 → **7.3 KB**。
+  为什么大头不是 `canonical_build`：实测每套 `build` 6.74 KB（63%）、`canonical_build` 2.01 KB（19%），
+  只砍后者根本到不了目标 —— 这条纠正了外部评审的前提。
+- **`duplicates` 的 perk 从对象压成判定依据**：每实例只给 `instance_id`/`location`/`power`/`equipped`/
+  `perks_complete` + `perks[] = {name, slot}`（`slot` 是插件类别最后一段，`barrels`/`traits` 这类 ——
+  "三、四号位是什么"要靠它）。真机 50.9 → **15.8 KB**（5 组）。不引入"好坏结论"字段：现在没这个数据，不编。
+- **`execution_id` 升为正式引用**：TTL 10 → **30 分钟**（"给玩家看 → 等回话"常超 10 分钟），
+  行里自带五件身份，过期也能说清是哪套。详情与执行仍只有一条路：
+  `equip_build(execution_id, confirmed=false)` 拿逐件预览（**不消费候选**）→ 同意 → `confirmed=true`；
+  **不新增 intent、不加 `detail="full"` 开关**。
+- **顺带纠正一条假文档**：旧语料写着"`recommend` 的候选丢给 `equip_build` 会被拒"，
+  真机实测两个 intent 的 `execution_id` 都返回 `confirmation_required` + 五件预览并都能装。
+- 语料加两条体量闸（每套候选 ≤ 5 KB 且总量 ≤ 15 KB、`duplicates` ≤ 20 KB），以后改胖了测试直接红；
+  真机另记一条武器分析基线（`analyze` 68.6 KB：自己副本明细 30.5 + 插槽池 21.1 = 75%），**这轮不动武器**。
+- 结构：候选行工厂在 `tools/_build_flow.py`（366 行）、`duplicate_rows` 在
+  `services/inventory_analysis_service.py`（617 行），两个模块都登记了体量上限；`assistants.py` 没长。
+
 ## 0.7.9 — 2026-09-25
 
 **新能力：社区配装的功能模组可以照抄着一起装了**（见 ADR-020）：
