@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, Mapping
 
+from ..utils.hash_utils import to_unsigned
 from . import weapon_profile
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -195,10 +196,12 @@ def weapon_block(
     if name:
         variants = weapon_profile.name_variants(manifest, name)
         if len(variants) > 1:
-            block["name_variants"] = variants
+            # 一律给**无符号**（账号/API 那边都是无符号，有符号摆一起会看着像对不上号）
+            block["name_variants"] = [to_unsigned(value) for value in variants]
             block["name_variants_note"] = (
                 f"⚠️ Manifest 里同名的武器有 {len(variants)} 个版本（item_hash："
-                f"{'、'.join(str(v) for v in variants)}），本次用的是 {block.get('item_hash')}。"
+                f"{'、'.join(str(to_unsigned(v)) for v in variants)}），"
+                f"本次用的是 {block.get('item_hash')}。"
                 "定义级池子只对这一个版本成立：要判**你手上那把**能滚什么，请用 "
                 'weapon_assistant(intent="compare") 的副本行（组件 310 的可切换项）。'
             )
