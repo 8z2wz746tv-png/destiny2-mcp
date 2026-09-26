@@ -189,6 +189,19 @@ def weapon_block(
         block["quality"] = fields["quality"]
     if owned is not None:
         block["owned"] = owned
+    # 同名多版本（复刻/重发）如实报：定义级 intent 按名字只能挑一个，不报出来调用方
+    # 会把"另一个版本的池子"当成自己那把的（真机 2026-09-26：「千码凝视」特性栏 0 交集）。
+    name = str(block.get("name") or "")
+    if name:
+        variants = weapon_profile.name_variants(manifest, name)
+        if len(variants) > 1:
+            block["name_variants"] = variants
+            block["name_variants_note"] = (
+                f"⚠️ Manifest 里同名的武器有 {len(variants)} 个版本（item_hash："
+                f"{'、'.join(str(v) for v in variants)}），本次用的是 {block.get('item_hash')}。"
+                "定义级池子只对这一个版本成立：要判**你手上那把**能滚什么，请用 "
+                'weapon_assistant(intent="compare") 的副本行（组件 310 的可切换项）。'
+            )
     return block
 
 

@@ -170,7 +170,11 @@ async def inventory_assistant(
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
     # 列清单（get/list）给 100 件的默认上限：它以前一次倒出整个仓库（1260 件 ≈ 511 KB），
     # 现在按上限返回并带 total/truncated/next_offset，想全看就翻页。
-    limit = positive_or_default(limit, _INVENTORY_DEFAULT_LIMIT if intent in _INVENTORY_PAGE_INTENTS else 10)
+    limit = positive_or_default(
+        limit,
+        _INVENTORY_DEFAULT_LIMIT if intent in _INVENTORY_PAGE_INTENTS
+        else (5 if intent in {"duplicates", "duplicate_weapons", "find_duplicates", "重复武器"} else 10),
+    )
     locked = True if locked is None else locked
     tracked = True if tracked is None else tracked
     resolved = resolve_player_name(player_name)
@@ -223,6 +227,12 @@ async def inventory_assistant(
                     svc.get("starside_svc"), _harvest_names(result["duplicates"])
                 ),
             },
+            next_actions=[
+                "这里只给**现在装着**的 perk，不能用来定级：T5 武器每个特性栏还能切 3 项。"
+                '判"留哪把"要再看 weapon_assistant(intent="compare", weapon_name=…) —— '
+                "它一次给同名**全部副本**的每栏全部可切换项（含愿单结论）。",
+                "判据只看 perk（组件 310 的可切换项）：**光等低、没进社区清单都不是弃的理由**。",
+            ],
             warnings=result["warnings"],
         )
 

@@ -26,6 +26,10 @@ from typing import Any
 #: 一栏里没有任何愿单结论时，退回展示前几个（够看清"这栏长什么样"，不假装池子很小）
 OPTION_SAMPLE = 6
 
+#: 这些栏决定一把枪的 roll（框架/枪管/弹匣/特性）：**固定也要列出来**，
+#: 否则"这一栏没得选"会被读成"这一栏不存在"（0.7.13 的行视图踩过）。
+_ROLL_COLUMN_KINDS = frozenset({"intrinsic", "barrel", "magazine", "battery", "trait", "origin"})
+
 #: 选项里要保留的键（其余丢掉：`plug_hash`/`enhanced_plug_hash` 是给跨入口比对用的，
 #: 模型要按名字问详情有 `perk_description`）
 _OPTION_KEYS = ("name", "can_roll", "stat_effects", "recommended")
@@ -136,13 +140,20 @@ def compare_rows(comparison: dict[str, Any]) -> dict[str, Any]:
             if not isinstance(socket, dict):
                 continue
             options = [o for o in socket.get("options") or [] if isinstance(o, dict)]
-            if len(options) <= 1:
+            kind = str(socket.get("kind") or "")
+            # **roll 定义栏一律照列**（框架/枪管/弹匣/特性），即使只有 1 项（固定）——
+            # 真机 2026-09-26 踩过：只列"有得选"的栏，会让"特性栏固定"的枪看起来像
+            # **没有特性栏**，于是被读成"半成品"（报告里的 P0-2 就是这么来的）。
+            if len(options) <= 1 and kind not in _ROLL_COLUMN_KINDS:
                 continue
-            sockets.append({
-                "slot": socket.get("slot") or socket.get("kind") or "",
+            entry: dict[str, Any] = {
+                "slot": socket.get("slot") or kind or "",
                 "equipped": (socket.get("equipped") or {}).get("name") or "",
                 "options": [_option_row(o, with_effects=False) for o in options],
-            })
+            }
+            if len(options) <= 1:
+                entry["fixed"] = True
+            sockets.append(entry)
         row: dict[str, Any] = {
             "instance_id": instance.get("instance_id") or block.get("instance_id") or "",
             "location": instance.get("location") or block.get("location") or "",

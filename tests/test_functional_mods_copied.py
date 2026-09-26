@@ -382,7 +382,9 @@ def test_compare_rows_keep_every_switchable_option() -> None:
 
     row = rows["instances"][0]
     assert row["instance_id"] == "i-1" and row["location"] == "邮政官"
-    assert [s["slot"] for s in row["sockets"]] == ["特性1"], "固定栏（只有一项）不进行视图"
+    # roll 定义栏即使固定也照列（标 `fixed`）：藏掉它会让人读成"没有这一栏"
+    assert [s["slot"] for s in row["sockets"]] == ["特性1", "框架"]
+    assert row["sockets"][1]["fixed"] is True and len(row["sockets"][1]["options"]) == 1
     assert row["sockets"][0]["equipped"] == "超凡时刻"
     assert [o["name"] for o in row["sockets"][0]["options"]] == ["超凡时刻", "治疗弹匣", "孤狼"]
     assert row["sockets"][0]["options"][1]["recommended"] == {"wishlist": {"pve": True, "pvp": False}}

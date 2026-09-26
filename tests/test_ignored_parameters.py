@@ -620,6 +620,13 @@ async def test_explicit_body_default_counts_as_passed(
     )
 
 
+#: `limit` 的默认值是**按 intent** 给的（重复武器那族 5，其余 10）：表里那一份对不上时
+#: 按这张表取该 intent 的真默认值（0.7.14 起 `duplicates` 默认 5 —— 10 组 ≈ 38 KB 会落盘）。
+_INTENT_LIMIT_DEFAULTS: dict[str, int] = {
+    "duplicates": 5, "duplicate_weapons": 5, "find_duplicates": 5, "重复武器": 5,
+}
+
+
 @pytest.mark.parametrize(
     "tool,parameter,value",
     [(tool, parameter, value) for (tool, parameter), value in sorted(SENTINEL_BODY_DEFAULTS.items())],
@@ -630,6 +637,8 @@ async def test_owner_intent_treats_omitted_and_explicit_default_alike(
     """认领它的 intent 上，"不传"和"显式传默认值"必须完全同效（默认值补得对不对）。"""
     contract = contracts.PARAMETER_OWNERS[(tool, parameter)]
     intent = sorted(contract.intents)[0]
+    if parameter == "limit":
+        value = _INTENT_LIMIT_DEFAULTS.get(intent, value)
 
     _omitted_result, omitted_calls = await _guarded(tool, intent, parameter)
     _explicit_result, explicit_calls = await _guarded(

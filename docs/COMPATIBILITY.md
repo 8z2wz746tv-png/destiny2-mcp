@@ -13,6 +13,14 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：同名多版本如实报 + 副本行照列固定栏（2026-09-26）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 同名的多个武器定义（复刻/重发） | 按名字挑一个 `item_hash`，**不说**挑的是哪个版本 —— 另一个版本的池子会被当成你那把的（真机「千码凝视」特性栏 0 交集） | 身份块带 `name_variants`（全部同名 hash）与 `name_variants_note`（本次用的哪个、要定论用账号副本的 `compare`） |
+| `compare` 副本行 | 只列"有得选"的栏 → 固定栏被藏掉，看起来像"没有这一栏" | roll 定义栏（框架/枪管/弹匣/特性/起源）**一律照列**，只有 1 项时标 `fixed: true` |
+| `duplicates` 默认条数 | 10 组（≈38 KB，只发标量的宿主会落盘） | **5 组**；回执补 `next_actions`：定级要走 `compare` 行视图，且**光等低/没进清单都不是弃的理由** |
+
 ## 未发布：`location` 支持邮政官、`compare` 默认给副本行（**破坏性**，2026-09-25）
 
 | 变了什么 | 以前 | 现在 |

@@ -98,6 +98,24 @@ SLOT_LABELS: dict[str, str] = {
 ITEM_TYPE_WEAPON = 3
 
 
+def name_variants(manifest: "ManifestManager", weapon_name: str) -> list[int]:
+    """同名武器的**全部** item_hash（>1 = 有版本歧义）。
+
+    真机 2026-09-26：复刻/重发武器同名不同 hash（「千码凝视」账号副本 `1648948519`
+    vs 按名字解析到的 `4164201232`），**特性池毫无交集**——枪管/弹匣吻合、特性栏 0 交集。
+    定义级 intent（`perk_pool`/`god_roll`/`analyze`…）按名字只能挑一个，所以必须**报出来**，
+    让调用方知道"这份池子可能不是你那把的"。
+    """
+    hashes: list[int] = []
+    for item in manifest.search(weapon_name, limit=0, item_type=ITEM_TYPE_WEAPON):
+        if item.get("itemType") != ITEM_TYPE_WEAPON:
+            continue
+        item_hash = int(item.get("itemHash") or item.get("hash") or 0)
+        if item_hash and item_hash not in hashes and manifest.get_item_definition(item_hash):
+            hashes.append(item_hash)
+    return hashes
+
+
 def find_weapon(manifest: "ManifestManager", weapon_name: str) -> tuple[int, dict]:
     """按名字找武器定义：返回 (item_hash, definition)。
 

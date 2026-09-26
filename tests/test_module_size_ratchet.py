@@ -58,7 +58,8 @@ CEILINGS = {
     # —— 前者去 `_responses.action_response`，后者去 `_loadout_branches.confirm_write`。
     # 1206 → 1208（0.7.9）：`build_assistant` 多一个入参 `functional_mods`（照抄社区配装的功能模组）
     # —— 签名一行 + 两处分派各多一个实参。真正的解析与执行都不在这儿。
-    "destiny_mcp/tools/assistants.py": 1208,
+    # 1208 → 1218（0.7.14）：`duplicates` 的下一步与判据（先看整栏 options 再定级）+ 默认条数 5。
+    "destiny_mcp/tools/assistants.py": 1218,
     "destiny_mcp/build/farm_target.py": 1296,
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留
@@ -117,7 +118,8 @@ CEILINGS = {
     # `weapon_profile.py` —— 那里才是插槽助手的老家，也顺便给"强化版名标 ↑"腾出空间。
     # 性能第四项：属性值形状拆去 `weapon_stats_payload.py`、删掉两个 0 引用的空壳
     # （`roll_summary`/`instance_extras`），腾出位置放 `list_row` → 上限 334 → 297。
-    "destiny_mcp/services/weapon_payload.py": 297,
+    # 297 → 310（0.7.14）：身份块带 `name_variants`（同名多版本如实报，P0 修复）。
+    "destiny_mcp/services/weapon_payload.py": 310,
     # P5 新增：本地资料汇总（愿单/选取率/清单/社区 → 每个 plug 的 recommended）
     "destiny_mcp/services/weapon_local_data.py": 403,
     # 锻造图样查询新增登记（登记即上限）：目录（展示树 + 记录 + 目标需求）+ 账号进度
@@ -174,7 +176,8 @@ CEILINGS = {
     # 0.7.11：武器分析的投影（池子只给愿单有结论的项、副本去掉可换项）。
     # 108 → 166（0.7.13）：同名多副本的**行视图**（`compare_rows`）也搬进来 —— 它和 analyze
     # 的投影是同一件事（把武器域的结果投影成"行 + 判定依据"），放一起比再开一个文件清楚。
-    "destiny_mcp/services/weapon_analysis_projection.py": 173,
+    # 173 → 184（0.7.14）：roll 定义栏固定也照列（`fixed` 标记）——藏掉会被读成"没有这一栏"。
+    "destiny_mcp/services/weapon_analysis_projection.py": 184,
     # 0.7.10：重复武器的行视图（`duplicate_rows`；perk 从对象压成 {name, slot}）。
     # 0.7.12：按**类别**把插槽拆成 perks / mods / masterwork（"空模组插槽"不再是 perk）。
     "destiny_mcp/services/inventory_analysis_service.py": 654,
