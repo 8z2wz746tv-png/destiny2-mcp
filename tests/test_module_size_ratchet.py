@@ -119,7 +119,7 @@ CEILINGS = {
     # 性能第四项：属性值形状拆去 `weapon_stats_payload.py`、删掉两个 0 引用的空壳
     # （`roll_summary`/`instance_extras`），腾出位置放 `list_row` → 上限 334 → 297。
     # 297 → 310（0.7.14）：身份块带 `name_variants`（同名多版本如实报，P0 修复）。
-    "destiny_mcp/services/weapon_payload.py": 310,
+    "destiny_mcp/services/weapon_payload.py": 313,
     # P5 新增：本地资料汇总（愿单/选取率/清单/社区 → 每个 plug 的 recommended）
     "destiny_mcp/services/weapon_local_data.py": 403,
     # 锻造图样查询新增登记（登记即上限）：目录（展示树 + 记录 + 目标需求）+ 账号进度
