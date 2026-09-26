@@ -326,18 +326,21 @@ async def test_type_items_are_list_rows_without_the_socket_pool(services) -> Non
     assert 305 not in requested and 310 not in requested
 
 
-async def test_compare_instances_use_the_same_weapon_block(services) -> None:
+async def test_compare_defaults_to_instance_rows(services) -> None:
+    """0.7.13：不带 `item_instance_id` 时给**副本行视图**（每行一把 × 每栏全部可切换项）。"""
     response = await _call(services, intent="compare", weapon_name="测试武器")
 
     comparison = response["data"]["comparison"]
-    assert sorted(comparison.keys()) == ["differences", "instances", "weapon"]
-    instance = comparison["instances"][0]
-    assert sorted(instance.keys()) == ["options", "sockets", "stats", "weapon"]
-    # 副本级身份块 = 定义字段 + 副本字段（三个组件 300 的值）+ instance 摘要
-    assert sorted(instance["weapon"].keys()) == sorted(
-        WEAPON_BLOCK_KEYS + ["instance", "gear_tier", "item_level", "quality"]
-    )
-    assert comparison["weapon"]["owned"]["count"] == 1
+    assert sorted(comparison.keys()) == ["instances", "rows_note", "weapon"]
+    row = comparison["instances"][0]
+    assert sorted(row.keys()) == [
+        "instance_id", "is_equipped", "location", "locked", "power", "sockets",
+    ]
+    # 定义级身份块仍然带本地四块（`mode="lean"`：键都在、明说没查）
+    assert comparison["weapon"]["popularity"]["available"] is False
+    assert comparison["weapon"]["farming"]["matched"] is True or (
+        comparison["weapon"]["farming"]["matched"] is False
+    ), "farming 块要在（具体命中由夹具决定）"
 
 
 async def test_list_rows_use_the_lean_identity_block(services) -> None:

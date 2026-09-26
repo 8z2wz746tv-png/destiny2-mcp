@@ -456,7 +456,7 @@ async def weapon_assistant(
         result = await svc["weapon_compare_svc"].compare_weapon_instances(
             resolved, weapon_name, item_instance_id or None
         )
-        return weapon_branches.compare_payload(svc, result, weapon_name)
+        return weapon_branches.compare_payload(svc, result, weapon_name, single=bool(item_instance_id))
 
     if intent in {"perk_pool", "perks"}:
         return await weapon_branches.perk_pool_payload(svc, weapon_name)

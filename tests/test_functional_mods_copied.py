@@ -346,3 +346,88 @@ def test_duplicate_rows_omits_masterwork_when_absent() -> None:
 
     assert "masterwork" not in rows[0]["instances"][0]
     assert rows[0]["instances"][0]["mods"] == []
+
+
+# ── 邮政官位置 + compare 行视图（0.7.13）─────────────────────────────────
+
+
+def test_compare_rows_keep_every_switchable_option() -> None:
+    """判"留哪把"要的是"每把 × 每栏全部可切换项"：一次给全、只列有得选的栏。
+
+    真机 2026-09-25：豆包那边为了这个对 19 件武器一把一次地拉 `compare`，中间还去 grep
+    落盘的结果文件 —— 就是因为没有这个行视图。
+    """
+    from destiny_mcp.services.weapon_analysis_projection import compare_rows
+
+    comparison = {
+        "weapon": {"name": "岁时之巅", "weapon_type": "微型冲锋枪", "frame": "轻质框架"},
+        "instances": [{
+            "instance_id": "i-1", "location": "邮政官", "power": 540, "is_equipped": False,
+            "weapon": {"instance": {"instance_id": "i-1", "location": "邮政官", "power": 540}},
+            "sockets": [
+                {"slot": "特性1", "kind": "trait",
+                 "equipped": {"name": "超凡时刻"},
+                 "options": [
+                     {"name": "超凡时刻", "plug_hash": 1},
+                     {"name": "治疗弹匣", "plug_hash": 2,
+                      "recommended": {"wishlist": {"pve": True, "pvp": False}}},
+                     {"name": "孤狼", "plug_hash": 3},
+                 ]},
+                {"slot": "框架", "kind": "intrinsic",
+                 "equipped": {"name": "轻质框架"}, "options": [{"name": "轻质框架"}]},
+            ],
+        }],
+    }
+    rows = compare_rows(comparison)
+
+    row = rows["instances"][0]
+    assert row["instance_id"] == "i-1" and row["location"] == "邮政官"
+    assert [s["slot"] for s in row["sockets"]] == ["特性1"], "固定栏（只有一项）不进行视图"
+    assert row["sockets"][0]["equipped"] == "超凡时刻"
+    assert [o["name"] for o in row["sockets"][0]["options"]] == ["超凡时刻", "治疗弹匣", "孤狼"]
+    assert row["sockets"][0]["options"][1]["recommended"] == {"wishlist": {"pve": True, "pvp": False}}
+    assert "plug_hash" not in row["sockets"][0]["options"][1]
+    assert "留哪把" in rows["rows_note"] or "整栏" in rows["rows_note"]
+
+
+def test_postmaster_items_are_not_labelled_as_being_on_a_character() -> None:
+    """邮政官（Lost Items 桶）在 `characterInventories` 里，但**不在角色身上**。
+
+    以前标成角色名 → 模型以为能直接 equip/move，撞墙后才知道要先 `pull_postmaster`。
+    """
+    from destiny_mcp.services.item_parser import parse_items_from_profile
+
+    class _Manifest:
+        def get_item_info(self, item_hash: int) -> dict:
+            return {"itemType": 3, "tier": 5, "bucketTypeHash": 1498876634, "name": "测试枪"}
+
+        def get_item_name(self, item_hash: int) -> str:
+            return "测试枪"
+
+        def bucket_name(self, bucket_hash: int) -> str:
+            return {215593132: "Lost Items", 1498876634: "Kinetic Weapons"}.get(bucket_hash, "")
+
+        def get_item_definition(self, item_hash: int) -> dict:
+            return {}
+
+        def get_english_name(self, item_hash: int) -> str:
+            return "Test Gun"
+
+        def item_type_name(self, item_type: int) -> str:
+            return {3: "Weapon"}.get(item_type, "")
+
+    profile = {
+        "characters": {"data": {"char-1": {"classType": 2}}},
+        "profileInventory": {"data": {"items": []}},
+        "characterInventories": {"data": {"char-1": {"items": [
+            {"itemInstanceId": "pm-1", "itemHash": 5, "bucketHash": 215593132},
+            {"itemInstanceId": "on-1", "itemHash": 5, "bucketHash": 1498876634},
+        ]}}},
+        "characterEquipment": {"data": {"char-1": {"items": []}}},
+        "itemComponents": {"instances": {"data": {}}, "stats": {"data": {}}},
+    }
+    items = parse_items_from_profile(profile, _Manifest())
+
+    by_id = {i.item_instance_id: i.location for i in items}
+    assert by_id["pm-1"] == "postmaster", "邮政官是独立位置"
+    assert by_id["on-1"] == "warlock", "真正在身上的还是角色名"

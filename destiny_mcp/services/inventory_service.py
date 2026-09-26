@@ -10,6 +10,7 @@ from .. import vocabulary
 from ..exceptions import (
     AuthenticationError,
     ConfigError,
+    DestinyMCPError,
     InvalidArgumentError,
     ItemNotFoundError,
 )
@@ -316,7 +317,21 @@ class InventoryService:
                 ),
                 "vault",
             )
-        class_type = resolve_character_name(location)
+        if normalized in ("postmaster", "邮政官", "邮政长", "lost items", "lost_items"):
+            items = parse_items_from_profile(profile, self._manifest)
+            return (
+                [item for item in items if item.location == "postmaster"],
+                "postmaster",
+            )
+        try:
+            class_type = resolve_character_name(location)
+        except DestinyMCPError as exc:
+            # 以前这里直接冒"该账号上没有 'postmaster' 角色"—— 调用方读成"账号没这个人"，
+            # 实际是"location 取值不认"。按工具层前置校验的口径报 invalid_arguments + 合法取值。
+            raise InvalidArgumentError(
+                f"location 取值不认识：{location!r}。可用：all/全部、vault/仓库、"
+                "postmaster/邮政官、hunter/warlock/titan（或中文职业名）。"
+            ) from exc
         canonical_location = class_type_name(class_type).lower()
         items = parse_items_from_profile(profile, self._manifest)
         return (

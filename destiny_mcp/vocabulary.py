@@ -105,7 +105,11 @@ LOCATION_ALIASES: dict[str, str] = {
     **CLASS_ALIASES,
 }
 
-LOCATION_LABELS_ZH: dict[str, str] = {"vault": "仓库", **CLASS_LABELS_ZH}
+LOCATION_LABELS_ZH: dict[str, str] = {
+    "vault": "仓库",
+    "postmaster": "邮政官",
+    **CLASS_LABELS_ZH,
+}
 
 # ── 物品大类 ─────────────────────────────────────────────────────────────
 

@@ -17,14 +17,40 @@
 
 口诀：**账号 = 我有什么；Manifest = 游戏里有什么；社区 = 别人怎么说。**
 
+**只走 MCP，不读文件。** 回答上面任何一类问题的唯一入口都是这八个工具。仓库里那份
+`manifest/destiny_manifest.sqlite3`、源码文件、`docs/**` 都**不是**回答账号/武器问题的数据源
+（用户看到这个仓库只因为 MCP 装在那儿）；**尤其不要 grep 宿主落盘的工具结果文件**
+（`system/tool-results/*.txt` 这类）——响应太大被落盘时，正确做法是**换更小的入口或收窄参数**
+（`limit`、`item_instance_id`、`weapon_type`、`filter_rolls`、`compare` 的副本行视图），
+翻文件既慢又容易漏，还会把上下文撑爆。
+
 ### 最容易走错的四个岔路
 
 1. 「我有没有带某 Perk 的枪」→ `weapon_assistant(intent="filter_rolls")`；「游戏里一共有多少把能滚出这个 Perk」→ `weapon_assistant(intent="catalog")`。两个方向反了就是错答案。
 2. 「我这把能不能换成某 Perk」看 `sockets` 两处：`sockets[].equipped` 是**现在装的**，`options[]`（`scope=instance`，来自组件 310）才是**这一件能换的**；定义级池子里有、但实例选项里没有的，就是"这枪能滚到、但你这把不行"。
 3. `sockets[].options_available=false` 表示这次没展开池子（列表类为了体积），`option_count` 仍是数字；不能读成"没有可选项"。
-2. 「社区配装／热门配装」→ `build_assistant(intent="community")`，**不是** `loadout_assistant`（那是我自己存过的配装）。
-3. 「这把枪可能滚到什么」→ `perk_pool`；「我这把现在是什么」→ `filter_rolls`／`analyze`／`compare`。定义和实物不能混。
-4. 「这个 Perk 什么效果」→ `perk_description`，**不得按名字推断效果**。
+4. 「社区配装／热门配装」→ `build_assistant(intent="community")`，**不是** `loadout_assistant`（那是我自己存过的配装）。
+5. 「这把枪可能滚到什么」→ `perk_pool`；「我这把现在是什么」→ `filter_rolls`／`analyze`／`compare`。定义和实物不能混。
+6. 「这个 Perk 什么效果」→ `perk_description`，**不得按名字推断效果**。
+
+### 判「留哪把」的口径（真机被用户抓过一次）
+
+- **必须看每个可切换栏的全部 `options`**（组件 310），不是只看 `equipped`：T5 武器每个特性栏能在
+  3 个固定 perk 间切换，三、四号位共 6 个 —— 只看当前那颗会把「能切成 god roll」的枪误判成垃圾。
+- 一次拿全的入口：`weapon_assistant(intent="compare", weapon_name=…)`（**不给** `item_instance_id`）
+  返回**副本行视图**：每行一把 × 只列有得选的栏 × `equipped` + 全部 `options`（带 `recommended`）。
+  不要一把一次地拉（真机 19 把拉 19 次，还差点去 grep 落盘文件）。
+- 要看某一个副本的完整明细（固定栏、可换件、评分）才传 `item_instance_id`。
+- 光等低、重复、活动可刷**都不是**"该弃"的理由；没有 perk 依据就不要给取舍结论，先把 options 拿到。
+
+### 邮政官（`postmaster`）三条
+
+1. 列清单：`inventory_assistant(intent="get", location="postmaster")`（也认 `邮政官`/`邮政长`）。
+   它**不是**角色名，也不在"角色身上"的清单里 —— `location` 传别的值会被拒并列出合法取值。
+2. 邮政官里的东西**不在身上**：`equip`/`move` 都会被上游拒，先
+   `inventory_assistant(intent="pull_postmaster", item_instance_id=…)` 取回到角色身上。
+3. 邮政官的副本**读不到"现在装着哪颗"**（组件 305 不给这些实例的插槽），但**可切换项（组件 310）
+   能读** —— 所以判"留哪把"用 `compare` 的副本行视图照常可行；要报"当前是什么 roll"得先取回。
 
 ## 二、逐个工具：intent 索引
 

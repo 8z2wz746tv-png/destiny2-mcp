@@ -360,7 +360,8 @@ async def test_compare_instances_mark_local_blocks_not_checked() -> None:
     """精简档（`mode="lean"`）现在只有副本对比在用：键都在，但明说"这个 intent 不查"。"""
     response = await _call(_services(), intent="compare", weapon_name="测试武器")
 
-    weapon = response["data"]["comparison"]["instances"][0]["weapon"]
+    # 0.7.13 起默认是副本行视图：身份块在 `comparison.weapon`（不再是每个副本各一份）
+    weapon = response["data"]["comparison"]["weapon"]
     assert weapon["popularity"]["available"] is False
     assert "列表类" in weapon["popularity"]["note"]
     assert weapon["community"]["results"] == []

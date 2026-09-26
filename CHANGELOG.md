@@ -2,6 +2,29 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.7.13 — 2026-09-25
+
+**邮政官能列了 + `compare` 一次给全"留哪把"的依据**（真机复盘豆包那次邮政官取舍会话抓到）：
+
+- **`location="postmaster"`（也认 `邮政官`/`邮政长`）**：以前传它得到的是「该账号上没有 'postmaster'
+  角色」——把"取值不认"说成了"账号没这个人"。现在是一个正常位置，取值不认时回
+  `invalid_argument_error` + 合法取值。
+- **邮政官里的东西不再谎报"在角色身上"**：`Lost Items` 桶的物品在 `characterInventories` 里，
+  以前标成 `hunter/warlock`（模型因此以为能直接 equip/move，撞墙才知道要先 `pull_postmaster`），
+  现在标 `postmaster`（真机 33 件全部改正，`intent="get", location="postmaster"` 直接可用）。
+- **`compare` 不带 `item_instance_id` 时返回副本行视图**：每行一把 × **每个可切换栏的全部项** ×
+  `equipped` + `recommended`（愿单结论）。真机「岁时之巅」7 个副本一次 12.3 KB —— 同样的信息
+  以前要**一把一次**地拉（豆包那次 19 把拉了 19 次，每次响应还得靠宿主压缩，中间还去 grep 落盘的
+  结果文件）。带 `item_instance_id` 时仍是单副本完整明细（含固定栏、可换件、数值说明）。
+  行视图里选项只给名字 + 愿单结论：`stat_effects` 是噪音（每项 75 B，7 副本会多出 3 KB+），
+  要看效果用 `perk_description`。
+- **skill 补三条硬规矩**（`skills/destiny2-mcp/references/routing.md`）：
+  ① **只走 MCP、不读文件**——点名"仓库里的 sqlite/源码不是数据源"，尤其"响应被宿主落盘后
+  不要 grep 那个文件，改换更小的 intent 或收窄参数"；
+  ② **判「留哪把」必须看每栏全部 `options`（组件 310）**，只看 `equipped` 会把"能切成 god roll"
+  的枪误判成垃圾（这次真被用户抓到），并给出"一次拿全"的入口；
+  ③ **邮政官三条**（怎么列、为什么不能直接 equip/move、为什么"当前装着哪颗"读不到而可切换项读得到）。
+
 ## 0.7.12 — 2026-09-25
 
 **修复投影之后暴露的口径问题：`duplicates` 的插槽不只有 perk** —— 2026-09-25（小范围测试前自查抓到）：

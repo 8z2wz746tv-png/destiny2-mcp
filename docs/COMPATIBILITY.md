@@ -13,6 +13,17 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：`location` 支持邮政官、`compare` 默认给副本行（**破坏性**，2026-09-25）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `inventory_assistant` 的 `location` | 只认 all/vault/角色名；传 `postmaster` 会得到「该账号上没有 'postmaster' 角色」 | 多认 `postmaster`（`邮政官`/`邮政长`）；取值不认时回 `invalid_argument_error` + 合法取值 |
+| 邮政官物品的 `location` | 标成 `hunter`/`warlock`（谎报"在身上"） | 标 `postmaster`（`bucket_type` 仍是 `Lost Items`） |
+| `weapon_assistant(intent="compare")` | 不带 `item_instance_id` → 全部副本的完整明细 + `differences`（每个副本十几 KB，没人一次读得完） | **副本行视图**：每行一把 × 只列有得选的栏 × `equipped` + 全部 `options`（`recommended` 是愿单结论）；带 `item_instance_id` 时仍是单副本完整明细 |
+
+真机：`location="postmaster"` 列出 22 件武器（全部标 `postmaster`）；「岁时之巅」7 副本行视图 12.3 KB
+（此前按副本逐个拉，每次 16.4 KB）。**插件/模组的中文名与愿单结论照旧**；行视图里不再给 `stat_effects`。
+
 ## 未发布：`duplicates` 的插槽按类别拆成 perks / mods / masterwork（**破坏性**，2026-09-25）
 
 压成 `{name, slot}` 之后暴露的口径问题：插槽里**不只有 perk**。以前它们带着 `plug_category`，

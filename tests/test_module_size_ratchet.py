@@ -103,7 +103,9 @@ CEILINGS = {
     # 性能第四项：`inventory_assistant(intent="type")` 的载荷搬去 `_inventory_branches.py`
     # ——它本来就不是武器 intent（不读账号武器服务），一直占着这个文件的位置；
     # `type` 改成列表行后上限跟着收紧到 412。
-    "destiny_mcp/tools/_weapon_branches.py": 412,
+    # 412 → 435（0.7.13）：`compare` 多一条分支 —— 不带 `item_instance_id` 时给行视图，
+    # 带 ID 时保持单副本明细（同一 intent 的两种读法，分支必须在这层）。
+    "destiny_mcp/tools/_weapon_branches.py": 435,
     # 性能第四项新增登记：从 `weapon_payload.py`（上帝模块，加了闸）拆出的属性值形状。
     # 登记即上限：以后再往里加东西要先回答"是搬出去还是抬上限"。
     "destiny_mcp/services/weapon_stats_payload.py": 92,
@@ -170,7 +172,9 @@ CEILINGS = {
     # 0.7.10：`find`/`recommend` 的候选行投影（默认出口只给行 + execution_id）。
     "destiny_mcp/tools/_build_flow.py": 366,
     # 0.7.11：武器分析的投影（池子只给愿单有结论的项、副本去掉可换项）。
-    "destiny_mcp/services/weapon_analysis_projection.py": 108,
+    # 108 → 166（0.7.13）：同名多副本的**行视图**（`compare_rows`）也搬进来 —— 它和 analyze
+    # 的投影是同一件事（把武器域的结果投影成"行 + 判定依据"），放一起比再开一个文件清楚。
+    "destiny_mcp/services/weapon_analysis_projection.py": 173,
     # 0.7.10：重复武器的行视图（`duplicate_rows`；perk 从对象压成 {name, slot}）。
     # 0.7.12：按**类别**把插槽拆成 perks / mods / masterwork（"空模组插槽"不再是 perk）。
     "destiny_mcp/services/inventory_analysis_service.py": 654,

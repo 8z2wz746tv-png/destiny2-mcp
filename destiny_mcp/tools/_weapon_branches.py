@@ -234,9 +234,32 @@ def type_payload(
     )
 
 
-def compare_payload(svc: dict[str, Any], result: Any, weapon_name: str) -> dict[str, Any]:
+def compare_payload(
+    svc: dict[str, Any], result: Any, weapon_name: str, *, single: bool = False
+) -> dict[str, Any]:
+    """`compare`：给了 `item_instance_id` → 单副本完整明细；没给 → **同名多副本的行视图**。
+
+    行视图是 0.7.13 的新默认出口：判"留哪把"要的是"每把 × 每栏全部可切换项"，
+    一次给全（≤ 5 把约 5 KB），而不是让调用方一把一次地拉（真机 19 次 + 落盘 grep）。
+    """
     comparison = result.model_dump(mode="json")
     instances = comparison.get("instances") or []
+    if not single:
+        rows = weapon_analysis_projection.compare_rows(comparison)
+        local_rows = _local(svc, weapon_name)
+        weapon_block = rows.get("weapon") or {}
+        weapon_local_data.attach(
+            local_rows, weapon=weapon_block, sockets=[], weapon_name=weapon_name, mode="lean"
+        )
+        return ok_response(
+            f"已列出「{weapon_block.get('name') or weapon_name}」的 {len(rows['instances'])} 个副本"
+            "（每把一行：现在装着什么 + 每个可切换栏的全部项）。",
+            {"comparison": rows, "farming_list": _farming(svc, weapon_name), **schema_block()},
+            warnings=[
+                "`recommended` 是本地愿单结论（PvE/PvP），空表示愿单没收录 —— 不是「不好」。",
+                "判「留哪把」要看整栏 options，只看 equipped 会误判（T5 武器每栏可切 3 项）。",
+            ],
+        )
     weapon = comparison.get("weapon") or {}
     # 副本的身份块也补齐本地四块（列表类口径：只给清单摘要），保证形状一致
     local = _local(svc, weapon_name)

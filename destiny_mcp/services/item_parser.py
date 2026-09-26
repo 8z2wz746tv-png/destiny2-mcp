@@ -19,6 +19,7 @@ from ..services.armor_payload import (
 
 # Armor bucket hashes (unsigned)
 _ARMOR_BUCKETS = {3448274439, 3551918588, 14239492, 20886954, 1585787867}
+_POSTMASTER_BUCKET_HASH = 215593132  # Lost Items（邮政官）
 _VAULT_BUCKET_HASH = 138197802
 
 
@@ -176,8 +177,16 @@ def parse_items_from_profile(
         )
 
         for raw in char_items:
+            # 邮政官（Lost Items 桶）里的东西在 `characterInventories` 里，
+            # 但它**不在角色身上**：标成 `postmaster` 才对（以前标成角色名，
+            # 于是模型以为能直接装备/搬，撞墙之后才知道要先 pull_postmaster）。
+            is_postmaster = raw.get("bucketHash") == _POSTMASTER_BUCKET_HASH
             items.append(
-                _build_item(raw, location=loc_name, character_id=char_id)
+                _build_item(
+                    raw,
+                    location="postmaster" if is_postmaster else loc_name,
+                    character_id=char_id,
+                )
             )
 
     # Filter by location if specified (vault / hunter / warlock / titan)
