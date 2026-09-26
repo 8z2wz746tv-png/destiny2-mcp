@@ -480,24 +480,50 @@ def duplicate_rows(groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     真机基线（2026-09-25）：`limit=5` 一次 50.9 KB，每实例 1.81 KB —— 其中 **`perks` 1.64 KB（91%）**，
     装的是每个 perk 的 `plug_hash` + `icon_url` + `plug_category` 三件模型不需要的东西。
-    这里把 perk 压成 `{name, slot}`（slot 是插件类别的最后一段，如 `barrels`/`trait` ——
+    这里把 perk 压成 `{name, slot}`（slot 是插件类别的最后一段，如 `barrels`/`frames` ——
     "三、四号位是什么"要靠它，名字本身不说明位置），并把组级 `icon_url` 去掉。
 
     为什么不能压成"只剩 id/位置/光等"：这个 intent 的用途就是**判断留哪把**，
     没有 perk 就没法判断 —— 那种"库存索引"式瘦身会把这个功能的业务价值砍掉。
+
+    压缩之后暴露出的一个口径问题（2026-09-25 真机回执里立刻看见）：插槽里**不只有 perk**
+    ——大师杰作（`v400.plugs.weapons.masterworks.stat.*`，如"3阶：填装速度"）与武器模组
+    （`v400.weapon.mod_damage`/`mod_guns`，空插槽是 `mod_empty`）以前带着 `plug_category`，
+    模型自己能分辨；压成 `{name, slot}` 之后 `reload`/`mod_empty` 这种短键看起来就像特性。
+    所以按**类别**（不是按名字）拆成三块：`perks`（框架/枪管/弹匣/特性/起源）、
+    `mods`（装着的武器模组；空插槽不算"装着的"）、`masterwork`（大师杰作档位，留一把时有用）。
     """
     rows: list[dict[str, Any]] = []
     for group in groups or []:
         instances = []
         for instance in group.get("instances") or []:
-            instances.append({
+            perks: list[dict[str, Any]] = []
+            mods: list[str] = []
+            masterwork = ""
+            for plug in instance.get("perks") or []:
+                category = str(plug.get("plug_category") or "")
+                kind = _plug_kind(category)
+                if kind == "masterwork":
+                    masterwork = masterwork or str(plug.get("name") or "")
+                    continue
+                if kind == "mods":
+                    # 空插槽（`v400.weapon.mod_empty`）不是"装着的模组"，不进列表
+                    if not category.lower().endswith(".mod_empty"):
+                        mods.append(str(plug.get("name") or ""))
+                    continue
+                perks.append(_perk_row(plug))
+            row = {
                 "instance_id": instance.get("instance_id", ""),
                 "location": instance.get("location", ""),
                 "power": instance.get("power"),
                 "equipped": bool(instance.get("equipped")),
                 "perks_complete": bool(instance.get("perks_complete")),
-                "perks": [_perk_row(perk) for perk in instance.get("perks") or []],
-            })
+                "perks": perks,
+                "mods": mods,
+            }
+            if masterwork:
+                row["masterwork"] = masterwork
+            instances.append(row)
         rows.append({
             "item_hash": group.get("item_hash"),
             "name": group.get("name", ""),
@@ -509,13 +535,24 @@ def duplicate_rows(groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def _perk_row(perk: dict[str, Any]) -> dict[str, Any]:
-    """一个 perk → `{name, slot}`（`slot` = 类别最后一段，"三、四号位"这类话靠它说清）。"""
+    """一个插件 → `{name, slot}`（`slot` = 类别最后一段，"三、四号位"这类话靠它说清）。"""
     category = str(perk.get("plug_category") or "")
     slot = category.rsplit(".", 1)[-1] if category else ""
     row = {"name": perk.get("name", "")}
     if slot:
         row["slot"] = slot
     return row
+
+
+def _plug_kind(category: str) -> str:
+    """插件类别 → 三块之一。**按类别判**（实测的真实类别见 `duplicate_rows` 的 docstring），
+    不按名字判：`3阶：装填速度` 和 `大师杰作：稳定性` 名字不一样但都是 masterworks。"""
+    key = category.lower()
+    if "masterwork" in key:
+        return "masterwork"
+    if ".mod_" in key or key.endswith(".mod") or "weapon.mod" in key:
+        return "mods"
+    return "perks"
 
 
 def _duplicate_page_limit(value: Any) -> int:

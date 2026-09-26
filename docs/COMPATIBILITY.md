@@ -13,6 +13,19 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：`duplicates` 的插槽按类别拆成 perks / mods / masterwork（**破坏性**，2026-09-25）
+
+压成 `{name, slot}` 之后暴露的口径问题：插槽里**不只有 perk**。以前它们带着 `plug_category`，
+模型自己能分辨；压短之后就分不清了 —— 真机回执里「空模组插槽」(`v400.weapon.mod_empty`)、
+「3阶：填装速度」(`v400.plugs.weapons.masterworks.stat.reload`) 与「维度偏移」(`frames`) 长一个样，
+而"留哪把"正是这个 intent 的用途。现在按**类别**（不是名字）分三块：
+
+| 字段 | 内容 |
+| --- | --- |
+| `perks[]` | 真 perk：框架(`intrinsics`)/枪管(`barrels`)/弹匣(`magazines`)/特性(`frames`)/起源(`origins`) 等，仍是 `{name, slot}` |
+| `mods[]` | **装着的**武器模组名（`v400.weapon.mod_*`）；空插槽（`mod_empty`）不算 —— 空列表 = 没装模组 |
+| `masterwork` | 大师杰作那一颗的名字（如「3阶：填装速度」）；没有就不给这个键 |
+
 ## 未发布：`weapon_assistant(intent="analyze")` 只给"值得看的池子"（**破坏性**，2026-09-25）
 
 | 变了什么 | 以前 | 现在 |

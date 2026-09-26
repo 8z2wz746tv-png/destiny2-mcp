@@ -1487,11 +1487,19 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     dup_bytes = len(json.dumps(dup, ensure_ascii=False, default=str).encode("utf-8"))
     check(
         "rows",
-        "inventory：duplicates 只给行（每实例 id/位置/光等 + perk 名字与栏位）",
+        "inventory：duplicates 只给行（perk 名字与栏位，模组/大师杰作分开，空插槽不算模组）",
         dup_err is None and bool(dup_groups) and "icon_url" not in dup_first
         and "icon_url" not in dup_inst
-        and all("plug_hash" not in perk for perk in (dup_inst.get("perks") or [])),
-        f"组={len(dup_groups)} 首组键={keys_of(dup_first)} 首实例键={keys_of(dup_inst)}",
+        and all("plug_hash" not in perk for perk in (dup_inst.get("perks") or []))
+        and isinstance(dup_inst.get("mods"), list)
+        and not any("空" in str(m) for m in dup_inst.get("mods") or [])
+        and all(
+            str(perk.get("slot") or "") not in {"mod_empty", "reload", "stability", "handling", "range"}
+            for perk in (dup_inst.get("perks") or [])
+        ),
+        f"组={len(dup_groups)} 首实例键={keys_of(dup_inst)} "
+        f"perk 栏={[p.get('slot') for p in (dup_inst.get('perks') or [])]} "
+        f"模组={dup_inst.get('mods')} 大师杰作={dup_inst.get('masterwork')!r}",
         seconds=dup_dt,
     )
     check(

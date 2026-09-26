@@ -299,3 +299,50 @@ def test_analysis_projection_does_not_silently_empty_a_socket() -> None:
     assert row["recommended_count"] == 0
     assert "本地愿单没有结论" in row["options_note"]
     assert "perk_pool" in row["options_note"]
+
+
+# ── 重复武器的三块拆分（0.7.12）：perks / mods / masterwork ────────────────
+
+
+def test_duplicate_rows_split_plugs_by_category_not_by_name() -> None:
+    """插槽里不只有 perk：大师杰作与武器模组按**类别**分出去，空插槽不算"装着的模组"。
+
+    真机 2026-09-25：压成 `{name, slot}` 之后「空模组插槽 / 3阶：填装速度」看起来就像特性，
+    而"留哪把"正是这个 intent 的用途 —— 混在一起会直接污染判断。
+    """
+    from destiny_mcp.services.inventory_analysis_service import duplicate_rows
+
+    rows = duplicate_rows([{
+        "item_hash": 1, "name": "测试枪", "weapon_type": "狙击步枪", "instance_count": 1,
+        "icon_url": "https://example/x.jpg",
+        "instances": [{
+            "instance_id": "i-1", "location": "仓库", "power": 550, "equipped": False,
+            "perks_complete": True,
+            "perks": [
+                {"name": "适配框架", "plug_category": "intrinsics"},
+                {"name": "维度偏移", "plug_category": "frames"},
+                {"name": "宝藏现世", "plug_category": "origins"},
+                {"name": "3阶：填装速度",
+                 "plug_category": "v400.plugs.weapons.masterworks.stat.reload"},
+                {"name": "弹道", "plug_category": "v400.weapon.mod_guns"},
+                {"name": "空模组插槽", "plug_category": "v400.weapon.mod_empty"},
+            ],
+        }],
+    }])
+
+    instance = rows[0]["instances"][0]
+    assert [p["name"] for p in instance["perks"]] == ["适配框架", "维度偏移", "宝藏现世"]
+    assert instance["mods"] == ["弹道"], "空插槽不是装着的模组"
+    assert instance["masterwork"] == "3阶：填装速度"
+    assert "icon_url" not in rows[0]
+
+
+def test_duplicate_rows_omits_masterwork_when_absent() -> None:
+    from destiny_mcp.services.inventory_analysis_service import duplicate_rows
+
+    rows = duplicate_rows([{"item_hash": 1, "name": "枪", "instances": [{
+        "instance_id": "i-1", "perks": [{"name": "孤狼", "plug_category": "frames"}],
+    }]}])
+
+    assert "masterwork" not in rows[0]["instances"][0]
+    assert rows[0]["instances"][0]["mods"] == []

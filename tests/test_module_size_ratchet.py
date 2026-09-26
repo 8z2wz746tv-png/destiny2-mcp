@@ -172,7 +172,8 @@ CEILINGS = {
     # 0.7.11：武器分析的投影（池子只给愿单有结论的项、副本去掉可换项）。
     "destiny_mcp/services/weapon_analysis_projection.py": 108,
     # 0.7.10：重复武器的行视图（`duplicate_rows`；perk 从对象压成 {name, slot}）。
-    "destiny_mcp/services/inventory_analysis_service.py": 617,
+    # 0.7.12：按**类别**把插槽拆成 perks / mods / masterwork（"空模组插槽"不再是 perk）。
+    "destiny_mcp/services/inventory_analysis_service.py": 654,
     # 0.7.9 新增：社区配装的功能模组（名字 → 部位/版本/能量；不进求解器，只算它占多少能量）。
     "destiny_mcp/build/functional_mods.py": 159,
     # 0.7.9 新增：照抄模组在执行时的现场决策（挑版本、插不进/装不下就跳过并点名）。
