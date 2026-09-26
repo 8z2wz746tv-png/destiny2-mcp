@@ -243,3 +243,59 @@ async def test_functional_mod_skips_when_not_insertable() -> None:
 
     assert [op.action for op in operations] == ["blocked"]
     assert "可插入清单" in operations[0].reason
+
+
+# ── 武器分析的投影（0.7.11）：池子只给值得看的、副本去掉可换项 ──────────────
+
+
+def test_analysis_projection_keeps_the_recommended_options() -> None:
+    """定义级池子默认只给本地愿单有结论的项，并把总数与推荐数一起给出去。"""
+    from destiny_mcp.services.weapon_analysis_projection import project_analysis
+
+    socket = {
+        "kind": "trait", "slot": "特性1", "option_count": 20,
+        "options": [
+            {"plug_hash": 1, "name": "普通 A", "can_roll": True, "enhanced_plug_hash": 0,
+             "stat_effects": [{"stat": "射程", "value": 5}]},
+            {"plug_hash": 2, "name": "推荐 B", "can_roll": True, "enhanced_plug_hash": 77,
+             "stat_effects": [{"stat": "射程", "value": 10}],
+             "recommended": {"wishlist": {"pve": True, "pvp": False}}},
+        ],
+    }
+    projected = project_analysis({
+        "weapon": {"name": "测试枪"}, "sockets": [socket], "stats": {}, "god_roll": {},
+        "inventory": {"instances": [{"weapon": {"name": "测试枪"}, "options": [{"options": ["x"]}],
+                                     "sockets": [{"equipped": {"name": "推荐 B"}, "options": ["x"]}],
+                                     "stats": {}}]},
+        "inventory_status": "complete", "starside": {},
+    })
+
+    row = projected["sockets"][0]
+    assert [o["name"] for o in row["options"]] == ["推荐 B"]
+    assert row["option_count"] == 20 and row["recommended_count"] == 1
+    # 0/空值不再逐项发；强化版只留 `enhanced: true`
+    assert "plug_hash" not in row["options"][0]
+    assert row["options"][0]["enhanced"] is True
+    assert row["options"][0]["recommended"] == {"wishlist": {"pve": True, "pvp": False}}
+    # 副本：可换项整块去掉（归 compare），现在装着什么留着
+    instance = projected["inventory"]["instances"][0]
+    assert "options" not in instance
+    assert "options" not in instance["sockets"][0]
+    assert instance["sockets"][0]["equipped"]["name"] == "推荐 B"
+    assert "options_hint" in projected["inventory"]
+
+
+def test_analysis_projection_does_not_silently_empty_a_socket() -> None:
+    """一栏里一个愿单结论都没有时，退回前 N 项并说明原因 —— 不许变成"这栏没得选"。"""
+    from destiny_mcp.services.weapon_analysis_projection import OPTION_SAMPLE, project_analysis
+
+    socket = {
+        "kind": "barrel", "slot": "枪管",
+        "options": [{"name": f"选项{i}", "can_roll": True} for i in range(10)],
+    }
+    row = project_analysis({"sockets": [socket], "inventory": {}})["sockets"][0]
+
+    assert len(row["options"]) == OPTION_SAMPLE
+    assert row["recommended_count"] == 0
+    assert "本地愿单没有结论" in row["options_note"]
+    assert "perk_pool" in row["options_note"]

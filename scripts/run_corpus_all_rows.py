@@ -906,7 +906,28 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         "weapon_assistant", intent="analyze", weapon_name="无感", include_inventory=True,
         slow=True,
     )
-    instances = (((analyze or {}).get("data") or {}).get("inventory") or {}).get("instances") or []
+    adata = (analyze or {}).get("data") or {}
+    instances = (adata.get("inventory") or {}).get("instances") or []
+    analyze_bytes = len(json.dumps(analyze, ensure_ascii=False, default=str).encode("utf-8"))
+    sockets_rows = adata.get("sockets") or []
+    check(
+        "rows",
+        "weapon：analyze 只给值得看的池子 + 副本不带可换项 + 载荷 ≤ 45 KB",
+        err is None and bool(sockets_rows)
+        # 定义级池子：给结论项 + 两个计数（`options` 留着，那是"值得看的项"本身）
+        and all({"recommended_count", "option_count", "options"} <= set(row) for row in sockets_rows)
+        # 副本与副本内插槽：可换项整块不在（那是 compare 的活）
+        and all("options" not in (i or {}) for i in instances)
+        and all(
+            "options" not in socket
+            for i in instances for socket in (i.get("sockets") or [])
+        )
+        and analyze_bytes <= 45_000,
+        f"{analyze_bytes}B 栏={len(sockets_rows)} 副本={len(instances)} "
+        f"首栏推荐={((sockets_rows or [{}])[0]).get('recommended_count')}/"
+        f"{((sockets_rows or [{}])[0]).get('option_count')}",
+        seconds=dt,
+    )
     marked, plain_pairs, instance_options = [], 0, 0
     for instance in instances:
         for socket in instance.get("sockets") or []:

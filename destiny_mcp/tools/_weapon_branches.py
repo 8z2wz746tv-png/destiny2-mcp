@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..services import weapon_local_data, weapon_payload
+from ..services import weapon_analysis_projection, weapon_local_data, weapon_payload
 from ..services.weapon_payload import schema_block
 from ._farming import farming_reference, item_names
 from ..services.starside_notes import weapon_note_from_svc
@@ -132,19 +132,26 @@ def analyze_payload(svc: dict[str, Any], result: dict[str, Any], weapon_name: st
     warnings = _attach_local(
         svc, local, weapon=result["weapon"], sockets=result["sockets"], weapon_name=weapon_name
     )
+    # 默认出口投影（真机 68.6 → 34.7 KB）：池子只给"值得看的那几个"、副本去掉可换项明细。
+    # 口径与 find/duplicates 同一套，见 services/weapon_analysis_projection.py。
+    payload = weapon_analysis_projection.project_analysis({
+        "weapon": result["weapon"],
+        "sockets": result["sockets"],
+        "stats": result["stats"],
+        "god_roll": result["god_roll"],
+        "inventory": result["inventory"],
+        "inventory_status": result["inventory_status"],
+        "starside": starside,
+        **schema_block(),
+    })
     return ok_response(
         result["summary"],
-        {
-            "weapon": result["weapon"],
-            "sockets": result["sockets"],
-            "stats": result["stats"],
-            "god_roll": result["god_roll"],
-            "inventory": result["inventory"],
-            "inventory_status": result["inventory_status"],
-            "starside": starside,
-            **schema_block(),
-        },
-        next_actions=result["next_actions"],
+        payload,
+        next_actions=[
+            *(result["next_actions"] or []),
+            '要看完整插槽池（不筛愿单结论）用 weapon_assistant(intent="perk_pool", '
+            f'weapon_name="{weapon_name}")；要看某个副本每个栏位能换成什么用 intent="compare"。',
+        ],
         warnings=list(result["warnings"]) + warnings,
     )
 

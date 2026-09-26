@@ -13,6 +13,18 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：`weapon_assistant(intent="analyze")` 只给"值得看的池子"（**破坏性**，2026-09-25）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 定义级 `sockets[].options` | 整栏全给（枪管 22 项 / 弹匣 16 / 特性各 20），每项带 `plug_hash` + `enhanced_plug_hash` + `stat_effects` + `recommended` | 只给**本地愿单有结论**的项 + `option_count`/`recommended_count`；一栏一个结论都没有时退回前 6 项并给 `options_note`（**不许静默变空**）。完整池子走 `perk_pool` |
+| 选项字段 | 每项带两个 hash（`enhanced_plug_hash: 0` 也逐项发） | `name`/`can_roll`/`stat_effects`/`recommended`；有强化版时给 `enhanced: true` |
+| `inventory.instances[].options`（可换项，每件 9 KB，每项还带整句 `description`） | 默认带上 | **默认不带**（那是 `compare` 的活，ADR-007）；改给 `options_hint` 指路 |
+| 副本内的 `sockets[].options` | 带上 | 不带（保留现在装着什么：`equipped` 的名字，含强化版 `name_plain`） |
+
+真机（`weapon_name="遗产"`）：**68.6 → 34.7 KB（−49%）**，其中池子 21.1 → 6.6 KB、副本明细 34.2 → 14.8 KB；
+`weapon`/`stats`/`god_roll`/`starside`（合计 13 KB）是答案本身，不动。语料加闸：`analyze` ≤ 45 KB。
+
 ## 未发布：`find` / `recommend` 只给候选行，`duplicates` 只给判定依据（**破坏性**，2026-09-25）
 
 | 变了什么 | 以前 | 现在 |

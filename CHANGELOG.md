@@ -2,6 +2,24 @@
 
 按日期倒序。版本号来自 `pyproject.toml`，tag 用 `v<版本>`。
 
+## 0.7.11 — 2026-09-25
+
+**武器分析也收口了（P0）+ 写入链分段量清（P1，只量不改）**：
+
+- `weapon_assistant(intent="analyze")` 真机 **68.6 → 34.7 KB（−49%）**：
+  - 定义级插槽池 21.1 → **6.6 KB**：只列**本地愿单有结论**的项，另给 `option_count`/`recommended_count`；
+    一栏一个结论都没有时退回前 6 项并带 `options_note`（**不许静默变空**），完整池子走 `perk_pool`；
+    选项里两个 hash 不再逐项发（强化版只留 `enhanced: true`）。
+  - 自己副本 34.2 → **14.8 KB**：整块"可换项"（每件 9 KB，每项还带整句描述）默认不带 —— 那是
+    `compare` 的活（ADR-007），改为给 `options_hint` 指路；副本内插槽的 `equipped` 名字照留。
+  - `weapon`/`stats`/`god_roll`/`starside` 合计 13 KB 是答案本身，不动。语料加闸：`analyze` ≤ 45 KB。
+- **写入链分段（幂等那次 43.9s）**：护甲快照 12.0s、回滚快照 3.2s、逐件搬运 ×5 = 11.1s（每件之间还夹
+  一次 0.4–0.5s 的 profile 抓取）、批量装备 4.3s、回读核对 ×5–8 = 8.0s，全链约 16 次小 profile 抓取。
+  真要写时 93–134s。**下一个性能目标是减少串行往返，不是继续压载荷** —— 单独一轮再动。
+- **当天真实用量**（审计 13 次调用）：服务端合计 **14s**，中位调用间隔 6.9s —— 查询类使用里体感几乎
+  全在模型回合；服务端占大头的仍是写入链（28 条装备链：墙钟 p50 623s / 服务端 p50 258.6s / 间隔 46%）。
+- 结构：投影在 `services/weapon_analysis_projection.py`（108 行，已登记上限），`_weapon_branches.py` 只接线。
+
 ## 0.7.10 — 2026-09-25
 
 **响应投影收口：`find`/`recommend` 只给候选行，`duplicates` 只给判定依据**（见 ADR-021、`docs/plans/RESPONSE_PROJECTION_PLAN.md`）：

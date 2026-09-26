@@ -3,7 +3,7 @@
 - Status: accepted
 - Date: 2026-09-25
 - Decision By: maintainer
-- Scope: `destiny_mcp/tools/_build_flow.py`、`destiny_mcp/services/inventory_analysis_service.py`、`destiny_mcp/services/build_candidates.py`
+- Scope: `destiny_mcp/tools/_build_flow.py`、`destiny_mcp/services/inventory_analysis_service.py`、`destiny_mcp/services/build_candidates.py`、`destiny_mcp/services/weapon_analysis_projection.py`
 
 ## Context
 
@@ -43,10 +43,14 @@
    `equip_build(execution_id, confirmed=false)` → 逐件 `items_preview` + `canonical_build`（**不消费候选**）
    → 玩家同意 → `confirmed=true`。确认信封里仍给整块 `canonical_build`，所以"原样回传"那条路没断。
 
+5. **`weapon_assistant(intent="analyze")` 同样只给"值得看的"**：定义级插槽池默认只给本地愿单
+   有结论的选项（一栏一个都没有时退回前 6 项并说明），副本的"可换项"明细（每件 9 KB）默认不带 —— 
+   那是 `compare` 的活。完整池子走 `perk_pool`。
+
 ## Consequences
 
-- 真机（2026-09-25，hunter，同参数）：`find` **21.5 → 8.6 KB**（2 套）、`recommend` **43.1 → 7.3 KB**、
-  `duplicates` **50.9 → 15.8 KB**（5 组）；`equip_build` 用行里的 `execution_id` 先看不确认（5 件预览 +
+- 真机（2026-09-25，同参数）：`find` **21.5 → 8.6 KB**（2 套）、`recommend` **43.1 → 7.3 KB**、
+  `duplicates` **50.9 → 15.8 KB**（5 组）、`weapon analyze` **68.6 → 34.7 KB**；`equip_build` 用行里的 `execution_id` 先看不确认（5 件预览 +
   `canonical_build`）再确认写入，整链通过。**顺带纠正一条假文档**：旧语料说"`recommend` 的候选会被拒"，
   实测两个 intent 的 `execution_id` 都能装。
 - **破坏性**：默认响应里 `build` / `canonical_build` 消失（登记在 `docs/COMPATIBILITY.md`），

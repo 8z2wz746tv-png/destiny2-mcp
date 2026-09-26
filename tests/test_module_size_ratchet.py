@@ -169,6 +169,8 @@ CEILINGS = {
     "destiny_mcp/services/loadout_mod_sockets.py": 518,
     # 0.7.10：`find`/`recommend` 的候选行投影（默认出口只给行 + execution_id）。
     "destiny_mcp/tools/_build_flow.py": 366,
+    # 0.7.11：武器分析的投影（池子只给愿单有结论的项、副本去掉可换项）。
+    "destiny_mcp/services/weapon_analysis_projection.py": 108,
     # 0.7.10：重复武器的行视图（`duplicate_rows`；perk 从对象压成 {name, slot}）。
     "destiny_mcp/services/inventory_analysis_service.py": 617,
     # 0.7.9 新增：社区配装的功能模组（名字 → 部位/版本/能量；不进求解器，只算它占多少能量）。
