@@ -30,7 +30,9 @@ from . import _equip_branches as equip_branches
 from . import _stats_branches as stats_branches
 from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
+from . import _history_branches as history_branches
 from . import _leaderboard_branches as leaderboard_branches
+
 from . import _loadout_branches as loadout_branches
 from . import _player_branches as player_branches
 from . import _patterns_branches as patterns_branches
@@ -1055,7 +1057,8 @@ async def activity_assistant(
         "stats=生涯 PvE/PvP 统计；weapon_history=武器使用排行（全模式）；"
         "pvp_weapons=纯 PvP 武器榜（最近 N 场结算聚合，不是生涯）；"
         "aggregate=活动累计排行；leaderboards=玩家排行榜；"
-        "clan_leaderboards=公会排行榜；counters=游戏内计数器（profile 组件 1100）。"
+        "clan_leaderboards=公会排行榜；counters=游戏内计数器（profile 组件 1100）；"
+        "raid_report=突袭/地牢报表（mode 选 raid/dungeon，数字取自同一组件 1100）。"
     ))] = "history",
     player_name: fields.PlayerName = None,
     character: fields.CharacterOptional = None,
@@ -1086,7 +1089,7 @@ async def activity_assistant(
     maxtop = positive_or_default(maxtop, 10)
     # pvp_weapons 的 count 是"分析多少场"：逐场 PGCR 约 1 场/秒（实测），
     # 所以它的默认值是 10 而不是别处的 20 条。`None`/0/负数都算"没指定"。
-    count = positive_or_default(count, 10 if intent == "pvp_weapons" else 20)
+    count = positive_or_default(count, 10 if intent == "pvp_weapons" else 60 if intent == "raid_scan" else 20)
     community_section = community_section or "text"
     resolved = resolve_player_name(player_name)
 
@@ -1100,17 +1103,14 @@ async def activity_assistant(
             "DPS、机制和攻略属于社区记录；其中的理论值、Bug 或实验条件不能当作实战保证。"
         ])
 
-    if intent == "history":
-        return ok_response("已读取活动历史。", {"activities": await svc["activity_svc"].get_activity_history(resolved, character, mode, count)})
-
-    if intent == "pgcr":
-        return ok_response("已读取活动结算。", {"pgcr": await svc["activity_svc"].get_pgcr(activity_id)})
+    if intent in history_branches.INTENTS:
+        return await history_branches.history_response(svc, intent, resolved, character, mode or "", count, activity_id)
 
     if intent in {"stats", "career", "historical_stats"}:
         return await stats_branches.stats_response(svc, resolved, character, mode or "", period or "", query)
 
-    if intent == "counters":
-        return await counters_branches.counters_response(svc, resolved, query, count, mode or "", period or "")
+    if intent in counters_branches.INTENTS:
+        return await counters_branches.metrics_response(svc, intent, resolved, query, count, mode or "", period or "")
 
     if intent in weapon_usage_branches.INTENTS:
         return await weapon_usage_branches.weapon_usage_response(
