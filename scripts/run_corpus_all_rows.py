@@ -536,6 +536,14 @@ def sweep_args(tool: str, intent: str, live: dict[str, Any]) -> dict[str, Any]:
             args["group_id"] = "4611686018490000000"
         elif intent in {"aggregate", "activity_aggregate", "activity_stats"}:
             args["mode"] = "raid"
+        elif intent == "raid_report":
+            # 只读、秒回（官方计数器）；显式给 dungeon 是为了顺带体检非默认口径。
+            args["mode"] = "dungeon"
+        elif intent == "raid_scan":
+            # **要真扫一小块才算覆盖**：之前 sweep 空手调它，索引根本没被写 ——
+            # 那只证明了"不炸"，没证明"能干活"。固定一个小副本 + count=1：
+            # 一次翻页 + 一次 PGCR，几秒钟，且可重复（扫过的不会再扫）。
+            args.update(query="破碎王座", count=1)
         elif intent == "community":
             args["query"] = "突袭"
     elif tool == "world_assistant":

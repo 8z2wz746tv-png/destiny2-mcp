@@ -37,6 +37,7 @@ if TYPE_CHECKING:
     from .services.starside_entities import StarsideEntities
     from .services.starside_service import StarsideService
     from .services.pattern_service import PatternService
+    from .services.raid_report_service import RaidReportService
     from .services.rotation_service import RotationService
 
 
@@ -73,4 +74,5 @@ class ServiceContext(TypedDict):
     starside_svc: StarsideService
     starside_entities_svc: StarsideEntities
     pattern_svc: PatternService
+    raid_report_svc: RaidReportService
     rotation_svc: RotationService

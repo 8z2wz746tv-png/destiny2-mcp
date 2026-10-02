@@ -67,6 +67,8 @@ from .services.set_bonus_service import SetBonusService
 from .services.starside_entities import StarsideEntities
 from .services.starside_service import StarsideService
 from .services.pattern_service import PatternService
+from .services.raid_report_service import RaidReportService
+from .services.raid_runs import RaidScanner
 from .services.rotation_service import RotationService
 from .wishlist_data import ensure_wishlist_data
 from .service_context import ServiceContext
@@ -126,6 +128,10 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
         starside_svc = StarsideService(manifest)
         starside_entities_svc = StarsideEntities()
         pattern_svc = PatternService(bungie, manifest, resolver, starside_svc)
+        # 突袭报表复用计数器服务的读法（同一个组件 1100、同一种抖动重试）；
+        # 扫描器负责逐场 PGCR → 本地索引（报表里「全程/最短用时」两列的唯一来源）
+        raid_report_svc = RaidReportService(
+            activity_counters_svc, RaidScanner(bungie, resolver))
         rotation_svc = RotationService(bungie, manifest, resolver)
         armor_mod_svc = ArmorModService(bungie, manifest, resolver)
 
@@ -163,6 +169,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
             "starside_svc": starside_svc,
             "starside_entities_svc": starside_entities_svc,
             "pattern_svc": pattern_svc,
+            "raid_report_svc": raid_report_svc,
             "rotation_svc": rotation_svc,
             "armor_mod_svc": armor_mod_svc,
         }

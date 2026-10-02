@@ -275,6 +275,8 @@ Manifest 侧（**不代表拥有**）：
 | `pgcr` | 单场结算详情 | `activity_id` |
 | `stats`（`career`、`historical_stats`） | 生涯统计汇总（Bungie 统计接口）。**默认账号级三档**（每行 `existing` 现存 / `deleted` 已删明细 / `account_total` 账号合计，**已含已删角色**）；显式传 `character` 才给单角色并标 `scope=character` | `character`、`mode`、`period` |
 | `counters` | **游戏内生涯计数器**（profile 组件 1100；S1 起累计、含已删角色，与 `stats` 口径不同，数字可能不一样） | `query`（按名称/描述筛，如 `crucible`、`trials`）、`count` |
+| `raid_report` | **突袭/地牢战绩报表**：每个副本一行，给完成次数 / 担任导师次数（**人数**，一次带 3 个新人记 +3）/ 无瑕完成次数 / 单人无瑕完成次数 —— 全部取自**游戏内官方计数器**（组件 1100，一次读全）。**没有**「全程次数」「全程最短用时」「Full Clears Rank」「DayOne 编号」：响应的 `unavailable` 逐条说明为什么（分别是"要逐场 PGCR 且该字段历史上坏过"与"是人群数据"），别把 `null` 读成 0 | `mode`（`raid` 默认 / `dungeon`） |
+| `raid_scan` | **按副本扫 PGCR**，把 `raid_report` 里「全程次数 / 最短用时」两列的数据补齐（写本地逐场索引 `~/.destiny_mcp/cache/raid_runs.jsonl`）。**一次扫不完**：实测 PGCR 0.88 秒/场、**并发没用**（4/8/12 并发都是 1.1~1.3 场/秒），深岩墓室 336 场要 4.5 分钟、全量 2095 场要 26 分钟。所以按 `count` 分块（默认 60 场 ≈ 53 秒），**可重复调用续扫**，回执里的 `pending` 告诉你还剩多少；扫过的不会再扫 | `query`（**副本名**，如"深岩墓室"）、`count`（这一块多少场） |
 | `weapon_history`（`weapons`、`weapon_usage`、`weapon_leaderboard`） | 武器使用历史排行（**全模式** PvE+PvP，`scope=all_modes`，**不是 PvP 榜**） | `character`、`count` |
 | `pvp_weapons` | **纯 PvP 武器榜**：逐场结算（PGCR）聚合"最近 N 场"的武器击杀，`scope=pvp_recent`、`source=pgcr_aggregation`。上游没有生涯口径的 PvP 武器榜，所以**必须看 `window`**（起止时间），别当成生涯 | `character`、`mode`（`pvp` 默认／`trials`／`iron_banner`／`competitive`／`gambit`）、`count`（分析多少场，默认 10、上限 100） |
 | `aggregate`（`activity_aggregate`、`activity_stats`） | 按活动类型聚合 | `character`、`count` |
@@ -349,7 +351,7 @@ Manifest 侧（**不代表拥有**）：
 | `canonical_build` | `build_assistant`：`equip_build` |
 | `category` | `build_assistant`：`community`、`community_build`、`starside` |
 | `changes` | `subclass_assistant`：`modify` |
-| `character` | `activity_assistant`：除 `clan_leaderboards`、`counters`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`set_bonus` 外全部；`inventory_assistant`：`equip`、`equip_items`、`equip_many`、`equip_mod`、`lock`、`pull_postmaster`、`quest_tracking`、`track_quest`；`loadout_assistant`：`clear_official`、`get`、`list`、`save`、`snapshot_official`、`update_official_identifiers`；`subclass_assistant`：除 `artifact_mod`、`fragment_details`、`fragments` 外全部；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`vendor` |
+| `character` | `activity_assistant`：`activity_aggregate`、`activity_stats`、`aggregate`、`career`、`community`、`historical_stats`、`history`、`leaderboard`、`leaderboards`、`pvp_weapons`、`stats`、`weapon_history`、`weapon_leaderboard`、`weapon_usage`、`weapons`；`build_assistant`：除 `armor_mods`、`set_bonus` 外全部；`inventory_assistant`：`equip`、`equip_items`、`equip_many`、`equip_mod`、`lock`、`pull_postmaster`、`quest_tracking`、`track_quest`；`loadout_assistant`：`clear_official`、`get`、`list`、`save`、`snapshot_official`、`update_official_identifiers`；`subclass_assistant`：除 `artifact_mod`、`fragment_details`、`fragments` 外全部；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`vendor` |
 | `class_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `collectible_node_hash` | `world_assistant`：`collectible_node` |
 | `color_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
@@ -357,7 +359,7 @@ Manifest 侧（**不代表拥有**）：
 | `community_section` | `activity_assistant`：`community`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
 | `component` | `subclass_assistant`：`options` |
 | `confirmed_exotic_hash` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
-| `count` | `activity_assistant`：`activity_aggregate`、`activity_stats`、`aggregate`、`community`、`counters`、`history`、`pvp_weapons`、`weapon_history`、`weapon_leaderboard`、`weapon_usage`、`weapons` |
+| `count` | `activity_assistant`：`activity_aggregate`、`activity_stats`、`aggregate`、`community`、`counters`、`history`、`pvp_weapons`、`raid_scan`、`weapon_history`、`weapon_leaderboard`、`weapon_usage`、`weapons` |
 | `destination` | `inventory_assistant`：`move` |
 | `element` | `subclass_assistant`：`community`、`fragments`、`options` |
 | `equip` | `inventory_assistant`：`move` |
@@ -391,7 +393,7 @@ Manifest 侧（**不代表拥有**）：
 | `maxtop` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
 | `melee_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `mod_name` | `inventory_assistant`：`equip_mod` |
-| `mode` | `activity_assistant`：`career`、`clan_leaderboards`、`community`、`counters`、`historical_stats`、`history`、`leaderboard`、`leaderboards`、`pvp_weapons`、`stats` |
+| `mode` | `activity_assistant`：`career`、`clan_leaderboards`、`community`、`counters`、`historical_stats`、`history`、`leaderboard`、`leaderboards`、`pvp_weapons`、`raid_report`、`stats` |
 | `name` | `loadout_assistant`：`save` |
 | `name_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
 | `name_prefix` | `player_assistant`：`find`、`find_players`、`fuzzy` |
@@ -402,7 +404,7 @@ Manifest 侧（**不代表拥有**）：
 | `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact`、`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`craft`、`filter_rolls`、`pattern`、`patterns`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：`collectible_item`、`collectible_node`、`rotations`、`vendor`、`周常轮换`、`轮换`、`这周` |
 | `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |
 | `priority_stats` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
-| `query` | `activity_assistant`：`career`、`community`、`counters`、`historical_stats`、`stats`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |
+| `query` | `activity_assistant`：`career`、`community`、`counters`、`historical_stats`、`raid_scan`、`stats`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |
 | `rarity` | `inventory_assistant`：`get`、`inventory`、`list`；`weapon_assistant`：`craft`、`pattern`、`patterns`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器` |
 | `replacement_slot` | `build_assistant`：`farm_target` |
 | `required_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |

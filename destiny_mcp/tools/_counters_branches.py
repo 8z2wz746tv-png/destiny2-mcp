@@ -1,9 +1,17 @@
 """活动分支的响应组装：`assistants.py` 只做分派，话术与降级判断落在这里。
 
-现在只有 `counters` 一个分支（其余历史分支此前都在 `assistants.py` 里逐行返回）。
-单独开文件是为了让"游戏内计数器"的话术与失败判断有一处可查：它是**另一个数据源**，
-最容易被当成 `stats` 的另一种写法 —— 两者的数字本来就不一样（见
-docs/reference/bungie_api.md「Metrics（组件 1100）vs Stats」）。
+**本模块是"组件 1100 的两个出口"**（同一个数据源、同一种抖动）：
+
+- `counters`：游戏内生涯计数器的总表（按名称/模式/周期筛）；
+- `raid_report`：突袭/地牢报表（`data/raids.py` 那张对照表 → 每个副本一行）；
+- `raid_scan`：按副本分块扫 PGCR，把报表里「全程次数/最短用时」两列的数据补齐。
+
+后两个在 `_raid_report_branches.py`（同一块功能），这里只做转发 ——
+`assistants.py` 贴着体量上限（1218 行），加一个 intent 不能再加一行分派。
+
+两者放一起不是凑数：读的是同一个组件、共用 `read_metrics` 的重试与"空不是 0"的话术，
+分开就得抄第二份。它是**另一个数据源**，最容易被当成 `stats` 的另一种写法 ——
+两者的数字本来就不一样（见 docs/reference/bungie_api.md「Metrics（组件 1100）vs Stats」）。
 
 文件名跟 `_weapon_branches.py` / `_armor_branches.py` 同族（`_*_branches.py`），
 `tests/test_tool_dispatch_contracts.py` 会把它算进"分派层"一起扫。
@@ -17,7 +25,31 @@ from typing import Any
 
 from ..data import pvp_counters
 from ..error_codes import ErrorCode
+from . import _raid_report_branches as raid_report_branches
 from ._responses import data_only, error_response, ok_response
+
+#: 本模块认领的 intent（`assistants.py` 用它分派，别再写第二份字符串）
+INTENTS: tuple[str, ...] = ("counters", "raid_report", "raid_scan")
+
+
+async def metrics_response(
+    svc: dict[str, Any],
+    intent: str,
+    player_name: str,
+    query: str,
+    count: int,
+    mode: str = "",
+    period: str = "",
+) -> dict[str, Any]:
+    """分派：突袭那两条走 `_raid_report_branches`，`counters` 走计数器总表。
+
+    `query` 给 `raid_scan` 当副本名、`count` 给它当"这一块扫多少场"——
+    两个参数本来就传给这里了，所以不需要在 `assistants.py` 多加一行。
+    """
+    if intent in raid_report_branches.INTENTS:
+        return await raid_report_branches.raid_response(
+            svc, intent, player_name, mode, query, count)
+    return await counters_response(svc, player_name, query, count, mode, period)
 
 
 def _scope_label(mode: str, period: str, labels: dict[str, str]) -> str:

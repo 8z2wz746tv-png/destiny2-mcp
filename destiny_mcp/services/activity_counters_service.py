@@ -252,6 +252,31 @@ class ActivityCountersService:
             return {}
         return raw
 
+    async def read_metrics(self, player_name: str) -> tuple[dict, str]:
+        """读组件 1100 的原始 `metrics`，带抖动重试。
+
+        返回 `(metrics, 不可用原因)`：拿到就是 `({...}, "")`，读不到是 `({}, "原因")`。
+        **抽成公开方法的理由**：突袭/地牢报表（`raid_report_service`）读的是同一个组件、
+        面对的是同一种抖动 —— 那份重试与"空不是 0"的话术只能有一处，抄第二份就会漂。
+
+        抖动的判据是"拿到非空 metrics"；这里只负责重试与判断，怎么用交给调用方。
+        """
+        player = await self._resolver.resolve_player(player_name)
+        membership_id = str(player["membership_id"])
+        membership_type = int(player["membership_type"])
+        raw_metrics = await read_until(
+            lambda: self._read_metrics(membership_id, membership_type),
+            lambda metrics: bool(metrics),
+            attempts=ATTEMPTS,
+            delay=DELAY_SECONDS,
+        )
+        if not raw_metrics:
+            return {}, (
+                f"组件 1100（Metrics）返回空：上游读取抖动，已重试 {ATTEMPTS} 次仍未拿到计数器。"
+                "这不代表你没有任何计数（空不是 0），请稍后重试。"
+            )
+        return raw_metrics, ""
+
     async def get_career_counters(
         self,
         player_name: str,
@@ -281,22 +306,8 @@ class ActivityCountersService:
             `{"counters": [...], "total", "returned", "truncated", "unavailable", "filter",
             "labels", "components"}`；读不到时 `counters=[]` 且 `unavailable` 写清原因，**不报成功**。
         """
-        player = await self._resolver.resolve_player(player_name)
-        membership_id = str(player["membership_id"])
-        membership_type = int(player["membership_type"])
-
-        # 抖动的判据是"拿到非空 metrics"；重试只重试、不判断成败，判断留给这里。
-        raw_metrics = await read_until(
-            lambda: self._read_metrics(membership_id, membership_type),
-            lambda metrics: bool(metrics),
-            attempts=ATTEMPTS,
-            delay=DELAY_SECONDS,
-        )
-        if not raw_metrics:
-            reason = (
-                f"组件 1100（Metrics）返回空：上游读取抖动，已重试 {ATTEMPTS} 次仍未拿到计数器。"
-                "这不代表你没有任何计数（空不是 0），请稍后重试。"
-            )
+        raw_metrics, reason = await self.read_metrics(player_name)
+        if reason:
             logger.warning("生涯计数器不可用：player=%s", player_name)
             empty = payload([], self._manifest, limit=limit, unavailable=reason, query=query, mode=mode, period=period)
             empty["warnings"] = []

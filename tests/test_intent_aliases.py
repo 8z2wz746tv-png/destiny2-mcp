@@ -94,6 +94,11 @@ STANDALONE: dict[str, tuple[str, ...]] = {
         "history", "pgcr", "counters", "clan_leaderboards", "community",
         # 独立口径：PvP 武器榜（逐场 PGCR 聚合"最近 N 场"，不是 weapon_history 的别名）
         "pvp_weapons",
+        # 独立口径：突袭/地牢报表（副本一行，数字取自组件 1100 官方计数器；
+        # 不是 counters 的别名 —— counters 给的是计数器总表，它给的是按副本归好的表）
+        "raid_report",
+        # 独立口径：按副本扫 PGCR 补「全程/最短用时」两列（长、可续、会落盘）
+        "raid_scan",
     ),
     "BuildIntent": (
         "recommend", "find", "analyze", "farm_target", "equip_build",

@@ -121,7 +121,8 @@ CEILINGS = {
     # 297 → 310（0.7.14）：身份块带 `name_variants`（同名多版本如实报，P0 修复）。
     "destiny_mcp/services/weapon_payload.py": 313,
     # P5 新增：本地资料汇总（愿单/选取率/清单/社区 → 每个 plug 的 recommended）
-    "destiny_mcp/services/weapon_local_data.py": 403,
+    # 425：cross_check 不再对"同名多版本"断言 in_manifest_pool（2026-09-28）。
+    "destiny_mcp/services/weapon_local_data.py": 427,
     # 锻造图样查询新增登记（登记即上限）：目录（展示树 + 记录 + 目标需求）+ 账号进度
     # （组件 900 的**档案级与角色级两份**）+ 来源装配 + 变体的塑形配置都在这里。
     # 463 = 427 + 角色级记录合并（真机事故：32 条角色级记录被漏读）+ read 块收敛。
@@ -183,13 +184,39 @@ CEILINGS = {
     "destiny_mcp/services/inventory_analysis_service.py": 654,
     # 0.7.9 新增：社区配装的功能模组（名字 → 部位/版本/能量；不进求解器，只算它占多少能量）。
     "destiny_mcp/build/functional_mods.py": 159,
+    # 2026-09-28 新增：职业金装（相对主义/唯我主义/坚忍克己）roll 到的两个异域特性。
+    # 单独成模块的原因：armor_payload 贴着上限，而这读的是"插槽里装着哪颗异域 plug"，
+    # 与"六维怎么算"是两件事。登记即上限：再往里加东西先回答"是不是该拆"。
+    "destiny_mcp/services/armor_class_item.py": 195,
+    # 社区模板的"异域护甲=两个特性名"这一支接进 starside_matching（2026-09-28）。
+    # 860：接上"按组件 305 真核对职业金装特性"（2026-09-28，原为 not_checked）。
+    "destiny_mcp/services/starside_matching.py": 860,
+    # 2026-09-28 新增（从 loadout_mod_sockets / armor_mod_service 抽出）：调谐能不能写的判据。
+    # 抽出来的直接原因：同一判据被两条写入路径各写一份，只改了一边 → equip_build 拿组件 207
+    # 判调谐，把 3 颗能装的调谐误拦（连上游都没试）。登记即上限。
+    "destiny_mcp/build/tuning_writes.py": 66,
     # 0.7.9 新增：照抄模组在执行时的现场决策（挑版本、插不进/装不下就跳过并点名）。
     "destiny_mcp/services/loadout_functional_mods.py": 127,
     # 0.7.9 新增（从 loadout_mod_sockets 拆出）：模组的能量预算与"拿谁去腾能量"。
     "destiny_mcp/services/loadout_energy_budget.py": 85,
+    # 2026-10 新增（从 loadout_mod_sockets 拆出，那边贴着 518）：1676 的话术 —— 把 Manifest 的
+    # 插入条件分成"候选"与"已被账号守护者等级证伪"，外加读守护者等级这一处（组件 100）。
+    # 抽出来的直接原因：把条件清单念成原因会让用户**早就满足**的那条背锅（等级 11 被告知要 3 级）。
+    "destiny_mcp/services/insertion_rule_diagnosis.py": 98,
     # 配装服务本体：清单/详情/存档/预览/官方槽都在这。真机走查连加了两块（`describe_save`
     # 与抽出的 `_read_equipment`），登记在 1030 就是"下次先想清楚放哪儿"。
     "destiny_mcp/services/loadout_service.py": 1030,
+    # 突袭报表新增登记（登记即上限）：表本体（副本 → 官方计数器 hash）+ 取数组装 + 分支话术。
+    # 三块分开登记的理由：它们的上限不该互相借用 —— 表会随新副本长，服务与话术不该跟着长。
+    # 表里每一行都有 `tests/test_raid_report.py` 对着 Manifest 核（hash 存在、描述里含副本名、
+    # 且不是"本周/本赛季"变体），所以加行是"有意识的决定"，不是顺手抄一条。
+    "destiny_mcp/data/raids.py": 163,
+    "destiny_mcp/services/raid_report_service.py": 269,
+    # 逐场索引（P4）：存从 PGCR 抠出来的原始事实 + 按副本分块扫描。两者同处一模块是因为
+    # 扫描写的就是这里的格式，分开会让"字段名"有两个出处。
+    "destiny_mcp/services/raid_runs.py": 319,
+    "destiny_mcp/tools/_raid_report_branches.py": 129,
+    "destiny_mcp/tools/_history_branches.py": 42,
 }
 
 

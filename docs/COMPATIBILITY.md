@@ -13,6 +13,62 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：同名多版本不再让 `cross_check` 给出反向结论（2026-09-28）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 武器身份块的 `name_variant_count` | 无这个键 | **恒有**（别名/复刻下同名的武器定义个数，只有 1 个时也给 `1`） |
+| `farming.cross_check.perks[].in_manifest_pool` | 推荐 perk 不在**解析到的那一个**版本的池里就给 `false` | 同名有多个版本时给 **`null`** + `perk_pool_check: "variant_pool_ambiguous"` + `perk_pool_check_reason`；只有唯一版本（`name_variant_count == 1`）时才敢断言 `false` |
+| `cross_check.note` | "清单可能早于退役" | 补一句：`in_manifest_pool=null` 表示**没判**，不等于 `false` |
+
+**为什么**：定义级 intent（`perk_pool`/`god_roll`/`analyze`/`info`）按名字只能挑一个版本，而社区清单写的是**玩家那把**的事实。
+真机「千码凝视」有两个 hash（`4164201232` = `releases.v540.season`、`1648948519` = `releases.v970.core`），
+解析到前者时清单推荐的 4 颗（失调协议 / 斩首武器 / 转向 / 瓦解）全被判 `false` ——
+调用方会读成"清单过时了 / 这些 perk 退役了"，**而错的其实是我们挑了另一个版本**。
+`name_variants`（2026-09-26 加的）只把警告摆在数据旁边，管不住这个机器可读字段，所以本次补上。
+
+**没做**（记在这，别以为已经做了）：解析仍然是"悄悄挑第一个"，没有返回候选列表；要定论仍得用 `compare` 的副本行（组件 310）。
+
+## 未发布：职业金装报出它 roll 到的两个异域特性（2026-09-28）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `inventory_assistant(intent="item")` 的 `instance` 块 | 两个特性只以裸插槽形式躺在 `sockets[]` 里（`kind: "intrinsic"`），顶层没有"这件 roll 了哪两颗" | 多一个 **`instance.class_item_perks`**：`[{name, item_hash, stats}]`，按槽序。只在**职业金装**（相对主义/唯我主义/坚忍克己）且真 roll 到特性时出现，否则**没有这个键** |
+
+**纯增字段**，旧键一个没少；`identity` 与 `exotic_name` 语义不变（金装仍按**名字**识别 ——
+它就是一个 `item_hash`，不因为特性组合变成多个身份）。
+
+**为什么加**：社区配装里 14 套的"异域护甲"字段写的是**两个特性名**（例：「至纯光能之灵、曲腹蛛之灵」），
+而不是金装名 —— 以前我们既报不出"这件 roll 的是哪两颗"，也没法回答"我那件相对主义是不是至纯+曲腹蛛"。
+特性池**只能从账号读**（金装的特性槽在 Manifest 里是 `plugSources: 1`，定义里是占位），
+判据是 `plugCategoryHash == 1744546145`（`services/armor_class_item.py`，守门 `tests/test_armor_class_item.py`）。
+带属性的那 15 颗（如至纯 = 超能30/近战25）**早就进了 `roll`**，本次只做"报出来"，六维算法未动。
+
+**同一支也接进了社区比对**（`build_assistant(intent="community")`）：模板里那种写法以前回
+`status: "unresolved"` + `name_not_matched`，读起来像"你没有这件装备"，实际是模板用特性名指代职业金装。现在：
+
+| 字段 | 说明 |
+| --- | --- |
+| `exotic_armor` 要求的 `status` | `unresolved` → **`resolved`**（翻回金装名后按普通金装解析） |
+| `class_item_name` | 新增：翻出来的金装名（如「相对主义」） |
+| `required_class_item_perks` | 新增：要求的两个特性（`item_hash` 无符号 + `name`）。**只点名一颗也是合法的** |
+| `class_item_perk_status` | 新增，四种取值：`verified`（有副本同时 roll 到要求的组合，`class_item_perk_match` 指出是哪一个）/ `owned_wrong_perks`（持有但没有任何副本满足，`class_item_perk_rolled` 列出各副本实际滚到的）/ `unknown`（读不到组件 305 或宿主读不了插槽，`class_item_perk_reason` 说明原因）。另有 `class_item_perk_rolled` 在 `verified` 时也给出各副本的组合 |
+
+口径：`owned` 只代表"持有这件金装"；**特性是否 roll 对看 `class_item_perk_status`**，别把 `owned` 读成满足，
+也别把 `unknown` 读成不满足。核对是**真读组件 305**（一次读全账号，实测 3.47 MB / 0.85 秒；
+不是每件读一次 —— 那会变成 N+1），只在配装要求里出现职业金特性时才付这个成本（社区 90 套里 15 套，17%）。
+
+## 未发布：`equip_build` 不再把调谐误判成"装不上"（2026-09-28）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `equip_build` 的模组预检对**调谐** | 拿组件 **207**（角色级 `characterPlugSets`）判"这一位能不能插"。而 207 **不覆盖调谐槽**（调谐只在组件 310 的逐件清单里）→ 必然得 `false`：真机把 3 颗调谐（含「平衡调整」）全判成"装不上：不在 Bungie 给这一位角色的可插入清单里（游戏里同样装不上）"，插入条件还是从 207 抄来的「需要守护者等级3」，**连上游都没试** | 调谐**跳过** 207 判据。这条执行路径不请求 310，手上没有"这件允许哪些调谐"，所以退回**不判断**（缺数据 ≠ 不许）；真装不上由上游回 1675，按 ADR-018 记 `mod_blocked` 且不回退整条配装 |
+
+判据收进 `destiny_mcp/build/tuning_writes.py`（`equip_mod` 确认阶段与 `equip_build` 模组预检共用），
+不再两边各写一份 —— 这次事故的根因就是"只改了一边"。**非调谐模组的行为一字未变**（仍照 207 拦），
+守门两条成对：`tests/test_loadout_mod_planning.py` 的 `test_tuning_is_not_blocked_by_the_role_level_plug_sets`
+与 `test_non_tuning_mod_is_still_blocked_by_the_role_level_plug_sets`。
+
 ## 未发布：同名多版本如实报 + 副本行照列固定栏（2026-09-26）
 
 | 变了什么 | 以前 | 现在 |
@@ -410,6 +466,7 @@ Starside 作者给的新归档（按 hash 的实体数据）接进来了：`anal
 | 周常轮换表 | `world_assistant(intent="rotations")` | 新 intent（只读）：本周特色突袭/地牢（官方里程碑）、本周夜幕/宗师**哪个打击 + 词缀 + 掉落**（角色活动组件 204）、上维挑战/异域任务/泉源（自维护周期表 + 锚点）。每行带 `source=official\|schedule`；**遗失区域顺序未核对，只给候选**（见 ADR-010） |
 | 图样按稀有度筛 | `weapon_assistant(intent="patterns", rarity="异域")` | 新参数（只被 `patterns` 读）：异域/金枪、传说/紫枪、稀有；稀有度词表收拢到 `vocabulary.RARITY_ALIASES`（`inventory_assistant` 原来私藏一份）。同时 `counts` 旁多了 `by_tier` 汇总——真机上出现过"只读第一页把 16 把金枪报成 2 把" |
 | 锻造武器模式查询 | `weapon_assistant(intent="patterns")` | 新 intent（只读）：图鉴「模式和催化」183 条武器模式的进度（组件 900，就是游戏里那条「模式进度 4/5」）、还差几个红框萃取、需求次数、掉落来源。**新能力，非破坏性**：没动任何既有 intent 的键；两个"可锻造"口径并存（模式 183 条 vs `is_craftable` 219 件，后者含 36 件变体，变体可塑形栏位更少、且不带深视插槽），见 ADR-009 |
+| 突袭/地牢战绩报表 | `activity_assistant(intent="raid_report", mode="raid"\|"dungeon")` | 新 intent（只读）：每个副本一行的完成次数 / 担任导师次数（**人数**，一次带 3 个新人记 +3）/ 无瑕完成次数 / 单人无瑕完成次数，**全部取自游戏内官方计数器**（组件 1100，与 `counters` 同一个来源、共用读法与抖动重试）。**非破坏性**：没动任何既有 intent 的键。**没有**「全程次数」「全程最短用时」「Full Clears Rank」「DayOne 编号」—— 响应的 `unavailable` 逐条说明为什么（前两个要逐场 PGCR 且 `activityWasStartedFromBeginning` 历史上坏过三段；后两个是人群数据）。`null` 是「这个副本没有这项计数器」或「本次没读到」，**不是 0** |
 
 **删除的行为（不留兼容分支）**：`equip_loadout` 遇到"保存的子职业与当前不一致"以前直接失败并返回
 「当前子职业与保存/确认的子职业不一致。」；0.3.0 起改成**先换上再配**（用户 2026-09-15 拍板），

@@ -566,15 +566,17 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         _only(*(i for i in _all(ActivityIntent) if i not in {"pgcr", "clan_leaderboards", "community"})),
         hint="单场结算只看活动 ID，公会榜只看 group_id，社区资料与账号无关。",
     ),
-    # counters 是账号级组件（游戏内生涯计数器没有按角色的口径），所以 character 对它无意义。
+    # counters 与 raid_report 都是账号级组件（游戏内计数器没有按角色的口径），
+    # 所以 character 对它们无意义 —— 带上也不会改变任何结果，按"没认领"处理。
     ("activity_assistant", "character"): _contract(
-        _only(*(i for i in _all(ActivityIntent) if i not in {"pgcr", "clan_leaderboards", "counters"})),
-        hint="单场结算和公会榜不按角色过滤；counters 是账号级计数器（不按角色拆）。",
+        _only(*(i for i in _all(ActivityIntent) if i not in {"pgcr", "clan_leaderboards", "counters", "raid_report", "raid_scan"})),
+        hint="单场结算和公会榜不按角色过滤；counters、raid_report 与 raid_scan 都是账号级（不按角色拆）。",
     ),
     ("activity_assistant", "mode"): _contract(
-        _only("history", *_A_STATS, "counters", "pvp_weapons", *_A_LEADERBOARD, "clan_leaderboards", "community"),
+        _only("history", "raid_report", *_A_STATS, "counters", "pvp_weapons", *_A_LEADERBOARD, "clan_leaderboards", "community"),
         hint=(
-            "模式过滤被 history、排行榜和社区资料读；counters 用它按对照表筛计数器家族"
+            "模式过滤被 history、排行榜和社区资料读；raid_report 用它选口径"
+            "（raid 突袭 / dungeon 地牢，不传按 raid）；counters 用它按对照表筛计数器家族"
             "（crucible/trials/iron_banner/competitive/gambit/raid）；stats 把它翻成统计接口的"
             "modes= 数值（同一个词表，数值取自 Manifest 的 modeType）；pvp_weapons 用它选 PvP 家族"
             "（pvp/trials/iron_banner/competitive/gambit）；武器历史（全模式那条）不分模式。"
@@ -612,17 +614,18 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("activity_assistant", "leaderboards"),
     ),
     ("activity_assistant", "count"): _contract(
-        _only("history", *_A_WEAPON_HISTORY, "pvp_weapons", *_A_AGGREGATE, "counters", "community"),
+        _only("history", *_A_WEAPON_HISTORY, "pvp_weapons", *_A_AGGREGATE, "counters", "raid_scan", "community"),
         hint='要几场/几条只被 history、武器历史、PvP 武器榜（pvp_weapons，这里指\"分析多少场\"）、'
-             '聚合统计、计数器（counters）和社区资料读；'
-             "生涯统计不分条数。",
+             '聚合统计、计数器（counters）、扫描（raid_scan，这里指\"这一块扫多少场\"，默认 60）'
+             "和社区资料读；生涯统计不分条数。",
         suggestion=("activity_assistant", "history"),
     ),
     ("activity_assistant", "query"): _contract(
-        _only("counters", *_A_STATS, "community"),
+        _only("counters", *_A_STATS, "raid_scan", "community"),
         hint=(
             '关键词在 intent="counters"（筛计数器名称/描述）、intent="stats"（按统计项名称筛行，'
-            '例如"击败"，省得一次读 60 行）与社区活动资料 intent="community" 上用。'
+            '例如"击败"，省得一次读 60 行）、intent="raid_scan"（要扫的**副本名**，如"深岩墓室"）'
+            '与社区活动资料 intent="community" 上用。'
         ),
         suggestion=("activity_assistant", "stats"),
     ),
