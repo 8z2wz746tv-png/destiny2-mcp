@@ -37,6 +37,20 @@ INVENTORY_SOCKETS: list[int] = [102, 200, 201, 205, 300, *ITEM_SOCKETS]
 # 护甲快照：属性值 + 插槽（模组要写进插槽，所以两个都要）
 ARMOR_SNAPSHOT: list[int] = [102, 200, 201, 205, 300, 304, *ITEM_SOCKETS]
 
+# 守护者等级（100 = profile → `Response.profile.data.currentGuardianRank`）。
+# 谁需要它：模组写入被上游 1676 挡下时，用它把「需要守护者等级N」这类**候选条件**里
+# 已经满足的那几条剔掉 —— 上游只回"插入规则没过"、不说是哪条，把用户早就满足的那条念成
+# 原因是误导（2026-10 真机：守护者等级 11 的账号被告知「需要守护者等级3」）。
+GUARDIAN_RANK: list[int] = [100]
+
+#: 装备配装那条路（`equip_loadout` / `equip_build` → `_equip_local_unlocked`）读的快照：
+#: `INVENTORY_SOCKETS` 再加 **守护者等级**。
+#:
+#: 为什么要多要 100：1676 的插入条件清单里有「需要守护者等级N」这种静态门槛，只有拿账号
+#: 事实比一比才知道哪条早就满足（判据与话术在 `services/insertion_rule_diagnosis.py`）。
+#: 100 只有 userInfo + 角色 ID + 三个等级字段，不值得为它多开一次请求。
+EQUIP_LOADOUT: list[int] = [*INVENTORY_SOCKETS, *GUARDIAN_RANK]
+
 #: 配装求解/规划要用的组件：比 `ARMOR_SNAPSHOT` 多一个 **310 `ItemReusablePlugs`**。
 #:
 #: 为什么非它不可：**每件护甲允许装哪些调谐，只在 310 里**。Manifest 的调谐 plug set 是

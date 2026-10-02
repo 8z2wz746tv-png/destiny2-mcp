@@ -43,6 +43,17 @@ def test_weapon_detail_asks_for_every_weapon_component():
     assert profile_components.WEAPON_DETAIL == [102, 200, 201, 205, 300, 304, 305, 302, 310, 308]
 
 
+def test_equip_loadout_carries_the_guardian_rank():
+    """装备那条路比 `INVENTORY_SOCKETS` 多要组件 100（守护者等级）。
+
+    多取一个组件就是响应更大，所以数字钉死：改这里的人得先回答"这个调用点到底要不要它"。
+    1676 的插入条件里有「需要守护者等级N」这种静态门槛，没有等级就只能说"没法判断"
+    （判据与话术在 `services/insertion_rule_diagnosis.py`）。
+    """
+    assert profile_components.GUARDIAN_RANK == [100]
+    assert profile_components.EQUIP_LOADOUT == [102, 200, 201, 205, 300, 305, 100]
+
+
 def test_cache_union_covers_every_cached_caller():
     """缓存的后台刷新用 FULL；少一个组件就会把并集降级、逼下一次调用重拉 10 MB。
 
@@ -104,7 +115,11 @@ def _source(module) -> str:
         (loadout_recovery, "ARMOR_SNAPSHOT", 1),
         # 抓取/恢复那两段已抽到 loadout_recovery.py，钉桩跟着搬家
         (loadout_recovery, "INVENTORY_MINIMAL", 1),
-        (loadout_equipment_service, "INVENTORY_SOCKETS", 2),  # 子职业 + 模组插槽
+        (loadout_equipment_service, "INVENTORY_SOCKETS", 1),  # 回读核对装备实例
+        # 装模组那条路（`_equip_local_unlocked`）改要 EQUIP_LOADOUT：多一个组件 100
+        # （守护者等级），因为 1676 的话术要拿它把"早就满足的插入条件"剔掉
+        # （2026-10 真机：等级 11 的账号被告知「需要守护者等级3」）。
+        (loadout_equipment_service, "EQUIP_LOADOUT", 1),
     ],
 )
 def test_call_sites_keep_their_historical_set(module, named_set, count):

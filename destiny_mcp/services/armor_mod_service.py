@@ -21,15 +21,18 @@ from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
 from ..vocabulary import LEGACY_STAT_ALIASES
 from . import profile_components
+from ..build.tuning_writes import plug_is_tuning, tuning_write_blocker
+from .insertion_rule_diagnosis import (
+    guardian_rank_requirement,
+    insertion_rule_blocker_text,
+    insertion_rule_preflight_text,
+)
 from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
 from ..utils.hash_utils import to_unsigned
 
 # 属性模组（+5/+10 六维）与部位功能模组在插槽里分属不同 plug 类别，名字可能撞车，
 # 所以解析模组名时只在"护甲模组"这一类里找。
 _MOD_ITEM_TYPE = 19
-
-#: 调谐插件的 plug 类别（`core.gear_systems.armor_tiering.plugs.tuning.mods`）。
-_TUNING_CATEGORY_HASH = 3481777685
 
 #: "手雷调谐"这类说法里的属性词 → 六维键。调谐是零和的，光说加哪一项不够，
 #: 还得说减哪一项，所以这种说法一律让调用方明确到具体那一个插件。
@@ -156,6 +159,32 @@ class ArmorModService(ModSocketMixin):
             + "、".join(choice.name for choice in options)
             + "。调谐是零和的（+5 一项一定 −5 另一项），得指定减哪一项 —— "
             '把 mod_name 写成其中一个的完整名字，例如 mod_name="+手雷 / -职业"。'
+        )
+
+    # ── 插入条件：按需读一次守护者等级 ─────────────────────────────────
+
+    async def _guardian_rank_profile(
+        self,
+        conditions: list[str],
+        membership_id: str,
+        membership_type: int | None,
+    ) -> dict | None:
+        """这次诊断要用的账号档案（组件 100）；**只有条件里真有「需要守护者等级N」才读**。
+
+        为什么懒读：条件是这个 plug 的静态门槛清单，多数与等级无关（实测 6049 条门槛文案里
+        只有 501 条是守护者等级类），而"写不进去"的路径上每多一次 GetProfile 都是白花 ——
+        只有确实要拿等级跟 `N` 比一比时才值得读。哪个条件算那一类由
+        `insertion_rule_diagnosis.guardian_rank_requirement` 判，这里不另写一份正则。
+
+        读不到（没有 membership_id、上游没给这个字段）返回 `None`：交给话术说"判不了"，
+        **不许当成满足**。
+        """
+        if not membership_id or not any(
+            guardian_rank_requirement(condition) for condition in conditions
+        ):
+            return None
+        return await self._resolver.get_profile(
+            membership_id, membership_type, profile_components.GUARDIAN_RANK
         )
 
     # ── 方案 ─────────────────────────────────────────────────────────
@@ -291,29 +320,21 @@ class ArmorModService(ModSocketMixin):
                     # 那段），报出去会被读成"写不了"。与 `to.unlock_state` 同一口径。
                     "unlock_state": (
                         None
-                        if self._plug_category_hash(alt_hash) == _TUNING_CATEGORY_HASH
+                        if plug_is_tuning(alt_hash, self._plug_category_hash)
                         else _unlock_state(alt_socket, alt_hash)
                     ),
                 })
 
-        is_tuning = self._plug_category_hash(matched_hash) == _TUNING_CATEGORY_HASH
-        # 调谐：这颗在不在"这件护甲允许的清单"里（组件 310，单一出处见 models）。
-        # 读不到清单 = 不拦（缺数据 ≠ 不许，交给上游说话）；读到了且不在里面 = 明确不写 ——
-        # 省得让用户确认完再去撞 1675。
-        from ..build.models import (  # 局部导入，同上
-            tuning_is_allowed,
-            tuning_options_from_reusable,
-        )
-
-        allowed = tuning_options_from_reusable(
-            (reusable_plugs.get(item_instance_id) or {}),
-            self._plug_category_hash,
-            _TUNING_CATEGORY_HASH,
-        )
-        # `tuning_is_allowed` 两边过 `to_unsigned`：`matched_hash` 来自 manifest.search（有符号），
-        # 310 清单来自 profile（无符号）—— 裸 `in` 会把清单里有的那颗判成"装不到这件上"（真机踩过）。
-        tuning_allowed = (
-            (not is_tuning) or (not allowed) or tuning_is_allowed(allowed, matched_hash)
+        is_tuning = plug_is_tuning(matched_hash, self._plug_category_hash)
+        # 调谐的判据只有一条：那颗在不在**这件护甲允许的清单**里（组件 310）。
+        # 实现在 `ModSocketMixin.tuning_write_reason`（单一出处）—— `equip_build` 的模组预检
+        # 共用它。2026-09-28 那次事故就是"两条路径各写一遍、只改了一边"：这里对，那边错。
+        reason = (
+            tuning_write_blocker(
+                item_instance_id, matched_hash, reusable_plugs, self._plug_category_hash
+            )
+            if is_tuning
+            else ""
         )
         raw_unlock_state = _unlock_state(socket_index, matched_hash)
         # **调谐不看 `unlock_state`** —— 那份"这一位能不能插"的判定在调谐槽上不可信：实测连
@@ -329,27 +350,24 @@ class ArmorModService(ModSocketMixin):
         #      那句话读作"这颗装不到这件上"，**不是**"你没材料"；
         #   ② 非调谐模组不在这一位角色的可插入清单里 → 上游回 1676（插入条件没满足），游戏里同样装不上；
         #   ③ 其余情况可写（角色级清单"没数据"不算拦截 —— 缺数据 ≠ 不许，交给上游说话）。
-        if is_tuning and not tuning_allowed:
-            reason = (
-                "这颗调谐**不在这件护甲允许的调谐里**（组件 310 的清单里没有它）："
-                "上游会回 1675「这颗装不到这件上」，不是「你没材料」。"
-                "换一件能装它的护甲，或者换成这件清单里已有的那几颗。"
+        if not is_tuning and unlock_state is False:
+            # 预检口径：这是**写入之前**的判断，还没往上写过一遍，所以只说"候选条件"、
+            # 不写成"上游拒绝了"（那句只留给真拿到 1676 回执的 `apply`）。条件里已被账号
+            # 满足的那几条会以"已排除"出现，不再冒充原因（话术与判据在
+            # `insertion_rule_diagnosis.insertion_rule_preflight_text`）。
+            rank_profile = await self._guardian_rank_profile(
+                conditions, membership_id, membership_type
             )
-        elif (not is_tuning) and unlock_state is False:
             reason = (
                 f"「{_mod_label(self._manifest.get_item_definition(matched_hash), mod_name)}」"
-                "不在 Bungie 给这一位角色的可插入清单里 —— 实测这种写入会被回 1676"
-                "（插入条件没满足），游戏里同样装不上。它的插入条件是："
-                + ("；".join(conditions) if conditions else "上游没给条件文本")
-                + "。条件里有「必须在赛季神器中选择」时，先在赛季神器里解锁它。"
+                + insertion_rule_preflight_text(conditions, rank_profile)
+                + "条件里有「必须在赛季神器中选择」时，先在赛季神器里解锁它。"
             )
-        else:
-            reason = ""
         return {
             "player_name": player_name,
             "item_instance_id": item_instance_id,
             "kind": "tuning" if is_tuning else "mod",
-            "writable": tuning_allowed if is_tuning else unlock_state is not False,
+            "writable": not reason,
             "writable_reason": reason,
             "note": (
                 "调谐不花能量、也不占模组槽；它是零和的："
@@ -480,15 +498,20 @@ class ArmorModService(ModSocketMixin):
                 }
             if "DestinyFailedPlugInsertionRules" in f"{status} {message}":
                 # 1676：这颗模组的**插入条件**没满足。错误体里不说是哪条没过（message_data 空），
-                # 唯一能拿到的中文说法是 Manifest 的 `plug.insertionRules[].failureMessage`。
+                # Manifest 的 `insertionRules` 只是静态门槛清单 —— 已被账号事实满足的那几条
+                # 会被剔出候选，不再冒充原因（2026-10 真机：等级 11 的账号被告知"需要等级3"）。
+                # 守护者等级按需读一次（`_guardian_rank_profile`），读不到就说判不了。
                 # 实测被它拒掉的那些，条件里都有「必须在赛季神器中选择」—— 游戏里同样装不上，
                 # 所以不能报成"请在游戏里手动装"（以前那句就是这么错的）。
                 conditions = self.plug_insertion_conditions(plan["to"]["hash"])
+                rank_profile = await self._guardian_rank_profile(
+                    conditions,
+                    str(plan.get("membership_id") or ""),
+                    plan.get("membership_type"),
+                )
                 raise TransferError(
-                    "装模组失败：Bungie 回了 1676（这颗模组的插入条件没满足）。"
-                    "Manifest 里它的条件是："
-                    + ("；".join(conditions) if conditions else "上游没给条件文本")
-                    + "。条件里有「必须在赛季神器中选择」时，先在赛季神器里解锁它再装。"
+                    "装模组失败：" + insertion_rule_blocker_text(conditions, rank_profile)
+                    + "条件里有「必须在赛季神器中选择」时，先在赛季神器里解锁它再装。"
                 )
             if "accessnotpermittedbyapplicationscope" in message.lower() or "scope" in message.lower():
                 # 免费插槽接口**不需要** AWA（官方原文：does not require 'Advanced Write Action'

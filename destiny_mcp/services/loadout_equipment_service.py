@@ -85,7 +85,7 @@ class LoadoutEquipmentService(
         mid, mtype = p["membership_id"], p["membership_type"]
 
         # Find character ID
-        profile = await self._resolver.get_profile(mid, mtype, profile_components.INVENTORY_SOCKETS)
+        profile = await self._resolver.get_profile(mid, mtype, profile_components.EQUIP_LOADOUT)
         chars_data = profile.get("characters", {}).get("data", {})
         char_id = None
         for cid, cinfo in chars_data.items():
@@ -244,7 +244,7 @@ class LoadoutEquipmentService(
                         success=ok,
                     ))
                     if not ok:
-                        blocker = self.mod_write_blocker(mod_result, mod_hash)
+                        blocker = self.mod_write_blocker(mod_result, mod_hash, profile)
                         if blocker:
                             # 上游明确拒绝的：记下原因，继续走完剩下的模组，最后如实汇报。
                             blocked_mods.append((lo_item.name, mod_hash, blocker))

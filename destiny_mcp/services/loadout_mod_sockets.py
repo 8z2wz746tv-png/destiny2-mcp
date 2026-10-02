@@ -9,8 +9,10 @@ from __future__ import annotations
 from ..exceptions import TransferError
 from ..manifest import ManifestManager
 from ..models import LoadoutItem, ModOperation, MoveItemStep
+from ..build.tuning_writes import plug_is_tuning
 from ..utils.hash_utils import to_unsigned
 from . import profile_components, write_readback
+from .insertion_rule_diagnosis import insertion_rule_blocker_text, insertion_rule_preflight_text
 from .loadout_energy_budget import plan_energy_clearing
 from .loadout_plug_lookup import PlugLookupMixin
 
@@ -79,12 +81,8 @@ class ModSocketMixin(PlugLookupMixin):
         3315022374,  # Legacy EnhancementsV2ArmorOnly
     }
 
-    # 调谐（`core.gear_systems.armor_tiering.plugs.tuning.mods`）。
-    # 实测纠正一条旧假设：它**本来就在** `_MOD_CATEGORY_HASHES` 里
-    # （那个集合由 `ManifestManager._ARMOR_MOD_CATEGORIES` 生成，其中 3481777685 → "tuning"），
-    # 所以 `_find_mod_socket` 一直允许往调谐槽写、`read_armor_mods` 也一直会读到它。
-    # 唯一为它特判的地方是"腾能量"那一段（调谐免费，清掉它腾不出能量，见下面的 continue）。
-    _PLUG_CAT_TUNING = 3481777685
+    # 调谐本来就属于 `_MOD_CATEGORY_HASHES`（Manifest 的 armor_tiering → "tuning"），所以
+    # `_find_mod_socket` / `read_armor_mods` 一直认它；类别常量见 build/tuning_writes.py。
 
     def read_armor_mod_sockets(
         self,
@@ -136,7 +134,7 @@ class ModSocketMixin(PlugLookupMixin):
 
         return mods
 
-    def mod_write_blocker(self, result: dict, plug_hash: int) -> str:
+    def mod_write_blocker(self, result: dict, plug_hash: int, profile: dict | None) -> str:
         """写入被上游挡住时给一句中文原因；不是"挡住"就返回空串。
 
         三种实测，**原因不同**，都不是重试能成的：
@@ -150,9 +148,8 @@ class ModSocketMixin(PlugLookupMixin):
           2026-09-22 实测撞到它的那次是**调谐**：想装的调谐不在这件护甲允许的清单里（组件 310）
           → 1675；清单里的调谐写入不花材料、直接成功。**算"挡住"而不是硬失败**：装备已经换好了，
           为一颗插件把整条配装回退更糟（也符合"调谐写不进去不回退"这条口径）。
-        - 1676 `DestinyFailedPlugInsertionRules`：这颗模组的**插入条件**没满足（实测被拒的
-          那些条件里都有「必须在赛季神器中选择」）。这条**游戏里同样装不上**，以前把它归到
-          "去游戏里手动装"是错的。
+        - 1676 `DestinyFailedPlugInsertionRules`：插入规则没过（游戏里同样装不上），而**上游
+          没说是哪一条**：`insertionRules` 是静态门槛清单，念成原因会让早就满足的那条背锅。
         """
         text = f"{result.get('Message', '')} {result.get('ErrorStatus', '')}"
         if result.get("ErrorCode") == 1675 or "DestinyCannotAffordMaterialRequirements" in text:
@@ -161,10 +158,8 @@ class ModSocketMixin(PlugLookupMixin):
                 "清单里」那一档会撞上它（清单里的调谐不花材料、能直接写）"
             )
         if "DestinyFailedPlugInsertionRules" in text or result.get("ErrorCode") == 1676:
-            conditions = self.plug_insertion_conditions(plug_hash)
-            return (
-                "插入条件没满足（1676）："
-                + ("；".join(conditions) if conditions else "上游没给条件文本")
+            return insertion_rule_blocker_text(
+                self.plug_insertion_conditions(plug_hash), profile
             )
         if "Access not permitted by application scope" in text:
             return "走到了需要 AdvancedWriteActions（AWA）的付费插槽接口，本项目没实现那段授权"
@@ -227,11 +222,13 @@ class ModSocketMixin(PlugLookupMixin):
         sockets_cache: dict[str, list[dict]],
         instances_data: dict,
         insertable: dict[int, set[int]] | None = None,
+        profile: dict | None = None,
     ) -> list[tuple[str, int, int]]:
         """Order minimal energy-clearing writes before requested mod writes.
 
         `insertable` = `PlugLookupMixin.insertable_plugs` 的结果。给了就**在计划阶段**先查
-        "这一位能不能插这颗"：不能就带着插入条件报错，别等写到一半才让上游回 1676。
+        "这一位能不能插这颗"：不能就带着候选条件报错，别等写到一半才让上游回 1676。
+        `profile`（组件 100）交给话术把**已满足的守护者等级条件**剔出候选 —— 档案本来就在手上。
         没给（None）或上游没给这个 plug set，都退回不判断。
         """
         sockets = sockets_cache.get(item.item_instance_id) or []
@@ -295,7 +292,10 @@ class ModSocketMixin(PlugLookupMixin):
                 assigned_sockets.add(socket_index)
                 keep_operations.append(ModOperation("keep", mod_hash, socket_index))
                 continue
-            if insertable is not None:
+            # 调谐跳过组件 207 判据：调谐槽不在 207 覆盖范围（那是角色级 plug set），只在 310
+            # 的逐件清单里 → 拿 207 判必然 false，会把能装的调谐说成"游戏里同样装不上"且
+            # **连上游都不试**（2026-09-28 事故）。本路径没有 310，所以不判断；判据见 build/tuning_writes.py。
+            if not plug_is_tuning(mod_hash, self._plug_category_hash) and insertable is not None:
                 state = self.plug_is_insertable(
                     insertable,
                     self._manifest.get_item_definition(item.item_hash),
@@ -305,13 +305,13 @@ class ModSocketMixin(PlugLookupMixin):
                 )
                 if state is False:
                     # 这一位装不上这颗（组件 207 的清单里没有）。**不抛错、不回退整条配装**：
-                    # 装备照换，这一颗如实报"装不上"并给出插入条件（ADR-013 的口径）。
+                    # 装备照换，这一颗如实报"装不上"并给出候选条件（ADR-013）。这是**预检**口径：
+                    # 还没往上写过，不许写成"上游拒绝了"（那句只留给真拿到 1676 的那条路）。
                     conditions = self.plug_insertion_conditions(mod_hash)
                     assigned_sockets.add(socket_index)
                     blocked_operations.append(ModOperation(
                         "blocked", mod_hash, socket_index,
-                        "不在 Bungie 给这一位角色的可插入清单里（游戏里同样装不上）。插入条件是："
-                        + ("；".join(conditions) if conditions else "上游没给条件文本"),
+                        insertion_rule_preflight_text(conditions, profile),
                     ))
                     continue
             current_cost = self._plug_energy_cost(current_hash) if current_hash else 0

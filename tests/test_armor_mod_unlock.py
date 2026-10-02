@@ -440,16 +440,94 @@ def _equipment(manifest: _Manifest) -> LoadoutEquipmentService:
     return LoadoutEquipmentService(MagicMock(), manifest, MagicMock())  # type: ignore[arg-type]
 
 
+def _ranked(rank: int | None = 11) -> dict:
+    """带守护者等级的档案替身；`None` = 档案里没有这个字段（读不到，不是 0 级）。"""
+    return {} if rank is None else {"profile": {"data": {"currentGuardianRank": rank}}}
+
+
 def test_mod_write_blocker_names_the_insertion_conditions() -> None:
     service = _equipment(_plan_manifest())
 
     detail = service.mod_write_blocker(
-        {"ErrorCode": 1676, "ErrorStatus": "DestinyFailedPlugInsertionRules"}, LOCKED_MOD
+        {"ErrorCode": 1676, "ErrorStatus": "DestinyFailedPlugInsertionRules"},
+        LOCKED_MOD,
+        _ranked(),
     )
 
     assert "插入条件没满足" in detail
     assert "必须在赛季神器中选择" in detail
     assert "游戏里" not in detail, "1676 不是「去游戏里装」，别那样写"
+
+
+def test_1676_does_not_blame_a_guardian_rank_the_account_already_has() -> None:
+    """**已满足的条件不许被当成失败原因** —— 1676 的条件是候选，不是上游指认的原因。
+
+    真机（2026-10）：守护者等级 11 的用户装护甲模组，收到「插入条件没满足（1676）：
+    需要守护者等级3」，读成"我等级不够"，而那颗模组只要 3 级。上游只说"插入规则没过"
+    （错误体里 `message_data` 是空的），条件清单是 Manifest 的**静态门槛** —— 把清单
+    念成原因，用户早就满足的那条就成了失败理由。
+
+    注入验证：把 `mod_write_blocker` 的 1676 分支改回旧文案（把条件清单直接念成原因、
+    不看守护者等级）跑一次 —— 这条立刻变红，报出那句 `插入条件没满足（1676）：需要守护者等级3`。
+    """
+    manifest = _Manifest({
+        LOCKED_MOD: _mod(
+            LOCKED_MOD, "药到病除", rules=["需要守护者等级3", "必须在赛季神器中选择"]
+        ),
+    })
+    service = _equipment(manifest)
+
+    detail = service.mod_write_blocker(
+        {"ErrorCode": 1676, "ErrorStatus": "DestinyFailedPlugInsertionRules"},
+        LOCKED_MOD,
+        _ranked(11),
+    )
+
+    assert "你的守护者等级 11 已满足这条，它不是本次原因" in detail, (
+        "11 级已满足「需要守护者等级3」—— 它只能以「已排除」的身份出现，不许当失败原因"
+    )
+    assert "插入条件没满足（1676）：需要守护者等级3" not in detail, "旧文案把候选当原因，不许回来"
+    assert "1676" in detail and "DestinyFailedPlugInsertionRules" in detail, "错误码与上游原文要留着"
+    assert "需要守护者等级3" in detail, "被排除的那条要原样写出来，不能悄悄吞掉"
+    assert "候选条件（Manifest 给的静态门槛清单，不是上游指认的原因）：必须在赛季神器中选择" in detail
+
+
+def test_1676_does_not_apply_the_guardian_rank_to_another_rank_system() -> None:
+    """`需要等级10` 是**另一套等级**（实测 717 条，如竞争黑沙），不许拿守护者等级判它已满足。"""
+    manifest = _Manifest({LOCKED_MOD: _mod(LOCKED_MOD, "竞争黑沙", rules=["需要等级10"])})
+    service = _equipment(manifest)
+
+    detail = service.mod_write_blocker(
+        {"ErrorCode": 1676, "ErrorStatus": "DestinyFailedPlugInsertionRules"},
+        LOCKED_MOD,
+        _ranked(11),
+    )
+
+    assert "需要等级10" in detail, "判不了的那类原样留作候选"
+    assert "已满足" not in detail and "已排除" not in detail, "另一套等级没判断，不许说已满足"
+
+
+@pytest.mark.parametrize(
+    "profile",
+    [None, {}, {"profile": {"data": {}}}, {"profile": {"data": {"currentGuardianRank": 0}}}],
+)
+def test_1676_says_it_cannot_judge_when_the_guardian_rank_is_missing(profile) -> None:
+    """读不到守护者等级时**不许假设满足**，也不许静默降级：明说判不了。
+
+    组件 100 没请求、上游回空壳、字段是 0（官方字段说明写着它「starts at rank 1」，
+    0 是没填、不是"0 级"）都算"没读到"。
+    """
+    manifest = _Manifest({LOCKED_MOD: _mod(LOCKED_MOD, "药到病除", rules=["需要守护者等级3"])})
+    service = _equipment(manifest)
+
+    detail = service.mod_write_blocker(
+        {"ErrorCode": 1676, "ErrorStatus": "DestinyFailedPlugInsertionRules"},
+        LOCKED_MOD,
+        profile,
+    )
+
+    assert "没读到守护者等级，无法判断这几条是否成立：需要守护者等级3" in detail
+    assert "已满足" not in detail and "已排除" not in detail, "没读到就不许说满足"
 
 
 def test_mod_write_blocker_treats_1675_as_blocked_not_fatal() -> None:
@@ -462,7 +540,9 @@ def test_mod_write_blocker_treats_1675_as_blocked_not_fatal() -> None:
     service = _equipment(_plan_manifest())
 
     detail = service.mod_write_blocker(
-        {"ErrorCode": 1675, "ErrorStatus": "DestinyCannotAffordMaterialRequirements"}, LOCKED_MOD
+        {"ErrorCode": 1675, "ErrorStatus": "DestinyCannotAffordMaterialRequirements"},
+        LOCKED_MOD,
+        _ranked(),
     )
 
     assert "要材料" in detail and "1675" in detail
@@ -476,12 +556,16 @@ def test_mod_write_blocker_separates_scope_and_in_game() -> None:
     service = _equipment(_plan_manifest())
 
     assert "AWA" in service.mod_write_blocker(
-        {"ErrorCode": 403, "Message": "Access not permitted by application scope"}, LOCKED_MOD
+        {"ErrorCode": 403, "Message": "Access not permitted by application scope"},
+        LOCKED_MOD,
+        _ranked(),
     )
     assert "in-game" in service.mod_write_blocker(
-        {"ErrorCode": 1663, "Message": "This action can only be done in-game."}, LOCKED_MOD
+        {"ErrorCode": 1663, "Message": "This action can only be done in-game."},
+        LOCKED_MOD,
+        _ranked(),
     )
-    assert service.mod_write_blocker({"ErrorCode": 1, "Message": "Ok"}, LOCKED_MOD) == ""
+    assert service.mod_write_blocker({"ErrorCode": 1, "Message": "Ok"}, LOCKED_MOD, _ranked()) == ""
 
 
 # ── 配装预检：写之前就说清，别写一半才让上游拒 ──────────────────────────
