@@ -185,3 +185,28 @@ def parse(request: BuildRequest, manifest) -> BuildConstraints:
         [STAT_NAMES[index] for index in priority_stat_indices],
     )
     return constraints
+
+
+def allowed_exotic_hashes(constraints: BuildConstraints) -> set[int]:
+    """这次指定的金装，**在三种写法下**的 hash 集合。
+
+    为什么需要它（真机 2026-10-01 的 bug）：hash 有两套值域 —— Manifest/`manifest.search()`
+    给的是**有符号**（`黎明副歌` = -1978053128），而账号快照里 `item_hash` 来自 Bungie API
+    是**无符号**（3767088557）。谁忘了归一，谁那边的"指定金装"就**静默失效**。
+    当时的后果：`estimate_combinations`（规模闸门）比不中金装 → 该部位退化成全量件数 →
+    背包大的角色任何带金装的 `find` 都撞"组合规模太大"闸门，而闸门自己给的第一条建议
+    正是"指定一件金装"（等于建议了也不生效）。
+
+    唯一出处放这里：`constraints` 就是装金装 hash 的地方，求解器与规模闸门共用这一份。
+    """
+    from ..utils.hash_utils import to_signed, to_unsigned
+
+    hashes: set[int] = set()
+    # `exotic_hash` 用 getattr 兜底：这个函数被规模闸门（`estimate_combinations`）调用，
+    # 而那一层历来只被"数件数"的轻量替身喂（多个语料测试的替身只有 `exotic_hashes`）。
+    # 它是可选字段，缺了就是"没单独指定那一件"，不是错误。
+    for item_hash in {*constraints.exotic_hashes, getattr(constraints, "exotic_hash", None)}:
+        if item_hash is None:
+            continue
+        hashes.update({item_hash, to_signed(item_hash), to_unsigned(item_hash)})
+    return hashes

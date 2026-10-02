@@ -12,6 +12,7 @@ from typing import Sequence
 
 from ..logging_config import get_logger
 from .constants import STAT_HASHES as _STAT_HASHES
+from .constraints import allowed_exotic_hashes
 from .models import (
     BuildConstraints,
     InventorySnapshot,
@@ -252,18 +253,6 @@ def prepare_fixed_set_context(
     )
 
 
-def _allowed_exotic_hashes(constraints: BuildConstraints) -> set[int]:
-    """Return signed and unsigned variants accepted for the requested exotic."""
-    from ..utils.hash_utils import to_signed, to_unsigned
-
-    hashes: set[int] = set()
-    for item_hash in {*constraints.exotic_hashes, constraints.exotic_hash}:
-        if item_hash is None:
-            continue
-        hashes.update({item_hash, to_signed(item_hash), to_unsigned(item_hash)})
-    return hashes
-
-
 def _fixed_items_meet_non_stat_constraints(
     items: Sequence[ProcessItem],
     constraints: BuildConstraints,
@@ -273,7 +262,7 @@ def _fixed_items_meet_non_stat_constraints(
         return False
 
     if constraints.exotic_hash is not None:
-        allowed_hashes = _allowed_exotic_hashes(constraints)
+        allowed_hashes = allowed_exotic_hashes(constraints)
         if not any(item.hash in allowed_hashes for item in items):
             return False
 

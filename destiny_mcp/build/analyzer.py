@@ -17,6 +17,7 @@ from .models import (
     InventorySnapshot,
 )
 from ..vocabulary import STAT_LABELS_ZH
+from .constraints import allowed_exotic_hashes
 
 logger = get_logger(__name__)
 
@@ -47,10 +48,14 @@ def estimate_combinations(
         snapshot.legs,
         snapshot.class_items,
     ]
+    # 比 hash 必须归一：快照是无符号、`manifest.search()` 是有符号（见
+    # `constraints.allowed_exotic_hashes` 的说明）。漏归一的后果是"指定金装收窄"
+    # **静默失效** —— 这个闸门一边建议"指定一件金装"，一边不认它。
+    allowed_exotic = allowed_exotic_hashes(constraints)
     counts: list[int] = []
     for pieces in slots:
-        if constraints.exotic_hashes:
-            exotic = [p for p in pieces if p.item_hash in constraints.exotic_hashes]
+        if allowed_exotic:
+            exotic = [p for p in pieces if p.item_hash in allowed_exotic]
             counts.append(len(exotic) if exotic else len(pieces))
             continue
         counts.append(len(pieces))
