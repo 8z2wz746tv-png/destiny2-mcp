@@ -46,6 +46,14 @@ For any agent, not only Codex:
   `active teammate not found` —— **主会话看不到它的状态，只能等它汇报**。所以：
   ①派活前把要求写全（它中途问不了）；②**别为了"怕它没在干活"而重复派同一个任务** ——
   那会变成两个写者改同一个文件，正是上一条那种事故的来源。
+- **"进程比提交新"这条判据有盲区：跑测期间 HEAD 会前移**。重连判据只在**重连那一刻**成立；
+  长任务跑到一半，别的 agent 可能又提交了几个（2026-10-04 跑真机那趟期间前移了 3 个提交）。
+  **正确做法**：核**"被执行的字节有没有变"** —— 看那些提交**动了什么**（只改 CHANGELOG/pyproject/
+  tests 就不影响）＋ 被跑的文件 `mtime` 是否都早于进程启动。**别只看 `HEAD` 的哈希**。
+- **测试不许依赖环境**：开发机 `.env` 里配一个正式配置项（如 `DESTINY_DEFAULT_PLAYER`）就可能让
+  单测变红（2026-10-04：两条测试默认假定"没配默认玩家"，配上之后断言全部落空）。
+  **规矩**：测试要**显式钉住自己假定的配置**（`monkeypatch`），并且**配了与没配两种环境都要过**。
+  看见"只有我这台机器红"，先怀疑环境依赖，别怀疑代码。
 - 改了 `skills/**` 之后**一定**跑 `scripts/install_skill.py`：`~/.dsh/skills/` 是宿主真正读的那份，
   不跑就是"文档改了但 agent 看到的还是旧版"（子代理常常会漏这一步，主会话要兜住）。
 
@@ -177,9 +185,16 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - **一次提交只做一件事**：跨主题的改动拆成多条；发布提交也一样——内容照发，标题只留一行。
 - 破坏性变更在标题里点明（例：`活动统计改为行式（破坏性）`），影响面写进 CHANGELOG。
 - **推到哪**：工作分支是 `codex/bundle-starside-markdown`，`origin/main` 与它同源。发布用
-  `git push origin HEAD:main HEAD:codex/bundle-starside-markdown --tags` —— 本地那个 `main` 是
-  2026-09 的旧分支，`git push origin main` 会被非快进拒绝（2026-09-24 踩过）。
-  GitHub 直连常超时（SSL / 443），加 `-c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20` 重试几轮即可。
+  （**连超时设置一起照抄**——`-c` 是 git 的**顶层选项**，必须写在 `push` **前面**）：
+
+      git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20 push origin HEAD:main HEAD:codex/bundle-starside-markdown --tags
+
+  本地那个 `main` 是 2026-09 的旧分支，`git push origin main` 会被非快进拒绝（2026-09-24 踩过）。
+  GitHub 直连常超时（SSL / 443）→ **失败就重试几轮**；连通时单次推送可能卡 75 秒才报
+  `Failed to connect to github.com port 443`，那不是命令写错。
+  **⚠️ 别把 `-c` 追加到 refspec 后面**：写成 `git push origin HEAD:main … -c http.lowSpeedLimit=1000`
+  会得到 `error: unknown switch 'c'`（2026-10-04 有 agent 连试 5 次都以为是网络问题，其实是命令位置错）。
+
 
 ## 代码地图
 
