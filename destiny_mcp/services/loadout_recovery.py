@@ -27,7 +27,10 @@ from ..models import (
 )
 from . import profile_components
 from .item_parser import armor_slot_from_bucket, parse_items_from_profile
+from .loadout_armor_state import socket_diffs
 from .loadout_mod_sockets import plug_already_installed
+from .loadout_restore_locations import restore_locations
+from . import loadout_verify
 
 logger = get_logger(__name__)
 
@@ -190,6 +193,9 @@ class RecoveryStateMixin:
         }
 
         sockets_cache: dict = {}
+        sockets_data = (
+            current_profile.get("itemComponents", {}).get("sockets", {}).get("data", {})
+        )
         for original in target_states.values():
             current = current_items.get(original.item_instance_id)
             if (
@@ -198,11 +204,28 @@ class RecoveryStateMixin:
                 and original.source_location != attempted.character
             ):
                 continue
-            operations = (
-                [(mod_hash, socket_index) for socket_index, mod_hash in sorted(original.mod_sockets.items())]
-                if original.mod_sockets
-                else [(mod_hash, None) for mod_hash in original.mods]
-            )
+            # **先比对再写**：口径的唯一出处是 loadout_armor_state.socket_diffs（与穿快照那条
+            # 路的 _restore_one 同一份判据）。这个槽已经装着记录里那颗时一个写入都不发 ——
+            # 上游对再装一次回 HTTP 500 + 1679，客户端还会退避重试，真机实测每颗白花约 10 秒
+            # （2026-10-03 复测），而回滚要恢复的常常本来就是没被改动过的那些格。
+            if original.mod_sockets:
+                diffs = socket_diffs(
+                    self.read_armor_mod_sockets(
+                        original.item_instance_id, original.item_hash, sockets_data
+                    ),
+                    original,
+                )
+                if not diffs:
+                    steps.append(MoveItemStep(
+                        action="rollback_mod",
+                        detail=f"'{original.name}' 的模组与执行前一致，未改动",
+                        success=True,
+                    ))
+                    continue
+                operations = [(plug_hash, index) for index, plug_hash in diffs]
+            else:
+                # 老记录只存了 mods（没有逐槽现场）：仍然逐颗找槽，没有"已装着"的便宜可捡。
+                operations = [(mod_hash, None) for mod_hash in original.mods]
             for mod_hash, exact_socket_index in operations:
                 try:
                     socket_idx = (
@@ -271,65 +294,15 @@ class RecoveryStateMixin:
         )
         all_ok = all_ok and previous_result.success
 
-        for original in target_states.values():
-            destination = original.source_location
-            if destination not in {"vault", "hunter", "warlock", "titan"}:
-                steps.append(MoveItemStep(
-                    action="rollback_location",
-                    detail=f"无法确定 '{original.name}' 的原始位置。",
-                    success=False,
-                ))
-                all_ok = False
-                continue
-            if destination == attempted.character:
-                continue
-            try:
-                moved = await self._transfer.transfer_item(
-                    player_name,
-                    original.item_instance_id,
-                    destination,
-                    to_character_id=(
-                        original.source_character_id or None
-                    ),
-                )
-                steps.append(MoveItemStep(
-                    action="rollback_location",
-                    detail=f"恢复 '{original.name}' 到 {destination}",
-                    success=moved.success,
-                ))
-                all_ok = all_ok and moved.success
-                if moved.success and original.was_equipped and destination != "vault":
-                    if original.source_character_id:
-                        response = await self._bungie.equip_item(
-                            original.item_instance_id,
-                            original.source_character_id,
-                            mtype,
-                        )
-                        equipped_ok = response.get("ErrorCode", 0) == 1
-                    else:
-                        equipped = await self._transfer.equip_item(
-                            player_name,
-                            original.item_instance_id,
-                            destination,
-                        )
-                        equipped_ok = equipped.success
-                    steps.append(MoveItemStep(
-                        action="rollback_equip",
-                        detail=f"重新装备 '{original.name}' 到 {destination}",
-                        success=equipped_ok,
-                    ))
-                    all_ok = all_ok and equipped_ok
-            except (ItemNotFoundError, TransferError) as exc:
-                logger.error("Failed to restore location for %s: %s", original.name, exc)
-                steps.append(MoveItemStep(
-                    action="rollback_location", detail=describe_exception(exc), success=False
-                ))
-                all_ok = False
+        # 位置那一半搬去 loadout_restore_locations："这一件上装着什么"与"这一件在哪"本就是两件事
+        all_ok = await restore_locations(
+            self, player_name, attempted.character, target_states, steps
+        ) and all_ok
 
         if all_ok:
-            previous_ok = await self._verify_loadout(player_name, previous)
-            target_items_ok = await self._verify_restored_items(
-                player_name, target_states
+            previous_ok = await loadout_verify.verify_loadout(self, player_name, previous)
+            target_items_ok = await loadout_verify.verify_restored_items(
+                self, player_name, target_states
             )
             all_ok = previous_ok and target_items_ok
         steps.append(MoveItemStep(
@@ -339,47 +312,6 @@ class RecoveryStateMixin:
         ))
         return all_ok
 
-    async def _verify_restored_items(
-        self,
-        player_name: str,
-        target_states: dict[str, LoadoutItem],
-    ) -> bool:
-        """Verify candidate items returned to their original locations and sockets."""
-        p = await self._resolver.resolve_player(player_name)
-        mid, mtype = p["membership_id"], p["membership_type"]
-        profile = await self._resolver.get_profile(
-            mid, mtype, profile_components.INVENTORY_SOCKETS
-        )
-        current_items = {
-            item.item_instance_id: item
-            for item in parse_items_from_profile(profile, self._manifest)
-        }
-        equipped_ids = {
-            str(raw.get("itemInstanceId", ""))
-            for equipment in (
-                profile.get("characterEquipment", {}).get("data", {}).values()
-            )
-            for raw in equipment.get("items", [])
-        }
-        sockets_data = (
-            profile.get("itemComponents", {}).get("sockets", {}).get("data", {})
-        )
-        for original in target_states.values():
-            current = current_items.get(original.item_instance_id)
-            if current is None or current.location != original.source_location:
-                return False
-            if original.was_equipped and original.item_instance_id not in equipped_ids:
-                return False
-            actual_sockets = sockets_data.get(original.item_instance_id, {}).get(
-                "sockets", []
-            )
-            if any(
-                socket_index >= len(actual_sockets)
-                or actual_sockets[socket_index].get("plugHash", 0) != plug_hash
-                for socket_index, plug_hash in original.mod_sockets.items()
-            ):
-                return False
-        return True
 
     # ── Private helpers ──────────────────────────────────────────────
 

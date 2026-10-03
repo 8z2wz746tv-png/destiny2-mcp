@@ -104,8 +104,22 @@ async def restore_after_equip(
         return result
     result.steps.extend(steps)
     if not all(step.success for step in steps):
+        # 话术要**分开说**（以前这里对哪种情况都写"配装 X 未完全生效"，装备明明生效了）：
+        # 主装备成没成、附加还原做没做全是两件事，而 `result.message` 是调用方读的那一句。
+        # 真机 2026-10-03：装备确实穿上了，只因为一件仓库里的护甲没还原成功，回执就成了
+        # "配装未完全生效" —— 读起来像"没穿上"，误导比不说更糟。`success=False` 保留：
+        # 整件事（穿上 + 还原）确实没做全。
+        worn = result.success
         result.success = False
-        result.message = f"配装 '{loadout.name}' 未完全生效（原因见 steps）。"
+        if not worn:
+            result.message = (
+                f"配装 '{loadout.name}' 没换成，附加还原也没做全（原因见 steps）。"
+            )
+        else:
+            result.message = (
+                f"配装 '{loadout.name}' 的装备已生效；但附加还原（快照里那份账号护甲现场）"
+                f"没做全（原因见 steps）。"
+            )
     return result
 
 
@@ -145,7 +159,7 @@ async def _restore_all(owner: Any, player_name: str, loadout: Loadout) -> list[M
         current_mods = owner.read_armor_mod_sockets(
             instance_id, current.item_hash, sockets_data
         )
-        diffs = _diff_sockets(current_mods, record)
+        diffs = socket_diffs(current_mods, record)
         if current.location != loadout.character:
             # 不在这一位角色身上：只在与快照**确实不一致**时点名（否则整个仓库都会被报成"没还原"）
             if diffs:
@@ -171,10 +185,14 @@ async def _restore_all(owner: Any, player_name: str, loadout: Loadout) -> list[M
     return steps
 
 
-def _diff_sockets(
-    current: dict[int, int], record: LoadoutArmorState
-) -> list[tuple[int, int]]:
-    """与快照不一致的格：`[(插槽号, 快照里的插件 hash)]`（一致就给空表 = 不用动它）。"""
+def socket_diffs(current: dict[int, int], record: LoadoutArmorState) -> list[tuple[int, int]]:
+    """与快照不一致的格：`[(插槽号, 快照里的插件 hash)]`（一致就给空表 = 不用动它）。
+
+    公开（原先叫 `_diff_sockets`）是因为**回滚也要用它**：`loadout_recovery._restore_exact_state`
+    以前逐颗重写记录里的模组，连"这个槽已经装着它"都不比一下 —— 上游对"再装一次"回的是
+    HTTP 500 + 1679，客户端还会退避重试，真机实测**每颗白花约 10 秒**（2026-10-03 复测）。
+    两份"要不要写"的判据一旦各写一次，就一定会有人只改一边，所以只留这一份。
+    """
     return [
         (socket_index, plug_hash)
         for socket_index, plug_hash in sorted(record.mod_sockets.items())
@@ -195,7 +213,7 @@ async def _restore_one(
     character_id: str,
     membership_type: int,
 ) -> list[MoveItemStep]:
-    """一件护甲：把不一致的格按"先腾后占"写回去（`diffs` 由 `_diff_sockets` 给）。"""
+    """一件护甲：把不一致的格按"先腾后占"写回去（`diffs` 由 `socket_diffs` 给）。"""
     energy = _energy_of(instances_data, item.item_instance_id)
     if energy is None:
         return [MoveItemStep(

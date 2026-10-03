@@ -236,20 +236,29 @@ async def test_insert_armor_mod_prefers_the_free_endpoint() -> None:
     service._bungie.insert_socket_plug.assert_not_awaited()
 
 
-async def test_insert_armor_mod_falls_back_to_paid_only_for_non_free_plugs() -> None:
-    """free 接口回 1663「只能游戏内做」= 这个 plug 不是"免费可逆"的 → 才退回付费接口。"""
+async def test_insert_armor_mod_never_falls_back_to_the_paid_socket_api() -> None:
+    """free 接口回 1663「只能游戏内做」时**不再退付费接口**，原话交回去。
+
+    以前这里会再调一次 `insert_socket_plug`，而那个接口要 AWA 三段流程
+    （`AwaInitializeRequest` → 用户亲自批准 → `AwaGetActionToken`）拿 `actionToken` ——
+    我们没发这个字段，退过去必然再失败一次。1663 本身已经是一句完整的上游结论
+    （至少对应"角色不在社交区/轨道/离线"与"这个槽本身禁用"两种），原文照转即可；
+    再退一次只是多一次白往返，还把真原因换成付费接口的二次报错。
+    这是 2026-10-03 删掉的分支，`_insert_armor_mod` 的 docstring 里记着为什么。
+    """
     service = _service(_Manifest({600: _mod(GENERAL_MOD_CATEGORY, 2)}))
-    service._bungie.insert_socket_plug_free = AsyncMock(return_value={
+    forbidden = {
         "ErrorCode": 1663,
         "ErrorStatus": "DestinyItemActionForbidden",
         "Message": "This action can only be done in-game. I know, we're working on it.",
-    })
+    }
+    service._bungie.insert_socket_plug_free = AsyncMock(return_value=forbidden)
     service._bungie.insert_socket_plug = AsyncMock(return_value={"ErrorCode": 1})
 
     result = await service._insert_armor_mod("item-1", 600, 3, "char", 3)
 
-    assert result == {"ErrorCode": 1}
-    service._bungie.insert_socket_plug.assert_awaited_once_with("item-1", 600, 3, 0, "char", 3)
+    assert result == forbidden, "上游原话要原样交回去（别吞、也别二次包装）"
+    service._bungie.insert_socket_plug.assert_not_awaited()
 
 
 async def test_insert_armor_mod_does_not_fall_back_on_scope_errors() -> None:
@@ -597,7 +606,7 @@ async def test_apply_subclass_config_is_a_noop_without_a_subclass() -> None:
 
     assert await service._apply_subclass_config(
         "player", _subclass_loadout(None), "char", 3, steps
-    ) is True
+    ) == (True, "")
     assert steps == []
 
 
@@ -606,7 +615,7 @@ async def test_apply_subclass_config_reports_a_missing_equipped_subclass() -> No
     await _resolve(service, {"characterEquipment": {"data": {"char": {"items": []}}}})
     steps: list = []
 
-    ok = await service._apply_subclass_config(
+    ok, _why = await service._apply_subclass_config(
         "player",
         _subclass_loadout(LoadoutSubclassConfig(subclass_item_hash=50, super_hash=900)),
         "char",
@@ -625,7 +634,7 @@ async def test_apply_subclass_config_stops_when_the_target_subclass_is_not_in_th
     service._bungie.equip_item = AsyncMock(return_value={"ErrorCode": 1})
     steps: list = []
 
-    ok = await service._apply_subclass_config(
+    ok, _why = await service._apply_subclass_config(
         "player",
         _subclass_loadout(LoadoutSubclassConfig(subclass_item_hash=999, super_hash=900)),
         "char",
@@ -655,7 +664,7 @@ async def test_apply_subclass_config_switches_first_then_writes_the_new_item() -
     service._bungie.equip_item = AsyncMock(return_value={"ErrorCode": 1})
     steps: list = []
 
-    ok = await service._apply_subclass_config(
+    ok, _why = await service._apply_subclass_config(
         "player",
         _subclass_loadout(
             LoadoutSubclassConfig(
@@ -683,13 +692,13 @@ async def test_apply_subclass_config_uses_exact_socket_map_when_present() -> Non
         subclass_item_hash=50, subclass_instance_id="sub-1", plug_sockets={1: 901}
     )
 
-    ok = await service._apply_subclass_config(
+    ok, _why = await service._apply_subclass_config(
         "player", _subclass_loadout(config), "char", 3, steps
     )
 
     assert ok is True
     assert [(step.action, step.detail, step.success) for step in steps] == [
-        ("subclass", "plug 901 已应用", True)
+        ("subclass", "plug '#901' 已应用", True)
     ]
     service._bungie.insert_socket_plug_free.assert_awaited_once_with(
         "sub-1", 901, 1, 0, "char", 3
@@ -707,12 +716,14 @@ async def test_apply_subclass_config_falls_back_to_named_hashes() -> None:
         grenade_hash=901,
     )
 
-    ok = await service._apply_subclass_config(
+    ok, _why = await service._apply_subclass_config(
         "player", _subclass_loadout(config), "char", 3, steps
     )
 
     assert ok is True
-    assert [step.detail for step in steps] == ["super 900 已应用", "grenade 901 已应用"]
+    assert [step.detail for step in steps] == [
+        "super '#900' 已应用", "grenade '#901' 已应用",
+    ]
     # 两个 plug 分别占用插槽 0 和 1
     assert [call.args[2] for call in service._bungie.insert_socket_plug_free.await_args_list] == [0, 1]
 
@@ -731,15 +742,18 @@ async def test_apply_subclass_config_records_per_plug_failures_and_keeps_going()
         grenade_hash=901,
     )
 
-    ok = await service._apply_subclass_config(
+    ok, _why = await service._apply_subclass_config(
         "player", _subclass_loadout(config), "char", 3, steps
     )
 
     assert ok is False
+    # 失败那一行必须带上游原文（与模组那条路同一口径）：以前只有"plug <hash> 已应用"，
+    # 真机 2026-10-03 第 3 轮一颗碎片写失败时，原因就是这么丢的。
     assert [(step.detail, step.success) for step in steps] == [
-        ("super 900 已应用", False),
-        ("grenade 901 已应用", True),
+        ("super '#900' 已应用 失败：上游没给原因", False),
+        ("grenade '#901' 已应用", True),
     ]
+    assert _why and "#900" in _why
 
 
 async def test_apply_subclass_config_reports_a_missing_socket_and_keeps_going() -> None:
@@ -750,7 +764,7 @@ async def test_apply_subclass_config_reports_a_missing_socket_and_keeps_going() 
         subclass_item_hash=50, subclass_instance_id="sub-1", plug_sockets={9: 901}
     )
 
-    ok = await service._apply_subclass_config(
+    ok, _why = await service._apply_subclass_config(
         "player", _subclass_loadout(config), "char", 3, steps
     )
 
@@ -770,7 +784,7 @@ async def test_apply_subclass_config_turns_http_errors_into_failed_steps() -> No
         subclass_item_hash=50, subclass_instance_id="sub-1", plug_sockets={0: 900}
     )
 
-    ok = await service._apply_subclass_config(
+    ok, _why = await service._apply_subclass_config(
         "player", _subclass_loadout(config), "char", 3, steps
     )
 

@@ -1,4 +1,7 @@
-"""把配装里的东西搬到角色身上：**有界并发**，全部搬完才做批量装备。
+"""把配装里的东西搬到角色身上：**严格串行**，全部搬完才做批量装备。
+
+（首行以前写的是"有界并发"，而实现从 2026-09-23 起就是顺序搬 —— 同段 bullet 里也写着"只能
+顺序搬"，两句话自相矛盾，改文档对齐实现。）
 
 搬出 `loadout_equipment_service.py` 的原因与其它 mixin 一样：那个文件贴着体积上限（520 行），
 而这一段有自己的语义 ——
@@ -18,7 +21,7 @@ from ..models import Loadout, LoadoutItem, MoveItemStep
 
 
 class TransferStepMixin:
-    """`_equip_local_unlocked` 的第一步：搬运（并发）+ 逐件回执。"""
+    """`_equip_local_unlocked` 的第一步：搬运（**顺序**，见模块 docstring）+ 逐件回执。"""
 
     async def transfer_loadout_items(
         self, player_name: str, loadout: Loadout

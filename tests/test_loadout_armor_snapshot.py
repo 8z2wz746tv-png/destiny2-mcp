@@ -259,7 +259,11 @@ async def test_restore_does_not_touch_armor_that_is_elsewhere() -> None:
     assert len(skipped) == 1 and skipped[0].success is False
     assert "光芒领主胸甲" in skipped[0].detail and "vault" in skipped[0].detail
     assert out.success is False, "还原没做全就要如实降级（别报成'已装备'）"
-    assert "未完全生效" in out.message
+    # 话术必须**分开说**：主装备生效了、附加还原没做全 —— 两件事，别写成"配装未完全生效"
+    # （真机 2026-10-03：装备确实穿上了，那句读起来却像"没穿上"）。
+    assert "装备已生效" in out.message, out.message
+    assert "附加还原" in out.message and "没做全" in out.message, out.message
+    assert "未完全生效" not in out.message
 
 
 @pytest.mark.asyncio

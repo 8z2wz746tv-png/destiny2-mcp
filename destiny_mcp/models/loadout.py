@@ -180,6 +180,16 @@ class LoadoutOperationResult(BaseModel):
     loadout_name: str = Field(default="")
     message: str = Field(default="")
     steps: list[MoveItemStep] = Field(default_factory=list, description="Equip steps (for equip_loadout)")
+    verified: bool | None = Field(
+        default=None,
+        description=(
+            "这一趟执行的回读核对结论：`True` 对得上、`False` 重试满窗口后仍对不上"
+            "（= 未确认，**不是**没写进去）、`None` 没走到回读那一步（写入阶段就失败了）。"
+            "为什么必须与 `success` 分开：`equip_with_recovery` 要拿它决定回不回滚 —— 写入全成功、"
+            "只是回读还没同步时回滚，等于把**已经正确的账号**改回旧状态"
+            "（`write_readback` 的口径：没确认 ≠ 没换成）。"
+        ),
+    )
     loadout_id: str = Field(
         default="",
         description=(

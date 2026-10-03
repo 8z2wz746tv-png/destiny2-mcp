@@ -109,13 +109,19 @@ class SubclassSocketMixin(PlugLookupMixin):
         char_id: str,
         membership_type: int,
         steps: list[MoveItemStep],
-    ) -> bool:
-        """Apply subclass configuration."""
+    ) -> tuple[bool, str]:
+        """应用子职业配置：`(成不成, 失败原因)`。
+
+        为什么要把原因**返出去**而不是只写进 `steps`：真机 2026-10-03 第 3 轮一颗碎片写失败，
+        回执里 `subclass` 步骤只写"plug 124726504 已应用"、**不带上游原文**，于是"为什么没写进去"
+        只能靠猜（同一份回执里 `mod` 步骤是带原文的，两条路口径不一致）。外层要拿它写结论句。
+        """
         subclass = loadout.subclass
         if not subclass:
-            return True
+            return True, ""
 
         all_ok = True
+        reason = ""
 
         p = await self._resolver.resolve_player(player_name)
         profile = await self._resolver.get_profile(
@@ -153,7 +159,7 @@ class SubclassSocketMixin(PlugLookupMixin):
             steps.append(MoveItemStep(
                 action="error", detail="找不到已装备的子职业", success=False,
             ))
-            return False
+            return False, "找不到已装备的子职业"
 
         if (
             subclass.subclass_item_hash
@@ -190,7 +196,7 @@ class SubclassSocketMixin(PlugLookupMixin):
                     ),
                     success=False,
                 ))
-                return False
+                return False, "要装的子职业不在这个角色的背包里（子职业不能从仓库装）"
             target_inst = str(target.get("itemInstanceId", ""))
             result = await self._bungie.equip_item(
                 item_instance_id=target_inst,
@@ -198,12 +204,13 @@ class SubclassSocketMixin(PlugLookupMixin):
                 membership_type=membership_type,
             )
             if result.get("ErrorCode", 0) != 1:
+                upstream = str(result.get("Message") or "").strip() or "上游没给原因"
                 steps.append(MoveItemStep(
                     action="subclass",
-                    detail=f"换上保存的子职业失败：{result.get('Message', '上游没给原因')}",
+                    detail=f"换上保存的子职业失败：{upstream}",
                     success=False,
                 ))
-                return False
+                return False, f"换上保存的子职业失败：{upstream}"
             steps.append(MoveItemStep(
                 action="subclass",
                 detail=f"已换上保存的子职业（实例 {target_inst}）",
@@ -300,14 +307,19 @@ class SubclassSocketMixin(PlugLookupMixin):
                 # 每次 equip_build 都会失败并回退，真机实测一次白烧 5 分钟以上。
                 already = plug_already_installed(result)
                 ok = result.get("ErrorCode", 0) == 1 or already
+                # 失败要带上游原文（与模组那条路同一口径）：以前这里只写"plug <hash> 已应用"，
+                # 一颗写失败时调用方拿不到任何原因 —— 真机 2026-10-03 第 3 轮就是这么丢的。
+                upstream = str(result.get("Message") or "").strip()
+                detail = (
+                    f"{plug_type} '{self.mod_label(plug_hash)}' 已经装着，未改动"
+                    if already
+                    else f"{plug_type} '{self.mod_label(plug_hash)}' 已应用"
+                )
+                if not ok:
+                    detail += f" 失败：{upstream or '上游没给原因'}"
+                    reason = reason or f"{plug_type} '{self.mod_label(plug_hash)}'：{upstream or '上游没给原因'}"
                 steps.append(MoveItemStep(
-                    action="subclass",
-                    detail=(
-                        f"{plug_type} '{self.mod_label(plug_hash)}' 已经装着，未改动"
-                        if already
-                        else f"{plug_type} {plug_hash} 已应用"
-                    ),
-                    success=ok,
+                    action="subclass", detail=detail, success=ok,
                 ))
                 if not ok:
                     all_ok = False
@@ -317,9 +329,10 @@ class SubclassSocketMixin(PlugLookupMixin):
                     detail=f"{plug_type} {plug_hash} 应用失败: {e}",
                     success=False,
                 ))
+                reason = reason or f"{plug_type} '{self.mod_label(plug_hash)}'：{e}"
                 all_ok = False
 
-        return all_ok
+        return all_ok, ("" if all_ok else reason or "子职业配置没写完（原因见 steps）")
 
     async def _find_subclass_socket(
         self,

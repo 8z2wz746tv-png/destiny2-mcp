@@ -14,6 +14,7 @@ from ..utils.hash_utils import to_unsigned
 from . import profile_components, write_readback
 from .insertion_rule_diagnosis import insertion_rule_blocker_text, insertion_rule_preflight_text
 from .loadout_energy_budget import plan_energy_clearing
+from .loadout_mod_preflight import ModPreflightMixin
 from .loadout_plug_lookup import PlugLookupMixin
 
 
@@ -34,7 +35,7 @@ def plug_already_installed(result: dict | None) -> bool:
     return result.get("ErrorCode") == 1679 or "DestinySocketAlreadyHasPlug" in text
 
 
-class ModSocketMixin(PlugLookupMixin):
+class ModSocketMixin(ModPreflightMixin, PlugLookupMixin):
     """护甲模组一侧的读取与写入规划。"""
 
     def keep_mod_step(self, item: LoadoutItem, mod_hash: int, socket_index: int) -> MoveItemStep:
@@ -483,7 +484,7 @@ class ModSocketMixin(PlugLookupMixin):
         character_id: str,
         membership_type: int,
     ) -> dict:
-        """插模组：**先走 free 接口**，只有上游回"这个插槽不走免费"时才退回付费接口。
+        """插模组：**只走 free 接口**，上游的原话原样交回去。
 
         以前按"能量消耗 > 0"选接口，那是错的：Bungie 的 free 指的是**没有材料消耗**，
         官方文档明确 `InsertSocketPlugFree` 就覆盖 "Perks, **Armor Mods**, Shaders, Ornaments"，
@@ -491,24 +492,14 @@ class ModSocketMixin(PlugLookupMixin):
         authorization and is available to 3rd-party apps）。护甲模组消耗的是能量、不是材料，
         所以它本来就该走 free —— 真机上 5 颗属性模组就是这么装上的（ADR-012）。
 
-        退回付费接口只针对"非免费可逆"的 plug（调谐/强化类）。但**付费那条路我们没实现**：
-        它要 AWA 三段流程（`AwaInitializeRequest` → 用户亲自批准 → `AwaGetActionToken`）拿
-        `actionToken`，我们没发这个字段，所以退过去也是白退——本来该在免费失败时就如实说清楚。
+        **撞到 "in-game"/1663 时不再退付费接口**（2026-10-03 删掉的那段）：付费那条路要 AWA
+        三段流程（`AwaInitializeRequest` → 用户亲自批准 → `AwaGetActionToken`）拿
+        `actionToken`，我们没发这个字段，退过去必然再失败一次。而 1663 本身已经是完整的上游
+        结论（至少对应"角色不在社交区/轨道/离线"与"这个槽本身禁用"两种，原文照转即可）——
+        再退一次只是多一次白往返，还把真原因换成付费接口的二次报错。调谐/强化类走不通就
+        如实说走不通（ADR-014：写不进去不回退）。
         """
-        result = await self._bungie.insert_socket_plug_free(
-            item_instance_id,
-            mod_hash,
-            socket_index,
-            0,
-            character_id,
-            membership_type,
-        )
-        if result.get("ErrorCode", 0) == 1:
-            return result
-        text = f"{result.get('Message', '')} {result.get('ErrorStatus', '')}"
-        if not ("in-game" in text or "DestinyItemActionForbidden" in text):
-            return result
-        return await self._bungie.insert_socket_plug(
+        return await self._bungie.insert_socket_plug_free(
             item_instance_id,
             mod_hash,
             socket_index,

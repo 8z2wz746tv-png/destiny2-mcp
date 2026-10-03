@@ -6,14 +6,10 @@ apply subclass configuration. Extracted from loadout_service.py.
 
 from __future__ import annotations
 
-import asyncio
-
 import aiobungie
-import anyio
 
 from ..bungie_client import BungieClient
 from ..exceptions import (
-    DestinyMCPError,
     ItemNotFoundError,
     TransferError,
     describe_exception,
@@ -29,6 +25,7 @@ from ..models import (
 from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
 from .account_action_lock import account_action_lock
+from .loadout_exact_flow import ExactFlowMixin
 from .write_readback import read_until
 from .loadout_armor_state import restore_after_equip
 from .loadout_functional_mods import FunctionalModMixin
@@ -36,6 +33,7 @@ from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
 from .loadout_transfer_step import TransferStepMixin
 from .loadout_recovery import RecoveryStateMixin
 from .loadout_subclass_sockets import SubclassSocketMixin
+from . import loadout_verify
 
 logger = get_logger(__name__)
 
@@ -43,7 +41,8 @@ _CANCEL_ROLLBACK_TIMEOUT_SECONDS = 60
 
 
 class LoadoutEquipmentService(
-    RecoveryStateMixin, ModSocketMixin, FunctionalModMixin, SubclassSocketMixin, TransferStepMixin
+    ExactFlowMixin, RecoveryStateMixin, ModSocketMixin, FunctionalModMixin,
+    SubclassSocketMixin, TransferStepMixin,
 ):
     """Apply loadout equipment: transfer, equip, mods, subclass config."""
 
@@ -66,12 +65,16 @@ class LoadoutEquipmentService(
         player_name: str,
         loadout: Loadout,
     ) -> LoadoutOperationResult:
-        """Serialize local loadout writes for this user context."""
-        async with self._equip_lock:
-            result = await self._equip_local_unlocked(player_name, loadout)
-            # 快照里那份"账号护甲现场"（当时没穿着、被上一次操作改过的件）在这里补还原：
-            # 挂最外层是为了上面哪条分支返回都要跑（口径与代价见 loadout_armor_state）
-            return await restore_after_equip(self, player_name, loadout, result)
+        """装备一套**已存配装**（`equip_loadout`）：与 `equip_build` 同一条恢复路径。
+
+        以前这里直接调 `_equip_local_unlocked`：步骤之间失败时留下"装备换了、模组只写了一半"
+        的混合状态，而没有任何恢复点把它还原 —— 同一个动作，`equip_build` 会恢复、
+        `equip_loadout` 不会，只因为入口不同（真机 2026-10-03 复测点名了这条差异）。
+        """
+        result = await self.equip_with_recovery(player_name, loadout)
+        # 快照里那份"账号护甲现场"（当时没穿着、被上一次操作改过的件）在这里补还原：
+        # 挂最外层是为了上面哪条分支返回都要跑（口径与代价见 loadout_armor_state）
+        return await restore_after_equip(self, player_name, loadout, result)
 
     async def _equip_local_unlocked(
         self,
@@ -104,6 +107,26 @@ class LoadoutEquipmentService(
                 success=False,
                 loadout_name=loadout.name,
                 message=f"找不到角色 '{loadout.character}'。",
+            )
+
+        # Step 0: 模组预检 —— **必须在任何写入之前**。真机 2026-10-03：预检（插槽读不到 /
+        # 找不到唯一兼容槽 / 能量腾不出来）排在搬运+装备**之后**，于是注定失败的那一批已经把
+        # 装备换好了，只能整条回滚，实测一次白烧 3.5 分钟。预检要的数据（插槽、能量、
+        # 可插入清单）在同一次 profile 里就有，换装前拿得到，所以前置不产生假阴性。
+        preflight_ok, preflight_error = await self._mod_preflight(
+            loadout, mid, mtype, profile, char_id
+        )
+        if not preflight_ok:
+            return LoadoutOperationResult(
+                success=False,
+                loadout_name=loadout.name,
+                message=(
+                    f"配装 '{loadout.name}' 模组预检失败（{preflight_error}）—— "
+                    "这次**没有搬运、没有换装、没有写模组**，账号一个字节都没动。"
+                ),
+                steps=[MoveItemStep(
+                    action="mod_preflight", detail=preflight_error, success=False,
+                )],
             )
 
         # Step 1: 搬运（有界并发）。顺序不能动：先都搬过来、再一起装，见 loadout_transfer_step。
@@ -154,19 +177,17 @@ class LoadoutEquipmentService(
                 steps=steps,
             )
 
-        # Step 2: Resolve all socket writes against one socket/energy snapshot.
-        item_components = profile.get("itemComponents", {})
-        instances_data = item_components.get("instances", {}).get("data", {})
-        sockets_cache = {
-            instance_id: payload.get("sockets", [])
-            for instance_id, payload in (
-                item_components.get("sockets", {}).get("data", {})
-            ).items()
-        }
+        # Step 2: 按**换装之后**的现场重读一次再规划写入。
+        #
+        # 不复用 Step 0 那份 profile：搬运与批量装备刚改过账号，那份快照已经过期 ——
+        # 拿它规划写入会照旧快照的插槽号/能量去写新现场（Step 0 只当"守门"，不当"抄近路"）。
+        # 预检已经在这一趟里判过一次，所以这里再失败只会是刚换上去的件还没同步到；
+        # `_prepare_mod_operations` → `_read_sockets` 自带同步窗口重试（见 loadout_mod_sockets）。
+        profile = await self._resolver.get_profile(
+            mid, mtype, profile_components.EQUIP_LOADOUT
+        )
+        sockets_cache, instances_data, insertable = self._mod_write_snapshot(profile, char_id)
         mod_operations: dict[str, list[tuple[str, int, int]]] = {}
-        # "这一位角色实际能插哪些 plug"（组件 207，随 305 一起回来）。不给就等于不判断 ——
-        # 上游没给这份数据时，"装不了"与"没查到"必须分开（本项目的老毛病）。
-        insertable = self.insertable_plugs(profile, char_id)
         for lo_item in loadout.items:
             has_work = lo_item.mods or lo_item.mod_sockets or lo_item.functional_mod_groups
             if not has_work or not lo_item.item_instance_id:
@@ -231,15 +252,24 @@ class LoadoutEquipmentService(
                             if operation == "clear"
                             else f"'{lo_item.name}' 插槽 {socket_idx} 已经装着 '{mod_label}'，未改动"
                         )
-                    else:
+                    elif operation == "clear":
+                        # **点名被换掉的是哪一颗**：只写"为 X 腾出能量"的话，调用方看不出
+                        # 这一格原来装的是什么 —— 而"我原来那颗去哪了"正是玩家第一个要问的。
+                        replaced = sockets_cache.get(lo_item.item_instance_id, [])
+                        replaced_label = (
+                            self.mod_label(replaced[socket_idx].get("plugHash", 0))
+                            if socket_idx < len(replaced) else ""
+                        )
                         detail = (
                             f"为 '{mod_label}' 腾出能量：'{lo_item.name}' 插槽 {socket_idx}"
-                            if operation == "clear"
-                            else f"模组 '{mod_label}' → '{lo_item.name}'"
+                            + (f"（换下 '{replaced_label}'）" if replaced_label else "")
                         )
-                        # 失败要带上游原文（以前只写"为…腾出能量"，真因看不到）
-                        if not ok:
-                            detail += f" 失败：{upstream or '上游没给原因'}"
+                    else:
+                        detail = f"模组 '{mod_label}' → '{lo_item.name}'"
+                    # 失败要带上游原文（以前只写"为…腾出能量"，真因看不到）——
+                    # **清能量那一支同样要带**：它失败时调用方往往只看到这一行。
+                    if not ok and not already:
+                        detail += f" 失败：{upstream or '上游没给原因'}"
                     steps.append(MoveItemStep(
                         action="mod_clear" if operation == "clear" else "mod",
                         detail=detail,
@@ -262,44 +292,40 @@ class LoadoutEquipmentService(
                     all_ok = False
                     break
 
-        if blocked_mods and all_ok:
-            detail = "；".join(
-                f"'{name}' 的模组 {mod_hash}：{why}" for name, mod_hash, why in blocked_mods
-            )
-            steps.append(MoveItemStep(action="mod_blocked", detail=detail, success=False))
-            return LoadoutOperationResult(
-                success=False,
-                loadout_name=loadout.name,
-                message=(
-                    f"配装 '{loadout.name}' 的装备已经换上；但 {len(blocked_mods)} 颗模组被上游"
-                    "拒绝写入（原因见 steps.mod_blocked）—— 这些条件在游戏里同样要先解决，"
-                    "不是 API 的限制。"
-                ),
-                steps=steps,
-            )
-
-        if not all_ok:
-            return LoadoutOperationResult(
-                success=False,
-                loadout_name=loadout.name,
-                message=f"配装 '{loadout.name}' 模组阶段失败，未继续修改子职业。",
-                steps=steps,
-            )
-
-        # Step 3: Apply subclass configuration
+        # Step 3: 子职业 —— **无条件跑**，不再让模组阶段的结论把它吞掉。
+        #
+        # 真机 2026-10-03 第 1 轮：`equip_build` 里 1 颗模组被上游挡住（1676），旧代码在这个
+        # 分支提前 return，Step 3（子职业/碎片）整段没跑，而回执只说"装备已经换上" ——
+        # **少做了一步却不说**。碎片是这套配装的独立一半，模组写不动不影响它，
+        # 所以这里不设门；跑没跑、成没成，一律写进 steps 与 message。
+        subclass_ok: bool | None = None
+        subclass_why = ""
         if loadout.subclass:
-            subclass_ok = await self._apply_subclass_config(
+            subclass_ok, subclass_why = await self._apply_subclass_config(
                 player_name, loadout, char_id, mtype, steps
             )
             if not subclass_ok:
                 all_ok = False
 
-        # Step 4: 回读核对 —— 与 `equip_exact` 同一条纪律：没核对过就不能说"已装备"（真机
+        # "子职业那一步做没做"的一句话 —— 只在"装备换上了、但模组有被挡住"的回执里用得上：
+        # 那一刻调用方最容易被"装备已经换上"骗过去，如果这半句不写，少做的一步就没人提。
+        if subclass_ok is None:
+            subclass_receipt = "没做（这套配装没存子职业配置）"
+        elif subclass_ok:
+            subclass_receipt = "做完了"
+        else:
+            # 带上游原文（与 `mod` 那条路同一口径）：只写"做了但没成（见 steps）"时，
+            # 调用方还得自己去翻一遍步骤才知道为什么 —— 真机 2026-10-03 第 3 轮就是这么丢的。
+            subclass_receipt = f"做了但没成（{subclass_why}）"
+
+        # Step 4: 回读核对 —— 与 `equip_with_recovery` 同一条纪律：没核对过就不能说"已装备"（真机
         # 2026-09-24 这条路直接以"已装备"收尾，回执里没有一步证明装备真在身上）。写入有 3～10 秒
         # 同步窗口，所以按 `write_readback` 重试；核对不上只报"没确认"，**不改写入结论**。
         detail, verified = "已回读核对：装备实例、模组与子职业配置都对得上。", False
         try:
-            verified = await read_until(lambda: self._verify_loadout(player_name, loadout), bool)
+            verified = await read_until(
+                lambda: loadout_verify.verify_loadout(self, player_name, loadout), bool
+            )
             if not verified:
                 detail = "写入步骤都成功了，但回读重试后仍对不上（可能是同步窗口）——过十几秒再看一次，别当成没装上。"
         except Exception as exc:  # noqa: BLE001 —— 回读是**可选证据**：它自己炸了不能把写成功报成失败
@@ -307,215 +333,38 @@ class LoadoutEquipmentService(
             detail = f"回读核对没做成：{describe_exception(exc)}"
         steps.append(MoveItemStep(action="verify", detail=detail, success=verified))
 
+        # 模组被上游拒绝写入时 equipment 是好的，但**子职业那一半的状态要说清**：
+        # 回执是调用方唯一的证据，少做一步就必须点名（不然它只会读到"装备已经换上"）。
+        if blocked_mods:
+            blocked_detail = "；".join(
+                f"'{name}' 的模组 {mod_hash}：{why}" for name, mod_hash, why in blocked_mods
+            )
+            steps.append(MoveItemStep(
+                action="mod_blocked", detail=blocked_detail, success=False,
+            ))
+
         if not all_ok:
-            message = f"配装 '{loadout.name}' 未完全生效（原因见 steps）。"
+            # 失败也要说清**走到了哪一步**：以前这句是"未继续修改子职业"，而子职业其实跑了
+            # （真机 2026-10-03 的毛病就是"少做了一步却不说"，反过来"做了却说没做"同样是假话）。
+            message = (
+                f"配装 '{loadout.name}' 未完全生效：子职业那一步{subclass_receipt}，"
+                "模组阶段有没写成的（原因见 steps）。"
+            )
+        elif blocked_mods:
+            message = f"配装 '{loadout.name}' 的装备已经换上；子职业那一步{subclass_receipt}。"
         elif verified:
             message = f"配装 '{loadout.name}' 已装备，回读核对通过。"
         else:
             message = f"配装 '{loadout.name}' 的写入都成功了，但回读没确认：{detail}"
+        if blocked_mods:
+            message += (
+                f" {len(blocked_mods)} 颗模组被上游拒绝写入（原因见 steps.mod_blocked）——"
+                "这些条件在游戏里同样要先解决，不是 API 的限制。"
+            )
         return LoadoutOperationResult(
-            success=all_ok, loadout_name=loadout.name, message=message, steps=steps,
-        )
-
-    async def equip_exact(
-        self,
-        player_name: str,
-        loadout: Loadout,
-    ) -> LoadoutOperationResult:
-        """Apply an exact loadout, verify it, and restore prior state on failure."""
-        async with self._equip_lock:
-            return await self._equip_exact_unlocked(player_name, loadout)
-
-    async def _equip_exact_unlocked(
-        self,
-        player_name: str,
-        loadout: Loadout,
-    ) -> LoadoutOperationResult:
-        """Apply exact loadout while the per-user equipment lock is held."""
-        try:
-            recovery = await self._capture_recovery_state(player_name, loadout)
-        except (ItemNotFoundError, TransferError) as exc:
-            return LoadoutOperationResult(
-                success=False,
-                loadout_name=loadout.name,
-                message=f"配装预检失败：{exc}",
-                steps=[MoveItemStep(action="preflight", detail=str(exc), success=False)],
-            )
-
-        try:
-            return await self._apply_exact_with_recovery(player_name, loadout, recovery)
-        except asyncio.CancelledError:
-            # Stay in the lock-owning task: rollback re-enters account-write methods.
-            rollback_ok = False
-            steps: list[MoveItemStep] = []
-            with anyio.move_on_after(_CANCEL_ROLLBACK_TIMEOUT_SECONDS, shield=True):
-                try:
-                    rollback_ok = await self._restore_exact_state(
-                        player_name, loadout, recovery, steps
-                    )
-                except Exception:
-                    logger.exception("Cancelled exact loadout rollback failed")
-            if rollback_ok:
-                logger.info("Cancelled exact loadout restored the previous equipment state")
-            else:
-                logger.error("Cancelled exact loadout recovery incomplete; check character equipment")
-            raise
-
-    async def _apply_exact_with_recovery(
-        self, player_name: str, loadout: Loadout, recovery: dict
-    ) -> LoadoutOperationResult:
-        try:
-            applied = await self._equip_local_unlocked(player_name, loadout)
-        except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:
-            # `describe_exception`：`TimeoutError()` 的 str 是空的，直接写会留下"失败但没有原因"（真机 2026-09-23 撞过）。
-            logger.exception("Exact loadout application failed: %s", describe_exception(exc))
-            reason = describe_exception(exc)
-            applied = LoadoutOperationResult(
-                success=False,
-                loadout_name=loadout.name,
-                message=reason,
-                steps=[MoveItemStep(action="apply", detail=reason, success=False)],
-            )
-        verified = False
-        if applied.success:
-            # 有模组被上游挡住时，"对不上"的原因就是它 —— 别让调用方以为整个装备都没生效。
-            blocked = [step for step in applied.steps if step.action == "mod_blocked"]
-            verification_detail = (
-                f"有 {len(blocked)} 颗模组没装上（见 mod_blocked 步骤），其余已按确认内容写入。"
-                if blocked else "执行结果与确认的配装不一致。"
-            )
-            try:
-                verified = await self._verify_loadout(player_name, loadout)
-            except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:
-                logger.error("Exact loadout verification failed: %s", exc)
-                verification_detail = str(exc)
-            applied.steps.append(MoveItemStep(
-                action="verify",
-                detail=(
-                    "已验证装备实例、模组和子职业配置。"
-                    if verified
-                    else verification_detail
-                ),
-                success=verified,
-            ))
-
-        # 模组被上游拒绝写入时 equipment 是好的：不回滚，交给上层如实汇报。
-        if applied.success and verified or any(
-            st.action == "mod_blocked" for st in applied.steps
-        ):
-            return applied
-
-        rollback_steps: list[MoveItemStep] = []
-        try:
-            rollback_ok = await self._restore_exact_state(
-                player_name,
-                loadout,
-                recovery,
-                rollback_steps,
-            )
-        except (DestinyMCPError, aiobungie.HTTPError, OSError, TypeError) as exc:
-            logger.exception("Exact loadout rollback failed: %s", exc)
-            rollback_steps.append(MoveItemStep(
-                action="rollback_error", detail=str(exc), success=False
-            ))
-            rollback_ok = False
-        return LoadoutOperationResult(
-            success=False,
+            success=all_ok and not blocked_mods,
             loadout_name=loadout.name,
-            message=(
-                f"配装 '{loadout.name}' 执行失败，已恢复执行前状态。"
-                if rollback_ok
-                else f"配装 '{loadout.name}' 执行失败，且自动恢复不完整；请检查角色装备。"
-            ),
-            steps=[*applied.steps, *rollback_steps],
+            message=message,
+            steps=steps,
+            verified=verified,
         )
-
-    async def _verify_loadout(self, player_name: str, loadout: Loadout) -> bool:
-        """Verify exact equipped instances and requested socket plugs."""
-        p = await self._resolver.resolve_player(player_name)
-        mid, mtype = p["membership_id"], p["membership_type"]
-        char_id = await self._resolver.resolve_character_id(
-            mid, mtype, loadout.character
-        )
-        profile = await self._resolver.get_profile(mid, mtype, profile_components.INVENTORY_SOCKETS)
-        equipped = (
-            profile.get("characterEquipment", {})
-            .get("data", {})
-            .get(char_id, {})
-            .get("items", [])
-        )
-        equipped_ids = {
-            str(item.get("itemInstanceId", "")) for item in equipped
-        }
-        if any(item.item_instance_id not in equipped_ids for item in loadout.items):
-            return False
-
-        sockets_data = (
-            profile.get("itemComponents", {}).get("sockets", {}).get("data", {})
-        )
-        for item in loadout.items:
-            actual_sockets = sockets_data.get(item.item_instance_id, {}).get(
-                "sockets", []
-            )
-            if any(
-                socket_index >= len(actual_sockets)
-                or actual_sockets[socket_index].get("plugHash", 0) != plug_hash
-                for socket_index, plug_hash in item.mod_sockets.items()
-            ):
-                return False
-            actual_plugs = {
-                socket.get("plugHash", 0) for socket in actual_sockets
-            }
-            if any(mod_hash not in actual_plugs for mod_hash in item.mods):
-                return False
-
-        if loadout.subclass:
-            subclass_item = next(
-                (
-                    raw
-                    for raw in equipped
-                    if (self._manifest.get_item_info(raw.get("itemHash", 0)) or {}).get(
-                        "itemType"
-                    )
-                    == 16
-                ),
-                None,
-            )
-            if not subclass_item:
-                return False
-            subclass_id = str(subclass_item.get("itemInstanceId", ""))
-            if (
-                loadout.subclass.subclass_item_hash
-                and subclass_item.get("itemHash", 0)
-                != loadout.subclass.subclass_item_hash
-            ) or (
-                loadout.subclass.subclass_instance_id
-                and subclass_id != loadout.subclass.subclass_instance_id
-            ):
-                return False
-            subclass_sockets = sockets_data.get(subclass_id, {}).get("sockets", [])
-            if any(
-                socket_index >= len(subclass_sockets)
-                or subclass_sockets[socket_index].get("plugHash", 0) != plug_hash
-                for socket_index, plug_hash in loadout.subclass.plug_sockets.items()
-            ):
-                return False
-            actual_plugs = {
-                socket.get("plugHash", 0)
-                for socket in subclass_sockets
-            }
-            expected_plugs = {
-                loadout.subclass.super_hash,
-                loadout.subclass.grenade_hash,
-                loadout.subclass.melee_hash,
-                loadout.subclass.class_ability_hash,
-                loadout.subclass.movement_hash,
-                *loadout.subclass.aspect_hashes,
-                *loadout.subclass.fragment_hashes,
-            }
-            expected_plugs.discard(0)
-            if not expected_plugs.issubset(actual_plugs):
-                return False
-
-        return True
-

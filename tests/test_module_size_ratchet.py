@@ -85,7 +85,11 @@ CEILINGS = {
     # 833 → 808（① 执行前提，2026-10-03）：执行前提（格子满搬不进来 / 与角色正穿着的金装
     # 冲突）的原因要接进 find 的诊断与 analyze 的结论；腾位置把 `_snapshot_version`
     # 拆去 `build/snapshot_version.py`（它是"求解 ↔ 执行"的一致性契约，不是这个类的内部细节）。
-    "destiny_mcp/services/build_service.py": 808,
+    # 808 → 788（② 执行前复检）：写账号前最后那段只读闸（重取现场 → 执行前提复检 →
+    # 指纹比对 → 实例核对）整段搬去 `services/build_execution_guard.py`，`equip_build`
+    # 只留一次调用 —— 那段本来就是"用户确认 → 真写账号"之间独立的四步，混在签发流程里
+    # 读不出顺序。上限跟着收紧，腾出来的位置已经用掉了（一行注释 + 调用点）。
+    "destiny_mcp/services/build_service.py": 788,
     # 2026-10-03 新增（从 build_service 拆出）：碎片替换的兼容预检。拆出来的直接原因：
     # 上面那块贴在 889 没有位置放"为什么"，而它是真机事故（碎片有符号/无符号没归一，
     # 5 颗里 4 颗被判"与插槽不兼容"）的修复落点。登记即上限。
@@ -93,10 +97,17 @@ CEILINGS = {
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升
-    # 520 → 519：`equip_loadout` 补上回读核对（同一条纪律，与 equip_exact 一致）。
+    # 520 → 519：`equip_loadout` 补上回读核对（同一条纪律，与 equip_with_recovery 一致）。
     # 519 → 521（0.7.9）：模组预检的入口条件要认"只有照抄模组"的件（+1），以及多继承一个
     # `FunctionalModMixin`（+1）。决策逻辑本身在 `loadout_functional_mods.py`。
-    "destiny_mcp/services/loadout_equipment_service.py": 521,
+    # 521 → 469 → 354（2026-10-03）：两段搬走 —— 回读核对（`_verify_loadout`）去
+    # `loadout_verify.py`（它同时被 Step 4 与 `equip_with_recovery` 用，而"核对"与"执行"是两件事）；
+    # 精确执行那三个方法（应用 → 核对 → 判回滚）去 `loadout_exact_flow.py`（"要不要回滚"是
+    # 一个判断，散在两处就会出现真机那两类事故）。模组预检前置、话术修正、以及
+    # `equip_loadout` 改走同一条恢复路径、以及三条话术修正（腾能量点名换下的那颗、
+    # 清能量失败也带上游原文、子职业原因写进回执）都落在这 370 里。
+    # 上限**跟着收紧**，腾出来的位置才是真腾出来。
+    "destiny_mcp/services/loadout_equipment_service.py": 370,
     "destiny_mcp/services/starside_service.py": 769,
     # 新增登记（PvP 武器榜）：不登记就等于没有闸 —— 仓库的规矩是"要在这里加代码
     # 得先做一次有意识的决定"，而不是等它长成下一个上帝模块。当前 529 行即上限。
@@ -177,11 +188,37 @@ CEILINGS = {
     # 上游原文关键词 → 下一步话术（会随实测加条目，所以单独登记，别挤回信封模块）。
     "destiny_mcp/tools/_write_failure_hints.py": 43,
     # 执行前状态快照与回滚（从 loadout_equipment_service 拆出）。
-    "destiny_mcp/services/loadout_recovery.py": 385,
-    # 模组插槽读写/预检（三条写入路径共用 `plug_already_installed`）。
+    # 385 → 317：三块搬走 —— 回滚核对（`_verify_restored_items`）去 `loadout_verify.py`
+    # （它和 `verify_loadout` 是同一件事：拿一份 profile 逐槽比，且共用"哪些实例在身上"）；
+    # 位置还原去 `loadout_restore_locations.py`（"这一件装着什么"与"这一件在哪"是两件事）。
+    # 上限跟着收紧。
+    "destiny_mcp/services/loadout_recovery.py": 317,
+    # 模组插槽读写（三条写入路径共用 `plug_already_installed`）。
     # 562 → 518：能量腾挪那段搬去 `loadout_energy_budget.py`（预算是一道算术 + 挑选规则，
     # 与"这颗该进哪个槽"是两件事），腾出来的位置给照抄模组的调用点。
-    "destiny_mcp/services/loadout_mod_sockets.py": 518,
+    # 518 → 519：这次把"预检两趟"（`_mod_write_snapshot` / `_mod_preflight`）整段搬去
+    # `loadout_mod_preflight.py`（守门与规划语义相反，混一处最容易让规划复用守门的过期快照），
+    # 净剩 2 行：多继承一个 `ModPreflightMixin` 与那一行 import。
+    "destiny_mcp/services/loadout_mod_sockets.py": 519,
+    # 2026-10-03 新增（从 loadout_equipment_service 拆出）：回读核对 —— 写入之后账号上到底是
+    # 不是要的那套。单独成模块的直接原因有二：那边贴着 521 没有位置；而"核对"与"执行"本来
+    # 就是两件事（`equip_with_recovery` 的外层与 `_equip_local_unlocked` 的 Step 4 共用同一份判据，
+    # 各自写一份就会各自漂移）。注册即上限。
+    "destiny_mcp/services/loadout_verify.py": 159,
+    # 2026-10-03 新增（从 loadout_mod_sockets 拆出，那边贴着 518）：模组写入的守门那一趟。
+    # 单独成模块的原因：守门（换装**前**的现场）与规划（换装后的现场）语义相反，混在一处
+    # 最容易发生的就是"规划顺手复用了守门那份过期快照"。注册即上限。
+    "destiny_mcp/services/loadout_mod_preflight.py": 86,
+    # 2026-10-03 新增（从 loadout_equipment_service 拆出，那边贴着上限）：`equip_build` 的
+    # 精确执行 —— 应用 → 回读核对 → **判要不要回滚**。"要不要回滚"是一个判断：它以前散在
+    # `_equip_local_unlocked` 的返回分支与它自己的外层之间，于是出了真机那两类事故
+    # （模组被挡就提前 return，子职业整段没跑；外侧只读一次就把"没确认"判成失败，整条白回滚）。
+    # 197 = 184 + `equip_loadout` 也走这一条（同一动作两种后果，只因为入口不同）。
+    # 注册即上限。
+    "destiny_mcp/services/loadout_exact_flow.py": 197,
+    # 2026-10-03 新增（从 loadout_recovery 拆出）：回滚的位置那一半（放回原位 + 原先穿着的
+    # 再穿回去）。与"这一件装着什么"分开的理由见模块 docstring。注册即上限。
+    "destiny_mcp/services/loadout_restore_locations.py": 89,
     # 0.7.10：`find`/`recommend` 的候选行投影（默认出口只给行 + execution_id）。
     # 366 → 284（① 执行前提）：0 候选要把"装不上"与"配不出来"分开说，这里已经满了 ——
     # 候选行投影（118 行）搬去 `services/build_projection.py`（形状工厂该在的层，
@@ -218,7 +255,21 @@ CEILINGS = {
     # 2026-10-03 新增（①）：求解阶段就要判死的两条执行前提（仓库件遇上满格、与角色正穿着的
     # 金装冲突）。单独成模块是因为它同时被求解器（滤件）、分析器（说话术）与规模闸门（数件数）
     # 读，放进任何一边都会变成两处判据。登记即上限。
-    "destiny_mcp/build/execution_feasibility.py": 257,
+    # 257 → 230（② 执行前复检）：判据与"这条约束的出路"留在这里（出路是判据的反面，
+    # 写进件上的 `execution_blocker` 就是完整一句"哪条约束 + 怎么办"，确认那一刻的复检
+    # 直接原句拿走）；**叙述**那半边（0 候选怎么解释、是哪个格满的）搬去
+    # `build/execution_diagnosis.py`。上限跟着收紧。
+    "destiny_mcp/build/execution_feasibility.py": 230,
+    # 2026-10-03 新增（② 执行前复检，从 execution_feasibility 拆出）：执行前提的**叙述** ——
+    # 格级汇总（"哪个格满了、仓库里几件搬不进来"）与"指定的金装跟身上那件冲突"的点名。
+    # 拆出来的原因：判据那边贴着 257，而这几句会随真机反馈改（改措辞不该动判据那一侧）；
+    # 件级的那句话不在这里 —— 确认复检直接引用 `execution_blocker` 原句，不重复叙述。
+    "destiny_mcp/build/execution_diagnosis.py": 95,
+    # 2026-10-03 新增（② 执行前复检，从 build_service 拆出）：写账号前最后一段只读闸。
+    # 单独成模块的直接原因：那边贴着 808 没位置，而"重取现场 → 执行前提复检 → 指纹比对 →
+    # 实例核对"是一段完整的四步，顺序本身就是结论（缺一条就是"以为在装备、实际撞上游 500"，
+    # 真机两次各 0 颗模组落地）。登记即上限。
+    "destiny_mcp/services/build_execution_guard.py": 101,
     # 2026-09-28 新增（从 loadout_mod_sockets / armor_mod_service 抽出）：调谐能不能写的判据。
     # 抽出来的直接原因：同一判据被两条写入路径各写一份，只改了一边 → equip_build 拿组件 207
     # 判调谐，把 3 颗能装的调谐误拦（连上游都没试）。登记即上限。

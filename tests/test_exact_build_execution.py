@@ -30,8 +30,11 @@ from destiny_mcp.models import (
     MoveItemStep,
 )
 from destiny_mcp.services import build_candidates as build_candidates_module
-from destiny_mcp.services import loadout_equipment_service as equipment_module
-from destiny_mcp.services.build_service import BuildService, _snapshot_version
+from destiny_mcp.services import loadout_exact_flow as exact_flow_module
+from destiny_mcp.services import loadout_verify
+from destiny_mcp.services import write_readback
+from destiny_mcp.build.snapshot_version import snapshot_version
+from destiny_mcp.services.build_service import BuildService
 from destiny_mcp.services.loadout_equipment_service import LoadoutEquipmentService
 from destiny_mcp.tools import _build_confirmation
 from destiny_mcp.tools.assistants import build_assistant
@@ -56,6 +59,16 @@ def _loadout() -> Loadout:
             )
         ],
     )
+
+
+def stub_verify(monkeypatch: pytest.MonkeyPatch, value: bool) -> AsyncMock:
+    """回读核对的替身：`_verify_loadout` 已搬成模块函数 `loadout_verify.verify_loadout`。
+
+    搬家的原因：`loadout_equipment_service.py` 贴着体量上限，而"核对"与"执行"本来就是两件事。
+    """
+    stub = AsyncMock(return_value=value)
+    monkeypatch.setattr(loadout_verify, "verify_loadout", stub)
+    return stub
 
 
 def _equipment_service() -> LoadoutEquipmentService:
@@ -106,7 +119,7 @@ def _exact_contract() -> tuple[InventorySnapshot, CanonicalBuild]:
                 zip(armor, slot_data), 1
             )
         ],
-        snapshot_version=_snapshot_version(snapshot),
+        snapshot_version=snapshot_version(snapshot),
         execution_id="candidate-1",
     )
     return snapshot, build
@@ -359,7 +372,7 @@ async def test_equip_build_by_execution_id_against_the_real_service(
     snapshot, build = _exact_contract()
     service._candidates.register(build, "Alpha#0100")
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
-    service._equipment.equip_exact = AsyncMock(return_value=LoadoutOperationResult(
+    service._equipment.equip_with_recovery = AsyncMock(return_value=LoadoutOperationResult(
         success=True,
         loadout_name="Exact",
         message="OK",
@@ -379,7 +392,7 @@ async def test_equip_build_by_execution_id_against_the_real_service(
     )
 
     assert done["ok"] is True
-    service._equipment.equip_exact.assert_awaited_once()
+    service._equipment.equip_with_recovery.assert_awaited_once()
     # 一次确认只能用一次：同一个 ID 再来一次就是"不认识"
     replay = await armor_branches.equip_build(
         services, "Alpha#0100", None, build.execution_id, "hunter", True
@@ -497,7 +510,7 @@ def test_priority_stats_keep_strict_order_and_remove_duplicates() -> None:
 
 
 @pytest.mark.asyncio
-async def test_exact_equipment_verifies_success() -> None:
+async def test_exact_equipment_verifies_success(monkeypatch: pytest.MonkeyPatch) -> None:
     service = _equipment_service()
     service._capture_recovery_state = AsyncMock(return_value={})
     service._equip_local_unlocked = AsyncMock(return_value=LoadoutOperationResult(
@@ -505,10 +518,10 @@ async def test_exact_equipment_verifies_success() -> None:
         loadout_name="Exact",
         message="applied",
     ))
-    service._verify_loadout = AsyncMock(return_value=True)
+    stub_verify(monkeypatch, True)
     service._restore_exact_state = AsyncMock()
 
-    result = await service.equip_exact("Alpha#0100", _loadout())
+    result = await service.equip_with_recovery("Alpha#0100", _loadout())
 
     assert result.success is True
     assert result.steps[-1].action == "verify"
@@ -531,10 +544,9 @@ async def test_a_blocked_plug_keeps_the_equipment_and_skips_rollback() -> None:
         message="装备已经换上；但 1 颗模组被上游拒绝写入",
         steps=[MoveItemStep(action="mod_blocked", detail="要材料（1675）", success=False)],
     ))
-    service._verify_loadout = AsyncMock(return_value=False)
     service._restore_exact_state = AsyncMock(return_value=True)
 
-    result = await service.equip_exact("Alpha#0100", _loadout())
+    result = await service.equip_with_recovery("Alpha#0100", _loadout())
 
     assert result.success is False, "被挡住不许报成功"
     service._restore_exact_state.assert_not_awaited()
@@ -542,7 +554,24 @@ async def test_a_blocked_plug_keeps_the_equipment_and_skips_rollback() -> None:
 
 
 @pytest.mark.asyncio
-async def test_exact_equipment_rolls_back_failed_verification() -> None:
+async def test_exact_equipment_does_not_roll_back_an_unconfirmed_readback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """**这条测试原来叫 `…rolls_back_failed_verification`，它钉的正是要修的那个 bug。**
+
+    旧代码把 `equip_with_recovery` 外侧那次回读写成"读一次"，读不到就 `success=False` + 整条回滚；
+    而内层（`_equip_local_unlocked` 的 Step 4）是重试约 10.5 秒、并明确写"别当成没装上"。
+    于是同步窗口一超过 10.5 秒，**同一份账号状态被读成两种结论**，把已经换好的配装整条改回
+    旧状态。`write_readback` 的口径写得很清楚：没确认 ≠ 没换成。
+
+    所以**改的是测试**：写入阶段一路成功、只是回读重试满窗口后仍对不上时，正确结论是
+    "未确认" —— **不启动回滚**，`verified=False` 让上层自己决定怎么说，`success` 保持
+    "写入都成功了"（`ok=true` 说的是"写入成功"，具体确认与否由 `verified` 承担）。
+    真正该回滚的是"写入阶段就失败了"——那条由
+    `test_partial_batch_equip_stops_mods_and_rolls_back` 盖住（`_equip_local_unlocked`
+    返回 `success=False`，`_restore_exact_state` 必须被 await）。
+    """
+    monkeypatch.setattr(write_readback, "ATTEMPTS", 1)
     service = _equipment_service()
     recovery = {"captured": True}
     service._capture_recovery_state = AsyncMock(return_value=recovery)
@@ -551,22 +580,105 @@ async def test_exact_equipment_rolls_back_failed_verification() -> None:
         loadout_name="Exact",
         message="applied",
     ))
-    service._verify_loadout = AsyncMock(return_value=False)
+    stub_verify(monkeypatch, False)
     service._restore_exact_state = AsyncMock(return_value=True)
 
-    result = await service.equip_exact("Alpha#0100", _loadout())
+    result = await service.equip_with_recovery("Alpha#0100", _loadout())
 
-    assert result.success is False
-    assert "已恢复" in result.message
-    service._restore_exact_state.assert_awaited_once()
+    assert result.verified is False, "没确认要如实记在 verified 上"
+    assert "别当成没装上" in result.message, result.message
+    service._restore_exact_state.assert_not_awaited()
+    verify_step = next(step for step in result.steps if step.action == "verify")
+    assert verify_step.success is False
+
+
+@pytest.mark.asyncio
+async def test_exact_equipment_reads_back_through_the_shared_retry_window(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """外侧回读**必须走 `write_readback` 的重试**，而不是读一次就下结论。
+
+    真机 2026-10-03 第 3 轮：内层重试满约 10.5 秒、按口径报"别当成没装上"，而外侧**只读一次**
+    就判失败，于是同步窗口一超过 10.5 秒，同一份状态被读成两种结论、整条配装白白回滚。
+    这里让前两次读返回 False、第三次 True：换回"读一次"的实现，这条立刻变红。
+    """
+    monkeypatch.setattr(write_readback, "ATTEMPTS", 4)
+    monkeypatch.setattr(write_readback, "DELAY_SECONDS", 0)
+    service = _equipment_service()
+    service._capture_recovery_state = AsyncMock(return_value={})
+    service._equip_local_unlocked = AsyncMock(return_value=LoadoutOperationResult(
+        success=True,
+        loadout_name="Exact",
+        message="applied",
+        verified=None,  # 内层没给结论（替身路径）→ 外侧要自己按同步窗口重试
+    ))
+    reads = []
+
+    async def slow_to_sync(*args):
+        reads.append(1)
+        return len(reads) >= 3
+
+    monkeypatch.setattr(loadout_verify, "verify_loadout", slow_to_sync)
+    service._restore_exact_state = AsyncMock()
+
+    result = await service.equip_with_recovery("Alpha#0100", _loadout())
+
+    assert len(reads) == 3, f"要重试到对上为止，实际读了 {len(reads)} 次"
+    assert result.verified is True
+    assert result.success is True
+    service._restore_exact_state.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_exact_equipment_reuses_the_inner_verdict_without_a_second_read(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """内层已经核对过就不再读第二遍：同一份判据、同一个窗口，重读只是白等一个窗口。
+
+    要读第二遍的只有一种情形 —— 内层没给结论（`verified=None`：外层直接拿别的替身跑了
+    `_equip_local_unlocked`），那时才按 `write_readback` 重试（见上一条）。
+    """
+    service = _equipment_service()
+    service._capture_recovery_state = AsyncMock(return_value={})
+    service._equip_local_unlocked = AsyncMock(return_value=LoadoutOperationResult(
+        success=True,
+        loadout_name="Exact",
+        message="applied",
+        verified=True,
+    ))
+    verify = stub_verify(monkeypatch, False)
+    service._restore_exact_state = AsyncMock()
+
+    result = await service.equip_with_recovery("Alpha#0100", _loadout())
+
+    assert result.success is True
+    assert result.verified is True
+    verify.assert_not_awaited()
+    service._restore_exact_state.assert_not_awaited()
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("cancel_mode", ["asyncio", "mcp_scope"])
 @pytest.mark.parametrize("phase", ["apply", "verify", "rollback"])
 async def test_cancelled_equipment_recovers_before_releasing_account_lock(
-    cancel_mode: str, phase: str,
+    cancel_mode: str, phase: str, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """取消发生在哪一段，都要**先把执行前状态恢复完**再放开账号写入的锁。
+
+    `phase="rollback"` 那档要让**写入阶段真的失败**：2026-10-03 之后"写入全成功、只是
+    回读没确认"不再触发回滚（口径见 `write_readback` 的"没确认 ≠ 没换成"），
+    所以只有 `applied.success=False` 才会走到恢复那一趟 —— 这正是这一档要取消的东西。
+
+    这条测试原本靠 `await asyncio.wait_for(interrupted.wait(), 1)` 去"等取消时机"，
+    而 `verify` 那一步内层会按 `write_readback` 重试整整一个同步窗口（8 × 1.5 秒）——
+    于是"读到哪一次才算被取消"取决于读循环的节奏，测试变成一场竞速：把外层回读改成
+    复用 `write_readback`（同一个窗口）之后，取消总是落在 `sleep(1.5)` 里，
+    那个 1 秒的等待就先超时了（真机口径没变，是测试自己不稳）。
+
+    所以这里把等待换成**自旋 + 明确的截止时间**：不再猜"第几次读会被取消"，
+    只规定"取消必须在我等够之前落地"。钉的契约一条没动 —— 锁在恢复完成前不放、
+    恢复期间别的写入进不来、恢复动作确实发生过。
+    """
     service = _equipment_service()
     recovery = {"captured": True}
     service._capture_recovery_state = AsyncMock(return_value=recovery)
@@ -582,13 +694,17 @@ async def test_cancelled_equipment_recovers_before_releasing_account_lock(
         if phase == "apply":
             interrupted.set()
             await asyncio.Event().wait()
-        return LoadoutOperationResult(success=True)
+        return LoadoutOperationResult(success=phase != "rollback", message="synthetic")
 
     async def verify(*args):
         if phase == "verify":
             interrupted.set()
             await asyncio.Event().wait()
         return False
+
+    # 前两档取消在"写入还没结束"的时候，这条回读窗口用不上；压成 1 次省掉等待，
+    # rollback 档根本不走回读（写入阶段就失败了）。
+    monkeypatch.setattr(write_readback, "ATTEMPTS", 1)
 
     async def restore(*args):
         if phase == "rollback" and not interrupted.is_set():
@@ -602,38 +718,47 @@ async def test_cancelled_equipment_recovers_before_releasing_account_lock(
             return True
 
     service._equip_local_unlocked = apply
-    service._verify_loadout = verify
+    monkeypatch.setattr(loadout_verify, "verify_loadout", verify)
     service._restore_exact_state = AsyncMock(side_effect=restore)
 
     async def run():
         with anyio.CancelScope() as scope:
             scopes.append(scope)
-            await service.equip_exact("Alpha#0100", _loadout())
+            await service.equip_with_recovery("Alpha#0100", _loadout())
 
     async def subsequent_write():
         async with service._equip_lock:
             assert state["equipment"] == "before"
             next_write.set()
 
+    async def wait_for_event(event: asyncio.Event, deadline: float) -> None:
+        """自旋等待（不用 `wait_for`）：等不到就是这条守门真的没触发，直接判红。"""
+        loop = asyncio.get_running_loop()
+        while loop.time() < deadline:
+            if event.is_set():
+                return
+            await asyncio.sleep(0.01)
+        raise AssertionError("取消没有在等够的时间内落到该落的那一段上")
+
     task = asyncio.create_task(run())
     other = None
     try:
-        await asyncio.wait_for(interrupted.wait(), 1)
+        await wait_for_event(interrupted, asyncio.get_running_loop().time() + 30)
         if cancel_mode == "asyncio":
             task.cancel()
         else:
             scopes[0].cancel()
-        await asyncio.wait_for(restoring.wait(), 1)
+        await wait_for_event(restoring, asyncio.get_running_loop().time() + 30)
         other = asyncio.create_task(subsequent_write())
         await asyncio.sleep(0)
         assert not next_write.is_set()
         release_restore.set()
         if cancel_mode == "asyncio":
             with pytest.raises(asyncio.CancelledError):
-                await asyncio.wait_for(task, 1)
+                await asyncio.wait_for(task, 5)
         else:
-            await asyncio.wait_for(task, 1)
-        await asyncio.wait_for(other, 1)
+            await asyncio.wait_for(task, 5)
+        await asyncio.wait_for(other, 5)
         assert state["equipment"] == "before"
         assert next_write.is_set()
         assert service._restore_exact_state.await_count == (2 if phase == "rollback" else 1)
@@ -662,9 +787,9 @@ async def test_cancelled_recovery_is_bounded_and_reports_failure(
         return False
 
     service._restore_exact_state = restore
-    monkeypatch.setattr(equipment_module, "_CANCEL_ROLLBACK_TIMEOUT_SECONDS", 0.01)
+    monkeypatch.setattr(exact_flow_module, "_CANCEL_ROLLBACK_TIMEOUT_SECONDS", 0.01)
     with pytest.raises(asyncio.CancelledError):
-        await asyncio.wait_for(service.equip_exact("Alpha#0100", _loadout()), 1)
+        await asyncio.wait_for(service.equip_with_recovery("Alpha#0100", _loadout()), 1)
 
     assert "recovery incomplete" in caplog.text
     async with service._equip_lock:
@@ -673,6 +798,12 @@ async def test_cancelled_recovery_is_bounded_and_reports_failure(
 
 @pytest.mark.asyncio
 async def test_partial_batch_equip_stops_mods_and_rolls_back() -> None:
+    """批量装备失败时**一个模组都不写**，并且整条回滚。
+
+    这里钉的是 `_insert_armor_mod`（真写入）而不是 `_prepare_mod_operations`：
+    后者从 2026-10-03 起在**搬运之前**多跑一趟只读预检（"注定失败就别写"），装备阶段失败时
+    它当然已经被调用过了 —— 但那时它一分写入都没做。
+    """
     service = _equipment_service()
     service._resolver.resolve_player = AsyncMock(return_value={
         "membership_id": "11", "membership_type": 3,
@@ -683,14 +814,15 @@ async def test_partial_batch_equip_stops_mods_and_rolls_back() -> None:
     service._transfer.transfer_item = AsyncMock(return_value=SimpleNamespace(success=True))
     service._transfer.equip_items = AsyncMock(return_value={"success": False})
     service._prepare_mod_operations = AsyncMock()
+    service._insert_armor_mod = AsyncMock()
     service._apply_subclass_config = AsyncMock()
     service._capture_recovery_state = AsyncMock(return_value={})
     service._restore_exact_state = AsyncMock(return_value=True)
 
-    result = await service.equip_exact("Alpha#0100", _loadout())
+    result = await service.equip_with_recovery("Alpha#0100", _loadout())
 
     assert not result.success
-    service._prepare_mod_operations.assert_not_awaited()
+    service._insert_armor_mod.assert_not_awaited()
     service._apply_subclass_config.assert_not_awaited()
     service._restore_exact_state.assert_awaited_once()
 
@@ -701,7 +833,7 @@ async def test_build_candidate_is_player_bound_and_tamper_protected() -> None:
     _, build = _exact_contract()
     service._candidates.register(build, "Alpha#0100")
     service._inventory.get_armor_snapshot = AsyncMock()
-    service._equipment.equip_exact = AsyncMock()
+    service._equipment.equip_with_recovery = AsyncMock()
 
     other_player = await service.equip_build("Beta#0200", build, "hunter")
     assert other_player["code"] == "unknown_execution_id"
@@ -711,7 +843,7 @@ async def test_build_candidate_is_player_bound_and_tamper_protected() -> None:
     changed = await service.equip_build("Alpha#0100", tampered, "hunter")
     assert changed["code"] == "canonical_build_mismatch"
     service._inventory.get_armor_snapshot.assert_not_awaited()
-    service._equipment.equip_exact.assert_not_awaited()
+    service._equipment.equip_with_recovery.assert_not_awaited()
 
 
 @pytest.mark.asyncio
@@ -724,14 +856,14 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
         incomplete_build, "Alpha#0100"
     )
     incomplete_service._inventory.get_armor_snapshot = AsyncMock()
-    incomplete_service._equipment.equip_exact = AsyncMock()
+    incomplete_service._equipment.equip_with_recovery = AsyncMock()
 
     incomplete = await incomplete_service.equip_build(
         "Alpha#0100", incomplete_build, "hunter"
     )
     assert incomplete["code"] == "invalid_item_count"
     incomplete_service._inventory.get_armor_snapshot.assert_not_awaited()
-    incomplete_service._equipment.equip_exact.assert_not_awaited()
+    incomplete_service._equipment.equip_with_recovery.assert_not_awaited()
 
     duplicate_service = _build_service()
     _, duplicate_build = _exact_contract()
@@ -743,7 +875,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
         duplicate_build, "Alpha#0100"
     )
     duplicate_service._inventory.get_armor_snapshot = AsyncMock()
-    duplicate_service._equipment.equip_exact = AsyncMock()
+    duplicate_service._equipment.equip_with_recovery = AsyncMock()
 
     duplicate = await duplicate_service.equip_build(
         "Alpha#0100", duplicate_build, "hunter"
@@ -759,7 +891,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
         duplicate_slot_build, "Alpha#0100"
     )
     slot_service._inventory.get_armor_snapshot = AsyncMock()
-    slot_service._equipment.equip_exact = AsyncMock()
+    slot_service._equipment.equip_with_recovery = AsyncMock()
 
     duplicate_slot = await slot_service.equip_build(
         "Alpha#0100", duplicate_slot_build, "hunter"
@@ -772,12 +904,12 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     service._candidates.register(build, "Alpha#0100")
     snapshot.helmets[0].energy_capacity = 9
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
-    service._equipment.equip_exact = AsyncMock()
+    service._equipment.equip_with_recovery = AsyncMock()
 
     result = await service.equip_build("Alpha#0100", build, "hunter")
 
     assert result["code"] == "stale_inventory_snapshot"
-    service._equipment.equip_exact.assert_not_awaited()
+    service._equipment.equip_with_recovery.assert_not_awaited()
 
     missing_service = _build_service()
     missing_snapshot, missing_build = _exact_contract()
@@ -787,13 +919,13 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     missing_service._inventory.get_armor_snapshot = AsyncMock(
         return_value=missing_snapshot
     )
-    missing_service._equipment.equip_exact = AsyncMock()
+    missing_service._equipment.equip_with_recovery = AsyncMock()
 
     missing = await missing_service.equip_build(
         "Alpha#0100", missing_build, "hunter"
     )
     assert missing["code"] == "exact_item_missing"
-    missing_service._equipment.equip_exact.assert_not_awaited()
+    missing_service._equipment.equip_with_recovery.assert_not_awaited()
 
     mod_service = _build_service()
     _, invalid_mod_build = _exact_contract()
@@ -801,14 +933,14 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     invalid_mod_build.items[0].mods = [0]
     mod_service._candidates.register(invalid_mod_build, "Alpha#0100")
     mod_service._inventory.get_armor_snapshot = AsyncMock()
-    mod_service._equipment.equip_exact = AsyncMock()
+    mod_service._equipment.equip_with_recovery = AsyncMock()
 
     invalid_mod = await mod_service.equip_build(
         "Alpha#0100", invalid_mod_build, "hunter"
     )
     assert invalid_mod["code"] == "invalid_mod_hash"
     mod_service._inventory.get_armor_snapshot.assert_not_awaited()
-    mod_service._equipment.equip_exact.assert_not_awaited()
+    mod_service._equipment.equip_with_recovery.assert_not_awaited()
 
 
 @pytest.mark.asyncio
@@ -817,7 +949,7 @@ async def test_build_candidate_is_one_time_and_score_path_is_disabled() -> None:
     snapshot, build = _exact_contract()
     service._candidates.register(build, "Alpha#0100")
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
-    service._equipment.equip_exact = AsyncMock(return_value=LoadoutOperationResult(
+    service._equipment.equip_with_recovery = AsyncMock(return_value=LoadoutOperationResult(
         success=True,
         loadout_name="Exact",
         message="OK",
