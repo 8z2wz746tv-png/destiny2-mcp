@@ -14,6 +14,12 @@ from ._armor_branches import with_slot_keys
 from ._responses import ok_response
 from ..build.analyzer import narrowing_actions
 from ..exceptions import BuildTooLargeError
+from ..services.build_projection import (
+    ROWS_NOTE,
+    candidate_rows,
+    row_hint,
+    tuning_summary,
+)
 
 
 def _functional_mods_payload(payload: Any) -> dict[str, Any] | None:
@@ -28,7 +34,7 @@ def _functional_mods_payload(payload: Any) -> dict[str, Any] | None:
     return None
 
 
-def _summary_with_functional_mods(message: str, payload: dict[str, Any] | None) -> str:
+def summary_with_functional_mods(message: str, payload: dict[str, Any] | None) -> str:
     """摘要里点一句"带上了社区作者的功能模组"，并说清没抄上的几颗。"""
     if not payload:
         return message
@@ -106,159 +112,61 @@ async def recommend(
         ladder = await armor_ladder.no_solution_ladder(
             svc, player_name, request, base_order_empty=True
         )
+        # 有执行前提挡路时，**不能**把 0 候选念成"属性配不出来"：那会把下一步指到
+        # "降目标/反推待刷"上，而真正要做的是腾一格或先顶下冲突的金装。
+        blocked_by = (recommendation.get("analysis") or {}).get("blocked_by") or []
         return ok_response(
-            "真实库存中没有满足原始硬约束的配装；金装和全部属性目标都保持不变。",
+            (
+                "没有**能装上**的候选：执行前提先把候选砍掉了 —— " + "；".join(blocked_by)
+                if blocked_by
+                else "真实库存中没有满足原始硬约束的配装；金装和全部属性目标都保持不变。"
+            ),
             {"recommendation": recommendation, "query": query, "ladder": ladder},
-            next_actions=[
-                "如果玩家想知道如何达标，保留本次全部参数调用 "
-                "build_assistant(intent='farm_target', max_replacements=2)；"
-                "只有待刷反推也无解时才询问是否调整硬约束。",
-                "ladder 里的 suggestion 是「建议降哪一项」，要用户同意后才带着新参数重试。",
-            ],
-            warnings=[
-                "原始硬约束未改变。无解时不能自动降低属性目标、替换指定金装或去掉碎片设置。"
-            ],
+            next_actions=(
+                [
+                    "这几条是**执行前提**，不是属性不够：先按 analysis.reason 里的出路做"
+                    "（腾一格 / 用 equip 先把冲突的金装顶下来），再原参数重新求解。"
+                ]
+                if blocked_by
+                else [
+                    "如果玩家想知道如何达标，保留本次全部参数调用 "
+                    "build_assistant(intent='farm_target', max_replacements=2)；"
+                    "只有待刷反推也无解时才询问是否调整硬约束。",
+                    "ladder 里的 suggestion 是「建议降哪一项」，要用户同意后才带着新参数重试。",
+                ]
+            ),
+            warnings=(
+                list(blocked_by)
+                if blocked_by
+                else [
+                    "原始硬约束未改变。无解时不能自动降低属性目标、替换指定金装或去掉碎片设置。"
+                ]
+            ),
         )
     return ok_response(
-        _summary_with_functional_mods(
+        summary_with_functional_mods(
             f"已生成 {len(rows)} 套配装推荐（每套只给行；细节与装备走 execution_id）。", copied_mods
         ),
-        {"recommendation": recommendation, "query": query, "builds_note": _ROWS_NOTE},
-        next_actions=[_row_hint(rows[0])] if rows else [],
+        {"recommendation": recommendation, "query": query, "builds_note": ROWS_NOTE},
+        next_actions=[row_hint(rows[0])] if rows else [],
     )
 
-
-# ── 候选行（响应投影：默认出口只给行 + execution_id）─────────────────────
-#
-# 真机基线（2026-09-25）：`find` 一次 21.5 KB / 2 套，其中每套 `build` 6.74 KB —— 那是**求解器的
-# 内部模型**（`tuning_option_hashes` / `base_roll_stats` / `archetype_*` / `armor3_roll_verified` /
-# `roll_parse_error` / `icon_url` …），模型看不懂也用不上；`canonical_build` 又占 2 KB 且是
-# "原样回传"的执行载荷。两者都不该出现在默认响应里：默认给行，细节与执行走 `execution_id`
-# （确认信封 `equip_build(execution_id, confirmed=false)` 会给出逐件预览与 canonical_build）。
-#
-# 保留什么：**能让人决定"穿不穿这套"的东西** —— 分数/达标率/六维/金装/套装/是否要改调谐，
-# 以及这套是哪五件（名字、部位、实例 ID、光等、能量、六维、调谐名）。
-_ROW_ITEM_FIELDS = (
-    "name", "item_hash", "item_instance_id", "slot", "slot_key", "slot_display",
-    "power", "energy_capacity", "stats", "is_exotic", "set_bonus_name",
-    "tuning_name", "is_masterworked", "is_artifice",
-)
-
-
-def _tuning_rows(changes: Any) -> list[dict[str, Any]]:
-    """调谐改动：只留"哪一件、从什么换成什么、六维怎么动"。
-
-    真机形状是 `{item_instance_id, item_name, slot, from{hash,name}, to{hash,name}, delta{…},
-    slot_key, slot_display}`；hash 对玩家没意义（要执行的话用 `execution_id` 取候选，
-    那里有完整的 `tuning_changes`），所以这里只留名字与六维变化。
-    """
-    rows: list[dict[str, Any]] = []
-    for change in changes or []:
-        if not isinstance(change, dict):
-            continue
-        row: dict[str, Any] = {
-            key: change[key]
-            for key in ("item_instance_id", "item_name", "slot", "slot_key", "slot_display", "delta")
-            if change.get(key) is not None
-        }
-        for key in ("from", "to"):
-            block = change.get(key)
-            if isinstance(block, dict) and block.get("name"):
-                row[key] = {"name": block["name"]}
-        rows.append(row)
-    return rows
-
-
-def candidate_rows(results: Any) -> list[dict[str, Any]]:
-    """把 `find` / `recommend` 的结果投影成**候选行**（默认出口）。"""
-    rows: list[dict[str, Any]] = []
-    for result in results or []:
-        if not isinstance(result, dict):
-            continue
-        candidate = result.get("build") if isinstance(result.get("build"), dict) else {}
-        canonical = result.get("canonical_build") if isinstance(result.get("canonical_build"), dict) else {}
-        items = candidate.get("items") if isinstance(candidate.get("items"), list) else []
-        row: dict[str, Any] = {
-            "execution_id": result.get("execution_id") or canonical.get("execution_id") or "",
-            "score": result.get("score"),
-            "completion_rate": result.get("completion_rate"),
-            "stats": {
-                name: candidate.get(name)
-                for name in ("weapons", "health", "class_stat", "grenade", "melee", "super_stat")
-                if candidate.get(name) is not None
-            },
-            "missing_requirements": result.get("missing_requirements") or [],
-            "max_violations": result.get("max_violations") or [],
-            "requires_tuning": bool(result.get("requires_tuning")),
-            "tuning_changes": _tuning_rows(result.get("tuning_changes")),
-            "items": [
-                {key: item.get(key) for key in _ROW_ITEM_FIELDS if item.get(key) is not None}
-                for item in items
-                if isinstance(item, dict)
-            ],
-        }
-        if result.get("tuning_note"):
-            row["tuning_note"] = result["tuning_note"]
-        if result.get("functional_mods"):
-            row["functional_mods"] = result["functional_mods"]
-        exotic = next((i.get("name") for i in row["items"] if i.get("is_exotic")), "")
-        sets = [i.get("set_bonus_name") for i in row["items"] if i.get("set_bonus_name")]
-        row["exotic"] = exotic or ""
-        # 同一套里同一套装名会出现多次：去重但保序（"埃希恩记忆 ×4"这种话要靠它）
-        row["set"] = list(dict.fromkeys(sets))
-        rows.append(row)
-    return rows
-
-
-#: 默认出口只给候选行：说明一次，别再逐行重复（`detail_hint` 那种每行一遍的做法已经吃过亏）
-_ROWS_NOTE = (
-    "这里是**候选行**：分数/六维/金装/套装 + 这套是哪五件（名字、部位、实例 ID、光等、能量、"
-    "调谐名）。求解器内部字段与可执行载荷（canonical_build）不在默认响应里 —— "
-    "要看逐件预览或装备它，用 execution_id 调 equip_build。"
-)
-
-
-def _row_hint(row: dict[str, Any]) -> str:
-    """每一行都带一句"下一步"：不给就把"怎么把行变成动作"丢给模型猜。"""
-    return (
-        "要看逐件预览或装备它：build_assistant(intent=\"equip_build\", "
-        f'execution_id="{row.get("execution_id")}", character=…)；先不确认拿预览，'
-        "得到同意后加 confirmed=true（编号 30 分钟内有效）。"
-    )
-
-
-def _tuning_summary(builds: Any) -> dict[str, Any] | None:
-    """结果里有没有"要靠调谐才达标"的方案；没有就返回 None（不占响应）。"""
-    if not isinstance(builds, list):
-        return None
-    rows = [
-        build
-        for build in builds
-        if isinstance(build, dict) and build.get("tuning_changes")
-    ]
-    if not rows:
-        return None
-    changes = [change for row in rows for change in row.get("tuning_changes") or []]
-    return {
-        "build_count": len(rows),
-        "change_count": len(changes),
-        "changes": changes,
-        "note": (
-            "这些方案是「按原目标求解器没达标 → 放宽目标复解 → 用真实目标逐套复核」"
-            "找出来的；tuning_changes 里是要改的调谐（从什么改成什么、六维怎么变）。"
-            "调谐**确认后一起改**（2026-09-22 起开放代写）：条件只有一条 —— 这颗在这件护甲"
-            "允许的清单里（组件 310）。canonical_build 里带着它，equip_build 会连同护甲与模组"
-            "一起写；清单外的不会进计划（那种情况上游会回 1675「这颗装不到这件上」）。"
-        ),
-    }
 
 
 def _empty_message(search: dict[str, Any] | None) -> str:
-    """0 候选时说的话**必须自证"搜完了"**。
+    """0 候选时说的话**必须自证"搜完了"**，并且分清"配不出来"与"装不上"。
 
-    否则读的人分不清"枚举完了、真没有满足下限的方案"与"没搜完/被截断"——
-    这正是本仓库栽过的坑（`analyze` 曾在没验证过的情况下断言"没有合法组合"）。
+    读的人要能分清三件事：枚举完了真没有满足下限的方案、没搜完/被截断、以及
+    **执行前提把候选砍掉了**（格子满搬不进来 / 与当前金装冲突）。第三种最要紧：
+    真机实测那两次都是"求解成功、写入在动第一颗模组之前整批回滚"，用户看到的
+    "0 候选"如果被念成"属性配不出来"，下一步就全错了。
     """
+    blockers = (search or {}).get("blockers") or []
+    if blockers:
+        return (
+            "找到 0 个**能装上**的候选配装：执行前提先把候选砍掉了 —— "
+            + "；".join(blockers)
+        )
     if search is None or search.get("exhaustive"):
         combos = (search or {}).get("combos")
         scope = f"（枚举了 {combos:,} 套组合）" if isinstance(combos, int) else ""
@@ -287,25 +195,35 @@ async def find(
         return _not_computed(str(exc), query, key="builds")
     report = diagnostics[0].to_dict() if diagnostics else None
     search = (
-        {key: report[key] for key in ("exhaustive", "combos", "truncated_by")}
+        {key: report[key] for key in ("exhaustive", "combos", "truncated_by", "blockers")
+         if key in report}
         if report
         else None
     )
     dumped = with_slot_keys(dump(result))
     copied_mods = _functional_mods_payload(dumped)
-    tuning = _tuning_summary(dumped)
+    tuning = tuning_summary(dumped)
     builds = candidate_rows(dumped)
     if not builds:
         ladder = await armor_ladder.no_solution_ladder(
             svc, player_name, request, coverage=search, base_order_empty=True
         )
+        blocked = (search or {}).get("blockers") or []
         return ok_response(
             _empty_message(search),
             {"builds": builds, "query": query, "ladder": ladder, "search": search},
-            next_actions=[
-                "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；"
-                "降级要用户同意后再重试。",
-            ],
+            next_actions=(
+                [
+                    "这几条是**执行前提**，不是属性不够：先按上面每一条里的出路做"
+                    "（腾一格 / 用 equip 先把冲突的金装顶下来），再原参数重新求解。",
+                ]
+                if blocked
+                else [
+                    "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；"
+                    "降级要用户同意后再重试。",
+                ]
+            ),
+            warnings=blocked,
         )
     if not _has_hard_targets(request):
         for build in builds:
@@ -315,10 +233,10 @@ async def find(
                     "completion_rate_note",
                     "没有硬目标时这个比例没有意义（不是 0%）。",
                 )
-    payload: dict[str, Any] = {"builds": builds, "query": query, "builds_note": _ROWS_NOTE}
+    payload: dict[str, Any] = {"builds": builds, "query": query, "builds_note": ROWS_NOTE}
     if copied_mods is not None:
         payload["functional_mods"] = copied_mods
-    message = _summary_with_functional_mods(
+    message = summary_with_functional_mods(
         f"找到 {len(builds)} 个候选配装。", copied_mods
     )
     if tuning is not None:
@@ -346,7 +264,7 @@ async def find(
             f"其中 {len(violated)} 套超过了指定的属性上限（见各自的 max_violations），"
             "已排到没超上限的方案后面。"
         )
-    return ok_response(message, payload, next_actions=[_row_hint(builds[0])] if builds else [])
+    return ok_response(message, payload, next_actions=[row_hint(builds[0])] if builds else [])
 
 
 async def analyze(
