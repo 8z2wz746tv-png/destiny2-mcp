@@ -8,6 +8,12 @@ from typing import Any, Callable
 from ..manifest import ITEM_ALIASES, ManifestManager
 from ..exceptions import DestinyMCPError
 from ..utils.hash_utils import to_unsigned
+from .armor_class_item import (
+    classify_required_perks,
+    class_item_for_perks,
+    class_item_perks_of,
+    split_perk_names,
+)
 from .armor_payload import SLOT_DISPLAY, slot_key_from_bucket, slot_key_from_solver
 
 CLASS_TYPES = {"titan": 0, "hunter": 1, "warlock": 2}
@@ -255,17 +261,41 @@ def validate_build(manifest: ManifestManager, build: dict) -> dict:
         requirements.append(resolution)
     exotic = build.get("armor", {}).get("exotic", "")
     if exotic:
-        requirements.append(
-            _resolution(
+        # 职业金装的写法是**两个特性名**（实测 14 套：「至纯光能之灵、曲腹蛛之灵」），
+        # 不是金装名 —— 直接当物品名解析必然 unresolved。先按特性解析，认出来就落到金装名上，
+        # 并把要求的特性一起带上，供库存比对判断"这件 roll 得对不对"。
+        class_item = class_item_for_perks(
+            manifest, split_perk_names(exotic), class_id
+        )
+        if class_item is not None:
+            armor_name, required_perks = class_item
+            resolution = _resolution(
                 "exotic_armor",
                 exotic,
                 _exact_definitions(
-                    manifest, exotic, item_type=2, tier=6, class_type=class_type
+                    manifest, armor_name, item_type=2, tier=6, class_type=class_type
                 )
                 if class_type is not None
                 else [],
             )
-        )
+            resolution["class_item_name"] = armor_name
+            resolution["required_class_item_perks"] = [
+                {"item_hash": plug["item_hash"], "name": plug["name"]}
+                for plug in required_perks
+            ]
+            requirements.append(resolution)
+        else:
+            requirements.append(
+                _resolution(
+                    "exotic_armor",
+                    exotic,
+                    _exact_definitions(
+                        manifest, exotic, item_type=2, tier=6, class_type=class_type
+                    )
+                    if class_type is not None
+                    else [],
+                )
+            )
     for required_set in build.get("armor", {}).get("set_requirements", []):
         resolution = _set_resolution(manifest, required_set["name"])
         resolution["required_count"] = required_set["count"]
@@ -400,6 +430,47 @@ def _owned_instances(items, hashes: set[int], *, item_type: str) -> list:
         if item.item_type.casefold() == item_type
         and to_unsigned(item.item_hash) in hashes
     ]
+
+
+async def _class_item_perk_status(
+    row: dict,
+    candidate_ids: list[str],
+    inventory_service: Any,
+    manifest: ManifestManager,
+    player_name: str,
+    read_errors: list[dict],
+) -> dict:
+    """核对职业金装 roll 到的两个特性，返回要并进要求行的字段。
+
+    实现在 `armor_class_item.classify_required_perks`（三种结论不许混）；这里只负责
+    "读一次账号的组件 305"和"读不到时如实说为什么"。
+    """
+    reader = getattr(inventory_service, "get_armor_socket_plugs", None)
+    if reader is None:
+        return {"class_item_perk_status": "unknown", "class_item_perk_reason": "inventory_service_cannot_read_sockets"}
+    try:
+        raw = await reader(player_name)
+    except DestinyMCPError as exc:
+        read_errors.append({"scope": "class_item_perks", "error_type": type(exc).__name__})
+        return {"class_item_perk_status": "unknown", "class_item_perk_reason": "socket_read_failed"}
+    # 读回来的是组件 305 的原始插槽（`[{plugHash}]`）—— 先抽成"只含职业金特性"再对；
+    # 判据在 `class_item_perks_of` 一处（`classify_required_perks` 收的是抽好的形状）。
+    sockets_by_instance = {
+        instance_id: class_item_perks_of(sockets, manifest.get_item_definition)
+        for instance_id, sockets in raw.items()
+    }
+    result, best = classify_required_perks(
+        row["required_class_item_perks"], sockets_by_instance, candidate_ids
+    )
+    if result["status"] == "verified":
+        return {"class_item_perk_status": "verified", "class_item_perk_match": best, "class_item_perk_rolled": result["rolled"]}
+    if result["status"] == "owned_wrong_perks":
+        return {
+            "class_item_perk_status": "owned_wrong_perks",
+            "class_item_perk_rolled": result["rolled"],
+            "class_item_perk_reason": "持有这件金装，但没有任何副本同时 roll 到要求的组合",
+        }
+    return {"class_item_perk_status": "unknown", "class_item_perk_reason": result.get("reason", "socket_data_missing")}
 
 
 async def match_inventory(
@@ -621,6 +692,15 @@ async def match_inventory(
                 }
                 for item in candidates
             ]
+            # 职业金装：社区模板写的是**两个特性**，光"有这件金装"不等于满足要求 ——
+            # 同一件相对主义不同副本 roll 的组合不一样（真机：至纯+曲腹蛛 与 至纯+合成感受器）。
+            # 特性只在组件 305 的已装插槽里，所以真去读一次（一次读全账号，不是每件一次：
+            # 实测 3.47 MB / 0.85 秒）；读不到就记 unknown，**不**降级成"不满足"。
+            if row.get("required_class_item_perks") and candidates:
+                row |= await _class_item_perk_status(
+                    row, [item.item_instance_id for item in candidates],
+                    inventory_service, manifest, player_name, read_errors,
+                )
             row["inventory_status"] = "owned" if candidates else "missing"
             if not candidates:
                 known_missing.append(row)
