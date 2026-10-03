@@ -232,7 +232,12 @@ async def test_functional_mod_keeps_when_already_installed() -> None:
 
 @pytest.mark.asyncio
 async def test_functional_mod_skips_when_not_insertable() -> None:
-    """一个版本都插不进这一位角色：跳过 + 点名（与 equip_mod 的 writable=false 同一口径）。"""
+    """一个版本都挑不到槽：跳过 + 点名，原因只写**查证过的事**（"游戏里同样装不上"要有证据）。
+
+    真机 2026-10-03：这句曾写成"同名版本都不在这一位角色的可插入清单里（游戏里同样装不上）"，
+    而这条路上**从没查过**组件 207 的清单 —— 同一颗模组其实已经写成功了（见
+    `tests/test_mod_conclusion_steps.py`）。
+    """
     service = _service([{"plugHash": 1078080765}])
     item = _item([[999999]])
 
@@ -242,7 +247,8 @@ async def test_functional_mod_skips_when_not_insertable() -> None:
     )
 
     assert [op.action for op in operations] == ["blocked"]
-    assert "可插入清单" in operations[0].reason
+    assert "没找到可用的槽" in operations[0].reason
+    assert "游戏里同样装不上" not in operations[0].reason, "无证据的断言不许写进回执"
 
 
 # ── 武器分析的投影（0.7.11）：池子只给值得看的、副本去掉可换项 ──────────────

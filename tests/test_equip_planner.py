@@ -37,6 +37,18 @@ WEAPON_SLOT_KEYS = frozenset({"kinetic", "energy", "power"})
 # 互斥组（Manifest 的 `uniqueLabel`）：异域武器与异域护甲分属两组，**互不冲突**（ADR-011）。
 EXOTIC_ARMOR = "exotic_armor"
 EXOTIC_WEAPON = "exotic_weapon"
+# 装备槽 hash → 桶定义里的**官方中文名**（zh Manifest 实录：14239492 → 胸部护甲、3551918588 → 臂铠）。
+# `slot_label` 从这儿取名字，不从代码里手抄的表取。
+BUCKET_NAME: dict[int, str] = {
+    SLOT_HASH["helmet"]: "头盔",
+    SLOT_HASH["gauntlets"]: "臂铠",
+    SLOT_HASH["chest"]: "胸部护甲",
+    SLOT_HASH["legs"]: "腿部护甲",
+    SLOT_HASH["class_item"]: "职业护甲",
+    SLOT_HASH["kinetic"]: "动能武器",
+    SLOT_HASH["energy"]: "能量武器",
+    SLOT_HASH["power"]: "威能武器",
+}
 
 
 class FakeManifest:
@@ -45,6 +57,12 @@ class FakeManifest:
     `tiers` 仍按稀有度写（6=异域），替身把它翻成 Manifest 真实的互斥组 —— 测试因此与代码走
     **同一套说法**（ADR-011），而不是自己判"是不是异域"。`slots` 是 hash → 槽位键；没登记的
     hash 不给 `equippingBlock`，等于"定义里读不到槽位"，用来验证退回实例 `slot` 的那条路。
+
+    **非异域件不给 `uniqueLabel` 这个键** —— 这是真机形状（本机全量 Manifest：6029 件带
+    `equippingBlock` 的护甲里 5681 件传说/稀有/精良/普通只有 `uniqueLabelHash: 0`，键本身不在；
+    348 件异域全部是 `exotic_armor`）。替身以前写成 `"uniqueLabel": ""`，于是"缺席"这条真实
+    形状从来没被测过，也就没抓到 `_downgrade_candidates` 在真机上永远挑不到中间件那件事
+    （真机 2026-10-03：背包里 8 件非异域胸甲全被跳过，回执却说"没有可用的非异域胸部护甲"）。
     """
 
     def __init__(
@@ -65,19 +83,26 @@ class FakeManifest:
         definition: dict = {"inventory": {"tierType": self.tiers[item_hash]}}
         slot_key = self.slots.get(item_hash)
         if slot_key:
-            exotic = self.tiers[item_hash] == EXOTIC
-            definition["equippingBlock"] = {
-                "uniqueLabel": (
-                    (EXOTIC_WEAPON if slot_key in WEAPON_SLOT_KEYS else EXOTIC_ARMOR)
-                    if exotic
-                    else ""
-                ),
-                "equipmentSlotTypeHash": SLOT_HASH[slot_key],
-            }
+            block: dict = {"equipmentSlotTypeHash": SLOT_HASH[slot_key]}
+            if self.tiers[item_hash] == EXOTIC:
+                block["uniqueLabel"] = (
+                    EXOTIC_WEAPON if slot_key in WEAPON_SLOT_KEYS else EXOTIC_ARMOR
+                )
+            definition["equippingBlock"] = block
         return definition
 
     def get_item_name(self, item_hash: int) -> str:
         return self.names.get(item_hash, f"物品{item_hash}")
+
+    def get_bucket_definition(self, bucket_hash: int) -> dict | None:
+        """部位中文名的**数据来源**（`slot_label` 读它的 `displayProperties.name`）。
+
+        名字就是 zh Manifest 给的那几个（真机核对：14239492 → 胸部护甲、3551918588 → 臂铠）；
+        这里故意与 `SLOT_DISPLAY` 那张手抄表同值 —— 名字从哪来由代码注释钉住，
+        不需要靠"值不同"来证明。
+        """
+        name = BUCKET_NAME.get(bucket_hash & 0xFFFFFFFF)
+        return {"displayProperties": {"name": name}} if name else None
 
 
 def item(
@@ -474,15 +499,16 @@ class _ProfileManifest:
     def get_item_definition(self, item_hash: int) -> dict | None:
         slot_key = {2000: "gauntlets", 3000: "gauntlets", 4000: "chest"}.get(item_hash, "chest")
         exotic = item_hash in {2000, 4000}
+        block: dict = {"equipmentSlotTypeHash": SLOT_HASH[slot_key]}
+        if exotic:
+            # 只有异域件带 `uniqueLabel`（真机形状，见 `FakeManifest` 的说明）
+            block["uniqueLabel"] = EXOTIC_ARMOR
         return {
             "inventory": {"tierType": 6 if exotic else 5},
             # 仓库里的护甲认不出 bucket（bucketHash 是仓库格），部位只能从定义读 ——
             # 真机也是这条路，所以这里给 `equippingBlock.equipmentSlotTypeHash`（ADR-011）。
             "itemTypeDisplayName": self._DISPLAY.get(item_hash, "胸部护甲"),
-            "equippingBlock": {
-                "uniqueLabel": EXOTIC_ARMOR if exotic else "",
-                "equipmentSlotTypeHash": SLOT_HASH[slot_key],
-            },
+            "equippingBlock": block,
         }
 
 
@@ -618,3 +644,81 @@ async def test_plan_for_player_raises_when_the_instance_is_gone() -> None:
             "Tester#1234", "i-missing", "warlock",
             manifest=_ProfileManifest(), resolver=Resolver(),
         )
+
+
+# ── 真机 2026-10-03：非异域中间件挑不到 —— 键缺席 ≠ 判不了 ──────────────────
+#
+# 真机回执原文（`inventory_assistant(intent="equip")`，目标「黎明副歌」是**头盔**）：
+#   「黎明副歌」与 warlock 正装备的「星火协议」属于同一类异域（胸部护甲）；同类异域只能装备
+#   一件，需要先换一件非异域的胸部护甲顶下它，**但该角色背包里没有可用的非异域胸部护甲**。
+# 而 `intent="get", location="warlock", armor_slot="chest"` 当场列出 **8 件**非异域胸甲
+# （`is_equipped:false`、`character_id` 与回执一致）。根因不是"只看了身上没看背包"：
+# 8 件都进了 `carried()`，是 `item_traits` 把"定义里没有 `uniqueLabel` 这个键"读成了
+# `None`（判不了），而 `_downgrade_candidates` 只收 `label == ""` —— 于是**全游戏每一件
+# 传说护甲都当不了中间件**（实测：6029 件带 `equippingBlock` 的护甲里 5681 件没有这个键）。
+
+
+def test_legendary_without_the_unique_label_key_is_a_downgrade_candidate() -> None:
+    """没有 `uniqueLabel` 键 = 非异域 = 可以顶下金装（真机那 8 件就是这么被漏掉的）。"""
+    worn = item("i-starfire", "星火协议", slot="chest", equipped=True, item_hash=4000)
+    target = item("i-dawn", "黎明副歌", slot="helmet", item_hash=5000)
+    spare = item("i-spare", "圣贤保护者法袍", slot="chest", item_hash=3000)
+    manifest = FakeManifest(
+        {4000: EXOTIC, 5000: EXOTIC, 3000: LEGENDARY},
+        {},
+        {4000: "chest", 5000: "helmet", 3000: "chest"},
+    )
+
+    plan = plan_equip(request_for(target, inventory=[worn, spare]), manifest)
+
+    assert plan.status == "ready", plan.message
+    assert [step.action for step in plan.steps] == ["downgrade", "equip"]
+    assert plan.steps[0].item == "圣贤保护者法袍"
+    assert plan.steps[0].replaces == "星火协议"
+    assert plan.steps[0].slot == "chest"
+    assert plan.blockers == []
+
+
+def test_missing_definition_still_means_cannot_tell() -> None:
+    """反向：定义查不到才是"判不了"（`None`），不许把"没查到"说成"非异域"。"""
+    from destiny_mcp.services.equip_planner import item_traits
+
+    manifest = FakeManifest({}, {})
+    unknown = item("i-x", "看不见的护甲", slot="chest", item_hash=9999)
+
+    assert item_traits(manifest, unknown)[2] is None
+
+
+class _RenamedBuckets(FakeManifest):
+    """桶定义里的名字**只有 Manifest 有**（手抄表里没有这个词），用来钉"名字从数据来"。"""
+
+    def get_bucket_definition(self, bucket_hash: int) -> dict | None:
+        base = super().get_bucket_definition(bucket_hash)
+        if not base:
+            return None
+        return {"displayProperties": {"name": f"{base['displayProperties']['name']}·桶定义"}} 
+
+
+def test_conflict_names_each_piece_with_its_own_slot_from_the_manifest() -> None:
+    """回执里两个件各自带自己的部位名，且名字来自桶定义 —— 不许手抄一张中文表。
+
+    真机那条回执只给了一个括注（`（胸部护甲）`），它还紧跟在**头盔**那件名字后面，
+    读的人当场判定"部位映射写错了"。这里钉住：目标那件带自己的部位名、被顶下的那件带自己的，
+    两处都取自 Manifest 的桶定义（替身故意把名字改成手抄表里没有的词）。
+    """
+    worn = item("i-starfire", "星火协议", slot="chest", equipped=True, item_hash=4000)
+    target = item("i-dawn", "黎明副歌", slot="helmet", item_hash=5000)
+    manifest = _RenamedBuckets(
+        {4000: EXOTIC, 5000: EXOTIC}, {}, {4000: "chest", 5000: "helmet"}
+    )
+
+    plan = plan_equip(request_for(target, inventory=[worn]), manifest)
+
+    assert plan.status == "blocked"
+    assert "「黎明副歌」（头盔·桶定义）" in plan.message, plan.message
+    assert "「星火协议」（胸部护甲·桶定义）" in plan.message, plan.message
+    # 要被顶下的是穿着的那件，出路也只说那件的部位
+    assert "需要先换一件非异域的胸部护甲·桶定义顶下「星火协议」" in plan.message
+    assert "没有可用的非异域胸部护甲·桶定义" in plan.message
+    # 机器可读的那个字段仍然是槽位键（中文名只给人和模型读）
+    assert plan.blockers[0].slot == "chest"

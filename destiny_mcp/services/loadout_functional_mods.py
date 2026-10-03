@@ -122,6 +122,6 @@ class FunctionalModMixin:
             if best is None or score < best[0]:
                 best = (score, variant_hash, socket_index)
         if best is None:
-            # hash 仍要回去：回执要指名道姓哪一颗没插上
-            return int(group[0]), None, "同名版本都不在这一位角色的可插入清单里（游戏里同样装不上）"
+            # hash 仍要回去（回执得指名道姓）；原因只写这一趟查证过的事，口径见 `blocked_mod_step`。
+            return int(group[0]), None, "没找到可用的槽（同名版本在这一位落不下，或已被这一批里的其它模组占用）"
         return best[1], best[2], ""

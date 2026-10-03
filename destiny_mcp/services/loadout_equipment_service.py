@@ -1,7 +1,6 @@
-"""Loadout equipment service — apply mods and subclass config when equipping loadouts.
-
-Handles the complex equipment logic: transfer+equip armor, apply mod sockets,
-apply subclass configuration. Extracted from loadout_service.py.
+"""装备编排的执行段：搬 → 批量装备 → 模组 → 子职业 → 回读核对，按这个次序跑。
+各步的判断（怎么挑槽、怎么腾能量、装不上怎么说）都在 `loadout_*.py` 的 mixin 里；
+这里只负责**次序**与把结论写进回执 —— 加代码前先问它该不该落在这个文件。
 """
 
 from __future__ import annotations
@@ -36,8 +35,6 @@ from .loadout_subclass_sockets import SubclassSocketMixin
 from . import loadout_verify
 
 logger = get_logger(__name__)
-
-_CANCEL_ROLLBACK_TIMEOUT_SECONDS = 60
 
 
 class LoadoutEquipmentService(
@@ -113,8 +110,11 @@ class LoadoutEquipmentService(
         # 找不到唯一兼容槽 / 能量腾不出来）排在搬运+装备**之后**，于是注定失败的那一批已经把
         # 装备换好了，只能整条回滚，实测一次白烧 3.5 分钟。预检要的数据（插槽、能量、
         # 可插入清单）在同一次 profile 里就有，换装前拿得到，所以前置不产生假阴性。
+        # 守门跑在**副本**上：规划会往 `LoadoutItem.mod_sockets` 记下"挑中的槽位"（回读核对要它），
+        # 而这一趟的结果有意丢弃 —— 真机 2026-10-03 那 15 对「同一颗模组既写成功、又被报
+        # `插槽 -1` 装不上」就是它留下的槽位被写入那一趟读成了"调用方指定"。
         preflight_ok, preflight_error = await self._mod_preflight(
-            loadout, mid, mtype, profile, char_id
+            loadout.model_copy(deep=True), mid, mtype, profile, char_id
         )
         if not preflight_ok:
             return LoadoutOperationResult(

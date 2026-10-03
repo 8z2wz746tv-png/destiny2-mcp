@@ -60,8 +60,15 @@ def item_traits(manifest: EquipItemInfo, item: InventoryItem) -> tuple[str, str,
     """(装备槽键, 装备槽中文, 互斥组)。
 
     槽位与互斥组都取物品定义里的 `equippingBlock` —— 这是游戏自己的说法，武器和护甲一视同仁
-    （ADR-011）。互斥组 `None` 表示**判不了**（定义查不到 / 没有这个字段），此时不下结论；
-    槽位查不到就退回按 bucket 认出来的护甲槽（老路径），仍认不出给空串。
+    （ADR-011）。互斥组 `None` 表示**判不了**（定义查不到 / 整个 `equippingBlock` 读不到），
+    此时不下结论；槽位查不到就退回按 bucket 认出来的护甲槽（老路径），仍认不出给空串。
+
+    **`"uniqueLabel"` 这个键缺席 = 非异域，不是"判不了"**（真机 2026-10-03 实测，本机全量
+    Manifest）：6029 件带 `equippingBlock` 的护甲里，5681 件传说/稀有/精良/普通**根本没有这个键**
+    （只有 `uniqueLabelHash: 0`），348 件异域全部是 `exotic_armor`；武器同理（`exotic_weapon`）。
+    以前把"键不在"也归进 `None`（判不了），于是 `_downgrade_candidates` 要求 `label == ""`
+    永远不成立 —— **背包里 8 件非异域胸甲全被跳过**，回执却说"该角色背包里没有可用的非异域
+    胸部护甲"，而 `intent="get", armor_slot="chest"` 一次列出 8 件。
 
     **这是"实例 → 槽位"的唯一口径**：`transfer_service` 的回滚/回读也用它，
     否则执行层按护甲槽找、规划层按装备槽出步骤，武器那一步就会在回滚里凭空消失。
@@ -71,9 +78,37 @@ def item_traits(manifest: EquipItemInfo, item: InventoryItem) -> tuple[str, str,
     if not slot_key:
         slot_key, slot_display = item.slot, item.slot_display
     block = (definition or {}).get("equippingBlock")
-    if not isinstance(block, dict) or "uniqueLabel" not in block:
+    if not isinstance(block, dict):
         return slot_key, slot_display, None
     return slot_key, slot_display, str(block.get("uniqueLabel") or "")
+
+
+def slot_label(manifest: EquipItemInfo, item_hash: int, slot_key: str) -> str:
+    """装备槽的中文名 —— **只从 Manifest 读**，读不到退回槽位键（宁可难看，不编名字）。
+
+    来源顺序：该槽的桶定义 `displayProperties.name`（zh Manifest 给的是官方中文名：
+    头盔/臂铠/胸部护甲/腿部护甲/职业护甲、动能/能量/威能武器）→ 该物品的 `itemTypeDisplayName`
+    → 槽位键本身。
+
+    为什么不复用 `armor_payload.SLOT_DISPLAY`：那是我们手抄的一张中文表，而"这个槽叫什么"
+    是上游数据。真机 2026-10-03 的回执里，两个件各属哪个部位说不清（`（胸部护甲）` 紧跟在
+    头盔那件名后面），读的人当场判定"部位映射写错了" —— 名字必须来自数据，并且**贴在对的那件上**。
+    口径与 `build/execution_feasibility`（`facts.label()`：桶定义名 → 该部位那件的类型名）一致；
+    那个文件的实现只吃它的 `Armor` 模型，且属另一处改动面，所以这里按同一来源重取一次。
+    """
+    definition = manifest.get_item_definition(item_hash)
+    block = (definition or {}).get("equippingBlock")
+    slot_hash = block.get("equipmentSlotTypeHash") if isinstance(block, dict) else None
+    # 桶定义不一定每个替身都给（`Protocol` 要求有，`getattr` 只是不把替身的缺项当数据）；
+    # 名字非字符串（替身给 MagicMock）同样不算读到。
+    lookup = getattr(manifest, "get_bucket_definition", None)
+    bucket = lookup(slot_hash) if callable(lookup) and isinstance(slot_hash, int) else None
+    raw = ((bucket or {}).get("displayProperties") or {}).get("name")
+    label = raw.strip() if isinstance(raw, str) else ""
+    if not label:
+        raw = (definition or {}).get("itemTypeDisplayName")
+        label = raw.strip() if isinstance(raw, str) else ""
+    return label or slot_key
 
 
 def _where(location: str) -> str:
@@ -233,7 +268,7 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
     """
     target = request.target
     # 槽位与互斥组都来自 Manifest（ADR-011）：武器和护甲同一套槽位键。
-    target_slot, target_slot_display, target_label = item_traits(manifest, target)
+    target_slot, _target_display, target_label = item_traits(manifest, target)
     plan = EquipPlan(
         status="ready",
         character=request.character,
@@ -287,15 +322,14 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
     if target_label:
         conflict_item: InventoryItem | None = None
         conflict_slot = ""
-        conflict_slot_display = ""
         for worn in request.worn():
-            worn_slot, worn_display, worn_label = item_traits(manifest, worn)
+            worn_slot, _worn_display, worn_label = item_traits(manifest, worn)
             if worn_label != target_label:
                 continue
             # 同槽位（且槽位认得出）说明装上目标就会把它替换掉，不算冲突。
             if target_slot and worn_slot == target_slot:
                 continue
-            conflict_item, conflict_slot, conflict_slot_display = worn, worn_slot, worn_display
+            conflict_item, conflict_slot = worn, worn_slot
             break
         if conflict_item is not None:
             candidates = _downgrade_candidates(request, manifest, conflict_slot)
@@ -318,13 +352,17 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
                     success=True,
                 )
             else:
-                where = conflict_slot_display or conflict_slot or "同部位"
+                # 每个件各自带自己的部位名（来自 Manifest，见 `slot_label`）：以前只给一个
+                # 括注，它还紧跟在**目标**那件名字后面，真机 2026-10-03 因此被读成
+                # "黎明副歌（头盔）标成了胸部护甲"。要顶下的是**穿着的那件**，名字贴它。
+                target_where = slot_label(manifest, target.item_hash, target_slot)
+                worn_where = slot_label(manifest, conflict_item.item_hash, conflict_slot)
                 blockers.append(_block(
                     "exotic_conflict",
-                    f"「{target.name}」与 {request.character} 正装备的「{conflict_item.name}」"
-                    f"属于同一类异域（{where}）；同类异域只能装备一件，"
-                    f"需要先换一件非异域的{where}顶下它，"
-                    f"但该角色背包里没有可用的非异域{where}。"
+                    f"「{target.name}」（{target_where}）与 {request.character} 正装备的"
+                    f"「{conflict_item.name}」（{worn_where}）属于同一类异域；同类异域只能装备一件，"
+                    f"需要先换一件非异域的{worn_where}顶下「{conflict_item.name}」，"
+                    f"但该角色背包里没有可用的非异域{worn_where}。"
                     f"出路：{_catalog_hint(conflict_slot)} 看有哪些，"
                     f"或用 move 从仓库搬一件同部位的非异域装备过来。",
                     slot=conflict_slot,

@@ -52,15 +52,23 @@ class ModSocketMixin(ModPreflightMixin, PlugLookupMixin):
     def blocked_mod_step(
         self, item: LoadoutItem, mod_hash: int, socket_index: int, reason: str
     ) -> MoveItemStep:
-        """这一位装不上这颗的回执：写不了就说清为什么，且**不连累整条配装**。"""
-        return MoveItemStep(
-            action="mod_blocked",
-            detail=(
-                f"'{item.name}' 插槽 {socket_index} 的模组 "
-                f"'{self.mod_label(mod_hash)}' 装不上：{reason}"
-            ),
-            success=False,
+        """这一位装不上这颗的回执：写不了就说清为什么，且**不连累整条配装**。
+
+        **哨兵不进 detail**：`socket_index < 0` 是"一个可用槽都没挑到"的内部值
+        （见 `loadout_functional_mods`），真机 2026-10-03 把它印成了 15 条
+        「插槽 -1 的模组 … 装不上」，读的人既看不懂也没法照做。
+
+        `reason` 只许写**判它的那一步查证过的事**：那条路上从没查过组件 207 的可插入清单，
+        所以不许写成"同名版本都不在可插入清单里（游戏里同样装不上）"—— 真机那 15 条正是
+        这句无证据的断言（同一颗模组其实已经写成功了）。要那句话说出口，先给它证据。
+        """
+        label = self.mod_label(mod_hash)
+        detail = (
+            f"'{item.name}' 插槽 {socket_index} 的模组 '{label}' 装不上：{reason}"
+            if socket_index >= 0
+            else f"'{item.name}' 的模组 '{label}' 装不上：{reason}"
         )
+        return MoveItemStep(action="mod_blocked", detail=detail, success=False)
 
     def mod_label(self, mod_hash: int) -> str:
         """模组 hash → 中文名（查不到就退回 hash 本身）。
