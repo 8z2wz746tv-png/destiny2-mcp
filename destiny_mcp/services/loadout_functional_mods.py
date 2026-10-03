@@ -1,10 +1,10 @@
 """照抄来的功能模组在执行时的现场决策（从 `loadout_mod_sockets` 拆出来的一个 Mixin）。
 
-`_prepare_mod_operations` 那条路是"求解器算出来的模组，装不下就是预检失败"，照抄来的功能模组
-是**另一个口径**：同名多版本里挑"这一位这件护甲插得进"的（实测「鼓舞爆弹」便宜那版
-`unlock_state=false`）→ 能插优先、其次挑便宜的；插不进（组件 207 的清单里没有）→ 跳过 + 点名
-（与 `equip_mod` 的 `writable=false` 同口径）；能量不够 → **也跳过 + 点名**，不替玩家去拆别的模组、
-不许让整条配装失败或回退（玩家要的是"照抄作者这套"，抄不上的如实报出来就够了）；
+`_prepare_mod_operations` 那条路是"求解器算出来的模组，装不下就是预检失败"，照抄来的功能模组是**另一个口径**：
+同名多版本里挑"这一位这件护甲插得进"的（实测「鼓舞爆弹」便宜那版 `unlock_state=false`）→
+能插优先、其次挑便宜的；插不进（组件 207 的清单里没有）或能量不够 → 跳过 + 点名，不替玩家去拆别的模组、
+不许让整条配装失败或回退（玩家要的是"照抄作者这套"，抄不上的如实报出来就够了；与 `equip_mod`
+的 `writable=false` 同口径）；两种跳过都记 `skipped` 而不是 `blocked`（判据见 `loadout_blocked_mods`）；
 判能量看**最终净额**、写下去按**先腾后占** —— 两道口子的由来见 `_plan_functional_mods`。
 """
 
@@ -32,7 +32,7 @@ class FunctionalModMixin:
         used_energy: int,
         capacity: int,
     ) -> list[ModOperation]:
-        """把 `item.functional_mod_groups` 变成要写的操作（`mod` / `keep` / `blocked`）。
+        """把 `item.functional_mod_groups` 变成要写的操作（`mod` / `keep` / `blocked` / `skipped`）。
 
         `used_energy` = **属性模组已经安排完之后**的已用能量：照抄来的模组只在剩下的空间里装，不够就跳过。
 
@@ -50,8 +50,8 @@ class FunctionalModMixin:
                 assigned_sockets, membership_id, membership_type,
             )
             if socket_index is None:
-                # 一个版本都插不进这一位角色：不写、如实报（ADR-013 的口径）
-                operations.append(ModOperation("blocked", plug_hash, -1, blocked_reason))
+                # 一个版本都插不进这一位角色：不写、如实报（ADR-013 的口径）；记成 `skipped` 的理由见模块 docstring。
+                operations.append(ModOperation("skipped", plug_hash, -1, blocked_reason))
                 continue
             assigned_sockets.add(socket_index)
             current_hash = int(sockets[socket_index].get("plugHash", 0) or 0)
@@ -69,7 +69,7 @@ class FunctionalModMixin:
         for delta, _, operation in sorted(pending, key=lambda row: row[:2]):
             if projected + delta > capacity:
                 operations.append(ModOperation(
-                    "blocked", operation.plug_hash, operation.socket_index,
+                    "skipped", operation.plug_hash, operation.socket_index,
                     f"能量不够（要 {projected + delta}/{capacity}）：这一颗跳过，其余照抄的模组与六维属性模组照常安装",
                 ))
                 continue

@@ -399,7 +399,7 @@ class ModSocketMixin(ModPreflightMixin, PlugLookupMixin):
             ],
             *[
                 op for op in functional_operations
-                if op.action in {"keep", "blocked"}
+                if op.action in {"keep", "skipped"}
             ],
             *functional_writes,
         ]

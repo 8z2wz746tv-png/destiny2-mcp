@@ -242,6 +242,11 @@ CEILINGS = {
     # 扫描也认得出这里的归一写法（那三条 `to_unsigned(...) != to_unsigned(...)`）。
     # 注册即上限。
     "destiny_mcp/services/loadout_matches.py": 109,
+    # 2026-10-03 新增（① 预检判死的模组也要让回读提前收手）：`loadout_equipment_service` 贴着
+    # 364 没有位置，而"写不成的模组算不算、分哪两类、回读还核不核"本来就是**一个判断**：
+    # 判据（`OPERATION_KINDS` 那张表）、两本账、以及它们各自的话术（聚合步骤 / 回执尾句）
+    # 都只有这一处。登记即上限。
+    "destiny_mcp/services/loadout_blocked_mods.py": 117,
     # 2026-10-03 新增（从 loadout_mod_sockets 拆出，那边贴着 518）：模组写入的守门那一趟。
     # 单独成模块的原因：守门（换装**前**的现场）与规划（换装后的现场）语义相反，混在一处
     # 最容易发生的就是"规划顺手复用了守门那份过期快照"。注册即上限。

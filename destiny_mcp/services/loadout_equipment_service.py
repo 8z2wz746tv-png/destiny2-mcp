@@ -24,6 +24,7 @@ from ..models import (
 from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
 from .account_action_lock import account_action_lock
+from .loadout_blocked_mods import BlockedMods
 from .loadout_exact_flow import ExactFlowMixin
 from .loadout_armor_state import restore_after_equip
 from .loadout_functional_mods import FunctionalModMixin
@@ -216,7 +217,7 @@ class LoadoutEquipmentService(
                 steps=steps,
             )
 
-        blocked_mods: list[tuple[str, int, str]] = []
+        blocked = BlockedMods()
         for lo_item in loadout.items:
             for operation, mod_hash, socket_idx, reason in mod_operations.get(
                 lo_item.item_instance_id, []
@@ -224,9 +225,11 @@ class LoadoutEquipmentService(
                 if operation == "keep":
                     steps.append(self.keep_mod_step(lo_item, mod_hash, socket_idx))
                     continue
-                if operation == "blocked":
+                if operation in {"blocked", "skipped"}:
                     # 装不上的那一颗：不写、也不回退整条配装，如实报给玩家（ADR-013）。
+                    # 两类都交给 `blocked` 记账 —— 哪一类算"回读永远等不到"由它一处判。
                     steps.append(self.blocked_mod_step(lo_item, mod_hash, socket_idx, reason))
+                    blocked.add(operation, lo_item.name, mod_hash, reason)
                     continue
                 try:
                     mod_result = await self._insert_armor_mod(
@@ -276,7 +279,7 @@ class LoadoutEquipmentService(
                         blocker = self.mod_write_blocker(mod_result, mod_hash, profile)
                         if blocker:
                             # 上游明确拒绝的：记下原因，继续走完剩下的模组，最后如实汇报。
-                            blocked_mods.append((lo_item.name, mod_hash, blocker))
+                            blocked.add(operation, lo_item.name, mod_hash, blocker)
                             continue
                         all_ok = False
                         break
@@ -317,24 +320,24 @@ class LoadoutEquipmentService(
 
         # Step 4: 回读核对 —— **这一趟是全流程唯一的核对**（没核对过就不能说"已装备"：真机
         # 2026-09-24 这条路直接以"已装备"收尾，回执里没有一步证明装备真在身上）。
-        # 判据（`loadout_matches`）、窗口（`write_readback`）、话术（`readback_verdict`）各只有
-        # 一处；`equip_with_recovery` 的外层直接读这里的 `verified`，**不再自己开第二个窗口**
+        # 判据（`loadout_matches`）、窗口（`write_readback`）、话术（`readback_verdict`）、
+        # "写不成的模组算不算"（`loadout_blocked_mods`）各只有一处；`equip_with_recovery` 的
+        # 外层直接读这里的 `verified`，**不再自己开第二个窗口**
         # —— 真机 2026-10-03 audit 123435：内侧这一轮 8 次读没对上之后，外层又读了一整轮，
         # 两次读的是同一份状态、同一个函数，结论不可能变，那 147.8 秒全是白等。
         # 核对不上只报"没确认"，**不改写入结论**。
         detail, verified = await loadout_verify.readback_verdict(
-            self, player_name, loadout, blocked_count=len(blocked_mods)
+            self, player_name, loadout, blocked=blocked
         )
         steps.append(MoveItemStep(action="verify", detail=detail, success=verified))
 
         # 模组被上游拒绝写入时 equipment 是好的，但**子职业那一半的状态要说清**：
         # 回执是调用方唯一的证据，少做一步就必须点名（不然它只会读到"装备已经换上"）。
-        if blocked_mods:
-            blocked_detail = "；".join(
-                f"'{name}' 的模组 {mod_hash}：{why}" for name, mod_hash, why in blocked_mods
-            )
+        # 预检判死的那几颗**不并进这条**：它们各自已经有一条 `mod_blocked` 步（循环里写的），
+        # 再聚合一次就是同一颗报两遍。
+        if blocked.has_upstream:
             steps.append(MoveItemStep(
-                action="mod_blocked", detail=blocked_detail, success=False,
+                action="mod_blocked", detail=blocked.upstream_detail(), success=False,
             ))
 
         if not all_ok:
@@ -344,19 +347,16 @@ class LoadoutEquipmentService(
                 f"配装 '{loadout.name}' 未完全生效：子职业那一步{subclass_receipt}，"
                 "模组阶段有没写成的（原因见 steps）。"
             )
-        elif blocked_mods:
+        elif blocked.has_any:
             message = f"配装 '{loadout.name}' 的装备已经换上；子职业那一步{subclass_receipt}。"
         elif verified:
             message = f"配装 '{loadout.name}' 已装备，回读核对通过。"
         else:
             message = f"配装 '{loadout.name}' 的写入都成功了，但回读没确认：{detail}"
-        if blocked_mods:
-            message += (
-                f" {len(blocked_mods)} 颗模组被上游拒绝写入（原因见 steps.mod_blocked）——"
-                "这些条件在游戏里同样要先解决，不是 API 的限制。"
-            )
+        if blocked.has_any:
+            message += blocked.tail()
         return LoadoutOperationResult(
-            success=all_ok and not blocked_mods,
+            success=all_ok and not blocked.has_upstream,
             loadout_name=loadout.name,
             message=message,
             steps=steps,

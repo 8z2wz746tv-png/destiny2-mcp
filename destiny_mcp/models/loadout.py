@@ -12,9 +12,14 @@ from .base import MoveItemStep
 class ModOperation(NamedTuple):
     """一条要执行的模组操作（或"不执行"的理由）。
 
-    `action`：`mod` 要写 / `clear` 腾能量 / `keep` 已经装着 / `blocked` 这一位装不上。
-    带 `reason` 是为了让"装不上"能一路传到回执里 —— 以前预检遇到不可插入的模组直接抛错，
-    整条配装失败并回退（真机实测一次白烧 4 分钟），而正确做法是**跳过这一颗、如实汇报**。
+    `action`：`mod` 要写 / `clear` 腾能量 / `keep` 已经装着 / `blocked` 计划里的这一颗装不上
+    / `skipped` 照抄来的这一颗落不下（能量不够、一个版本都挑不到槽）。
+
+    **`blocked` 与 `skipped` 不是一回事**（`loadout_blocked_mods` 按这条分档）：前者来自规划的
+    目标列表（`mod_sockets` / `mods`），账号上永远等不到它，回读核对因此注定不通过；后者既没
+    进 `mod_sockets` 也没进 `mods`，回读不看它。带 `reason` 是为了让"装不上"能一路传到回执里
+    —— 以前预检遇到不可插入的模组直接抛错，整条配装失败并回退（真机实测一次白烧 4 分钟），
+    而正确做法是**跳过这一颗、如实汇报**。
     """
 
     action: str
@@ -83,6 +88,24 @@ class LoadoutSubclassConfig(BaseModel):
     plug_sockets: dict[int, int] = Field(
         default_factory=dict,
         description="Exact subclass socket index to equipped plug hash",
+    )
+    socket_states: dict[int, bool] = Field(
+        default_factory=dict,
+        description=(
+            "Subclass socket index → whether the account says that socket is enabled "
+            "(`DestinyItemSocketState.isEnabled`). A disabled socket cannot be written "
+            "through Bungie.net (upstream 500 DestinySocketActionNotAllowed), so callers "
+            "must not place plugs there"
+        ),
+    )
+    fragment_sockets: list[int] = Field(
+        default_factory=list,
+        description=(
+            "Subclass socket indices the account reported as fragment sockets, including "
+            "the ones that are disabled (the live profile puts the `空碎片插槽` placeholder "
+            "in those) and the ones that had no socket state at all. Exact socket indices "
+            "are not guessable from position, so the ones we read are recorded here"
+        ),
     )
 
 

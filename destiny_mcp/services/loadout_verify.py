@@ -1,9 +1,9 @@
 """装备回读核对的两个**入口**：装备这一趟（`verify_loadout`）与回滚那一趟
 （`verify_restored_items`）—— 各自去读一份 profile，然后交给 `loadout_matches` 逐项比。
 
-搬出 `loadout_equipment_service.py` 的原因和其他 mixin 一样 —— 那个文件贴着体量上限，
-而"回读核对"本来就不属于"执行"：它是**证据**，两边都要用同一份判据，放在执行流程里就迟早
-会各写一份。以模块函数挂在 `owner`（`LoadoutEquipmentService`）上取 `_resolver` / `_manifest`。
+搬出 `loadout_equipment_service.py` 的原因和其他 mixin 一样（那个文件贴着体量上限），而
+"回读核对"本来就不属于"执行"：它是**证据**，两边共用同一份判据。模块函数挂在 `owner` 上，
+`_resolver` / `_manifest` 从它身上取。
 
 **一个窗口、一份判据、一句话**：判据在 `loadout_matches`（hash 两边归一，真机数字在那边），
 窗口在 `write_readback.read_until`，结论与话术在 `readback_verdict`。写入有 3～10 秒同步窗口，
@@ -20,6 +20,7 @@ from ..exceptions import describe_exception
 from ..logging_config import get_logger
 from ..models import Loadout, LoadoutItem
 from .item_parser import parse_items_from_profile
+from .loadout_blocked_mods import PREFLIGHT, UPSTREAM, BlockedMods
 from .loadout_matches import plugs_present, sockets_match, subclass_matches
 from . import profile_components, write_readback
 
@@ -60,7 +61,7 @@ async def verify_loadout(owner: Any, player_name: str, loadout: Loadout) -> bool
 
 
 async def readback_verdict(
-    owner: Any, player_name: str, loadout: Loadout, *, blocked_count: int = 0
+    owner: Any, player_name: str, loadout: Loadout, *, blocked: BlockedMods
 ) -> tuple[str, bool]:
     """按 `write_readback` 的窗口重读一遍，返回**这一趟的结论与话术**（`(detail, verified)`）。
 
@@ -68,16 +69,16 @@ async def readback_verdict(
     别当成没装上"，外层拿自己那次读覆盖成"对不上"（真机 2026-10-03 第 3 轮）。调用方只许
     拿这个返回值去写 `verify` 步骤与 message，**不许自己再措辞、更不许自己再读**。
 
-    `blocked_count` > 0 = 有模组被上游拒绝写入：那几颗**永远**不在账号上，核对必然不通过，
-    所以**一次都不读** —— 真机 2026-10-03 实测跑满窗口 70.13 秒（8 次读 59.63 + 7 次 sleep
-    10.5），等的是一个已知的 False；而且 `verify_loadout` 在**第一个不一致处**就返回，
-    "核对过一部分"这种说法本来就立不住。
+    `blocked` = 这一趟写不成的模组：**计划目标态里的那些一颗都不许漏**，它们永远不会在账号
+    上成立、核对必然不通过，所以**一次都不读**（真机实测空等 70.13 秒）。哪些算、为什么，
+    判据只有 `loadout_blocked_mods` 一处；这里只按它给的结论措辞，不自己重判。
     """
-    if blocked_count:
+    if blocked.stops_readback:
         return (
-            f"这次没有回读核对：{blocked_count} 颗模组被上游拒绝写入（见 mod_blocked 步骤），"
-            "核对注定不通过，所以一次都没读 —— 装备与子职业那一半这次没有独立证据"
-            "（写入步骤报的是成功，但别把'没核对'当成'没装上'）。",
+            f"这次没有回读核对：计划要写的模组里有 {blocked.stopped(UPSTREAM)} 颗被上游拒绝、"
+            f"{blocked.stopped(PREFLIGHT)} 颗在组件 207 预检就被判死（见 steps.mod_blocked）"
+            "——它们都不在账号上，核对注定不通过，所以一次都没读；装备与子职业那一半这次"
+            "没有独立证据（写入步骤报的是成功，但别把'没核对'当成'没装上'）。",
             False,
         )
     try:
@@ -136,9 +137,7 @@ async def verify_restored_items(
         for item in parse_items_from_profile(profile, owner._manifest)
     }
     equipped_ids = _equipped_instance_ids(profile)
-    sockets_data = (
-        profile.get("itemComponents", {}).get("sockets", {}).get("data", {})
-    )
+    sockets_data = profile.get("itemComponents", {}).get("sockets", {}).get("data", {})
     for original in target_states.values():
         current = current_items.get(original.item_instance_id)
         if current is None or current.location != original.source_location:

@@ -211,7 +211,9 @@ async def test_functional_mod_skips_when_it_cannot_fit() -> None:
         used_energy=10, capacity=11,
     )
 
-    assert [op.action for op in operations] == ["blocked"]
+    assert [op.action for op in operations] == ["skipped"], (
+        "动作记 `skipped` 而不是 `blocked`：这一颗不在计划目标态里，回读核对不许被它拦下"
+    )
     assert "能量不够" in operations[0].reason
     assert item.mod_sockets == {}, "没写进去的槽不能进 mod_sockets（否则回读会把成功判成失败）"
 
@@ -246,7 +248,9 @@ async def test_functional_mod_skips_when_not_insertable() -> None:
         used_energy=8, capacity=11,
     )
 
-    assert [op.action for op in operations] == ["blocked"]
+    assert [op.action for op in operations] == ["skipped"], (
+        "同上：`skipped` 不拦回读（`blocked` 才拦 —— 那一档只留给计划目标态里的那颗）"
+    )
     assert "没找到可用的槽" in operations[0].reason
     assert "游戏里同样装不上" not in operations[0].reason, "无证据的断言不许写进回执"
 
