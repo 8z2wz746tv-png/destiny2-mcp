@@ -51,6 +51,7 @@ from ..build.ranking import rank_results
 from ..build.snapshot_version import snapshot_version
 from .build_tuning import apply_local_tuning, solve_with_tuning
 from .build_candidates import BuildCandidateStore, describe_candidate
+from .build_execution_guard import recheck_confirmed_build
 from .build_fragments import replace_fragment_config
 from .build_results import (
     canonical_subclass,
@@ -736,38 +737,17 @@ class BuildService:
                 "message": "配装包含无效模组 Hash，请重新生成配装。",
             }
 
-        snapshot = await self._inventory.get_armor_snapshot(
-            player_name, normalized_character
+        # 写账号之前的最后一段只读闸：重取现场 → 执行前提复检（格满 / 与当前金装冲突，
+        # ADR-022 的判据）→ 指纹比对 → 实例核对。四步的顺序与"为什么先查执行前提"写在
+        # `services/build_execution_guard` 的模块 docstring 里。
+        refusal = await recheck_confirmed_build(
+            inventory=self._inventory,
+            player_name=player_name,
+            character=normalized_character,
+            build=build,
         )
-        current_version = snapshot_version(snapshot)
-        if current_version != build.snapshot_version:
-            return {
-                "success": False,
-                "code": "stale_inventory_snapshot",
-                "message": "生成配装后库存或护甲状态已变化；为避免装备另一套，请重新求解并确认。",
-                "expected_snapshot_version": build.snapshot_version,
-                "current_snapshot_version": current_version,
-            }
-
-        current_items = {
-            armor.item_instance_id: armor
-            for collection in (
-                snapshot.helmets,
-                snapshot.gauntlets,
-                snapshot.chests,
-                snapshot.legs,
-                snapshot.class_items,
-            )
-            for armor in collection
-        }
-        for item in build.items:
-            current = current_items.get(item.item_instance_id)
-            if current is None or current.item_hash != item.item_hash:
-                return {
-                    "success": False,
-                    "code": "exact_item_missing",
-                    "message": f"确认的装备实例 '{item.item_instance_id}' 已不存在或发生变化。",
-                }
+        if refusal is not None:
+            return refusal
 
         build = ExecutableBuild.model_validate(build.model_dump())
         loadout = Loadout(
@@ -778,7 +758,7 @@ class BuildService:
             subclass=canonical_subclass(build),
             source="build",
         )
-        result = await self._equipment.equip_exact(player_name, loadout)
+        result = await self._equipment.equip_with_recovery(player_name, loadout)
         return {
             "success": result.success,
             "character": normalized_character,

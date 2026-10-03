@@ -168,22 +168,27 @@ class SearchCoverage:
 
 @dataclass(frozen=True)
 class SearchDiagnostics:
-    """一次求解"关于自己"的全部信息：搜完了没有 + 每项属性**单独**能顶到多少。
+    """一次求解"关于自己"的全部信息：搜完了没有 + 每项属性**单独**能顶到多少 + 这次砍掉了什么。
 
     `reachable_ceilings` 按 `STAT_NAMES` 顺序，是"在其余属性仍满足下限的前提下，这一项
     最多能到多少"（`update_max_stats` 逐点试出来的，DIM 同源）。**逐项可达 ≠ 同时可达**：
     六个数放在一起并不能构成一套配装，回答时必须原样带上这句话（阶梯那边已经钉过同一条）。
+
+    `blocked_by` 是**执行前提**砍掉候选的原因（格子满搬不进来、与当前金装冲突），
+    中文句子、一条一句。它和"属性达不达得到"是两回事：0 候选时调用方必须能分清
+    "这套配不出来"与"这套装不上"（真机实测：后者会在写第一颗模组前整批回滚）。
     """
 
     coverage: SearchCoverage
     reachable_ceilings: list[int] = field(default_factory=list)
+    blocked_by: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         # 全 0 = "这一趟没有任何候选被验证过"，也就是**没量过** —— 不许当成"哪项都到不了"。
         # 门槛放在这里（形状的唯一出处），工具层只管照发；真机踩过：0 候选的响应里
         # 报了一排 0，读起来像"你什么都顶不上去"（P6 记录）。
         measured = any(self.reachable_ceilings)
-        return {
+        payload = {
             **self.coverage.to_dict(),
             "reachable": (
                 dict(zip(STAT_NAMES, self.reachable_ceilings)) if measured else {}
@@ -198,6 +203,11 @@ class SearchDiagnostics:
             if measured
             else None,
         }
+        # 没被砍就不占响应：`search` 这块的形状是钉过的（0 候选时的自证），
+        # 不能让每个响应都多一个恒为空的键。
+        if self.blocked_by:
+            payload["blockers"] = list(self.blocked_by)
+        return payload
 
 
 @dataclass

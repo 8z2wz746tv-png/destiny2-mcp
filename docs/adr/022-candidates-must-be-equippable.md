@@ -71,3 +71,5 @@
 - **不覆盖的**：`find` 与 `confirm` 之间账号状态变化（那一格被填满、换上了另一件金装）
   仍会在写入时撞上游错误。`snapshot_version` 刻意不含执行现场（见 `build/snapshot_version.py`：
   含了会让"捡到一件护甲"就作废手里的候选）。
+  **这一条已由 [ADR-024](024-recheck-premises-before-writing.md) 接手**：写入前按当时的现场
+  复检这两条前提（判据仍是这里的那一份），不再让上游 500/1641 来当判据。

@@ -91,6 +91,11 @@ for _hash, _slot in _SLOT_BUCKETS_SIGNED.items():
 
 ARMOR_SLOT_NAMES: dict[str, int] = {v: k for k, v in _SLOT_BUCKETS_SIGNED.items()}
 
+#: 求解器槽位的**规范顺序**（`InventorySnapshot` 的五个列表就是按它排的）。
+#: 谁要"逐部位过一遍"（执行前提的现场快照、组合规模估算、诊断话术）都用这一份，
+#: 别再各写一个元组 —— 顺序不一致时，按位置配对的两份数据会静默错位。
+SOLVER_SLOTS: tuple[str, ...] = ("helmets", "gauntlets", "chests", "legs", "class_items")
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Subclass base stat bonuses (hardcoded from Destiny 2 game data)
 # ═══════════════════════════════════════════════════════════════════════════

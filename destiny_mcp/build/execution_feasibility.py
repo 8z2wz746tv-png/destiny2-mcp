@@ -26,16 +26,19 @@
 （`character_class` 为空时三个角色混在一份快照里）时，这一条**不下结论**、不拦任何件 ——
 让上游去判，别编一个满/不满。反过来，只要判出来了就一定要拦（"多算顶多让用户白清一格，
 少算会去撞上游"）。
+
+**判据、以及每条约束的"出路"都在这儿**：出路是判据的反面（满格 → 腾一格；同类异域冲突 →
+先顶下那一件），写进件上的 `execution_blocker` 就是完整一句"哪条约束 + 怎么办"。
+**叙述**那一层（0 候选怎么解释、确认那一刻怎么拒绝）在 `execution_diagnosis` 与
+`services/build_execution_guard`：它们只读这一句，不另写判据、也不另写出路。
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from ..utils.hash_utils import to_unsigned
 from ..vocabulary import CLASS_LABELS_ZH, CLASS_TYPE_KEYS
 from .constants import ARMOR_SLOT_NAMES, SOLVER_SLOTS
 
@@ -48,9 +51,9 @@ __all__ = [
     "ExecutionFacts",
     "annotate",
     "blocked_pieces",
-    "exotic_conflict_reasons",
-    "full_bucket_reasons",
+    "exotic_way_out",
     "read_facts",
+    "vault_full_way_out",
 ]
 
 #: 仓库在 `from_profile` 里的位置标记（`Armor.source_location`）。
@@ -162,20 +165,48 @@ def _piece_type_label(manifest: ManifestManager, pieces: list[Armor]) -> str:
     return ""
 
 
+def vault_full_way_out(facts: ExecutionFacts, slot: str) -> str:
+    """格子满的**出路**（唯一出处：判据与出路是一件事的两面，所以在判据旁边）。
+
+    三个出口共用这一句：求解器的 0 候选诊断、分析器的结论、**确认那一刻的复检**
+    （`services/build_execution_guard` 直接把 `execution_blocker` 整句带出去）。
+    各写一句的后果是同一件事三种说法，改了一处另两处还留着旧出路。
+    """
+    return (
+        f"先在游戏里腾出{facts.label(slot)}格的一格（分解或转移到仓库别的位置），"
+        "再重新求解"
+    )
+
+
+def exotic_way_out(facts: ExecutionFacts) -> str:
+    """金装冲突的出路（同上：唯一出处）。说清"先顶下"这个动作，别只说"不能装"。"""
+    return (
+        f"①先用一件非异域{facts.label(facts.worn_exotic_slot)}把它顶下来"
+        '（inventory_assistant(intent="equip") 会给"先顶下、再装目标"的两步计划），'
+        "再重新求解；②或改选一件别的金装/不带金装"
+    )
+
+
 def _piece_blocker(armor: Armor, slot: str, facts: ExecutionFacts) -> str:
-    """这件为什么这次装不上（空串 = 能装）。"""
+    """这件为什么这次装不上、以及怎么办（空串 = 能装）。
+
+    带上出路是有意的：这一句会被**确认那一刻**原样拿去当拒绝理由（写入前复检），
+    "只报装不上"会把读的人指去降属性目标 —— 那是错的方向。
+    """
     if armor.source_location == VAULT_LOCATION and facts.blocks_vault_piece(slot):
         bucket = facts.buckets[slot]
         return (
             f"「{armor.name}」在仓库里，而{facts.character_label}的{facts.label(slot)}"
             f"格已经满了（{bucket.used}/{bucket.capacity}）：搬运会撞上游 "
             "DestinyNoRoomInDestination（装备要求东西先在角色身上）。"
+            f"出路：{vault_full_way_out(facts, slot)}。"
         )
     if armor.is_exotic and not facts.allows_exotic_in(slot):
         return (
             f"「{armor.name}」是异域{facts.label(slot)}，而{facts.character_label}"
             f"正穿着异域「{facts.worn_exotic_name}」（{facts.label(facts.worn_exotic_slot)}）："
             "同类异域只能装备一件，批量装备会回 1641 DestinyItemUniqueEquipRestricted。"
+            f"出路：{exotic_way_out(facts)}。"
         )
     return ""
 
@@ -197,61 +228,3 @@ def annotate(
 def blocked_pieces(snapshot: InventorySnapshot, slot: str) -> list[Armor]:
     """这一部位里"这次装不上"的件（给分析器数"砍掉了多少件"用）。"""
     return [armor for armor in snapshot.get_slot(slot) if armor.execution_blocker]
-
-
-def full_bucket_reasons(snapshot: InventorySnapshot) -> list[str]:
-    """哪些格满了、仓库里有多少件因此搬不进来（一条一句话；没满给空表）。"""
-    facts: ExecutionFacts = snapshot.execution
-    reasons: list[str] = []
-    for slot in SOLVER_SLOTS:
-        if not facts.blocks_vault_piece(slot):
-            continue
-        blocked = blocked_pieces(snapshot, slot)
-        bucket = facts.buckets[slot]
-        reasons.append(
-            f"{facts.character_label}的{facts.label(slot)}格已经满了"
-            f"（{bucket.used}/{bucket.capacity}），仓库里那 {len(blocked)} 件搬不进来"
-            "（上游会回 DestinyNoRoomInDestination）—— 这次只从他身上/背包里已有的"
-            f"{facts.label(slot)}里挑。要用仓库那几件：先在游戏里腾出一格"
-            "（分解或转移到仓库别的位置），再重新求解。"
-        )
-    return reasons
-
-
-def exotic_conflict_reasons(
-    snapshot: InventorySnapshot,
-    exotic_hashes: Iterable[int],
-    name_of: Callable[[int], str],
-) -> list[str]:
-    """**指定的**金装与角色正穿着的另一件金装冲突时，说清是哪两件（空表 = 不冲突）。
-
-    只看"请求里指定的金装"：没指定金装时求解器会自己避开冲突的部位（那是它的选择，
-    不是用户被挡住的理由），只有用户点名要的那件被挡住才需要解释。
-    """
-    facts: ExecutionFacts = snapshot.execution
-    if not facts.worn_exotic_slot:
-        return []
-    # 归一在这里做：快照里的 `item_hash` 是无符号（Bungie 给的原值），而 `exotic_hashes`
-    # 可能来自 `manifest.search`（有符号）。裸比会**静默失效** —— 这个坑在本仓库复现过
-    # 多次（见 `build/constraints.allowed_exotic_hashes`）。
-    wanted = {to_unsigned(int(item_hash)) for item_hash in exotic_hashes if item_hash}
-    if not wanted:
-        return []
-    for slot in SOLVER_SLOTS:
-        if slot == facts.worn_exotic_slot:
-            continue
-        for armor in snapshot.get_slot(slot):
-            if to_unsigned(int(armor.item_hash)) not in wanted:
-                continue
-            return [
-                f"指定的金装「{name_of(armor.item_hash) or armor.name}」是"
-                f"{facts.label(slot)}部位的，"
-                f"而{facts.character_label}当前穿着异域「{facts.worn_exotic_name}」"
-                f"（{facts.label(facts.worn_exotic_slot)}）：同类异域只能装备一件，"
-                "一次性装备会撞 1641 DestinyItemUniqueEquipRestricted（真机实测：整批回滚、"
-                "0 颗模组落地）。出路：①先用一件非异域"
-                f"{facts.label(facts.worn_exotic_slot)}把它顶下来"
-                '（inventory_assistant(intent="equip") 会给"先顶下、再装目标"的两步计划），'
-                "再重新求解；②或改选一件别的金装/不带金装。"
-            ]
-    return []

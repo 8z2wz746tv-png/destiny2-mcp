@@ -24,10 +24,12 @@ from .armor_rules import (
     tuning_options,
 )
 from .constants import SOLVER_SLOT_TO_LOADOUT
+from .execution_feasibility import ExecutionFacts, annotate as _annotate_execution
 from .constants import (
     REQUEST_TARGET_FIELDS,
     ARMOR_SLOT_MAP,
     NAME_TO_STAT_HASH,
+    SOLVER_SLOTS,
     STAT_HASH_TO_NAME,
     STAT_NAMES,
     MAIN_STAT_HASHES,
@@ -190,6 +192,11 @@ class Armor(BaseModel):
     #: 求解器只能拿**剩下的**能量装属性模组 —— 见 `armor_to_process_item` 与
     #: docs/plans/SOLVER_OPTIMALITY_PLAN.md 四·十六。**一般插槽里那颗不算**（它会被替换掉）。
     energy_used_by_other_mods: int = 0
+    #: 上面那条的**账号那一半**：已装部位模组实际占掉的能量（不含照抄模板的"预留额度"）。
+    #: 为什么单列：预算取的是 `max(已装, 预留)`，而写入那一刻**没有预留额度**（它来自求解请求
+    #: 参数），所以只有这一项能在求解与执行两侧算出同一个值 —— 指纹认它、不认上面那条，
+    #: 否则带功能模组的候选会在确认时被判成"库存变了"（见 `build/snapshot_version`）。
+    installed_mod_energy: int = 0
     #: 这件护甲**允许装**的调谐插件 hash（组件 310 的清单）。**空 = 读不到，缺数据 ≠ 允许** ——
     #: 求解器不许拿 Manifest 那份全局 32 颗当选项（每件实际只开放"某一个属性 +5"的 5 颗
     #: + 平衡调整，真机实测见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 四·十四）。
@@ -205,6 +212,11 @@ class Armor(BaseModel):
     source_location: str = ""
     source_character_id: str = ""
     is_equipped: bool = False
+    #: 这次装备流程**能不能用到这件**（空 = 能）。判据是账号现场，不是属性 ——
+    #: 详见 `build/execution_feasibility`：仓库件遇上满格（上游 NoRoomInDestination）、
+    #: 与角色正穿着的另一件金装冲突（上游 1641）。求解器只从没有这一项的件里挑，
+    #: 所以"求解出来的方案一定装得上"，而不是写完才发现装不上。
+    execution_blocker: str = ""
 
 
 def _load_stat_mod_definitions(
@@ -285,6 +297,9 @@ class InventorySnapshot(BaseModel):
     legs: list[Armor] = Field(default_factory=list)
     class_items: list[Armor] = Field(default_factory=list)
     stat_mod_definitions: list[StatModDefinition] = Field(default_factory=list)
+    #: 这次装备的**执行现场**（角色当前穿的金装、各格还剩几位）：与护甲列表来自同一次
+    #: profile 读取，所以挂在快照上而不是另取一次。判定与话术见 `execution_feasibility`。
+    execution: ExecutionFacts = Field(default_factory=ExecutionFacts)
 
     @property
     def total_pieces(self) -> int:
@@ -662,6 +677,8 @@ class InventorySnapshot(BaseModel):
                     other_mod_energy,
                     int((reserved_mod_energy or {}).get(SOLVER_SLOT_TO_LOADOUT.get(slot, slot), 0) or 0),
                 ),
+                # 账号那一半单独留一份：指纹只认它（两侧都算得出来的那个值）。
+                installed_mod_energy=other_mod_energy,
                 armor3_roll_verified=armor3_roll_verified,
                 roll_parse_error=roll_parse_error,
                 is_artifice=is_artifice,
@@ -728,14 +745,22 @@ class InventorySnapshot(BaseModel):
                 if armor is not None:
                     getattr(snapshot, armor.slot).append(armor)
 
+        # 执行现场与"这件这次装不装得上"必须在这里算：账号事实刚解析完、请求还没进来。
+        # 晚一步的代价是真机实测过的（求解器挑了满格里的仓库件 → 写入 0 颗模组就中止）。
+        snapshot.execution = _annotate_execution(snapshot, target_class_type, manifest)
+
         logger.debug(
             "InventorySnapshot built: %d helmets, %d gauntlets, %d chests, "
-            "%d legs, %d class_items",
+            "%d legs, %d class_items (%d pieces blocked by the equip context)",
             len(snapshot.helmets),
             len(snapshot.gauntlets),
             len(snapshot.chests),
             len(snapshot.legs),
             len(snapshot.class_items),
+            sum(
+                len([a for a in snapshot.get_slot(slot) if a.execution_blocker])
+                for slot in SOLVER_SLOTS
+            ),
         )
         return snapshot
 
@@ -1000,6 +1025,14 @@ class BuildAnalysis(BaseModel):
     """Failure analysis when no build satisfies constraints."""
 
     reason: str = Field(description="Why no build was found")
+    blocked_by: list[str] = Field(
+        default_factory=list,
+        description=(
+            "被**执行前提**挡下的原因（格子满搬不进来、与角色正穿着的金装冲突），逐条中文。"
+            "非空 = 这次没有候选不是「属性不够」，而是「装不上」——下一步是腾格子/先顶下金装，"
+            "不是降属性目标。判据与话术的唯一出处：`build/execution_feasibility`。"
+        ),
+    )
     max_possible: dict[str, int] = Field(
         default_factory=dict,
         description="Max achievable stats given current inventory",

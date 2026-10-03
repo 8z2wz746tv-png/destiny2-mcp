@@ -30,6 +30,9 @@
 | [ADR-019](019-disambiguation-is-not-a-failure.md) | 「同名多件，先选一件」回 `item_disambiguation_required`（没写也没失败），不是 `move_failed`；候选只在信封里发一份，`next_actions` 告诉调用方拿 `question` 去问 | accepted |
 | [ADR-020](020-functional-mods-are-copied.md) | 社区配装的**功能模组照抄**（抗性/搜寻/回收这类流派取向，不进求解器）；求解器只让出它们占的能量，插不进/装不下就跳过并点名 | accepted |
 | [ADR-021](021-default-exit-gives-rows-and-references.md) | 默认出口只给**行 + 引用**：`find`/`recommend` 不再带 `build`/`canonical_build`（`execution_id` 成唯一引用、TTL 30 分钟），`duplicates` 的 perk 压成 `{name, slot}`；详情走确认信封 | accepted |
+| [ADR-022](022-candidates-must-be-equippable.md) | 求解器不许产出**注定装不上**的候选：格满搬不进来（`NoRoomInDestination`）与"另一部位还穿着异域"（1641）在求解阶段判死、0 候选必须说清是哪条约束卡的 | accepted |
+| [ADR-023](023-one-call-readback-for-equipped-mods.md) | 独立回读要有**一次调用拿全**的入口：`inventory_assistant(intent="mods")` 一次读回已装备护甲的插槽（槽行与 `intent="item"` 同形状），不替代写入路径的 `verify` | accepted |
+| [ADR-024](024-recheck-premises-before-writing.md) | 写账号前按**当时**的现场复检 ADR-022 那两条执行前提（判据仍是同一份，不重解）；指纹只收"写入前复算得出来的求解输入"（补入已装功能模组的能量占用） | accepted |
 
 ## 编号规矩
 

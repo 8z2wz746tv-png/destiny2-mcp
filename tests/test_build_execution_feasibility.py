@@ -9,12 +9,15 @@
   `DestinyItemUniqueEquipRestricted`，全量回滚。
 
 两条判据现在落在**件上**（`Armor.execution_blocker`，出处 `build/execution_feasibility`）：
-求解器只从没有这一项的件里挑，分析器与规模闸门读同一份标注。这个文件钉四件事：
+求解器只从没有这一项的件里挑，分析器与规模闸门读同一份标注。这个文件钉五件事：
 
 1. 那两个场景下**求解器不会再给出注定失败的候选**（有解时选能装的，无解时如实报原因）；
 2. 原因要说清**是哪条约束卡的**（1641 / NoRoomInDestination + 是哪两件/哪一格）；
 3. 读不到就不下结论（桶定义缺失、认不出唯一角色时**一件都不许拦**）；
-4. 闸门数的是**同一个空间**（装不上的件不计入组合规模）。
+4. 闸门数的是**同一个空间**（装不上的件不计入组合规模）；
+5. **确认那一刻要复检**（(c) 段）：求解时判过的两条前提，到"用户点确认"时不必然还成立 ——
+   写入层以前只比库存指纹，而 `snapshot.execution` 刻意不进指纹（见 `build/snapshot_version`），
+   指纹一样证明不了它们还成立；撞上游就是整批回滚、0 颗模组落地。
 """
 
 from __future__ import annotations
@@ -31,7 +34,9 @@ os.environ.setdefault("BUNGIE_CLIENT_SECRET", "dummy")
 
 from destiny_mcp.build import analyzer  # noqa: E402
 from destiny_mcp.build.constraints import parse as parse_constraints  # noqa: E402
+from destiny_mcp.build.execution_feasibility import annotate  # noqa: E402
 from destiny_mcp.build.models import BuildConstraints, BuildRequest, InventorySnapshot  # noqa: E402
+from destiny_mcp.build.snapshot_version import snapshot_version  # noqa: E402
 from destiny_mcp.build.solver import solve  # noqa: E402
 from destiny_mcp.services.build_service import BuildService  # noqa: E402
 from destiny_mcp.tools import _build_flow  # noqa: E402
@@ -466,3 +471,125 @@ def _request_fields() -> dict:
         "grenade_target": 50, "melee_target": None, "super_target": None,
         "character_class": "warlock",
     }
+
+
+# ── (c) 确认那一刻的复检：ADR-022 只覆盖了"求解那一刻" ─────────────────────
+#
+# 真机代价（同上两次白跑）：求解阶段判过的两条前提，到了用户点确认时可能已经不成立，
+# 而写入层以前只比"库存指纹"——`snapshot.execution` 刻意不进指纹，指纹一样证明不了
+# 它们还成立；撞上游的结果是整批回滚、0 颗模组落地。
+#
+# 复检的判据就是求解那一刻写在件上的 `execution_blocker`（唯一出处
+# `build/execution_feasibility`，连同"哪条约束 + 出路"整句），写入前换一份**刚重取**的
+# 现场重读一遍；判决落不落地的顺序与理由在 `services/build_execution_guard` 的 docstring。
+
+
+def _confirm_service(manifest: _Manifest, snapshot: InventorySnapshot) -> BuildService:
+    service = BuildService(MagicMock(), manifest, MagicMock())
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
+    service._equipment.equip_with_recovery = AsyncMock()
+    return service
+
+
+async def _candidate_containing(
+    service: BuildService, request: BuildRequest, instance_id: str
+) -> object:
+    """跑一次真 `find_build`，取回包含指定实例的那份候选（顺带验证它真会签发出来）。"""
+    results = await service.find_build("Tester#1234", request, [])
+    return next(
+        result.canonical_build
+        for result in results
+        if any(item.item_instance_id == instance_id for item in result.canonical_build.items)
+    )
+
+
+@pytest.mark.asyncio
+async def test_equip_build_rechecks_the_premises_the_find_stage_could_not_judge() -> None:
+    """求解读不到桶容量时不拦件（"没探成"≠"装不上"）→ 确认时读到了就必须自己判。
+
+    这一条**只能**由写入前的复检抓到：两次读的是**同一份账号现场**，护甲行逐字段相同，
+    `snapshot_version` 也相同（`execution` 刻意不进指纹）—— 指纹比对给不出任何信号。
+
+    注入验证：去掉 `build_execution_guard.recheck_confirmed_build` 里 `refusals` 那段判断
+    → 本用例红（会一路走到 `equip_with_recovery`，真机上就是上游 500 + 整批回滚、0 颗模组落地）。
+    """
+    at_find = _snapshot(bucket_counts=False)
+    service = _confirm_service(_Manifest(bucket_counts=False), at_find)
+    build = await _candidate_containing(
+        service,
+        BuildRequest(character_class="warlock", grenade_target=50),
+        "gauntlet-vault",
+    )
+
+    assert build.snapshot_version == snapshot_version(_snapshot()), (
+        "两次读的是同一份账号现场：指纹一样，所以这条只能靠写入前的复检"
+    )
+
+    service._manifest = _Manifest()  # 确认这一刻桶定义读得到（现场本身没变）
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=_snapshot())
+    result = await service.equip_build("Tester#1234", build, "warlock")
+
+    assert result["code"] == "execution_precondition_failed"
+    assert "DestinyNoRoomInDestination" in result["message"]
+    assert "10/10" in result["message"], "要说清是哪一格、满到什么程度"
+    assert "先在游戏里腾出" in result["message"], (
+        "要给出路（腾一格）：只报装不上，下一步会被指去降属性目标"
+    )
+    assert result["blockers"]
+    service._equipment.equip_with_recovery.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_equip_build_refuses_when_the_bucket_filled_up_after_find() -> None:
+    """求解时臂铠格 9/10、确认时 10/10：拒绝理由是"腾一格"，不是泛泛的"重新求解"。
+
+    这件事用户真的会做（求解完回游戏里捡东西/挪装备）。指纹这时**也**对不上，而复检排在
+    指纹比对之前 —— 两个信号都指向"别写"，但只有前者说得清是哪条约束、出路是什么。
+    """
+    at_find = _snapshot(on_character_gauntlets=9)
+    service = _confirm_service(_Manifest(), at_find)
+    build = await _candidate_containing(
+        service,
+        BuildRequest(character_class="warlock", grenade_target=50),
+        "gauntlet-vault",
+    )
+
+    service._inventory.get_armor_snapshot = AsyncMock(
+        return_value=_snapshot(on_character_gauntlets=10)
+    )
+    result = await service.equip_build("Tester#1234", build, "warlock")
+
+    assert result["code"] == "execution_precondition_failed"
+    assert "臂铠" in result["message"] and "10/10" in result["message"]
+    assert "先在游戏里腾出" in result["message"]
+    service._equipment.equip_with_recovery.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_equip_build_refuses_when_the_worn_exotic_changed() -> None:
+    """确认前换上了另一件金装：写入前按当时的现场复检，报 1641 与"先顶下"的出路。
+
+    求解那一刻他身上没有异域（胸前是普通胸甲），异域头盔合法；确认时胸口已经是「星火协议」，
+    同一件头盔就撞 1641 —— 上游的答案是整批回滚，所以必须在这里拦住。
+    """
+    at_find = _snapshot()
+    worn = next(a for a in at_find.chests if a.item_hash == WORN_EXOTIC_CHEST)
+    plain = next(a for a in at_find.chests if a.item_hash == PLAIN_CHEST)
+    worn.is_equipped, plain.is_equipped = False, True
+    # 现场变了就得重算标注：判据只有一份（`execution_feasibility.annotate`），别自己写一遍
+    at_find.execution = annotate(at_find, 2, _Manifest())
+    service = _confirm_service(_Manifest(), at_find)
+    build = await _candidate_containing(
+        service,
+        BuildRequest(character_class="warlock", exotic_name="光耀之冠"),
+        "helmet-exotic",
+    )
+
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=_snapshot())
+    result = await service.equip_build("Tester#1234", build, "warlock")
+
+    assert result["code"] == "execution_precondition_failed"
+    assert "1641" in result["message"] and "光耀之冠" in result["message"]
+    assert "星火协议" in result["message"], "要说清是与哪一件冲突"
+    assert "先用一件非异域" in result["message"], "出路"
+    service._equipment.equip_with_recovery.assert_not_awaited()
