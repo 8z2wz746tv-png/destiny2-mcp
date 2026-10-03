@@ -37,6 +37,15 @@ For any agent, not only Codex:
   **规矩**：注入后 `touch` 源文件，并用 `PYTHONDONTWRITEBYTECODE=1` 跑；恢复后用 `cmp`/sha256
   **逐字节核对**，别只看测试颜色。这条比上一条更底层：**它让"注入验证"这个动作本身失效**，
   而后者是整套路数可信的地基。
+- **同一文件被并发改时，先确认"谁是写者"再裁定**：多 agent 同时干活时，**报告者的自述不是写入证据**。
+  （2026-10-04 踩到：两个 agent 并发改 `scripts/benchmark_equip_chain.py`，我按"报告者=写者"去裁定，
+  判给了错的那个人 —— 真正在写的是另一个实例，报告者全程一个字节都没写。）
+  **规矩**：收尾裁定之前自己核一遍 `shasum -a 256 <文件>` 与 `git status --short`，拿**最终字节**
+  说话；别信任何一份报告的自述，也别按报告去追责或"恢复"。
+- **`subagent` 派出去的进程无法寻址**：它不在 teammate 名单里，`send_message` 会回
+  `active teammate not found` —— **主会话看不到它的状态，只能等它汇报**。所以：
+  ①派活前把要求写全（它中途问不了）；②**别为了"怕它没在干活"而重复派同一个任务** ——
+  那会变成两个写者改同一个文件，正是上一条那种事故的来源。
 - 改了 `skills/**` 之后**一定**跑 `scripts/install_skill.py`：`~/.dsh/skills/` 是宿主真正读的那份，
   不跑就是"文档改了但 agent 看到的还是旧版"（子代理常常会漏这一步，主会话要兜住）。
 
@@ -289,7 +298,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/design/DESKTOP_SHELL.md` — 要动桌面客户端的外壳（导航模型、工作区形态、装备页尺寸、数据来源标签、Flutter 落地）之前看它：token 与尺寸出自老 webui 的 `tokens.css`/`AppShell.tsx`/`inventory.css`，附可点击原型与三张实拍图。
 - `docs/plans/ARMOR_FORMAT_PLAN.md` — 动护甲载荷格式（体积口径、字段取舍）之前看实机证据与取舍。
 - `docs/plans/EQUIP_FLOW_PLAN.md` — 动装备流程（候选签发 → `confirmed` → 回读）之前看它为什么长这样。
-- `docs/plans/EQUIP_WRITE_PATH_PLAN.md` — 动装备**写入路径**（求解前提 → 确认复检 → 预检次序 → 写入 → 回读/回滚）之前看它：2026-10-03 那一轮逐条的证据等级（故障侧是真机原文、修复侧只有单测）、验收点、**未取得**清单，以及 ADR-024 结尾「三条注入」的可核对记录在哪一节。
+- `docs/plans/EQUIP_WRITE_PATH_PLAN.md` — 动装备**写入路径**（求解前提 → 确认复检 → 预检次序 → 写入 → 回读/回滚）之前看它：2026-10-03 那一轮逐条的证据等级（故障侧是真机原文）、**2026-10-04 真机轮的修复侧结果**（§八：回读跳过、写入回执、逐槽还原、分段实测）、验收点、仍然**未取得**的清单（§六），以及 ADR-024 结尾「三条注入」的可核对记录在哪一节。
 - `docs/plans/HOST_COMPAT_PLAN.md` — 要支持「只发标量」的宿主（豆包 connector 这类）时看它：哪些参数收文本写法、为什么 `equip_build` 改成也能收 `execution_id`、守门在哪。
 - `docs/plans/PVP_STATS_PLAN.md` — 动生涯/赛季战绩（计数器 vs 统计接口、模式与角色范围标注）之前看它为什么分三档。
 - `docs/plans/LEGACY_SURFACE_REMOVAL_PLAN.md` — 要动历史工具面（`full`/`expert` profile、`ENABLE_LEGACY_TOOLS`）或配装导入入口之前看它：删什么、导入怎么搬、怎么验都在里面。
