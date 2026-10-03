@@ -13,7 +13,7 @@ from .. import config
 from ..exceptions import BuildTooLargeError
 from ..logging_config import get_logger
 from .constants import SOLVER_SLOTS
-from .execution_feasibility import exotic_conflict_reasons, full_bucket_reasons
+from .execution_diagnosis import exotic_conflict_reasons, full_bucket_reasons
 from .models import (
     STAT_NAMES,
     BuildAnalysis,
