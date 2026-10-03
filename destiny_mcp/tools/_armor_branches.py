@@ -24,6 +24,64 @@ from ..services.armor_payload import armor_payload
 from ..vocabulary import STAT_LABELS_ZH as _STAT_LABELS  # 六维中文名的单一出处
 
 
+async def armor_read(
+    svc: Any,
+    player_name: str,
+    intent: str,
+    item_instance_id: str,
+    character: str,
+) -> dict:
+    """`inventory_assistant` 的两个**只读**护甲入口：`item`（单件）与 `mods`（多件插槽）。
+
+    合在一个分派里是为了让 `assistants.py` 不涨行（它贴着上限），两个 intent 各自的分支
+    紧接着在下面，谁读哪些参数一目了然。
+    """
+    if intent == "mods":
+        return await equipped_armor_mods(svc, player_name, character)
+    return await armor_item(svc, player_name, item_instance_id)
+
+
+async def equipped_armor_mods(svc: Any, player_name: str, character: str) -> dict:
+    """`inventory_assistant(intent="mods")`：一次读回已装备护甲的插槽（**独立回读**）。
+
+    谁需要它：写入回执里的 `verify` 步骤是**写入路径内部的自证**，要拿第二条证据核对
+    "现在到底装着什么"时，以前只能逐件 `intent="item"` —— 那是 N+1，语料实测 13.9 秒/件、
+    五件 ≈ 70 秒。这里一次 profile 读取（组件 305 覆盖全账号插槽，实测 0.85 秒）就够了。
+
+    只给"哪件、哪个槽、装着哪颗"：属性/词条那三层在 `intent="item"` 里（那是**一件**的
+    完整载荷）；这里要的是**多件**的插槽快照，两者槽行形状相同（同一个形状工厂）。
+    """
+    payload = await svc["inventory_svc"].get_equipped_armor_mods(player_name, character)
+    blocks = payload.get("characters") or []
+    total = sum(block["item_count"] for block in blocks)
+    labels = "、".join(
+        block["class_display"] or block["character"] for block in blocks
+    ) or "（没有装备护甲）"
+    warnings: list[str] = []
+    incomplete = [
+        block for block in blocks if block["item_count"] != 5
+    ]
+    if incomplete:
+        warnings.append(
+            "这些角色身上读回的护甲不是 5 件（某个部位没装备或读不到）："
+            + "、".join(
+                f"{block['class_display'] or block['character']} {block['item_count']} 件"
+                for block in incomplete
+            )
+        )
+    return ok_response(
+        f"已读回 {labels} 身上 {total} 件护甲的插槽（**一次调用**；每件的 mods 就是现在装着的模组）。",
+        {"equipped_armor": payload},
+        next_actions=[
+            "核对某一颗：看那件 mods 里对应槽的 name/plug_hash（kind 说明是属性模组、"
+            "部位功能模组还是调谐），与写入回执里的 steps 对一遍。",
+            '要**一件**的完整载荷（能量、三层属性、词条、能不能调谐）用 intent="item"；'
+            '要换模组用 intent="equip_mod"（要确认）。',
+        ],
+        warnings=warnings,
+    )
+
+
 async def armor_item(svc: Any, player_name: str, item_instance_id: str) -> dict:
     """`inventory_assistant(intent="item")`：一件护甲的完整载荷。
 

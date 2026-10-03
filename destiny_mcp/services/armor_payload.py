@@ -20,6 +20,7 @@ from typing import Any, Callable, Literal
 
 from ..build.armor_rules import balanced_tuning_bonus
 from ..build.constants import STAT_NAMES
+from .armor_class_item import CLASS_ITEM_PERK_CATEGORY_HASH
 from ..utils.hash_utils import to_unsigned
 from ..vocabulary import CLASS_LABELS_ZH as CLASS_DISPLAY
 from ..vocabulary import class_key
@@ -134,8 +135,7 @@ _SOCKET_KINDS: dict[str, tuple[str, bool]] = {
     "v460.plugs.armor.masterworks": ("masterwork", False),
     "core.gear_systems.armor_tiering.plugs.tuning.mods": ("tuning", True),
     "shader": ("shader", True),
-    # 异域护甲的固定属性分布藏在这里（实测：相对主义 的超能30/近战25 来自
-    # `至纯光能之灵`，不是 armor_stats 槽）—— 它和词条一样是"定死的"，算进 roll。
+    # 异域护甲的固定分布藏在这里（相对主义的 超能30/近战25 来自 `至纯光能之灵`）——算进 roll。
     "intrinsics": ("intrinsic", False),
 }
 
@@ -252,13 +252,16 @@ def armor_system_of(instance: dict[str, Any] | None) -> Literal["armor_3", "lega
     return "armor_3" if tier is not None else "legacy"
 
 
-def _sockets(
+def socket_rows(
     socket_entries: list[dict[str, Any]],
     lookup: DefinitionLookup,
-    *,
-    include_icons: bool = False,
 ) -> list[dict[str, Any]]:
-    """组件 305 → 插槽列表（短键、可改性、能量成本）。"""
+    """组件 305 → 插槽列表（短键、可改性、能量成本）。
+
+    公开出来给**一次读回多件**用（`inventory_service.get_equipped_armor_mods`）：
+    独立回读看到的 `mods` 必须与 `intent="item"` 的 `armor.sockets` **同一形状**，
+    否则"核对"要两套读法，两边迟早对不上。
+    """
     rows: list[dict[str, Any]] = []
     for index, entry in enumerate(socket_entries or []):
         plug_hash = int(entry.get("plugHash", 0) or 0)
@@ -318,7 +321,7 @@ def armor_payload(
     slot = slot_key_from_bucket(bucket)
 
     entries = sockets or []
-    socket_rows = _sockets(entries, lookup) if include_sockets else []
+    rows = socket_rows(entries, lookup) if include_sockets else []
 
     # 词条本体 / 大师 / 调谐：都从装着的 plug 读，不推断
     roll: dict[str, int] = {}
@@ -329,8 +332,9 @@ def armor_payload(
     mod_stats: dict[str, int] = {}
     archetype: dict[str, Any] | None = None
     raid_family: str | None = None
+    perks: list[dict[str, Any]] = []
 
-    for row, entry in zip(socket_rows, entries):
+    for row, entry in zip(rows, entries):
         plug_hash = row["plug_hash"] or 0
         if not plug_hash:
             continue
@@ -343,8 +347,10 @@ def armor_payload(
                 "name": row["name"] or "",
             }
         elif category in ("armor_stats", "intrinsics"):
-            # 两处都算"定死的属性分布"：armor_stats 是 3.0 的词条槽，
-            # intrinsics 是异域护甲写死的分布。玩家都改不了。
+            # 都算"定死的属性分布"（词条槽 / 异域护甲写死），玩家改不了。
+            if (plug_def.get("plug") or {}).get("plugCategoryHash") == CLASS_ITEM_PERK_CATEGORY_HASH:
+                # 职业金装那两个特性槽：名字进身份块，属性照旧并进 roll（至纯就是超能30/近战25）。
+                perks.append({"name": row["name"] or "", "item_hash": int(plug_hash), "stats": plug_stats})
             for key, value in plug_stats.items():
                 roll[key] = roll.get(key, 0) + value
         elif category == "v460.plugs.armor.masterworks":
@@ -445,16 +451,13 @@ def armor_payload(
             "icon_url": icon_url,
         },
         "instance": {
-            "item_instance_id": item_instance_id,
-            "location": location,
-            "character_id": character_id,
-            "power": power,
-            "is_equipped": is_equipped,
-            "quantity": quantity,
-            "energy": _energy(instance),
+            "item_instance_id": item_instance_id, "location": location, "character_id": character_id,
+            "power": power, "is_equipped": is_equipped, "quantity": quantity, "energy": _energy(instance),
         },
         "armor_schema_version": ARMOR_SCHEMA_VERSION,
     }
+    if perks:
+        payload["instance"]["class_item_perks"] = perks
     identity = payload["identity"]
     if archetype is not None:
         identity["archetype"] = archetype
@@ -480,7 +483,7 @@ def armor_payload(
             "notes": notes,
         }
     if include_sockets:
-        payload["sockets"] = socket_rows
+        payload["sockets"] = rows
         if raid_family:
             payload["instance"]["raid_family"] = raid_family
     return payload

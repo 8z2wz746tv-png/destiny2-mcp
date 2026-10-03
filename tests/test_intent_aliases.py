@@ -76,7 +76,11 @@ ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
 # ALIASES（canonical 或别名）或这里，两者都不是就让测试红掉——逼着做决定。
 STANDALONE: dict[str, tuple[str, ...]] = {
     "PlayerIntent": (),
-    "InventoryIntent": ("item", "move", "transfer", "equip", "equip_mod", "pull_postmaster", "lock"),
+    # `mods`（一次读回已装备护甲的插槽，②）没有别名：与 `item` 共用只读分派，
+    # 但两者读的东西不同（多件 vs 单件完整载荷），所以不是别名关系。
+    "InventoryIntent": (
+        "item", "mods", "move", "transfer", "equip", "equip_mod", "pull_postmaster", "lock",
+    ),
     "WeaponIntent": (
         "analyze", "filter_rolls", "god_roll", "type", "info", "stats",
         "perk_description", "catalyst", "community",

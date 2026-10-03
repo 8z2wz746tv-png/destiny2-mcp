@@ -67,6 +67,10 @@
 | search 未命中 | 说「没找到」，不反推「全账号没有」 |
 | item 缺实例 ID | `invalid_arguments`，不是裸抛 |
 | item 传 null | 干净信封（`AttributeError` 算 FAIL） |
+| mods（0.7.15 新增） | 一次调用读回**每一位**角色身上五件护甲的插槽行（`{slot, slot_key, name, item_instance_id, is_exotic, energy, mods[]}`）；`mods[]` 与 `item` 的 `armor.sockets` 同形状（`index/kind/name/plug_hash/energy_cost/empty`） |
+| mods + `character` | 只回那一位角色的块；三位角色的名字/职业标签照旧（`class_display` 中文来自词表） |
+| mods 只调一次上游 | 计数 profile 读取：**1 次**（逐件 `item` 是 N 次；语料实测 13.9 秒/件） |
+| mods 读回的护甲不是 5 件 | `warnings` 里点名哪一位少了几件，不静默 |
 
 ### weapon_assistant（0.1.11 / 0.1.12 新增口径）
 

@@ -73,6 +73,7 @@
 | `summary`（`summarize`、`概况`） | 背包／仓库数量概况 | `location`、`item_type`、`limit` |
 | `get`（`inventory`、`list`） | 列出物品清单 | `location`、`item_type`、`armor_slot`、`rarity` |
 | `item` | 单件护甲的完整载荷：插槽（含 `editable`）、能量、三层属性（`roll`/`base`/`final`）、大师与调谐、词条原型、套装 | `item_instance_id`（必填） |
+| `mods` | **一次读回已装备护甲的插槽**（哪个槽装着哪颗：`kind`/`name`/`plug_hash`/`energy_cost`）—— 写入回执之外要**独立核对**时用它，别逐件查 `item` | `character`（只读某一位；不给就三位都读） |
 | `search`（`find_item`） | 按名字找某件东西 | `item_name`、`location` |
 | `type`（`search_type`） | 按类型列物品 | `type_name`（或 `item_type`）、`location` |
 | `duplicates`（`duplicate_weapons`、`find_duplicates`、`重复武器`） | 按精确 `item_hash` 分组出重复武器 | `item_name`、`type_name`、`limit`、`offset` |
@@ -87,8 +88,14 @@
 
 列表保持轻量（**不带**插槽/能量）；要看插槽、能量、三层属性（`roll`/`base`/`final`）、
 大师与调谐、词条原型与套装，用 `inventory_assistant(intent="item", item_instance_id=…)`。
+
 `equip_build` 的确认请求里 `candidates[0].items_preview` 会逐件给出光等、能量、
 现有模组与将要装的模组。
+
+**要核对"身上五件现在装着什么"用 `intent="mods"`（一次调用）**，不要逐件 `intent="item"`：
+后者每件都重读一次整份 profile（实测 13.9 秒/件，五件 ≈ 70 秒），而 `mods` 一次读完
+（组件 305 覆盖全账号插槽）。两者的槽行形状相同（`kind`/`name`/`plug_hash`/`energy_cost`/`empty`），
+所以"写之前看一件、写之后核对五件"用的是同一套读法。
 
 写入（必须 `confirmed=true`，见第六节）：
 
@@ -351,7 +358,7 @@ Manifest 侧（**不代表拥有**）：
 | `canonical_build` | `build_assistant`：`equip_build` |
 | `category` | `build_assistant`：`community`、`community_build`、`starside` |
 | `changes` | `subclass_assistant`：`modify` |
-| `character` | `activity_assistant`：`activity_aggregate`、`activity_stats`、`aggregate`、`career`、`community`、`historical_stats`、`history`、`leaderboard`、`leaderboards`、`pvp_weapons`、`stats`、`weapon_history`、`weapon_leaderboard`、`weapon_usage`、`weapons`；`build_assistant`：除 `armor_mods`、`set_bonus` 外全部；`inventory_assistant`：`equip`、`equip_items`、`equip_many`、`equip_mod`、`lock`、`pull_postmaster`、`quest_tracking`、`track_quest`；`loadout_assistant`：`clear_official`、`get`、`list`、`save`、`snapshot_official`、`update_official_identifiers`；`subclass_assistant`：除 `artifact_mod`、`fragment_details`、`fragments` 外全部；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`vendor` |
+| `character` | `activity_assistant`：`activity_aggregate`、`activity_stats`、`aggregate`、`career`、`community`、`historical_stats`、`history`、`leaderboard`、`leaderboards`、`pvp_weapons`、`stats`、`weapon_history`、`weapon_leaderboard`、`weapon_usage`、`weapons`；`build_assistant`：除 `armor_mods`、`set_bonus` 外全部；`inventory_assistant`：`equip`、`equip_items`、`equip_many`、`equip_mod`、`lock`、`mods`、`pull_postmaster`、`quest_tracking`、`track_quest`；`loadout_assistant`：`clear_official`、`get`、`list`、`save`、`snapshot_official`、`update_official_identifiers`；`subclass_assistant`：除 `artifact_mod`、`fragment_details`、`fragments` 外全部；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`vendor` |
 | `class_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `collectible_node_hash` | `world_assistant`：`collectible_node` |
 | `color_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |

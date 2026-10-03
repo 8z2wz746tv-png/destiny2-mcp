@@ -25,6 +25,10 @@
   prompt: 找几组我持有的重复武器，列出实例 ID 和位置，不要处理它们。
   expected_tool: inventory_assistant
   expected_intent: duplicates
+- id: inventory_equipped_mods
+  prompt: 我身上五件护甲现在各装着什么模组？（写完装备后独立核对一遍）
+  expected_tool: inventory_assistant
+  expected_intent: mods
 - id: inventory_search
   prompt: 我有没有某件指定物品？
   expected_tool: inventory_assistant

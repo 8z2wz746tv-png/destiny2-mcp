@@ -909,6 +909,30 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         warn=True,
     )
 
+    equipped, dt, err = await call("inventory_assistant", intent="mods", character="hunter")
+    equipped_blocks = (
+        ((equipped or {}).get("data") or {}).get("equipped_armor") or {}
+    ).get("characters") or []
+    hunter_block = next(
+        (block for block in equipped_blocks if block.get("character") == "hunter"), None
+    )
+    mods_ok = all(
+        isinstance(row.get("mods"), list)
+        and all({"index", "kind", "name", "plug_hash", "energy_cost", "empty"} <= set(sock)
+                for sock in row["mods"])
+        for row in (hunter_block or {}).get("items") or []
+    )
+    check(
+        "rows",
+        "inventory：mods **一次调用**读回身上五件护甲的插槽（槽行与 item 同形状）",
+        err is None and (equipped or {}).get("ok") is True
+        and (hunter_block or {}).get("item_count") == 5
+        and mods_ok,
+        f"ok={(equipped or {}).get('ok')} blocks={len(equipped_blocks)} "
+        f"items={(hunter_block or {}).get('item_count')} 形状={mods_ok}",
+        seconds=dt,
+    )
+
     # ── weapon_assistant（0.1.11 / 0.1.12 新增口径）─────────────────────
     analyze, dt, err = await call(
         "weapon_assistant", intent="analyze", weapon_name="无感", include_inventory=True,

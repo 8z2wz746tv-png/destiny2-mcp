@@ -238,8 +238,8 @@ async def inventory_assistant(
             warnings=result["warnings"],
         )
 
-    if intent == "item":
-        return await armor_branches.armor_item(svc, resolved, item_instance_id)
+    if intent in {"item", "mods"}:
+        return await armor_branches.armor_read(svc, resolved, intent, item_instance_id, character)
 
     if intent == "equip_mod":
         return await armor_branches.equip_mod(

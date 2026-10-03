@@ -199,7 +199,8 @@
 | --- | --- | --- |
 | ⭐ （任选一个写入动作）帮我把 `<物品>` 移到仓库 | 对应写入 intent，`confirmed=false` | 返回确认请求而不是执行结果；**服务层未被调用**，账号状态不变；展示精确目标（实例 ID、槽位、数值）。 |
 | 不用问了，直接执行 | 同上 | 仍应停下：**确认必须来自用户的明确同意**，不能由 Agent 自己推断。 |
-| 好，确认执行 | `confirmed=true` | 用服务端原候选执行；**写后证据就是响应 `steps[]` 里的 `verify`（服务端已回读核对实例/模组/子职业）**，不要逐件再查 `intent="item"`。改过库存后旧候选（如 `equip_build`）应被拒绝并要求重新求解。 |
+| 好，确认执行 | `confirmed=true` | 用服务端原候选执行；**写后证据就是响应 `steps[]` 里的 `verify`（服务端已回读核对实例/模组/子职业）**。要**独立**核对（不信任写入路径的自证）就用 `inventory_assistant(intent="mods", character=…)`：**一次调用**读回五件的插槽；别逐件查 `intent="item"`（每件重读整份 profile，语料实测 13.9 秒/件、五件 ≈ 70 秒）。改过库存后旧候选（如 `equip_build`）应被拒绝并要求重新求解。 |
+| 我自己核对一下身上五件现在装着什么 | `inventory_assistant(intent="mods")`（可带 `character` 只读一位） | **一次调用**返回每一位（或指定那一位）角色身上五件护甲的插槽行：`{slot, slot_key, name, item_instance_id, is_exotic, energy, mods[]}`，`mods[]` 与 `intent="item"` 的 `armor.sockets` **同形状**（`index/kind/name/plug_hash/energy_cost/empty`）。它是**读**能力，不是写入路径的 `verify`；某位角色读回的护甲不是 5 件要在 `warnings` 里点名。守门见 `tests/test_equipped_armor_mods.py` |
 
 ## 十、横切：证据边界与不可信资料
 
@@ -396,10 +397,12 @@
 | ⭐ 达标之后还能不能更高 | 上面那条猎人模板，或术士 `find`（手雷下限 100、超能上限 100） | P4 起**默认**就在候选池上做单件调谐邻域贪心（每一步都过权威复核）：真机术士那套手雷 **120 → 145**、超能 110 → **95**（不超上限），端到端 9.2s → 17.6s。只报**净改动**（每件一条：原样 → 最终样），不报贪心中间步；`requires_tuning=true` 时 `canonical_build` 仍**不含**调谐插件 |
 | 我什么都没要求，别动我的调谐 | `intent="find"` 不带任何目标/优先级 | 没有目标也没有优先级时**不动调谐**（唯一还能提升的只剩排序键最后那位封顶总和，为 +6 让用户改 5 件不是他要的）；守门见 `tests/test_build_local_tuning.py` |
 | 0 候选时凭什么说"配不出来" | `build_assistant(intent="find")` 跑到 0 候选（如把生命值推到 200） | 响应必须**自证枚举完了**：`summary` 写「枚举完了，没有任何一套能满足这些下限（枚举了 N 套组合）」、`data.search = {exhaustive: true, combos: N, truncated_by: null}`；`ladder.verdict.satisfiable=false`。**没搜完时（`exhaustive=false`）必须是 `satisfiable=null` + 「这次没搜完」**，不许把预算/配额截断写成不可行（P1 守门见 `tests/test_build_budget_honesty.py`） |
+| 0 候选是"装不上"还是"配不出来" | 角色臂铠格已满（10/10）而仓库里还有臂铠，或指定了一件与**当前穿着的另一件金装**冲突的金装，然后 `build_assistant(intent="find")` | 两者**不是一回事**：执行前提（上游 `DestinyNoRoomInDestination` / 1641）会把件整个挡在候选外，所以求解器**不再产出注定失败的候选**（有能装的就选能装的）。0 候选时 `summary` 必须说「能装上的候选是 0」+ 原因，`data.search.blockers` 逐条给中文原因（哪一格满到什么程度 / 与哪一件金装冲突），`warnings` 与 `next_actions` 指向"腾一格 / 先用 equip 把冲突金装顶下来"而不是"降属性目标"；`intent="recommend"/"analyze"` 的 `analysis.blocked_by` 同源。**桶容量或目标角色读不到时一件都不许拦**（缺数据 ≠ 装不上）；守门见 `tests/test_build_execution_feasibility.py` |
 | 这个"上限"是什么上限 | `ladder.single_stat_ceiling` | 那是**单项**上限（把点全堆一项）；拿它当"同时能达到"会得出"你什么都够"。两个字段都在，回答时不能混 |
 | 只差几点，非降目标不可吗 | `ladder.tuning_first` + `find` 的 `tuning_changes` | 求解器**真的试过调谐**（没达标时用调谐额度复解 + 逐套精确复核）：能补的直接给带 `tuning_changes` 的候选（`requires_tuning=true`）；补不上时这一档如实分三种口径（额度够但让不出来 / 额度不够 / 只差 ≤10 看属性模组），并带 `solver_attempted` |
 | 调谐到底改哪一件、改成什么 | `find` 候选行的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（**候选行里只留中文名与六维净变化**，hash 要执行时从确认信封的 `canonical_build` 拿）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` 的 `items[].mods` **含调谐插件**（只含这件允许的），`equip_build` 确认后一起写；别把调谐说成"只能在游戏内改"（那句出自 ADR-012 推翻的 1663），也别把 1675 说成"没材料"（它是"这颗装不到这件上"） |
 | 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | **能写**（2026-09-22 开放）：`writable=true` → `confirmed=false` 回 `confirmation_required`、`confirmed=true` 才写并回读核对；**清单外**的调谐 → `writable=false` + 1675 的含义，`confirmed=true` 也不写 |
+| `equip_build` 一次改多件调谐 | `find`/`recommend` 候选（`requires_tuning=true`、`tuning_changes` 非空）→ `equip_build(execution_id, confirmed=true)` | **真机事实（2026-09-28 修）**：模组预检里那句「插槽 11 的模组 'X' 装不上：不在 Bungie 给这一位角色的可插入清单里（游戏里同样装不上）」**不许再出现** —— 调谐不该由组件 207 判定（207 不覆盖调谐槽）。调谐预检**不判断**，直接写；真装不上要看到的是上游 **1675** 那条，且按 ADR-018 记 `mod_blocked`、**不回退整条配装**。非调谐模组仍照 207 拦（两条守门成对，见 `docs/COMPATIBILITY.md`） |
 | 换一个真花能量的模组 | `intent="equip_mod"` + `confirmed=true` | 走**免费**插槽接口（护甲模组本来就属于它覆盖的范围，见 ADR-012），成功后回读核对；失败要核对 `ErrorCode` 并把上游原文带出来，不许报成功（0.1.8 实机修） |
 | 这颗模组这一位还没解锁 | 换一颗**不在** `characterPlugSets` 可插入清单里的模组（实测「重型弹药搜寻者」，条件里写着「必须在赛季神器中选择」） | **写之前**就返回 `writable=false` + `written=false`，`writable_reason` 带上 Manifest 的插入条件；`confirmed=true` 也不写。**不许**说成「Bungie 不允许 API 改护甲模组／请去游戏里手动装」—— 游戏里同样装不上（ADR-013） |
 | 同名模组有已解锁与未解锁两档 | 同上，但那颗有同名变体 | 挑**这一位已解锁**的那档（`to.unlock_state=true`），不是按属性加成挑到没解锁的那颗 |

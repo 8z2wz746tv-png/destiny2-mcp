@@ -9,6 +9,7 @@ from ..bungie_client import BungieClient
 from .. import vocabulary
 from ..exceptions import (
     AuthenticationError,
+    CharacterNotFoundError,
     ConfigError,
     DestinyMCPError,
     InvalidArgumentError,
@@ -18,10 +19,11 @@ from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..build.models import InventorySnapshot
-from ..build.constants import ARMOR_SLOT_MAP, STAT_HASH_TO_NAME
+from ..build.constants import ARMOR_SLOT_MAP, SOLVER_SLOTS, STAT_HASH_TO_NAME
 from ..models import InventoryItem, InventoryResponse, SearchItemsResponse
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
+from .armor_payload import slot_key_from_solver, socket_rows
 from .item_parser import parse_items_from_profile
 
 logger = get_logger(__name__)
@@ -447,6 +449,111 @@ class InventoryService:
                 ((self._manifest.get_item_definition(item.get("itemHash", 0)) or {})
                  .get("inventory") or {}).get("bucketTypeHash", 0)
             ),
+        }
+
+    async def get_equipped_armor_mods(
+        self, player_name: str, character: str = ""
+    ) -> dict:
+        """一次读回「已装备的护甲 + 每件的插槽」：**独立回读**用（写入回执之外的另一条证据）。
+
+        为什么一次就够：组件 305 覆盖**账号里全部物品**的已装插槽（实测 3.47 MB / 0.85 秒），
+        而"哪五件在装备位上"就在同一次响应的组件 205 里。逐件走 `get_armor_item` 是 N+1：
+        每件重读一次整份 profile（实测 4.31 MB / 3.32 秒 + 载荷组装），五件 ≈ 70 秒。
+
+        与写入流程 `verify` 的分工：那条是**写入路径内部的自证**（写在回执的 steps 里）；
+        这一条不信任回执，只看账号现在到底装着什么 —— 所以它只读、不改、也不判断"该不该"。
+
+        Args:
+            character: 只读这一位角色；留空 = 三位角色都读（各带职业标签，调用方自己挑）。
+
+        Returns:
+            `{"characters": [{"character", "class", "class_display", "item_count", "items"}]}`；
+            `items[]` = `{slot, slot_key, name, item_instance_id, item_hash, is_exotic, power,
+            energy, mods}`，`mods` 与 `intent="item"` 的 `armor.sockets` **同一形状**
+            （同一形状工厂 `armor_payload.socket_rows`），否则两边对不上。
+
+        Raises:
+            PlayerNotFoundError: 玩家名解析失败。
+            CharacterNotFoundError: 指定了角色但账号里没有这一位。
+        """
+        class_type = resolve_character_name(character) if character.strip() else -1
+        _, profile = await self._resolve_and_fetch(
+            player_name, profile_components.INVENTORY_SOCKETS
+        )
+        chars = (profile.get("characters") or {}).get("data") or {}
+        equipment = (profile.get("characterEquipment") or {}).get("data") or {}
+        components = profile.get("itemComponents") or {}
+        sockets_map = (components.get("sockets") or {}).get("data") or {}
+        instances = (components.get("instances") or {}).get("data") or {}
+
+        blocks: list[dict] = []
+        for char_id, info in chars.items():
+            char_class_type = info.get("classType", -1)
+            if class_type >= 0 and char_class_type != class_type:
+                continue
+            items: list[dict] = []
+            for raw in (equipment.get(char_id) or {}).get("items", []):
+                item_hash = int(raw.get("itemHash", 0) or 0)
+                definition = self._manifest.get_item_info(item_hash) or {}
+                bucket = raw.get("bucketHash", 0)
+                if bucket == 138197802:
+                    bucket = definition.get("bucketTypeHash", 0)
+                slot = ARMOR_SLOT_MAP.get(bucket)
+                if slot is None:
+                    continue  # 不是护甲（武器/子职业/机灵…）
+                instance_id = str(raw.get("itemInstanceId", "") or "")
+                instance = instances.get(instance_id) or {}
+                energy = instance.get("energy") if isinstance(instance, dict) else None
+                items.append({
+                    "slot": slot,
+                    "slot_key": slot_key_from_solver(slot),
+                    "name": self._manifest.get_item_name(item_hash),
+                    "item_instance_id": instance_id,
+                    "item_hash": item_hash,
+                    "is_exotic": definition.get("tier") == 6,
+                    "power": (instance.get("primaryStat") or {}).get("value"),
+                    "energy": {
+                        "capacity": (energy or {}).get("energyCapacity"),
+                        "used": (energy or {}).get("energyUsed"),
+                    } if isinstance(energy, dict) else None,
+                    "mods": socket_rows(
+                        (sockets_map.get(instance_id) or {}).get("sockets") or [],
+                        self._manifest.get_item_definition,
+                    ),
+                })
+            # 按**规范部位顺序**排（头盔→职业物品）：随便按字母排的话，读的人要自己对
+            # 五件的位置，而"这五件是哪五件"正是这个入口要回答的。
+            items.sort(key=lambda row: SOLVER_SLOTS.index(row["slot"]))
+            class_key = class_type_name(char_class_type).lower()
+            blocks.append({
+                "character": class_key,
+                "class": char_class_type,
+                # 中文名走词表（唯一出处），别在这里再抄一张
+                "class_display": vocabulary.CLASS_LABELS_ZH.get(class_key, ""),
+                "item_count": len(items),
+                "items": items,
+            })
+        if class_type >= 0 and not blocks:
+            raise CharacterNotFoundError(character, ["hunter", "warlock", "titan"])
+        return {"characters": blocks}
+
+    async def get_armor_socket_plugs(self, player_name: str) -> dict[str, list[dict]]:
+        """一次读回全账号的「已装插槽」：`{item_instance_id: sockets}`。
+
+        和 `get_armor_item` 的区别是**一次 vs 每件一次** —— 后者每件都要重读整份 profile，
+        要核对多件时就是 N+1（项目文档点过这条）。这里只要组件 305，不带 304 属性：
+        实测 3.47 MB / 0.85 秒（带 304 是 4.31 MB / 3.32 秒），覆盖全部 1628 件。
+
+        用途是「这件东西上到底装着哪几颗」——职业金装的两个异域特性只有这里看得到
+        （Manifest 的定义里那两个槽是占位，`plugSources: 1` 只从实例来）。
+        """
+        _, profile = await self._resolve_and_fetch(
+            player_name, profile_components.INVENTORY_SOCKETS
+        )
+        data = ((profile.get("itemComponents") or {}).get("sockets") or {}).get("data") or {}
+        return {
+            instance_id: (entry or {}).get("sockets") or []
+            for instance_id, entry in data.items()
         }
 
     # ── Armor Snapshot (Build Engine) ─────────────────────────────────

@@ -86,6 +86,8 @@ _INV_SUMMARY = ("summary", "summarize", "概况")
 _INV_GET = ("get", "inventory", "list")
 # 单件详情：只看一件护甲的完整载荷（插槽/能量/三层属性），不参与列清单的参数
 _INV_ITEM = ("item",)
+# 多件插槽：一次读回**已装备护甲**现在装着什么（独立回读用；与 item 共用只读分派）
+_INV_MODS = ("mods",)
 _INV_TYPE = ("type", "search_type")
 # ── weapon_assistant ────────────────────────────────────────────────────────
 _W_CATALOG = ("catalog", "search_catalog", "all_weapons", "global", "search_all")
@@ -196,9 +198,12 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ("inventory_assistant", "character"): _contract(
         _only(
             "equip", "equip_many", "equip_items", "equip_mod", "pull_postmaster",
-            "lock", "track_quest", "quest_tracking",
+            "lock", "track_quest", "quest_tracking", *_INV_MODS,
         ),
-        hint="装备、批量装备、换模组、取回、锁定、任务追踪这几个写入 intent 需要指定角色。",
+        hint=(
+            "装备、批量装备、换模组、取回、锁定、任务追踪这几个写入 intent 需要指定角色；"
+            'intent="mods"（读回已装备护甲的插槽）可以用它只读某一位角色，不给就三位都读。'
+        ),
     ),
     ("inventory_assistant", "locked"): _contract(
         _only("lock"), hint='锁定/解锁用 intent="lock"，locked=true 锁、false 解锁。',

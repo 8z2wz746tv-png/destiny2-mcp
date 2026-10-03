@@ -79,7 +79,17 @@ CEILINGS = {
     # 880 → 889（0.7.9）：照抄来的功能模组是**求解的一项输入**（它占掉的能量必须先扣掉），
     # 工具层 → 快照的透传（含标量写法归一）就地加在这里。要再压请先拆碎片属性那两块
     # （`_get_fragment_stats_by_names` 42 行 + `_replace_fragment_config` 58 行）。
-    "destiny_mcp/services/build_service.py": 889,
+    # 889 → 833（2026-10-03）：按上一行的指引拆了 `_replace_fragment_config`
+    # （→ `services/build_fragments.py`）—— 碎片 hash 两套值域没归一的修复要在那里写清
+    # 为什么，这里已经没有位置；那块本来也不属于求解流程。上限跟着收紧。
+    # 833 → 808（① 执行前提，2026-10-03）：执行前提（格子满搬不进来 / 与角色正穿着的金装
+    # 冲突）的原因要接进 find 的诊断与 analyze 的结论；腾位置把 `_snapshot_version`
+    # 拆去 `build/snapshot_version.py`（它是"求解 ↔ 执行"的一致性契约，不是这个类的内部细节）。
+    "destiny_mcp/services/build_service.py": 808,
+    # 2026-10-03 新增（从 build_service 拆出）：碎片替换的兼容预检。拆出来的直接原因：
+    # 上面那块贴在 889 没有位置放"为什么"，而它是真机事故（碎片有符号/无符号没归一，
+    # 5 颗里 4 颗被判"与插槽不兼容"）的修复落点。登记即上限。
+    "destiny_mcp/services/build_fragments.py": 82,
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升
@@ -173,7 +183,10 @@ CEILINGS = {
     # 与"这颗该进哪个槽"是两件事），腾出来的位置给照抄模组的调用点。
     "destiny_mcp/services/loadout_mod_sockets.py": 518,
     # 0.7.10：`find`/`recommend` 的候选行投影（默认出口只给行 + execution_id）。
-    "destiny_mcp/tools/_build_flow.py": 366,
+    # 366 → 284（① 执行前提）：0 候选要把"装不上"与"配不出来"分开说，这里已经满了 ——
+    # 候选行投影（118 行）搬去 `services/build_projection.py`（形状工厂该在的层，
+    # 与 `weapon_analysis_projection` 同一分工），上限跟着收紧。
+    "destiny_mcp/tools/_build_flow.py": 284,
     # 0.7.11：武器分析的投影（池子只给愿单有结论的项、副本去掉可换项）。
     # 108 → 166（0.7.13）：同名多副本的**行视图**（`compare_rows`）也搬进来 —— 它和 analyze
     # 的投影是同一件事（把武器域的结果投影成"行 + 判定依据"），放一起比再开一个文件清楚。
@@ -191,6 +204,21 @@ CEILINGS = {
     # 社区模板的"异域护甲=两个特性名"这一支接进 starside_matching（2026-09-28）。
     # 860：接上"按组件 305 真核对职业金装特性"（2026-09-28，原为 not_checked）。
     "destiny_mcp/services/starside_matching.py": 860,
+    # 2026-10-03 登记（② 一次读回已装备护甲的插槽）：这个文件已经是"账号读取"里最大的一块，
+    # 再加读取入口先回答"是拆出去还是复用"（读回那一段本身只有 70 行，形状工厂在 armor_payload）。
+    "destiny_mcp/services/inventory_service.py": 783,
+    # 2026-10-03 登记（②）：护甲只读分支（`item` 单件 + `mods` 多件插槽）。
+    "destiny_mcp/tools/_armor_branches.py": 589,
+    # 2026-10-03 新增（从 `_build_flow` 拆出，① 执行前提腾位置）：`find`/`recommend` 的
+    # 候选行投影。登记即上限 —— 再往里加东西先回答"是不是该拆"。
+    "destiny_mcp/services/build_projection.py": 137,
+    # 2026-10-03 新增（从 `build_service` 拆出）：求解输入指纹（`CanonicalBuild.snapshot_version`
+    # 的重算口径）。登记即上限。
+    "destiny_mcp/build/snapshot_version.py": 61,
+    # 2026-10-03 新增（①）：求解阶段就要判死的两条执行前提（仓库件遇上满格、与角色正穿着的
+    # 金装冲突）。单独成模块是因为它同时被求解器（滤件）、分析器（说话术）与规模闸门（数件数）
+    # 读，放进任何一边都会变成两处判据。登记即上限。
+    "destiny_mcp/build/execution_feasibility.py": 257,
     # 2026-09-28 新增（从 loadout_mod_sockets / armor_mod_service 抽出）：调谐能不能写的判据。
     # 抽出来的直接原因：同一判据被两条写入路径各写一份，只改了一边 → equip_build 拿组件 207
     # 判调谐，把 3 颗能装的调谐误拦（连上游都没试）。登记即上限。
@@ -217,6 +245,10 @@ CEILINGS = {
     "destiny_mcp/services/raid_runs.py": 319,
     "destiny_mcp/tools/_raid_report_branches.py": 129,
     "destiny_mcp/tools/_history_branches.py": 42,
+    # 跨值域 hash 比较的静态守门（tests/ 里唯一登记的一条：它不是业务模块，但里面有
+    # 半个静态分析器 —— 台账、判据、注入样本都在里面，长起来同样是"下一个上帝模块"的苗头，
+    # 所以按同样的规矩登记在**当前长度**：再加规则先回答"是拆出去还是抬上限"）。
+    "tests/test_hash_domains.py": 1338,
 }
 
 

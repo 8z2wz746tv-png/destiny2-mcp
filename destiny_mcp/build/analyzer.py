@@ -7,9 +7,13 @@ cannot be met. It also suggests farming activities for each stat.
 
 from __future__ import annotations
 
+from typing import Any
+
 from .. import config
 from ..exceptions import BuildTooLargeError
 from ..logging_config import get_logger
+from .constants import SOLVER_SLOTS
+from .execution_feasibility import exotic_conflict_reasons, full_bucket_reasons
 from .models import (
     STAT_NAMES,
     BuildAnalysis,
@@ -40,20 +44,21 @@ def estimate_combinations(
 
     纯计数、不枚举：五个部位件数相乘，指定金装时该部位只算金装那几件
     （所以"指定金装"是最有效的收窄手段）。
+
+    **装不上的件不算**（`Armor.execution_blocker`）：它们根本进不了求解器的候选，
+    算进来的后果是"闸门拿一个求解器永远不会跑的数字去拒绝一次请求"（真机里格子满
+    会一次性砍掉该部位大半件数），而且它给的第一条建议"指定一件金装"可能正是被挡的那件。
     """
-    slots = [
-        snapshot.helmets,
-        snapshot.gauntlets,
-        snapshot.chests,
-        snapshot.legs,
-        snapshot.class_items,
+    slots = [snapshot.get_slot(slot) for slot in SOLVER_SLOTS]
+    usable = [
+        [piece for piece in pieces if not piece.execution_blocker] for pieces in slots
     ]
     # 比 hash 必须归一：快照是无符号、`manifest.search()` 是有符号（见
     # `constraints.allowed_exotic_hashes` 的说明）。漏归一的后果是"指定金装收窄"
     # **静默失效** —— 这个闸门一边建议"指定一件金装"，一边不认它。
     allowed_exotic = allowed_exotic_hashes(constraints)
     counts: list[int] = []
-    for pieces in slots:
+    for pieces in usable:
         if allowed_exotic:
             exotic = [p for p in pieces if p.item_hash in allowed_exotic]
             counts.append(len(exotic) if exotic else len(pieces))
@@ -119,6 +124,27 @@ def oversized_reason(
         )
         return too_large_reason(total, counts, limit)
     return None
+
+
+def execution_blockers(
+    snapshot: InventorySnapshot,
+    constraints: BuildConstraints,
+    manifest: Any,
+) -> list[str]:
+    """候选被**执行前提**砍掉时，用中文说清是哪一条（空表 = 没被砍）。
+
+    为什么归分析器：它的输出就是"为什么没有解"，而"格子满了搬不进""与当前金装冲突"
+    与"属性顶不上去"是同一层的结论。求解器那边只负责不去挑被卡住的件，不说话术。
+
+    两条判据都不猜：`execution_feasibility` 读不到的（桶容量缺失、认不出唯一角色）一律
+    不下结论 —— "没探成"不能写成"不行"。
+    """
+    reasons = exotic_conflict_reasons(
+        snapshot,
+        allowed_exotic_hashes(constraints),
+        lambda item_hash: manifest.get_item_name(item_hash),
+    )
+    return [*reasons, *full_bucket_reasons(snapshot)]
 
 
 def probe_stat(
