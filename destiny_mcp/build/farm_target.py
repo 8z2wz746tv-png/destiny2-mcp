@@ -14,7 +14,7 @@ import heapq
 from itertools import combinations
 from typing import Literal, cast
 
-from ..utils.hash_utils import to_signed, to_unsigned
+from ..utils.hash_utils import hash_variants
 from .armor_rules import (
     ArmorRollTemplate,
     ArmorTuningOption,
@@ -1266,12 +1266,8 @@ def _extend_state(
 def _requested_exotic_hashes(constraints: BuildConstraints) -> set[int]:
     if constraints.exotic_hash is None:
         return set()
-    result: set[int] = set()
-    for item_hash in {*constraints.exotic_hashes, constraints.exotic_hash}:
-        if item_hash is None:
-            continue
-        result.update({item_hash, to_signed(item_hash), to_unsigned(item_hash)})
-    return result
+    # 归一只有一份写法：`hash_utils.hash_variants`（两套值域的坑见那里的说明）。
+    return hash_variants(*constraints.exotic_hashes, constraints.exotic_hash)
 
 
 def _normalize_slot(value: str | None) -> str | None:

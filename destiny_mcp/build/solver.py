@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from typing import Sequence
 
 from ..logging_config import get_logger
-from .constants import STAT_HASHES as _STAT_HASHES
+from .constants import SOLVER_SLOTS, STAT_HASHES as _STAT_HASHES
 from .constraints import allowed_exotic_hashes
 from .models import (
     BuildConstraints,
@@ -397,12 +397,20 @@ def solve(
     mod_stat_totals = context.mod_stat_totals
 
     # ── Prepare items per slot ─────────────────────────────────────────
-    # Keep both Armor objects (for output) and ProcessItem (for computation)
-    helmets_armor = list(snapshot.helmets)
-    gauntlets_armor = list(snapshot.gauntlets)
-    chests_armor = list(snapshot.chests)
-    legs_armor = list(snapshot.legs)
-    class_items_armor = list(snapshot.class_items)
+    # Keep both Armor objects (for output) and ProcessItem (for computation).
+    # **装不上的件直接不进候选**（`Armor.execution_blocker`：仓库件遇上满格、与角色正穿着的
+    # 另一件金装冲突）。这不是"事后过滤失败候选"，而是把注定写不进账号的组合从搜索空间里
+    # 去掉 —— 真机实测：那两种方案会在写第一颗模组之前中止，整批回滚、0 颗落地。
+    # 判据与话术的唯一出处在 `execution_feasibility`；这里只读它的结论。
+    armor_by_slot = {
+        slot: [armor for armor in snapshot.get_slot(slot) if not armor.execution_blocker]
+        for slot in SOLVER_SLOTS
+    }
+    helmets_armor = armor_by_slot["helmets"]
+    gauntlets_armor = armor_by_slot["gauntlets"]
+    chests_armor = armor_by_slot["chests"]
+    legs_armor = armor_by_slot["legs"]
+    class_items_armor = armor_by_slot["class_items"]
 
     helmets = [armor_to_process_item(a) for a in helmets_armor]
     gauntlets = [armor_to_process_item(a) for a in gauntlets_armor]
@@ -412,19 +420,9 @@ def solve(
 
     # Filter by exotic constraint
     if constraints.exotic_hash is not None:
-        from ..utils.hash_utils import to_signed, to_unsigned
-
-        # Build set of all valid exotic hashes (including unsigned variants
-        # and all versions of the same item name from manifest search)
-        exotic_hashes: set[int] = set()
-        for h in constraints.exotic_hashes:
-            exotic_hashes.add(h)
-            exotic_hashes.add(to_signed(h))
-            exotic_hashes.add(to_unsigned(h))
-        if constraints.exotic_hash not in exotic_hashes:
-            exotic_hashes.add(constraints.exotic_hash)
-            exotic_hashes.add(to_signed(constraints.exotic_hash))
-            exotic_hashes.add(to_unsigned(constraints.exotic_hash))
+        # 这次指定的金装在所有写法下的 hash：`constraints.allowed_exotic_hashes`
+        # （归一那份写法在 `utils/hash_utils.hash_variants`，这里不再各抄一遍）。
+        exotic_hashes = allowed_exotic_hashes(constraints)
 
         # Find which slot the exotic belongs to
         exotic_slot = None
@@ -438,9 +436,19 @@ def solve(
                 break
 
         if exotic_slot is None:
+            # 两种可能都要能从日志里认出来：账号里真没有，或者有但这次装不上
+            # （`execution_blocker` 把它挡在候选外）。后者的话术由 `analyzer.execution_blockers`
+            # 生成 —— 这里只留一条可排查的记录，别让它变成"莫名没有解"。
+            blocked_exotic = any(
+                armor.is_exotic and armor.execution_blocker
+                for slot in SOLVER_SLOTS
+                for armor in snapshot.get_slot(slot)
+            )
             logger.info(
-                "Requested exotic is not present in the armor snapshot: %s",
+                "Requested exotic is not usable for this solve: hash=%s "
+                "(present_but_blocked_by_equip_context=%s)",
                 constraints.exotic_hash,
+                blocked_exotic,
             )
             return ProcessResult(sets=[], combos=0)
 

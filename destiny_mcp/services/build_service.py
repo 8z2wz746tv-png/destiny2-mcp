@@ -15,14 +15,13 @@ Workflow:
 from __future__ import annotations
 
 import asyncio
-import hashlib
-import json
 from difflib import SequenceMatcher
 from typing import Any, Literal, cast
 
 from ..build.analyzer import (
     analyze_from_probes,
     ensure_within_combination_limit,
+    execution_blockers,
     oversized_reason,
     probe_stat,
 )
@@ -49,8 +48,10 @@ from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
 from ..build.process_types import SearchDiagnostics
 from ..build.ranking import rank_results
+from ..build.snapshot_version import snapshot_version
 from .build_tuning import apply_local_tuning, solve_with_tuning
 from .build_candidates import BuildCandidateStore, describe_candidate
+from .build_fragments import replace_fragment_config
 from .build_results import (
     canonical_subclass,
     LOADOUT_SLOT_NAMES as _LOADOUT_SLOT_NAMES,
@@ -67,46 +68,6 @@ logger = get_logger(__name__)
 
 
 _EXPECTED_ARMOR_SLOTS = {"helmet", "gauntlets", "chest", "legs", "class_item"}
-
-
-def _snapshot_version(snapshot) -> str:
-    """Return a deterministic version for the armor state used by the solver."""
-    rows = []
-    for collection in (
-        snapshot.helmets,
-        snapshot.gauntlets,
-        snapshot.chests,
-        snapshot.legs,
-        snapshot.class_items,
-    ):
-        for armor in collection:
-            rows.append({
-                "instance_id": armor.item_instance_id,
-                "item_hash": armor.item_hash,
-                "slot": armor.slot,
-                "stats": armor.stats.model_dump(),
-                "energy_capacity": armor.energy_capacity,
-                "source_location": getattr(armor, "source_location", ""),
-                "source_character_id": getattr(armor, "source_character_id", ""),
-                "is_equipped": getattr(armor, "is_equipped", False),
-            })
-    mod_definitions = sorted(
-        (
-            definition.model_dump()
-            for definition in getattr(snapshot, "stat_mod_definitions", [])
-        ),
-        key=lambda definition: definition["hash"],
-    )
-    payload = json.dumps(
-        {
-            "armor": sorted(rows, key=lambda row: row["instance_id"]),
-            "stat_mod_definitions": mod_definitions,
-        },
-        ensure_ascii=True,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 class BuildService:
@@ -264,64 +225,6 @@ class BuildService:
                 logger.warning("Fragment '%s': no stat bonuses found in manifest", name)
                 details.append({"name": name, "stats": {}, "warning": "未找到"})
         return vector, details
-
-    def _replace_fragment_config(
-        self,
-        current: LoadoutSubclassConfig | None,
-        fragment_hashes: list[int],
-    ) -> LoadoutSubclassConfig:
-        """Replace a complete fragment set while preserving exact socket indices."""
-        if current is None or not current.subclass_item_hash:
-            raise BuildValidationError("无法读取当前子职业，不能安全应用碎片。")
-        old_fragment_hashes = set(current.fragment_hashes)
-        fragment_indices = sorted(
-            index
-            for index, plug_hash in current.plug_sockets.items()
-            if plug_hash in old_fragment_hashes
-        )
-        if len(fragment_hashes) != len(fragment_indices):
-            raise BuildValidationError(
-                "必须提供完整碎片配置："
-                f"当前子职业需要 {len(fragment_indices)} 个，收到 {len(fragment_hashes)} 个。"
-            )
-
-        subclass_definition = self._manifest.get_item_definition(
-            current.subclass_item_hash
-        ) or {}
-        socket_entries = (subclass_definition.get("sockets") or {}).get(
-            "socketEntries", []
-        )
-        updated_sockets = dict(current.plug_sockets)
-        for socket_index, plug_hash in zip(fragment_indices, fragment_hashes):
-            if socket_index >= len(socket_entries):
-                raise BuildValidationError("子职业碎片插槽定义已变化，请刷新 Manifest。")
-            entry = socket_entries[socket_index]
-            accepted = entry.get("singleInitialItemHash", 0) == plug_hash
-            for plug_set_hash in {
-                entry.get("reusablePlugSetHash", 0),
-                entry.get("randomizedPlugSetHash", 0),
-            }:
-                if not plug_set_hash:
-                    continue
-                plug_set = self._manifest.get_definition(
-                    "DestinyPlugSetDefinition", plug_set_hash
-                ) or {}
-                if any(
-                    item.get("plugItemHash", 0) == plug_hash
-                    for item in plug_set.get("reusablePlugItems", [])
-                ):
-                    accepted = True
-                    break
-            if not accepted:
-                raise BuildValidationError(
-                    f"碎片 {plug_hash} 与当前子职业插槽 {socket_index} 不兼容。"
-                )
-            updated_sockets[socket_index] = plug_hash
-
-        return current.model_copy(update={
-            "fragment_hashes": fragment_hashes,
-            "plug_sockets": updated_sockets,
-        })
 
     def resolve_exotic_armor(
         self,
@@ -487,7 +390,7 @@ class BuildService:
         # Step 1: Fetch armor data (filtered by character class)
         snapshot = await self._inventory.get_armor_snapshot(
             player_name, request.character_class, reserved_mod_energy=plan.energy_by_slot() or None)
-        snapshot_version = _snapshot_version(snapshot)
+        version = snapshot_version(snapshot)
         logger.info("Snapshot: %d pieces across 5 slots", snapshot.total_pieces)
 
         parsed = _parse_constraints(request, self._manifest)
@@ -518,7 +421,8 @@ class BuildService:
                 for detail in fragment_details
                 if detail.get("hash")
             ]
-            execution_subclass = self._replace_fragment_config(
+            execution_subclass = replace_fragment_config(
+                self._manifest,
                 execution_subclass,
                 requested_fragment_hashes,
             )
@@ -550,9 +454,14 @@ class BuildService:
         pool, tuning_map = apply_local_tuning(
             pool, tuning_map, snapshot, parsed, self._manifest, top_n=parsed.top_n
         )
+        # 执行前提砍掉了哪些件（格子满搬不进来 / 与角色正穿着的金装冲突）：0 候选时
+        # 调用方必须能分清"属性配不出来"与"这套装不上"——后者会在写第一颗模组之前整批回滚。
+        blocked_by = execution_blockers(snapshot, parsed, self._manifest)
         if diagnostics is not None:
             diagnostics.append(SearchDiagnostics(
-                coverage=solved.coverage, reachable_ceilings=solved.reachable_ceilings
+                coverage=solved.coverage,
+                reachable_ceilings=solved.reachable_ceilings,
+                blocked_by=blocked_by,
             ))
         logger.info("Solver: %d sets (%d 靠调谐补齐)", len(pool), len(tuning_map))
         if not pool:
@@ -568,7 +477,7 @@ class BuildService:
                 request=request,
                 manifest=self._manifest,
                 class_type=canonical_class,
-                snapshot_version=snapshot_version,
+                snapshot_version=version,
                 bonus_vector=bonus_vector,
                 fragment_details=fragment_details,
                 execution_subclass=execution_subclass,
@@ -621,6 +530,16 @@ class BuildService:
         oversized = oversized_reason(snapshot, parsed)
         if oversized:
             return BuildAnalysis(reason=oversized, precision="not_computed")
+        # 执行前提先说话：那几条会把某件（甚至指定的金装）整个挡在候选外，
+        # 而单项上限探测对此一无所知 —— 不先说的话，"配不出来"会被归到属性上（错因）。
+        if blocked_by := execution_blockers(snapshot, parsed, self._manifest):
+            return BuildAnalysis(
+                reason="；".join(blocked_by)
+                + "（这几条是执行前提，不是属性不够：先解决它们再重新求解。）",
+                blocked_by=blocked_by,
+                precision="exact",
+                assumptions=["本次分析没有把被执行前提挡住的件算进「单项上限」。"],
+            )
         return analyze_from_probes(parsed, await self._probe_single_stat_ceilings(snapshot, parsed))
 
     async def probe_find_build(
@@ -820,7 +739,7 @@ class BuildService:
         snapshot = await self._inventory.get_armor_snapshot(
             player_name, normalized_character
         )
-        current_version = _snapshot_version(snapshot)
+        current_version = snapshot_version(snapshot)
         if current_version != build.snapshot_version:
             return {
                 "success": False,

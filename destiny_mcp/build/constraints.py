@@ -198,15 +198,14 @@ def allowed_exotic_hashes(constraints: BuildConstraints) -> set[int]:
     正是"指定一件金装"（等于建议了也不生效）。
 
     唯一出处放这里：`constraints` 就是装金装 hash 的地方，求解器与规模闸门共用这一份。
+    归一的**写法**不在这里 —— 那是 `hash_utils.hash_variants`（碎片配置那条路也调它，
+    两套值域的坑只留一份说明）。
     """
-    from ..utils.hash_utils import to_signed, to_unsigned
+    from ..utils.hash_utils import hash_variants
 
-    hashes: set[int] = set()
     # `exotic_hash` 用 getattr 兜底：这个函数被规模闸门（`estimate_combinations`）调用，
     # 而那一层历来只被"数件数"的轻量替身喂（多个语料测试的替身只有 `exotic_hashes`）。
     # 它是可选字段，缺了就是"没单独指定那一件"，不是错误。
-    for item_hash in {*constraints.exotic_hashes, getattr(constraints, "exotic_hash", None)}:
-        if item_hash is None:
-            continue
-        hashes.update({item_hash, to_signed(item_hash), to_unsigned(item_hash)})
-    return hashes
+    return hash_variants(
+        *constraints.exotic_hashes, getattr(constraints, "exotic_hash", None)
+    )
