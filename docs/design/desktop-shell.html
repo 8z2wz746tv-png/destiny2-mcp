@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Ghost Intelligence · 桌面外壳原型</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   Ghost Intelligence — 桌面外壳原型（可点击，?ws=chat|inv|quest）
+   token 取自 webui/src/styles/tokens.css（Braytech 那套是废案）
+   结构取自 webui/src/components/AppShell.tsx + app.css + inventory.css
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  color-scheme:dark;
+  --font-ui:"Inter","SF Pro Text","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --font-mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --font-prose:Georgia,"Times New Roman",serif;
+  --bg:#090a0c; --bg-raised:#0d1013;
+  --surface-1:#101317; --surface-2:#14181d; --surface-3:#1a2026;
+  --panel-hover:#1a2025; --panel-active:#20262d;
+  --line:#2a3037; --line-soft:#1d2227; --line-strong:#3a424b;
+  --text:#e8e9e6; --text-strong:#fafaf7; --muted:#9fa6ac; --muted-strong:#c4c9cd;
+  --accent:#d7b35e; --accent-hover:#e4c370; --accent-soft:rgba(215,179,94,.11);
+  --accent-border:rgba(215,179,94,.38); --accent-ink:#17130b;
+  --cool:#7bb0b5; --success:#7fb58b; --warning:#d5a85f; --danger:#dc7979; --focus:#e5c675;
+  --radius-xs:5px; --radius-sm:7px; --radius-md:10px;
+  --nav-width:216px; --session-width:280px;
+  /* 稀有度只出现在物品上，压暗一档以区别于 UI 强调金 */
+  --exotic:#b8933f; --legendary:#6f5a96; --rare:#47698f; --common:#7d858b;
+  /* 装备页尺寸：抄 inventory.css */
+  --tile:48px; --tile-row:76px; --bucket-min-h:92px; --bucket-pad-y:8px; --bucket-pad-x:8px;
+  --bucket-gap-y:6px; --bucket-gap-x:4px; --empty-cell:38px; --char-col:186px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%}
+body{
+  background:var(--bg);color:var(--text);overflow:hidden;
+  font:14px/1.5 var(--font-ui);letter-spacing:0;text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,textarea{font:inherit;color:inherit;letter-spacing:0;background:none;border:0}
+button{cursor:pointer}
+a{color:var(--cool);text-decoration:none}
+::selection{color:var(--text-strong);background:rgba(215,179,94,.3)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+*{scrollbar-width:thin;scrollbar-color:transparent transparent}
+*:hover{scrollbar-color:#4a5259 transparent}
+*::-webkit-scrollbar{width:7px;height:7px}
+*::-webkit-scrollbar-thumb{background:transparent;border-radius:6px}
+*:hover::-webkit-scrollbar-thumb{background:#4a5259}
+.num{font-variant-numeric:tabular-nums}
+
+/* ── 外壳：只有两列，导航栏 + 工作区（app.css L40） ── */
+.app-shell{height:100dvh;display:grid;grid-template-columns:var(--nav-width) minmax(0,1fr);background:var(--bg)}
+
+/* ── 导航栏（AppShell.tsx） ── */
+.navigation-rail{display:flex;flex-direction:column;min-height:0;background:var(--bg-raised);border-right:1px solid var(--line)}
+.brand-lockup{display:flex;align-items:center;gap:10px;padding:14px 16px 12px;border-bottom:1px solid var(--line-soft)}
+.brand-sigil{
+  width:30px;height:30px;flex:none;border-radius:var(--radius-xs);display:grid;place-items:center;
+  color:var(--accent-ink);font-size:15px;font-weight:700;background:linear-gradient(150deg,var(--accent),#b8933f);
+}
+.brand-lockup strong{display:block;font-size:13.5px;color:var(--text-strong)}
+.brand-lockup span{display:block;font-size:11px;color:var(--muted)}
+.nav-group{padding:12px 8px 4px}
+.nav-group-label{display:block;padding:0 8px 7px;font-size:10.5px;letter-spacing:.14em;color:#6b737a;text-transform:uppercase}
+.nav-item{
+  display:flex;align-items:center;gap:10px;width:100%;height:34px;padding:0 9px;
+  border-radius:var(--radius-xs);color:var(--muted-strong);font-size:13px;text-align:left;
+  border-left:2px solid transparent;
+}
+.nav-item:hover{background:var(--panel-hover);color:var(--text)}
+.nav-item.active{background:var(--accent-soft);color:var(--text-strong);border-left-color:var(--accent)}
+.nav-item.active .ic{color:var(--accent)}
+.nav-item .ic{width:16px;text-align:center;color:#7d858b;font-size:13px}
+.nav-item .tag{margin-left:auto;font:10px var(--font-mono);color:var(--muted);padding:1px 5px;border:1px solid var(--line);border-radius:3px}
+.nav-item .tag.warn{color:var(--warning);border-color:rgba(213,168,95,.35)}
+.account-area{margin-top:auto;padding:8px;border-top:1px solid var(--line)}
+.account-button{display:flex;align-items:center;gap:9px;width:100%;padding:7px 8px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--surface-1);text-align:left}
+.account-button:hover{background:var(--panel-hover)}
+.guardian-avatar{width:28px;height:28px;flex:none;border-radius:var(--radius-xs);display:grid;place-items:center;background:#1b2530;border:1px solid var(--line-strong);color:var(--text-strong);font-size:12px;font-weight:600}
+.account-copy{min-width:0;display:grid;gap:1px}
+.account-copy strong{font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account-copy small{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.account-button .caret{margin-left:auto;color:var(--muted);font-size:9px}
+
+/* ── 工作区 ── */
+.app-main{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.page-header{display:flex;align-items:center;gap:12px;min-height:54px;padding:0 20px;background:var(--surface-1);border-bottom:1px solid var(--line)}
+.page-header h1{font-size:15px;font-weight:600;color:var(--text-strong)}
+.page-header .sub{font-size:11.5px;color:var(--muted)}
+.page-header .tools{margin-left:auto;display:flex;align-items:center;gap:8px}
+.char-switch{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px 0 4px;border:1px solid var(--line);border-radius:var(--radius-xs);background:var(--surface-2)}
+.char-switch:hover{border-color:var(--line-strong)}
+.char-switch .emb{width:22px;height:22px;border-radius:3px;border:1px solid var(--line-strong);background:linear-gradient(140deg,#33465f,#1a2430)}
+.char-switch b{font-size:12px}
+.char-switch span{font-size:10.5px;color:var(--muted)}
+.src{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 7px;border:1px solid var(--line);border-radius:3px;background:var(--surface-1);font-size:10.5px;color:var(--muted);white-space:nowrap}
+.src b{font-weight:600;color:var(--muted-strong)}
+.src.account{border-color:rgba(127,181,139,.35)} .src.account b{color:var(--success)}
+.src.manifest{border-color:rgba(123,176,181,.35)} .src.manifest b{color:var(--cool)}
+.src.community{border-color:rgba(213,168,95,.32)} .src.community b{color:var(--warning)}
+.src.curated{border-color:var(--accent-border)} .src.curated b{color:var(--accent)}
+.src.unknown{border-color:rgba(220,121,121,.35)} .src.unknown b{color:var(--danger)}
+.btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid var(--line-strong);border-radius:var(--radius-xs);background:var(--surface-2);font-size:12.5px}
+.btn:hover{background:var(--panel-hover)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.ghost{border-color:transparent;color:var(--muted-strong)}
+.btn.ghost:hover{background:var(--panel-hover);color:var(--text)}
+.chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border:1px solid var(--line);border-radius:var(--radius-xs);background:var(--bg);color:var(--muted);font-size:12px}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent-border);color:var(--text-strong)}
+.field{height:30px;width:100%;padding:0 10px;border:1px solid var(--line);border-radius:var(--radius-xs);background:var(--bg);font-size:12.5px}
+.field::placeholder{color:#6b737a}
+.field:focus{border-color:var(--accent-border);outline:none}
+.seg{display:flex;gap:2px;padding:3px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-sm)}
+.bar{height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--success)}
+.hint{font-size:11.5px;color:var(--muted)}
+.panel{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-1)}
+.panel-h{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:12.5px;font-weight:600}
+
+/* ══ 聊天（app.css .chat-layout） ══ */
+.chat-layout{flex:1;min-height:0;display:grid;grid-template-columns:var(--session-width) minmax(0,1fr)}
+.session-list{border-right:1px solid var(--line);background:var(--bg-raised);display:flex;flex-direction:column;min-height:0}
+.session-list .top{padding:10px;display:flex;gap:7px;border-bottom:1px solid var(--line-soft)}
+.session{display:block;width:100%;text-align:left;padding:9px 11px;border-left:2px solid transparent;border-bottom:1px solid var(--line-soft)}
+.session:hover{background:var(--panel-hover)}
+.session.active{background:var(--accent-soft);border-left-color:var(--accent)}
+.session .t{font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.session .m{font-size:10.5px;color:var(--muted);margin-top:2px}
+.session-group{padding:12px 12px 5px;font-size:10.5px;letter-spacing:.14em;color:#6b737a;text-transform:uppercase}
+.chat-main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.timeline{flex:1;min-height:0;overflow:auto}
+.thread{max-width:780px;margin:0 auto;padding:20px 24px 28px}
+.message-row{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;padding:16px 0;border-bottom:1px solid var(--line-soft)}
+.message-row:last-child{border-bottom:0}
+.avatar{width:30px;height:30px;border-radius:var(--radius-xs);display:grid;place-items:center;font-size:12px;font-weight:600}
+.avatar.you{background:var(--surface-3);border:1px solid var(--line);color:var(--muted-strong)}
+.avatar.ai{background:var(--accent-soft);border:1px solid var(--accent-border);color:var(--accent)}
+.role{font-size:11px;color:var(--muted);margin-bottom:6px}
+/* 正文用衬线：DESIGN.md 要求助手 prose 有叙事节奏 */
+.prose{font:15px/1.7 var(--font-prose);color:#e4e2dc}
+.prose p{margin-bottom:9px}
+.prose p:last-child{margin-bottom:0}
+.prose b{color:var(--text-strong);font-weight:600}
+.tool-block{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-1);margin-top:12px;overflow:hidden}
+.tool-block>.h{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.tool-block>.h .t{font-size:12.5px;font-weight:600}
+.tool-block>.h .tools{margin-left:auto;display:flex;gap:6px}
+.tool-block>.f{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid var(--line-soft)}
+.item-row{display:flex;align-items:center;gap:11px;padding:9px 12px;border-top:1px solid var(--line-soft)}
+.item-row:first-child{border-top:0}
+.item-row:hover{background:var(--panel-hover)}
+.tile{position:relative;flex:none;border:1px solid var(--line);border-radius:3px;background:var(--surface-2);overflow:hidden}
+.tile::after{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--common)}
+.tile.exotic::after{background:var(--exotic)} .tile.legendary::after{background:var(--legendary)} .tile.rare::after{background:var(--rare)}
+.tile.md{width:34px;height:34px} .tile.lg{width:56px;height:56px}
+.item-row .nm{font-size:13px}
+.item-row .meta{font-size:11.5px;color:var(--muted);margin-top:1px}
+.tool-block details{border-top:1px solid var(--line-soft)}
+.tool-block summary{padding:8px 12px;font-size:11.5px;color:var(--muted);cursor:pointer;list-style:none}
+.tool-block summary::-webkit-details-marker{display:none}
+.tool-block summary:hover{color:var(--text)}
+.confirm{border:1px solid var(--accent-border);border-radius:var(--radius-sm);background:var(--accent-soft);margin-top:12px;overflow:hidden}
+.confirm>.h{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--accent-border)}
+.confirm>.h .t{font-size:12.5px;font-weight:600;color:var(--text-strong)}
+.steps{list-style:none}
+.steps li{display:flex;gap:10px;padding:9px 12px;border-top:1px solid rgba(215,179,94,.14)}
+.steps li:first-child{border-top:0}
+.steps .n{flex:none;width:18px;height:18px;margin-top:1px;border:1px solid var(--accent-border);border-radius:3px;display:grid;place-items:center;font:10px var(--font-mono);color:var(--accent)}
+.steps .body{font-size:12.5px}
+.steps .why{font-size:11.5px;color:var(--muted);margin-top:2px}
+.confirm>.f{display:flex;align-items:center;gap:9px;padding:10px 12px;border-top:1px solid var(--accent-border)}
+.composer{border-top:1px solid var(--line);background:var(--bg-raised);padding:12px 24px 14px}
+.composer .box{max-width:780px;margin:0 auto;display:flex;align-items:flex-end;gap:10px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface-2);padding:9px 11px}
+.composer .box:focus-within{border-color:var(--accent-border)}
+.composer textarea{flex:1;resize:none;border:0;outline:none;background:none;font:13.5px/1.55 var(--font-ui);max-height:120px;min-height:21px}
+.composer .meta{max-width:780px;margin:8px auto 0;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted)}
+.composer .meta .right{margin-left:auto}
+
+/* ══ 仓库（inventory.css 骨架） ══ */
+.inv-toolbar{display:flex;align-items:center;gap:9px;padding:9px 20px;background:var(--surface-1);border-bottom:1px solid var(--line)}
+.inv-toolbar .search{width:min(420px,100%)}
+.inv-scope{margin-left:auto;display:flex;align-items:center;gap:9px}
+.inventory-workspace{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 10px 360px;overflow:hidden}
+.inventory-scroll{min-width:0;min-height:0;overflow:auto;background:#0a0c0f}
+.inventory-grid{min-width:max-content}
+.store-headings{position:sticky;top:0;z-index:8;display:grid;min-height:68px;background:#101419;border-bottom:1px solid var(--line-strong)}
+.store-heading{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#14191f;border-right:1px solid var(--line);width:var(--char-col)}
+.store-heading .emb{width:32px;height:32px;flex:none;border-radius:3px;border:1px solid var(--line-strong);background:linear-gradient(140deg,#33465f,#1a2430)}
+.store-heading .emb.h{background:linear-gradient(140deg,#2f4a44,#16241f)}
+.store-heading .emb.t{background:linear-gradient(140deg,#52332f,#241512)}
+.store-heading .emb.w{background:linear-gradient(140deg,#3d3a2a,#1e1b14)}
+.store-heading .nm{font-size:12.5px;font-weight:600;white-space:nowrap}
+.store-heading .pl{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.store-heading .cap{margin-left:auto;font:10.5px var(--font-mono);color:var(--muted)}
+.store-heading .cap.full{color:var(--warning)}
+.bucket-row{display:grid;min-height:78px;border-bottom:1px solid var(--line)}
+/* 用 flex 换行而不是 grid：grid 的 grid-auto-rows 会把标题行也算成 76px，
+   行高被撑开、物品行之间出现大段空白（第一版就踩了这个） */
+.bucket{
+  min-height:var(--bucket-min-h);padding:var(--bucket-pad-y) var(--bucket-pad-x);width:var(--char-col);
+  background:#0b0e11;border-right:1px solid var(--line-soft);
+  display:flex;flex-wrap:wrap;align-content:flex-start;
+  gap:var(--bucket-gap-y) var(--bucket-gap-x);
+}
+.bucket-title{flex:0 0 100%;display:flex;align-items:baseline;gap:6px;height:14px;font-size:10px;letter-spacing:.08em;color:#6b737a;text-transform:uppercase}
+.bucket-title span{letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
+.it{position:relative;width:var(--tile);height:var(--tile);border:1px solid var(--line);border-radius:3px;background:var(--surface-2);display:grid;place-items:center;font:9px var(--font-mono);color:var(--muted-strong);overflow:hidden}
+.it::after{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--common)}
+.it.exotic::after{background:var(--exotic)} .it.legendary::after{background:var(--legendary)} .it.rare::after{background:var(--rare)}
+.it .p{position:absolute;right:3px;bottom:2px;font-size:8px;color:var(--muted)}
+.it.eq{border-color:rgba(215,179,94,.45);background:rgba(215,179,94,.08)}
+.it.eq::before{content:"";position:absolute;left:4px;top:4px;width:5px;height:5px;border-radius:1px;background:var(--accent)}
+.it.sel{outline:1px solid var(--accent);outline-offset:1px}
+.it.locked::after{background:var(--warning)}
+.empty-cell{width:var(--empty-cell);height:var(--empty-cell);border:1px solid #232a31;border-radius:3px;background:rgba(255,255,255,.02)}
+.more-btn{flex:0 0 100%;height:28px;margin-top:2px;padding:0 10px;border:1px dashed var(--line-strong);border-radius:var(--radius-xs);background:var(--surface-2);color:var(--muted-strong);font-size:11px;white-space:nowrap}
+.more-btn:hover{background:var(--panel-hover);color:var(--text)}
+.panel-resizer{position:relative;z-index:12;width:10px;cursor:col-resize}
+.panel-resizer::after{content:"";position:absolute;left:4px;top:0;bottom:0;width:1px;background:var(--line)}
+.panel-resizer:hover::after{background:var(--accent-border);width:2px;left:3px}
+.detail-panel{border-left:1px solid var(--line);background:var(--surface-1);overflow:auto;min-width:0}
+.detail-head{display:flex;gap:12px;padding:14px;border-bottom:1px solid var(--line)}
+.detail-head .nm{font-size:15px;font-weight:600;color:var(--text-strong)}
+.detail-head .sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.detail-head .srcs{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:62px 1fr;gap:7px 10px;padding:12px 14px;font-size:12.5px}
+.kv dt{color:var(--muted);font-size:11.5px}
+.sect{padding:12px 14px;border-top:1px solid var(--line)}
+.sect h5{font-size:10.5px;letter-spacing:.12em;color:#6b737a;text-transform:uppercase;margin-bottom:9px}
+.plug{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:12.5px}
+.plug .picon{width:24px;height:24px;flex:none;border:1px solid #5d6670;border-radius:3px;background:#25292d}
+.plug .dot{width:10px;height:10px;flex:none;border:1px solid var(--line-strong);border-radius:2px;background:var(--surface-2)}
+.plug .dot.on{background:var(--accent);border-color:var(--accent)}
+.plug .tag{margin-left:auto;font-size:10.5px;color:var(--muted)}
+.detail-actions{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;border-top:1px solid var(--line);position:sticky;bottom:0;background:var(--surface-1)}
+
+/* ══ 任务随航 ══ */
+.quest-wrap{flex:1;min-height:0;overflow:auto}
+.quest{max-width:940px;margin:0 auto;padding:18px 20px 28px;display:flex;flex-direction:column;gap:14px}
+.hero{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-1);overflow:hidden}
+.hero .top{display:flex;align-items:center;gap:13px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.hero .sig{width:38px;height:38px;flex:none;display:grid;place-items:center;border:1px solid var(--accent-border);border-radius:var(--radius-xs);color:var(--accent);background:var(--accent-soft)}
+.hero .nm{font-size:16px;font-weight:600;color:var(--text-strong)}
+.stepno{text-align:right;font:12px var(--font-mono);color:var(--muted)}
+.stepno b{display:block;font-size:20px;color:var(--text-strong);line-height:1.1}
+.obj{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.obj .t{font-size:15px;color:var(--text-strong)}
+.obj .p{display:flex;align-items:baseline;gap:10px}
+.obj .p .n{font:22px var(--font-mono);color:var(--text-strong)}
+.obj .p .d{font:13px var(--font-mono);color:var(--muted)}
+.quick{display:flex;gap:9px;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.map-card,.guide-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-1);padding:13px}
+.map-card svg{width:100%;height:136px;display:block;margin:4px 0 6px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:10.5px;color:var(--muted)}
+.legend i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
+.guide-card{display:flex;flex-direction:column;gap:10px}
+.guide-card p{font:13.5px/1.65 var(--font-prose);color:#e4e2dc}
+.note{display:flex;gap:10px;padding:11px 13px;border:1px solid rgba(213,168,95,.3);border-radius:var(--radius-sm);background:rgba(213,168,95,.06);font-size:12.5px;color:#e8d5a6}
+.note .mk{flex:none;width:16px;height:16px;margin-top:1px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;font-size:10px}
+.next-row{display:flex;align-items:center;gap:11px;padding:11px 13px;border-top:1px solid var(--line-soft)}
+.next-row:first-child{border-top:0}
+.stub{flex:1;display:grid;place-items:center;padding:32px}
+.stub .panel{max-width:620px}
+.stub ul{padding:14px 16px;display:grid;gap:9px;list-style:none;color:var(--muted);font-size:13px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="navigation-rail">
+    <div class="brand-lockup">
+      <span class="brand-sigil">◈</span>
+      <div><strong>Ghost Intelligence</strong><span>守护者智能伙伴</span></div>
+    </div>
+
+    <nav id="primary-navigation" aria-label="主要功能" style="display:flex;flex-direction:column;min-height:0;overflow:auto">
+      <div class="nav-group" role="group" aria-label="玩家工作区">
+        <span class="nav-group-label">玩家工作区</span>
+        <button class="nav-item" data-ws="chat"><span class="ic">▤</span>聊天</button>
+        <button class="nav-item" data-ws="inv"><span class="ic">▦</span>仓库</button>
+        <button class="nav-item" data-ws="build"><span class="ic">◈</span>配装</button>
+        <button class="nav-item" data-ws="loadout"><span class="ic">❖</span>配装槽<span class="tag">12</span></button>
+        <button class="nav-item" data-ws="quest"><span class="ic">➤</span>任务随航<span class="tag warn">1</span></button>
+        <button class="nav-item" data-ws="triumph"><span class="ic">★</span>成就</button>
+        <button class="nav-item" data-ws="collect"><span class="ic">▣</span>收藏</button>
+        <button class="nav-item" data-ws="char"><span class="ic">☰</span>角色</button>
+        <button class="nav-item" data-ws="act"><span class="ic">◎</span>活动</button>
+      </div>
+      <div class="nav-group" role="group" aria-label="账号与工具">
+        <span class="nav-group-label">账号与工具</span>
+        <button class="nav-item" data-ws="tools"><span class="ic">⚯</span>工具</button>
+        <button class="nav-item" data-ws="settings"><span class="ic">⚙</span>设置</button>
+      </div>
+    </nav>
+
+    <div class="account-area">
+      <button class="account-button">
+        <span class="guardian-avatar">守</span>
+        <span class="account-copy"><strong>OneTop丶Husky#6641</strong><small>Bungie 已绑定 · 2 分钟前同步</small></span>
+        <span class="caret">▼</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="app-main">
+
+    <!-- ══ 聊天 ══ -->
+    <section data-pane="chat" style="display:flex;flex-direction:column;flex:1;min-height:0">
+      <div class="chat-layout">
+        <aside class="session-list">
+          <div class="top"><button class="btn primary" style="flex:1;justify-content:center">＋ 新对话</button></div>
+          <div style="overflow:auto;flex:1">
+            <div class="session-group">今天</div>
+            <button class="session active"><div class="t">仓库里没用的紫枪</div><div class="m">7 分钟前 · 12 条</div></button>
+            <button class="session"><div class="t">这周要打什么</div><div class="m">1 小时前 · 8 条</div></button>
+            <div class="session-group">昨天</div>
+            <button class="session"><div class="t">术士星火配装差一点手雷</div><div class="m">昨天 22:14</div></button>
+            <button class="session"><div class="t">暗地孤灵做到哪了</div><div class="m">昨天 21:02</div></button>
+            <div class="session-group">更早</div>
+            <button class="session"><div class="t">宗师夜幕配装</div><div class="m">9 月 27 日</div></button>
+          </div>
+        </aside>
+
+        <div class="chat-main">
+          <div class="page-header">
+            <div><h1>聊天</h1><div class="sub">仓库里没用的紫枪</div></div>
+            <div class="tools">
+              <span class="src account"><b>账号</b>·2 分钟前</span>
+              <button class="btn ghost">导出</button>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <div class="thread">
+              <div class="message-row">
+                <span class="avatar you">你</span>
+                <div><div class="role">你</div>
+                  <div class="prose"><p>帮我把仓库里没用的紫枪挑出来，别按光等判，看 perk。</p></div>
+                </div>
+              </div>
+
+              <div class="message-row">
+                <span class="avatar ai">◈</span>
+                <div>
+                  <div class="role">Ghost Intelligence</div>
+                  <div class="prose">
+                    <p>扫了全账号 <b>1,247</b> 件武器，传说级 <b>863</b> 件。按你的口径——只看 perk、不看光等——有 <b>7</b> 件两个 perk 栏都没有可留项、也没进任何社区清单。</p>
+                    <p>先看前 3 件。这几件我逐个核过<b>组件 310 的可切换项</b>，不是只看当前装着的那颗。</p>
+                  </div>
+
+                  <div class="tool-block">
+                    <div class="h">
+                      <span class="t">候选拆解 · 3 件</span>
+                      <span class="src account"><b>账号</b>·2 分钟前</span>
+                      <span class="src community"><b>社区清单</b>·DIM 愿单</span>
+                      <div class="tools"><button class="btn ghost">在仓库里打开</button></div>
+                    </div>
+                    <div>
+                      <div class="item-row">
+                        <span class="tile md legendary"></span>
+                        <div style="flex:1"><div class="nm">月之狂嚎</div><div class="meta">手炮 · 传说 · 动能 · 可切换项 2/7 命中</div></div>
+                        <button class="btn ghost">详情</button>
+                      </div>
+                      <div class="item-row">
+                        <span class="tile md legendary"></span>
+                        <div style="flex:1"><div class="nm">玫瑰</div><div class="meta">手炮 · 传说 · 烈日 · 可切换项 1/6 命中</div></div>
+                        <button class="btn ghost">详情</button>
+                      </div>
+                      <div class="item-row">
+                        <span class="tile md legendary"></span>
+                        <div style="flex:1"><div class="nm">巅峰捕食者</div><div class="meta">火箭筒 · 传说 · 虚空 · 可切换项 0/5 命中</div></div>
+                        <button class="btn ghost">详情</button>
+                      </div>
+                    </div>
+                    <div class="f">
+                      <span class="hint">没有"光等低就拆"这条；没进清单也不等于该弃。</span>
+                      <button class="btn ghost" style="margin-left:auto">换一批</button>
+                    </div>
+                    <details>
+                      <summary>▸ 展开这次调用的细节（工具 · intent · 耗时）</summary>
+                      <div style="padding:10px 12px;font:11.5px/1.7 var(--font-mono);color:var(--muted)">
+                        inventory_assistant(intent="duplicates", type_name="手炮")<br>
+                        组件 102/200/201/205/300/304/305/310 · 4.11 MB · 1.8s
+                      </div>
+                    </details>
+                  </div>
+
+                  <div class="prose" style="margin-top:14px">
+                    <p>你要的转装备我也备好了。<b>账号没有任何改动</b>，确认后才执行：</p>
+                  </div>
+
+                  <div class="confirm">
+                    <div class="h">
+                      <span class="t">准备执行 · 3 步</span>
+                      <span class="src unknown" style="margin-left:auto"><b>待确认</b>·未写入</span>
+                    </div>
+                    <ul class="steps">
+                      <li><span class="n">1</span><div><div class="body">把「光芒领主手套」<b>从仓库搬到术士背包</b></div><div class="why">它现在不在该角色身上，直接装备会被上游拒</div></div></li>
+                      <li><span class="n">2</span><div><div class="body">穿上它，<b>顶下</b>当前异域臂铠「逃逸艺术家」</div><div class="why">同一槽位不能同时穿两件异域</div></div></li>
+                      <li><span class="n">3</span><div><div class="body">装备「星火协议」，<b>回读核对</b></div><div class="why">写入后有 3~10 秒同步窗口，读不到会如实报"未确认"，不报成功</div></div></li>
+                    </ul>
+                    <div class="f">
+                      <button class="btn primary">确认执行</button>
+                      <button class="btn ghost">只执行第 1 步</button>
+                      <span class="hint" style="margin-left:auto">不消耗材料 · 失败会说清停在哪一步</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="composer">
+            <div class="box">
+              <textarea rows="1" placeholder="问点什么，或者让我去改…"></textarea>
+              <button class="btn primary">发送</button>
+            </div>
+            <div class="meta">
+              <span>Enter 发送 · Shift+Enter 换行</span>
+              <span class="right">任何写入都会先给你看要改什么</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ 仓库 ══ -->
+    <section data-pane="inv" style="display:flex;flex-direction:column;flex:1;min-height:0" hidden>
+      <div class="page-header">
+        <h1>仓库</h1>
+        <span class="sub">3 个角色 · 仓库 587 件</span>
+        <div class="tools">
+          <button class="char-switch"><span class="emb"></span><div><b>猎人</b> <span>光等 2013</span></div><span class="caret">▼</span></button>
+          <span class="src account"><b>账号</b>·2 分钟前</span>
+          <button class="btn ghost">刷新</button>
+        </div>
+      </div>
+
+      <div class="inv-toolbar">
+        <div class="search"><input class="field" placeholder="搜索物品、perk、类型…"></div>
+        <div class="seg">
+          <button class="chip" aria-pressed="true">全部</button>
+          <button class="chip">武器</button>
+          <button class="chip">护甲</button>
+        </div>
+        <button class="chip">拆解候选</button>
+        <button class="chip">重复</button>
+        <div class="inv-scope">
+          <span class="hint">网格按可见区域渲染，587 件不一次倒出</span>
+          <button class="btn ghost">排序：光等</button>
+        </div>
+      </div>
+
+      <div class="inventory-workspace">
+        <div class="inventory-scroll">
+          <div class="inventory-grid" style="--char-col:186px">
+            <div class="store-headings" style="grid-template-columns:repeat(4,var(--char-col))">
+              <div class="store-heading"><span class="emb h"></span><div><div class="nm">猎人</div><div class="pl">虚空 · 2013</div></div><span class="cap">176/200</span></div>
+              <div class="store-heading"><span class="emb t"></span><div><div class="nm">泰坦</div><div class="pl">烈日 · 1996</div></div><span class="cap">142/200</span></div>
+              <div class="store-heading"><span class="emb"></span><div><div class="nm">术士</div><div class="pl">烈日 · 2004</div></div><span class="cap">163/200</span></div>
+              <div class="store-heading" style="background:#151a20"><span class="emb w"></span><div><div class="nm">仓库</div><div class="pl">全账号共享</div></div><span class="cap full">587/600</span></div>
+            </div>
+
+            <div class="bucket-row" style="grid-template-columns:repeat(4,var(--char-col))">
+              <div class="bucket"><div class="bucket-title">动能武器 <span>3/3</span></div>
+                <div class="it exotic eq">980<span class="p">2013</span></div><div class="it legendary">85<span class="p">2011</span></div><div class="it legendary">72<span class="p">2010</span></div>
+              </div>
+              <div class="bucket"><div class="bucket-title">动能武器 <span>3/3</span></div>
+                <div class="it legendary eq">77<span class="p">1996</span></div><div class="it legendary">70<span class="p">1994</span></div><div class="it rare">15<span class="p">1985</span></div>
+              </div>
+              <div class="bucket"><div class="bucket-title">动能武器 <span>3/3</span></div>
+                <div class="it legendary eq">90<span class="p">2004</span></div><div class="it exotic">52<span class="p">2002</span></div><div class="it legendary">48<span class="p">1999</span></div>
+              </div>
+              <div class="bucket" style="background:#0e1216"><div class="bucket-title">手炮 <span>38</span></div>
+                <div class="it legendary">12</div><div class="it legendary">9</div><div class="it exotic">7</div><div class="it legendary">5</div>
+                <div class="it legendary">4</div><div class="it legendary">3</div><div class="it rare">2</div><div class="it legendary">1</div>
+                <button class="more-btn">还有 30 件 · 展开</button>
+              </div>
+            </div>
+
+            <div class="bucket-row" style="grid-template-columns:repeat(4,var(--char-col))">
+              <div class="bucket"><div class="bucket-title">能量武器 <span>3/3</span></div>
+                <div class="it legendary eq">61<span class="p">2012</span></div><div class="it exotic">44<span class="p">2011</span></div><div class="it rare">18<span class="p">1998</span></div>
+              </div>
+              <div class="bucket"><div class="bucket-title">能量武器 <span>2/3</span></div>
+                <div class="it legendary eq">66<span class="p">1994</span></div><div class="it legendary">58<span class="p">1990</span></div><div class="empty-cell"></div>
+              </div>
+              <div class="bucket"><div class="bucket-title">能量武器 <span>3/3</span></div>
+                <div class="it legendary eq">88<span class="p">2003</span></div><div class="it legendary">75<span class="p">2000</span></div><div class="it legendary">70<span class="p">1997</span></div>
+              </div>
+              <div class="bucket" style="background:#0e1216"><div class="bucket-title">火箭筒 <span>14</span></div>
+                <div class="it legendary">8</div><div class="it legendary">6</div><div class="it exotic">4</div>
+                <button class="more-btn">还有 11 件 · 展开</button>
+              </div>
+            </div>
+
+            <div class="bucket-row" style="grid-template-columns:repeat(4,var(--char-col))">
+              <div class="bucket"><div class="bucket-title">头盔 <span>2/9</span></div>
+                <div class="it legendary eq">95<span class="p">2010</span></div><div class="it legendary">93<span class="p">2008</span></div><div class="empty-cell"></div><div class="empty-cell"></div>
+              </div>
+              <div class="bucket"><div class="bucket-title">腿甲 <span>2/9</span></div>
+                <div class="it legendary eq">81<span class="p">1996</span></div><div class="it legendary locked">79<span class="p">1990</span></div><div class="empty-cell"></div><div class="empty-cell"></div>
+              </div>
+              <div class="bucket"><div class="bucket-title">手臂 <span>2/9</span></div>
+                <div class="it exotic eq">97<span class="p">2010</span></div><div class="it legendary">91<span class="p">2001</span></div><div class="empty-cell"></div><div class="empty-cell"></div>
+              </div>
+              <div class="bucket" style="background:#0e1216"><div class="bucket-title">胸甲（三职业） <span>61</span></div>
+                <div class="it legendary">22</div><div class="it legendary">19</div><div class="it legendary">14</div>
+                <button class="more-btn">还有 58 件 · 展开</button>
+              </div>
+            </div>
+
+            <div class="bucket-row" style="grid-template-columns:repeat(4,var(--char-col))">
+              <div class="bucket"><div class="bucket-title">胸甲 <span>1/9</span></div>
+                <div class="it exotic eq">88<span class="p">2010</span></div><div class="empty-cell"></div><div class="empty-cell"></div><div class="empty-cell"></div>
+              </div>
+              <div class="bucket"><div class="bucket-title">职业物品 <span>1/9</span></div>
+                <div class="it legendary eq">66<span class="p">1992</span></div><div class="empty-cell"></div><div class="empty-cell"></div><div class="empty-cell"></div>
+              </div>
+              <div class="bucket"><div class="bucket-title">胸甲 <span>2/9</span></div>
+                <div class="it exotic sel">73<span class="p">2010</span></div><div class="it legendary">69<span class="p">1997</span></div><div class="empty-cell"></div><div class="empty-cell"></div>
+              </div>
+              <div class="bucket" style="background:#0e1216"><div class="bucket-title">已锁定 <span>47</span></div>
+                <div class="it legendary locked">31</div><div class="it legendary locked">28</div><div class="it exotic locked">19</div>
+                <button class="more-btn">还有 44 件 · 展开</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-resizer" role="separator" aria-orientation="vertical" aria-label="调整面板宽度"></div>
+
+        <aside class="detail-panel">
+          <div class="detail-head">
+            <span class="tile lg exotic"></span>
+            <div>
+              <div class="nm">星火协议</div>
+              <div class="sub">异域 · 胸甲 · 术士 · 光等 <span class="num">2010</span></div>
+              <div class="srcs">
+                <span class="src account"><b>账号</b>·持有 1 件</span>
+                <span class="src manifest"><b>图鉴</b>·已核对</span>
+              </div>
+            </div>
+          </div>
+          <dl class="kv">
+            <dt>六维</dt><dd class="num">武器 100 · 生命值 42 · 职业 30 · 手雷 100 · 近战 24 · 超能 22</dd>
+            <dt>位置</dt><dd>术士背包</dd>
+            <dt>分级</dt><dd class="num">T5 · 光等 2010</dd>
+          </dl>
+          <div class="sect">
+            <h5>当前已装</h5>
+            <div class="plug"><span class="picon"></span>武器模组<span class="tag">+10</span></div>
+            <div class="plug"><span class="picon"></span>手雷模组<span class="tag">+10</span></div>
+          </div>
+          <div class="sect">
+            <h5>这件能换的 · 组件 310</h5>
+            <div class="plug"><span class="dot on"></span>手雷 +5<span class="tag">清单内</span></div>
+            <div class="plug"><span class="dot"></span>武器 +5<span class="tag">清单内</span></div>
+            <div class="plug"><span class="dot"></span>平衡调整<span class="tag">最低三项 +1</span></div>
+            <p class="hint" style="margin-top:9px">清单外的调谐装不上，上游会拒；我们不会先替你试。</p>
+          </div>
+          <div class="detail-actions">
+            <button class="btn primary">装备到当前角色</button>
+            <button class="btn">移到仓库</button>
+            <button class="btn ghost">锁定</button>
+          </div>
+          <div class="sect" style="border-top:1px solid var(--line)">
+            <p class="hint">操作会先给你看这几步，确认后才动账号，完成后回读核对。</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ══ 任务随航 ══ -->
+    <section data-pane="quest" style="display:flex;flex-direction:column;flex:1;min-height:0" hidden>
+      <div class="page-header">
+        <h1>任务随航</h1>
+        <span class="sub">按你账号的实时进度走，不是一篇静态攻略</span>
+        <div class="tools">
+          <button class="char-switch"><span class="emb"></span><div><b>猎人</b> <span>光等 2013</span></div><span class="caret">▼</span></button>
+          <span class="src account"><b>任务状态</b>·30 秒前</span>
+          <button class="btn ghost">刷新</button>
+        </div>
+      </div>
+
+      <div class="quest-wrap">
+        <div class="quest">
+          <div class="hero">
+            <div class="top">
+              <span class="sig">➤</span>
+              <div style="flex:1">
+                <div class="nm">暗地孤灵</div>
+                <div class="hint" style="margin-top:3px">月球 · 主线 · <span class="src curated"><b>步骤文案</b>·人工整理 2026-09-28</span></div>
+              </div>
+              <div class="stepno">Step<b>3 / 7</b></div>
+            </div>
+            <div class="obj">
+              <div class="t">已完成活动</div>
+              <div class="p">
+                <span class="n num">37</span><span class="d num">/ 50</span>
+                <div class="bar" style="flex:1;margin:0 4px 4px"><i style="width:74%"></i></div>
+                <span class="src account"><b>账号</b>·组件 301</span>
+              </div>
+              <div class="quick">
+                <button class="btn primary">打开地图</button>
+                <button class="btn">查看攻略</button>
+                <button class="btn ghost">标记为已完成</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="map-card">
+              <div style="display:flex;align-items:center;gap:8px">
+                <b style="font-size:12.5px">月球 · 导演地图</b>
+                <span class="src manifest"><b>图鉴</b>·节点坐标</span>
+              </div>
+              <svg viewBox="0 0 320 136" role="img" aria-label="导演地图节点与当前目标">
+                <line x1="46" y1="98" x2="120" y2="68" stroke="#2a3037" stroke-width="1"/>
+                <line x1="120" y1="68" x2="198" y2="82" stroke="#2a3037" stroke-width="1"/>
+                <line x1="198" y1="82" x2="272" y2="44" stroke="rgba(215,179,94,.5)" stroke-width="1" stroke-dasharray="3 3"/>
+                <circle cx="46" cy="98" r="5" fill="#14181d" stroke="#3a424b"/>
+                <text x="46" y="120" fill="#9fa6ac" font-size="9.5" text-anchor="middle">着陆区</text>
+                <circle cx="120" cy="68" r="5" fill="#14181d" stroke="#3a424b"/>
+                <text x="120" y="54" fill="#9fa6ac" font-size="9.5" text-anchor="middle">NPC</text>
+                <circle cx="198" cy="82" r="5" fill="#14181d" stroke="#3a424b"/>
+                <text x="198" y="104" fill="#9fa6ac" font-size="9.5" text-anchor="middle">任务入口</text>
+                <circle cx="272" cy="44" r="8" fill="rgba(215,179,94,.14)" stroke="#d7b35e"/>
+                <circle cx="272" cy="44" r="2.6" fill="#d7b35e"/>
+                <text x="272" y="27" fill="#d7b35e" font-size="10" text-anchor="middle">目标</text>
+              </svg>
+              <div class="legend">
+                <span><i style="background:#d7b35e"></i>当前目标节点</span>
+                <span><i style="background:#3a424b"></i>已知节点</span>
+                <span>关卡内路线：<b style="color:var(--warning)">无数据</b>（靠人工整理）</span>
+              </div>
+            </div>
+
+            <div class="guide-card">
+              <div style="display:flex;align-items:center;gap:8px">
+                <b style="font-size:12.5px">这一步怎么做</b>
+                <span class="src curated"><b>人工整理</b>·2026-09-28</span>
+              </div>
+              <p>在月球「地狱深渊」完成任意 50 次活动结算。刷法：从着陆区往东进地狱深渊，反复打公共事件；单人一轮约 90 秒。</p>
+              <p class="hint">社区补充：暗影要塞的公共事件刷新更快，双人时两处轮换。</p>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <span class="src community"><b>社区</b>·Starside·2026-09-21</span>
+                <span class="src"><b>未核对</b>·数值随版本可能变</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="note">
+            <span class="mk">!</span>
+            <div>这条攻略是<b>人工整理</b>的，版本更新后可能过期。系统不会替你编步骤——没整理过的任务阶段会直说"还没有攻略"，而不是让模型现编一段。</div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-h">接下来</div>
+            <div class="next-row">
+              <span class="tile md" style="border-radius:3px"></span>
+              <div style="flex:1">
+                <div style="font-size:13px">Step 4 · 回到 NPC 交任务</div>
+                <div class="hint" style="margin-top:2px">已完成 0/1 · 需要先完成 Step 3</div>
+              </div>
+              <span class="src"><b>没锚点</b>·只给候选</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 其余模块占位 -->
+    <section data-pane="other" style="display:flex;flex-direction:column;flex:1;min-height:0" hidden>
+      <div class="page-header"><h1 id="other-title">模块</h1><span class="sub">外壳已定，内容待做</span></div>
+      <div class="stub">
+        <div class="panel">
+          <div class="panel-h">这个模块的骨架</div>
+          <ul>
+            <li>· 页头：标题 + 当前上下文（角色/活动）+ 数据来源与时间</li>
+            <li>· 主体：列表或网格，按可见区域渲染，不一次倒出</li>
+            <li>· 右侧：选中项的详情与操作；写入走确认信封</li>
+            <li>· 空态 / 加载 / 未核对 三个状态都要有，不能只有成功态</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const wired = {chat:'chat', inv:'inv', quest:'quest'};
+const items = [...document.querySelectorAll('.nav-item[data-ws]')];
+function show(ws){
+  items.forEach(b => b.classList.toggle('active', b.dataset.ws === ws));
+  document.querySelectorAll('[data-pane]').forEach(p => { p.hidden = true; });
+  const target = document.querySelector(`[data-pane="${wired[ws] || 'other'}"]`);
+  target.hidden = false;
+  if (!wired[ws]) {
+    const b = items.find(x => x.dataset.ws === ws);
+    document.getElementById('other-title').textContent = b ? b.textContent.trim() : '模块';
+  }
+}
+items.forEach(b => b.addEventListener('click', () => show(b.dataset.ws)));
+show(new URLSearchParams(location.search).get('ws') || 'chat');
+</script>
+</body>
+</html>
