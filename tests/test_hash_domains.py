@@ -1102,25 +1102,11 @@ LEDGER: dict[str, str] = {
         "`set(self._ARMOR_MOD_CATEGORIES.keys())`（键含 3481777685）拼成，全在无符号那一侧。"
         "静态算不出是因为还有一支 `{slot_to_hash[slot_key]}`。"
     ),
-    "destiny_mcp/services/loadout_equipment_service.py::actual_sockets[socket_index].get('plugHash', 0) != plug_hash": (
-        "「判不准，有真风险」这是**写完之后的回读核对**：左边是组件 305 的无符号插座值，"
-        "右边 `plug_hash` 来自 `item.mod_sockets`（存档配装 / 求解方案）。今天两条生产路径给的"
-        "都是无符号（`loadout_mod_sockets` 与 `build_fragments` 都 `to_unsigned` 过），但只要有人"
-        "往 `mod_sockets` 里塞 `manifest.search()` 的 hash，这条核对就会**恒为 False**，"
-        "表现是「明明装上了却报没装上」。"
-    ),
-    "destiny_mcp/services/loadout_equipment_service.py::subclass_sockets[socket_index].get('plugHash', 0) != plug_hash": (
-        "「判不准，有真风险」同上一行，只是换成子职业那组插槽（`loadout.subclass.plug_sockets`）。"
-    ),
-    "destiny_mcp/services/loadout_equipment_service.py::subclass_item.get('itemHash', 0) != loadout.subclass.subclass_item_hash": (
-        "「判不准，有真风险」回读核对子职业本体：左边是当前装备的 API 字段（无符号），"
-        "右边是存档配装里记的 `subclass_item_hash`。存档那条路读 profile（无符号），"
-        "但配装方案那条路由求解流程填，值域没有类型约束兜住。"
-    ),
-    "destiny_mcp/services/loadout_recovery.py::actual_sockets[socket_index].get('plugHash', 0) != plug_hash": (
-        "「判不准，有真风险」回滚前的现场核对，和 `loadout_equipment_service` 那两处同源："
-        "`original.mod_sockets` 的值域取决于谁写的这套配装。"
-    ),
+    # **下面这三条原来在这里，2026-10-03 已删**：它们记的是回读核对里那三条跨值域比较
+    # （`actual_sockets[…].get('plugHash') != plug_hash` 等），而当天真机证明那**不是"判不准"、
+    # 是恒为 False 的真 bug**（社区模板给有符号的 `回天掌法` = -1847517590，账号上是 2447449706
+    # → 两次回读窗口白烧 147.8 秒）。现在两边都过 `to_unsigned`，这几条比较被下面
+    # `test_normalization_is_positively_recognized` 当"归一过"正面钉住；台账里留着就是过期条目。
     "destiny_mcp/services/loadout_subclass_sockets.py::item.get('itemHash') == subclass.subclass_item_hash": (
         "「判不准，有真风险」找「要换上的那个子职业」时按 hash 认物品：左边是背包里的 API 字段"
         "（无符号），右边是配装里记的。认不中的后果是「要装的子职业不在这个角色的背包里」这条"
@@ -1237,6 +1223,10 @@ def test_normalization_is_positively_recognized() -> None:
         "destiny_mcp/services/inventory_service.py::item.item_hash in match_hashes": "widened",
         # 两边都过 `to_unsigned`
         "destiny_mcp/services/loadout_mod_sockets.py::to_unsigned(plug_hash) == target": "aligned",
+        # 回读核对的两条（2026-10-03 真机：社区模板给有符号、账号侧给无符号 → 恒为 False，
+        # 两次回读窗口白烧 147.8 秒；修好之后必须**认得出来**，不是"扫不到"）
+        "destiny_mcp/services/loadout_matches.py::to_unsigned(installed.get('plugHash', 0) or 0) != to_unsigned(plug_hash)": "aligned",
+        "destiny_mcp/services/loadout_matches.py::to_unsigned(subclass_item.get('itemHash', 0) or 0) != expected_item_hash": "aligned",
     }
     missing = sorted(key for key in expected if key not in sites)
     wrong = sorted(

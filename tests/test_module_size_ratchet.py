@@ -89,7 +89,10 @@ CEILINGS = {
     # 指纹比对 → 实例核对）整段搬去 `services/build_execution_guard.py`，`equip_build`
     # 只留一次调用 —— 那段本来就是"用户确认 → 真写账号"之间独立的四步，混在签发流程里
     # 读不出顺序。上限跟着收紧，腾出来的位置已经用掉了（一行注释 + 调用点）。
-    "destiny_mcp/services/build_service.py": 788,
+    # 788 → 787：`equip_build` 那一族候选拒绝码收进 `ErrorCode`（+1 行 import），同一趟把
+    # `equip_by_score` 的 logger 实参收成一行（-2）—— 净减 1，上限跟着收紧。别把这行抬回来：
+    # 它多出来的是"码的第二个出处"，不是新功能。
+    "destiny_mcp/services/build_service.py": 787,
     # 2026-10-03 新增（从 build_service 拆出）：碎片替换的兼容预检。拆出来的直接原因：
     # 上面那块贴在 889 没有位置放"为什么"，而它是真机事故（碎片有符号/无符号没归一，
     # 5 颗里 4 颗被判"与插槽不兼容"）的修复落点。登记即上限。
@@ -117,7 +120,11 @@ CEILINGS = {
     # `equip_loadout` 改走同一条恢复路径、以及三条话术修正（腾能量点名换下的那颗、
     # 清能量失败也带上游原文、子职业原因写进回执）都落在这 370 里。
     # 上限**跟着收紧**，腾出来的位置才是真腾出来。
-    "destiny_mcp/services/loadout_equipment_service.py": 370,
+    # 370 → 364（2026-10-03 回读那一趟的单一出处）：Step 4 从"自己开窗口 + 自己措辞"改成
+    # 两次调用 —— 窗口在 `write_readback`、判据在 `loadout_matches`、结论与话术在
+    # `loadout_verify.readback_verdict`。真机 audit 123435：外层自己又读了一整轮（约 78 秒），
+    # 与内侧读的是同一份状态、同一个函数，结论不可能变。
+    "destiny_mcp/services/loadout_equipment_service.py": 364,
     "destiny_mcp/services/starside_service.py": 769,
     # 新增登记（PvP 武器榜）：不登记就等于没有闸 —— 仓库的规矩是"要在这里加代码
     # 得先做一次有意识的决定"，而不是等它长成下一个上帝模块。当前 529 行即上限。
@@ -152,8 +159,14 @@ CEILINGS = {
     # 297 → 310（0.7.14）：身份块带 `name_variants`（同名多版本如实报，P0 修复）。
     "destiny_mcp/services/weapon_payload.py": 313,
     # P5 新增：本地资料汇总（愿单/选取率/清单/社区 → 每个 plug 的 recommended）
-    # 425：cross_check 不再对"同名多版本"断言 in_manifest_pool（2026-09-28）。
-    "destiny_mcp/services/weapon_local_data.py": 427,
+    # 403 → 425（2026-09-28，真机「千码凝视」同名两版）：`_cross_check` 不再对"同名多版本"
+    # 断言 `in_manifest_pool=false`。+22 的去处逐块可数：docstring 写清"为什么不能据此说滚不到"
+    # （+8）、`name_variant_count` 判歧义（+3）、逐颗从一次性 dict 改成可变 dict 并补
+    # `in_manifest_pool=null` / `perk_pool_check` / `perk_pool_check_reason`（+9）、`note` 补
+    # null 的语义（+2）。这就是那次修复的全部，没有顺带重构。
+    # 425 → 427 是**错的**：那 +2 出自 0be0c1b（突袭报表，没碰过这个文件），而且当时这次修复
+    # 还只在工作区里 —— 它是凭余量写的数，不是量出来的。上限按实际长度收回 425。
+    "destiny_mcp/services/weapon_local_data.py": 425,
     # 锻造图样查询新增登记（登记即上限）：目录（展示树 + 记录 + 目标需求）+ 账号进度
     # （组件 900 的**档案级与角色级两份**）+ 来源装配 + 变体的塑形配置都在这里。
     # 463 = 427 + 角色级记录合并（真机事故：32 条角色级记录被漏读）+ read 块收敛。
@@ -177,7 +190,9 @@ CEILINGS = {
     # 候选暂存（从 build_service 拆出）：登记即上限 —— 再往里加东西先回答"是不是该拆状态与话术"。
     # 101 → 126：`get_build_candidate` 的判定与话术（expired/unknown 两种下一步）搬了进来，
     # 与暂存同一处；换出来的是 build_service 的行数（那边要放"阶梯试解走并发档"）。
-    "destiny_mcp/services/build_candidates.py": 126,
+    # 126 → 125（错误码收口）：两个候选拒绝码改用 `ErrorCode`（+1 行 import），
+    # `describe_candidate` 的签名收成一行（-2）—— 上限跟着收紧。
+    "destiny_mcp/services/build_candidates.py": 125,
     # 同上：`intent="patterns"` 的载荷与话术（总览 / 单把 / 变体 / 术语对照 /「未开始」措辞）。
     # 211 是加上"玩家说红框、游戏说模式"的术语块与变体话术（含强化插槽）之后的长度；
     # 215 = 211 + 载荷里的 by_tier 汇总。
@@ -214,7 +229,19 @@ CEILINGS = {
     # 不是要的那套。单独成模块的直接原因有二：那边贴着 521 没有位置；而"核对"与"执行"本来
     # 就是两件事（`equip_with_recovery` 的外层与 `_equip_local_unlocked` 的 Step 4 共用同一份判据，
     # 各自写一份就会各自漂移）。注册即上限。
-    "destiny_mcp/services/loadout_verify.py": 159,
+    # 159 → 153：判据（逐槽比 / 集合比 / 子职业那一半）搬去 `loadout_matches.py`（见下），
+    # 这里留下两个**入口**（装备这一趟、回滚那一趟）与装备这一趟的结论话术
+    # `readback_verdict`（窗口仍在 `write_readback`）；腾出来的位置放了"核对自己炸了"那两行
+    # 留痕（回执 + 服务器日志）。上限跟着收紧。
+    "destiny_mcp/services/loadout_verify.py": 153,
+    # 2026-10-03 新增（从 loadout_verify 拆出，那边贴着 159）：**判据本身** —— 组件 305 报的
+    # 插槽与"要的那一套"逐项比（逐槽位 + 集合 + 子职业本体/技能/星象/碎片）。
+    # 拆出来的直接原因是 2026-10-03 真机那 147.8 秒的根因就落在这里：hash 两边值域没归一，
+    # 比对**恒为 False**（社区模板给有符号的 `回天掌法` = -1847517590，账号上是 2447449706），
+    # 于是"装好了"被报成"对不上"。判据与入口分开之后，`tests/test_hash_domains.py` 的横切
+    # 扫描也认得出这里的归一写法（那三条 `to_unsigned(...) != to_unsigned(...)`）。
+    # 注册即上限。
+    "destiny_mcp/services/loadout_matches.py": 109,
     # 2026-10-03 新增（从 loadout_mod_sockets 拆出，那边贴着 518）：模组写入的守门那一趟。
     # 单独成模块的原因：守门（换装**前**的现场）与规划（换装后的现场）语义相反，混在一处
     # 最容易发生的就是"规划顺手复用了守门那份过期快照"。注册即上限。
@@ -224,8 +251,11 @@ CEILINGS = {
     # `_equip_local_unlocked` 的返回分支与它自己的外层之间，于是出了真机那两类事故
     # （模组被挡就提前 return，子职业整段没跑；外侧只读一次就把"没确认"判成失败，整条白回滚）。
     # 197 = 184 + `equip_loadout` 也走这一条（同一动作两种后果，只因为入口不同）。
-    # 注册即上限。
-    "destiny_mcp/services/loadout_exact_flow.py": 197,
+    # 197 → 175：外层那次"自己再读一遍"整段删掉（它是 2026-10-03 那 147.8 秒里的第二轮，
+    # 与内侧同一判据、同一窗口，结论不可能变），只留"读内侧的结论 + 判要不要回滚"；
+    # 省下的位置换成了那三条不许回滚的**真实控制流**说明（第三种"没确认"已经不在那条路上）。
+    # 上限跟着收紧。
+    "destiny_mcp/services/loadout_exact_flow.py": 175,
     # 2026-10-03 新增（从 loadout_recovery 拆出）：回滚的位置那一半（放回原位 + 原先穿着的
     # 再穿回去）。与"这一件装着什么"分开的理由见模块 docstring。注册即上限。
     "destiny_mcp/services/loadout_restore_locations.py": 89,
@@ -279,7 +309,9 @@ CEILINGS = {
     # 单独成模块的直接原因：那边贴着 808 没位置，而"重取现场 → 执行前提复检 → 指纹比对 →
     # 实例核对"是一段完整的四步，顺序本身就是结论（缺一条就是"以为在装备、实际撞上游 500"，
     # 真机两次各 0 颗模组落地）。登记即上限。
-    "destiny_mcp/services/build_execution_guard.py": 101,
+    # 101 → 99：三个候选拒绝码收进 `error_codes.ErrorCode`（局部常量与那行注释去掉、换成
+    # 一行 import）—— 上限跟着收紧：腾出来的位置不该留着。
+    "destiny_mcp/services/build_execution_guard.py": 99,
     # 2026-09-28 新增（从 loadout_mod_sockets / armor_mod_service 抽出）：调谐能不能写的判据。
     # 抽出来的直接原因：同一判据被两条写入路径各写一份，只改了一边 → equip_build 拿组件 207
     # 判调谐，把 3 颗能装的调谐误拦（连上游都没试）。登记即上限。
@@ -309,7 +341,10 @@ CEILINGS = {
     # 跨值域 hash 比较的静态守门（tests/ 里唯一登记的一条：它不是业务模块，但里面有
     # 半个静态分析器 —— 台账、判据、注入样本都在里面，长起来同样是"下一个上帝模块"的苗头，
     # 所以按同样的规矩登记在**当前长度**：再加规则先回答"是拆出去还是抬上限"）。
-    "tests/test_hash_domains.py": 1338,
+    # 1338 → 1328（2026-10-03）：回读核对那三条台账条目删掉（它们记的不是"判不准"而是
+    # 恒为 False 的真 bug），改成 `test_normalization_is_positively_recognized` 里两条
+    # 正面钉住的归一比较（台账跟着收紧，别让它继续挂着一个已经不存在的问题）。
+    "tests/test_hash_domains.py": 1328,
 }
 
 

@@ -61,6 +61,14 @@ def _loadout() -> Loadout:
     )
 
 
+#: 回读重试满一轮之后那句话术（生产出处在 `loadout_verify.readback_verdict`）。
+#: 替身照抄它，是为了让"外层有没有改写这句话"这件事可断言 —— 2026-10-03 之前外层会把它
+#: 换成自己那份（还带一个算错的"12 秒"）。
+UNCONFIRMED_DETAIL = (
+    "写入步骤都成功了，但回读重试后仍对不上（可能是同步窗口）——过十几秒再看一次，别当成没装上。"
+)
+
+
 def stub_verify(monkeypatch: pytest.MonkeyPatch, value: bool) -> AsyncMock:
     """回读核对的替身：`_verify_loadout` 已搬成模块函数 `loadout_verify.verify_loadout`。
 
@@ -511,20 +519,33 @@ def test_priority_stats_keep_strict_order_and_remove_duplicates() -> None:
 
 @pytest.mark.asyncio
 async def test_exact_equipment_verifies_success(monkeypatch: pytest.MonkeyPatch) -> None:
+    """内层 Step 4 给了结论（对得上）→ 结论原样透传，外层**一行都不加、一次都不读**。
+
+    核对那一趟（含它写进 steps 的那一行与那句 message）归 `_equip_local_unlocked`：真机
+    2026-10-03 audit 123656 的回执里同一次核对出现了两行（内层一行 + 外层一行），
+    而 audit 123435 的两行一假一假 —— 一行就够，多出来的那行只会让调用方以为核对发生了两次。
+    """
     service = _equipment_service()
     service._capture_recovery_state = AsyncMock(return_value={})
     service._equip_local_unlocked = AsyncMock(return_value=LoadoutOperationResult(
         success=True,
         loadout_name="Exact",
-        message="applied",
+        message="已装备，回读核对通过。",
+        steps=[MoveItemStep(
+            action="verify", detail="已回读核对：装备实例、模组与子职业配置都对得上。",
+            success=True,
+        )],
+        verified=True,
     ))
-    stub_verify(monkeypatch, True)
+    verify = stub_verify(monkeypatch, False)
     service._restore_exact_state = AsyncMock()
 
     result = await service.equip_with_recovery("Alpha#0100", _loadout())
 
     assert result.success is True
-    assert result.steps[-1].action == "verify"
+    assert result.verified is True
+    assert [step.action for step in result.steps] == ["verify"]
+    verify.assert_not_awaited()
     service._restore_exact_state.assert_not_awaited()
 
 
@@ -575,32 +596,41 @@ async def test_exact_equipment_does_not_roll_back_an_unconfirmed_readback(
     service = _equipment_service()
     recovery = {"captured": True}
     service._capture_recovery_state = AsyncMock(return_value=recovery)
+    # 替身要**像生产那条路**：结论 + 那一行 steps + 那句话术都是内层写的（`readback_verdict`），
+    # 外层一个字都不改。给 `verified=False` 而 message 里没有那句，测的就不是真形状了。
+    unconfirmed = "配装 'Exact' 的写入都成功了，但回读没确认：" + UNCONFIRMED_DETAIL
     service._equip_local_unlocked = AsyncMock(return_value=LoadoutOperationResult(
         success=True,
         loadout_name="Exact",
-        message="applied",
+        message=unconfirmed,
+        steps=[MoveItemStep(action="verify", detail=UNCONFIRMED_DETAIL, success=False)],
+        verified=False,
     ))
-    stub_verify(monkeypatch, False)
+    verify = stub_verify(monkeypatch, True)
     service._restore_exact_state = AsyncMock(return_value=True)
 
     result = await service.equip_with_recovery("Alpha#0100", _loadout())
 
     assert result.verified is False, "没确认要如实记在 verified 上"
     assert "别当成没装上" in result.message, result.message
+    assert result.message == unconfirmed, "外层不许改写核对那趟的话术（两处措辞=两种结论）"
     service._restore_exact_state.assert_not_awaited()
+    verify.assert_not_awaited()  # 内层已经读过一整轮窗口，外层再读只是把 78 秒再花一遍
     verify_step = next(step for step in result.steps if step.action == "verify")
     assert verify_step.success is False
 
 
 @pytest.mark.asyncio
-async def test_exact_equipment_reads_back_through_the_shared_retry_window(
+async def test_exact_equipment_does_not_open_a_second_readback_window(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """外侧回读**必须走 `write_readback` 的重试**，而不是读一次就下结论。
+    """**外层一次都不许读**：内层（Step 4）已经开过一整轮窗口，外层再读是同一份判据、同一个窗口。
 
-    真机 2026-10-03 第 3 轮：内层重试满约 10.5 秒、按口径报"别当成没装上"，而外侧**只读一次**
-    就判失败，于是同步窗口一超过 10.5 秒，同一份状态被读成两种结论、整条配装白白回滚。
-    这里让前两次读返回 False、第三次 True：换回"读一次"的实现，这条立刻变红。
+    这条测试原来叫 `…reads_back_through_the_shared_retry_window`、钉的正是要删的那段代码：
+    内侧报 False 之后外侧**又**跑了一轮 `read_until`。真机 2026-10-03 audit 123435 的账：
+    两次调用差 147.8 秒，反解出单次回读尝试 ≈8.45 秒（3 次网络往返），一轮窗口约 78 秒 ——
+    而两轮读的是同一份账号状态、同一个函数，结论不可能变。判据与窗口各只有一处：
+    `loadout_matches` / `write_readback`（`readback_verdict` 是唯一调用它们的地方）。
     """
     monkeypatch.setattr(write_readback, "ATTEMPTS", 4)
     monkeypatch.setattr(write_readback, "DELAY_SECONDS", 0)
@@ -609,8 +639,9 @@ async def test_exact_equipment_reads_back_through_the_shared_retry_window(
     service._equip_local_unlocked = AsyncMock(return_value=LoadoutOperationResult(
         success=True,
         loadout_name="Exact",
-        message="applied",
-        verified=None,  # 内层没给结论（替身路径）→ 外侧要自己按同步窗口重试
+        message="配装 'Exact' 的写入都成功了，但回读没确认：" + UNCONFIRMED_DETAIL,
+        steps=[MoveItemStep(action="verify", detail=UNCONFIRMED_DETAIL, success=False)],
+        verified=False,  # 内层**已经**读过一整轮窗口，结论是"没确认"
     ))
     reads = []
 
@@ -623,9 +654,42 @@ async def test_exact_equipment_reads_back_through_the_shared_retry_window(
 
     result = await service.equip_with_recovery("Alpha#0100", _loadout())
 
-    assert len(reads) == 3, f"要重试到对上为止，实际读了 {len(reads)} 次"
-    assert result.verified is True
-    assert result.success is True
+    assert reads == [], f"外层不该再读（读了 {len(reads)} 次 = 又一轮约 78 秒）"
+    assert result.verified is False
+    assert result.success is True, "没确认 ≠ 写入失败"
+    service._restore_exact_state.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_exact_equipment_reports_a_missing_verdict_without_reading(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """内层**没给**结论时（`verified is None`）：如实说"这次没核对"，仍然不自己开窗口。
+
+    生产路径上 `success=True` 必带结论（Step 4 一定写 `verified`），所以这一档只在"绕开执行层"
+    的调用方身上出现。这时缺的是**证据**，不是写入 —— 所以说"没有回读核对"，
+    不编"回读重试 12 秒后仍对不上"（那句话在 2026-10-03 之前是外层自己造的，真机上还带着
+    一个算错的时间）。
+    """
+    service = _equipment_service()
+    service._capture_recovery_state = AsyncMock(return_value={})
+    service._equip_local_unlocked = AsyncMock(return_value=LoadoutOperationResult(
+        success=True,
+        loadout_name="Exact",
+        message="applied",
+        verified=None,
+    ))
+    verify = stub_verify(monkeypatch, False)
+    service._restore_exact_state = AsyncMock()
+
+    result = await service.equip_with_recovery("Alpha#0100", _loadout())
+
+    verify.assert_not_awaited()
+    assert result.verified is None, "没核对过就是没结论，不许写成 False（那会读成'核对过、对不上'）"
+    assert "没有回读核对" in result.message, result.message
+    assert "别当成没装上" in result.message, result.message
+    assert [step.action for step in result.steps] == ["verify"]
+    assert result.steps[-1].success is False
     service._restore_exact_state.assert_not_awaited()
 
 
@@ -669,6 +733,9 @@ async def test_cancelled_equipment_recovers_before_releasing_account_lock(
     回读没确认"不再触发回滚（口径见 `write_readback` 的"没确认 ≠ 没换成"），
     所以只有 `applied.success=False` 才会走到恢复那一趟 —— 这正是这一档要取消的东西。
 
+    `phase="verify"` 那档取消在**核对那一次 await** 上：核对本身在执行这一趟的 Step 4
+    （外层不再自己读，见 `loadout_exact_flow`），所以这一档由执行的那个替身走进 `verify`。
+
     这条测试原本靠 `await asyncio.wait_for(interrupted.wait(), 1)` 去"等取消时机"，
     而 `verify` 那一步内层会按 `write_readback` 重试整整一个同步窗口（8 × 1.5 秒）——
     于是"读到哪一次才算被取消"取决于读循环的节奏，测试变成一场竞速：把外层回读改成
@@ -689,18 +756,23 @@ async def test_cancelled_equipment_recovers_before_releasing_account_lock(
     state = {"equipment": "before"}
     scopes = []
 
-    async def apply(*args):
-        state["equipment"] = "changed"
-        if phase == "apply":
-            interrupted.set()
-            await asyncio.Event().wait()
-        return LoadoutOperationResult(success=phase != "rollback", message="synthetic")
-
     async def verify(*args):
         if phase == "verify":
             interrupted.set()
             await asyncio.Event().wait()
         return False
+
+    async def apply(*args):
+        state["equipment"] = "changed"
+        if phase == "apply":
+            interrupted.set()
+            await asyncio.Event().wait()
+        if phase == "verify":
+            # 回读在**执行这一趟里**（`_equip_local_unlocked` 的 Step 4，见
+            # `loadout_equipment_service`）：外层不再自己读第二遍，所以"取消落在核对那一段"
+            # 只能由执行这一趟走到核对里来表达 —— 取消点仍然落在核对那次 await 上。
+            await verify(None)
+        return LoadoutOperationResult(success=phase != "rollback", message="synthetic")
 
     # 前两档取消在"写入还没结束"的时候，这条回读窗口用不上；压成 1 次省掉等待，
     # rollback 档根本不走回读（写入阶段就失败了）。

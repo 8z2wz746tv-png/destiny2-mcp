@@ -1,6 +1,8 @@
 """装备编排的执行段：搬 → 批量装备 → 模组 → 子职业 → 回读核对，按这个次序跑。
 各步的判断（怎么挑槽、怎么腾能量、装不上怎么说）都在 `loadout_*.py` 的 mixin 里；
 这里只负责**次序**与把结论写进回执 —— 加代码前先问它该不该落在这个文件。
+回读核对那一步（Step 4）只做两次调用：判据与话术在 `loadout_verify`（窗口在
+`write_readback`），这里不自己措辞、也不自己重读。
 """
 
 from __future__ import annotations
@@ -11,9 +13,7 @@ from ..bungie_client import BungieClient
 from ..exceptions import (
     ItemNotFoundError,
     TransferError,
-    describe_exception,
 )
-from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager
 from ..models import (
@@ -25,7 +25,6 @@ from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
 from .account_action_lock import account_action_lock
 from .loadout_exact_flow import ExactFlowMixin
-from .write_readback import read_until
 from .loadout_armor_state import restore_after_equip
 from .loadout_functional_mods import FunctionalModMixin
 from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
@@ -33,8 +32,6 @@ from .loadout_transfer_step import TransferStepMixin
 from .loadout_recovery import RecoveryStateMixin
 from .loadout_subclass_sockets import SubclassSocketMixin
 from . import loadout_verify
-
-logger = get_logger(__name__)
 
 
 class LoadoutEquipmentService(
@@ -318,19 +315,16 @@ class LoadoutEquipmentService(
             # 调用方还得自己去翻一遍步骤才知道为什么 —— 真机 2026-10-03 第 3 轮就是这么丢的。
             subclass_receipt = f"做了但没成（{subclass_why}）"
 
-        # Step 4: 回读核对 —— 与 `equip_with_recovery` 同一条纪律：没核对过就不能说"已装备"（真机
-        # 2026-09-24 这条路直接以"已装备"收尾，回执里没有一步证明装备真在身上）。写入有 3～10 秒
-        # 同步窗口，所以按 `write_readback` 重试；核对不上只报"没确认"，**不改写入结论**。
-        detail, verified = "已回读核对：装备实例、模组与子职业配置都对得上。", False
-        try:
-            verified = await read_until(
-                lambda: loadout_verify.verify_loadout(self, player_name, loadout), bool
-            )
-            if not verified:
-                detail = "写入步骤都成功了，但回读重试后仍对不上（可能是同步窗口）——过十几秒再看一次，别当成没装上。"
-        except Exception as exc:  # noqa: BLE001 —— 回读是**可选证据**：它自己炸了不能把写成功报成失败
-            logger.exception("Local loadout verification failed: %s", exc)
-            detail = f"回读核对没做成：{describe_exception(exc)}"
+        # Step 4: 回读核对 —— **这一趟是全流程唯一的核对**（没核对过就不能说"已装备"：真机
+        # 2026-09-24 这条路直接以"已装备"收尾，回执里没有一步证明装备真在身上）。
+        # 判据（`loadout_matches`）、窗口（`write_readback`）、话术（`readback_verdict`）各只有
+        # 一处；`equip_with_recovery` 的外层直接读这里的 `verified`，**不再自己开第二个窗口**
+        # —— 真机 2026-10-03 audit 123435：内侧这一轮 8 次读没对上之后，外层又读了一整轮，
+        # 两次读的是同一份状态、同一个函数，结论不可能变，那 147.8 秒全是白等。
+        # 核对不上只报"没确认"，**不改写入结论**。
+        detail, verified = await loadout_verify.readback_verdict(
+            self, player_name, loadout, blocked_count=len(blocked_mods)
+        )
         steps.append(MoveItemStep(action="verify", detail=detail, success=verified))
 
         # 模组被上游拒绝写入时 equipment 是好的，但**子职业那一半的状态要说清**：

@@ -1,4 +1,4 @@
-"""装备一套配装的**完整一趟**：抓恢复点 → 应用 → 回读核对 → 判要不要回滚。
+"""装备一套配装的**完整一趟**：抓恢复点 → 应用 → 判要不要回滚。
 
 **两条入口共用这一趟**（`equip_loadout` 与 `equip_build`）。以前 `equip_loadout` 直接调
 `_equip_local_unlocked` 就完事、**没有任何恢复点** —— 同一条 `_equip_local_unlocked` 失败时，
@@ -8,8 +8,16 @@
 搬出 `loadout_equipment_service.py` 的原因和这一族其它 mixin 一样（那边贴着体量上限），
 但这里还有一条更实的理由：**"要不要回滚"是一个判断，不是一个步骤**。它以前散在
 `_equip_local_unlocked` 的返回分支与 `equip_with_recovery` 的外层之间，于是出现了真机 2026-10-03
-那两类事故 —— 模组被挡住就提前 return（子职业整段没跑）、外侧只读一次就把"没确认"判成失败
+那两类事故 —— 模组被挡住就提前 return（子职业整段没跑）、外侧拿自己那次读的结论覆盖内侧
 （整条配装白回滚）。现在它只有一处：`_apply_exact_with_recovery`。
+
+**外层不再自己回读**（2026-10-03 真机 audit `/123435` 的账）：那次 `equip_build` 224.2 秒里
+147.8 秒花在两轮"回读没对上"上 —— 内侧 Step 4 按 `write_readback` 重试满一轮（8 次读，
+每次 3 次网络往返：`search_player` + profile[200] + profile[INVENTORY_SOCKETS]）之后，外层
+**又开了第二个窗口**。两轮读的是同一份账号状态、用的是同一个判据，结论不可能变；而那一轮的
+"对不上"本身还是判据没归一造成的误报（见 `loadout_matches`）。所以核对（连同它的话术）只有
+一处：`_equip_local_unlocked` 的 Step 4 调 `loadout_verify.readback_verdict`；这里只读结论、
+判要不要回滚。
 
 以 mixin 挂在 `LoadoutEquipmentService` 上（`self` 上就有恢复快照与 `_equip_local_unlocked`），
 所以调用点不用改。
@@ -30,8 +38,6 @@ from ..exceptions import (
 )
 from ..logging_config import get_logger
 from ..models import Loadout, LoadoutOperationResult, MoveItemStep
-from . import loadout_verify, write_readback
-from .write_readback import read_until
 
 logger = get_logger(__name__)
 
@@ -104,69 +110,41 @@ class ExactFlowMixin:
                 message=reason,
                 steps=[MoveItemStep(action="apply", detail=reason, success=False)],
             )
-        verified = False
         if applied.success:
-            # 有模组被上游挡住时，"对不上"的原因就是它 —— 别让调用方以为整个装备都没生效。
-            blocked = [step for step in applied.steps if step.action == "mod_blocked"]
-            verification_detail = (
-                f"有 {len(blocked)} 颗模组没装上（见 mod_blocked 步骤），其余已按确认内容写入。"
-                if blocked else "执行结果与确认的配装不一致。"
-            )
-            if applied.verified:
-                # 内层 Step 4 已经核对过的那一趟**不再读第二遍**：它是同一份判据、同一个窗口，
-                # 重读只会让这条路多等一个同步窗口（实测最长 10.5 秒 × 2）。
-                verified = True
-            else:
-                try:
-                    # **走 `write_readback`，与内层 Step 4 同一个窗口**。真机 2026-10-03 第 3 轮：
-                    # 内层重试满约 10.5 秒、按口径报"别当成没装上"，而这里**只读一次**就判失败，
-                    # 于是同步窗口一超过 10.5 秒，同一份状态被读成两种结论、整条配装白白回滚。
-                    # 一处口径两处用，读法也必须一样。
-                    verified = await read_until(
-                        lambda: loadout_verify.verify_loadout(
-                            self, player_name, loadout
-                        ),
-                        bool,
-                    )
-                    if not verified:
-                        window = int(write_readback.ATTEMPTS * write_readback.DELAY_SECONDS)
-                        verification_detail = (
-                            f"写入步骤都成功了，但回读重试 {window} 秒后仍对不上（可能是同步窗口）"
-                            "——过十几秒再看一次，别当成没装上。"
-                        )
-                except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:
-                    logger.error("Exact loadout verification failed: %s", exc)
-                    verification_detail = str(exc)
-            applied.steps.append(MoveItemStep(
-                action="verify",
-                detail=(
-                    "已验证装备实例、模组和子职业配置。"
-                    if verified
-                    else verification_detail
-                ),
-                success=verified,
-            ))
-            applied.verified = verified
-            if verified:
-                return applied
-            # 没确认时 message 也要跟着改口径：调用方读的常常就是这一句，而内层原来那句
-            # （"写入都成功了…"）在"装备确实还在"的意义上是对的，但绝不能说成"失败"。
-            applied.message = (
-                f"配装 '{loadout.name}' 的写入都成功了，但回读没确认：{verification_detail}"
-            )
+            if applied.verified is None:
+                # 只有"绕开 Step 4 的调用方"会走到这里（生产路径上 success=True 必带核对结论）。
+                # 结论是"**没核对**"，不是"没装上"：写入阶段一路成功，缺的是证据。
+                # 这里**不自己开窗口** —— 窗口只有 `write_readback` 一处、判据只有 `loadout_matches`
+                # 一处、话术只有 `loadout_verify.readback_verdict` 一处；真机 2026-10-03 audit
+                # 123435 就是外层自己又读了一整轮（约 78 秒），读的还是同一份状态。
+                applied.steps.append(MoveItemStep(
+                    action="verify",
+                    detail="这次没有回读核对（执行层没给核对结论），账号状态未确认。",
+                    success=False,
+                ))
+                applied.message = (
+                    f"配装 '{loadout.name}' 的写入都成功了，但这次没有回读核对"
+                    "——账号上是不是这套没有证据（别当成没装上）。"
+                )
+            # 有结论时（True/False）**原样透传**：核对那一趟、它写进 steps 的那一行、以及
+            # 它那句话术都归 Step 4（`loadout_equipment_service` 调 `readback_verdict`），
+            # 这里只回答"要不要回滚" —— 两处各措一次辞，同一份状态就会被说成两种结论
+            # （真机 2026-10-03 第 3 轮："没确认"被外层改写成"对不上"）。
+            return applied
 
-        # 三个不许回滚的情形，理由不同但都写在这：
+        # 走到这里 = 写入阶段失败了（`success=True` 的那条上面已经 return）。两种不许回滚，
+        # 理由不同但都写在这：
         # - **模组预检失败**：那一步在**任何写入之前**，账号一个字节都没动
         #   （见 `loadout_mod_preflight`），回滚没有对象 —— 真机上再跑一趟反而是几分钟白等，
         #   而且会把"预检失败、这次没动账号"这句更准的话换成含糊的"已恢复执行前状态"；
-        # - **模组被上游拒绝写入**：equipment 是好的，为一颗插件把装备换回去更糟（ADR-013）；
-        # - **没确认**：写入阶段一路成功、只是回读还没同步。这时回滚等于把**已经正确的账号**
-        #   改回旧状态 —— 回滚本身是对的，错的是拿"没确认"当回滚条件（口径见 `write_readback`
-        #   的"没确认 ≠ 没换成"）。真机 2026-10-03 第 3 轮就是被这条判错的。
+        # - **模组被上游拒绝写入**：equipment 是好的，为一颗插件把装备换回去更糟（ADR-013）。
         #
-        # 回滚只留给**写入阶段本身失败/结果未知**的那条路（`applied.success is False`
-        # 且已经动过账号）。
-        if applied.success or any(
+        # 第三种"写入全成功、只是回读没确认"已经不在这条路上（`verified is False` 也在上面
+        # return 了）：那时回滚等于把**已经正确的账号**改回旧状态，错的是拿"没确认"当回滚
+        # 条件（口径见 `write_readback` 的"没确认 ≠ 没换成"）。
+        #
+        # 回滚只留给**写入阶段本身失败/结果未知**且已经动过账号的那条路。
+        if any(
             st.action in {"mod_blocked", "mod_preflight"} for st in applied.steps
         ):
             return applied
