@@ -93,7 +93,17 @@ CEILINGS = {
     # 2026-10-03 新增（从 build_service 拆出）：碎片替换的兼容预检。拆出来的直接原因：
     # 上面那块贴在 889 没有位置放"为什么"，而它是真机事故（碎片有符号/无符号没归一，
     # 5 颗里 4 颗被判"与插槽不兼容"）的修复落点。登记即上限。
-    "destiny_mcp/services/build_fragments.py": 82,
+    # 82 → 95（① 禁用槽）：差异报告（"能写几颗/收到几颗、哪些槽空着/被禁用"）
+    # 整段搬去 `fragment_sockets.py`，这里只剩替换本身。
+    "destiny_mcp/services/build_fragments.py": 95,
+    # 2026-10-03 新增（从 build_fragments 拆出，那边贴着 82）：碎片槽现场的**判据 + 报错清单**。
+    # 抽出来的直接原因有二：那边没有位置放"哪些槽算碎片槽"的判据链（真机 socket 14 被禁用、
+    # 第 6 颗碎片排进 14 → 上游 500 DestinySocketActionNotAllowed）；而"数几颗"与"报哪些槽"
+    # 必须是同一份判据 —— 各写一份就会漂移（清单里混进超能/星象槽，条数却只有碎片那一档）。
+    # 113 = 92 + ② 差异报告的两档措辞（"禁用"与"状态未知"必须分开说，混起来就是把
+    # 已知当成未知）+ 报错清单与数数共用 `is_assignable_fragment_slot`（注入一次
+    # "清单不看现场状态"就复现了漂移：能写 5 颗、清单列 6 个槽）。
+    "destiny_mcp/services/fragment_sockets.py": 113,
     # 794 → 795：P3 收拢组件号，多一行 `from . import profile_components`；
     # 三处裸组件字面量换成命名集合没有增行，这一行就是净增量。
     # 抽走 _capture_recovery_state（→ loadout_recovery.py）后下调：上限只能降不能升

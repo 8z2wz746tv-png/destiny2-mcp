@@ -3,6 +3,11 @@
 从 `build_service` 抽出来（那边贴着 `tests/test_module_size_ratchet` 的上限）：
 这一块读 Manifest 插槽定义、逐槽判"这颗能不能插进来"、并保留原有插槽下标，
 与求解/排名/候选签发无关 —— 拆开也正好让 hash 归一的修复有个不挤的地方。
+
+**槽号与"哪个槽能写"都来自现场**：能排的碎片槽由 `services/fragment_sockets` 按账号
+现报的 `isEnabled` 算出来（判据链见 `loadout_plug_lookup.socket_is_assignable`）。
+棱镜术士 6 个碎片槽里 socket 14 是禁用的，第 6 颗排进去上游回
+500 `DestinySocketActionNotAllowed`。
 """
 
 from __future__ import annotations
@@ -11,6 +16,7 @@ from ..exceptions import BuildValidationError
 from ..manifest import ManifestManager
 from ..models import LoadoutSubclassConfig
 from ..utils.hash_utils import hash_variants, to_unsigned
+from .fragment_sockets import fragment_slot_indices, fragment_slot_report
 
 
 def replace_fragment_config(
@@ -32,16 +38,23 @@ def replace_fragment_config(
     # 账号侧那份就是无符号（`read_subclass_config` 直读 profile），
     # 而写完的回读核对（`_verify_loadout`）是拿插槽裸值逐位比的。
     requested = [to_unsigned(int(h)) for h in fragment_hashes]
-    old_fragment_hashes = hash_variants(*current.fragment_hashes)
-    fragment_indices = sorted(
-        index
-        for index, plug_hash in current.plug_sockets.items()
-        if plug_hash in old_fragment_hashes
-    )
+    # 能排的槽只有现场报"开着"的那些碎片槽（判据在 `fragment_sockets`）。
+    # 禁用槽根本不在 `current.plug_sockets` 里：读取时就按 `isEnabled` 滤掉了，所以
+    # "第 N 颗进第 N 个碎片槽"这个位置假设在这里已经不成立 —— 真机棱镜术士的 6 个碎片槽里
+    # socket 14 是禁用的，旧写法把第 6 颗排进 14，上游回 500 `DestinySocketActionNotAllowed`。
+    fragment_indices = fragment_slot_indices(current)
     if len(requested) != len(fragment_indices):
+        # 报错必须**可操作**：说清能写几颗、收到几颗、差几颗，以及这些槽分别是哪些、
+        # 哪个空着、哪个被禁用 —— 否则调用方只能自己再读一次账号去猜。
+        # 缺的那颗**不替玩家补**：补哪一颗是构筑选择，不在这里决定。
         raise BuildValidationError(
-            "必须提供完整碎片配置："
-            f"当前子职业需要 {len(fragment_indices)} 个，收到 {len(requested)} 个。"
+            "碎片配置对不上："
+            f"当前子职业能写 {len(fragment_indices)} 颗，收到 {len(requested)} 颗"
+            f"（{'多' if len(requested) > len(fragment_indices) else '少'}"
+            f" {abs(len(requested) - len(fragment_indices))} 颗）。"
+            f"{fragment_slot_report(manifest, current)}。"
+            "要装就得给**正好这么多颗**碎片（按顺序填进上面这些槽）；"
+            "少的那几颗补哪一颗由你定，这里不替你选。"
         )
 
     subclass_definition = manifest.get_item_definition(current.subclass_item_hash) or {}

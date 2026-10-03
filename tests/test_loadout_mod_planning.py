@@ -456,8 +456,11 @@ def test_read_subclass_config_maps_socket_types_from_identifier() -> None:
 
     config = service.read_subclass_config("sub-1", 100, {
         "sub-1": {"sockets": [
-            {"plugHash": 900}, {"plugHash": 901}, {"plugHash": 902},
-            {"plugHash": 903}, {"plugHash": 0},
+            {"plugHash": 900, "isEnabled": True},
+            {"plugHash": 901, "isEnabled": True},
+            {"plugHash": 902, "isEnabled": True},
+            {"plugHash": 903, "isEnabled": True},
+            {"plugHash": 0, "isEnabled": True},
         ]}
     })
 
@@ -477,12 +480,77 @@ def test_read_subclass_config_falls_back_to_plug_category_hash() -> None:
     }))
 
     config = service.read_subclass_config("sub-1", 100, {
-        "sub-1": {"sockets": [{"plugHash": 900}, {"plugHash": 901}]}
+        "sub-1": {"sockets": [
+            {"plugHash": 900, "isEnabled": True}, {"plugHash": 901, "isEnabled": True}
+        ]}
     })
 
     assert config is not None
     assert config.super_hash == 900
     assert config.fragment_hashes == [901]
+
+
+def test_read_subclass_config_leaves_disabled_sockets_out_of_plug_sockets() -> None:
+    """**禁用槽不进 `plug_sockets`** —— 这就是"第 6 颗碎片被排进 socket 14"的根因那一步。
+
+    真机现场（棱镜术士，`subclass_assistant(intent="get")` 与 profile 组件 305 一致）：
+    socket 9–13 是 `isEnabled: true` 的碎片槽，socket 14 是 `isEnabled: false`、
+    里面躺着占位 `空碎片插槽`（无符号 2808665197）。旧写法把 14 也收进 `plug_sockets`，
+    下游 `replace_fragment_config` 于是数出 6 个碎片槽、把第 6 颗排进 14，
+    上游回 HTTP 500 `DestinySocketActionNotAllowed`（`request.plug.socketIndex`:
+    `The requested socket is disabled.`）。同一颗碎片写进 socket 12 就成功。
+    """
+    service = _service(_Manifest(
+        definitions={100: {"sockets": {"socketEntries": []}}},
+        identifiers={
+            900: "shared.solar.fragments",
+            901: "shared.solar.fragments",
+            2808665197: "shared.solar.fragments",
+        },
+    ))
+
+    config = service.read_subclass_config("sub-1", 100, {
+        "sub-1": {"sockets": [
+            {"plugHash": 900, "isEnabled": True},
+            {"plugHash": 901, "isEnabled": True},
+            {"plugHash": 2808665197, "isEnabled": False},
+        ]}
+    })
+
+    assert config is not None
+    assert config.plug_sockets == {0: 900, 1: 901}, (
+        "禁用槽 2 不许出现在可排槽位里 —— 它是真机那个 socket 14"
+    )
+    assert config.fragment_hashes == [900, 901]
+    assert config.socket_states == {0: True, 1: True, 2: False}, (
+        "活动状态要如实记下来：报错时要能点名「哪个槽被禁用、所以没排」"
+    )
+    assert config.fragment_sockets == [0, 1, 2], (
+        "读到的碎片槽（含禁用的那个）要记下来：报错必须点得出槽号，而槽号不许按位置推"
+    )
+
+
+def test_read_subclass_config_treats_a_missing_is_enabled_as_not_assignable() -> None:
+    """`isEnabled` 缺字段 = 状态未知：**不排**（不许猜它开着）。
+
+    与"账号明说 false"是两件事，所以 `socket_states` 里也不留记录（`None` ≠ `False`）。
+    """
+    service = _service(_Manifest(
+        definitions={100: {"sockets": {"socketEntries": []}}},
+        identifiers={900: "shared.solar.fragments", 901: "hunter.solar.supers"},
+    ))
+
+    config = service.read_subclass_config("sub-1", 100, {
+        "sub-1": {"sockets": [
+            {"plugHash": 901},
+            {"plugHash": 900, "isEnabled": True},
+        ]}
+    })
+
+    assert config is not None
+    assert config.plug_sockets == {1: 900}
+    assert config.super_hash == 0
+    assert config.socket_states == {1: True}
 
 
 def test_read_subclass_config_returns_none_without_recognised_sockets() -> None:
@@ -507,7 +575,9 @@ async def test_find_subclass_socket_matches_initial_item_then_plug_set() -> None
         plug_sets={700: {"reusablePlugItems": [{"plugItemHash": 901}]}},
     )
     service = _service(manifest)
-    sockets_map = {"sub-1": {"sockets": [{"plugHash": 0}, {"plugHash": 0}]}}
+    sockets_map = {"sub-1": {"sockets": [
+        {"plugHash": 0, "isEnabled": True}, {"plugHash": 0, "isEnabled": True},
+    ]}}
 
     assert await service._find_subclass_socket("sub-1", 100, 900, "super", sockets_map) == 0
     assert await service._find_subclass_socket("sub-1", 100, 901, "super", sockets_map) == 1
@@ -520,7 +590,8 @@ async def test_find_subclass_socket_falls_back_to_socket_type() -> None:
     ))
 
     result = await service._find_subclass_socket(
-        "sub-1", 100, 900, "fragment", {"sub-1": {"sockets": [{"plugHash": 901}]}}
+        "sub-1", 100, 900, "fragment",
+        {"sub-1": {"sockets": [{"plugHash": 901, "isEnabled": True}]}},
     )
 
     assert result == 0
@@ -534,7 +605,8 @@ async def test_find_subclass_socket_falls_back_to_category_hash_without_identifi
     }))
 
     result = await service._find_subclass_socket(
-        "sub-1", 100, 900, "aspect", {"sub-1": {"sockets": [{"plugHash": 901}]}}
+        "sub-1", 100, 900, "aspect",
+        {"sub-1": {"sockets": [{"plugHash": 901, "isEnabled": True}]}},
     )
 
     assert result == 0
@@ -545,13 +617,38 @@ async def test_find_subclass_socket_honours_assigned_and_returns_none() -> None:
         definitions={100: {"sockets": {"socketEntries": []}}},
         identifiers={900: "shared.solar.fragments"},
     ))
-    sockets_map = {"sub-1": {"sockets": [{"plugHash": 900}]}}
+    sockets_map = {"sub-1": {"sockets": [{"plugHash": 900, "isEnabled": True}]}}
 
     assert await service._find_subclass_socket(
         "sub-1", 100, 900, "fragment", sockets_map, assigned_sockets={0}
     ) is None
     # 类型对不上又不共享类别时找不到插槽
     assert await service._find_subclass_socket("sub-1", 100, 999, "super", sockets_map) is None
+
+
+async def test_find_subclass_socket_never_returns_a_disabled_socket() -> None:
+    """**禁用槽不是候选**：真机棱镜术士 socket 14 是禁用的碎片槽，按类型兜底正好会挑中它。
+
+    真机原文（`equip_build` 的 `subclass` 步骤）：
+    `DestinySocketActionNotAllowed` / `request.plug.socketIndex: The requested socket is disabled.`
+    —— 同一颗碎片写进开着的那几个槽（9–13）都成功。
+    """
+    service = _service(_Manifest(
+        definitions={100: {"sockets": {"socketEntries": []}}},
+        identifiers={900: "shared.solar.fragments", 901: "shared.solar.fragments"},
+    ))
+    sockets_map = {"sub-1": {"sockets": [
+        {"plugHash": 900, "isEnabled": True},
+        {"plugHash": 901, "isEnabled": False},
+    ]}}
+
+    # 槽 0 已被占（assigned），按类型兜底下一个就是禁用槽 1 —— 必须报"找不到"而不是挑它
+    assert await service._find_subclass_socket(
+        "sub-1", 100, 901, "fragment", sockets_map, assigned_sockets={0}
+    ) is None
+    assert await service._find_subclass_socket(
+        "sub-1", 100, 901, "fragment", sockets_map
+    ) == 0
 
 
 # ── _apply_subclass_config ───────────────────────────────────────────
@@ -587,8 +684,11 @@ def _profile_with_subclass(instance_id: str = "sub-1"):
             {"itemHash": 50, "itemInstanceId": instance_id}
         ]}}},
         # 子职业插槽的类型靠插槽里当前插着的 plug 判定，所以这里不能是空插槽。
+        # `isEnabled` 必须写上：现场（profile 组件 305 的 `DestinyItemSocketState`）就是这么报的，
+        # 而**只有明说 true 的槽才算能写**。替身不报这个字段，等于替账号断言一件它没说过的事，
+        # 于是"状态未知"这条真实分支会被替身悄悄盖住。
         "itemComponents": {"sockets": {"data": {instance_id: {"sockets": [
-            {"plugHash": 902}, {"plugHash": 903}
+            {"plugHash": 902, "isEnabled": True}, {"plugHash": 903, "isEnabled": True}
         ]}}}},
     }
 
@@ -770,6 +870,66 @@ async def test_apply_subclass_config_reports_a_missing_socket_and_keeps_going() 
 
     assert ok is False
     assert steps[0].detail == "找不到 plug 901 的兼容插槽"
+    service._bungie.insert_socket_plug_free.assert_not_awaited()
+
+
+async def test_apply_subclass_config_never_writes_into_a_disabled_socket() -> None:
+    """方案里的槽到执行时是禁用的：**不写、如实说**（真机 socket 14 那条路的最后一道闸）。
+
+    真机原文就是这个意思：`DestinySocketActionNotAllowed` /
+    `request.plug.socketIndex: The requested socket is disabled.` —— 上游 500，
+    而回执里当时只有一句"已应用"。这里改成：明确说"槽 N 禁用，不是可写的槽"，并且真的不调上游。
+    """
+    service = _subclass_service()
+    profile = {
+        "characterEquipment": {"data": {"char": {"items": [
+            {"itemHash": 50, "itemInstanceId": "sub-1"}
+        ]}}},
+        "itemComponents": {"sockets": {"data": {"sub-1": {"sockets": [
+            {"plugHash": 902, "isEnabled": True},
+            {"plugHash": 903, "isEnabled": False},
+        ]}}}},
+    }
+    await _resolve(service, profile)
+    steps: list = []
+    config = LoadoutSubclassConfig(
+        subclass_item_hash=50, subclass_instance_id="sub-1", plug_sockets={1: 901}
+    )
+
+    ok, why = await service._apply_subclass_config(
+        "player", _subclass_loadout(config), "char", 3, steps
+    )
+
+    assert ok is False
+    assert steps[0].detail == "plug '#901' 未排：槽 1 禁用，不是可写的槽"
+    assert steps[0].success is False
+    assert why and "槽 1 禁用" in why
+    service._bungie.insert_socket_plug_free.assert_not_awaited()
+
+
+async def test_apply_subclass_config_refuses_a_socket_without_a_live_state() -> None:
+    """现场没给 `isEnabled`（状态未知）：同样不写 —— 读不到就不赌它开着。"""
+    service = _subclass_service()
+    profile = {
+        "characterEquipment": {"data": {"char": {"items": [
+            {"itemHash": 50, "itemInstanceId": "sub-1"}
+        ]}}},
+        "itemComponents": {"sockets": {"data": {"sub-1": {"sockets": [
+            {"plugHash": 902},
+        ]}}}},
+    }
+    await _resolve(service, profile)
+    steps: list = []
+    config = LoadoutSubclassConfig(
+        subclass_item_hash=50, subclass_instance_id="sub-1", plug_sockets={0: 901}
+    )
+
+    ok, _why = await service._apply_subclass_config(
+        "player", _subclass_loadout(config), "char", 3, steps
+    )
+
+    assert ok is False
+    assert "状态未知" in steps[0].detail
     service._bungie.insert_socket_plug_free.assert_not_awaited()
 
 

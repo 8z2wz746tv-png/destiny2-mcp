@@ -32,6 +32,7 @@ from ..vocabulary import (
 )
 from . import profile_components, write_readback
 from .account_action_lock import account_action_lock, serialized_account_action
+from .loadout_plug_lookup import socket_is_enabled
 
 logger = get_logger(__name__)
 
@@ -447,7 +448,11 @@ class SubclassService:
                     name=plug_name,
                     socket_index=i,
                     socket_type=socket_type,
-                    is_active=socket_data.get("isEnabled", True),
+                    # 「这个槽开不开」的判据只有一处：`loadout_plug_lookup.socket_is_enabled`
+                    # （字段是 `isEnabled`；缺字段是 `None` = 未知，不是 False）。
+                    # 排槽那边（`loadout_subclass_sockets`）用的是同一个判据的
+                    # `socket_is_assignable`（只有 True 才算能写）—— 这里只负责如实报出来。
+                    is_active=socket_is_enabled(socket_data) is not False,
                     available=available,
                 )
             )

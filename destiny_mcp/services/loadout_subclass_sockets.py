@@ -10,7 +10,12 @@ import aiobungie
 from ..models import Loadout, LoadoutSubclassConfig, MoveItemStep
 from ..utils.hash_utils import to_unsigned
 from . import profile_components, write_readback
-from .loadout_plug_lookup import PlugLookupMixin
+from .loadout_plug_lookup import (
+    EMPTY_FRAGMENT_PLUG,
+    PlugLookupMixin,
+    socket_is_assignable,
+    socket_is_enabled,
+)
 from .loadout_mod_sockets import plug_already_installed
 from .subclass_service import identify_socket_type
 
@@ -26,7 +31,25 @@ class SubclassSocketMixin(PlugLookupMixin):
     def read_subclass_config(
         self, inst_id: str, item_hash: int, sockets_data: dict
     ) -> LoadoutSubclassConfig | None:
-        """Read subclass configuration from sockets."""
+        """Read subclass configuration from sockets.
+
+        **哪个槽能写，只认现场数据**：这个方法是"槽号"唯一的来处，它只把
+        `isEnabled: true` 的槽收进 `plug_sockets`（判据见 `socket_is_assignable`）。
+
+        为什么非要在这里就滤掉：真机事故（`equip_build` 的 `subclass` 步骤报
+        `DestinySocketActionNotAllowed` / `The requested socket is disabled.`）的根因
+        不是碎片、也不是写错了槽号，而是**这个函数把禁用槽也当成了可排的槽**。
+        棱镜术士有 6 个碎片槽（下标 9–14）其中 socket 14 是禁用的、里面躺着占位
+        `空碎片插槽`，于是 `plug_sockets` 里出现 6 个碎片槽 → 下游 `replace_fragment_config`
+        按"第 N 颗进第 N 个碎片槽"把第 6 颗排进 14 → 上游 500。同一颗碎片写进 socket 12
+        （`isEnabled: true`）就成功，说明碎片本身没问题。
+        这是第 n 次"位置假设 vs 现场事实"：**槽的可用性必须来自 `isEnabled`，不许按
+        "第几个碎片槽"猜，也不许照抄别的角色/别的子职业的槽位表。**
+
+        另一个变化是有意为之的：槽里躺着占位 `空碎片插槽` 时**不算"装着碎片"**
+        （它不是碎片，只表示那个位置没填）。所以 `fragment_hashes` / `plug_sockets`
+        数出来的是"真正装着的碎片"，空槽由 `fragment_sockets` 记着、由报错文案点名。
+        """
         if not inst_id:
             return None
 
@@ -42,6 +65,8 @@ class SubclassSocketMixin(PlugLookupMixin):
         class_ability_hash = 0
         movement_hash = 0
         plug_sockets: dict[int, int] = {}
+        socket_states: dict[int, bool] = {}
+        fragment_sockets: list[int] = []
 
         for socket_index, socket in enumerate(item_sockets):
             plug_hash = socket.get("plugHash", 0)
@@ -64,6 +89,26 @@ class SubclassSocketMixin(PlugLookupMixin):
                     socket_type = "aspect"
                 elif plug_category == self._PLUG_CAT_FRAGMENTS:
                     socket_type = "fragment"
+            # 占位 `空碎片插槽` 自己不是一个 fragment 分类的 plug，但**它所在的槽是碎片槽**
+            # （真机：棱镜术士 socket 14）。不认这一点的话禁用槽会从"碎片槽"名单里消失，
+            # 也就没机会在报错里点名它 —— 而"这个槽不用排、为什么"必须说得出来。
+            if not socket_type and to_unsigned(plug_hash) == EMPTY_FRAGMENT_PLUG:
+                socket_type = "fragment"
+            if not socket_type:
+                continue
+
+            enabled = socket_is_enabled(socket)
+            if enabled is not None:
+                socket_states[socket_index] = enabled
+            if socket_type == "fragment":
+                # 读到的碎片槽都记下来（含禁用的、含没给状态的）：报错要能点名
+                # "哪个槽不能用、为什么"。**槽号只能用这里记的**，不许按位置推。
+                fragment_sockets.append(socket_index)
+            # 禁用槽不进 plug_sockets：它不是一个可排的槽位，写进去必然被上游拒
+            # （见 `socket_is_assignable`）。状态未知（`enabled is None`）同样不排 ——
+            # 不赌它开着。
+            if not socket_is_assignable(socket):
+                continue
 
             if socket_type == "super":
                 super_hash = plug_hash
@@ -98,6 +143,8 @@ class SubclassSocketMixin(PlugLookupMixin):
             aspect_hashes=aspect_hashes,
             fragment_hashes=fragment_hashes,
             plug_sockets=plug_sockets,
+            socket_states=socket_states,
+            fragment_sockets=fragment_sockets,
         )
 
     # ── Equipment application ────────────────────────────────────────
@@ -289,6 +336,26 @@ class SubclassSocketMixin(PlugLookupMixin):
                     continue
                 assigned_sockets.add(socket_idx)
                 sockets = sockets_map.get(subclass_inst_id, {}).get("sockets", [])
+                # 写之前**再按现场核一次这个槽开不开**（判据与读取那条路同一个
+                # `socket_is_assignable`）。读取时已经滤过一遍禁用槽，这里防的是
+                # "签发方案 → 用户确认 → 执行"之间槽被关掉，或者方案里的槽号不是
+                # 这个角色的现场（旧方案、抄来的槽位表）。不核就是真机那条 500
+                # `DestinySocketActionNotAllowed` / `The requested socket is disabled.`。
+                # 状态读不到（`isEnabled` 缺字段）按不可写处理：这里**不许猜**。
+                live_socket = sockets[socket_idx]
+                if not socket_is_assignable(live_socket):
+                    state = socket_is_enabled(live_socket)
+                    why = "禁用" if state is False else "状态未知（账号没给 isEnabled）"
+                    detail = (
+                        f"{plug_type} '{self.mod_label(plug_hash)}' 未排："
+                        f"槽 {socket_idx} {why}，不是可写的槽"
+                    )
+                    steps.append(MoveItemStep(
+                        action="subclass", detail=detail, success=False,
+                    ))
+                    reason = reason or detail
+                    all_ok = False
+                    continue
                 if to_unsigned(int(sockets[socket_idx].get("plugHash", 0) or 0)) == to_unsigned(plug_hash):
                     # 这个槽已经装着它：**不调用上游**。再写一次回的是 HTTP 500 + 1679
                     # （客户端还会退避重试四次），真机实测每颗白花数秒。
@@ -343,10 +410,22 @@ class SubclassSocketMixin(PlugLookupMixin):
         sockets_map: dict,
         assigned_sockets: set[int] | None = None,
     ) -> int | None:
-        """Find a compatible subclass socket from plug sets, then categories."""
+        """Find a compatible subclass socket from plug sets, then categories.
+
+        两个来源都套同一道闸：**禁用/状态未知的槽一律不算候选**（`socket_is_assignable`）。
+        少了这道闸，下面按类型兜底那段会顺着下标把禁用槽当成兼容槽还给调用方 ——
+        真机 socket 14 是禁用的碎片槽，"按类型兜底"正好会挑中它。
+        """
         sockets = sockets_map.get(subclass_inst_id, {}).get("sockets", [])
         if assigned_sockets is None:
             assigned_sockets = set()
+
+        def _usable(index: int) -> bool:
+            return (
+                index < len(sockets)
+                and index not in assigned_sockets
+                and socket_is_assignable(sockets[index])
+            )
 
         subclass_definition = self._manifest.get_item_definition(
             subclass_item_hash
@@ -355,7 +434,7 @@ class SubclassSocketMixin(PlugLookupMixin):
             "socketEntries", []
         )
         for index, entry in enumerate(socket_entries):
-            if index >= len(sockets) or index in assigned_sockets:
+            if not _usable(index):
                 continue
             plug_set_hashes = {
                 entry.get("reusablePlugSetHash", 0),
@@ -385,7 +464,7 @@ class SubclassSocketMixin(PlugLookupMixin):
             else plug_type
         )
         for index, socket in enumerate(sockets):
-            if index in assigned_sockets:
+            if not _usable(index):
                 continue
             current_hash = socket.get("plugHash", 0)
             if current_hash == plug_hash:
