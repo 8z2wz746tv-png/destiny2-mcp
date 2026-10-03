@@ -17,6 +17,7 @@ from destiny_mcp.models import Loadout, LoadoutItem, LoadoutSubclassConfig
 from destiny_mcp.services.loadout_equipment_service import LoadoutEquipmentService
 
 GENERAL_MOD_CATEGORY = 2487827355  # enhancements.v2_general（属性模组）
+LEGS_MOD_CATEGORY = 2111701510     # enhancements.v2_legs（腿部模组：回收器/洗礼/复原…）
 ARTIFICE_MOD_CATEGORY = 3773173029
 NOT_A_MOD_CATEGORY = 111111
 
@@ -840,3 +841,205 @@ async def test_find_mod_socket_writes_tuning_like_any_other_mod() -> None:
     )
 
     assert result == 1, "调谐必须和别的模组一样，按类别找到它自己的插槽"
+
+
+# ── 调谐不能被组件 207 判据拦下（2026-09-28 真机事故的回归守门）─────────────
+
+
+async def test_tuning_is_not_blocked_by_the_role_level_plug_sets() -> None:
+    """调谐在预检里**不许**被组件 207 的"这一位能不能插"拦下 —— 207 根本不覆盖调谐槽。
+
+    真机（2026-09-26，`docs/plans/TUNING_WRITE_PLAN.md` 那轮之后）：
+    `equip_build` 把 3 颗调谐全判成"装不上：不在 Bungie 给这一位角色的可插入清单里
+    （游戏里同样装不上）"，还给了「需要守护者等级3」这种从 207 抄来的插入条件 ——
+    **连上游都没试过一次**。根因是执行路径（本函数）只请求 `INVENTORY_SOCKETS`（305 那条），
+    手上没有组件 310（逐件的调谐清单），却拿 207 判调谐；而 207 里**正装着的那颗调谐都不在**。
+
+    注入验证：把本函数里的 `not self.plug_is_tuning(mod_hash)` 去掉，这条立刻变红
+    （调谐会被排成 `blocked`）。
+    """
+    tuning_category = 3481777685  # core.gear_systems.armor_tertiary... 见 TUNING_CATEGORY_HASH
+    installed, target = 901, 900
+    manifest = _Manifest(
+        definitions={
+            # 插槽定义挂在**这件护甲的 item_hash**（_item() 默认 100）上：
+            # 预检读的就是 item.item_hash，建在别的 hash 上会退化成"没数据 = 不判断"。
+            100: {"sockets": {"socketEntries": [{"reusablePlugSetHash": 701}]}},
+            installed: _mod(tuning_category, 0),
+            target: _mod(tuning_category, 0),
+        },
+        plug_sets={701: {"reusablePlugItems": [{"plugItemHash": installed}]}},
+        infos={name: {"name": name} for name in (installed, target)},
+    )
+    service = _service(manifest)
+    item = _item(mod_sockets={0: target})
+    sockets_cache = {"item-1": [{"plugHash": installed}]}
+    instances = {"item-1": {"energy": {"energyCapacity": 11, "energyUsed": 0}}}
+    # 207 池里有"已装着的那颗"、没有目标那颗 —— 旧代码正是据此把它判成装不上。
+    insertable = {701: {installed}}
+
+    ops = await service._prepare_mod_operations(
+        item, "player", 3, sockets_cache, instances, insertable
+    )
+
+    actions = [(op.action, op.plug_hash) for op in ops]
+    assert ("blocked", target) not in actions, (
+        "调谐被 207 判据拦下了 —— 它只该走组件 310（这里没有 310，就该不判断）"
+    )
+    assert ("mod", target) in actions, "调谐应当照常排进写入计划"
+
+
+async def test_non_tuning_mod_is_still_blocked_by_the_role_level_plug_sets() -> None:
+    """反面：**非调谐**模组仍然照 207 拦 —— 别把上一条的修法放宽成"什么都不拦"。
+
+    守的是"修一处、别塌另一处"：这条与上面那条是一对，任何一边松掉都能被抓到。
+    """
+    target = 900
+    manifest = _Manifest(
+        definitions={
+            100: {"sockets": {"socketEntries": [{"reusablePlugSetHash": 701}]}},
+            target: _mod(GENERAL_MOD_CATEGORY, 3),
+        },
+        plug_sets={701: {"reusablePlugItems": [{"plugItemHash": target}]}},
+        infos={target: {"name": "职业模组"}},
+    )
+    service = _service(manifest)
+    item = _item(mod_sockets={0: target})
+    sockets_cache = {"item-1": [{"plugHash": 0}]}
+    instances = {"item-1": {"energy": {"energyCapacity": 11, "energyUsed": 0}}}
+
+    ops = await service._prepare_mod_operations(
+        item, "player", 3, sockets_cache, instances, {701: set()}
+    )
+
+    actions = [(op.action, op.plug_hash) for op in ops]
+    assert ("blocked", target) in actions, "非调谐模组不在 207 清单里时必须照旧拦住"
+
+
+# ── 功能模组的能量按"最终净额"判（2026-10-03 真机白丢一颗的回归守门）─────────
+#
+# 真机那一件的现场（拿真 Manifest 的值搭出来：护甲 `光芒领主护腿` 3094263124，
+# 插槽 0 = 通用属性模组 plug set 731468111，插槽 1/2/3 = 腿部模组 plug set 541478408）：
+#
+#   已装  插槽 0 职业模组 3 点 / 1 复原 1 点 / 2 宽恕 3 点 / 3 武器洗礼 3 点 → 已用 10，上限 11
+#   照抄  [缚丝回收器 3 点|1 点] [谐振回收器 1 点|2 点] [武器洗礼 3 点|1 点]
+#   求解器给了插槽 0 一颗 3 点的「手雷模组」（替掉同样 3 点的「职业模组」→ 净额 0）
+#
+# 旧代码按组顺序判"此刻够不够"：缚丝回收器要 3 点、替掉 1 点的复原 → 10 + 2 = 12/11 跳过；
+# 可它后面那颗谐振回收器（1 点，替掉 3 点的宽恕）会腾出 2 点，全部装完只要 10/11 ——
+# 20 颗里白丢的那一颗就是它。修法见 `loadout_functional_mods._plan_functional_mods`。
+
+LEGS = "光芒领主护腿"
+LEGS_ITEM_HASH = 3094263124
+GENERAL_PLUG_SET = 731468111
+LEGS_PLUG_SET = 541478408
+GENERAL_EMPTY = 1980618587
+LEGS_EMPTY = 2269836811
+GRENADE_MOD = 1435557120        # 手雷模组 3 点（求解器给的属性模组）
+CLASS_MOD = 4204488676          # 职业模组 3 点（现装在插槽 0）
+RECUPERATION = 4087056174       # 复原 1 点
+ABSOLUTION = 2793473444         # 宽恕 3 点
+STRAND_SCAVENGER_3 = 2257238439  # 缚丝回收器 3 点（这一位能插的那版）
+STRAND_SCAVENGER_1 = 1305848463  # 缚丝回收器 1 点（便宜那版：不在 207 清单里）
+HARMONIC_SCAVENGER_1 = 877723168   # 谐振回收器 1 点
+HARMONIC_SCAVENGER_2 = 1301391064  # 谐振回收器 2 点
+WEAPON_SURGE_3 = 4046357305     # 武器洗礼 3 点（现装着）
+WEAPON_SURGE_1 = 1901221009     # 武器洗礼 1 点
+
+
+def _legs_manifest() -> _Manifest:
+    return _Manifest(
+        definitions={
+            LEGS_ITEM_HASH: {"sockets": {"socketEntries": [
+                {"reusablePlugSetHash": GENERAL_PLUG_SET, "singleInitialItemHash": GENERAL_EMPTY},
+                {"reusablePlugSetHash": LEGS_PLUG_SET, "singleInitialItemHash": LEGS_EMPTY},
+                {"reusablePlugSetHash": LEGS_PLUG_SET, "singleInitialItemHash": LEGS_EMPTY},
+                {"reusablePlugSetHash": LEGS_PLUG_SET, "singleInitialItemHash": LEGS_EMPTY},
+            ]}},
+            GENERAL_EMPTY: _mod(GENERAL_MOD_CATEGORY, 0),
+            LEGS_EMPTY: _mod(LEGS_MOD_CATEGORY, 0),
+            GRENADE_MOD: _mod(GENERAL_MOD_CATEGORY, 3),
+            CLASS_MOD: _mod(GENERAL_MOD_CATEGORY, 3),
+            RECUPERATION: _mod(LEGS_MOD_CATEGORY, 1),
+            ABSOLUTION: _mod(LEGS_MOD_CATEGORY, 3),
+            STRAND_SCAVENGER_3: _mod(LEGS_MOD_CATEGORY, 3),
+            STRAND_SCAVENGER_1: _mod(LEGS_MOD_CATEGORY, 1),
+            HARMONIC_SCAVENGER_1: _mod(LEGS_MOD_CATEGORY, 1),
+            HARMONIC_SCAVENGER_2: _mod(LEGS_MOD_CATEGORY, 2),
+            WEAPON_SURGE_3: _mod(LEGS_MOD_CATEGORY, 3),
+            WEAPON_SURGE_1: _mod(LEGS_MOD_CATEGORY, 1),
+        },
+        plug_sets={
+            GENERAL_PLUG_SET: {"reusablePlugItems": [
+                {"plugItemHash": GENERAL_EMPTY}, {"plugItemHash": GRENADE_MOD},
+                {"plugItemHash": CLASS_MOD},
+            ]},
+            LEGS_PLUG_SET: {"reusablePlugItems": [
+                {"plugItemHash": LEGS_EMPTY}, {"plugItemHash": RECUPERATION},
+                {"plugItemHash": ABSOLUTION}, {"plugItemHash": STRAND_SCAVENGER_3},
+                {"plugItemHash": STRAND_SCAVENGER_1}, {"plugItemHash": HARMONIC_SCAVENGER_1},
+                {"plugItemHash": HARMONIC_SCAVENGER_2}, {"plugItemHash": WEAPON_SURGE_3},
+                {"plugItemHash": WEAPON_SURGE_1},
+            ]},
+        },
+        infos={hash_id: {"name": f"#{hash_id}"} for hash_id in (
+            GRENADE_MOD, CLASS_MOD, RECUPERATION, ABSOLUTION, STRAND_SCAVENGER_3,
+            STRAND_SCAVENGER_1, HARMONIC_SCAVENGER_1, HARMONIC_SCAVENGER_2,
+            WEAPON_SURGE_3, WEAPON_SURGE_1,
+        )},
+    )
+
+
+async def test_functional_mod_energy_is_judged_by_the_final_net_amount() -> None:
+    """瞬时 12/11 但最终只有 10/11 的那一颗**必须装上**（真机 2026-10-03 白丢的那颗）。
+
+    注入验证：把 `_plan_functional_mods` 第二趟的 `sorted(...)` 换回 `pending`（按组顺序判
+    瞬时值）—— 这条立刻变红：「缚丝回收器」会被排成 `blocked`。
+    """
+    manifest = _legs_manifest()
+    service = _service(manifest)
+    item = _item(
+        item_hash=LEGS_ITEM_HASH, name=LEGS, slot="legs",
+        mod_sockets={0: GRENADE_MOD},
+        functional_mod_groups=[
+            [STRAND_SCAVENGER_3, STRAND_SCAVENGER_1],
+            [HARMONIC_SCAVENGER_1, HARMONIC_SCAVENGER_2],
+            [WEAPON_SURGE_3, WEAPON_SURGE_1],
+        ],
+    )
+    sockets = [
+        {"plugHash": CLASS_MOD}, {"plugHash": RECUPERATION},
+        {"plugHash": ABSOLUTION}, {"plugHash": WEAPON_SURGE_3},
+    ]
+    instances = {"item-1": {"energy": {"energyCapacity": 11, "energyUsed": 10}}}
+    # 组件 207：便宜那版「缚丝回收器」**不在**这一位的可插入清单里（真机就是这么给的）
+    insertable = {
+        GENERAL_PLUG_SET: {GRENADE_MOD, CLASS_MOD},
+        LEGS_PLUG_SET: {
+            STRAND_SCAVENGER_3, HARMONIC_SCAVENGER_1, WEAPON_SURGE_3, RECUPERATION,
+        },
+    }
+
+    ops = await service._prepare_mod_operations(
+        item, "player", 3, {"item-1": sockets}, instances, insertable
+    )
+
+    actions = [op.as_tuple() for op in ops]
+    assert ("blocked", STRAND_SCAVENGER_3, 1) not in actions, (
+        "缚丝回收器被按瞬时值判成装不下了 —— 判的该是全部组算完之后的净额"
+    )
+    assert actions == [
+        ("mod", GRENADE_MOD, 0),
+        ("keep", WEAPON_SURGE_3, 3),
+        # 先腾后占：腾出 2 点的那颗排在要 2 点的那颗前面（游戏逐颗校验能量）
+        ("mod", HARMONIC_SCAVENGER_1, 2),
+        ("mod", STRAND_SCAVENGER_3, 1),
+    ]
+    assert item.mod_sockets == {
+        0: GRENADE_MOD, 1: STRAND_SCAVENGER_3, 2: HARMONIC_SCAVENGER_1, 3: WEAPON_SURGE_3,
+    }, "写过的槽都要进 mod_sockets，否则回读核对会把成功的判成失败"
+    # 真机最终形态：3 + 3 + 1 + 3 = 10 ≤ 11（旧代码把这一套算成 12）
+    assert sum(
+        cost for hash_id in item.mod_sockets.values()
+        if (cost := service._plug_energy_cost(hash_id)) is not None
+    ) == 10

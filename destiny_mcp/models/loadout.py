@@ -86,6 +86,25 @@ class LoadoutSubclassConfig(BaseModel):
     )
 
 
+class LoadoutArmorState(BaseModel):
+    """快照里的一件护甲：只要"是哪一件"与"当时的模组现场"。
+
+    名字与位置不存：还原时现场 profile 里就有，存两份迟早对不上（同一个事实一个出处）。
+    `item_hash` 留着是为了两件事：认这一件还是不是当初那件（实例号会重新分配）；
+    以及那件已经不在账号里时还能按 hash 报出名字。
+    """
+
+    item_instance_id: str = Field(description="Item instance ID")
+    item_hash: int = Field(default=0, description="Item definition hash")
+    mod_sockets: dict[int, int] = Field(
+        default_factory=dict,
+        description=(
+            "插槽号 → 当时装着的插件 hash；空插槽记的是它的默认插件 —— "
+            "'这一格本来是空的'也是要还原的状态，缺键分不清'空着'与'没有这一格'"
+        ),
+    )
+
+
 class Loadout(BaseModel):
     """A saved equipment loadout (配装).
 
@@ -99,6 +118,13 @@ class Loadout(BaseModel):
     character: str = Field(description="Target character: hunter/warlock/titan")
     items: list[LoadoutItem] = Field(default_factory=list, description="Armor pieces in this loadout")
     subclass: LoadoutSubclassConfig | None = Field(default=None, description="Subclass configuration")
+    armor_state: list[LoadoutArmorState] = Field(
+        default_factory=list,
+        description=(
+            "快照那一刻**账号里每一件护甲**的模组现场（这一套自己那几件不重复登记，它们在 items 里）："
+            "测试里被改写的常常是当时没穿着、被 build 从仓库搬进来的件 —— 只拍身上那 5 件就还原不了它们"
+        ),
+    )
     source: str = Field(
         default="local",
         description="Origin: 'bungie' (官方槽位), 'local' (自建) or 'build' (求解候选)",

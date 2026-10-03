@@ -30,6 +30,7 @@ from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
 from .account_action_lock import account_action_lock
 from .write_readback import read_until
+from .loadout_armor_state import restore_after_equip
 from .loadout_functional_mods import FunctionalModMixin
 from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
 from .loadout_transfer_step import TransferStepMixin
@@ -67,7 +68,10 @@ class LoadoutEquipmentService(
     ) -> LoadoutOperationResult:
         """Serialize local loadout writes for this user context."""
         async with self._equip_lock:
-            return await self._equip_local_unlocked(player_name, loadout)
+            result = await self._equip_local_unlocked(player_name, loadout)
+            # 快照里那份"账号护甲现场"（当时没穿着、被上一次操作改过的件）在这里补还原：
+            # 挂最外层是为了上面哪条分支返回都要跑（口径与代价见 loadout_armor_state）
+            return await restore_after_equip(self, player_name, loadout, result)
 
     async def _equip_local_unlocked(
         self,
@@ -116,8 +120,7 @@ class LoadoutEquipmentService(
                     player_name, transferred_ids, loadout.character
                 )
                 equipped = bool(equip_result.get("success"))
-                # 失败要说清上游为什么（以前只写"批量装备 N 件物品"，原因被丢掉，
-                # 真机排查时只能靠猜）。
+                # 失败要说清上游为什么（以前只写"批量装备 N 件物品"，真机排查时只能靠猜）。
                 steps.append(MoveItemStep(
                     action="equip_many",
                     detail=(
@@ -216,12 +219,11 @@ class LoadoutEquipmentService(
                         mtype,
                     )
                     upstream = str(mod_result.get("Message") or "").strip()
-                    # 1679 = 这个槽已经装着它了：状态已成立，不算失败（当成失败会让整条配装
-                    # 回退，真机实测 3.5 分钟）。判据与 equip_mod 那条路共用一份。
+                    # 1679 = 这个槽已经装着它了：状态已成立，不算失败（当成失败会让整条配装回退
+                    # 3.5 分钟，真机实测）。判据与 equip_mod 那条路共用一份。
                     already = plug_already_installed(mod_result)
                     ok = mod_result.get("ErrorCode", 0) == 1 or already
-                    # 回执写**模组名字**：这份 steps 是调用方唯一的写后证据，写 hash 会逼它
-                    # 再逐件查护甲（实测一次链路因此多 5 次往返）。
+                    # 回执写**模组名字**：steps 是调用方唯一的写后证据，写 hash 会逼它再逐件查护甲。
                     mod_label = self.mod_label(mod_hash)
                     if already:
                         detail = (
@@ -292,10 +294,9 @@ class LoadoutEquipmentService(
             if not subclass_ok:
                 all_ok = False
 
-        # Step 4: 回读核对 —— 与 `equip_exact` 同一条纪律：没核对过就不能说"已装备"。
-        # 真机 2026-09-24：这条路以前直接以"已装备"收尾，回执里没有任何一步证明装备真在身上。
-        # 写入有 3～10 秒同步窗口，所以按 `write_readback` 重试；核对不上只报"没确认"，
-        # **不改写入结论**（"没读到"和"没写上"是两件事）。
+        # Step 4: 回读核对 —— 与 `equip_exact` 同一条纪律：没核对过就不能说"已装备"（真机
+        # 2026-09-24 这条路直接以"已装备"收尾，回执里没有一步证明装备真在身上）。写入有 3～10 秒
+        # 同步窗口，所以按 `write_readback` 重试；核对不上只报"没确认"，**不改写入结论**。
         detail, verified = "已回读核对：装备实例、模组与子职业配置都对得上。", False
         try:
             verified = await read_until(lambda: self._verify_loadout(player_name, loadout), bool)
@@ -366,8 +367,7 @@ class LoadoutEquipmentService(
         try:
             applied = await self._equip_local_unlocked(player_name, loadout)
         except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:
-            # `describe_exception`：`TimeoutError()` 的 str 是空的，直接写会留下"失败但没有原因"
-            # （真机 2026-09-23：apply 步骤 detail 为空，谁也看不出发生了什么）。
+            # `describe_exception`：`TimeoutError()` 的 str 是空的，直接写会留下"失败但没有原因"（真机 2026-09-23 撞过）。
             logger.exception("Exact loadout application failed: %s", describe_exception(exc))
             reason = describe_exception(exc)
             applied = LoadoutOperationResult(

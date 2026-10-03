@@ -5,8 +5,7 @@ Hybrid approach:
 - Local loadouts (unlimited): stored in ~/.destiny_mcp/loadouts.json
 - Background cache refresh every 5 minutes for fast equip
 
-Equipment logic (mod application, subclass config) is delegated to
-LoadoutEquipmentService.
+Equipment logic (mod application, subclass config) is delegated to LoadoutEquipmentService.
 """
 
 from __future__ import annotations
@@ -30,6 +29,7 @@ from .armor_payload import slot_key_from_solver
 from ..manifest import BUNGIE_BASE_URL, ManifestManager, class_type_name, resolve_character_name
 from ..models import (
     Loadout,
+    LoadoutArmorState,
     LoadoutItem,
     LoadoutListResponse,
     LoadoutOperationResult,
@@ -37,14 +37,13 @@ from ..models import (
 )
 from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
+from .loadout_armor_state import collect_armor_state
 from .loadout_equipment_service import LoadoutEquipmentService
 
 logger = get_logger(__name__)
 
-# Default loadout storage path
 _DEFAULT_LOADOUT_PATH = Path.home() / ".destiny_mcp" / "loadouts.json"
 
-# Bucket hashes for armor slots (unsigned 32-bit)
 # 桶 hash → 槽位键（从单一出处派生：build/constants.ARMOR_SLOT_MAP 是正主）
 _ARMOR_SLOTS = {
     bucket_hash: slot_key_from_solver(slot)
@@ -61,6 +60,7 @@ class _EquipmentSnapshot(NamedTuple):
     armor: list[LoadoutItem]
     raw_items: list[dict]
     subclass: LoadoutSubclassConfig | None
+    armor_state: list[LoadoutArmorState]
 
 
 class LoadoutService:
@@ -118,8 +118,7 @@ class LoadoutService:
             else [(normalized, tables.get(normalized, ""))]
         )
         if not selected or not selected[0][1]:
-            # 抛异常而不是返回 {"success": False}：后者会被包进 ok=true 的信封，
-            # 模型看到的是"成功"，只能从 message 里猜自己错了。
+            # 抛异常而不是返回 {"success": False}：后者会被包进 ok=true 的信封（模型看成"成功"）
             raise InvalidArgumentError(
                 "kind 只能是 all/name/icon/color（或 全部/名称/图标/颜色）。"
             )
@@ -253,8 +252,7 @@ class LoadoutService:
         try:
             data = json.loads(self._path.read_text(encoding="utf-8"))
             return [
-                self._migrate_local_loadout(Loadout(**item))
-                for item in data.get("loadouts", [])
+                self._migrate_local_loadout(Loadout(**item)) for item in data.get("loadouts", [])
             ]
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             logger.warning("Failed to load local loadouts: %s", e)
@@ -264,8 +262,7 @@ class LoadoutService:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         data = {"loadouts": [lo.model_dump() for lo in loadouts]}
         self._path.write_text(
-            json.dumps(data, ensure_ascii=False, indent=2),
-            encoding="utf-8",
+            json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         self._local_version += 1
         self._cache_timestamp.clear()
@@ -610,8 +607,7 @@ class LoadoutService:
             all_loadouts = self._cache[player_name]
 
         if loadout_id:
-            # 按 id 取一套：`list` 只给清单行，要看某一套的完整模板走这里
-            # （以前没有这个入口，唯一办法是把 20 套模板全拉下来自己找）。
+            # 按 id 取一套：`list` 只给清单行，要完整模板走这里（以前只能把 20 套全拉下来自己找）
             all_loadouts = [lo for lo in all_loadouts if lo.id == loadout_id]
 
         if character:
@@ -620,8 +616,8 @@ class LoadoutService:
             }.get(resolve_character_name(character), character.lower())
             all_loadouts = [lo for lo in all_loadouts if lo.character == char_lower]
 
-        # 每套配装带完整 build_template（约 11 KB）：20 套 ≈ 227 KB，一次全给会把
-        # 调用方上下文打满。这里按 limit/offset 切片，并把"是否被截断"写进响应。
+        # 每套带完整 build_template（约 11 KB）：20 套 ≈ 227 KB，一次全给会把调用方上下文打满。
+        # 这里按 limit/offset 切片，并把"是否被截断"写进响应。
         total = len(all_loadouts)
         start = max(0, offset)
         if limit is not None and limit > 0:
@@ -641,8 +637,8 @@ class LoadoutService:
     async def _read_equipment(self, player_name: str, character: str) -> _EquipmentSnapshot:
         """采集"此刻这个角色身上穿着什么"。
 
-        `save_loadout`（真存）与 `describe_save`（存之前给玩家看的预览）**共用这一处**：
-        各写一遍读法迟早漂移，变成"预览说存 A、实际存下 B"。`char_id=""` = 没有这个角色。
+        `save_loadout`（真存）与 `describe_save`（预览）**共用这一处**：各写一遍读法迟早漂移，
+        变成"预览说存 A、实际存下 B"。`char_id=""` = 没有这个角色。
         """
         char_lower = character.lower()
 
@@ -663,7 +659,7 @@ class LoadoutService:
                 break
 
         if not char_id:
-            return _EquipmentSnapshot("", char_lower, [], [], None)
+            return _EquipmentSnapshot("", char_lower, [], [], None, [])
 
         equip_data = (
             profile.get("characterEquipment", {})
@@ -716,8 +712,12 @@ class LoadoutService:
                     inst_id, item_hash, sockets_data
                 )
 
+        # 账号护甲现场（含没穿着的那几件）：与上面同一份读取 —— 分两次读就会有两个"当时"
+        own_ids = {item.item_instance_id for item in equipped_items}
+        armor_state = collect_armor_state(profile, self._manifest, self._equipment, own_ids)
         return _EquipmentSnapshot(
-            char_id, char_lower, equipped_items, raw_equipped_items, subclass_config
+            char_id, char_lower, equipped_items, raw_equipped_items, subclass_config,
+            armor_state,
         )
 
     async def describe_save(
@@ -725,10 +725,9 @@ class LoadoutService:
     ) -> dict:
         """`save` 的确认信封要能自证"这次存下的是哪一套"（以前只有一个名字）。
 
-        - 走 `_read_equipment` + `_build_template`，与 `save_loadout` 同一处读法与同一处整形，
-          所以预览里列的就是真存下来的那套；
-        - 这是**可选数据**：读不到就 `available=False` + `reason`，不阻断确认流程
-          （预览失败不该让玩家连"确认"都做不了），所以这里的 except 是宽的、并且留日志。
+        走 `_read_equipment` + `_build_template`，与 `save_loadout` 同一处读法与整形，所以预览里
+        列的就是真存下来的那套。这是**可选数据**：读不到就给 `available=False` + `reason`，不阻断
+        确认流程（预览失败不该让玩家连"确认"都做不了），所以这里的 except 是宽的、并且留日志。
         """
         try:
             snap = await self._read_equipment(player_name, character)
@@ -745,8 +744,8 @@ class LoadoutService:
             logger.exception("保存前预览失败（不影响确认）：%s", reason)
             return {"available": False, "reason": reason}
         armor = template["armor"]
-        # `characterEquipment` 里还有幽灵、载具、飞船这些**不进配装**的东西（真机 17 件里只有 9 件
-        # 是配装），所以件数按进配装的三类算，别让"17 件"误导玩家。
+        # `characterEquipment` 里还有幽灵/载具/飞船这些**不进配装**的东西（真机 17 件里只有 9 件是
+        # 配装），所以件数按进配装的三类算，别让"17 件"误导玩家。
         item_count = len(template["weapons"]) + len(armor["items"]) + (1 if template["subclass"] else 0)
         return {
             "available": True,
@@ -767,8 +766,8 @@ class LoadoutService:
             "ignored_count": max(len(snap.raw_items) - item_count, 0),
             "mod_count": sum(len(mods or []) for mods in armor["mods"].values()),
             "note": (
-                "存的是**此刻身上穿着的**这套（护甲模组与子职业配置一起存）；"
-                "此后换装不会改动已存的这一套。"
+                "存的是**此刻身上穿着的**这套（护甲模组与子职业配置一起存），外加账号里每一件护甲"
+                "（含仓库与别的角色）的模组现场 —— 还原时按它逐格写回；此后换装不会改动已存的这一套。"
             ),
         }
 
@@ -795,6 +794,7 @@ class LoadoutService:
             id=loadout_id,
             name=name, character=char_lower,
             items=equipped_items, subclass=subclass_config,
+            armor_state=snap.armor_state,
             source="local",
             created_at=datetime.now(timezone.utc).isoformat(),
             notes=notes,
@@ -993,10 +993,9 @@ class LoadoutService:
 def loadout_rows(loadouts: list[dict]) -> list[dict]:
     """配装**清单行**：列表页只该给这些，完整 `build_template` 走 `get`。
 
-    真机（2026-09-24）：`intent="list"` 一次回 **121 KB**（5 套，截断状态；共 21 套，全量约 500 KB）——
-    每件装备把同一份插槽数据发了三遍（`plugs` / `perk_hashes` / `perks`），而且列表里塞了完整模板。
-    这里只留"让人挑一套"需要的字段，外加**能不能执行**（`execution_supported`）与**怎么取详情**
-    （`detail_hint`，工具层再补 next_action）——能力字段不能省，省了模型就会开始说"我做不到"。
+    真机（2026-09-24）：`intent="list"` 一次回 **121 KB**（5 套，截断；共 21 套约 500 KB）—— 每件
+    装备把同一份插槽数据发三遍（`plugs`/`perk_hashes`/`perks`），列表里还塞了完整模板。这里只留
+    "让人挑一套"的字段，外加**能不能执行**与**怎么取详情**（能力字段不能省，省了模型就说"我做不到"）。
 
     入参是**已经 dump 过的字典**（工具层拿到 payload 后调用，不再解析 pydantic 对象）。
     """

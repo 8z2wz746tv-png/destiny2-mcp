@@ -38,6 +38,17 @@ class FakeManifest:
     def get_plug_category_identifier(self, plug_hash: int) -> str:
         return "enhancements.v2_chest" if plug_hash == 401 else "weapon.frame"
 
+    # `save` 现在也要走 `parse_items_from_profile`（账号护甲现场），那一段会读这三样：
+    # 真 Manifest 都有，替身补齐即可（别为了少写几个方法就让采集退化成手搓字典）。
+    def get_english_name(self, item_hash: int) -> str:
+        return f"Item {item_hash}"
+
+    def bucket_name(self, bucket_hash: int) -> str:
+        return {14239492: "Chest Armor", 1498876634: "Kinetic Weapons"}.get(bucket_hash, "")
+
+    def item_type_name(self, item_type: int) -> str:
+        return {2: "Armor", 3: "Weapon", 16: "Subclass", 19: "Mod"}.get(item_type, "Unknown")
+
 
 class FakeClient:
     pass
@@ -270,3 +281,30 @@ async def test_loadout_assistant_labels_account_scope_and_community_route() -> N
         "tool": "build_assistant",
         "arguments": {"intent": "community", "character": "hunter"},
     }
+
+
+@pytest.mark.asyncio
+async def test_get_reports_only_the_count_of_the_snapshot_armor_state() -> None:
+    """快照里那份"账号护甲现场"（几百件）不进响应：`get` 只报件数，别把载荷撑爆。
+
+    注入验证：去掉 `_loadout_branches.list_or_get` 里那三行投影，这条立刻变红
+    （整块 `armor_state` 会出现在响应里）。
+    """
+    saved = Loadout(id="local-1", name="测试前快照", character="hunter", items=[], armor_state=[
+        {"item_instance_id": f"i-{i}", "item_hash": 1000 + i, "mod_sockets": {0: 401}}
+        for i in range(50)
+    ])
+    loadout_service = SimpleNamespace(
+        get_loadouts=AsyncMock(return_value=LoadoutListResponse(
+            player_name="player", loadouts=[saved],
+        ))
+    )
+    ctx = SimpleNamespace(
+        request_context=SimpleNamespace(lifespan_context={"loadout_svc": loadout_service})
+    )
+
+    response = await loadout_assistant(intent="get", character="hunter", ctx=ctx)
+
+    row = response["data"]["loadouts"][0]
+    assert row["armor_state_count"] == 50, "件数要报（`0` = 这套快照没有护甲现场，还原不了别的件）"
+    assert "armor_state" not in row, "几十上百件的现场不许进响应"

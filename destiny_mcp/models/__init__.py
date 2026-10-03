@@ -16,6 +16,7 @@ from .equip_plan import (
 from .inventory import InventoryItem, InventoryResponse, SearchItemsResponse
 from .loadout import (
     Loadout,
+    LoadoutArmorState,
     LoadoutItem,
     LoadoutListResponse,
     LoadoutOperationResult,
@@ -104,6 +105,7 @@ __all__ = [
     "WeeklyMilestone",
     "WeeklyResetResponse",
     # loadout
+    "LoadoutArmorState",
     "LoadoutItem",
     "LoadoutSubclassConfig",
     "Loadout",

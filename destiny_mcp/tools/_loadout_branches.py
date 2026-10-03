@@ -2,9 +2,9 @@
 
 搬出 `assistants.py` 的原因与其它 `_*_branches` 一样：那边贴着体积上限，而这里有一段自己的口径 ——
 
-- `list` 只给**清单行**（真机 2026-09-24：以前一次 121 KB / 5 套，截断；共 21 套 ≈ 500 KB，
-  每件装备还把插槽数据发三遍），行里保留"能不能执行"与"去哪看详情"；
-- `get` 才给完整 `build_template`，并且可以用 `loadout_id` 只取一套；
+- `list` 只给**清单行**（真机 2026-09-24：以前一次 121 KB / 5 套，截断；共 21 套 ≈ 500 KB，每件
+  装备还把插槽数据发三遍），行里保留"能不能执行"与"去哪看详情"；
+- `get` 才给完整 `build_template`，并且可以用 `loadout_id` 只取一套；快照的"账号护甲现场"只报件数；
 - "被截断"与"怎么翻页"由这一段讲清楚（列表类响应都要能自证全量）。
 """
 
@@ -17,15 +17,15 @@ from ._responses import confirmation_required_response, dump, ok_response
 
 # 列表默认给几套（切片在服务层做，工具层只负责把"被截断"讲清楚）
 _LOADOUT_DEFAULT_LIMIT = 5
+# 账号这一档的口径（`list` 与 `get` 都要带，别一边有一边没有）
+_SCOPE_WARNING = "这里仅包含玩家本地配装和 Bungie 官方槽位，不代表社区热门或推荐排序。"
 
 
 async def save_preview(svc: Any, resolved: str, character: str, name: str) -> dict:
     """`save` 的确认信封里那块"这次存什么"。
 
-    真机 2026-09-24：`save` 的确认只有 `{loadout_id:"", character, slot_number, name}`——
-    没有一处能看出"存下来是哪套"，玩家只能凭名字点头。预览取自账号（与 save 同一段采集），
-    是可选数据：读不到就给 `available=false` + reason，确认本身照常能给。
-    """
+    真机 2026-09-24：确认里只有 `{loadout_id, character, slot_number, name}`，看不出"存下来是哪套"。
+    预览取自账号（与 save 同一段采集），是可选数据：读不到就给 `available=false` + reason。"""
     from ..services.armor_payload import SLOT_DISPLAY
 
     preview = await svc["loadout_svc"].describe_save(resolved, character, name)
@@ -50,8 +50,8 @@ async def confirm_write(
 ) -> dict:
     """`loadout_assistant` 写入前的确认信封：只装这个 intent 真会用到的东西。
 
-    以前所有写入 intent 共用一坨 `{loadout_id, character, slot_number, name}`：`save` 也带着
-    它根本不读的 `loadout_id`/`slot_number`，而 `save` 最该说清的"这次存的是哪一套"没有。
+    以前所有写入 intent 共用一坨 `{loadout_id, character, slot_number, name}`：`save` 也带着它
+    根本不读的 `loadout_id`/`slot_number`，而它最该说清的"这次存的是哪一套"没有。
     """
     payload: dict[str, Any] = {"intent": intent}
     if intent == "save":
@@ -84,6 +84,10 @@ async def list_or_get(
         resolved, character or None, page_limit, offset, loadout_id=loadout_id
     )
     payload = dump(result)
+    # 快照里那份"账号护甲现场"（几百件）不进响应：`equip_loadout` 还原时才用，塞进 `get` 会把
+    # 载荷撑到几百 KB（`list` 当年就是这么回到 121 KB 的）。这里只报件数。
+    for saved in payload["loadouts"]:
+        saved["armor_state_count"] = len(saved.pop("armor_state", None) or [])
     cut = bool(payload.get("truncated"))
     warnings: list[str] = []
     if cut:
@@ -109,8 +113,8 @@ async def list_or_get(
                 "next_offset": payload["next_offset"],
                 "scope": payload["scope"],
                 "list_note": (
-                    "这是**清单行**（每套一行）。要看某一套的逐件装备/模组/子职业，"
-                    '用 intent="get" + loadout_id；要穿它用 intent="equip_loadout"。'
+                    "这是**清单行**（每套一行）。要看某一套的逐件装备/模组/子职业，用 "
+                    'intent="get" + loadout_id；要穿它用 intent="equip_loadout"。'
                 ),
             },
             next_actions=[
@@ -119,9 +123,7 @@ async def list_or_get(
                 '要穿某一套：loadout_assistant(intent="equip_loadout", loadout_id="…", '
                 "confirmed=true)，写入前先向玩家确认。",
             ],
-            warnings=warnings + [
-                "这里仅包含玩家本地配装和 Bungie 官方槽位，不代表社区热门或推荐排序。",
-            ],
+            warnings=[*warnings, _SCOPE_WARNING],
         )
 
     return ok_response(
@@ -145,7 +147,5 @@ async def list_or_get(
                 },
             },
         },
-        warnings=warnings + [
-            "这里仅包含玩家本地配装和 Bungie 官方槽位，不代表社区热门或推荐排序。",
-        ],
+        warnings=[*warnings, _SCOPE_WARNING],
     )
