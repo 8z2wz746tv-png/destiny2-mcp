@@ -68,10 +68,18 @@ async def readback_verdict(
     别当成没装上"，外层拿自己那次读覆盖成"对不上"（真机 2026-10-03 第 3 轮）。调用方只许
     拿这个返回值去写 `verify` 步骤与 message，**不许自己再措辞、更不许自己再读**。
 
-    `blocked_count` > 0 = 有模组被上游拒绝写入：那几颗**永远**不会在账号上，核对必然不通过，
-    这时说"可能是同步窗口、过十几秒再看一次"就是让调用方白跑一趟 —— 原因已知就直接点名。
+    `blocked_count` > 0 = 有模组被上游拒绝写入：那几颗**永远**不在账号上，核对必然不通过，
+    所以**一次都不读** —— 真机 2026-10-03 实测跑满窗口 70.13 秒（8 次读 59.63 + 7 次 sleep
+    10.5），等的是一个已知的 False；而且 `verify_loadout` 在**第一个不一致处**就返回，
+    "核对过一部分"这种说法本来就立不住。
     """
-    detail = "已回读核对：装备实例、模组与子职业配置都对得上。"
+    if blocked_count:
+        return (
+            f"这次没有回读核对：{blocked_count} 颗模组被上游拒绝写入（见 mod_blocked 步骤），"
+            "核对注定不通过，所以一次都没读 —— 装备与子职业那一半这次没有独立证据"
+            "（写入步骤报的是成功，但别把'没核对'当成'没装上'）。",
+            False,
+        )
     try:
         verified = await write_readback.read_until(
             lambda: verify_loadout(owner, player_name, loadout), bool
@@ -83,17 +91,9 @@ async def readback_verdict(
         # `describe_exception`：`TimeoutError()` 的 str 是空的，直接用 `exc` 会留下"没做成但没有原因"。
         return f"回读核对没做成：{describe_exception(exc)}", False
     if verified:
-        return detail, True
-    if blocked_count:
-        return (
-            f"回读没通过：{blocked_count} 颗模组被上游拒绝、不在账号上（见 mod_blocked 步骤），"
-            "其余项这一趟没核对（核对在第一个不一致处就停了）。",
-            False,
-        )
-    # 次数与等待时长都要**现读** `write_readback`（模块属性，不是 import 时绑的名字）：
-    # 测试会把 `ATTEMPTS` 压到 1 免得真等，写死就会再说一次假话（旧文案那个"12 秒"就是这么来的
-    # —— 真实等待是 `(ATTEMPTS-1) × 1.5` = 10.5 秒，而真机上一轮窗口的代价是约 78 秒：
-    # 10.5 秒等待 + 8 次整份档案回读）。三个数混用会让用户按错的量级判断。
+        return "已回读核对：装备实例、模组与子职业配置都对得上。", True
+    # 次数与等待时长都要**现读** `write_readback`（模块属性，不是 import 时绑的名字）：测试会把
+    # `ATTEMPTS` 压小免得真等，写死就再说一次假话（旧文案那个"12 秒"= 8×1.5，真实等待只有 7 次 sleep）。
     return (
         f"写入步骤都成功了，但回读重试 {write_readback.ATTEMPTS} 次"
         f"（约 {write_readback.window_seconds():g} 秒等待 + 每次一整份档案回读）后仍对不上"

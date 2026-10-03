@@ -269,33 +269,46 @@ async def test_readback_verdict_says_the_window_it_actually_waited(
     monkeypatch.setattr(write_readback, "ATTEMPTS", 3)
     monkeypatch.setattr(write_readback, "DELAY_SECONDS", 0)
     owner = _owner(_profile())
-    monkeypatch.setattr(loadout_verify, "verify_loadout", AsyncMock(return_value=False))
+    verify = AsyncMock(return_value=False)
+    monkeypatch.setattr(loadout_verify, "verify_loadout", verify)
 
     detail, verified = await loadout_verify.readback_verdict(
         owner, "Alpha#0100", _loadout(mod_sockets={}, mods=[])
     )
 
     assert verified is False
+    assert verify.await_count == 3, "**没有** blocked 时窗口照跑满，不许跟着一起提前收手"
     assert "重试 3 次" in detail, detail
     assert "别当成没装上" in detail, detail
 
 
 @pytest.mark.asyncio
-async def test_readback_verdict_names_the_refused_mods_instead_of_the_window(
+async def test_readback_with_blocked_mods_never_opens_the_window(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """有模组被上游拒绝时，"对不上"的原因**已知**：不许再说"可能是同步窗口、过十几秒再看"
-    （那几颗永远不在账号上，重看多少次都一样）。"""
-    monkeypatch.setattr(write_readback, "ATTEMPTS", 1)
+    """有模组被上游拒绝时**一次都不读**，并且必须**明说没核对**。
+
+    被拒绝的那颗永远不在账号上，判据只可能给 False；跑满窗口的代价是真机实测的 70.13 秒
+    （8 次读 59.63 秒 + 7 次 sleep 10.5 秒，`ATTEMPTS=8`/`DELAY_SECONDS=1.5` 就是这一档）。
+    这里把窗口留在**真档位**上钉：只要读了一次，`await_count` 就不再是 0。
+
+    口径是"没有回读核对"、不是"核对过、只是没对上"：判据在**第一个不一致处**就返回 False，
+    我们并不知道那一处是不是这颗模组，所以说"其余项核对过了"是句无证据的话。
+    """
+    monkeypatch.setattr(write_readback, "ATTEMPTS", 8)
+    monkeypatch.setattr(write_readback, "DELAY_SECONDS", 1.5)
     owner = _owner(_profile())
-    monkeypatch.setattr(loadout_verify, "verify_loadout", AsyncMock(return_value=False))
+    verify = AsyncMock(return_value=False)
+    monkeypatch.setattr(loadout_verify, "verify_loadout", verify)
 
     detail, verified = await loadout_verify.readback_verdict(
         owner, "Alpha#0100", _loadout(mod_sockets={}, mods=[]), blocked_count=2
     )
 
     assert verified is False
-    assert "2 颗模组被上游拒绝" in detail, detail
+    assert verify.await_count == 0, f"有 blocked 就不许开窗口（读了 {verify.await_count} 次）"
+    assert "这次没有回读核对" in detail, detail
+    assert "2 颗模组被上游拒绝写入" in detail, detail
     assert "mod_blocked" in detail, detail
     assert "可能是同步窗口" not in detail, detail
 

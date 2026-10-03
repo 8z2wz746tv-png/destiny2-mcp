@@ -983,6 +983,74 @@ async def test_empty_socket_cache_is_reread_instead_of_failing_the_preflight() -
     assert index == 0, "空缓存要触发重读，而不是当成没有插槽"
 
 
+async def test_preflight_reuses_the_snapshot_instead_of_fetching_each_piece() -> None:
+    """Step 0 手里那份 profile 就是现场：预检不许为每件护甲各抓一份全量档案。
+
+    真机 2026-10-03 分段实测：`_mod_preflight` 给 `_prepare_mod_operations` 传空缓存，于是
+    **每一件**都走 `_read_sockets` → 各抓一份 3.3 MB 的 profile，5 件花了 **6.73 秒**
+    （1.07/1.18/1.33/2.22/0.93），而这处窗口连 `steps` 都进不去（只看回执永远发现不了）；
+    最坏情形是一件都读不空就吃满 8 次重试窗口（8 抓 + 10.5 秒 sleep/件）。
+    复用不牺牲正确性的理由写在 `_mod_preflight` 的 docstring 里（组件集
+    `EQUIP_LOADOUT ⊇ INVENTORY_SOCKETS`、同一趟相隔几秒）。
+
+    注入违规（把调用点的 `sockets_cache` 改回 `{}`）时本条会红：下面两个替身至少被碰一次。
+    """
+    service = _service(_Manifest({600: _mod(GENERAL_MOD_CATEGORY, 2)}))
+    profile = {
+        "characters": {"data": {"char-1": {"classType": 2}}},
+        "itemComponents": {
+            "instances": {"data": {"item-1": {
+                "energy": {"energyCapacity": 10, "energyUsed": 0},
+            }}},
+            "sockets": {"data": {"item-1": {"sockets": [{"plugHash": 0}, {"plugHash": 0}]}}},
+        },
+    }
+    service._resolver.get_profile = AsyncMock(return_value=profile)
+    # 替身**故意给足 4 格**：注入违规时不许靠"插槽数不够"偶然变红 —— 要红在
+    # `assert_not_awaited` 上（那才是这条守门要钉的事）。
+    reads = AsyncMock(return_value=[{"plugHash": 0}] * 4)
+    service._read_sockets = reads  # type: ignore[method-assign]
+
+    ok, why = await service._mod_preflight(
+        Loadout(id="l", name="l", character="warlock", items=[_item(mod_sockets={1: 600})]),
+        "mid", 3, profile, "char-1",
+    )
+
+    assert (ok, why) == (True, ""), why
+    reads.assert_not_awaited()
+    service._resolver.get_profile.assert_not_awaited()
+
+
+async def test_preflight_still_reads_a_piece_the_snapshot_lacks() -> None:
+    """快照里没有插槽数据的那件仍然**现读** —— `_read_sockets` 的同步窗口保留。
+
+    这是上一条的反面：复用快照 ≠ 把"快照里没有"当成"这件没有插槽"。刚搬过来的件在旧快照里
+    就没有插槽数据，那时直接报"找不到唯一兼容插槽"正是真机踩过的坑
+    （见 `test_empty_socket_cache_is_reread_instead_of_failing_the_preflight`）。
+    """
+    service = _service(_Manifest({600: _mod(GENERAL_MOD_CATEGORY, 2)}))
+    profile = {
+        "itemComponents": {
+            "instances": {"data": {"item-1": {
+                "energy": {"energyCapacity": 10, "energyUsed": 0},
+            }}},
+            "sockets": {"data": {}},   # 这件还没出现在快照里
+        },
+    }
+    service._resolver.get_profile = AsyncMock(return_value=profile)
+    reads = AsyncMock(return_value=[{"plugHash": 0}])
+    service._read_sockets = reads  # type: ignore[method-assign]
+
+    ok, why = await service._mod_preflight(
+        Loadout(id="l", name="l", character="warlock", items=[_item(mod_sockets={0: 600})]),
+        "mid", 3, profile, "char-1",
+    )
+
+    assert (ok, why) == (True, ""), why
+    reads.assert_awaited_once()
+
+
+
 async def test_find_mod_socket_writes_tuning_like_any_other_mod() -> None:
     """**调谐槽也是插槽**：`equip_build` 把调谐和属性模组一视同仁地写进去。
 
