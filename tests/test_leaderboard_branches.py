@@ -12,9 +12,30 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+from destiny_mcp import config
 from destiny_mcp.player_resolver import CURRENT_OAUTH_PLAYER
 from destiny_mcp.tools import _leaderboard_branches as branches
 from destiny_mcp.tools.assistants import activity_assistant
+
+
+def _pin_no_default_player(monkeypatch: pytest.MonkeyPatch) -> None:
+    """把"这台机器没配默认玩家"这个前提钉进测试自己手里，别去读开发机的 `.env`。
+
+    钉的是哪条契约：`activity_assistant` 没收到 `player_name` 时，应当把"当前 OAuth 玩家"
+    哨兵交给服务层（真名到 `player_resolver` 才解析），而不是在工具层就地塞一个名字。
+
+    为什么必须显式隔离：`DESTINY_DEFAULT_PLAYER` 是 `config.py:92` 的正式配置项，开发者
+    一配上它，`resolve_player_name` 就返回真名、哨兵断言变红 —— 此时**产品行为是对的、
+    红的是测试**。不隔离的话，这两条测试证明的是"这台机器的 `.env` 长什么样"，
+    而不是代码行为；换台机器 / CI 上结论还会再翻一次。
+
+    为什么打 `destiny_mcp.config` 这个属性：`config.py` 在 import 时就把 env 与 `.env`
+    读成了模块常量（`config.DESTINY_DEFAULT_PLAYER`），之后再 `monkeypatch.delenv` 已经
+    晚了；而工具层是 `config.DESTINY_DEFAULT_PLAYER` 的**属性读取**
+    （`tools/_helpers.resolve_player_name`），不是 `from .config import DESTINY_DEFAULT_PLAYER`
+    的名字绑定 —— 所以 patch 模块属性正好命中读取点。
+    """
+    monkeypatch.setattr(config, "DESTINY_DEFAULT_PLAYER", None)
 
 
 def _svc() -> dict:
@@ -72,13 +93,16 @@ def _tool_context(activity: AsyncMock) -> object:
 
 
 @pytest.mark.asyncio
-async def test_tool_call_site_maps_every_argument_to_the_right_parameter() -> None:
+async def test_tool_call_site_maps_every_argument_to_the_right_parameter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """工具层的**位置传参顺序**必须与分支签名一致。
 
     CI 只跑 pytest（不跑 mypy/ruff），所以"签名一改、参数错位"没有类型网兜底 ——
     以前 `statid` 收到 `maxtop` 这类错误会一路静默到"排行榜返回空"。
     这条测试把 5 个相邻参数（character/mode/statid/maxtop）的映射钉死。
     """
+    _pin_no_default_player(monkeypatch)
     activity = AsyncMock()
     activity.get_leaderboards.return_value = {"message": "已读取排行榜。"}
 
@@ -109,7 +133,10 @@ async def test_clan_leaderboard_call_site_passes_group_id_and_defaults() -> None
 
 
 @pytest.mark.asyncio
-async def test_aggregate_call_site_passes_count_as_limit() -> None:
+async def test_aggregate_call_site_passes_count_as_limit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _pin_no_default_player(monkeypatch)
     activity = AsyncMock()
     activity.get_aggregate_activity_stats.return_value = {"activities": []}
 
