@@ -20,6 +20,7 @@ from destiny_mcp.services import (
     loadout_equipment_service,
     loadout_recovery,
     loadout_service,
+    loadout_verify,
     loadout_subclass_sockets,
     profile_cache,
     profile_components,
@@ -115,11 +116,14 @@ def _source(module) -> str:
         (loadout_recovery, "ARMOR_SNAPSHOT", 1),
         # 抓取/恢复那两段已抽到 loadout_recovery.py，钉桩跟着搬家
         (loadout_recovery, "INVENTORY_MINIMAL", 1),
-        (loadout_equipment_service, "INVENTORY_SOCKETS", 1),  # 回读核对装备实例
-        # 装模组那条路（`_equip_local_unlocked`）改要 EQUIP_LOADOUT：多一个组件 100
-        # （守护者等级），因为 1676 的话术要拿它把"早就满足的插入条件"剔掉
-        # （2026-10 真机：等级 11 的账号被告知「需要守护者等级3」）。
-        (loadout_equipment_service, "EQUIP_LOADOUT", 1),
+        # 回读核对装备实例（2026-10-03 抽到 loadout_verify.py：核对与执行是两件事，
+        # 而且 Step 4 与 equip_with_recovery 共用同一份判据，钉桩跟着搬家）
+        (loadout_verify, "INVENTORY_SOCKETS", 2),  # verify_loadout + verify_restored_items
+        # 装模组那条路（`_equip_local_unlocked`）要 EQUIP_LOADOUT：多一个组件 100（守护者等级），
+        # 因为 1676 的话术要拿它把"早就满足的插入条件"剔掉（2026-10 真机：等级 11 的账号
+        # 被告知「需要守护者等级3」）。**两处**：换装前那次（认角色 + 只读预检）与换装后
+        # 重新规划写入那次，两份现场都要能说清插入条件。
+        (loadout_equipment_service, "EQUIP_LOADOUT", 2),
     ],
 )
 def test_call_sites_keep_their_historical_set(module, named_set, count):

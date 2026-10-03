@@ -29,6 +29,7 @@ from destiny_mcp.services.armor_payload import (
     slot_key_from_bucket_hash,
     slot_key_from_bucket,
 )
+from destiny_mcp.services import loadout_verify
 from destiny_mcp.services.loadout_equipment_service import LoadoutEquipmentService
 from destiny_mcp.models import ModOperation
 
@@ -440,6 +441,17 @@ def _equipment(manifest: _Manifest) -> LoadoutEquipmentService:
     return LoadoutEquipmentService(MagicMock(), manifest, MagicMock())  # type: ignore[arg-type]
 
 
+def _patch_verify(monkeypatch: Any, verify: Any) -> None:
+    """换掉回读核对：`_verify_loadout` 已搬成模块函数 `loadout_verify.verify_loadout`。
+
+    改动这一行之前先看 `loadout_equipment_service` 的导入方式：它**整模块**导入
+    （`from . import loadout_verify`）而不是 `from .loadout_verify import verify_loadout`。
+    后者会把函数绑成模块级名字，替身打在 `loadout_verify` 上就够不着它 ——
+    真机之外最容易骗过自己的一种"测试绿了、代码没变"。
+    """
+    monkeypatch.setattr(loadout_verify, "verify_loadout", verify)
+
+
 def _ranked(rank: int | None = 11) -> dict:
     """带守护者等级的档案替身；`None` = 档案里没有这个字段（读不到，不是 0 级）。"""
     return {} if rank is None else {"profile": {"data": {"currentGuardianRank": rank}}}
@@ -734,21 +746,23 @@ async def test_local_loadout_reports_the_readback_verdict(monkeypatch) -> None:
     )
     monkeypatch.setattr(write_readback, "ATTEMPTS", 1)
 
+    # 替身必须在取服务之前装好：`_service()` 会把 resolver 换成 `SimpleNamespace`，
+    # 真核对一跑就 AttributeError（回读核对是模块函数，替身落在模块上）。
+    _patch_verify(monkeypatch, AsyncMock(return_value=True))
     service = _service()
-    service._verify_loadout = AsyncMock(return_value=True)
     verified = await service._equip_local_unlocked("Alpha#0100", loadout)
     assert verified.success is True
     assert "回读核对通过" in verified.message, verified.message
     assert [s.action for s in verified.steps][-1] == "verify"
 
+    _patch_verify(monkeypatch, AsyncMock(return_value=False))
     service = _service()
-    service._verify_loadout = AsyncMock(return_value=False)
     unverified = await service._equip_local_unlocked("Alpha#0100", loadout)
     assert unverified.success is True, "写入都成功了，核对不上不许改写入结论"
     assert "回读没确认" in unverified.message, unverified.message
 
+    _patch_verify(monkeypatch, AsyncMock(side_effect=RuntimeError("manifest 挂了")))
     service = _service()
-    service._verify_loadout = AsyncMock(side_effect=RuntimeError("manifest 挂了"))
     crashed = await service._equip_local_unlocked("Alpha#0100", loadout)
     assert crashed.success is True
     assert "回读核对没做成" in crashed.message, crashed.message
