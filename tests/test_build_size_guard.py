@@ -15,10 +15,12 @@ from destiny_mcp.exceptions import BuildTooLargeError
 class _Piece:
     def __init__(self, item_hash: int) -> None:
         self.item_hash = item_hash
+        # 真模型上的"这次装不装得上"（求解器与闸门都读它）；替身一律"能装"。
+        self.execution_blocker = ""
 
 
 class _Snapshot:
-    """只要能被估算函数数件数就行。"""
+    """只要能被估算函数数件数就行（按真模型的槽位接口给：`get_slot`）。"""
 
     def __init__(self, size: int) -> None:
         self.helmets = [_Piece(i) for i in range(size)]
@@ -26,6 +28,9 @@ class _Snapshot:
         self.chests = [_Piece(i) for i in range(size)]
         self.legs = [_Piece(i) for i in range(size)]
         self.class_items = [_Piece(i) for i in range(size)]
+
+    def get_slot(self, slot: str) -> list:
+        return getattr(self, slot)
 
 
 def _constraints() -> Any:

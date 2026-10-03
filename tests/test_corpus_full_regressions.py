@@ -35,12 +35,17 @@ from destiny_mcp.utils.hash_utils import to_signed, to_unsigned
 class _Piece:
     def __init__(self, item_hash: int) -> None:
         self.item_hash = item_hash
+        # 真模型上的"这次装不装得上"（求解器与规模闸门都读它）；替身一律"能装"。
+        self.execution_blocker = ""
 
 
 class _Snapshot:
     def __init__(self, size: int = 2) -> None:
         for slot in ("helmets", "gauntlets", "chests", "legs", "class_items"):
             setattr(self, slot, [_Piece(i) for i in range(size)])
+
+    def get_slot(self, slot: str) -> list:
+        return getattr(self, slot)
 
 
 def _constraints(**targets: int):
