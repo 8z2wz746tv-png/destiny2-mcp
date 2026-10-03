@@ -18,6 +18,7 @@ from collections.abc import Callable
 from typing import Literal
 
 from ..build_contracts import CanonicalBuild
+from ..error_codes import ErrorCode
 
 # 200 条够一个人连着试配装；10 分钟够走完"看预览 → 确认"。
 MAX_CANDIDATES = 200
@@ -101,9 +102,7 @@ class BuildCandidateStore:
         self._players.pop(execution_id, None)
 
 
-def describe_candidate(
-    store: "BuildCandidateStore", player_name: str, execution_id: str
-) -> dict:
+def describe_candidate(store: "BuildCandidateStore", player_name: str, execution_id: str) -> dict:
     """按候选 ID 取回签发的那份方案（只读、不焚烧），转成工具层要的 dict。
 
     话术在这儿而不在服务里：`expired` 与 `unknown` 是**两件事**
@@ -113,13 +112,13 @@ def describe_candidate(
     if status == "expired":
         return {
             "success": False,
-            "code": "expired_execution_id",
+            "code": ErrorCode.EXPIRED_EXECUTION_ID,
             "message": "该配装候选已过期，请重新求解并确认。",
         }
     if build is None:
         return {
             "success": False,
-            "code": "unknown_execution_id",
+            "code": ErrorCode.UNKNOWN_EXECUTION_ID,
             "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
         }
     return {"success": True, "build": build.model_dump(mode="json")}

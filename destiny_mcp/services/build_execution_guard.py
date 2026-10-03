@@ -36,14 +36,12 @@ from typing import TYPE_CHECKING
 from ..build.constants import SOLVER_SLOTS
 from ..build.snapshot_version import snapshot_version
 from ..build_contracts import CanonicalBuild
+from ..error_codes import ErrorCode
 
 if TYPE_CHECKING:  # 只用于标注：服务实现由 `BuildService` 注入，这里不 import 服务层
     from .inventory_service import InventoryService
 
-__all__ = ["EXECUTION_PRECONDITION_FAILED", "recheck_confirmed_build"]
-
-#: 拒绝码：与 `stale_inventory_snapshot` 那族并列（服务层的候选拒绝码，工具层原样带出去）。
-EXECUTION_PRECONDITION_FAILED = "execution_precondition_failed"
+__all__ = ["recheck_confirmed_build"]
 
 
 async def recheck_confirmed_build(
@@ -75,7 +73,7 @@ async def recheck_confirmed_build(
     if refusals:
         return {
             "success": False,
-            "code": EXECUTION_PRECONDITION_FAILED,
+            "code": ErrorCode.EXECUTION_PRECONDITION_FAILED,
             "message": "这次确认的配装**现在装不上**：" + "；".join(refusals),
             "blockers": refusals,
         }
@@ -84,7 +82,7 @@ async def recheck_confirmed_build(
     if current_version != build.snapshot_version:
         return {
             "success": False,
-            "code": "stale_inventory_snapshot",
+            "code": ErrorCode.STALE_INVENTORY_SNAPSHOT,
             "message": "生成配装后库存或护甲状态已变化；为避免装备另一套，请重新求解并确认。",
             "expected_snapshot_version": build.snapshot_version,
             "current_snapshot_version": current_version,
@@ -95,7 +93,7 @@ async def recheck_confirmed_build(
         if current is None or current.item_hash != item.item_hash:
             return {
                 "success": False,
-                "code": "exact_item_missing",
+                "code": ErrorCode.EXACT_ITEM_MISSING,
                 "message": f"确认的装备实例 '{item.item_instance_id}' 已不存在或发生变化。",
             }
     return None

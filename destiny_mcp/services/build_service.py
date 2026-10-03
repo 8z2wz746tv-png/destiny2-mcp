@@ -39,6 +39,7 @@ from ..build.models import (
 from ..bungie_client import BungieClient
 from ..build_contracts import CanonicalBuild, ExecutableBuild
 from . import profile_components
+from ..error_codes import ErrorCode
 from ..exceptions import BuildValidationError
 from ..logging_config import get_logger
 from ..utils.arg_text import split_items
@@ -670,27 +671,27 @@ class BuildService:
         if not build.execution_id:
             return {
                 "success": False,
-                "code": "missing_execution_id",
+                "code": ErrorCode.MISSING_EXECUTION_ID,
                 "message": "配装缺少服务端候选 ID，请重新运行 find_build 后再确认。",
             }
         trusted, status = self._candidates.resolve(build.execution_id, player_name)
         if status == "expired":
             return {
                 "success": False,
-                "code": "expired_execution_id",
+                "code": ErrorCode.EXPIRED_EXECUTION_ID,
                 "message": "该配装候选已过期，请重新求解并确认。",
             }
         if trusted is None:
             # 别人的候选与不存在的候选回同一句话：不泄露"这个 ID 存在，只是不属于你"。
             return {
                 "success": False,
-                "code": "unknown_execution_id",
+                "code": ErrorCode.UNKNOWN_EXECUTION_ID,
                 "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
             }
         if trusted.model_dump(mode="json") != build.model_dump(mode="json"):
             return {
                 "success": False,
-                "code": "canonical_build_mismatch",
+                "code": ErrorCode.CANONICAL_BUILD_MISMATCH,
                 "message": "确认后的配装内容发生变化，已拒绝执行。请重新选择候选。",
             }
         self._candidates.consume(build.execution_id)
@@ -702,19 +703,19 @@ class BuildService:
             if build_character != normalized_character:
                 return {
                     "success": False,
-                    "code": "character_mismatch",
+                    "code": ErrorCode.CHARACTER_MISMATCH,
                     "message": "确认的配装职业与目标角色不一致，请重新生成配装。",
                 }
         if not build.snapshot_version:
             return {
                 "success": False,
-                "code": "missing_snapshot_version",
+                "code": ErrorCode.MISSING_SNAPSHOT_VERSION,
                 "message": "配装缺少库存快照版本，请重新运行 find_build 后再确认。",
             }
         if len(build.items) != 5:
             return {
                 "success": False,
-                "code": "invalid_item_count",
+                "code": ErrorCode.INVALID_ITEM_COUNT,
                 "message": "精确配装必须包含五件护甲。",
             }
 
@@ -727,13 +728,13 @@ class BuildService:
         ):
             return {
                 "success": False,
-                "code": "invalid_exact_items",
+                "code": ErrorCode.INVALID_EXACT_ITEMS,
                 "message": "配装实例或护甲槽位不完整，请重新生成配装。",
             }
         if any(mod_hash <= 0 for item in build.items for mod_hash in item.mods):
             return {
                 "success": False,
-                "code": "invalid_mod_hash",
+                "code": ErrorCode.INVALID_MOD_HASH,
                 "message": "配装包含无效模组 Hash，请重新生成配装。",
             }
 
@@ -777,12 +778,10 @@ class BuildService:
         """Reject the unsafe legacy score-based execution path."""
         logger.warning(
             "Rejected score-based build execution for player=%s target=%s score=%s",
-            player_name,
-            target_character,
-            score,
+            player_name, target_character, score,
         )
         return {
             "success": False,
-            "code": "exact_build_required",
+            "code": ErrorCode.EXACT_BUILD_REQUIRED,
             "message": "不能再按浮点 score 重新求解并装备；请传回 find_build 返回的 canonical_build。",
         }

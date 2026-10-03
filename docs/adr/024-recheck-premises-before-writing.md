@@ -69,4 +69,8 @@ Consequences 里写着一条明确的缺口：**"`find` 与 `confirm` 之间账�
   "腾一格 / 先顶下金装"）。这一轮没动工具层，出路靠 `message` 与 `blockers` 带出去。
 - 守门在 `tests/test_build_execution_feasibility.py`（(c) 段：指纹相同只能靠复检、格满、换金装）
   与 `tests/test_snapshot_version_fingerprint.py`（换一颗功能模组作废候选；预留额度与其余执行现场
-  不进指纹）。三条注入都验证过会变红（见 plan/提交说明）。
+  不进指纹）。三条注入都验证过会变红；**逐条可核对的记录**在
+  [EQUIP_WRITE_PATH_PLAN.md](../plans/EQUIP_WRITE_PATH_PLAN.md) 的第五节「注入验证：哪几条有
+  记录可核对」（注入点、预期红点，以及哪几条只留下测试本身）。原先这里写「见 plan/提交说明」，
+  两头都不存在：这一轮当时没有计划文档，而提交说明按仓库规矩只有一行标题 —— 那份计划已补记为
+  [EQUIP_WRITE_PATH_PLAN.md](../plans/EQUIP_WRITE_PATH_PLAN.md)。

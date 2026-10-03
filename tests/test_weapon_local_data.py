@@ -407,3 +407,38 @@ def test_local_data_module_has_no_hard_dependency_on_starside() -> None:
     assert data.available is False
     assert data.warnings == []
     assert Path("destiny_mcp/services/weapon_local_data.py").is_file()
+
+
+def test_cross_check_still_says_false_when_there_is_only_one_version() -> None:
+    """只有一个版本时"不在池里"是**能断言**的，照旧给 False。"""
+    block = wld.farming_block(
+        {"available": True, "results": [FARMING_ROW]},
+        "测试武器",
+        weapon={"frame": "精确重击框架", "damage_type": "动能", "name_variant_count": 1},
+        sockets=[{"options": [{"name": "快速命中", "can_roll": True}]}],
+    )
+    perks = {item["name"]: item for item in block["cross_check"]["perks"]}
+    assert perks["萤火虫"]["in_manifest_pool"] is False
+    assert "perk_pool_check" not in perks["萤火虫"]
+
+
+def test_cross_check_refuses_to_deny_a_perk_when_the_name_has_variants() -> None:
+    """同名多版本时"不在这一份池里"**不许**说成滚不到（2026-09-28 真机「千码凝视」）。
+
+    定义级 intent 按名字只能挑一个版本，而清单写的是玩家那把的事实。以前这里给
+    `in_manifest_pool: false`，调用方会读成"清单过时了/这些 perk 退役了" —— 反向结论。
+    """
+    block = wld.farming_block(
+        {"available": True, "results": [FARMING_ROW]},
+        "测试武器",
+        weapon={"frame": "精确重击框架", "damage_type": "动能", "name_variant_count": 2},
+        sockets=[{"options": [{"name": "快速命中", "can_roll": True}]}],
+    )
+    perks = {item["name"]: item for item in block["cross_check"]["perks"]}
+    # 在解析到的池里 → 照旧给 True（多版本不影响这一条）
+    assert perks["快速命中"]["in_manifest_pool"] is True
+    # 不在解析到的池里 → **没判**，不是 false
+    assert perks["萤火虫"]["in_manifest_pool"] is None
+    assert perks["萤火虫"]["perk_pool_check"] == "variant_pool_ambiguous"
+    assert "不能" in perks["萤火虫"]["perk_pool_check_reason"]
+    assert "in_manifest_pool=null" in block["cross_check"]["note"]

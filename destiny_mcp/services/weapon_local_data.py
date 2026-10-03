@@ -96,7 +96,15 @@ def _cross_check(
     weapon: dict[str, Any],
     sockets: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """清单 vs Manifest：只报"对得上/对不上/查不到"，不替调用方下结论。"""
+    """清单 vs Manifest：只报"对得上/对不上/查不到"，不替调用方下结论。
+
+    **同名多版本时不许说"不在池里"**（2026-09-28 修，真机「千码凝视」）：定义级 intent 按名字
+    解析只能挑一个版本，而清单写的是**玩家那把**的事实。实测「千码凝视」有两个 hash
+    （`4164201232` = `releases.v540.season` 与 `1648948519` = `releases.v970.core`），
+    解析到前者时清单推荐的 4 颗（失调协议/斩首武器/转向/瓦解）全被判 `false` ——
+    这会把"清单过时了"这个**反向结论**喂给调用方，而错的其实是我们挑了另一个版本。
+    没有第二份池子可比时，"不在这一份里"不等于"滚不到"，所以给 `null` + 原因。
+    """
     listed_frame = str(row.get("frame") or "").strip()
     manifest_frame = str(weapon.get("frame") or weapon.get("intrinsic") or "").strip()
     listed_element = str(row.get("element") or "").strip()
@@ -109,16 +117,28 @@ def _cross_check(
             if name:
                 pool.setdefault(name, option)
 
+    variants = int(weapon.get("name_variant_count") or 1)
+    ambiguous_variant = variants > 1
+
     perks: list[dict[str, Any]] = []
     for column, names in (block_names(row) or {}).items():
         for name in names or []:
             found = pool.get(str(name).strip())
-            perks.append({
+            item = {
                 "name": str(name),
                 "column": column,
                 "in_manifest_pool": found is not None,
                 "can_roll": bool(found.get("can_roll")) if found else None,
-            })
+            }
+            if found is None and ambiguous_variant:
+                item["in_manifest_pool"] = None
+                item["perk_pool_check"] = "variant_pool_ambiguous"
+                item["perk_pool_check_reason"] = (
+                    "同名有多个版本，本次按名字解析到的是其中一个；"
+                    "这颗不在那一份池子里，但**不能**据此说它滚不到 —— "
+                    "要定论用该版本的池子或账号副本的 compare 行。"
+                )
+            perks.append(item)
 
     return {
         "frame": {
@@ -135,6 +155,8 @@ def _cross_check(
         "note": (
             "cross_check 只说明清单与当前 Manifest 是否对得上；"
             "can_roll=false 表示这个 perk 已退役（清单可能早于退役）。"
+            "in_manifest_pool=null 表示**没判**（同名多版本，本次解析到的不是唯一那份池子），"
+            "不等于 false。"
         ),
     }
 

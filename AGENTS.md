@@ -282,6 +282,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/design/DESKTOP_SHELL.md` — 要动桌面客户端的外壳（导航模型、工作区形态、装备页尺寸、数据来源标签、Flutter 落地）之前看它：token 与尺寸出自老 webui 的 `tokens.css`/`AppShell.tsx`/`inventory.css`，附可点击原型与三张实拍图。
 - `docs/plans/ARMOR_FORMAT_PLAN.md` — 动护甲载荷格式（体积口径、字段取舍）之前看实机证据与取舍。
 - `docs/plans/EQUIP_FLOW_PLAN.md` — 动装备流程（候选签发 → `confirmed` → 回读）之前看它为什么长这样。
+- `docs/plans/EQUIP_WRITE_PATH_PLAN.md` — 动装备**写入路径**（求解前提 → 确认复检 → 预检次序 → 写入 → 回读/回滚）之前看它：2026-10-03 那一轮逐条的证据等级（故障侧是真机原文、修复侧只有单测）、验收点、**未取得**清单，以及 ADR-024 结尾「三条注入」的可核对记录在哪一节。
 - `docs/plans/HOST_COMPAT_PLAN.md` — 要支持「只发标量」的宿主（豆包 connector 这类）时看它：哪些参数收文本写法、为什么 `equip_build` 改成也能收 `execution_id`、守门在哪。
 - `docs/plans/PVP_STATS_PLAN.md` — 动生涯/赛季战绩（计数器 vs 统计接口、模式与角色范围标注）之前看它为什么分三档。
 - `docs/plans/LEGACY_SURFACE_REMOVAL_PLAN.md` — 要动历史工具面（`full`/`expert` profile、`ENABLE_LEGACY_TOOLS`）或配装导入入口之前看它：删什么、导入怎么搬、怎么验都在里面。
