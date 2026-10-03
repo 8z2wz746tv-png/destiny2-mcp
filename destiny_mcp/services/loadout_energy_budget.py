@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from ..build.tuning_writes import TUNING_CATEGORY_HASH
 from ..exceptions import TransferError
 from ..models import ModOperation
 
@@ -28,8 +29,7 @@ def plan_energy_clearing(
 ) -> list[ModOperation]:
     """为 `deficit` 点能量挑选"把槽恢复成默认插件"的操作（腾不出来就抛 `TransferError`）。
 
-    `owner` 提供 `_manifest` / `_plug_category_hash` / `_plug_energy_cost` / `_MOD_CATEGORY_HASHES`
-    / `_PLUG_CAT_TUNING`（就是 `ModSocketMixin` 自己）。
+    `owner` 提供 `_manifest` / `_plug_category_hash` / `_plug_energy_cost` / `_MOD_CATEGORY_HASHES`。
     """
     if deficit <= 0:
         return []
@@ -49,7 +49,7 @@ def plan_energy_clearing(
             continue
         current_category = owner._plug_category_hash(current_hash)
         default_category = owner._plug_category_hash(default_hash)
-        if current_category == owner._PLUG_CAT_TUNING:
+        if current_category == TUNING_CATEGORY_HASH:
             continue
         if (
             current_category not in owner._MOD_CATEGORY_HASHES
