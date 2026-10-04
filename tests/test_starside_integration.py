@@ -283,6 +283,39 @@ class _Manifest:
                 "classType": 1,
             }
         ],
+        # 职业金装的写法：模板写的是**两个特性名**，不是金装名。
+        "至纯光能之灵": [
+            {
+                "itemHash": 21,
+                "name": "至纯光能之灵",
+                "nameEn": "Spirit of the Assassin",
+                "itemType": 19,
+                "tier": 6,
+                "classType": 1,
+                "plugCategoryHash": 1744546145,
+            }
+        ],
+        "曲腹蛛之灵": [
+            {
+                "itemHash": 22,
+                "name": "曲腹蛛之灵",
+                "nameEn": "Spirit of Cyrtarachne",
+                "itemType": 19,
+                "tier": 6,
+                "classType": 1,
+                "plugCategoryHash": 1744546145,
+            }
+        ],
+        "相对主义": [
+            {
+                "itemHash": 23,
+                "name": "相对主义",
+                "nameEn": "Relativism",
+                "itemType": 2,
+                "tier": 6,
+                "classType": 1,
+            }
+        ],
         "测试模组": [
             {
                 "itemHash": 11,
@@ -307,6 +340,17 @@ class _Manifest:
 
     def search(self, name: str, *, limit: int = 0, item_type: int | None = None) -> list[dict]:
         return self.entries.get(name, [])
+
+    def get_item_definition(self, item_hash: int):
+        """按 hash 反查条目 —— `perk_plug` 用它验 `plugCategoryHash`。"""
+        for rows in self.entries.values():
+            for row in rows:
+                if int(row["itemHash"]) == int(item_hash):
+                    return {
+                        "displayProperties": {"name": row["name"]},
+                        "plug": {"plugCategoryHash": row.get("plugCategoryHash", 0)},
+                    }
+        return None
 
     def get_all_set_bonuses(self) -> dict:
         return {20: {"set_name": "甲套"}, 21: {"set_name": "乙套"}}
@@ -891,6 +935,124 @@ def test_activity_name_resolves_to_the_real_set_name() -> None:
     assert armor_set["alias_from"] == "玻璃拱顶"
     assert armor_set["resolved_name"] == "埃希恩记忆"
     assert armor_set["definitions"][0]["set_name"] == "埃希恩记忆"
+
+
+def test_class_item_perk_pair_resolves_to_the_class_item() -> None:
+    """「至纯光能之灵、曲腹蛛之灵」是**两个特性**，要翻成相对主义并把要求的特性带上。
+
+    社区里 14 套是这么写的（另 76 套写金装名）。以前这条只回 unresolved/name_not_matched，
+    读起来像"你没有这件装备"，实际是模板用特性名指代职业金装。
+    """
+    manifest = _Manifest()
+    build = parse_build(
+        BUILD.replace("异域护甲：测试金装", "异域护甲：至纯光能之灵、曲腹蛛之灵"),
+        build_id="a",
+        source={"title": "A"},
+    )
+
+    result = validate_build(manifest, build)
+
+    row = next(r for r in result["requirements"] if r["kind"] == "exotic_armor")
+    assert row["status"] == "resolved", "两个特性名要能翻回金装名，不是 unresolved"
+    assert row["class_item_name"] == "相对主义"
+    assert [p["name"] for p in row["required_class_item_perks"]] == ["至纯光能之灵", "曲腹蛛之灵"]
+
+
+def _class_item_build():
+    return parse_build(
+        BUILD.replace("异域护甲：测试金装", "异域护甲：至纯光能之灵、曲腹蛛之灵"),
+        build_id="a",
+        source={"title": "A"},
+    )
+
+
+class _SocketPlugsReader:
+    """签名与 `InventoryService.get_armor_socket_plugs(player_name)` 一致。
+
+    刻意不用 `AsyncMock`：`AsyncMock` 收任何参数，漏传 `player_name` 照样绿 ——
+    真机上就是这么炸的（`missing 1 required positional argument: 'player_name'`）。
+    """
+
+    def __init__(self, data: dict) -> None:
+        self.data = data
+        self.calls: list[str] = []
+
+    async def __call__(self, player_name: str) -> dict:
+        self.calls.append(player_name)
+        return self.data
+
+
+def _perk_hash(name: str) -> int:
+    """清单里那颗特性的 hash —— 真实里"已装插槽的 plugHash"和"要求里的 item_hash"是同一个号。"""
+    return int(_Manifest().entries[name][0]["itemHash"])
+
+
+def _owned_class_item():
+    return SimpleNamespace(
+        item_hash=23, item_type="Armor", item_instance_id="c1", name="相对主义", location="hunter"
+    )
+
+
+async def test_class_item_perks_verified_when_the_copy_has_both() -> None:
+    """真读组件 305 后：副本同时满足两颗 → verified，并指出是哪一个副本。"""
+    inventory = SimpleNamespace(items=[_owned_class_item()])
+    inventory_service = SimpleNamespace(
+        get_inventory=AsyncMock(return_value=inventory),
+        get_armor_snapshot=AsyncMock(side_effect=ConfigError("partial")),
+        get_armor_socket_plugs=_SocketPlugsReader({
+            "c1": [{"plugHash": _perk_hash("至纯光能之灵")}, {"plugHash": _perk_hash("曲腹蛛之灵")}],
+        }),
+    )
+
+    result = await match_inventory(
+        _Manifest(), "player", _class_item_build(), inventory_service,
+        SimpleNamespace(get_weapon_details_by_type=AsyncMock()),
+    )
+
+    row = next(r for r in result["requirements"] if r["kind"] == "exotic_armor")
+    assert row["class_item_perk_status"] == "verified"
+    assert row["class_item_perk_match"]["instance_id"] == "c1"
+
+
+async def test_class_item_perks_say_wrong_rolls_instead_of_missing() -> None:
+    """持有但 roll 错了 → `owned_wrong_perks` + 实际滚到的组合，**不是** missing。"""
+    inventory = SimpleNamespace(items=[_owned_class_item()])
+    inventory_service = SimpleNamespace(
+        get_inventory=AsyncMock(return_value=inventory),
+        get_armor_snapshot=AsyncMock(side_effect=ConfigError("partial")),
+        get_armor_socket_plugs=_SocketPlugsReader({
+            "c1": [{"plugHash": _perk_hash("至纯光能之灵")}, {"plugHash": 999999}],
+        }),
+    )
+
+    result = await match_inventory(
+        _Manifest(), "player", _class_item_build(), inventory_service,
+        SimpleNamespace(get_weapon_details_by_type=AsyncMock()),
+    )
+
+    row = next(r for r in result["requirements"] if r["kind"] == "exotic_armor")
+    assert row["inventory_status"] == "owned"
+    assert row["class_item_perk_status"] == "owned_wrong_perks"
+    assert row["class_item_perk_rolled"][0]["instance_id"] == "c1"
+
+
+async def test_class_item_perks_unknown_when_sockets_cannot_be_read() -> None:
+    """替身不能读插槽 → unknown + 原因；**不许**降级成"不满足"或"满足"。"""
+    inventory = SimpleNamespace(items=[_owned_class_item()])
+    inventory_service = SimpleNamespace(
+        get_inventory=AsyncMock(return_value=inventory),
+        get_armor_snapshot=AsyncMock(side_effect=ConfigError("partial")),
+    )
+
+    result = await match_inventory(
+        _Manifest(), "player", _class_item_build(), inventory_service,
+        SimpleNamespace(get_weapon_details_by_type=AsyncMock()),
+    )
+
+    row = next(r for r in result["requirements"] if r["kind"] == "exotic_armor")
+    assert row["class_item_perk_status"] == "unknown"
+    assert row["class_item_perk_reason"] == "inventory_service_cannot_read_sockets"
+    assert row["inventory_status"] == "owned"
 
 
 def test_unknown_set_name_gives_candidates_and_a_reason() -> None:
