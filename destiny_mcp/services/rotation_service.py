@@ -112,6 +112,15 @@ class RotationService:
                 for a in activities if isinstance(a, dict)
             }
             kind = "raid" if "突袭" in types else "dungeon" if "地牢" in types else "featured_activity"
+            # 活动行**先造一次**，行头与 `activities[]` 用同一批：行头的图必须与行头的 hash 同源
+            # （一个副本在 Manifest 里是好几个活动：普通/大师/竞赛各一条、各有各的图）。
+            # 取"第一个查得到图的"那条行 —— 与 `raid_report` 同一条规矩；一条都没有就退到第一条，
+            # 图留空串（缺值不编，也不拿别的副本的图顶上）。
+            activity_rows = [
+                self._activity_row(a.get("activityHash"))
+                for a in activities if isinstance(a, dict)
+            ]
+            header = next((row for row in activity_rows if row["icon_url"]), activity_rows[0])
             rows.append({
                 "kind": kind,
                 "kind_label": {"raid": "特色突袭", "dungeon": "特色地牢"}.get(kind, "特色活动"),
@@ -121,10 +130,11 @@ class RotationService:
                 "difficulty": "",
                 "week_of": milestone.get("startDate"),
                 "until": milestone.get("endDate"),
-                "activities": [
-                    self._activity_row(a.get("activityHash"))
-                    for a in activities if isinstance(a, dict)
-                ],
+                # 行头（卡片第一行）自己也要有图：`activities[]` 是更下面一层的明细，
+                # 渲染 skill 的周常表只列到 `rows[].icon_url`（用户 2026-10-05 实测：整行没图）。
+                "activity_hash": header["activity_hash"],
+                "icon_url": header["icon_url"],
+                "activities": activity_rows,
                 "modifiers": [],
                 "rewards": [],
                 "source": SOURCE_OFFICIAL,
@@ -220,46 +230,16 @@ class RotationService:
         return rewards
 
     # ── 自维护表那半 ─────────────────────────────────────────────────
-    def _schedule_rows(self, now: datetime) -> list[dict[str, Any]]:
-        rows: list[dict[str, Any]] = []
-        for rotation in tables.WEEKLY_ROTATIONS:
-            for week, name in rotation.upcoming(now, weeks=2):
-                rows.append({
-                    "kind": rotation.key,
-                    "kind_label": rotation.label,
-                    "name": name,
-                    "difficulty": "",
-                    "week_of": tables.week_stamp(week),
-                    "modifiers": [],
-                    "rewards": [],
-                    "source": SOURCE_SCHEDULE,
-                    "verified_at": rotation.verified_at,
-                    "verified_against": rotation.verified_against,
-                    "note": rotation.note,
-                })
-        for day, mode in tables.wellspring_upcoming(now, days=2):
-            rows.append({
-                "kind": "wellspring",
-                "kind_label": "泉源",
-                "name": f"泉源：{mode}",
-                "difficulty": "",
-                "week_of": tables.week_stamp(day),
-                "day_of": tables.week_stamp(day),
-                "modifiers": [],
-                "rewards": [],
-                "variants": list(tables.WELLSPRING_DIFFICULTIES),
-                "source": SOURCE_SCHEDULE,
-                "verified_at": tables.WELLSPRING_VERIFIED_AT,
-                "verified_against": tables.WELLSPRING_VERIFIED_AGAINST,
-            })
-        return rows
+    #
+    # 那半（上维挑战 / 异域任务 / 泉源）搬去了 `rotation_tables.schedule_rows(now)`：
+    # 它只读 `data/rotations.py`，与"取数"无关，而这个模块贴着 285 行上限。
 
     # ── 入口 ─────────────────────────────────────────────────────────
     async def rotations(self, player_name: str = "", *, limit: int = 20) -> dict[str, Any]:
         now = datetime.now(timezone.utc)
         rows = await self._featured_rows()
         rows += await self._nightfall_rows(player_name)
-        rows += self._schedule_rows(now)
+        rows += rotation_tables.schedule_rows(now)
         rows.sort(key=lambda row: (row.get("source") != SOURCE_OFFICIAL, row.get("kind", "")))
 
         total = len(rows)

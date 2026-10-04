@@ -7,9 +7,55 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 from ..data import rotations as tables
+
+
+def schedule_rows(now: datetime) -> list[dict[str, Any]]:
+    """自维护表那一半的**每一行**（上维挑战 / 异域任务轮换 / 泉源），按表算出来。
+
+    从 `rotation_service._schedule_rows` 搬来（那边贴着 285 行上限）：这一块只读
+    `data/rotations.py`，不碰账号、不碰 Bungie，与 `tables_block` 是同一类东西。
+
+    **这一半刻意没有 `icon_url`**：表里只存名字（异域任务连活动 hash 都不存，
+    理由见 `data/rotations.py` 里那段"挑错比不给更糟"），而名字→活动定义这一跳
+    实测对不上（上维挑战 6 个候选 0 命中；异域任务 7 个候选 4 个 0 命中）——
+    不给图是"给不出"，不是漏了。要给图得先有一份可核的 hash 表。
+    """
+    rows: list[dict[str, Any]] = []
+    for rotation in tables.WEEKLY_ROTATIONS:
+        for week, name in rotation.upcoming(now, weeks=2):
+            rows.append({
+                "kind": rotation.key,
+                "kind_label": rotation.label,
+                "name": name,
+                "difficulty": "",
+                "week_of": tables.week_stamp(week),
+                "modifiers": [],
+                "rewards": [],
+                "source": "schedule",
+                "verified_at": rotation.verified_at,
+                "verified_against": rotation.verified_against,
+                "note": rotation.note,
+            })
+    for day, mode in tables.wellspring_upcoming(now, days=2):
+        rows.append({
+            "kind": "wellspring",
+            "kind_label": "泉源",
+            "name": f"泉源：{mode}",
+            "difficulty": "",
+            "week_of": tables.week_stamp(day),
+            "day_of": tables.week_stamp(day),
+            "modifiers": [],
+            "rewards": [],
+            "variants": list(tables.WELLSPRING_DIFFICULTIES),
+            "source": "schedule",
+            "verified_at": tables.WELLSPRING_VERIFIED_AT,
+            "verified_against": tables.WELLSPRING_VERIFIED_AGAINST,
+        })
+    return rows
 
 
 def lost_sector_block() -> dict[str, Any]:

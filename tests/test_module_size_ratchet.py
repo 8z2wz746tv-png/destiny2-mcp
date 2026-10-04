@@ -193,10 +193,15 @@ CEILINGS = {
     # 遗失区域块拆去 `services/rotation_tables.py`（不碰账号、不碰 Bungie）。
     # 300 → 285：周期表本身（`_tables_block`）搬去 `rotation_tables.tables_block()` ——
     # 那一块只读 `data/rotations.py`，与"取数"无关；腾出的位置正好放活动行的图标。
-    "destiny_mcp/services/rotation_service.py": 285,
+    # 285 → 265（2026-10-05 第六轮）：自维护表那半的**每一行**（`_schedule_rows`）也搬去
+    # `rotation_tables.schedule_rows(now)`（同上：只读表、不碰账号），腾出的位置放
+    # **轮换行头**的 `activity_hash`/`icon_url`（行头与 `activities[]` 取同一条活动行）。
+    "destiny_mcp/services/rotation_service.py": 265,
     # 遗失区域块拆去 `services/rotation_tables.py`（不碰账号、不碰 Bungie）。
     # 61 = 遗失区域块 + 周期表本身（2026-10-04 从服务搬来）：两块都是"表的只读渲染"。
-    "destiny_mcp/services/rotation_tables.py": 61,
+    # 61 → 107（2026-10-05）：自维护表那半的**行**（`schedule_rows`）也并进来 ——
+    # 这一块与"表怎么算"是同一件事，分在两个文件里反而要把 `data/rotations.py` 的用法读两遍。
+    "destiny_mcp/services/rotation_tables.py": 107,
     # 同上：`intent="rotations"` 的载荷与话术（口径分离 / 未锚点说明 / {var:} 提醒）。
     "destiny_mcp/tools/_rotation_branches.py": 111,
     # 只发标量的宿主（豆包 connector）把结构化参数写成文本时的还原：登记表 + 一次性还原。
