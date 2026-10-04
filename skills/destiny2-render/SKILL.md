@@ -19,9 +19,15 @@ whole card for "you own four copies of one hand cannon" is noise.
 
 | Host capability | What to emit |
 | --- | --- |
-| Renders HTML in the transcript (Doubao's chat renderer, a web client, a preview pane) | the HTML blocks in `references/blocks.md`, exactly as specified |
+| Renders HTML in the transcript (Doubao's chat renderer, a web client, a preview pane) | **fix the delivery wrapper first** (`references/html-conventions.md` §0): on Doubao the code fence must open with ` ```html type="renderer" ` — a plain ` ```html ` fence, or bare HTML, is *shown as source text* there. Then emit the HTML blocks in `references/blocks.md`, exactly as specified |
 | Renders Markdown only | the same blocks as Markdown: a heading line, a table, `-` rows. Keep every field, drop the icons (write the name; do not paste an image tag) |
 | Plain text only | the same rows as text lines, one per item |
+
+The wrapper is **host-specific**: `type="renderer"` is a marker Doubao's renderer
+recognizes, not a general HTML convention. On any other host **confirm the wrapper
+before rendering** — or send one small block first and see whether it renders or comes
+back as source text — and never carry Doubao's marker onto a host nobody checked. The
+two lower tiers never need one: there is no HTML block to wrap.
 
 Never assume one host. Never emit `<style>`, a `<link>` to a stylesheet, a script,
 or an external font — a host that does render HTML still may strip them. All
@@ -69,9 +75,10 @@ A number without its window is a wrong number. The exact fields are in
 - [blocks.md](references/blocks.md) — block index (which intent feeds which block),
   the verified field table per block, the HTML skeleton, and the degradation rule
   for every optional field.
-- [html-conventions.md](references/html-conventions.md) — allowed tags, the inline
-  style subset, icon sizes, the escaping rule, layout baseline, and how to mount the
-  archive-relative community images.
+- [html-conventions.md](references/html-conventions.md) — the host delivery wrapper (§0:
+  which code fence makes the host render instead of showing source), allowed tags, the
+  inline style subset, icon sizes, the escaping rule, layout baseline, and how to mount
+  the archive-relative community images.
 
 `references/blocks.md` is machine-checked against live responses by
 `scripts/verify_render_fields.py` (repo-side): every path in its tables is resolved

@@ -18,6 +18,11 @@
 写错的字段渲染出来是一张空白卡，而没人知道为什么。要加字段，先跑
 `python scripts/verify_render_fields.py` 确认它在真实响应里。
 
+**这些骨架是 HTML 片段，交付包装另算**：能渲染 HTML 的宿主（豆包）要求代码块起始行写成
+```` ```html type="renderer" ````，普通的 ```` ```html ```` 会被原样当源码显示
+（实测与分档见 `references/html-conventions.md` §零）。所以下面每段示例用的都是**正确的那一行**，
+照抄即可 —— 示例本身写错比不写示例更糟，模型会照抄。
+
 ---
 
 ## 一、块索引（哪条 intent 喂哪块）
@@ -42,7 +47,7 @@
 
 **骨架**（照老 web 的 `weapon_workbench`：身份块 → 属性格 → 固有特性 → Perk 池 → 推荐思路 → 注意）：
 
-```html
+```html type="renderer"
 <section style="background:#101317;border:1px solid #3a424b;border-radius:7px;overflow:hidden;color:#e8e9e6;font-family:system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">
   <!-- 身份块：68px 图标 + 踢脚 + 名字 + 英文名 + 标签 -->
   <div style="display:grid;grid-template-columns:68px minmax(0,1fr);gap:13px;align-items:center;padding:14px;background:#17141a;border-bottom:1px solid #3a424b">
@@ -148,7 +153,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 - **不带图行**：只有 `name`（+ 可选数值）。定义级 perk 池、选取率快照、`duplicates`
   的 perk 行都属于这种 —— 这是**体积口径**（拍板 2/3/4），不是漏了，别去找图。
 
-```html
+```html type="renderer"
 <!-- 带图行：30px 图 + 名字；第二行放栏位/选取率/描述提示 -->
 <div style="display:grid;grid-template-columns:30px minmax(0,1fr);gap:7px;align-items:center;padding:6px 7px;background:#14181d;border:1px solid #1d2227;border-radius:5px">
   <img src="{{icon_url}}" alt="{{名字}} 图标" loading="lazy" style="width:30px;height:30px;display:block;object-fit:cover;background:#25292d;border:1px solid #5d6670;border-radius:2px">
@@ -236,7 +241,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 两个视图，别混：**行视图**（不给 `item_instance_id`）每把一行、只有可切换栏；
 **明细**（给了 `item_instance_id`）带 `options[]` 与图。
 
-```html
+```html type="renderer"
 <section style="background:#101317;border:1px solid #3a424b;border-radius:7px;overflow:hidden;color:#e8e9e6">
   <header style="padding:12px 14px;background:#14181d;border-bottom:1px solid #2a3037">
     <h3 style="margin:0;font-size:14px;color:#fafaf7">你拥有的 4 把「星狐座」</h3>
@@ -286,7 +291,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 
 ## 五、护甲卡
 
-```html
+```html type="renderer"
 <section style="background:#101317;border:1px solid #3a424b;border-radius:7px;overflow:hidden;color:#e8e9e6">
   <div style="display:grid;grid-template-columns:68px minmax(0,1fr);gap:13px;align-items:center;padding:14px;background:#17141a;border-bottom:1px solid #3a424b">
     <img src="{{icon_url}}" alt="{{名字}} 图标" loading="lazy" style="width:68px;height:68px;display:block;object-fit:cover;background:#1a2026;border:2px solid #806497;border-radius:2px">
@@ -508,7 +513,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 
 ## 七、配装候选卡
 
-```html
+```html type="renderer"
 <section style="background:#101317;border:1px solid #3a424b;border-radius:7px;overflow:hidden;color:#e8e9e6">
   <header style="display:flex;justify-content:space-between;gap:14px;align-items:center;padding:12px 14px;background:#14181d;border-bottom:1px solid #2a3037">
     <h3 style="margin:0;font-size:14px;color:#fafaf7">候选配装 1</h3>
