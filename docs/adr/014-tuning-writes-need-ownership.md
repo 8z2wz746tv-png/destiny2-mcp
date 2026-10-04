@@ -76,6 +76,28 @@
 会把能装的调谐报成"游戏里同样装不上"。现在调谐只看 310 清单，且 `unlock_state` 对调谐一律报
 `null`（不把一个已知错误的值当判据发出去）。
 
+## 修订（2026-09-28）：同一条判据必须**两条写入路径都生效**
+
+上面那条修订只落在 `equip_mod` 的确认阶段（`armor_mod_service.plan`），**没落到 `equip_build` 的
+模组预检**（`loadout_mod_sockets._prepare_mod_operations`）—— 预检仍拿组件 **207**
+（`characterPlugSets`，角色级）判"这一位能不能插"。真机后果：`equip_build` 把 3 颗调谐
+（含一颗「平衡调整」）全判成"装不上：不在 Bungie 给这一位角色的可插入清单里（游戏里同样装不上）"，
+还给出「需要守护者等级3」这种从 207 抄来的插入条件，**连上游都没试过一次**。
+
+根因不是"忘了做"，是**一个事实写了两遍**：207 根本不覆盖调谐槽（调谐只在组件 310 的逐件清单里），
+拿它判调谐必然得 `false`。处置三条：
+
+1. 判据收进 `build/tuning_writes.py`（`plug_is_tuning` / `tuning_write_blocker`），**单一出处**，
+   两条路径共用；`services/loadout_energy_budget.py` 里第三份调谐类别常量一并收敛。
+2. `equip_build` 的执行路径**不请求 310**（只请求 `INVENTORY_SOCKETS`），手上没有那份清单，
+   所以预检对调谐**退回"不判断"** —— 缺数据 ≠ 不许，交给上游说话（本 ADR 与 ADR-013 反复强调的纪律）。
+3. 守门 `tests/test_loadout_mod_planning.py::test_tuning_is_not_blocked_by_the_role_level_plug_sets`，
+   配一条反面（非调谐模组**仍然**照 207 拦）；两条都做过注入验证。
+
+**这条路的前置条件**：候选生成阶段（`build_results`）已按 310 过滤，清单外的调谐不会进计划，
+所以预检的"不判断"不会放行一颗装不上的调谐 —— 真装不上由上游回 1675，执行器按 ADR-018
+记 `mod_blocked` 且**不回退**整条配装。
+
 ## Consequences
 
 - 求解器对平衡调整的估值回归真实：以前"六维各 +1"会**每项多算 1**（总账最多虚高 6 点），
