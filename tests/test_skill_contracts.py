@@ -292,3 +292,123 @@ def test_render_skill_only_names_real_intents_and_parameters() -> None:
 
     assert seen >= 20, f"只解析到 {seen} 条调用，正则或文档结构变了，先看这里"
     assert not problems, "渲染 skill 里的调用对不上代码：\n" + "\n".join(problems)
+
+
+# ── 宿主交付包装：HTML 得先包对，宿主才渲染 ───────────────────────────────────
+# 实测（2026-10-05，豆包客户端）：同一个模型、同一套卡片数据，只换代码块的起始行 ——
+# 起始行写成 ` ```html type="renderer" ` 时渲染成可视化卡片；写成普通的 ` ```html `
+# 或裸贴 HTML 时，整段 HTML 被**原样当源码显示**（用户亲眼看到另一个对话里吐出一大坨
+# `<div style=…>`）。skill 把"渲染哪些块、用哪些字段、什么 HTML 合法、图挂了怎么办"
+# 都教了，唯独没写"怎么把这个 HTML 交给宿主"，于是模型照 skill 做出来的卡片在豆包里
+# 是一坨源码 —— 卡在最后一公里。这条把包装协议变成可执行断言：
+# ① 两个入口（SKILL.md 的三档表、html-conventions.md 的约定）都要写出宿主认的起始行；
+# ② 都要说明它是**宿主特有**的（缺了这句，模型会把它当成 HTML 的通用写法带到别的宿主）；
+# ③ 都要写反面（普通 ```html / 裸 HTML 不渲染）—— 不写就会重犯；
+# ④ skill 里的 HTML 示例**只允许**用正确的起始行：示例写错比不写示例更糟（模型会照抄）。
+
+#: 宿主认的包装标记。改它之前先看 SKILL.md §1 与 html-conventions.md §零：
+#: 这是**豆包**认的行，不是 HTML 的通用协议。
+RENDER_WRAPPER = '```html type="renderer"'
+#: "包装是宿主特有的"。两份文档各自的语言里都要有这句。
+RENDER_WRAPPER_HOST_SPECIFIC = {
+    "SKILL.md": "host-specific",
+    "references/html-conventions.md": "宿主特有",
+}
+#: 反面：信息串只有 `html` 的普通围栏（`type="renderer"` 不算），或干脆裸贴 HTML。
+RENDER_WRAPPER_PLAIN = re.compile(r'```html(?!\s*type="renderer")')
+#: "那样交付不会被渲染"——两份文档各自的语言里的写法。
+RENDER_WRAPPER_FAILURE = {
+    "SKILL.md": "shown as source text",
+    "references/html-conventions.md": "不渲染",
+}
+#: 围栏起始行：`^```<信息串>`。行内代码用的 4 个以上反引号不算（信息串首字符不是字母）。
+FENCE_LINE = re.compile(r"^\s*```(.*)$")
+
+
+def _flat(text: str) -> str:
+    """折掉换行，好让"同一句话"能跨行匹配。"""
+    return " ".join(text.split())
+
+
+def _section(text: str, heading: str) -> str:
+    """取 `## <heading>` 到下一个二级标题之间的正文。"""
+    start = text.index(heading) + len(heading)
+    rest = text[start:]
+    end = rest.find("\n## ")
+    return rest if end == -1 else rest[:end]
+
+
+def test_render_skill_wires_the_delivery_wrapper_into_the_host_tiers() -> None:
+    """SKILL.md 的三档表里，"能渲染 HTML"那一档必须先定交付包装，并给出豆包的值。
+
+    只写在别的章节不够：模型是照着那一档决定"这个宿主该怎么发"的，那里没写就等于没定协议。
+    """
+    section = _section((RENDER_ROOT / "SKILL.md").read_text(encoding="utf-8"), "## 1.")
+    flat = _flat(section)
+
+    assert RENDER_WRAPPER in section, (
+        f"SKILL.md §1 的三档里没写宿主包装协议（要出现 {RENDER_WRAPPER}）："
+        "「能渲染 HTML」这一档不先定包装，模型照 skill 做出来的 HTML 会被宿主当源码显示"
+    )
+    assert RENDER_WRAPPER_HOST_SPECIFIC["SKILL.md"] in flat, (
+        "SKILL.md §1 没说明包装是宿主特有的 —— 模型会把它当成 HTML 的通用写法带到别的宿主"
+    )
+    assert RENDER_WRAPPER_PLAIN.search(flat), (
+        "SKILL.md §1 没写反面：普通的 ```html / 裸 HTML 在豆包里不渲染（不写就会重犯）"
+    )
+
+
+def test_render_skill_states_the_delivery_wrapper_in_both_entrypoints() -> None:
+    """包装协议两个入口都要有，而且口径一致：SKILL.md（三档）与 html-conventions.md（约定）。
+
+    blocks.md 的骨架是照它交付的，所以也得指得到这条（它的示例本身由下面那条守门盯着）。
+    """
+    documents = {
+        name: (RENDER_ROOT / name).read_text(encoding="utf-8")
+        for name in ("SKILL.md", "references/html-conventions.md")
+    }
+    for name, text in documents.items():
+        flat = _flat(text)
+        assert RENDER_WRAPPER in text, f"{name} 没写宿主认的包装起始行 {RENDER_WRAPPER}"
+        assert RENDER_WRAPPER_HOST_SPECIFIC[name] in flat, (
+            f"{name} 没说明包装是宿主特有的（不是 HTML 的通用写法）"
+        )
+        assert RENDER_WRAPPER_PLAIN.search(flat), (
+            f"{name} 没写反面：普通的 ```html / 裸 HTML 在豆包里不会渲染"
+        )
+        assert RENDER_WRAPPER_FAILURE[name] in flat, (
+            f"{name} 没写清那样交付的后果（会被原样当源码显示）"
+        )
+
+    blocks = (RENDER_ROOT / "references" / "blocks.md").read_text(encoding="utf-8")
+    assert RENDER_WRAPPER in blocks and "html-conventions.md" in blocks, (
+        "blocks.md 的骨架就是交付内容：要写明按 html-conventions.md 的包装交付，示例用正确的起始行"
+    )
+
+
+def test_render_skill_html_examples_use_the_host_wrapper() -> None:
+    """skill 里每一段 HTML 示例的起始行都必须是宿主认的那一行。
+
+    模型是照抄示例的：示例写成普通的 ```html，豆包就把整段当源码显示 ——
+    「示例本身错了比没示例更糟」。
+    """
+    offenders: list[str] = []
+    examples = 0
+    for path in sorted(RENDER_ROOT.rglob("*.md")):
+        for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            match = FENCE_LINE.match(line)
+            if match is None:
+                continue
+            info = match.group(1).strip()
+            if not info or info.split()[0] != "html":
+                continue
+            if info == 'html type="renderer"':
+                examples += 1
+            else:
+                offenders.append(f"{path.relative_to(RENDER_ROOT)}:{lineno}: ```{info}")
+
+    assert not offenders, (
+        "渲染 skill 里的 HTML 示例只能用它教的宿主包装起始行（示例会被照抄，写错就吐源码）：\n"
+        + "\n".join(offenders)
+    )
+    assert examples >= 5, f"只解析到 {examples} 段 HTML 示例，先看示例结构是不是变了"
