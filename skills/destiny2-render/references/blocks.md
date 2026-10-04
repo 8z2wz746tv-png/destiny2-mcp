@@ -195,7 +195,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.comparison.weapon.item_hash` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 行视图卡头那把枪的 hash（同名多版本时看这个） |
 | `data.comparison.instances[].item_hash` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 这一把属于哪个版本 |
 | `data.comparison.instances[].icon_url` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 行视图**每一行**的武器图（同一 hash 的行必然同一张图；空串 = 查不到定义 → 画占位块） |
-| `data.duplicate_weapons[].icon_url` | `inventory_assistant(intent="duplicates", limit=3)` | 组级武器图：**同一组里每一把都是这张图**。实例行没有自己的 `icon_url`（体积口径，见 `docs/adr/021`），渲染每把时复用它，别写成"每组只有第一把有图" |
+| `data.duplicate_weapons[].icon_url` | `inventory_assistant(intent="duplicates", limit=3)` | 组级武器图：**同一组里每一把都是这张图**。实例行**没有这个字段**（不是空串，体积口径见 `docs/adr/021`）→ 渲染每把时复用它，**不要画占位块**，也别写成"每组只有第一把有图"（细则在 §八 的降级） |
 | `data.subclass.subclass_name` | `subclass_assistant(intent="get", character="hunter")` | **子职业自己**那一行（卡片标题） |
 | `data.subclass.icon_url` | `subclass_assistant(intent="get", character="hunter")` | 子职业本身的图（2026-10-05 补：以前只有 `plugs` 有图，标题行只能放色块） |
 | `data.subclass.plugs[].name` | `subclass_assistant(intent="get", character="hunter")` | 子职业当前装的技能/星象/碎片 |
@@ -572,6 +572,10 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.loadouts[].exotic_armor` | `loadout_assistant(intent="list")` | 金装名，可空串 |
 | `data.loadouts[].subclass` | `loadout_assistant(intent="list")` | 子职业 |
 | `data.loadouts[].execution_supported` | `loadout_assistant(intent="list")` | 能不能一键穿 |
+| `data.loadouts[].visuals.armor.exotic.name` | `loadout_assistant(intent="list", limit=3)` | 这套的金装名（与同行的 `exotic_armor` 同一个值；这里是能画图的那一块） |
+| `data.loadouts[].visuals.armor.exotic.icon_url` | `loadout_assistant(intent="list", limit=3)` | 金装图；**可为空串**（名字在那五件里对不唯一就不给图，不猜） |
+| `data.loadouts[].visuals.subclass.name` | `loadout_assistant(intent="list", limit=3)` | 子职业名（Manifest 全名，如「棱镜猎人」） |
+| `data.loadouts[].visuals.subclass.icon_url` | `loadout_assistant(intent="list", limit=3)` | 子职业图；**可为空串** |
 | `data.total_loadouts` | `loadout_assistant(intent="list")` | 总套数 |
 | `data.next_offset` | `loadout_assistant(intent="list")` | 翻页偏移 |
 | `data.loadouts[].build_template.title` | `loadout_assistant(intent="get")` | 配装标题 |
@@ -589,6 +593,11 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 - `completion_rate` 为 `null` → 写 `completion_rate_note` 的那句话，**不写 0%**。
 - `query.targets.*` 全为 null → 不画"目标"列；`reachable` 要带"保守下界"说明。
 - `builds[].items[]` 少于 5 件 → 照实画几件，别补空位。
+- 已存配装**清单行**（`intent="list"`）的图只有两处：`visuals.armor.exotic.icon_url`
+  与 `visuals.subclass.icon_url`。**空串 = 解析不到**（金装名在那套的五件里对不唯一、
+  或者这套是旧记录没有模板）→ 画同尺寸占位块 + 只写名字，**别写 `<img src="">`**，
+  也别为了补图再调一次 `intent="get"`（清单页要为几十套各调一次）。套装（`armor_set`）
+  **永远**没有图（`DestinyEquipableItemSetDefinition` 实测 `hasIcon: false`），别给它留图位。
 
 ---
 
@@ -645,7 +654,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.counts.unlocked` | `weapon_assistant(intent="patterns", rarity="异域", limit=5)` | 已解锁条数 |
 | `data.counts.total` | `weapon_assistant(intent="patterns", rarity="异域", limit=5)` | 本页筛出的总条数 |
 | `data.duplicate_weapons[].name` | `inventory_assistant(intent="duplicates", limit=3)` | 重复武器组 |
-| `data.duplicate_weapons[].icon_url` | `inventory_assistant(intent="duplicates", limit=3)` | **组级**图标 —— 同一组里每一把都用它（实例行没有自己的 `icon_url`，那是体积口径） |
+| `data.duplicate_weapons[].icon_url` | `inventory_assistant(intent="duplicates", limit=3)` | **组级**图标 —— 同一组里每一把都用它（实例行**没有**这个字段，不是空串：体积口径；细则在 §八 的降级） |
 | `data.duplicate_weapons[].weapon_type` | `inventory_assistant(intent="duplicates", limit=3)` | 类型 |
 | `data.duplicate_weapons[].instance_count` | `inventory_assistant(intent="duplicates", limit=3)` | 这一组几件 |
 | `data.duplicate_weapons[].instances[].location` | `inventory_assistant(intent="duplicates", limit=3)` | 副本位置 |
@@ -667,6 +676,13 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 - 截断（`truncated=true`）→ 卡头必须写"本次 N / 共 M"，并给 `next_offset`。
 - `perk_data_complete=false` → 卡头写"perk 数据不完整"；`perks_complete=false` 的行
   单独标一句，**不许**把空 perk 列表画成"没有 perk"。
+- **`duplicates` 的实例行：每一把都用组级 `icon_url`，不要画占位块。**
+  实例行**没有** `icon_url` 这个字段（不是空串）—— 那是**体积口径**（每个实例给图 +17.3%，
+  见 `docs/adr/021`），不是漏了。同一组的每一把**本来就是同一张图**（分组判据是
+  `exact_item_hash_and_distinct_instance_id`），所以渲染实例时直接复用
+  `data.duplicate_weapons[].icon_url`：既不画占位块，也不要写成"只有第一把有图"、
+  更不要为了凑图去调别的 intent（那样是白花一次调用）。
+  判据是"组级有没有图"：组级也空串时才画占位块（那次是真查不到定义）。
 
 ---
 
@@ -686,6 +702,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.rows[].rewards[].icon_url` | `world_assistant(intent="rotations")` | 掉落图 |
 | `data.rows[].rewards[].quantity` | `world_assistant(intent="rotations")` | 数量 |
 | `data.vendors.vendors[].name` | `world_assistant(intent="vendor", vendor_name="班西-44", limit=3)` | 商人名 |
+| `data.vendors.vendors[].icon_url` | `world_assistant(intent="vendor", vendor_name="班西-44", limit=3)` | 商人**自己**那一行的图（方形徽标；菜单模式下每个候选商人也有） |
 | `data.vendors.vendors[].sale_items[].name` | `world_assistant(intent="vendor", vendor_name="班西-44", limit=3)` | 在卖什么 |
 | `data.vendors.vendors[].sale_items[].icon_url` | `world_assistant(intent="vendor", vendor_name="班西-44", limit=3)` | 商品图 |
 | `data.vendors.vendors[].sale_items[].item_type` | `world_assistant(intent="vendor", vendor_name="班西-44", limit=3)` | 类型 |
@@ -701,6 +718,10 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 
 - `source="schedule"` 的行必须标"自维护表（带核对日期）"，不能和官方口径的行混在一张表里不区分。
 - 商人是**窗口数据**（本次刷新），卡头写 `next_refresh`。
+- 轮换行的图分两档，**别把"给不出"画成"图挂了"**：官方那半（特色突袭/地牢、夜幕/宗师）
+  的行有 `icon_url`；**自维护表那半（上维挑战 / 异域任务轮换 / 泉源）没有这个字段**
+  （表里只存名字、没有活动 hash —— 名字→活动定义实测对不上，宁可不给）→ 那些行**不画图位**，
+  按纯文字行渲染（§三 的"不带图行"），不要画占位块。
 
 ---
 
