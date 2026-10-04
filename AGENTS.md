@@ -324,6 +324,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/plans/ARMOR_FORMAT_PLAN.md` — 动护甲载荷格式（体积口径、字段取舍）之前看实机证据与取舍。
 - `docs/plans/EQUIP_FLOW_PLAN.md` — 动装备流程（候选签发 → `confirmed` → 回读）之前看它为什么长这样。
 - `docs/plans/EQUIP_WRITE_PATH_PLAN.md` — 动装备**写入路径**（求解前提 → 确认复检 → 预检次序 → 写入 → 回读/回滚）之前看它：2026-10-03 那一轮逐条的证据等级（故障侧是真机原文）、**2026-10-04 真机轮的修复侧结果**（§八：回读跳过、写入回执、逐槽还原、分段实测）、验收点、仍然**未取得**的清单（§六），以及 ADR-024 结尾「三条注入」的可核对记录在哪一节。
+- `docs/plans/ICON_URL_PLAN.md` — 动**图标 URL 覆盖**（哪个出口带 `icon_url`、图片 URL 从哪来）或要给模型加**HTML 渲染 skill** 之前看它：老 web（`~/项目/Destiny_MCP`）的口径、设计决定（内部只传 hash / 出口现取 / 图片只走 Bungie CDN）、44 有 / 29 台账的清点表、守门与注入矩阵、受控基线 diff、**活动副本图标走另一条道**这个缺口，以及 7 项待拍板。
 - `docs/plans/HOST_COMPAT_PLAN.md` — 要支持「只发标量」的宿主（豆包 connector 这类）时看它：哪些参数收文本写法、为什么 `equip_build` 改成也能收 `execution_id`、守门在哪。
 - `docs/plans/PVP_STATS_PLAN.md` — 动生涯/赛季战绩（计数器 vs 统计接口、模式与角色范围标注）之前看它为什么分三档。
 - `docs/plans/LEGACY_SURFACE_REMOVAL_PLAN.md` — 要动历史工具面（`full`/`expert` profile、`ENABLE_LEGACY_TOOLS`）或配装导入入口之前看它：删什么、导入怎么搬、怎么验都在里面。
