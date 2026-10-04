@@ -216,7 +216,6 @@ class WeaponPopularityService:
                     {
                         "name": combo_entry["name"],
                         "plug_hash": combo_entry["plug_hash"],
-                        "icon_url": combo_entry["icon_url"],
                     }
                 )
             combinations.append(
@@ -413,21 +412,22 @@ class WeaponPopularityService:
         if selection_rate is not _MISSING:
             result["selection_rate"] = selection_rate
 
+        # **定义级 perk 行不带图标**（2026-10-04 统一，见 `docs/plans/ICON_URL_PLAN.md` §十）：
+        # 同一个 `popularity` intent 有两条路 —— 这里（第三方选取率快照）与
+        # `weapon_local_data._popularity_summary`（本地归档摘要）。两条路的 perk 行以前
+        # 一条带图、一条不带，是**真不一致**（不是有意为之）。口径按定义级 perk 池走：
+        # 它回答"可能滚到什么"，图给实例级 options；要统一就只能统一成不带。
+        # 守门：`tests/test_icon_url_output.py::test_popularity_paths_agree_on_perk_rows`。
         if len(unique) == 1:
-            plug_hash, item = next(iter(unique.items()))
+            plug_hash, _ = next(iter(unique.items()))
             result["plug_hash"] = plug_hash
-            result["icon_url"] = str(item.get("icon") or "")
             return result
 
         result["plug_hash"] = None
-        icons = {
-            str(item.get("icon") or "") for item in unique.values() if item.get("icon")
-        }
-        result["icon_url"] = next(iter(icons)) if len(icons) == 1 else ""
         if unique:
             warnings.append(
                 f"「{name}」在该武器 socket 中对应 {len(unique)} 个 Manifest Hash，"
-                "已保留图标但未猜测 Hash。"
+                "没有唯一命中就不给 Hash。"
             )
         else:
             warnings.append(f"「{name}」未能在该武器的 Manifest socket 中解析。")

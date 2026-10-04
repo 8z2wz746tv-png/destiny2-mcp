@@ -230,12 +230,15 @@ def test_weapon_popularity_returns_recorded_snapshot_and_missing_is_none(
 
     assert result is not None
     assert result["weapon"]["item_hash"] == 100
+    # 定义级 perk 行**不带** `icon_url`（2026-10-04 统一：同一个 `popularity` intent 的
+    # 另一条路 `weapon_local_data._popularity_summary` 也不带。理由与守门见
+    # `docs/plans/ICON_URL_PLAN.md` §十 与 `tests/test_icon_url_output.py`）。
     assert result["perk_columns"][0]["items"][0] == {
         "name": "集体爆破",
         "selection_rate": 42.0,
         "plug_hash": 201,
-        "icon_url": "/collective-action.png",
     }
+    assert "icon_url" not in result["popular_combinations"][0]["perks"][0]
     assert service.get_weapon_popularity("不存在的武器") is None
 
 
