@@ -540,10 +540,11 @@ MCP 是长驻进程。**第一次复现时两个出口都没有 `icon_url`，但
   按目标聚合的话"其中一条漏了图"会被另一条盖住 —— 注入验证会假绿，而运行期那一支真的没有图；
 - `x["k"] = v` **按 (函数, 目标) 聚合**：单看一条语句永远只有一个键，不聚合一条都判不了。
 
-**台账新增 7 条**（全部逐条核过、都不是出口）：3 条取数中间行（`weapon_compare_service` 的
-`weapon_instances` 收集、`snapshot_version` 的指纹输入、`get_pvp_weapon_board` 的 `totals` 暂存）
-+ 2 条"图由另一个具名工厂给"的装配（`weapon_popularity_service._weapon_identity`、`_enrich_entry`）。
-**台账总数 25 → 32。**
+**台账 37 → 43 条**（新增 6 条，全部逐条核过、都不是出口）：4 条取数中间行
+（`weapon_compare_service` 的两处 `weapon_instances` 收集合起来算一个键、`_check_name_match`、
+`snapshot_version` 的指纹输入、`get_pvp_weapon_board` 的 `totals` 暂存）
++ 2 条"图由另一个具名工厂给"的装配
+（`weapon_popularity_service._weapon_identity`、`_enrich_entry`）。
 
 ### 14.4 注入矩阵（11 条，全部咬红；`touch` + `PYTHONDONTWRITEBYTECODE=1`，恢复后 sha256 逐字节一致）
 
