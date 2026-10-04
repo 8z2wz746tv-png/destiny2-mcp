@@ -169,16 +169,23 @@
 
 | 项 | 结果 |
 | --- | --- |
-| 开发机 `pytest -q` | **1995 passed**（改前 1990） |
-| **干净树**（`git archive` 导出、`env -i`、干净 HOME、**无 `.env`**、`PYTHONPATH` 钉住临时树） | `import destiny_mcp.server` OK + **1977 passed / 18 skipped**（18 条要本地 `manifest/*.sqlite3`，全新克隆本来就没有） |
-| 语料 runner `scripts/run_corpus_all_rows.py` | **264 PASS / 3 INFO / 1 SKIP / 0 FAIL**（4 次调用层失败全是上游：排行榜空 ×3、`stats period=season` 是文档化的接口限制） |
-| **受控基线 diff** | `git worktree` 出 `dff38c7` 跑"改前"、**同账号紧接着**跑"改后"：武器面 **6** 条新路径、护甲面 **7** 条新路径，**两侧都没有"无理由消失"的字段** → 纯加法。仅易变项（`execution_id`、`god_roll.source_detail` 的集合序）变化，后者是既有的非确定性 |
-| 真机 URL 形状 | 星狐座 → `.../icons/6495d6a04cc9e7c0515b27b26ad8be60.jpg`，**与用户实测逐字一致** |
-| 真机出口取样 | 9 个新出口逐个 `curl`：**全部 HTTP 200 + `image/jpeg\|png`**，`打开失败: []` |
+| 开发机 `pytest -q` | **2002 passed**（第一轮基线 1995；本轮 +7 条守门） |
+| **干净树**（`git archive HEAD` 导出、`env -i`、干净 HOME、**无 `.env`**、`PYTHONPATH` 钉住临时树） | `import destiny_mcp.server` OK + **1984 passed / 18 skipped**（= 1977 + 7，**没有新增跳过**；18 条要本地 `manifest/*.sqlite3`） |
+| 语料 runner `scripts/run_corpus_all_rows.py` | **264 PASS / 3 INFO / 1 SKIP / 0 FAIL**（与第一轮基线逐项一致；4 次调用层失败全是上游：排行榜空 ×3、`stats period=season` 是文档化的接口限制） |
+| **受控基线 diff（本轮）** | `git worktree` 出改动前（`2a4cd8f`，物品道那一轮）跑一次、**同账号紧接着**跑改动后：武器面 27 例**路径零新增零消失**（仅 `god_roll.source_detail` 这个既有的非确定性值变化）；护甲面同。活动出口另做逐字段对比（武器/护甲基线不覆盖活动 intent）：history **+2**、pgcr **+2**、raid_report **+2**（dungeon 同）、rotations **+3**、pvp_weapons **+4**，**消失路径 0** → 纯加法 |
+| 真机 URL 形状 | 第一轮：星狐座 → `.../icons/6495d6a04cc9e7c0515b27b26ad8be60.jpg`，与用户实测逐字一致 |
+| 真机出口取样（第一轮，物品道） | 9 个新出口逐个 `curl`：**全部 HTTP 200 + `image/jpeg\|png`**，`打开失败: []` |
+| **真机 curl（本轮，活动道）** | 突袭 `raid_report(mode=raid)` 的世界吞噬者、地牢 `raid_report(mode=dungeon)` 的二象性、PvP `history`/`pvp_weapons` 的光辉悬崖：三条 **HTTP/2 200 + `content-type: image/jpeg`**（150,101 / 58,827 / 185,694 字节） |
+| **注入验证（本轮 6 条）** | 活动行去图 → 红并点名 `activity_service.py:575`；第二处读 `pgcrImage` → 红并列出两个持有者；两条道对调 → 活动 hash 走进物品表当场断言失败；`popularity` 加回图 → 两条路键集合不一致；`duplicates` perk 行加图 → 行变胖；Starside 图标退回抹掉 → 断言失败。**恢复后 6 个文件 sha256 全部逐字节一致** |
+| Starside 图标落点（数据面） | 渲染 `entities/perks.json` 全部文本后共 **6** 个不同相对路径，**`missing on disk: 0`**、**0 条外链**、**0 条未解析**（`assets/elements/arc/icons/5fc7a97f63.webp` 这类） |
+| 体积连续性 | 武器/护甲基线 27 + 23 例的载荷字节数与改动前一致（585 KB / 467 KB） |
 
 **同步了 1 条语料断言（不是为绿而改）**：`scripts/run_corpus_all_rows.py:1523` 原本钉 `"icon_url" not in dup_first`（组级图标曾被投影掉）。现在改钉"组级必须有、实例级仍然没有、perk 行仍是 `{name, slot}`"，注释里写了体积账：`duplicates` 20 KB 闸下 **13.5 → 13.965 KB**。
 
-**基线夹具 `tests/baselines/**` 未覆盖**（它们是冻结的对照快照，相关测试本来就绿）——要不要把本轮新键刷进夹具，**待拍板**。
+**另有 1 条既有测试同步了形状（也不是为绿而改）**：`tests/test_personal_migrated_read_features.py` 原本断言选取率快照的 perk 行**带** `icon_url`；按第 4 项拍板统一成不带，顺带加钉 `popular_combinations[].perks[]` 也不带。
+
+**基线夹具 `tests/baselines/**` 未刷**（拍板第 6 项按"不动"处理）：它们是武器/护甲的冻结快照，本轮没有改到那两类出口；活动出口的对照改用上面那次逐字段 diff（并且它证明的是"只加不减"）。
+
 
 ---
 
