@@ -27,6 +27,10 @@ Thumbs.db
 # Data / manifests (generated / downloaded)
 manifest/
 destiny_mcp/data/dim_wishlists.json
+# DIM 愿单缓存还有第二个落点：真机跑 `wishlist` 时写在项目的 `data/` 下（2026-10-04 跑真机时
+# 生成的，`data/dim_wishlists.json`）。规则以前只盖住了包内那份，于是它以未跟踪文件的形式
+# 一直挂在 `git status` 里 —— 那是缓存的正常产物，不是该提交的东西。
+data/dim_wishlists.json
 # 归档/：用户放的第三方派生转储（DIM 风格三张表，约 18 MB）。2026-09-23 对过账：
 # 5,760 条与本地 Manifest 逐条一致（hash 归一符号后交集 5760/5760，中文名抽查 300/300），
 # 我们库里本来就有这些字段（trait 定义我们 554 条 vs 归档 46 条）。所以它只作分析/校验用，
