@@ -1,6 +1,6 @@
 # 图标 URL 全覆盖 + 模型侧 HTML 渲染（开发档案）
 
-状态：**四轮都已实现并验证**（第一轮：物品/装备/perk 的 `icon_url` 覆盖；第二轮：活动道 + Starside 相对路径 + `popularity` 统一；第三轮：渲染 skill；**第四轮：豆包三个真实场景暴露的缺口**，见 §十三）。§十 的 7 项拍板**已落地**（第 6 项按"不刷基线夹具"处理）。
+状态：**五轮都已实现并验证**（第一轮：物品/装备/perk 的 `icon_url` 覆盖；第二轮：活动道 + Starside 相对路径 + `popularity` 统一；第三轮：渲染 skill；第四轮：豆包三个真实场景暴露的缺口，见 §十三；**第五轮：副本对比行视图 + 守门的形状/词表双缺口**，见 §十四）。§十 的 7 项拍板**已落地**（第 6 项按"不刷基线夹具"处理）；§十四 的 duplicates 实例行**是待拍板项**（体积表已量，见 14.2）。
 最后更新：2026-10-05
 
 ---
@@ -452,3 +452,144 @@ MCP 是长驻进程。**第一次复现时两个出口都没有 `icon_url`，但
 
 **三条"第一次是绿的"全部是注入打偏**（判据没覆盖那个形状 / 测试没走那条路），
 不是"守门没问题"—— 这正是仓库里那条纪律的现场复现。
+
+---
+
+## 十四、第五轮（2026-10-05）：副本对比行视图、守门的形状/词表双缺口
+
+**触发**：用户两张新实拍截图 —— ①`weapon_assistant(intent="compare")` 的**副本行视图**
+（8 把同一把枪，每把一行：现装 4 项 + 可切换项）**整包一张图都没有**；②`duplicates` 的
+**实例行**没有图（组级有）。
+
+### 14.1 副本对比行视图补 `icon_url`（已做）
+
+| 位置 | 加了什么 |
+| --- | --- |
+| `services/weapon_analysis_projection.py` `compare_rows` 的卡头（`_WEAPON_ROW_KEYS`） | `item_hash` + `icon_url` |
+| 同函数每一条副本行 | `item_hash` + `icon_url` |
+
+**两个值取自同一份身份块**（`instances[].weapon`，即 `weapon_payload.weapon_block` 按**这件副本
+自己的 hash** 查出来的物品道结果）—— 所以"同一 hash 出两种图"在形状上不可能：图不是在这里按 hash
+重算的，而是照抄那条已经走 `manifest_lookup.get_icon_url()` 的结果（单一出处）。
+
+**真机实测**（`weapon_assistant(intent="compare", weapon_name="M-17“快嘴”")`，5 个副本）：
+
+| 项 | 改动前 | 改动后 |
+| --- | --- | --- |
+| 整包 `icon_url` 出现次数 | **0** | **6**（卡头 1 + 每行 1） |
+| 行里缺图 | 5/5 | **0/5** |
+| 卡头 `icon_url` | 无这个键 | `…/icons/bac8c1358e1243f387aeede8d4c7b9bb.jpg` |
+| 同一 `item_hash` 出多种图 | —— | **无** |
+| 载荷 | 9,008 B | **9,788 B**（+780 B，+8.7%） |
+| 图能打开 | —— | `curl` **HTTP 200 + image/jpeg（4,228 B）** |
+
+**同一轮的副产物**：`patterns` 的歧义候选行（`data.candidates[]`）投影时**把 `icon_url` 丢了** ——
+同一批 `rows` 在 `_row` 里本来就有图。它是"拿真实响应逆推"抓到的第一个实例，修法是把投影搬进
+`services/pattern_records.candidate_rows()`（`pattern_service.py` 贴着 465 行上限，净增 0 行）。
+
+### 14.2 `duplicates` 的实例行：**先算体积，等拍板（这一轮没动）**
+
+`limit` 上限实测是 **25**（`limit=50` 被拒：`duplicates limit 必须是 1 到 25 的整数`）。
+两种口径都给：**闸口径** = `json.dumps(ensure_ascii=False)`（ADR-021 / 语料 20 KB 闸就是这个口径，
+`run_corpus_all_rows.py:1519`）；**线上口径** = 服务端实际发的那段文本（实测 `indent=2`，约 1.9 倍）。
+表里实测那列与模拟值**逐字节相等**（26,755 = 26,755），所以模拟是可信的。
+
+| limit | 组 | 实例 | 现状（闸口径） | B 每件给图 | ΔB | C 组级+首件 | ΔC | 现状（线上） | B（线上） | ΔB（线上） |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **5（默认）** | 5 | 23 | 13,965 B | **16,380 B** | **+2,415（+17.3%）** | 14,490 B | +525 | 26,755 B | 29,446 B | +2,691 |
+| 20 | 20 | 77 | 42,899 B | 50,984 B | +8,085 | 44,999 B | +2,100 | 85,627 B | 94,636 B | +9,009 |
+| 25（上限） | 25 | 92 | 51,199 B | 60,859 B | +9,660 | 53,824 B | +2,625 | 102,235 B | 112,999 B | +10,764 |
+
+- **20 KB 闸只在默认档（`limit=5`）成立**，而且它是**闸口径**；`limit=20/25` 现在就已经是闸的
+  2.1×/2.6×（那两档不是默认出口）。
+- 每件实例约 **105 B**（闸口径）/ **117 B**（线上口径）。
+- **方案 A′（推荐，0 字节）**：不加字段 —— 同一组里每一把的图**本来就是同一张**
+  （分组判据是 `exact_item_hash_and_distinct_instance_id`），渲染每把时复用组级 `icon_url` 即可。
+  已写进渲染 skill 的字段表（`skills/destiny2-render/references/blocks.md`）。
+- **方案 B**：每件给 `icon_url` → 默认档 13,965 → **16,380 B，仍在 20 KB 闸内**（+17.3%）；
+  `limit=20/25` 时 +8.1/+9.7 KB。**没有自己改闸、没有改 ADR-021**，等用户拍板。
+- **方案 C**：组级 + 首件 → +525 B（默认档）。只解决"组里第一把有图"，对"每把一行都要图"没用。
+
+### 14.3 守门扩面：**形状**与**词表**各补一次（这一轮的重点）
+
+用户口径是"很多场景都还没有 url，逐个补就是打地鼠"，所以先补覆盖面。**七种形状**（前四种是
+前几轮的，后三种是这一轮）：
+
+| # | 形状 | 何时加的 |
+| --- | --- | --- |
+| ① | 字典字面量（名字键 + 身份 hash 键） | 第一轮 |
+| ② | **命名**的键清单常量 | 第一轮 |
+| ③ | `Model(name=…, item_hash=…)` 构造调用 | 第一轮 |
+| ④ | 模型类体里的字段声明（pydantic 少一个字段） | 第四轮 |
+| ⑤ | **逐次装配**：`x.update(…)` + `x["k"] = v` | **本轮**（用户点名的盲区） |
+| ⑥ | **内联**键清单：`{k: row[k] for k in ("name", …)}` | **本轮**（逆推发现的） |
+| ⑦ | 只有 `item_hash` 的字典字面量（每行一把的行视图） | **本轮**（用户实拍那张图的形状） |
+
+**词表也缺一次**（第 5 种形状的注入验证逼出来的，见 14.4）：`subclass_item_hash` 根本不在
+`_HASH_KEYS` 里 —— `loadout_service` 那一行写了 `icon_url` 却没人管，**不是形状漏了，是键认不出**。
+按"先量后收"补进"物品/组件身份"那一族（`subclass_item_hash`/`plug_item_hash`/`new_plug_hash`/
+`enhanced_plug_hash`/`perk_hash`/`super_hash`/`grenade_hash`/`melee_hash`/`class_ability_hash`/
+`movement_hash`）：全仓**只多 0 行**。同族里**故意不收**的（`name_hash`/`icon_hash`/`color_hash`
+是配装外观标识，`vendor_hash`/`progression_hash`/`milestone_hash`/`metric_hash`/`node_hash`/
+`stat_hash`/`record_hash`/`tier_hash`/`with_hash` 不是物品）：实测收进来多 **20** 行、20 条台账
+—— 那是噪声不是覆盖。
+
+**第 5 种形状的实现口径**（两半，判据不同，都写进 docstring）：
+
+- `update()` 调用**按每一次调用判**：`class_data` 有两条**互斥分支**各 update 一次，
+  按目标聚合的话"其中一条漏了图"会被另一条盖住 —— 注入验证会假绿，而运行期那一支真的没有图；
+- `x["k"] = v` **按 (函数, 目标) 聚合**：单看一条语句永远只有一个键，不聚合一条都判不了。
+
+**台账新增 7 条**（全部逐条核过、都不是出口）：3 条取数中间行（`weapon_compare_service` 的
+`weapon_instances` 收集、`snapshot_version` 的指纹输入、`get_pvp_weapon_board` 的 `totals` 暂存）
++ 2 条"图由另一个具名工厂给"的装配（`weapon_popularity_service._weapon_identity`、`_enrich_entry`）。
+**台账总数 25 → 32。**
+
+### 14.4 注入矩阵（11 条，全部咬红；`touch` + `PYTHONDONTWRITEBYTECODE=1`，恢复后 sha256 逐字节一致）
+
+| 注入（打在哪） | 结果 |
+| --- | --- |
+| ④ `SubclassConfig` 去掉 `icon_url`（上一轮，一起重跑） | 红：点名 `models/subclass.py:32` |
+| 词表：神器行去掉 `icon_url`（上一轮） | 红：点名 `manifest_artifacts.py:244` |
+| 台账过期：给旧的豁免行补图（上一轮） | 红：点名 `collection_service.py::_declared_children` |
+| 红线三条（图不一致挑第一张 / 子职业去类型过滤 / 套装拿别的图） | 三条都红 |
+| **⑤ update(kwargs)**：去掉 `class_data.update(…, icon_url=…)` 里的图 | 红：`loadout_service.py:399 _build_template()::class_data.update ['subclass_item_hash']` |
+| **⑤ update(dict)**：另一条分支去掉图 | 红：`loadout_service.py:413`（同 kind） |
+| **⑤ 下标装配**：副本行改成逐键赋值且不带图 | 红：`weapon_analysis_projection.py:148 compare_rows()::row ['item_hash']` |
+| **⑥ 内联键清单**：卡头改成内联元组且不带图 | 红：`weapon_analysis_projection.py:165 compare_rows ['item_hash', 'name']` |
+| **⑦ 只有 item_hash**：副本行去掉 `icon_url` | 红：`weapon_analysis_projection.py:147 compare_rows ['item_hash']` |
+
+**⚠️ 第一次跑有 3 条是绿的 —— 全部是"打偏"，不是"守门没问题"**（正是仓库里那条纪律的现场复现）：
+
+| 第一次绿的 | 真因 | 修法 |
+| --- | --- | --- |
+| update(kwargs) | 判据只认"名字键 + hash 键"，而那次 update 只有 `subclass_item_hash`（**且它不在词表里**） | 扩词表（14.3）+ 装配形状改判"任何身份 hash 键" |
+| update(dict) | 同上 | 同上 |
+| 下标装配 | 判据要求名字键在**同一组**里，而名字是更早那条 `class_data = {"name": …}` 给的 | 装配形状改判"任何身份 hash 键" |
+
+### 14.5 `AGENTS.md` 那条 `PYTHONPATH` 规矩：**实测反例修正**（已改）
+
+原文写"在临时树里跑之前先钉住 `PYTHONPATH=<临时树>`"。实测：**经 stdio 起 MCP 子进程时它会被丢掉**
+（`mcp.client.stdio.get_default_environment()` 只转发白名单，POSIX 是 `HOME/LOGNAME/PATH/SHELL/TERM/USER`），
+症状是**基线 diff 假绿** —— "改动前"的 capture 里已经带着新字段。改法：写清适用范围（直接
+`python -c`/`pytest` 成立）+ 经 stdio 时必须在 harness 里显式 `env={**os.environ}` + 注明这是
+**实测反例**改出来的（"规矩也会错"的一类）。
+
+### 14.6 语料 `265 PASS / 0 SKIP` vs 基线 `264 PASS / 1 SKIP`：**定位到那一行**
+
+翻掉的那一行是 **`build：set_bonus 真实套装名往返`**（`run_corpus_all_rows.py:1295` 的 `else` 分支
+`record(..., "SKIP", "账号里没取到护甲套装名")`）。**不是代码改动，是账号数据变了**：
+
+- 这一行的输入是现场取的：`inventory_assistant(intent="get", armor_slot="legs", limit=8)` 里
+  **第一件有 `gear_tier` 的护甲**（`:315`）→ 再读 `intent="item"` 的 `identity.set.name`；
+- 基线那次录到的是 `6917530195336950066`「噬星者之鳞」—— **异域**腿甲，异域没有
+  `equipableItemSetHash` → `identity.set` 整个不在 → `set_name` 空 → SKIP（基线 JSON 里
+  `live.armor_instance_id` / `live.armor_identity` 都留着，可复核）；
+- 现在列表头一件成了 `6917530202732949212`「众神辉煌腿铠」（传说、套装 `众神辉煌`，
+  两个档位 `准备充足`/`沿线推进`）—— 那件的实例 ID 比基线那件**大**（更新获得），
+  而基线那件现在排在**第 2 位**，仍在账号里 → 说明是**新拿到一件**，不是代码改了顺序。
+- 所以：**SKIP → PASS 是"真跑并通过"**（好事），但它反映的是账号状态，不是本轮改动。
+
+### 14.7 本轮验证
+
+见 §十五（下面那张表按实跑结果填）。
