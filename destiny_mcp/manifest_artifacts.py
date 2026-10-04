@@ -245,6 +245,10 @@ class ArtifactCatalogMixin:
             "name": name,
             "description": desc,
             "hash": artifact_hash,
+            # 神器也是一件物品（有自己的图标）；这张行是 `artifact` 出口的主体，
+            # `tiers[].mods[]` 每一颗都有图，唯独"这是哪件神器"没有 —— 卡片第一行
+            # 只能放色块。`data` 就是它的定义，不额外查库。
+            "icon_url": _icon_url((data.get("displayProperties") or {}).get("icon")),
             "tiers": tiers,
         }
 
@@ -284,6 +288,8 @@ class ArtifactCatalogMixin:
         return {
             "name": name,
             "hash": mod_hash,
+            # `artifact_mod` 出口的主行就是这一张；`item_def` 上面刚查过，不额外查库。
+            "icon_url": _icon_url((item_def.get("displayProperties") or {}).get("icon")),
             "description": desc,
             "perks": perks,
         }

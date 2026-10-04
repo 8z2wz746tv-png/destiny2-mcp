@@ -351,6 +351,11 @@ def armor_payload(
             archetype = {
                 "hash": int(plug_hash),
                 "name": row["name"] or "",
+                # 词条原型（专家/机动/…）是一个**真插件**，Manifest 里有自己的图标
+                # （实测 2230428468 → `69731c603d7bcdd0a21b26c711d55f03.png`）。
+                # 它是护甲详情里"这件往哪个方向长"的那一行，缺图就只能放色块。
+                # `plug_def` 上面刚查过一次，这里不额外查库。
+                "icon_url": _icon_url((plug_def.get("displayProperties") or {}).get("icon")),
             }
         elif category in ("armor_stats", "intrinsics"):
             # 都算"定死的属性分布"（词条槽 / 异域护甲写死），玩家改不了。
@@ -371,6 +376,9 @@ def armor_payload(
             tuning = {
                 "hash": int(plug_hash),
                 "name": row["name"] or "",
+                # 调谐也是一颗真插件（有图标）；这一行是"这件护甲现在调的哪个方向"，
+                # 与 `sockets[]` 里同 `plug_hash` 的那行是同一颗，形状要对齐。
+                "icon_url": _icon_url((plug_def.get("displayProperties") or {}).get("icon")),
                 "declared_delta": plug_stats,
             }
         elif category.startswith("enhancements.raid"):
@@ -546,3 +554,38 @@ def armor_definition_payload(
         "intrinsic_perks": intrinsic_perks or [],
         "armor_schema_version": ARMOR_SCHEMA_VERSION,
     }
+
+
+def with_slot_keys(payload: Any) -> Any:
+    """递归给带 `slot` / `replacement_slot` 的条目补 `slot_key` + `slot_display`。
+
+    求解器内部用复数槽位名（`helmets`/`chests`），而工具参数与单件详情用单数
+    （`helmet`/`chest`）。这里**只加键**，不动原字段、也不改求解器模型：
+    调用方从此不用自己写映射表。
+
+    放在这儿（原在 `tools/_armor_branches.py`）的理由：它只依赖本模块自己的
+    `SLOT_DISPLAY` / `slot_key_from_solver`，是纯形状工厂；而工具层那个文件贴着
+    登记上限，往下挪一层既合规又能腾出位置。
+    """
+    def _walk(node: Any) -> Any:
+        if isinstance(node, dict):
+            for key in ("slot", "replacement_slot"):
+                raw = node.get(key)
+                if isinstance(raw, str) and raw.strip():
+                    slot_key = slot_key_from_solver(raw.strip())
+                    node.setdefault(f"{key}_key" if key == "replacement_slot" else "slot_key", slot_key)
+                    node.setdefault(
+                        "slot_display" if key == "slot" else "replacement_slot_display",
+                        SLOT_DISPLAY.get(slot_key, ""),
+                    )
+            for child_key, value in node.items():
+                # canonical_build 是"要原样回传"的可执行载荷，展示字段一律不进去
+                if child_key == "canonical_build":
+                    continue
+                _walk(value)
+        elif isinstance(node, list):
+            for value in node:
+                _walk(value)
+        return node
+
+    return _walk(payload)

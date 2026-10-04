@@ -227,6 +227,9 @@ def test_parse_artifact_reads_tier_fields_and_resolves_mods() -> None:
 
     assert parsed["hash"] == 42
     assert parsed["name"] == "好奇之器"
+    # 神器**自己**的图标（2026-10-05 补）：夹具的定义没给 `displayProperties.icon`，
+    # 所以是空串 —— 缺值给空串，不编一个假地址。
+    assert parsed["icon_url"] == ""
     assert parsed["tiers"] == [{
         "tier_hash": 7,
         "display_title": "1阶",
@@ -271,7 +274,7 @@ def test_parse_artifact_falls_back_to_perk_descriptions_for_mods() -> None:
 def test_parse_artifact_tolerates_a_definition_without_tiers() -> None:
     parsed = ManifestManager()._parse_artifact(42, {"displayProperties": {"name": "空神器"}})
 
-    assert parsed == {"name": "空神器", "description": "", "hash": 42, "tiers": []}
+    assert parsed == {"name": "空神器", "description": "", "hash": 42, "icon_url": "", "tiers": []}
 
 
 # ── get_artifact_mod_details ─────────────────────────────────────────
@@ -299,6 +302,8 @@ def test_artifact_mod_details_collects_perks() -> None:
     assert details == {
         "name": "模组甲",
         "hash": 100,
+        # `icon_url` 是 2026-10-05 加的：`artifact_mod` 出口的主行就是这一张。
+        "icon_url": "",
         "description": "主说明",
         "perks": [
             {"name": "Perk 甲", "description": "说明甲"},

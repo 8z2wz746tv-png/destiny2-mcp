@@ -21,6 +21,10 @@ from ..services.starside_notes import (
 from ._responses import confirmation_required_response, error_response, failure_response, ok_response
 from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..services.armor_payload import armor_payload
+# `with_slot_keys` 的形状工厂已下移到 `services/armor_payload.py`（它只依赖那边自己的
+# `SLOT_DISPLAY`/`slot_key_from_solver`）；这里**再导出**一次，`_build_flow` 与
+# `assistants` 的既有 import 路径不变。
+from ..services.armor_payload import with_slot_keys  # noqa: F401
 from ..utils.icons import icon_url as _icon_url
 from ..vocabulary import STAT_LABELS_ZH as _STAT_LABELS  # 六维中文名的单一出处
 
@@ -235,7 +239,12 @@ def armor_mods(svc: Any, priority_stat: str) -> dict:
         text = annotations.get("效果") or annotations.get("realgame_details")
         cooldown = annotations.get("冷却与槽位") or annotations.get("基础冷却") or annotations.get("冷却")
         if text or cooldown:
-            notes.append({"hash": mod.get("hash"), "name": mod.get("name"), "effect": text,
+            notes.append({"hash": mod.get("hash"), "name": mod.get("name"),
+                          # 这颗模组的图在 `picked["mods"]` 那一行里已经有了：同一份清单
+                          # 的两块（`mods` 与 `starside.mods`）指着同一颗，缺图的那块
+                          # 会让人以为是另一种东西。
+                          "icon_url": mod.get("icon_url") or "",
+                          "effect": text,
                           "cooldown": cooldown, "source": annotations.get("来源")})
     return ok_response(
         "已读取护甲模组。",
@@ -308,6 +317,9 @@ async def equip_preview(svc: Any, player_name: str, canonical_build: dict[str, A
                 mods.append({
                     "hash": int(mod_hash),
                     "name": (copied_definition.get("displayProperties") or {}).get("name", ""),
+                    # 模组是物品，有图标；`equip_preview` 的每一行都要能画卡片。
+                    # 定义上一行刚查过，不额外查库。
+                    "icon_url": _icon_url((copied_definition.get("displayProperties") or {}).get("icon")),
                     "copied_from_template": True,
                     "alternatives": [int(value) for value in group[1:]],
                     "energy_cost": ((copied_definition.get("plug") or {}).get("energyCost") or {}).get(
@@ -323,6 +335,7 @@ async def equip_preview(svc: Any, player_name: str, canonical_build: dict[str, A
             mods.append({
                 "hash": int(mod_hash),
                 "name": (mod_definition.get("displayProperties") or {}).get("name", ""),
+                "icon_url": _icon_url((mod_definition.get("displayProperties") or {}).get("icon")),
                 "energy_cost": ((mod_definition.get("plug") or {}).get("energyCost") or {}).get(
                     "energyCost", 0
                 ),
@@ -555,35 +568,3 @@ async def equip_build(
     # 成功摘要用服务层那句：它写着"回读核对通过"这类结论，固定话术会把它埋进 data.result。
     return ok_response(str(result.get("message") or "配装装备流程已执行。"), {"result": result})
 
-
-def with_slot_keys(payload: Any) -> Any:
-    """递归给带 `slot` / `replacement_slot` 的条目补 `slot_key` + `slot_display`。
-
-    求解器内部用复数槽位名（`helmets`/`chests`），而工具参数与单件详情用单数
-    （`helmet`/`chest`）。这里**只加键**，不动原字段、也不改求解器模型：
-    调用方从此不用自己写映射表。
-    """
-    from ..services.armor_payload import SLOT_DISPLAY, slot_key_from_solver
-
-    def _walk(node: Any) -> Any:
-        if isinstance(node, dict):
-            for key in ("slot", "replacement_slot"):
-                raw = node.get(key)
-                if isinstance(raw, str) and raw.strip():
-                    slot_key = slot_key_from_solver(raw.strip())
-                    node.setdefault(f"{key}_key" if key == "replacement_slot" else "slot_key", slot_key)
-                    node.setdefault(
-                        "slot_display" if key == "slot" else "replacement_slot_display",
-                        SLOT_DISPLAY.get(slot_key, ""),
-                    )
-            for child_key, value in node.items():
-                # canonical_build 是"要原样回传"的可执行载荷，展示字段一律不进去
-                if child_key == "canonical_build":
-                    continue
-                _walk(value)
-        elif isinstance(node, list):
-            for value in node:
-                _walk(value)
-        return node
-
-    return _walk(payload)

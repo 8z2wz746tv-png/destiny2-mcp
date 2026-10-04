@@ -18,6 +18,7 @@ import re
 from typing import Any
 
 from ..logging_config import get_logger
+from ..utils.icons import icon_url as _icon_url
 
 from . import starside_markup as markup
 from .starside_entities import StarsideEntities
@@ -328,6 +329,12 @@ def artifact_mod_notes(entity: StarsideEntities, manifest: Any, artifact: dict[s
                 "tier": tier_index,
                 "hash": int(mod["hash"]),
                 "name": mod.get("name") or names(str(mod.get("name") or "")) or str(mod["hash"]),
+                # 神器模组是物品（Manifest 里有图标）。这一块是 `artifact` 出口的
+                # 社区注记行，与 `tiers[].mods[]` 指的是同一颗 —— 那边有图、这边没有，
+                # 读的人会以为是两种东西。
+                "icon_url": _icon_url(
+                    ((manifest.get_item_definition(int(mod["hash"])) or {}).get("displayProperties") or {}).get("icon")
+                ),
                 "tier_label": mod.get("tier_label"),
                 # 站点对神器模组的档位与冷却（入库时保留的字段，这里补进响应）
                 "community_tier": entry.get("site_tier"),
@@ -432,6 +439,9 @@ def class_item_pairs(entity: StarsideEntities, manifest: Any, item_hash: int) ->
                 perks.append({
                     "hash": int(perk_hash),
                     "name": (definition.get("displayProperties") or {}).get("name") or int(perk_hash),
+                    # 职业金装那两条"之灵"是真插件（有图标）：双栏配对的卡片
+                    # 就是靠这两颗的图认的。`definition` 上面刚查过。
+                    "icon_url": _icon_url((definition.get("displayProperties") or {}).get("icon")),
                     "paired_with": zh_notes.get("右栏"),
                     "effect": zh_notes.get("realgame_details#2") or zh_notes.get("realgame_details"),
                 })

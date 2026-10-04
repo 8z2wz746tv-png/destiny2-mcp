@@ -32,6 +32,10 @@ class _Manifest:
     def get_item_name(self, item_hash: int) -> str:
         return NAMES.get(to_unsigned(item_hash), f"#{item_hash}")
 
+    def get_item_definition(self, item_hash: int):
+        """图标由 hash 现推：神器行现在也带 `icon_url`（2026-10-05 补），替身要能供图。"""
+        return {"displayProperties": {"icon": f"/common/destiny2_content/icons/{to_unsigned(item_hash)}.png"}}
+
 
 class _Resolver:
     """共享账号状态：equip 会改它，所以回读拿到的是写入后的状态。"""
@@ -124,9 +128,14 @@ async def test_state_reports_the_equipped_instance_and_what_can_be_swapped_in() 
     state = await service.artifact_state("p", "hunter")
 
     assert state["equipped"] == {
-        "name": "废墟石板", "hash": 111, "instance_id": "inst-a", "is_equipped": True
+        "name": "废墟石板", "hash": 111, "instance_id": "inst-a", "is_equipped": True,
+        # 神器行也带图标（2026-10-05 补）：三个出口（清单/from/to）共用这一份行。
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/111.png",
     }
     assert [i["name"] for i in state["available"]] == ["好奇之器"]
+    assert state["available"][0]["icon_url"].endswith("/icons/222.png"), (
+        "可换清单的每一件也要有图（它和 equipped 是同一份行）"
+    )
 
 
 async def test_switch_equips_the_other_instance_and_reads_back() -> None:
@@ -138,7 +147,8 @@ async def test_switch_equips_the_other_instance_and_reads_back() -> None:
     assert bungie.equips == ["inst-b"]
     assert result["from"]["name"] == "废墟石板"
     assert result["to"] == {
-        "name": "好奇之器", "hash": 222, "instance_id": "inst-b"
+        "name": "好奇之器", "hash": 222, "instance_id": "inst-b",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/222.png",
     }
     assert "已换上「好奇之器」" in result["message"]
 

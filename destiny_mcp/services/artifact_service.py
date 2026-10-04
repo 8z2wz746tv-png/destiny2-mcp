@@ -99,12 +99,18 @@ class ArtifactService:
         return found
 
     def _artifact_instances(self, profile: dict, character_id: str) -> list[dict]:
-        """同上，但带上给人看的东西（官方名 + 是否正装着）。"""
+        """同上，但带上给人看的东西（官方名 + 图标 + 是否正装着）。"""
         equipped_id = self._equipped_artifact_instance(profile, character_id)
         return [
             {
                 "name": self._manifest.get_item_name(item_hash) or f"#{item_hash}",
                 "hash": item_hash,
+                # 神器是物品，有自己的图标；这一份清单同时喂三个出口
+                # （`artifact` 的清单、`switch_artifact` 的 from/to/available 回执），
+                # 在这儿补一次就够了 —— 上面那三个地方都从这份行里取。
+                "icon_url": _icon_url(
+                    ((self._manifest.get_item_definition(item_hash) or {}).get("displayProperties") or {}).get("icon")
+                ),
                 "instance_id": instance_id,
                 "is_equipped": instance_id == equipped_id,
             }
@@ -201,11 +207,13 @@ class ArtifactService:
         from_payload = {
             "name": (equipped or {}).get("name", ""),
             "hash": (equipped or {}).get("hash", 0),
+            "icon_url": (equipped or {}).get("icon_url", ""),
             "instance_id": (equipped or {}).get("instance_id", ""),
         }
         to_payload = {
             "name": target["name"],
             "hash": target["hash"],
+            "icon_url": target["icon_url"],
             "instance_id": target["instance_id"],
         }
 
