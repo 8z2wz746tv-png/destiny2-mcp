@@ -1,6 +1,6 @@
 # 图标 URL 全覆盖 + 模型侧 HTML 渲染（开发档案）
 
-状态：**五轮都已实现并验证**（第一轮：物品/装备/perk 的 `icon_url` 覆盖；第二轮：活动道 + Starside 相对路径 + `popularity` 统一；第三轮：渲染 skill；第四轮：豆包三个真实场景暴露的缺口，见 §十三；**第五轮：副本对比行视图 + 守门的形状/词表双缺口**，见 §十四）。§十 的 7 项拍板**已落地**（第 6 项按"不刷基线夹具"处理）；§十四 的 duplicates 实例行**是待拍板项**（体积表已量，见 14.2）。
+状态：**六轮都已实现并验证**（第一轮：物品/装备/perk 的 `icon_url` 覆盖；第二轮：活动道 + Starside 相对路径 + `popularity` 统一；第三轮：渲染 skill；第四轮：豆包三个真实场景暴露的缺口，见 §十三；**第五轮：副本对比行视图 + 守门的形状/词表双缺口**，见 §十四；**第六轮：duplicates 走 A′、`vendor` 的图从"读不到"改成 `icon_url`、`loadout(list)` 与 `rotations` 行头补图**，见 §十五）。§十 的 7 项拍板**已落地**（第 6 项按"不刷基线夹具"处理）；§十四 的 duplicates 实例行**已按 A′ 拍板**（0 字节，见 15.1）。
 最后更新：2026-10-05
 
 ---
@@ -506,6 +506,8 @@ MCP 是长驻进程。**第一次复现时两个出口都没有 `icon_url`，但
 - **方案 A′（推荐，0 字节）**：不加字段 —— 同一组里每一把的图**本来就是同一张**
   （分组判据是 `exact_item_hash_and_distinct_instance_id`），渲染每把时复用组级 `icon_url` 即可。
   已写进渲染 skill 的字段表（`skills/destiny2-render/references/blocks.md`）。
+  **（2026-10-05 拍板：采用 A′，见 §十五 15.1 —— 这一轮只把 skill 那条规则写得更死，
+  字段一个没加、闸与 ADR-021 一个字没动。）**
 - **方案 B**：每件给 `icon_url` → 默认档 13,965 → **16,380 B，仍在 20 KB 闸内**（+17.3%）；
   `limit=20/25` 时 +8.1/+9.7 KB。**没有自己改闸、没有改 ADR-021**，等用户拍板。
 - **方案 C**：组级 + 首件 → +525 B（默认档）。只解决"组里第一把有图"，对"每把一行都要图"没用。
@@ -609,3 +611,179 @@ MCP 是长驻进程。**第一次复现时两个出口都没有 `icon_url`，但
 `loadout_assistant(intent="list")` 的行（整包 0 个 `icon_url`）、`rotations` 的轮换行头、
 `vendor` 的 `icon`（实测读的是定义里**不存在**的字段，永远空串 —— 供应商定义给的是
 `largeIcon`/`originalIcon`）这三处是"逆推扫出来、但这轮没动"的候选，需要先拍板"这一行该给哪张图"。
+
+---
+
+## 十五、第六轮（2026-10-05）：四处拍板落地 —— A′ / `vendor` / `loadout(list)` / `rotations` 行头
+
+**触发**：用户拍板四件事（第五轮末尾留的那三个候选 + `duplicates` 实例行的方案选择）。
+**先纠正一条写在上一轮末尾的错话**：那里说 `vendor` 的 `icon`"读的是定义里**不存在**的字段"——
+**实测不成立**（见 15.2），真因是另一回事。原文保留在上面，作为"逆推结论也要当场核"的一条记录。
+
+### 15.1 `duplicates` 实例行：**走方案 A′（0 字节）**
+
+拍板依据是 14.2 的体积表（每件给图 = 默认档 +17.3%，而 `limit=20/25` 早就不是闸内的事）。
+A′ = **不加任何字段**：同一组里每一把本来就是同一张图（分组判据
+`exact_item_hash_and_distinct_instance_id`），渲染时复用组级 `icon_url`。
+
+**这一轮做的是"把话说死"**：skill 里原本只有字段表那两行提到"复用它"，而 §三 的降级规则写的是
+"`icon_url` 是空串 → 画占位块" —— 实例行**没有这个字段**（不是空串），照那条读就会画出一排空图。
+所以 §八 的降级里补了一条正面规则（原文）：
+
+> **`duplicates` 的实例行：每一把都用组级 `icon_url`，不要画占位块。**
+> 实例行**没有** `icon_url` 这个字段（不是空串）—— 那是**体积口径**（每个实例给图 +17.3%，
+> 见 `docs/adr/021`），不是漏了。同一组的每一把**本来就是同一张图**（分组判据是
+> `exact_item_hash_and_distinct_instance_id`），所以渲染实例时直接复用
+> `data.duplicate_weapons[].icon_url`：既不画占位块，也不要写成"只有第一把有图"、
+> 更不要为了凑图去调别的 intent（那样是白花一次调用）。
+> 判据是"组级有没有图"：组级也空串时才画占位块（那次是真查不到定义）。
+
+**确认没加字段、没碰闸**：真机 `duplicates(limit=5)` 改动前后都是 **14,043 B / 组级 5 个 `icon_url`**
+（实例行仍然没有该键）；`tests/test_icon_url_output.py` 的
+`test_duplicates_perk_rows_stay_lean_by_volume` 与语料那条闸都没动。
+
+**⚠️ 闸的账另记**：20 KB 闸**只在默认档成立**（`limit=20` 已是 2.17×、`limit=25` 是 2.58×），
+这是既有的事、这一轮不修 —— 账记在 `docs/plans/RESPONSE_PROJECTION_PLAN.md` §七，**待拍板**。
+
+### 15.2 `vendor`：商人那一行的图**从来没有过**（`icon` 恒空串），改成 `icon_url`
+
+**实测（本机，2026-10-05）**，先把事实钉清（上一轮那句话错在哪）：
+
+| 事实 | 证据 |
+| --- | --- |
+| 供应商定义**有** `displayProperties.icon` | 直接读 zh/en 的 `DestinyVendorDefinition`：班西-44 `6806a443…png`、萨瓦拉 `23c0e684…png`、艾达-1 `39781248…png`（`hasIcon: true`）。**不是"定义里不存在"** |
+| 出口上 `icon` **恒为空串** | 真机 `vendor` 详情/菜单：`vendor.icon` 与 `sale_items[].icon` 全是 `""`。真因是 `_compact_response()` **主动清掉**了它们（`vendor.icon = ""` / `item.icon = ""`），而 `VendorInfo` **根本没有 `icon_url` 字段** |
+| 定义里的三个候选字段 | `originalIcon` 2081/2170 个商人有值（96%）、`icon` 2085（96%）、`largeIcon` **只有 259（12%）** |
+| 形状（下载三张量过） | `originalIcon` 是**方形徽标**（萨瓦拉 124×124、艾达 54×54）；`largeIcon` 是 **525×150 横幅** |
+
+**决定**：取 `displayProperties.originalIcon` ——
+① 卡片的商人行是 30~48px 的**方形**图标位，横幅塞进去会压扁；
+② `largeIcon` 只有 12% 的商人有，选它等于让 88% 继续没图。
+**不**走 `manifest_lookup.get_icon_url()` 的 hash 道：定义已经在手上（`get_vendor_inventory`
+本来就要读它取名字/标识），按 §三 第 2 条"出口现取零额外成本、优先复用已读到的定义"只做归一
+（`utils/icons.icon_url()`，唯一的构造点）。理由与实测数字写在
+`services/vendor_service.py::_vendor_header_icon()` 的 docstring 里。
+
+**旧键 `icon`：删掉**（`VendorInfo` 与 `VendorSaleItem` 两个模型都删）。判据是"恒空串 + 没人依赖"：
+`grep` 全仓只有模型定义、`vendor_service` 的构造与 compaction 三处，测试/语料/skill 一处引用都没有
+（`vendor_menu.VendorIdentity` 是匹配中间体，不进响应）。键名口径本来就是"一律 `icon_url`"。
+
+**真机（同一账号，改动前后）**：
+
+| 出口 | 前 | 后 |
+| --- | --- | --- |
+| `vendor(班西-44, limit=6)` | 5,181 B；`icon` ×7（全空）、`icon_url` ×6（全是商品行）；商人那一行**没有图** | **5,202 B**；`icon` ×**0**、`icon_url` ×**7**；商人行 = `…/icons/aa3c77392995cc1321a30a2250acfa1c.png`（`originalIcon`） |
+| `vendor(不点名)` 菜单 | 18,627 B；15 个商人**全无图** | **19,844 B**；15 个商人**全带 `icon_url`**（13 非空 / 2 空串） |
+| `vendor(萨瓦拉)` | 4,009 B；商人行没图 | 4,078 B；商人行 = `…/icons/48c80bf3cfe66efb4a847313250a1414.png`（= `originalIcon`，124×124） |
+
+`curl`（新加的三处各一次）：班西徽标 **200 + image/png（3,948 B）**、萨瓦拉徽标 **200 + image/png
+（3,549 B）**、菜单第一家 **200 + image/jpeg（8,259 B）** —— 全部 `image/*`，无 404。
+
+### 15.3 `loadout_assistant(intent="list")`：清单行补 `visuals`
+
+**实测（改动前）**：`intent="list"` 整包 **0 个 `icon_url`**（2,388 B / 3 套）—— 清单行只有名字，
+卡片一张图都没有。**有 `item_hash` 的行**在这条出口上是"这套配装自己的 `build_template`"：
+子职业那一行有 `subclass_item_hash` + `icon_url`，五件护甲各带 `item_hash` + `icon_url`
+（都是 `_build_template` 早就解析好的**账号数据**）。
+
+**补法**（`services/loadout_rows.py`，从 `loadout_service` 拆出）：
+
+```json
+"visuals": {
+  "armor": {"exotic": {"name": "星界夜鹰", "item_hash": 3960926756, "icon_url": "…/a7c3ee95….jpg"}},
+  "subclass": {"name": "棱镜猎人", "item_hash": 4282591831, "icon_url": "…/fab506e6….png"}
+}
+```
+
+形状照社区配装列表那份 `visuals`（同一段渲染 HTML 两边能用）。**零解析风险**：
+金装那一件是拿 `armor.exotic` 这个名字在**这套自己的五件**里反查（那个名字本来就是建模板时
+从这五件里挑的），**同名 0 件或 ≥2 件一律不给图**（`item_hash: null` + 空串）—— 不碰 Manifest、
+不做名字解析，所以出不了错图。套装（`armor_set`）**没有图**（`hasIcon: false`），不给。
+
+**真机**：2,388 → **3,459 B**（+1,071 B / +45%，绝对量仍在 3 KB 级），`icon_url` **0 → 6**
+（3 套 × 2 处，全非空）。`curl` 两处各一次：金装图 **200 + image/jpeg（4,876 B）**、
+子职业图 **200 + image/png（36,580 B）**。
+
+### 15.4 `rotations` 的**轮换行头**补图
+
+**实测（改动前）**：20 行里只有 4 行夜幕/宗师有 `icon_url`；10 行特色突袭/地牢的**行头没有**
+（图只藏在更下层的 `activities[]` 里，而渲染 skill 的周常表只列到 `rows[].icon_url`）——
+整张轮换表看起来只有夜幕那几行有图。
+
+补法（`rotation_service._featured_rows`）：**先造一次活动行**（`_activity_row`，走的还是活动道出口
+`manifest.get_icon_url(activity_hash=…)`），行头取"第一个查得到图的那条" —— 与 `raid_report`
+同一条规矩（一个副本在 Manifest 里是好几个活动：普通/大师/竞赛各一条、各有各的图）。
+**hash 与图同源**（同一行对象），两条都没有时退到第一条、图留空串。
+
+**真机**：15,989 → **17,128 B**（+1,139 B），`icon_url` **31 → 41**（新增的 10 个正好是 10 行
+特色突袭/地牢）；逐行核过：`kind=raid` 10 行 **0 → 10** 有图且都带 `activity_hash`，
+`kind=nightfall` 4 行不变，**自维护表那半 6 行仍然没有该键**。
+`curl` 一次：`…/pgcr/raid_gateways.jpg` **200 + image/jpeg（71,069 B）**。
+
+**自维护表那半（上维挑战 / 异域任务轮换 / 泉源）为什么不给图**（如实记，不是漏）：
+`data/rotations.py` 只存**名字**（异域任务那段注释写着"同一个任务在 Manifest 里有多个历史版本
+hash，挑错比不给更糟"），而"名字 → 活动定义"这一跳实测对不上：
+
+| 这类行 | 实测 |
+| --- | --- |
+| 上维挑战 6 个候选 | 活动表**精确名 0 命中**（`衔尾蛇`/`失却神殿`/`破碎废墟`/`锋刃要塞`/`权威深渊`/`辛梅里安卫戍营`）—— 那张表的注释本来就写着"名字是游戏内显示名（社区口径），不是 Manifest 字段" |
+| 异域任务 7 个候选 | **4 个 0 命中**（`安可`/`前兆`/`暗屋之声`/`行动：炽天使之盾`）、3 个命中且各 1–2 个 hash（`凯尔之陨`×2 同图、`//节点.超控.阿瓦隆//`×2 同图、`苦命鸳鸯`×1） |
+| 泉源 | 活动表里是 16 条带难度的变体（`泉源：攻击: 标准` …），行上写的是 `泉源：攻击`（无难度） |
+
+所以这一半**没有 hash 可用**，补图必须先做一次名字解析 —— 而那正是 §13.3 那条红线
+（**错图比没图坏得多**）。渲染 skill 的 §九 降级里因此明写了：这类行**不画图位**（按纯文字行渲染），
+别把"给不出"画成"图挂了"。要给图，先得有一份**可核的 hash 表**（那是一次独立的数据工作）。
+
+### 15.5 守门：两处覆盖面缺口一并补上（**注入验证逼出来的第二处**）
+
+用户的口径是"新增出口要落在既有'身份行必须带 `icon_url`'的覆盖面里"，一核就发现两处漏：
+
+1. **`vendor_hash` 不在 `_HASH_KEYS` 里** → 商人那一行（`VendorInfo` 类体 + 构造调用）**根本不在
+   扫描面**：本节 15.2 刚补的 `icon_url` 删掉，守门会**全绿**。
+   当初排除它用的是"**那一族**（`progression_hash`/`milestone_hash`/… 共 10 个键）会多 20 行噪声"
+   —— 单收 `vendor_hash` **实测只多 4 行**（两行就是本轮的商人出口，两行是
+   `vendor_menu.VendorIdentity` 中间体，已登记台账）。拿"一族"的量去否掉"一个键"不成立
+   （与 §14.3 收裸 `hash` 那次同一个错法）。
+2. **活动行只认 `activity_name`/`activity`** → `rotation_service` 的三行、`pvp_match_tally.activity_rows`
+   **一条都没被扫到**，而 `test_activity_rows_carry_icon_url` 的 docstring 里**写着**"覆盖
+   rotations / pvp_weapons" —— 那是句假话。补一条判据：**字典字面量里有 `activity_hash` 且有名字键**
+   也算活动身份行（要求名字键是为了不把 `pvp_weapon_service` 逐场扫描的暂存行卷进来 ——
+   那行没有名字键；活动行的口径是"**没有**豁免台账"，不该为它开一条）。
+   现在扫描面里 8 行：`activity_service` ×3、`raid_report_service` ×1、`rotation_service` ×3、
+   `pvp_match_tally` ×1，**全部带图**。
+
+### 15.6 验证矩阵（本轮）
+
+| 项 | 结果 |
+| --- | --- |
+| `ruff check destiny_mcp tests scripts skills` | 全过（仓库根的 `ruff check .` 只报未跟踪的 `showreel/`，那个目录没碰） |
+| 开发机全量 `pytest -q` | **2017 passed**（= 基线 **2017**：本轮没有新增测试函数，改的是三条既有守门判据与三条语料行的就地加严） |
+| **干净树**（`git archive <本轮树>`、`env -i`、干净 HOME、无 `.env`、`PYTHONPATH` 钉住临时树） | `import destiny_mcp.server` **OK** + **1999 passed / 18 skipped**（= 2017 − 18 条要本地 `manifest/*.sqlite3` 的，**没有新增跳过**） |
+| 语料 runner（`scripts/run_corpus_all_rows.py`） | **266 PASS / 3 INFO / 0 FAIL**（= 基线 266 PASS / 0 FAIL）。本轮**没有新增行**，把三处既有行就地加严：vendor 详情行钉 `icon_url` + 钉旧键没了、`loadout list` 行钉 `visuals`（且至少一套真出图）、`rotations` 行钉官方那半行头有图 + 自维护那半**没有**该键 |
+| **受控基线 diff（`env={**os.environ}`，两侧同源）** | 武器面 27 例：只有 `vendor_banshee` 动了 —— **新增 1 条路径** `data.vendors.vendors[].icon_url`、**消失 2 条**（`data.vendors.vendors[].icon`、`…sale_items[].icon`，已登记进 `tests/baselines/weapon_response_allowlist.json` 并写明去向），其余 26 例只有既有的 `data.god_roll.source_detail` 非确定性值变化；护甲面 23 例：**消失路径 0**，只有 `execution_id`/`next_actions[]` 这类既有非确定性值变化。**假绿对照**：跑之前先核过"改动前"那份 capture 真的是旧代码（`vendor_banshee` 里商人行只有 `icon`、没有 `icon_url`；商品行同时有 `icon`/`icon_url`）—— 两侧都钉了 `PYTHONPATH` + `DESTINY_MCP_ROOT` |
+| 真机出口 | `vendor(班西-44)` 5,181→5,202 B、菜单 18,627→19,844 B、`loadout list` 2,388→3,459 B、`rotations` 15,989→17,128 B；新增的 6 处图逐个 `curl` **全 200 + `image/*`**（见 15.2–15.4） |
+| 注入矩阵 | **4 条全部咬红**（每次点名打中的那一处）并逐字节恢复，见 15.7 |
+| 渲染字段表（`scripts/verify_render_fields.py`） | **382 条解析成功 / MISSING 0**（377 → 382，本轮新增 5 条：商人 `icon_url` + 清单行 4 条 `visuals`），EMPTY 2、条件字段这次没有 4（都与上轮一致） |
+
+### 15.7 注入矩阵（4 条，全部咬红；`touch` + `PYTHONDONTWRITEBYTECODE=1`，恢复后 sha256 逐字节一致）
+
+| 注入（打在哪） | 结果 |
+| --- | --- |
+| `VendorInfo` 类体去掉 `icon_url`（15.5 刚收进扫描面的形状） | 红：点名 `models/vendor.py:88 VendorInfo ['name', 'vendor_hash']` |
+| `_featured_rows` 的行头去掉 `icon_url`（活动行新判据） | 红：点名 `rotation_service.py:124 _featured_rows ['activity_hash']` |
+| `loadout_rows` 的金装行去掉 `icon_url`（改回内联字典） | 红：点名 `loadout_rows.py:53 _exotic_visual ['item_hash', 'name']` |
+| `VendorInfo` 构造调用去掉 `icon_url`（关键字实参） | 红：点名 `vendor_service.py:690 get_vendor_inventory()→VendorInfo ['name', 'vendor_hash']` |
+
+**注入是怎么打中的（这一轮三条"第一次是绿的"的教训照旧）**：每一条都是**删一个键 / 换一种写法**，
+且都是**等长或更短的替换** → 必须 `touch` 源文件 + `PYTHONDONTWRITEBYTECODE=1`
+（`__pycache__` 的失效判据是 (mtime, 大小)，等长替换会被判"没过期"）。判定"打中了"用的是
+**守门自己打印的行号与键集合**，不是"测试红了"这一件事：
+
+- ① `models/vendor.py:88` 就是 `VendorInfo` 类体那一行，键集合 `['name','vendor_hash']` 说明它
+  进了扫描面、且只有它缺图（**这条在第一版注入脚本里被"跳过"了 —— 不是打偏，是锚点字符串写错
+  （我抄的是类尾而不是类体），改对锚点后第一跑就红**）；
+- ② `rotation_service.py:124` 是那个行 dict 的起始行，触发键正是本轮新加的 `activity_hash`；
+- ③ `loadout_rows.py:53` 是 `_exotic_visual` 的返回行（改回内联字典后它变成"有名字+hash、没图"的行）；
+- ④ `vendor_service.py:690` 是 `VendorInfo(...)` 构造调用，形状名 `get_vendor_inventory()→VendorInfo`。
+
+**恢复核对**：四条注入每次恢复后都与注入前 **sha256 逐字节一致**（脚本里逐条打印）。

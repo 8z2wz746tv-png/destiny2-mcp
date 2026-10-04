@@ -13,6 +13,24 @@
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
 | **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
 
+## 未发布：商人那一行带图、清单行带图、`rotations` 行头带图（**删旧键**，2026-10-05）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `world_assistant(intent="vendor")` 的**商人行**（详情与菜单都有） | 只有 `icon` —— 而且**恒为空串**（`_compact_response` 主动清掉；定义里有图也发不出来），卡片第一行只能放色块 | **`icon` 键整块删掉**，改 `icon_url`（绝对 Bungie CDN 地址，取 `displayProperties.originalIcon` 方形徽标）。菜单模式的 15 家也全都带图 |
+| 同出口的 `sale_items[].icon` | 恒为空串（同一个 compaction 清掉），值与 `icon_url` 逐字相同 | **整块删掉**，只留 `icon_url`（键名口径"一律 `icon_url`"） |
+| `loadout_assistant(intent="list")` 的清单行 | 整包 **0 个 `icon_url`**（只有名字，卡片一张图都没有） | **纯加法**：每行多一个 `visuals` —— `visuals.armor.exotic.{name,item_hash,icon_url}` 与 `visuals.subclass.{name,item_hash,icon_url}`。图**只从这套配装自己的模板里取**（账号数据），金装名在那五件里对不唯一时给空串 + `item_hash: null`（不猜）。形状与社区配装列表的 `visuals` 一致 |
+| `world_assistant(intent="rotations")` 的特色突袭/地牢**行头** | 行头没有图（图只在更下层的 `activities[]` 里，而渲染表只列到 `rows[].icon_url`） | **纯加法**：行头多 `activity_hash` + `icon_url`（与 `activities[]` 里的同一条活动行同源）。**自维护表那半（上维挑战/异域任务/泉源）仍然没有该键** —— 表里只存名字、没有活动 hash，名字→活动定义实测对不上（见 `docs/plans/ICON_URL_PLAN.md` §15.4），渲染侧按纯文字行画 |
+
+判据来源：用户 2026-10-05 拍板"新增出口要落在既有'身份行必须带 `icon_url`'的覆盖面里"。
+真机（同账号前后）：`vendor(班西-44)` 5,181 → 5,202 B（`icon` ×7 → ×0、`icon_url` ×6 → ×7）、
+菜单 18,627 → 19,844 B（15 家全带图）、`loadout list` 2,388 → 3,459 B（`icon_url` 0 → 6）、
+`rotations` 15,989 → 17,128 B（31 → 41 个，全部来自 10 行行头）。
+
+**`duplicates` 的实例行仍然不加字段**（体积口径；每件给图 = 默认档 +17.3%，
+见 `docs/plans/ICON_URL_PLAN.md` §十四 14.2 与 §十五 15.1）：渲染侧复用**组级** `icon_url`，
+这条写进了 `skills/destiny2-render/references/blocks.md` 的降级规则。
+
 ## 未发布：同名多版本不再让 `cross_check` 给出反向结论（2026-09-28）
 
 | 变了什么 | 以前 | 现在 |
