@@ -147,6 +147,8 @@
     "type_list_default::data.weapons.items[].options": "同 type_list。",
     "type_list_default::data.weapons.items[].perks_complete": "同 type_list。",
     "type_list_default::data.weapons.items[].sockets": "同 type_list（新增的默认条数用例，第一次录就是列表行）。",
-    "type_list_default::data.weapons.items[].weapon": "同 type_list。"
+    "type_list_default::data.weapons.items[].weapon": "同 type_list。",
+    "vendor_banshee::data.vendors.vendors[].icon": "2026-10-05：旧键整块删掉（键名口径一律 `icon_url`）。它以前**恒为空串**（`_compact_response` 主动清掉，定义里有图也发不出来），去向是同一行的 `icon_url`（`displayProperties.originalIcon`，方形徽标）；见 docs/COMPATIBILITY.md 与 docs/plans/ICON_URL_PLAN.md §15.2。",
+    "vendor_banshee::data.vendors.vendors[].sale_items[].icon": "同上：同一个 compaction 清掉的旧键，值与 `icon_url` 逐字相同（构造时 `icon=icon_url`），删掉不留双写。"
   }
 }

@@ -198,6 +198,29 @@ def _vendor_socket_data(item_components: object) -> dict | None:
     return data if isinstance(data, dict) else None
 
 
+def _vendor_header_icon(vendor_def: dict) -> str:
+    """商人**自己**那一行的图（卡片第一行"这是哪个商人"）。归一走 `utils/icons.icon_url()`。
+
+    **取 `displayProperties.originalIcon`（方形徽标），不是 `largeIcon`（横幅）**，两条实测：
+
+    1. **形状**：下载三张量过 —— `originalIcon` 是方形徽标（指挥官萨瓦拉 124×124、
+       艾达-1 54×54），而 `largeIcon` 是 **525×150** 的横幅（萨瓦拉
+       `0a599ca6fad56a014f14475b73a6a1d8.jpg`、艾达 `f2af0324ed9aed5186fef3d3e6873b62.jpg`）。
+       卡片的商人行是 30~48px 的方形图标位，横幅塞进去会被压扁。
+    2. **覆盖**：同一天扫全库 **2170** 个商人 —— `originalIcon` 有值 **2081** 个（96%），
+       `largeIcon` 只有 **259** 个（12%）。选横幅等于让 88% 的商人继续没图。
+
+    空值给空串（渲染侧画同尺寸占位块），**不拿别的字段顶上**。
+
+    为什么不走 `manifest_lookup.get_icon_url()` 的 hash 道：定义**已经在手上**
+    （`get_vendor_inventory` 本来就要读它取名字与标识），按 `ICON_URL_PLAN` §三 第 2 条
+    "出口现取要零额外成本、优先复用出口手上已经读到的定义"，这里只做归一。
+    旧键 `icon` 读的是**同一张表里的另一个字段**且出口上恒为空串，2026-10-05 已删。
+    """
+    display = vendor_def.get("displayProperties") or {}
+    return _icon_url(display.get("originalIcon"))
+
+
 class VendorService:
     """Operations for querying vendor inventory."""
 
@@ -434,7 +457,6 @@ class VendorService:
             name=item_name,
             item_type=item_info.get("itemTypeNameDisplay", "") or item_info.get("itemTypeName", ""),
             tier=weapon_profile.rarity_of(item_info.get("tier", 0)),
-            icon=icon_url,
             icon_url=icon_url,
             costs=costs,
             owned=owned,
@@ -669,7 +691,7 @@ class VendorService:
                 vendor_hash=vendor_hash,
                 name=identity.label,
                 identifier=identity.identifier,
-                icon=(vendor_def.get("displayProperties") or {}).get("icon", ""),
+                icon_url=_vendor_header_icon(vendor_def),
                 next_refresh=vendor_data.get("nextRefreshDate", ""),
                 rank=build_rank(vendor_data.get("progression"), self._progression_name),
                 categories=categories,
@@ -808,12 +830,13 @@ class VendorService:
 
         Item hashes, costs, purchase state and category indexes all stay: callers
         chain them into other tools. Only rendering-only fields and perk text go.
+
+        2026-10-05：这里原本还把 `vendor.icon` 与 `item.icon` 清成空串 —— 那两个键
+        已经整块删掉（键名口径是"一律 `icon_url`"，而 `icon_url` **不清**：图是给卡片用的）。
         """
         for vendor in response.vendors:
-            vendor.icon = ""
             vendor.next_refresh = ""
             for item in vendor.sale_items:
-                item.icon = ""
                 item.vendor_item_index = 0
                 # Compress perks to names only, mark god rolls
                 if item.perks:

@@ -27,7 +27,8 @@ class VendorSaleItem(BaseModel):
     name: str = Field(default="", description="Item name")
     item_type: str = Field(default="", description="Item type name")
     tier: str = Field(default="", description="Tier: 传说/异域")
-    icon: str = Field(default="", description="Icon path")
+    #: 商品图（绝对 Bungie CDN 地址）。旧键 `icon`（相对路径）2026-10-05 删除：
+    #: 它在出口上**恒为空串**（`_compact_response` 清掉），同一个值 `icon_url` 里本来就有。
     icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
     costs: list[VendorCost] = Field(default_factory=list, description="Purchase costs")
     owned: bool = Field(default=False, description="Already owned")
@@ -90,7 +91,12 @@ class VendorInfo(BaseModel):
     vendor_hash: int = Field(description="Vendor definition hash")
     name: str = Field(default="", description="Vendor display name")
     identifier: str = Field(default="", description="Upstream vendorIdentifier, e.g. GUNSMITH")
-    icon: str = Field(default="", description="Vendor icon")
+    #: 商人**自己**那一行的图（绝对 Bungie CDN 地址）：卡片第一行"这是哪个商人"要有图。
+    #: 取 `displayProperties.originalIcon`（方形徽标）—— 形状与覆盖率两条实测理由写在
+    #: `services/vendor_service.py::_vendor_header_icon()`。
+    #: 旧键 `icon`（相对路径）2026-10-05 删除：出口上恒为空串（`_compact_response` 清掉），
+    #: 而键名口径是"一律 `icon_url`"（`utils/icons.py` 的开头、老 web 的 `_icon()`）。
+    icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
     next_refresh: str = Field(default="", description="Next refresh time (ISO)")
     rank: VendorRank | None = Field(default=None, description="Reputation progress when the vendor has one")
     categories: list[VendorCategory] = Field(
