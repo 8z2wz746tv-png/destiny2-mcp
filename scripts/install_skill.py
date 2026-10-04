@@ -39,7 +39,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 SOURCE = Path(__file__).resolve().parents[1] / "skills" / "destiny2-mcp"
+SKILLS_ROOT = SOURCE.parent
 SKILL_NAME = "destiny2-mcp"
+#: 除主 skill 之外还要装的 skill。**加一个目录就要在这里加一行** —— 漏了的话
+#: 那个 skill 永远到不了宿主，而且没有任何报错（`tests/test_skill_install.py`
+#: 拿 `skills/*/SKILL.md` 反向核对，漏了就红）。
+EXTRA_SKILLS = ("destiny2-render",)
+SKILL_NAMES = (SKILL_NAME, *EXTRA_SKILLS)
 
 # 只有这些进安装包：给 Agent 看的文档 + 宿主识别用的元数据。
 INCLUDE = ("SKILL.md", "references", "agents")
@@ -47,6 +53,8 @@ INCLUDE = ("SKILL.md", "references", "agents")
 # 线上兜底地址。仓库是公开的，所以「读不到本地文件」的宿主可以直接抓这一份。
 FALLBACK_REPO = "https://github.com/8z2wz746tv-png/destiny2-mcp"
 GUIDE_PATH = f"skills/{SKILL_NAME}/references/routing.md"
+#: 渲染 skill 的线上入口（指针块里给一行，免得只有 skills 目录的宿主才知道它）。
+RENDER_GUIDE_PATH = f"skills/{EXTRA_SKILLS[0]}/references/blocks.md"
 
 BEGIN = "<!-- destiny2-mcp:begin -->"
 END = "<!-- destiny2-mcp:end -->"
@@ -166,7 +174,12 @@ def pointer_block(installed: Path | None = None, repo_url: str | None = None) ->
     sources = []
     if installed is not None:
         sources.append(f"- 本地：`{installed / 'SKILL.md'}`，细节在 `{installed / 'references' / 'routing.md'}`")
+        render = installed.parent / EXTRA_SKILLS[0]
+        sources.append(
+            f"- 本地（渲染）：`{render / 'SKILL.md'}`，字段表在 `{render / 'references' / 'blocks.md'}`"
+        )
     sources.append(f"- 线上：{repo}/blob/main/{GUIDE_PATH}")
+    sources.append(f"- 线上（渲染）：{repo}/blob/main/{RENDER_GUIDE_PATH}")
     return "\n".join(
         [
             BEGIN,
@@ -175,6 +188,8 @@ def pointer_block(installed: Path | None = None, repo_url: str | None = None) ->
             "任务涉及命运 2 的账号、背包、武器与 Perk、配装、配装槽、子职业、战绩、周常或商人时，"
             "先读路由文档再调工具：",
             *sources,
+            "",
+            "要把结果渲染成卡片（HTML/表格）时读「渲染」那份；它逐字段写明哪条 intent 给哪个字段。",
             "",
             "三条不能破的线：",
             "",
@@ -205,16 +220,16 @@ def _relative_files(root: Path) -> set[Path]:
     }
 
 
-def _wanted_files() -> dict[Path, Path]:
+def _wanted_files(source: Path) -> dict[Path, Path]:
     wanted: dict[Path, Path] = {}
     for name in INCLUDE:
-        origin = SOURCE / name
+        origin = source / name
         if origin.is_file():
             wanted[Path(name)] = origin
         elif origin.is_dir():
             for path in origin.rglob("*"):
                 if path.is_file() and not any(part.startswith(".") for part in path.parts):
-                    wanted[path.relative_to(SOURCE)] = path
+                    wanted[path.relative_to(source)] = path
     return wanted
 
 
@@ -223,7 +238,7 @@ def sync(source: Path, target: Path, *, dry_run: bool) -> tuple[list[Path], list
     if not (source / "SKILL.md").is_file():
         raise FileNotFoundError(f"源头缺少 SKILL.md：{source}")
 
-    wanted = _wanted_files()
+    wanted = _wanted_files(source)
     existing = _relative_files(target) if target.is_dir() else set()
     written: list[Path] = []
 
@@ -254,9 +269,16 @@ def _report(action: str, written: list[Path], removed: list[Path], dry_run: bool
 
 
 def install_skills(targets: list[Path], *, dry_run: bool) -> None:
+    """每个 target 是**主 skill 的落点**；同级的其它 skill 装到它的兄弟目录。
+
+    这样 `--target` 的老语义（指到 destiny2-mcp 那个目录）不变，而新增的 skill
+    不会因为没人记得加一行就悄悄不装。
+    """
     for target in targets:
-        written, removed = sync(SOURCE, target, dry_run=dry_run)
-        _report(f"安装 {SKILL_NAME} -> {target}", written, removed, dry_run)
+        for name in SKILL_NAMES:
+            destination = target.parent / name
+            written, removed = sync(SKILLS_ROOT / name, destination, dry_run=dry_run)
+            _report(f"安装 {name} -> {destination}", written, removed, dry_run)
 
 
 def _installed_for(pointer: Path, installed: list[Path]) -> Path | None:
@@ -470,7 +492,13 @@ def mcp_registration_hint(host: Host, server_root: Path) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="把 destiny2-mcp 文档与 MCP 注册送到当前智能体宿主")
-    parser.add_argument("--target", type=Path, action="append", default=[], help="显式指定 skills 目录（可重复）")
+    parser.add_argument(
+        "--target",
+        type=Path,
+        action="append",
+        default=[],
+        help="显式指定**主 skill 的落点**（可重复）；同级的其它 skill 会装到它的兄弟目录",
+    )
     parser.add_argument(
         "--pointer",
         type=Path,
@@ -508,8 +536,11 @@ def main() -> int:
             if host.note:
                 print(f"           {host.note}")
         print()
+        for name in SKILL_NAMES:
+            print(f"  随包安装的 skill：{name}")
         print("其它宿主：既不放在上面的目录、也没有全局指令文件时，走两条通用路径 ——")
         print(f"  1. MCP 握手的 instructions 里有线上地址：{_repo_url()}/blob/main/{GUIDE_PATH}")
+        print(f"     渲染 skill 的线上地址：{_repo_url()}/blob/main/{RENDER_GUIDE_PATH}")
         print("  2. 用 --pointer <文件> 把指针块写进该宿主读的规则文件（例如 ~/AGENTS.md）")
         print("  3. 用 --target <目录> 直接指定 skills 落点")
         return 0
