@@ -100,3 +100,24 @@ def sale_item_names(vendors: Any, *, limit: int = 8) -> list[str]:
                 if len(found) >= limit:
                     return found
     return found
+
+
+def crafting_sources_block(result: dict[str, Any]) -> dict[str, Any]:
+    sources = result["sources"]
+    total = result["total"]
+    block: dict[str, Any] = {
+        "available": bool(sources.get("available")),
+        "page": sources.get("page") or {},
+        "matched": sources.get("matched_count") or 0,
+        "total": total,
+    }
+    if not block["available"]:
+        block["note"] = "这次没有读到本地「锻造武器来源」资料；图样进度不受影响。"
+    else:
+        block["note"] = (
+            f"本地资料覆盖 {block['matched']}/{total} 条；"
+            "没有对应行只说明这份清单没收录，不代表这把武器没有来源。"
+        )
+    return block
+
+

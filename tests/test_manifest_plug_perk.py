@@ -66,10 +66,14 @@ def test_plug_set_enriches_each_plug_from_its_item_definition() -> None:
 
     plugs = manager.get_plug_set_plugs(1)
 
+    # `icon_url` 是 2026-10-04 加的：插件池的消费方（子职业槽的 available、
+    # perk 池的 options）都要按颗画图标，而定义刚刚在这里查过一次。
+    # 夹具的定义没有 `displayProperties.icon`，所以值是空串（缺值给空串，不编地址）。
     assert plugs == [
         {
             "plugItemHash": 10,
             "name": "枪管 A",
+            "icon_url": "",
             "plugCategoryIdentifier": "barrels",
             "currentlyCanRoll": True,
             "craftingRequirements": None,
@@ -77,6 +81,7 @@ def test_plug_set_enriches_each_plug_from_its_item_definition() -> None:
         {
             "plugItemHash": 11,
             "name": "弹匣 B",
+            "icon_url": "",
             "plugCategoryIdentifier": "magazines",
             "currentlyCanRoll": True,
             "craftingRequirements": None,
@@ -103,6 +108,7 @@ def test_plug_set_keeps_a_plug_whose_definition_is_missing() -> None:
         {
             "plugItemHash": 10,
             "name": "",
+            "icon_url": "",
             "plugCategoryIdentifier": "",
             "currentlyCanRoll": True,
             "craftingRequirements": None,

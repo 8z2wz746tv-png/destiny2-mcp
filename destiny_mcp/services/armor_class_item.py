@@ -29,6 +29,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from ..utils.hash_utils import to_unsigned
+from ..utils.icons import icon_url as _icon_url
 
 #: 职业金装那两个特性槽的 plug 类别（36 颗「X之灵」共用这一个值）。
 #: 实测 2026-09-28：`至纯光能之灵`(1476923953) 与 `曲腹蛛之灵`(3751917994) 都指向它。
@@ -82,7 +83,11 @@ def perk_plug(manifest: Any, name: str) -> dict[str, Any] | None:
         # 名字要精确对上：search 是模糊的，别把近义条目当成那颗特性。
         if str(display.get("name", "")).strip().casefold() != name.strip().casefold():
             continue
-        return {"item_hash": to_unsigned(int(item_hash)), "name": display.get("name") or name}
+        return {
+            "item_hash": to_unsigned(int(item_hash)),
+            "name": display.get("name") or name,
+            "icon_url": _icon_url(display.get("icon")),
+        }
     return None
 
 def class_item_for_perks(
@@ -124,8 +129,8 @@ def class_item_perks(
         if plug.get("plugCategoryHash") != CLASS_ITEM_PERK_CATEGORY_HASH:
             continue
         out.append({
-            "name": row.get("name") or "",
-            "item_hash": plug_hash,
+            "name": row.get("name") or "", "item_hash": plug_hash,
+            "icon_url": _icon_url((definition.get("displayProperties") or {}).get("icon")),
             # 纯机制特性没有属性 —— 给空 dict，不编 0（"没有加成"和"没读到"是两回事）。
             "stats": stats_of(definition),
         })
@@ -181,6 +186,10 @@ def class_item_perks_of(sockets: list[dict[str, Any]], lookup: Callable[[int], d
         plug_def = lookup(plug_hash) or {} if plug_hash else {}
         if (plug_def.get("plug") or {}).get("plugCategoryHash") != CLASS_ITEM_PERK_CATEGORY_HASH:
             continue
-        name = (plug_def.get("displayProperties") or {}).get("name") or ""
-        out.append({"name": name, "plug_hash": plug_hash})
+        display = plug_def.get("displayProperties") or {}
+        out.append({
+            "name": display.get("name") or "",
+            "plug_hash": plug_hash,
+            "icon_url": _icon_url(display.get("icon")),
+        })
     return out

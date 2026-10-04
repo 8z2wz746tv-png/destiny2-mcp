@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Mapping
 
 from ..manifest_names import RPM_STAT_HASH
+from ..utils.icons import icon_url as _icon_url
 
 if TYPE_CHECKING:  # pragma: no cover
     from .manifest import ManifestManager
@@ -335,7 +336,7 @@ def identity_fields(
         "trait_ids": trait_ids(definition),
         "watermark": str(definition.get("iconWatermark") or ""),
         "description": str(display.get("description") or definition.get("flavorText") or ""),
-        "icon_url": f"https://www.bungie.net{icon}" if icon.startswith("/") else icon,
+        "icon_url": _icon_url(icon),
     }
 
 

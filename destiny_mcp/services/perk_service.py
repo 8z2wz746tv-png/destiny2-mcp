@@ -11,6 +11,7 @@ from typing import Any
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..manifest_names import names_for
+from ..utils.icons import icon_url as _icon_url
 from . import weapon_payload, weapon_profile
 from ..models import PerkInfo
 from .wishlist_service import WishListService
@@ -123,6 +124,7 @@ class PerkService:
                 entries.append({
                     "plug_hash": int(perk_hash),
                     "name": str(info.get("name") or f"#{perk_hash}"),
+                    "icon_url": _icon_url(info.get("icon")),
                 })
             return entries
 
@@ -134,7 +136,8 @@ class PerkService:
                 "kind": "fixed",
                 "source": "manifest",
                 "fixed_perks": [
-                    {"plug_hash": perk["plug_hash"], "name": perk["name"]}
+                    {"plug_hash": perk["plug_hash"], "name": perk["name"],
+                     "icon_url": perk.get("icon_url", "")}
                     for perk in weapon_profile.fixed_roll_perks(sockets)
                 ],
                 "note": (
@@ -172,7 +175,9 @@ class PerkService:
 
 
 def _item_icon_url(manifest: ManifestManager, item_hash: int) -> str:
+    """插件 hash → 绝对图标地址。`get_item_info()["icon"]` 契约上已经是绝对地址，
+    这里再过一次唯一构造点，是为了不让"两处各自拼一遍"的旧账从这条路回来。"""
     info = manifest.get_item_info(item_hash)
     if not isinstance(info, dict):
         return ""
-    return str(info.get("icon") or "")
+    return _icon_url(info.get("icon"))

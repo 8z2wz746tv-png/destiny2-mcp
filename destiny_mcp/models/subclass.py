@@ -10,6 +10,9 @@ class PlugOption(BaseModel):
 
     plug_hash: int = Field(description="Plug item definition hash")
     name: str = Field(description="Plug name (from manifest)")
+    #: 这一颗的图标（绝对 Bungie CDN 地址）。`intent="get"` 的 plugs/available 是
+    #: "这个槽能换成什么"的清单，UI 要按颗画图标。
+    icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
 
 
 class SubclassPlug(BaseModel):
@@ -17,6 +20,7 @@ class SubclassPlug(BaseModel):
 
     plug_hash: int = Field(description="Plug item definition hash")
     name: str = Field(description="Plug name (from manifest)")
+    icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
     socket_index: int = Field(description="Socket index on the subclass item")
     socket_type: str = Field(
         default="", description="Socket category: super, melee, grenade, aspect, fragment, class_ability"

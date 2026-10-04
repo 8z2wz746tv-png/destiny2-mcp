@@ -223,8 +223,10 @@ async def test_god_roll_recommended_branch(stub_manifest) -> None:
     assert result["kind"] == "recommended"
     assert result["source"] == "dim_wishlist"
     assert result["source_detail"] == "某愿单.txt"
-    assert result["pve"] == [{"plug_hash": 300, "name": "狂暴"}]
-    assert result["pvp"] == [{"plug_hash": 302, "name": "强化狂暴"}]
+    # 愿单读取里的 perk 行也带 icon_url（2026-10-04）：这一行是"推荐带哪几个特性"的
+    # 展示行，UI 要按特性画图标；替身的 `get_item_info` 不给 icon，所以这里是空串。
+    assert result["pve"] == [{"plug_hash": 300, "name": "狂暴", "icon_url": ""}]
+    assert result["pvp"] == [{"plug_hash": 302, "name": "强化狂暴", "icon_url": ""}]
 
 
 class _FixedStubManifest(_StubManifest):

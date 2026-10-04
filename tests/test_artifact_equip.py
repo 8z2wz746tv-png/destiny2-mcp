@@ -57,6 +57,18 @@ class _Manifest:
         definition = self.get_item_definition(item_hash) or {}
         return (definition.get("displayProperties") or {}).get("name", "")
 
+    def get_item_info(self, item_hash: int) -> dict | None:
+        # 真 ManifestManager 上就有这个方法，而且它的 `icon` 契约上是**绝对地址**
+        # （唯一构造点在 utils/icons.py）—— 神器槽行现在也带 icon_url，替身要跟上。
+        definition = self.get_item_definition(item_hash)
+        if definition is None:
+            return None
+        display = definition.get("displayProperties") or {}
+        return {
+            "name": display.get("name", ""),
+            "icon": f"https://www.bungie.net/common/destiny2_content/icons/{to_unsigned(item_hash)}.jpg",
+        }
+
     def get_plug_set_plugs(self, plug_set_hash: int):
         return [{"plugItemHash": h} for h in PLUG_SETS.get(plug_set_hash, [])]
 

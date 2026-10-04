@@ -94,6 +94,33 @@ def tuning_note(plan: TuningPlan | None, item_names: dict[str, str] | None = Non
     return head + "；".join(parts) + "。" + tail
 
 
+def tuning_rows(changes: Any) -> list[dict[str, Any]]:
+    """调谐改动 → **行视图**（`find`/`recommend` 默认出口用）。
+
+    从 `build_projection` 搬过来：那边贴着体积上限（137 行），而"调谐怎么给人看"
+    与 `tuning_note` 本来就是同一件事，放一起比按文件行数切开更合理。
+
+    真机形状是 `{item_instance_id, item_name, slot, from{hash,name}, to{hash,name}, delta{…},
+    slot_key, slot_display}`；hash 对玩家没意义（要执行的话用 `execution_id` 取候选，
+    那里有完整的 `tuning_changes`），所以这里只留名字与六维变化。
+    """
+    rows: list[dict[str, Any]] = []
+    for change in changes or []:
+        if not isinstance(change, dict):
+            continue
+        row: dict[str, Any] = {
+            key: change[key]
+            for key in ("item_instance_id", "item_name", "slot", "slot_key", "slot_display", "delta")
+            if change.get(key) is not None
+        }
+        for key in ("from", "to"):
+            block = change.get(key)
+            if isinstance(block, dict) and block.get("name"):
+                row[key] = {"name": block["name"]}
+        rows.append(row)
+    return rows
+
+
 def build_results(
     process_sets: Sequence[Any],
     context: ResultContext,
@@ -242,6 +269,7 @@ def build_results(
                         LoadoutItem(
                             item_hash=armor.item_hash,
                             name=armor.name,
+                            icon_url=armor.icon_url,
                             slot=LOADOUT_SLOT_NAMES.get(armor.slot, armor.slot),
                             item_instance_id=armor.item_instance_id,
                             # 属性模组 +（如果这套要改调谐）调谐插件：执行器按类别找槽，

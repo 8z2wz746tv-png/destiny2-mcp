@@ -23,6 +23,7 @@ from ..models import (
 )
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_signed, to_unsigned
+from ..utils.icons import icon_url as _icon_url
 from ..vocabulary import (
     CLASS_LABELS_ZH,
     ELEMENT_ALIASES,
@@ -429,7 +430,8 @@ class SubclassService:
             # Identify socket type
             socket_type = self._classify_socket(socket_data, socket_def)
 
-            plug_name = self._get_plug_name(current_plug_hash)
+            plug_info = self._get_plug_info(current_plug_hash)
+            plug_name = str(plug_info.get("name") or f"#{current_plug_hash}")
 
             # Get all available options from the plug set
             available: list[PlugOption] = []
@@ -438,7 +440,11 @@ class SubclassService:
                 plug_set_plugs = self._manifest.get_plug_set_plugs(plug_set_hash)
                 if plug_set_plugs:
                     available = [
-                        PlugOption(plug_hash=p["plugItemHash"], name=p["name"])
+                        PlugOption(
+                            plug_hash=p["plugItemHash"],
+                            name=p["name"],
+                            icon_url=str(p.get("icon_url") or ""),
+                        )
                         for p in plug_set_plugs
                     ]
 
@@ -446,6 +452,7 @@ class SubclassService:
                 SubclassPlug(
                     plug_hash=current_plug_hash,
                     name=plug_name,
+                    icon_url=_icon_url(plug_info.get("icon")),
                     socket_index=i,
                     socket_type=socket_type,
                     # 「这个槽开不开」的判据只有一处：`loadout_plug_lookup.socket_is_enabled`

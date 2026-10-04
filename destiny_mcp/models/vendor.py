@@ -14,6 +14,8 @@ class VendorCost(BaseModel):
 
     item_hash: int = Field(description="Currency item hash")
     item_name: str = Field(default="", description="Currency name (Glimmer, Legendary Shards, etc.)")
+    #: 货币的图标（绝对 Bungie CDN 地址）：价格行也要能画图标，不然只有一串数字
+    icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
     quantity: int = Field(description="Amount required")
 
 

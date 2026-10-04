@@ -32,8 +32,10 @@ from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
+from ..utils.icons import icon_url as _icon_url
 from .. import vocabulary
 from . import profile_components
+from .pattern_records import merge_cell as _merge_cell
 from .starside_crafting_sources import CraftingSources
 
 logger = get_logger(__name__)
@@ -84,35 +86,6 @@ UPGRADE_SOCKET_TYPE = 4251072212
 def name_key(value: str) -> str:
     """名字比对口径：去空白与间隔号、大小写折叠（用户输入 vs Manifest 名字）。"""
     return _NAME_NOISE.sub("", (value or "").strip().casefold())
-
-
-def _cell(component: Any) -> dict[str, Any]:
-    """一条记录的状态：只取第一个目标的进度与需求（实测模式记录就是这个形状）。"""
-    objectives = (component or {}).get("objectives") or []
-    first = objectives[0] if objectives and isinstance(objectives[0], dict) else {}
-    return {
-        "progress": first.get("progress"),
-        "need": first.get("completionValue"),
-        "state": (component or {}).get("state"),
-    }
-
-
-def _merge_cell(state: dict[int, dict], key: Any, component: Any) -> None:
-    """把一条记录并进状态表：同一记录号出现在多处（档案级 + 角色级）时取进度更靠前的那个。
-
-    模式解锁是账号级的，所以"角色 A 满了、角色 B 没满"应当算已解锁（实测那 32 条角色级记录
-    三个角色数值一致，这条规则只是为了不把话说反）。
-    """
-    if not isinstance(component, dict):
-        return
-    try:
-        record_hash = to_unsigned(int(key))
-    except (TypeError, ValueError):
-        return
-    candidate = _cell(component)
-    current = state.get(record_hash)
-    if current is None or (candidate.get("progress") or -1) > (current.get("progress") or -1):
-        state[record_hash] = candidate
 
 
 class PatternService:
@@ -193,6 +166,9 @@ class PatternService:
                 "record_hash": to_unsigned(record_hash),
                 "need": objective.get("completionValue"),
                 "item_hash": to_unsigned(int(item.get("hash") or 0)),
+                # 图样就是武器本体：这一行在 UI 里是武器卡片，图标与
+                # `weapon_assistant` 的列表行同一个来源（`displayProperties.icon`）。
+                "icon_path": ((item.get("displayProperties") or {}).get("icon") or ""),
                 "weapon_type": weapon_type,
                 "group": slot,
                 # 稀有度：标签给用户看，tierType 给筛选用（词表在 vocabulary.rarity_key）
@@ -270,6 +246,7 @@ class PatternService:
             "status": status,
             "item_hash": entry["item_hash"],
             "record_hash": entry["record_hash"],
+            "icon_url": _icon_url(entry.get("icon_path")),
         }
 
     # ── 变体：能不能塑形、能选哪些栏位（从 Manifest 现算，不写死结论） ────

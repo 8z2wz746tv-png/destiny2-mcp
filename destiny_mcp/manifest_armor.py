@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 from .logging_config import get_logger
 from .exceptions import InvalidArgumentError
 from .utils.hash_utils import to_signed
+from .utils.icons import icon_url as _icon_url
 
 if TYPE_CHECKING:
     import sqlite3 as sqlite3_types
@@ -246,11 +247,12 @@ class ArmorCatalogMixin:
             if pch not in target_hashes:
                 continue
 
-            name = (data.get("displayProperties") or {}).get("name", "")
+            display = data.get("displayProperties") or {}
+            name = display.get("name", "")
             if not name or "已锁定" in name or "空模组" in name:
                 continue
 
-            desc = (data.get("displayProperties") or {}).get("description", "")
+            desc = display.get("description", "")
 
             # 模组效果描述通常在 perks → DestinySandboxPerkDefinition 里
             if not desc:
@@ -285,6 +287,9 @@ class ArmorCatalogMixin:
             results.append({
                 "name": name,
                 "hash": row["id"],
+                # `build_assistant(intent="armor_mods")` 的每一行就是一颗模组，
+                # 是给人挑的清单；定义本来就整份在手，抄一个图标字段不额外查库。
+                "icon_url": _icon_url(display.get("icon")),
                 "description": desc,
                 "slot": slot_name,
                 "stat_bonus": stat_bonus,

@@ -10,10 +10,15 @@ from pathlib import Path
 import yaml
 
 from .logging_config import get_logger
+from .utils.icons import BUNGIE_ORIGIN as BUNGIE_BASE_URL
+
+__all__ = ["BUNGIE_BASE_URL"]  # 再导出：ruff 只认显式声明
 
 logger = get_logger(__name__)
 
-BUNGIE_BASE_URL = "https://www.bungie.net"
+# 基址的字面量全仓只有 `utils/icons.py` 一份（图标 URL 的构造也在那里）：
+# 以前两处各写一遍，而下游还有 12 处按各自的边界行为再拼一次 —— 于是同一个
+# `icon_url` 字段在四条路上有四种取值。`tests/test_icon_url_output.py` 扫这一条。
 
 # Item type names
 # 0 是 Bungie 枚举里名为 None 的成员（商人占位条目、部分任务步），不是"缺数据"；

@@ -21,6 +21,7 @@ from ..services.starside_notes import (
 from ._responses import confirmation_required_response, error_response, failure_response, ok_response
 from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..services.armor_payload import armor_payload
+from ..utils.icons import icon_url as _icon_url
 from ..vocabulary import STAT_LABELS_ZH as _STAT_LABELS  # 六维中文名的单一出处
 
 
@@ -339,22 +340,21 @@ async def equip_preview(svc: Any, player_name: str, canonical_build: dict[str, A
             plug_definition = manifest.get_item_definition(plug_hash) or {}
             category = (plug_definition.get("plug") or {}).get("plugCategoryIdentifier", "")
             kind, _editable = socket_kind(category)
-            if kind not in {"general", "helmet", "gauntlets", "chest", "legs", "class_item",
-                            "artifice", "raid"}:
+            if kind not in {"general", "helmet", "gauntlets", "chest", "legs", "class_item", "artifice", "raid"}:
                 continue
+            plug_display = plug_definition.get("displayProperties") or {}
             current_mods.append({
                 "hash": plug_hash,
-                "name": (plug_definition.get("displayProperties") or {}).get("name", ""),
-                "energy_cost": ((plug_definition.get("plug") or {}).get("energyCost") or {}).get(
-                    "energyCost", 0
-                ),
+                "name": plug_display.get("name", ""),
+                "icon_url": _icon_url(plug_display.get("icon")),
+                "energy_cost": ((plug_definition.get("plug") or {}).get("energyCost") or {}).get("energyCost", 0),
             })
         preview.append({
             "slot": slot_key,
             "slot_display": SLOT_DISPLAY.get(slot_key, ""),
-            "item_instance_id": instance_id,
-            "item_hash": item.get("item_hash"),
+            "item_instance_id": instance_id, "item_hash": item.get("item_hash"),
             "name": (definition.get("displayProperties") or {}).get("name", ""),
+            "icon_url": _icon_url((definition.get("displayProperties") or {}).get("icon")),
             "power": (instance.get("primaryStat") or {}).get("value"),
             "location": raw.get("location", ""),
             "energy": {

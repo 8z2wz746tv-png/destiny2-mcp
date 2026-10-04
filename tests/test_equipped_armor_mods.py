@@ -58,7 +58,8 @@ class _Manifest:
                 "tier": 6 if item_hash == EXOTIC_HELMET else 5,
                 "bucketTypeHash": slots[item_hash],
                 "itemType": 2,
-                "icon": "",
+                # 真形状：`get_item_info()["icon"]` 是**绝对地址**（构造点只有 utils/icons.py）
+                "icon": f"https://www.bungie.net/common/destiny2_content/icons/{item_hash}.jpg",
             }
         return {"classType": 2, "tier": 5, "bucketTypeHash": WEAPON_BUCKET, "itemType": 3}
 
@@ -72,7 +73,10 @@ class _Manifest:
                 "plugCategoryIdentifier": category,
                 "energyCost": {"energyCost": 3 if item_hash == STAT_MOD else 1},
             },
-            "displayProperties": {"name": self.get_item_name(item_hash)},
+            "displayProperties": {
+                "name": self.get_item_name(item_hash),
+                "icon": f"/common/destiny2_content/icons/plug{item_hash}.png",
+            },
             "sockets": {"socketEntries": []},
         }
 
@@ -189,12 +193,20 @@ async def test_socket_rows_match_the_single_item_shape() -> None:
     assert helmet["power"] == 2010
     mods = helmet["mods"]
     assert [row["index"] for row in mods] == [0, 1, 2]
+    # `icon_url`（2026-10-04）：两条出口都缺图时 UI 只能放色块 —— 这一件在
+    # `intent="mods"` 里是护甲卡片、每个槽是模组行，两处都要图。
+    assert helmet["icon_url"] == (
+        "https://www.bungie.net/common/destiny2_content/icons/101.jpg"
+    ), "五件护甲各自的身份图标（用户点名的缺口）"
     assert mods[0] == {
         "index": 0, "kind": "general", "editable": True, "plug_hash": STAT_MOD,
-        "name": "#插件5001", "energy_cost": 3, "empty": False,
+        "name": "#插件5001",
+        "icon_url": "https://www.bungie.net/common/destiny2_content/icons/plug5001.png",
+        "energy_cost": 3, "empty": False,
     }
     assert mods[1]["kind"] == "helmet", "部位功能模组按 plugCategoryIdentifier 分类"
     assert mods[2]["empty"] is True and mods[2]["plug_hash"] is None
+    assert mods[2]["icon_url"] == "", "空插槽没有图标：给空串，不编一个地址"
 
 
 @pytest.mark.asyncio

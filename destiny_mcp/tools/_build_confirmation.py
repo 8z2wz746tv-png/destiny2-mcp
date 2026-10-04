@@ -194,8 +194,7 @@ def resolve_exotic(
     if confirmed_exotic_hash is None:
         # 只剩 exact：名字唯一定中一件，没有"选哪件"的问题。把用的是哪件写进响应，
         # 让调用方（和玩家）看得见，而不是默默换了一件。
-        exact_match = matches[0] if matches else {}
-        resolved_name = resolution.get("canonical_name") or exotic_name
+        exact_match, resolved_name = matches[0] if matches else {}, resolution.get("canonical_name") or exotic_name
         return ExoticStep(
             exotic_name=resolved_name,
             resolution={
@@ -203,6 +202,7 @@ def resolve_exotic(
                 "name": resolved_name,
                 "name_en": exact_match.get("name_en"),
                 "item_hash": exact_match.get("item_hash"),
+                "icon_url": exact_match.get("icon_url", ""),
                 "note": "名字唯一精确匹配，已直接用它求解；写入仍要玩家确认后传 confirmed=true。",
             },
         )

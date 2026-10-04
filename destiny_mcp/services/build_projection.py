@@ -19,6 +19,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from .build_results import tuning_rows
+
 
 __all__ = ["ROWS_NOTE", "candidate_rows", "row_hint", "tuning_summary"]
 
@@ -26,31 +28,12 @@ _ROW_ITEM_FIELDS = (
     "name", "item_hash", "item_instance_id", "slot", "slot_key", "slot_display",
     "power", "energy_capacity", "stats", "is_exotic", "set_bonus_name",
     "tuning_name", "is_masterworked", "is_artifice",
+    # `icon_url` 曾和求解器内部字段（`roll_parse_error`/`base_roll_stats`…）一起被投影掉，
+    # 理由是"模型看不懂也用不上"——那对模型成立，对**画卡片的前端不成立**：
+    # 默认出口是 `find`/`recommend` 唯一的出口，这里没有图，UI 这五件就只能放色块。
+    # 一件一个 URL（~100 字节 × 5 件），不是那一批内部字段的量级。
+    "icon_url",
 )
-
-
-def _tuning_rows(changes: Any) -> list[dict[str, Any]]:
-    """调谐改动：只留"哪一件、从什么换成什么、六维怎么动"。
-
-    真机形状是 `{item_instance_id, item_name, slot, from{hash,name}, to{hash,name}, delta{…},
-    slot_key, slot_display}`；hash 对玩家没意义（要执行的话用 `execution_id` 取候选，
-    那里有完整的 `tuning_changes`），所以这里只留名字与六维变化。
-    """
-    rows: list[dict[str, Any]] = []
-    for change in changes or []:
-        if not isinstance(change, dict):
-            continue
-        row: dict[str, Any] = {
-            key: change[key]
-            for key in ("item_instance_id", "item_name", "slot", "slot_key", "slot_display", "delta")
-            if change.get(key) is not None
-        }
-        for key in ("from", "to"):
-            block = change.get(key)
-            if isinstance(block, dict) and block.get("name"):
-                row[key] = {"name": block["name"]}
-        rows.append(row)
-    return rows
 
 
 def candidate_rows(results: Any) -> list[dict[str, Any]]:
@@ -74,7 +57,7 @@ def candidate_rows(results: Any) -> list[dict[str, Any]]:
             "missing_requirements": result.get("missing_requirements") or [],
             "max_violations": result.get("max_violations") or [],
             "requires_tuning": bool(result.get("requires_tuning")),
-            "tuning_changes": _tuning_rows(result.get("tuning_changes")),
+            "tuning_changes": tuning_rows(result.get("tuning_changes")),
             "items": [
                 {key: item.get(key) for key in _ROW_ITEM_FIELDS if item.get(key) is not None}
                 for item in items

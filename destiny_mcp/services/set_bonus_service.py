@@ -12,6 +12,7 @@ from __future__ import annotations
 from ..exceptions import DefinitionNotFoundError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
+from ..utils.icons import icon_url as _icon_url
 
 logger = get_logger(__name__)
 
@@ -99,6 +100,8 @@ class SetBonusService:
                 armor_pieces.append({
                     "name": display.get("name", ""),
                     "hash": item_hash,
+                    # 这五件就是"这套是哪几件"的清单，与 `intent="item"` 同一个图标来源
+                    "icon_url": _icon_url(display.get("icon")),
                 })
 
         return {

@@ -1520,7 +1520,10 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     check(
         "rows",
         "inventory：duplicates 只给行（perk 名字与栏位，模组/大师杰作分开，空插槽不算模组）",
-        dup_err is None and bool(dup_groups) and "icon_url" not in dup_first
+        # 组级 `icon_url` 2026-10-04 起**保留**：`duplicates` 在 UI 里是武器卡片列表，
+        # 每组一个 URL（5 组约 0.45 KB，实测 20 KB 闸从 13.5 KB 到 13.9 KB）。
+        # 实例级仍然不带（perk 图标是 91% 的那块肥肉），perk 行还是 `{name, slot}`。
+        dup_err is None and bool(dup_groups) and bool(dup_first.get("icon_url"))
         and "icon_url" not in dup_inst
         and all("plug_hash" not in perk for perk in (dup_inst.get("perks") or []))
         and isinstance(dup_inst.get("mods"), list)

@@ -319,6 +319,9 @@ def test_payload_key_shape_is_stable() -> None:
         "quantity", "energy",
     }
     assert set(payload["stats"]) == {"roll", "base", "final", "notes"}
+    # `icon_url` 是 2026-10-04 加的：插槽表（`intent="item"` 的 sockets 与
+    # `intent="mods"` 的 mods 同一形状）在 UI 里是模组清单，缺图只能放色块。
+    # 定义刚刚查过一次，不额外查库。
     assert set(payload["sockets"][0]) == {
-        "index", "kind", "editable", "plug_hash", "name", "energy_cost", "empty",
+        "index", "kind", "editable", "plug_hash", "name", "icon_url", "energy_cost", "empty",
     }

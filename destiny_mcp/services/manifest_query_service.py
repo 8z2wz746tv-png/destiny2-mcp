@@ -15,6 +15,7 @@ from ..exceptions import ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..manifest_names import names_for
+from ..utils.icons import icon_url as _icon_url
 from . import armor_payload, weapon_payload, weapon_profile, weapon_stats_payload
 
 logger = get_logger(__name__)
@@ -75,8 +76,7 @@ class ManifestQueryService:
             raise ManifestError(f"找不到物品：{item_name or item_hash}")
 
         display = definition.get("displayProperties", {})
-        icon = display.get("icon") or ""
-        icon_url = f"https://www.bungie.net{icon}" if icon else ""
+        icon_url = _icon_url(display.get("icon"))
         en_name = self._get_en_name(definition.get("hash", 0))
         intrinsic_perks = self._extract_intrinsic_perks(definition)
 
@@ -129,14 +129,13 @@ class ManifestQueryService:
             raise ManifestError(f"找不到物品定义：{armor_name}")
 
         display = definition.get("displayProperties", {})
-        icon = display.get("icon") or ""
         return armor_payload.armor_definition_payload(
             item_hash=item_hash,
             lookup=self._manifest.get_item_definition,
             name=display.get("name", ""),
             name_en=self._get_en_name(definition.get("hash", 0)),
             item_type_display=definition.get("itemTypeDisplayName", ""),
-            icon_url=f"https://www.bungie.net{icon}" if icon else "",
+            icon_url=_icon_url(display.get("icon")),
             class_type=definition.get("classType"),
             description=display.get("description", ""),
             flavor_text=definition.get("flavorText", ""),
@@ -168,7 +167,7 @@ class ManifestQueryService:
                 name=item.get("name", "") or display.get("name", ""),
                 name_en=self._get_en_name(item_hash),
                 item_type_display=definition.get("itemTypeDisplayName", ""),
-                icon_url=f"https://www.bungie.net{icon}" if icon.startswith("/") else icon,
+                icon_url=_icon_url(icon),
                 class_type=definition.get("classType", exotics[0].get("classType")),
                 description=display.get("description", ""),
                 flavor_text="",
@@ -316,8 +315,7 @@ class ManifestQueryService:
             raise ManifestError(f"找不到 perk 定义：{perk_name}")
 
         display = definition.get("displayProperties", {})
-        icon = display.get("icon") or ""
-        icon_url = f"https://www.bungie.net{icon}" if icon else ""
+        icon_url = _icon_url(display.get("icon"))
         en_name = self._get_en_name(definition.get("hash", 0))
 
         return {
@@ -366,7 +364,7 @@ class ManifestQueryService:
                             intrinsic_perks.append({
                                 "name": name,
                                 "description": plug_display.get("description", ""),
-                                "icon_url": _absolute_icon_url(plug_display.get("icon")),
+                                "icon_url": _icon_url(plug_display.get("icon")),
                             })
         return intrinsic_perks
 
@@ -471,8 +469,7 @@ class ManifestQueryService:
                         break
 
         display = definition.get("displayProperties", {})
-        icon = display.get("icon") or ""
-        icon_url = f"https://www.bungie.net{icon}" if icon else ""
+        icon_url = _icon_url(display.get("icon"))
         en_name = self._get_en_name(definition.get("hash", 0))
 
         effects = []
@@ -496,12 +493,3 @@ class ManifestQueryService:
         }
 
 
-def _absolute_icon_url(value: object) -> str:
-    icon = str(value or "").strip()
-    if not icon:
-        return ""
-    if icon.startswith("https://www.bungie.net/"):
-        return icon
-    if icon.startswith("/"):
-        return f"https://www.bungie.net{icon}"
-    return ""

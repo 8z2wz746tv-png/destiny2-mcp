@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import json
 
+from .utils.icons import icon_url as _icon_url
+
 
 class ArtifactCatalogMixin:
     """神器的只读查询与结构解析。"""
@@ -52,6 +54,7 @@ class ArtifactCatalogMixin:
             results.append({
                 "name": name,
                 "hash": row["id"],
+                "icon_url": _icon_url((data.get("displayProperties") or {}).get("icon")),
                 "description": desc[:100] if desc else "",
             })
 
@@ -90,6 +93,8 @@ class ArtifactCatalogMixin:
                 return {
                     "name": artifact_name,
                     "hash": row["id"],
+                    # 神器本体也是物品，两个入口（按名/按 hash）同一行形状
+                    "icon_url": _icon_url((data.get("displayProperties") or {}).get("icon")),
                     "description": desc,
                 }
 
@@ -109,6 +114,8 @@ class ArtifactCatalogMixin:
                 return {
                     "name": artifact_name,
                     "hash": row["id"],
+                    # 神器本体也是物品，两个入口（按名/按 hash）同一行形状
+                    "icon_url": _icon_url((data.get("displayProperties") or {}).get("icon")),
                     "description": desc,
                 }
 
@@ -219,6 +226,11 @@ class ArtifactCatalogMixin:
                     mods.append({
                         "name": mod_name,
                         "hash": item_hash,  # 返回 unsigned hash 给用户
+                        # 神器模组也是插件：`artifact` / `artifact_mod` 两个出口都读这份
+                        # 结构，没有图标就只能放色块。定义上面刚查过，这里不额外查库。
+                        "icon_url": _icon_url(
+                            (item_def.get("displayProperties") or {}).get("icon")
+                        ),
                         "description": mod_desc,
                     })
 

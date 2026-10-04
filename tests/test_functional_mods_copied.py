@@ -344,7 +344,9 @@ def test_duplicate_rows_split_plugs_by_category_not_by_name() -> None:
     assert [p["name"] for p in instance["perks"]] == ["适配框架", "维度偏移", "宝藏现世"]
     assert instance["mods"] == ["弹道"], "空插槽不是装着的模组"
     assert instance["masterwork"] == "3阶：填装速度"
-    assert "icon_url" not in rows[0]
+    # 组级 `icon_url` 保留（2026-10-04）：`duplicates` 在 UI 里是"这几把重了"的
+    # 武器卡片列表。perk 图标（每实例十几个、占 91%）仍然投影掉，组级是**每组一个** URL。
+    assert rows[0]["icon_url"] == "https://example/x.jpg"
 
 
 def test_duplicate_rows_omits_masterwork_when_absent() -> None:

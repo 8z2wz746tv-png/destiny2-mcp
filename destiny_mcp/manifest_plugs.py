@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 
 from .logging_config import get_logger
+from .utils.icons import icon_url as _icon_url
 from .utils.hash_utils import to_signed
 
 logger = get_logger(__name__)
@@ -45,12 +46,17 @@ class PlugCatalogMixin:
             item_def = self.get_item_definition(ph)
             name = ""
             cat_id = ""
+            icon = ""
             if item_def:
-                name = (item_def.get("displayProperties") or {}).get("name", "")
+                display = item_def.get("displayProperties") or {}
+                name = display.get("name", "")
+                icon = display.get("icon", "")
                 cat_id = (item_def.get("plug") or {}).get("plugCategoryIdentifier", "")
             enriched.append({
                 "plugItemHash": ph,
                 "name": name,
+                # 定义刚查过：插件池的消费方（子职业槽、perk 池）都要这一份
+                "icon_url": _icon_url(icon),
                 "plugCategoryIdentifier": cat_id,
                 "currentlyCanRoll": p.get("currentlyCanRoll", True),
                 "craftingRequirements": p.get("craftingRequirements"),

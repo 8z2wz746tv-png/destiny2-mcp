@@ -11,8 +11,9 @@ import json
 import sqlite3
 
 from .exceptions import ManifestError
-from .manifest_data import BUNGIE_BASE_URL, ITEM_ALIASES, ITEM_TYPE_NAMES
+from .manifest_data import ITEM_ALIASES, ITEM_TYPE_NAMES
 from .utils.hash_utils import to_signed
+from .utils.icons import icon_url as _icon_url
 
 
 class SearchIndexMixin:
@@ -69,7 +70,9 @@ class SearchIndexMixin:
                 "itemTypeName": ITEM_TYPE_NAMES.get(item_type, f"Type({item_type})"),
                 "itemTypeNameDisplay": data.get("itemTypeDisplayName", ""),
                 "tier": tier,
-                "icon": (BUNGIE_BASE_URL + display["icon"]) if display.get("icon") else "",
+                # `get_item_info(hash)["icon"]` 契约上就是**绝对地址**（全仓唯一构造点在
+                # `utils/icons.py`）——下游十几个出口直接读它当 `icon_url` 用，别改这条。
+                "icon": _icon_url(display.get("icon")),
                 "classType": class_type,
                 "damageType": data.get("defaultDamageType", data.get("damageType", 0)),
                 "ammoType": (data.get("equippingBlock") or {}).get("ammoType", 0),

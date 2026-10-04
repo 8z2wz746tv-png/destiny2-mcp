@@ -30,6 +30,7 @@ from ..models import (
     VendorSaleItem,
 )
 from ..player_resolver import PlayerResolver
+from ..utils.icons import icon_url as _icon_url
 from .vendor_menu import (
     build_rank,
     cap_warnings,
@@ -386,11 +387,13 @@ class VendorService:
         costs: list[VendorCost] = []
         for cost in sale_item.get("costs", []) or []:
             cost_hash = cost.get("itemHash", 0)
+            cost_info = self._manifest.get_item_info(cost_hash) or {}
             costs.append(VendorCost(
                 item_hash=cost_hash,
                 item_name=CURRENCY_NAMES.get(
                     cost_hash, self._manifest.get_item_name(cost_hash)
                 ),
+                icon_url=_icon_url(cost_info.get("icon")),
                 quantity=cost.get("quantity", 0),
             ))
 

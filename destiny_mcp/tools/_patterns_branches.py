@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from ._farming import crafting_sources_block
 from ..services.pattern_service import (
     STATUS_IN_PROGRESS,
     STATUS_NOT_STARTED,
@@ -131,24 +132,6 @@ def _summary(result: dict[str, Any]) -> str:
     )
 
 
-def _sources_block(result: dict[str, Any]) -> dict[str, Any]:
-    sources = result["sources"]
-    total = result["total"]
-    block: dict[str, Any] = {
-        "available": bool(sources.get("available")),
-        "page": sources.get("page") or {},
-        "matched": sources.get("matched_count") or 0,
-        "total": total,
-    }
-    if not block["available"]:
-        block["note"] = "这次没有读到本地「锻造武器来源」资料；图样进度不受影响。"
-    else:
-        block["note"] = (
-            f"本地资料覆盖 {block['matched']}/{total} 条；"
-            "没有对应行只说明这份清单没收录，不代表这把武器没有来源。"
-        )
-    return block
-
 
 def patterns_payload(result: dict[str, Any]) -> dict[str, Any]:
     counts = result["counts"]
@@ -164,6 +147,8 @@ def patterns_payload(result: dict[str, Any]) -> dict[str, Any]:
             "remaining": row.get("remaining"),
             "status": row["status"],
             "item_hash": row["item_hash"],
+            # 图样行在 UI 里是**武器卡片**：没有它就只剩色块（与武器列表行同一口径）
+            "icon_url": row.get("icon_url", ""),
             "source": row["source"],
         }
         for row in result["rows"]
@@ -181,7 +166,7 @@ def patterns_payload(result: dict[str, Any]) -> dict[str, Any]:
             "next_offset": result["next_offset"],
             "items": items,
         },
-        "sources": _sources_block(result),
+        "sources": crafting_sources_block(result),
         "read": result["read"],
         "terms": TERMS,
         "note": (

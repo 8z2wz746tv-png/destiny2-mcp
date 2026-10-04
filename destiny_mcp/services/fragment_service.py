@@ -14,6 +14,7 @@ from ..exceptions import DefinitionNotFoundError, SubclassError
 from ..logging_config import get_logger
 from ..vocabulary import ELEMENT_ALIASES as _ELEMENT_MAP  # 元素别名的单一出处
 from ..manifest import ManifestManager, CHARACTER_CLASS_MAP
+from ..utils.icons import icon_url as _icon_url
 
 logger = get_logger(__name__)
 
@@ -264,8 +265,7 @@ class FragmentService:
             if stat_name and value != 0:
                 stats[stat_name] = value
 
-        icon = (display.get("icon") or "")
-        icon_url = f"https://www.bungie.net{icon}" if icon else ""
+        icon_url = _icon_url(display.get("icon"))
 
         return {
             "name": display.get("name", ""),

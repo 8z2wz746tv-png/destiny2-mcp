@@ -65,6 +65,9 @@ class LoadoutItem(BaseModel):
         default=False,
         description="Whether the item was equipped when the loadout was captured",
     )
+    #: 这一件在 UI 里的图标（绝对 Bungie CDN 地址，构造点只有 `utils/icons.py`）。
+    #: `intent="get"` 的 `loadouts[].items[]` 就是"这套有哪五件"，没有它只能放色块。
+    icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
 
 
 class LoadoutSubclassConfig(BaseModel):

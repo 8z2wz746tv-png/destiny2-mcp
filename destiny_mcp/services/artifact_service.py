@@ -14,6 +14,7 @@ from ..logging_config import get_logger
 from . import profile_components, write_readback
 from ..manifest import ManifestManager, resolve_character_name
 from ..utils.hash_utils import to_unsigned
+from ..utils.icons import icon_url as _icon_url
 from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
 
@@ -377,7 +378,11 @@ class ArtifactService:
             "success": True,
             "mod_name": mod_name,
             "slot_index": slot_index,
-            "to": {"plug_hash": target, "name": mod_name},
+            "to": {
+                "plug_hash": target, "name": mod_name,
+                # 写入回执里的"换成了哪颗"也要图：与 `_artifact_slots` 同一个来源
+                "icon_url": _icon_url((self._manifest.get_item_info(target) or {}).get("icon")),
+            },
             "message": f"已装备赛季神器模组：{mod_name}（第 {slot_index} 号槽）",
         }
         if current.get("plug_hash"):
@@ -420,7 +425,12 @@ class ArtifactService:
                 # 「空神器模组」这类占位插件的名字里带「空」→ 算空槽（不写死 hash）
                 name = self._manifest.get_item_name(plug_hash) if plug_hash else ""
                 if plug_hash and "空" not in (name or ""):
-                    current = {"plug_hash": plug_hash, "name": name}
+                    current = {
+                        "plug_hash": plug_hash,
+                        "name": name,
+                        # 神器槽里装的就是神器模组：与 `artifact` 入口同一份图标来源
+                        "icon_url": _icon_url((self._manifest.get_item_info(plug_hash) or {}).get("icon")),
+                    }
             slots[index] = {"candidates": candidates, "current": current}
         return slots
 

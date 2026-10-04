@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field, computed_field
 from ..logging_config import get_logger
 from ..models import ArmorStats
 from ..utils.hash_utils import to_unsigned
+from ..utils.icons import icon_url as _icon_url
 from ..build_contracts import CanonicalBuild
 from .armor_rules import (
     ArmorRollTemplate,
@@ -629,12 +630,9 @@ class InventorySnapshot(BaseModel):
                 set_bonus_hash = set_bonus_info["set_hash"]
                 set_bonus_name = set_bonus_info["set_name"]
 
-            icon_path = info.get("icon", "") if info else ""
-            icon_url = (
-                icon_path
-                if icon_path.startswith("https://www.bungie.net/")
-                else f"https://www.bungie.net{icon_path}" if icon_path else ""
-            )
+            # 图标 URL 的唯一构造点：这里以前自己拼一遍，遇到非 Bungie 的绝对地址
+            # 会拼成 `https://www.bungie.nethttps://…` 这种打不开的东西。
+            icon_url = _icon_url(info.get("icon") if info else "")
 
             # ── 调谐：**允许装哪些只信组件 310**（单一出处：模块级 `tuning_options_from_reusable`）
             tuning_options = tuning_options_from_reusable(

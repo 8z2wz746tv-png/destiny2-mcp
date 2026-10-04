@@ -26,7 +26,8 @@ from ..logging_config import get_logger
 from ..build.constants import ARMOR_SLOT_MAP
 from . import profile_components
 from .armor_payload import slot_key_from_solver
-from ..manifest import BUNGIE_BASE_URL, ManifestManager, class_type_name, resolve_character_name
+from ..manifest import ManifestManager, class_type_name, resolve_character_name
+from ..utils.icons import icon_url as _icon_url
 from ..models import (
     Loadout,
     LoadoutArmorState,
@@ -135,17 +136,11 @@ class LoadoutService:
             entries = []
             for definition in definitions:
                 display = definition.get("displayProperties") or {}
-                icon = display.get("icon", "")
-                icon_url = (
-                    f"{BUNGIE_BASE_URL}{icon}"
-                    if icon.startswith("/")
-                    else icon
-                )
                 entries.append({
                     "hash": int(definition.get("hash", 0)),
                     "name": display.get("name", ""),
                     "description": display.get("description", ""),
-                    "icon_url": icon_url,
+                    "icon_url": _icon_url(display.get("icon")),
                 })
             results[result_kind] = entries
 
@@ -311,6 +306,8 @@ class LoadoutService:
                 "hash": plug_hash,
                 "name": str(info.get("name") or self._manifest.get_item_name(plug_hash)),
                 "category": str(category),
+                # 插件（perk/模组）也有自己的图标；`get_item_info()["icon"]` 已是绝对地址。
+                "icon_url": _icon_url(info.get("icon")),
             })
         return records
 
@@ -369,6 +366,9 @@ class LoadoutService:
                 "name": item_name,
                 "item_hash": item_hash,
                 "item_instance_id": instance_id,
+                # 账号配装与社区模板共用一个 `build_template` 形状，两条路都走这里：
+                # 一件装备一个图标，UI 拿它画卡片（`get_item_info()["icon"]` 已是绝对地址）。
+                "icon_url": _icon_url(item_info.get("icon")),
                 "plugs": plugs,
                 "plug_hashes": plug_hashes,
             }
@@ -546,6 +546,7 @@ class LoadoutService:
                         armor_items.append(LoadoutItem(
                             item_hash=item_hash,
                             name=self._manifest.get_item_name(item_hash),
+                            icon_url=_icon_url(item_info.get("icon")),
                             slot=slot,
                             item_instance_id=instance_id,
                             perks=self._hashes(lo_item.get("plugItemHashes", [])),
@@ -701,7 +702,7 @@ class LoadoutService:
                 item_name = self._manifest.get_item_name(item_hash)
                 equipped_items.append(LoadoutItem(
                     item_hash=item_hash, name=item_name, slot=slot,
-                    item_instance_id=inst_id,
+                    icon_url=_icon_url((self._manifest.get_item_info(item_hash) or {}).get("icon")), item_instance_id=inst_id,
                     mods=list(mod_sockets.values()),
                     mod_sockets=mod_sockets,
                 ))

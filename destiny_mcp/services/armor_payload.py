@@ -22,6 +22,7 @@ from ..build.armor_rules import balanced_tuning_bonus
 from ..build.constants import STAT_NAMES
 from .armor_class_item import CLASS_ITEM_PERK_CATEGORY_HASH
 from ..utils.hash_utils import to_unsigned
+from ..utils.icons import icon_url as _icon_url
 from ..vocabulary import CLASS_LABELS_ZH as CLASS_DISPLAY
 from ..vocabulary import class_key
 
@@ -268,7 +269,8 @@ def socket_rows(
         definition = lookup(plug_hash) if plug_hash else None
         category = ((definition or {}).get("plug") or {}).get("plugCategoryIdentifier", "")
         kind, editable = socket_kind(category)
-        name = ((definition or {}).get("displayProperties") or {}).get("name", "")
+        display = (definition or {}).get("displayProperties") or {}
+        name = display.get("name", "")
         if not plug_hash and kind == "other":
             kind = "empty"
         cost = ((definition or {}).get("plug") or {}).get("energyCost") or {}
@@ -279,6 +281,10 @@ def socket_rows(
                 "editable": editable,
                 "plug_hash": plug_hash or None,
                 "name": name or None,
+                # 模组也是插件，也有自己的图标：`intent="item"` 的插槽表与
+                # `intent="mods"` 的模组块都是给人看的清单，缺图就只能放色块。
+                # 定义刚刚查过一次，这里不额外查库。
+                "icon_url": _icon_url(display.get("icon")),
                 "energy_cost": int(cost.get("energyCost", 0) or 0),
                 "empty": not plug_hash or "空" in name or not name,
             }
@@ -350,7 +356,10 @@ def armor_payload(
             # 都算"定死的属性分布"（词条槽 / 异域护甲写死），玩家改不了。
             if (plug_def.get("plug") or {}).get("plugCategoryHash") == CLASS_ITEM_PERK_CATEGORY_HASH:
                 # 职业金装那两个特性槽：名字进身份块，属性照旧并进 roll（至纯就是超能30/近战25）。
-                perks.append({"name": row["name"] or "", "item_hash": int(plug_hash), "stats": plug_stats})
+                perks.append({
+                    "name": row["name"] or "", "item_hash": int(plug_hash), "stats": plug_stats,
+                    "icon_url": _icon_url((plug_def.get("displayProperties") or {}).get("icon")),
+                })
             for key, value in plug_stats.items():
                 roll[key] = roll.get(key, 0) + value
         elif category == "v460.plugs.armor.masterworks":

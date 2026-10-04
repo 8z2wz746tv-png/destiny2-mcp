@@ -231,7 +231,13 @@ def test_parse_artifact_reads_tier_fields_and_resolves_mods() -> None:
         "tier_hash": 7,
         "display_title": "1阶",
         "min_unlock_points": 0,
-        "mods": [{"name": "模组甲", "hash": mod_unsigned, "description": "效果说明"}],
+        # `icon_url` 是 2026-10-04 加的：神器模组也是插件，`artifact` / `artifact_mod`
+        # 两个出口都读这份结构。夹具里的定义没有 `displayProperties.icon`，
+        # 所以值是空串（缺值给空串，不编一个假地址）。
+        "mods": [{
+            "name": "模组甲", "hash": mod_unsigned,
+            "icon_url": "", "description": "效果说明",
+        }],
     }]
 
 

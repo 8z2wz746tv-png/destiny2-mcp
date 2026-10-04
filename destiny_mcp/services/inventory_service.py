@@ -23,7 +23,9 @@ from ..build.constants import ARMOR_SLOT_MAP, SOLVER_SLOTS, STAT_HASH_TO_NAME
 from ..models import InventoryItem, InventoryResponse, SearchItemsResponse
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
+from ..utils.icons import icon_url as _icon_url
 from .armor_payload import slot_key_from_solver, socket_rows
+from .inventory_lookup import locate_instance as _locate_instance
 from .item_parser import parse_items_from_profile
 
 logger = get_logger(__name__)
@@ -468,8 +470,8 @@ class InventoryService:
 
         Returns:
             `{"characters": [{"character", "class", "class_display", "item_count", "items"}]}`；
-            `items[]` = `{slot, slot_key, name, item_instance_id, item_hash, is_exotic, power,
-            energy, mods}`，`mods` 与 `intent="item"` 的 `armor.sockets` **同一形状**
+            `items[]` = `{slot, slot_key, name, item_instance_id, item_hash, icon_url, is_exotic,
+            power, energy, mods}`，`mods` 与 `intent="item"` 的 `armor.sockets` **同一形状**
             （同一形状工厂 `armor_payload.socket_rows`），否则两边对不上。
 
         Raises:
@@ -510,6 +512,10 @@ class InventoryService:
                     "name": self._manifest.get_item_name(item_hash),
                     "item_instance_id": instance_id,
                     "item_hash": item_hash,
+                    # 这张表是"哪五件、每件装着什么"的核对入口，UI 拿它画卡片；
+                    # 少了图标就只能放色块（2026-10-04 用户实拍）。`definition` 是
+                    # `get_item_info()` 的结果，`icon` 已经是绝对地址。
+                    "icon_url": _icon_url(definition.get("icon")),
                     "is_exotic": definition.get("tier") == 6,
                     "power": (instance.get("primaryStat") or {}).get("value"),
                     "energy": {
@@ -695,33 +701,6 @@ class InventoryService:
                 f"有 {incomplete} 件候选护甲缺少实例、属性或插槽数据，"
                 "已停止配装计算，避免把缺失值当成 0。"
             )
-
-
-def _locate_instance(
-    profile: dict, item_instance_id: str
-) -> tuple[dict, str, str] | None:
-    """在仓库/角色背包/已装备里找一件实例，返回 (item, 位置, 角色 ID)。"""
-    containers: list[tuple[str, str, list]] = [
-        ("vault", "", ((profile.get("profileInventory") or {}).get("data") or {}).get("items") or []),
-    ]
-    for char_id, inv in (((profile.get("characterInventories") or {}).get("data")) or {}).items():
-        containers.append((_character_location(profile, char_id), char_id, (inv or {}).get("items") or []))
-    for char_id, eq in (((profile.get("characterEquipment") or {}).get("data")) or {}).items():
-        containers.append((_character_location(profile, char_id), char_id, (eq or {}).get("items") or []))
-    for location, char_id, items in containers:
-        for item in items:
-            if str(item.get("itemInstanceId") or "") == item_instance_id:
-                return item, location, char_id
-    return None
-
-
-_CLASS_LOCATION = {0: "titan", 1: "hunter", 2: "warlock"}
-
-
-def _character_location(profile: dict, character_id: str) -> str:
-    characters = ((profile.get("characters") or {}).get("data")) or {}
-    entry = characters.get(character_id) or {}
-    return _CLASS_LOCATION.get(entry.get("classType"), "character")
 
 
 def require_complete_inventory_components(profile: dict) -> None:

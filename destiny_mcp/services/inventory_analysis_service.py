@@ -14,6 +14,7 @@ from ..manifest import ManifestManager
 from ..models import InventoryItem
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
+from ..utils.icons import icon_url as _cdn_url  # 图标 URL 的唯一构造点（这里以前自己拼一份）
 from .inventory_service import (
     MISSING_INVENTORY_SCOPE_MESSAGE,
     looks_like_missing_inventory_scope,
@@ -455,15 +456,6 @@ def _is_relevant_weapon_plug(category: str) -> bool:
     return "mod" not in key or "weapon.mod" in key
 
 
-def _cdn_url(value: Any) -> str:
-    path = str(value or "").strip()
-    if path.startswith("https://www.bungie.net/"):
-        return path
-    if path.startswith("/"):
-        return f"https://www.bungie.net{path}"
-    return ""
-
-
 def _int_value(value: Any) -> int:
     try:
         return int(value)
@@ -481,7 +473,13 @@ def duplicate_rows(groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
     真机基线（2026-09-25）：`limit=5` 一次 50.9 KB，每实例 1.81 KB —— 其中 **`perks` 1.64 KB（91%）**，
     装的是每个 perk 的 `plug_hash` + `icon_url` + `plug_category` 三件模型不需要的东西。
     这里把 perk 压成 `{name, slot}`（slot 是插件类别的最后一段，如 `barrels`/`frames` ——
-    "三、四号位是什么"要靠它，名字本身不说明位置），并把组级 `icon_url` 去掉。
+    "三、四号位是什么"要靠它，名字本身不说明位置）。
+
+    **组级 `icon_url` 保留**（2026-10-04）：它一度跟着 perk 一起被砍掉，但两者不是一回事 ——
+    perk 图标是每实例十几个、占 91% 的那一块；组级图标是**每组一个 URL**（5 组约 0.5 KB）。
+    `duplicates` 在 UI 里是"这几把重了"的武器卡片列表，没有组级图标就只能放色块；
+    `RESPONSE_PROJECTION_PLAN.md:44` 当时把「`icon_url` 全局策略」**明确列在范围之外**，
+    所以这不是推翻旧决定，是把那一条补上。
 
     为什么不能压成"只剩 id/位置/光等"：这个 intent 的用途就是**判断留哪把**，
     没有 perk 就没法判断 —— 那种"库存索引"式瘦身会把这个功能的业务价值砍掉。
@@ -528,6 +526,7 @@ def duplicate_rows(groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "item_hash": group.get("item_hash"),
             "name": group.get("name", ""),
             "weapon_type": group.get("weapon_type", ""),
+            "icon_url": _cdn_url(group.get("icon_url")),
             "instance_count": group.get("instance_count", len(instances)),
             "instances": instances,
         })
@@ -636,7 +635,7 @@ def _compact_item(item: InventoryItem) -> dict[str, Any]:
         "type": item.item_type_display or item.item_type,
         "power": item.power,
         "equipped": item.is_equipped,
-        "icon_url": item.icon_url,
+        "icon_url": _cdn_url(item.icon_url),
     }
     if item.stats:
         payload["stats"] = item.stats.model_dump(mode="json")
