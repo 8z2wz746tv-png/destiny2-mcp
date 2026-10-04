@@ -19,6 +19,8 @@ from __future__ import annotations
 import re
 from collections.abc import Callable
 
+from . import starside_icons
+
 #: token → 我们的说法（`None` 表示"直接取花括号里的正文"）。
 #: 这份表是**单一出处**：守门测试拿它跟已入库数据里出现过的 token 对账，出现新 token 就红。
 TOKENS: dict[str, str | None] = {
@@ -40,6 +42,10 @@ TOKENS: dict[str, str | None] = {
 
 TOKEN_PATTERN = re.compile(r"\{([a-zA-Z0-9#_-]+)\|([^{}]*)\}")
 _MULTI = "\\\\"  # 站点用两个反斜杠分隔多选
+
+#: 站点文本里的图片写法（`![](icons/xxx.webp)`）。**只认空 alt** —— 站点就是这么写的；
+#: 带 alt 的图片不是它的格式，别顺手改（改错了会把正文里的普通 markdown 一起吃掉）。
+_ICON_MARKUP = re.compile(r"!\[\]\(([^)]*)\)")
 
 
 def unknown_tokens(text: str) -> tuple[str, ...]:
@@ -81,8 +87,23 @@ def perk_names(text: object) -> tuple[str, ...]:
 
 
 def _clean(body: str) -> str:
-    """去掉站点自己的图标写法（`![](icons/xxx.webp)` —— 那份资源没随归档给我们）。"""
-    return re.sub(r"!\[\]\([^)]*\)", "", body).strip()
+    """把站点自己的图标写法补成**归档里的相对路径**（`assets/<主题>/icons/<名>.webp`）。
+
+    以前这里是把 `![](icons/xxx.webp)` **整段抹掉**，注释写的是"那份资源没随归档给我们" ——
+    **那句话现在不成立**：图标就在归档里（3767 个，`missing on disk: 0`），抹掉等于把
+    "这里本来有张图"这条信息丢掉。改成保留，但**只给相对路径**：
+    `https://starside.work/...` 是第三方站点的热链（归档 `redistribution_license:
+    not_established`），写进响应就是替别人做分发 —— 理由与判据在 `starside_icons`。
+
+    非 `icons/` 的相对地址（真出现外链之类）仍旧抹掉：那类地址要么是别人的数据、
+    要么在归档里没有对应文件，留着只会给前端一个打不开的 src。
+    """
+    return _ICON_MARKUP.sub(
+        lambda m: f"![]({starside_icons.archive_relative_path(m.group(1))})"
+        if m.group(1).startswith("icons/")
+        else "",
+        body,
+    ).strip()
 
 
 def render(text: object, *, names: Callable[[str], str | None] | None = None) -> str:

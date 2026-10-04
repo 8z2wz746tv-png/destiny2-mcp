@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -220,3 +221,54 @@ def test_frame_block_uses_snake_case_and_translates_sentinels() -> None:
     assert not bad, f"帧表键名不是 snake_case：{sorted(bad)}"
     blob = json.dumps(frame, ensure_ascii=False)
     assert '"INF"' not in blob, "哨兵值必须翻译成 ∞"
+
+
+def _strings(node: object):
+    """递归取出一个 JSON 结构里的所有字符串（只用于遍历语料，不做判断）。"""
+    if isinstance(node, dict):
+        for value in node.values():
+            yield from _strings(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from _strings(value)
+    elif isinstance(node, str):
+        yield node
+
+
+_ICON_RE = re.compile(r"!\[\]\(([^)]*)\)")
+
+
+# ── 站点文本里的图标：保留成归档里的**相对路径** ──────────────────────────
+# 这一组只用仓库里已提交的数据（`data/starside/index.json` 与 `entities/perks.json` 都在 git 里），
+# `assets/` 本身不进 git —— 所以这里断言的是"路径指向归档里的哪一项"，不 stat 磁盘。
+
+def test_site_icon_markup_becomes_an_archive_relative_path() -> None:
+    """`![](icons/<hash>.webp)` 不再被抹掉，而是补成 `assets/<主题>/icons/<hash>.webp`。
+
+    为什么不给 `https://starside.work/...`：那是第三方站点热链，归档的
+    `redistribution_license` 是 `not_established`（见 `docs/community/COMMUNITY_DATA_NOTICE.md`）；
+    而图标文件本来就在归档里 —— 给相对路径两头都占。判据与理由在 `services/starside_icons.py`。
+    """
+    rendered = markup.render("{slot|![](icons/cf6c8a6a75.webp)}")
+
+    assert rendered.startswith("![](assets/"), rendered
+    assert rendered.endswith("/icons/cf6c8a6a75.webp)"), rendered
+    assert "starside.work" not in rendered, "外链不许出现在响应文本里"
+
+
+def test_every_icon_in_the_archive_is_resolved_to_a_real_asset(payloads) -> None:
+    """数据里出现的每个图标，都要在归档索引里查到落点（不然就是给了个打不开的路径）。"""
+    index = json.loads(
+        (Path(__file__).parents[1] / "data" / "starside" / "index.json").read_text(encoding="utf-8")
+    )
+    archived = {asset["path"] for asset in index["assets"]}
+
+    seen: set[str] = set()
+    for payload in payloads:
+        for text in _strings(payload):
+            for match in _ICON_RE.finditer(markup.render(text)):
+                seen.add(match.group(1))
+    assert seen, "样本里一个图标都没有？夹具或解析坏了"
+    unresolved = sorted(path for path in seen if path not in archived)
+    assert not unresolved, f"这些图标路径不在归档索引里：{unresolved}"
+    assert not [path for path in seen if "://" in path], "响应里不许出现外链或绝对地址"
