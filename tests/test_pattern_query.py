@@ -532,6 +532,23 @@ async def test_name_filter_exact_prefix_substring_and_unknown() -> None:
     assert unknown["rows"] == [] and unknown["candidates"] == []
 
 
+def test_ambiguous_candidates_carry_the_icon() -> None:
+    """歧义候选行（`data.candidates[]`）也要带图 —— 它们是**响应的一部分**。
+
+    2026-10-05：投影键清单是内联元组，当时把 `icon_url` 丢了，而静态守门只认**命名**的
+    键清单常量（见 `tests/test_icon_url_output.py` 第 6 种形状）；同一批 `rows` 在 `_row`
+    里本来就有图。形状工厂现在在 `pattern_records.candidate_rows()`，这里正面钉住键集合。
+    """
+    from destiny_mcp.services.pattern_records import candidate_rows
+
+    row = candidate_rows([{
+        "name": "惩戒措施", "weapon_type": "手炮", "status": "已解锁", "item_hash": 1001,
+        "record_hash": 9001, "group": "手炮", "tier": "传说", "icon_url": "https://x/a.jpg",
+    }])[0]
+    assert set(row) == {"name", "weapon_type", "status", "item_hash", "icon_url"}
+    assert candidate_rows([]) == []
+
+
 async def test_variant_name_points_back_to_the_base_pattern() -> None:
     """（失时）这类变体没有自己的图样记录，问它要答基础版，而不是"没找到"。"""
     svc, _ = service(profile_with({501: record_component(5, 5)}), starside=FakeStarside())

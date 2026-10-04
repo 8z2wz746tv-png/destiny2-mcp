@@ -22,6 +22,17 @@ def cell(component: Any) -> dict[str, Any]:
     }
 
 
+def candidate_rows(rows: list[dict[str, Any]], limit: int = 8) -> list[dict[str, Any]]:
+    """名字有歧义时的候选行（`patterns` 出口的 `data.candidates[]`）。
+
+    只留"认出是哪一个"要用的列 + `icon_url`：这几行**进的是响应**，而同一批 `rows`
+    在 `_row` 里已经带图 —— 2026-10-05 靠"拿真实响应逆推"才发现投影时把它丢了
+    （键清单写成内联元组，静态守门当时只认**命名**的键清单常量）。
+    """
+    keys = ("name", "weapon_type", "status", "item_hash", "icon_url")
+    return [{key: row[key] for key in keys} for row in rows[:limit]]
+
+
 def merge_cell(state: dict[int, dict], key: Any, component: Any) -> None:
     """把一条记录并进状态表：同一记录号出现在多处（档案级 + 角色级）时取进度更靠前的那个。
 

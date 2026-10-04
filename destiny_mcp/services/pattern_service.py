@@ -35,7 +35,7 @@ from ..utils.hash_utils import to_unsigned
 from ..utils.icons import icon_url as _icon_url
 from .. import vocabulary
 from . import profile_components
-from .pattern_records import merge_cell as _merge_cell
+from .pattern_records import candidate_rows, merge_cell as _merge_cell
 from .starside_crafting_sources import CraftingSources
 
 logger = get_logger(__name__)
@@ -394,7 +394,7 @@ class PatternService:
             if len(match) == 1:
                 return match, [], ""
             if len(match) > 1:
-                return [], [{k: row[k] for k in ("name", "weapon_type", "status", "item_hash")} for row in match[:8]], ""
+                return [], candidate_rows(match), ""
         # 变体（专家/失时/痛苦）：图样挂在基础版上，问变体名就指回基础版。
         base = _VARIANT_SUFFIX.sub("", query)
         if base != query:
