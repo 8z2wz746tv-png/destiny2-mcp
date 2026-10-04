@@ -1,7 +1,7 @@
 # 图标 URL 全覆盖 + 模型侧 HTML 渲染（开发档案）
 
-状态：**三轮都已实现并验证**（第一轮：物品/装备/perk 的 `icon_url` 覆盖；第二轮：活动道 + Starside 相对路径 + `popularity` 统一；第三轮：渲染 skill）。§十 的 7 项拍板**已落地**（第 6 项按"不刷基线夹具"处理）。
-最后更新：2026-10-04
+状态：**四轮都已实现并验证**（第一轮：物品/装备/perk 的 `icon_url` 覆盖；第二轮：活动道 + Starside 相对路径 + `popularity` 统一；第三轮：渲染 skill；**第四轮：豆包三个真实场景暴露的缺口**，见 §十三）。§十 的 7 项拍板**已落地**（第 6 项按"不刷基线夹具"处理）。
+最后更新：2026-10-05
 
 ---
 
@@ -328,3 +328,127 @@ HTML 交给宿主**。结果模型照 skill 做，用户在豆包里看到的是
 所以 §六 的守门里最值钱的不是前四条，而是**第六条注入**：它在**一个全新模块里新加一个出口**，照样被抓住。**防未来比抓现在重要。**
 
 同族的教训（本仓已有记录）：`ls-tree` 证明"文件在提交里"、不证明"树能跑"；`.venv` 的 editable 映射会让"临时树验证"作弊；`ruff` 抓不到"从一个模块导入一个它根本没有的名字"。
+
+---
+
+## 十三、第四轮（2026-10-05）：豆包三个真实场景暴露的缺口
+
+**触发**：用户在豆包里的三张实拍截图 —— ①社区配装列表（55 套，先显示前 5）渲染成**纯文字行**；
+②单套配装详情文字为主、**没有图**；③当前装备 5 件 + 子职业，模型在回复里**自己写明**
+「本次响应未带图标字段，按规范走文本行」（它遵守了 skill，是 MCP 侧没给字段）。
+
+### 13.1 场景 3 的出口：**先排掉"跑的是旧进程"这个混淆项**
+
+MCP 是长驻进程。**第一次复现时两个出口都没有 `icon_url`，但工作区源码里两个都有** ——
+这不能直接判成"代码缺口"：当时 DSH 那个子进程 **13:48** 起、而这两个源文件 **17:36 / 18:53** 才改
+（`ps -eo pid,lstart` + `stat -f %Sm`）。所以按仓库既有纪律，用一个**新起的**进程读当前字节：
+
+- 直接调服务层（`.venv/bin/python` 起新进程）：`get_equipped_armor_mods` 五件**全带图**、
+  `get_subclass` 的 `plugs[]/available[]` **全带图**；
+- 再走一次**真 stdio 握手**（新进程 + `mcp` 客户端）取整包：
+
+| 出口（复现命令） | 响应里的字段路径 | 结论 |
+| --- | --- | --- |
+| `inventory_assistant(intent="mods", character="hunter")` | `data.equipped_armor.characters[].items[].icon_url` | **69 个非空、0 行缺图** —— 是旧进程，不是代码缺口 |
+| `subclass_assistant(intent="get", character="hunter")` | `data.subclass.plugs[].icon_url`、`plugs[].available[].icon_url` | 181 个非空，**但 `data.subclass` 自己那一行没有** |
+
+**所以场景 3 的真缺口是一条**：`SubclassConfig`（`subclass_name` + `subclass_hash`）**没有 `icon_url`**。
+子职业是一件真物品（实测 `4282591831`「棱镜猎人」→ `fab506e62fa4f188bfe2fb6d56b39614.png`），
+而卡片第一行"这是哪个子职业"只能放色块。**零解析风险**：hash 现成，走既有出口函数。
+
+复跑方式（不依赖我这次会话）：
+`.venv/bin/python /tmp/survey_probe.py A_subclass_hunter`（真 stdio 握手 + 字段路径扫描）。
+
+### 13.2 同类出口逐个核（"账号里的装备/武器身份"）
+
+每个出口都取**真实响应**、按"有名字键或有身份 hash 键的行必须带 `icon_url`"扫一遍：
+
+| 出口 | 结果 |
+| --- | --- |
+| `inventory_assistant(intent="mods")` | ✅ 已有（69 个） |
+| `subclass_assistant(intent="get")` | ❌ **补**：`data.subclass.icon_url`（`models/subclass.py`、`services/subclass_service.py`） |
+| `inventory_assistant(intent="item")` | ❌ **补**：`data.armor.identity.archetype.icon_url`（词条原型是真插件，实测 `2230428468` 有图）；`data.armor.instance.tuning.icon_url` |
+| `inventory_assistant(intent="item")` 的 `armor.identity.set` / `set.tiers[]` | **不给**：套装是 `DestinyEquipableItemSetDefinition`，实测 `741162535` 写着 `hasIcon: false`（不是漏了，是没有这张图） |
+| `loadout_assistant(intent="get")` 的 `items[]` / `weapons[]` / `class.plugs[]` | ✅ 已有 |
+| `loadout_assistant(intent="get")` 的 `build_template.class` | ❌ **补**：`icon_url`（`subclass_item_hash` 就在同一行，两条构造路径都补） |
+| 神器三件套（`artifact` / `artifact_mod` / `switch_artifact`） | ❌ **补**：`_parse_artifact` 的神器行、`get_artifact_mod_details` 的主行、`_artifact_instances` 的清单行（`from`/`to`/`available` 都从它取） |
+| `armor_mods` 的社区注记块 / 职业金装双栏 | ❌ **补**：同一颗模组/同一颗"之灵"在别处有图、这里没有 |
+| `equip_preview` 的模组行 | ❌ **补**：两处字典字面量 |
+
+外部依赖（社区配装）见 §13.3。
+
+### 13.3 场景 1/2：社区配装模板里**只有名字，没有 hash**
+
+读了 `starside_builds.parse_build`（**只产出名字**：`weapons[].name`、`armor.exotic`、
+`armor.set_requirements[].name`、`class.{super,aspects,fragments,…}`、`artifact.name`）
+并用真实响应核过一遍。所以出图必须先做一次**名字 → Manifest 定义**的解析，
+而"解析"正是这条链上唯一会出错的一步。
+
+**红线（用户明确的价值判断，也是这一轮最硬的约束）**：
+> **玩家看图比看名快 —— 很多时候是看了图标才想起名字。**
+
+错图比没图坏得多：看图记名字的人会**记错**。所以 `services/starside_build_icons.py` 只有三条规则，
+每条都对应一个**本机实测反例**（不是设想）：
+
+| # | 规则 | 实测反例 |
+| --- | --- | --- |
+| 1 | 只用**精确名**解析（沿用 `starside_matching._exact_definitions`），相似度匹配一个不用 | 模板里的「贪婪之握」是**活动**名 → Manifest 精确名 **0 命中** → 不出图（正是用户截图里模型自己指出的那条） |
+| 2 | 同名多版本必须**图一致**才出图 | 「重型弹药搜寻者」3 个 hash 里 **2 种图**（`2867719094` vs `644105`/`554409585`） |
+| 3 | 裸标签不许直接解析，**必须带类型过滤** | 模板写「分支: 棱镜」，而 `棱镜` 这个精确名命中的是一件**武器皮肤**（`3373357626`，`itemType=19`、typeDisp=武器皮肤）—— 拿它的图当"子职业"就是一张错图。带 `item_type=16` + 「标签+职业名」（`棱镜`+`猎人`→`棱镜猎人`→`4282591831`）才落对 |
+
+解析不到的项给**空串**（不是省略）：`icon_url: ""` 的含义是"解析不到或图不一致"，
+渲染侧按 skill 画同尺寸占位块 —— 这与"缺值给空串、不编一个假地址"是同一条口径。
+**套装行恒为空串**（Manifest 里就没有这张图）。
+
+**两档形状**（用户口径："列表简单显示，问详情再全部显示"）：
+
+| 档 | 出口 | 给的字段 |
+| --- | --- | --- |
+| **简版** | `data.results[].visuals`（`community` 列表） | 只有 护甲（`armor.exotic` / `armor.set`）/ 武器（`weapons[]`）/ 子职业（`subclass`）三块，每块 `{name, icon_url}` |
+| **全量** | `data.selected_build.visuals` + `validation.requirements[].icon_url` | 详情里**每一行**都有图：武器 / 武器 perk / 异域护甲 / 套装 / 护甲模组 / 神器 / 神器模组 / 子职业组件；`perk_resolutions[]` 与 `required_class_item_perks[]` 也补 |
+
+**详情那一跳不是按名字猜**：`requirements[]` 本来就带 `definitions[].item_hash`（`validate_build`
+解析出来的），所以是"拿已经解析出来的 hash 取图"，仍然过"图一致"那道闸。
+
+### 13.4 载荷实测（真机，同一账号）
+
+`build_assistant(intent="community", query="猎人")` 命中 **62** 套（`top_n` 上限 20，
+所以"55 套"那档是**翻页取全 62 行后按前 55 行算的**，不是均值外推）：
+
+| 规模 | 基线 | + `visuals` | 合计 | 增幅 |
+| --- | --- | --- | --- | --- |
+| 前 5 套（默认 `top_n=5`） | 9,621 B | 2,485 B | **12,106 B** | **+25.8%** |
+| 前 55 套 | 108,632 B | 31,201 B | **139,833 B** | **+28.7%** |
+| 全部 62 套 | 122,616 B | 35,642 B | **158,258 B** | **+29.1%** |
+
+每套均值 **575 B**；`visuals` 里的项 **225 有图 / 136 空串**（62% 出得了图 ——
+剩下那 38% 就是规则 1–3 拦下来的"宁可不出图"）。详情整包 68,078 → **72,424 B（+6.4%）**。
+
+### 13.5 守门：补的是**形状**盲区，不只是词表盲区
+
+第四轮查出来的盲区有**两个**，第二个是注入验证抓出来的：
+
+1. **词表**（原来不含 `subclass_name`/`subclass_hash`，也不含裸 `hash`）。
+   裸 `hash` 当年被排除的理由是"套装层级/记录/档位表到处都是，会把台账冲成噪声" ——
+   这一轮把它**实测**了一遍：收进来全仓只多 **21** 行，**没有一行**是套装层级/记录/档位表，
+   全是 `{hash, name}` 形状的物品身份行。假设不成立，于是连它一起收紧
+   （12 行补图、9 行进台账，台账每行写清"是什么、凭什么不给图"）。
+2. **形状**（原来只扫三种：字典字面量 / 键清单常量 / 构造调用）。
+   **`SubclassConfig` 是 pydantic 类体** —— 把新补的 `icon_url` 删掉后守门**仍然全绿**。
+   所以补上第四种形状：**类体里同时声明了名字键与身份 hash 键字段的模型类**。
+   加上之后只多出 4 行（`ArmorArchetype` / `ProcessItem` / `TuningChoice` / `PieceTuning`），
+   全是求解器内部模型，逐条登记。
+
+### 13.6 注入矩阵（6 条，全咬红；`touch` + `PYTHONDONTWRITEBYTECODE=1`，恢复后 sha256 逐字节一致）
+
+| 注入 | 结果 |
+| --- | --- |
+| 场景 3：`SubclassConfig` 去掉 `icon_url` | 红：点名 `models/subclass.py`（**第一版这里是绿的 —— 形状盲区，补了判据才咬住**） |
+| 裸 hash：神器行去掉 `icon_url` | 红：点名 `manifest_artifacts.py:244 _parse_artifact` |
+| 台账过期：给豁免的 `_declared_children` 补上图 | 红：点名 `collection_service.py::_declared_children` |
+| 红线：图不一致时挑第一张 | 红：`assert '…/icons/a.png' == ''` |
+| 红线：子职业去掉 `item_type=16` | 红：**第一版绿的**（测试自己把过滤写进了调用）→ 改成走模块自己的 `_subclass_row` 才咬住 |
+| 红线：套装行拿别的图顶上 | 红：**第一版绿的**（只钉了 `requirements` 那条路）→ 改成两条路都钉才咬住 |
+
+**三条"第一次是绿的"全部是注入打偏**（判据没覆盖那个形状 / 测试没走那条路），
+不是"守门没问题"—— 这正是仓库里那条纪律的现场复现。
