@@ -190,13 +190,13 @@ def weapon_block(
         block["quality"] = fields["quality"]
     if owned is not None:
         block["owned"] = owned
-    # 同名多版本（复刻/重发）如实报：定义级 intent 按名字只能挑一个，不报出来调用方
-    # 会把"另一个版本的池子"当成自己那把的（真机 2026-09-26：「千码凝视」特性栏 0 交集）。
+    # 同名多版本如实报（定义级按名字只能挑一个）；变体数**恒给**：`cross_check` 靠它决定
+    # "不在池里"能不能断言（>1 只说"没判"）—— 见 `weapon_local_data._cross_check`。
     name = str(block.get("name") or "")
     if name:
         variants = weapon_profile.name_variants(manifest, name)
-        if len(variants) > 1:
-            # 一律给**无符号**（账号/API 那边都是无符号，有符号摆一起会看着像对不上号）
+        block["name_variant_count"] = len(variants)
+        if len(variants) > 1:  # 一律给**无符号**（账号/API 那边都是无符号，混着像对不上号）
             block["name_variants"] = [to_unsigned(value) for value in variants]
             block["name_variants_note"] = (
                 f"⚠️ Manifest 里同名的武器有 {len(variants)} 个版本（item_hash："

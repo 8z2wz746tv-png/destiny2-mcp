@@ -185,6 +185,9 @@ WEAPON_BLOCK_KEYS = sorted([
     "icon_url", "intrinsic", "is_craftable", "item_hash", "name", "name_en", "rarity",
     "rarity_tier", "rpm", "roll_kind", "roll_summary", "trait_ids", "watermark",
     "weapon_type",
+    # 同名多版本：变体数**恒有**（`cross_check` 靠它决定"不在池里"能不能断言）；
+    # `name_variants` / `name_variants_note` 只在 >1 时出现（见 weapon_payload）。
+    "name_variant_count",
     # P5：本地资料收进模板（列表类是精简版，但键一样）
     "farming", "popularity", "community", "sources",
 ])
