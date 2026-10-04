@@ -99,7 +99,7 @@
 
 | 行 | 断言 |
 | --- | --- |
-| 口径分离 | 每行 `source` ∈ {official, schedule}；官方 ≥ 14 行（10 特色突袭/地牢 + 4 夜幕/宗师），表那半 6 行 |
+| 口径分离 | 每行 `source` ∈ {official, schedule}；官方 ≥ 14 行（10 特色突袭/地牢 + 4 夜幕/宗师），表那半 6 行；**官方每一行都有 `icon_url` + `activity_hash`，自维护表那半一行都没有 `icon_url` 这个键**（表里只存名字、没有活动 hash —— 那是「给不出」，不是漏了，见 `docs/plans/ICON_URL_PLAN.md` §15.4） |
 | 夜幕/宗师 | 宗师那条 `name` 是打击名、`difficulty` 是难度、`modifiers` 非空且**不含空串**；奖励 `quantity=0` 原样保留 |
 | 表与锚点 | 上维挑战/异域任务各给本周+下周，名字与 `verified_at` 都在；泉源给今天+明天且**交替**（今天防御 → 明天攻击） |
 | 遗失区域 | `lost_sector.anchored=false`、31 个候选、`how_to_anchor` 有核对办法；**不产出 `kind=lost_sector` 的行** |
@@ -127,7 +127,7 @@
 
 | 行 | 断言 |
 | --- | --- |
-| list 默认 | 只给**清单行**（`loadout_id`/件数/`execution_supported`/`detail_hint`，**不带** `build_template`）+ 四个分页字段；整包 < 20 KB（121 KB → 2.8 KB 之后不许回涨） |
+| list 默认 | 只给**清单行**（`loadout_id`/件数/`execution_supported`/`detail_hint`/`visuals`，**不带** `build_template`）+ 四个分页字段；整包 < 20 KB（121 KB → 2.8 KB 之后不许回涨）。`visuals` 是 2026-10-05 补的图块：每行 `armor.exotic` 与 `subclass` 两块，且至少一套的非空 `icon_url` 以 `https://www.bungie.net/` 开头（只钉「键在」会被空串糊弄过去） |
 | list 翻页 | `offset` 两页不重叠（行里的实例键是 **`loadout_id`**，不是 `id`） |
 | get 传 `loadout_id` | 只给那一套的**完整模板**（0.7.6 起 `get` 与 `list` 是两件事，不再互为别名） |
 | search_identifiers | 按 `kind` 给标识（含 hash） |
@@ -192,7 +192,7 @@
 | weekly | 给 `reset_time` + 分类计数 + 重点活动 |
 | weekly_full 传 `limit` | `ignored_parameter`（它不读 limit） |
 | vendor 菜单 | `mode="menu"`、`total_vendors` 有值、`question`/`next_actions` 都在、`vendors[].sale_items` 全空 |
-| vendor 详情 | `mode="detail"`、有 `rank.name`/等级、分类 `kind ∈ {rewards,sale,submenu}`、商品数受 `limit` 约束 |
+| vendor 详情 | `mode="detail"`、有 `rank.name`/等级、分类 `kind ∈ {rewards,sale,submenu}`、商品数受 `limit` 约束；**商人那一行有 `icon_url`（绝对 Bungie CDN）且旧键 `icon` 已删**（2026-10-05：它以前恒为空串 —— `_compact_response` 清掉、定义里有图也发不出来） |
 | vendor hash 往返 | 菜单首条的 hash 直查回来是同一条 |
 | vendor 编名字 | 空菜单 + 下一步，**不是**错误信封 |
 | search_collectible_nodes | 给 `node_hash`/`name`（节点号 ≠ 收藏品号） |

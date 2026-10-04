@@ -1121,8 +1121,19 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         err is None and (rot or {}).get("ok") is True
         and all(row.get("source") in ("official", "schedule") for row in rrows)
         and (rdata.get("counts") or {}).get("official", 0) >= 5
-        and {"raid", "nightfall"} <= kinds,
-        f"counts={rdata.get('counts')} kinds={sorted(k for k in kinds if k)}",
+        and {"raid", "nightfall"} <= kinds
+        # 2026-10-05：**行头**也要有图 —— 官方那半（特色突袭/地牢 + 夜幕/宗师）的行头此前只有
+        # `activities[]` 里有图，而渲染 skill 的周常表只列到 `rows[].icon_url`（整行没图）。
+        # 自维护表那半（上维挑战/异域任务/泉源）**没有这个字段**：表里只存名字、没有活动 hash，
+        # 名字→活动定义实测对不上（上维挑战 6 个候选 0 命中）—— 那是"给不出"，不是漏了。
+        and all(
+            str(row.get("icon_url") or "").startswith("https://www.bungie.net/")
+            and row.get("activity_hash")
+            for row in rrows if row.get("source") == "official"
+        )
+        and all("icon_url" not in row for row in rrows if row.get("source") == "schedule"),
+        f"counts={rdata.get('counts')} kinds={sorted(k for k in kinds if k)} "
+        f"官方行头缺图={[r.get('name') for r in rrows if r.get('source') == 'official' and not r.get('icon_url')]}",
         seconds=dt,
     )
 
@@ -1463,17 +1474,28 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     rows_l = ldata.get("loadouts") or []
     check(
         "rows",
-        "loadout：list 只给清单行（每行有 loadout_id/件数/能不能执行），完整模板归 get",
+        "loadout：list 只给清单行（每行有 loadout_id/件数/能不能执行 + 能画图的 visuals），完整模板归 get",
         loadouts.get("ok") is True and len(rows_l) <= 5
         and {"total_loadouts", "returned_loadouts", "truncated", "next_offset"} <= set(ldata)
         and all(
             {"loadout_id", "item_count", "execution_supported", "detail_hint"} <= set(row)
             and "build_template" not in row
+            # 2026-10-05 补：清单行以前整包 0 个 `icon_url`（用户实测），卡片上一张图都没有。
+            # 两处身份（金装那一件、子职业那一行）都从**这份配装自己的模板**里取，不做名字解析。
+            and {"armor", "subclass"} <= set(row.get("visuals") or {})
+            and "exotic" in ((row.get("visuals") or {}).get("armor") or {})
+            for row in rows_l
+        )
+        # 有图才算补上了（第一套是官方槽位、模板齐全）：只钉"键在"会被空串糊弄过去。
+        and any(
+            str(((row.get("visuals") or {}).get("subclass") or {}).get("icon_url") or "")
+            .startswith("https://www.bungie.net/")
             for row in rows_l
         ),
         f"total={ldata.get('total_loadouts')} returned={ldata.get('returned_loadouts')} "
         f"truncated={ldata.get('truncated')} next_offset={ldata.get('next_offset')} "
-        f"首套键={keys_of(first_row(rows_l))}",
+        f"首套键={keys_of(first_row(rows_l))} "
+        f"首套 visuals={short(first_row(rows_l).get('visuals'), 200)}",
     )
     # 清单行真机 121 KB → 2.8 KB（5 套）；行里塞回模板就会顶破这里
     body = len(json.dumps(loadouts, ensure_ascii=False).encode("utf-8"))
@@ -2073,13 +2095,19 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     sale_items = vendor.get("sale_items") or []
     check(
         "rows",
-        "world：vendor 详情给等级与分类，商品数受 limit 约束",
+        "world：vendor 详情给等级与分类，商品数受 limit 约束，商人那一行带图（旧键 icon 已删）",
         err is None and vblock.get("mode") == "detail"
         and bool((vendor.get("rank") or {}).get("name"))
         and bool(categories)
         and all(c.get("kind") in {"rewards", "sale", "submenu"} for c in categories)
-        and len(sale_items) <= 5,
-        f"vendor={vendor.get('name')} rank={short(vendor.get('rank'), 120)} "
+        and len(sale_items) <= 5
+        # 商人**自己**那一行：图在 `icon_url`（`displayProperties.originalIcon`，方形徽标），
+        # 旧键 `icon` 整块删掉 —— 它以前读的是同一张表里的另一个字段、出口上恒为空串，
+        # 而"键名一律 `icon_url`"是本仓口径（`utils/icons.py` 开头、老 web 的 `_icon()`）。
+        and str(vendor.get("icon_url") or "").startswith("https://www.bungie.net/")
+        and "icon" not in vendor,
+        f"vendor={vendor.get('name')} icon_url={short(vendor.get('icon_url'), 80)!r} "
+        f"旧键={'有' if 'icon' in vendor else '无'} rank={short(vendor.get('rank'), 120)} "
         f"分类={[(c.get('kind'), c.get('item_count')) for c in categories]} "
         f"sale_items={len(sale_items)} total_items={vendor.get('total_items')} "
         f"truncated={vendor.get('truncated')}",
