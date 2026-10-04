@@ -82,13 +82,21 @@ For any agent, not only Codex:
 
 ## Skill maintenance
 
-`skills/destiny2-mcp/` is the single source for the agent-facing guide. Nothing in it may assume one host: the same folder is loaded by hosts with a skills directory, and hosts without one get a pointer block plus the public URL advertised in the MCP handshake.
+`skills/` holds the agent-facing guides; two of them ship to hosts today:
 
-- After editing anything under `skills/destiny2-mcp/`, run `scripts/install_skill.py` so the installed copy keeps up. It installs into **the host that is running you** by default (DSH: `~/.dsh/skills/`, Claude Code: `~/.claude/skills/`, Codex: `~/.codex/skills/`, detected from the environment); `--list` shows the current host, `--host <name>` picks one, `--all` installs into every detected host, `--pointer` refreshes the instruction-file pointers, and `--mcp` registers the MCP server (writes the DSH profile patch; prints the paste-ready command for the others).
+- `skills/destiny2-mcp/` — routing and evidence boundaries (the main guide).
+- `skills/destiny2-render/` — how to render a result as a card (allowed HTML/inline styles, icon
+  degradation, escaping, and a per-block field table that names the intent behind every field).
+  `scripts/verify_render_fields.py` resolves every path in that table against a live response.
+
+Nothing in them may assume one host: the same folders are loaded by hosts with a skills directory, and hosts without one get a pointer block plus the public URL advertised in the MCP handshake.
+
+- After editing anything under `skills/`, run `scripts/install_skill.py` so the installed copies keep up. It installs into **the host that is running you** by default (DSH: `~/.dsh/skills/`, Claude Code: `~/.claude/skills/`, Codex: `~/.codex/skills/`, detected from the environment); `--list` shows the current host, `--host <name>` picks one, `--all` installs into every detected host, `--pointer` refreshes the instruction-file pointers, and `--mcp` registers the MCP server (writes the DSH profile patch; prints the paste-ready command for the others).
+- **A new skill folder must be claimed by the installer**: add it to `EXTRA_SKILLS` in `scripts/install_skill.py`. An unclaimed folder installs nowhere and nothing complains — `tests/test_skill_install.py` fails on it on purpose (`SKILLS_NOT_INSTALLED` is the ledger for folders that intentionally stay repo-only).
 - A new user installs this for the agent they are talking to, not for every agent on the machine: do not spread copies into Codex and Claude "just in case".
 - Never write into a directory the host manages itself (for example Cursor's `skills-cursor`); use `--target` or `--pointer <file>` for unlisted hosts.
-- `tests/test_skill_contracts.py` checks `references/routing.md` against the code: intent coverage, parameter ownership, write intents, community categories. A red test there means the document is stale, not that the check is too strict.
-- `tests/test_skill_install.py` checks the delivery layer: pointer idempotence, mirror sync, and that `config.ROUTING_GUIDE_URL` matches the installer's URL.
+- `tests/test_skill_contracts.py` checks `references/routing.md` against the code: intent coverage, parameter ownership, write intents, community categories. It also checks the render skill: every `tool(intent=…, 参数=…)` in it must exist, and every reference file must be linked from its `SKILL.md`. A red test there means the document is stale, not that the check is too strict.
+- `tests/test_skill_install.py` checks the delivery layer: pointer idempotence, mirror sync, that `config.ROUTING_GUIDE_URL` matches the installer's URL, and that every `skills/*/SKILL.md` folder is either installed or in the not-installed ledger.
 - `destiny_mcp/error_codes.py` is the only place `error.code` may come from: literal codes live in `ErrorCode`, exception classes are turned into codes by `code_for_exception()` (the class name *is* the contract), and write failures use `write_failed(intent)`. `tests/test_error_codes.py` rejects bare string codes and pins the exception→code mapping.
 - `destiny_mcp/vocabulary.py` is the only place Chinese labels live (six stats, classes, locations, elements, legacy stat names). Labels are the Manifest's official Chinese strings; input aliases may be many but must resolve to one key. `tests/test_vocabulary.py` pins the official names, checks aliases round-trip (legacy names must point at *existing* labels), and rejects re-copied tables.
 - `tests/test_conclusion_paths.py` guards diagnosis/conclusion output: a conclusion module may fall back to weaker wording, but never silently — the `except` must re-raise or leave a trace (append / reason / log). Add new conclusion modules to `_CONCLUSION_MODULES` there.

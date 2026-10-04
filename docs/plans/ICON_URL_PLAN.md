@@ -1,7 +1,6 @@
 # 图标 URL 全覆盖 + 模型侧 HTML 渲染（开发档案）
 
-状态：**两轮都已实现并验证**（第一轮：物品/装备/perk 的 `icon_url` 覆盖；第二轮：活动道 + Starside 相对路径 + `popularity` 统一）。§十 的 7 项拍板**已落地**（第 6 项按"不刷基线夹具"处理）。
-下一阶段：渲染 skill（见 §九）
+状态：**三轮都已实现并验证**（第一轮：物品/装备/perk 的 `icon_url` 覆盖；第二轮：活动道 + Starside 相对路径 + `popularity` 统一；第三轮：渲染 skill）。§十 的 7 项拍板**已落地**（第 6 项按"不刷基线夹具"处理）。
 最后更新：2026-10-04
 
 ---
@@ -220,28 +219,34 @@
 
 ---
 
-## 九、下一阶段：模型侧 HTML 渲染 skill
+## 九、模型侧 HTML 渲染 skill（**已交付**，2026-10-04 第三轮）
 
-**设想**：模型输出时**自己渲染 HTML** 在对话框里（豆包已经可以做到）。**渲染格式照老 web 写**（`~/项目/Destiny_MCP` 的 `webui/api/destiny_render_blocks.py` —— 那里已经有 `_icon()` / `_perk()` 这类渲染块构造器，是现成模板）。
+**设想**：模型输出时**自己渲染 HTML** 在对话框里（豆包已经可以做到）。**渲染格式照老 web 写**（`~/项目/Destiny_MCP` 的 `webui/api/destiny_render_blocks.py` —— 块构造器，另有 `webui/src/features/chat/DestinyBlocks.tsx` + `styles/app.css` 是同一套块的**样式与降级**出处）。
 
 ### 与图标覆盖的配套关系
 
 > **没有 `icon_url`，HTML 渲染就只有文字和色块。**（就是用户截图里 Starside 那条的症状。）
 
-**顺序：先补齐 `icon_url`（本轮，已做）→ 再写渲染 skill。**
+**顺序：先补齐 `icon_url`（第一/二轮，已做）→ 再写渲染 skill（本轮）。**
 
-### skill 要准备的三样
+### 交付物
 
-| # | 要什么 | 现状 |
+| # | 要什么 | 落在哪 |
 | --- | --- | --- |
-| 1 | **老 web 的渲染格式** | **已找到**（`webui/api/destiny_render_blocks.py`），可直接作为模板 |
-| 2 | **HTML 渲染的约定** | **待定**：允许哪些标签/内联样式、图片尺寸与降级（图挂了显示什么）、列表/卡片布局 |
-| 3 | **可用于渲染的字段表** | **待列**：`icon_url` 是基础；还有名字、类型、稀有度、能量、perk 列表……**不列清楚，模型会瞎猜** |
+| 1 | **渲染块与格式** | `skills/destiny2-render/references/blocks.md`（块骨架 + 每块字段表 + 降级） |
+| 2 | **HTML 渲染的约定** | `skills/destiny2-render/references/html-conventions.md`（标签/内联样式白名单、图标尺寸与降级、转义、布局、社区相对路径怎么挂） |
+| 3 | **字段表（可复跑核对）** | 同 `blocks.md` 的字段表，由 `scripts/verify_render_fields.py` 打真机逐条解析 |
+
+### 与老 web 的差异（都是被迫的，写清了理由）
+
+- **样式内联**：老 web 有自己的应用与样式表（`var(--…)`、`onError` 回调）；对话宿主不一定支持外链 CSS/`<style>`/脚本。所以 class 全部展开成内联字面值，图片降级改成"`<img>` 自带底色与尺寸"（图挂了是一个深色方块，不跳版）。
+- **`icon_url` 为空串**（本轮口径）→ 渲染同尺寸占位块，**不写 `<img src="">`**（老 web 的 `ItemIcon` 也是这个分支）。
+- **Starside 的 `assets/…` 相对路径不进 `<img src>`**：归档在服务器的 `<DATA_PATH>/starside/`，能挂静态目录的宿主自己拼挂载点；挂不了的（豆包这类）删掉图片片段留文字 —— 服务端刻意不给 `starside.work` 热链。
 
 ### 仓库规矩（做的时候必须遵守）
 
-- 新 skill 放 `skills/` 下 → **必须跑 `scripts/install_skill.py`**（不跑，宿主读的还是旧版）
-- 要**登记进契约与文档索引**（`tests/test_skill_contracts.py` + `AGENTS.md` 文档索引会**双向核对**，漏了会红）
+- 新 skill 放 `skills/` 下 → **必须跑 `scripts/install_skill.py`**；它现在按 `SKILL_NAMES` 装多份，**新目录要加进 `EXTRA_SKILLS`**（漏了不会报错但装不进去，`tests/test_skill_install.py` 会判红）。
+- 登记：`tests/test_skill_contracts.py`（渲染 skill 里每条 `tool(intent=…, 参数=…)` 都要真实存在、参考文档都要从 SKILL.md 指得到）。
 
 ---
 
