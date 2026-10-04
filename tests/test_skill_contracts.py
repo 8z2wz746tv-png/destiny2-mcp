@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import inspect
 import re
 from pathlib import Path
 
@@ -211,3 +212,83 @@ def test_behavior_cases_are_covered_by_the_routing_index() -> None:
     ]
 
     assert not missing, f"这些语料用例的路由没有写进索引：{missing}"
+
+
+# ── 渲染 skill：文档里的每个字段都得有出处，每条调用都得真的存在 ──────────────
+# `skills/destiny2-render/` 教模型把工具结果渲染成卡片。它和 routing.md 是同一类风险：
+# 文档写得挺细，但**字段名/调用写错了不会有任何报错** —— 模型会渲染出一张空白卡。
+# 这里把"每个字段的出处"当成数据读：出处的调用必须真的存在，参数必须是该 intent 认领的。
+# （字段路径本身能不能解析，只有真机知道：`scripts/verify_render_fields.py` 干那件事。）
+
+RENDER_ROOT = ROOT / "skills" / "destiny2-render"
+RENDER_CALLS = re.compile(r"\b(\w+_assistant)\(([^)\n]*)")
+RENDER_KWARG = re.compile(r"(\w+)\s*=")
+RENDER_INTENT = re.compile(r'intent="([^"]+)"')
+
+
+def _render_docs() -> list[Path]:
+    return sorted(RENDER_ROOT.rglob("*.md"))
+
+
+def _render_reference_files() -> set[str]:
+    return {path.name for path in (RENDER_ROOT / "references").glob("*.md")}
+
+
+def test_render_skill_has_its_entrypoints() -> None:
+    """渲染 skill 要能被宿主当成一份独立 skill 加载：frontmatter 对、参考文档都得从
+    SKILL.md 指得到（加了文档忘了指 = 模型永远读不到它）。"""
+    entry = RENDER_ROOT / "SKILL.md"
+    assert entry.is_file(), "渲染 skill 缺少 SKILL.md"
+    text = entry.read_text(encoding="utf-8")
+
+    assert text.startswith("---\nname: destiny2-render"), "frontmatter 的 name 要和目录名一致"
+    assert "description:" in text
+    for name in _render_reference_files():
+        assert f"references/{name}" in text, f"SKILL.md 没有指向 references/{name}"
+
+
+def test_render_skill_only_names_real_intents_and_parameters() -> None:
+    """文档里出现的每条 `tool(intent=…, 参数=…)` 都必须真实存在：
+
+    - 工具名必须是八个聚合工具之一；
+    - intent 必须是那个工具**声明**的；
+    - 参数必须真的在工具的签名里（写一个不存在的参数，宿主在 schema 层就被拒）；
+    - 每个参数必须是那个 intent **认领**的（传了不读的参数会被 `ignored_parameter` 拒掉，
+      文档里却写着它 —— 模型照抄就会吃一个拒绝）。
+
+    只解析文档（离线），不碰真机；字段路径能否解析由 `scripts/verify_render_fields.py` 负责。
+    """
+    declared = _declared()
+    signatures = {
+        name: set(inspect.signature(getattr(assistants, name)).parameters)
+        for name in TOOL_NAMES
+    }
+    problems: list[str] = []
+    seen = 0
+    for path in _render_docs():
+        for match in RENDER_CALLS.finditer(path.read_text(encoding="utf-8")):
+            tool, raw = match.group(1), match.group(2)
+            if tool not in TOOL_NAMES:
+                problems.append(f"{path.name}: 不是八个聚合工具之一：{tool}")
+                continue
+            intent_match = RENDER_INTENT.search(raw)
+            if intent_match is None:
+                problems.append(f"{path.name}: 调用没写 intent：{tool}({raw})")
+                continue
+            intent = intent_match.group(1)
+            seen += 1
+            if intent not in declared[tool]:
+                problems.append(f"{path.name}: {tool} 没有 intent={intent}")
+                continue
+            for name in RENDER_KWARG.findall(raw):
+                if name == "intent":
+                    continue
+                if name not in signatures[tool]:
+                    problems.append(f"{path.name}: {tool} 没有参数 {name}")
+                elif not contracts.intent_accepts_parameter(tool, intent, name):
+                    problems.append(
+                        f"{path.name}: {tool}(intent={intent}) 不读参数 {name}"
+                    )
+
+    assert seen >= 20, f"只解析到 {seen} 条调用，正则或文档结构变了，先看这里"
+    assert not problems, "渲染 skill 里的调用对不上代码：\n" + "\n".join(problems)

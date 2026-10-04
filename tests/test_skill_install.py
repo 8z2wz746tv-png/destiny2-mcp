@@ -308,3 +308,59 @@ def test_other_hosts_get_a_paste_ready_command(tmp_path: Path) -> None:
     for hint in (claude, codex):
         assert str(tmp_path.resolve()) in hint
         assert "destiny-mcp" in hint
+
+
+# ── 多份 skill：加一个目录就必须认领，否则它永远到不了宿主 ─────────────────────
+# `skills/` 下每份 skill 都是给宿主的文档。安装器只装它认识的目录 —— 漏认领**不会报错**，
+# 只会让宿主一直读旧内容（"文档改了但 agent 看到的还是旧版" 是这条规矩的由来）。
+# 这两条把它变成可执行断言：目录集合要等于认领名单，装完每份都要真的落地。
+
+#: 故意不随包安装的 skill：台账写明凭什么。**新增条目要给理由**，否则这条守门就退化成
+#: "把红改成绿"。
+SKILLS_NOT_INSTALLED = {
+    "destiny-mcp-setup": (
+        "安装/排障 skill：它讲的是「怎么把这套装起来」，按 README/AGENTS 从仓库路径读"
+        "（`skills/destiny-mcp-setup/SKILL.md`），装完就不需要它躺在宿主目录里。"
+    ),
+}
+
+
+def test_every_skill_folder_is_claimed_by_the_installer() -> None:
+    folders = sorted(path.parent.name for path in (ROOT / "skills").glob("*/SKILL.md"))
+    claimed = set(installer.SKILL_NAMES) | set(SKILLS_NOT_INSTALLED)
+
+    assert folders, "skills/ 下一份 skill 都没有？先看 glob"
+    assert set(folders) == claimed, (
+        "skills/ 下的目录与 install_skill.SKILL_NAMES/EXTRA_SKILLS 不一致："
+        f"目录 {folders}，认领 {sorted(claimed)}"
+    )
+    assert not set(installer.SKILL_NAMES) & set(SKILLS_NOT_INSTALLED), (
+        "同一份 skill 不能既认领又不装"
+    )
+
+
+def test_install_skills_lands_every_skill_in_a_sibling_directory(tmp_path: Path) -> None:
+    """`install_skills` 的入参是**主 skill 的落点**，同级 skill 装到兄弟目录。"""
+    target = tmp_path / "skills" / installer.SKILL_NAME
+
+    installer.install_skills([target], dry_run=False)
+
+    for name in installer.SKILL_NAMES:
+        assert (tmp_path / "skills" / name / "SKILL.md").is_file(), f"{name} 没装上"
+
+
+def test_render_skill_payload_is_host_neutral_and_portable() -> None:
+    """渲染 skill 也要能装到任何机器：frontmatter 不带平台字段，正文不写本机绝对路径。"""
+    root = ROOT / "skills" / "destiny2-render"
+    entry = (root / "SKILL.md").read_text(encoding="utf-8")
+    header = entry.split("---", 2)[1]
+
+    assert "name: destiny2-render" in header
+    assert "description:" in header
+    for platform_specific in ("allowed-tools", "openai", "codex"):
+        assert platform_specific not in header.lower()
+
+    for path in sorted(root.rglob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        assert str(Path.home()) not in text, f"{path.name} 里有本机 home 路径"
+        assert "/Users/" not in text, f"{path.name} 里有本机绝对路径"
