@@ -276,16 +276,18 @@ def test_offline_write_run_wires_ctx_through_the_whole_write_path(
     """离线跑通**整条写段的接线**：存快照 → 写入 → 自动还原 → 逐槽 diff。
 
     `OfflineStub` 的四个入口都要求 `ctx`（照活体签名收严），所以任何一处漏传在离线就是
-    `TypeError` —— 不必再拿账号去换这条证据。`read_armor_state` 换成假读数：它走
-    `owner._resolver`（真网络），而这条测试要一直保持零网络。
+    `TypeError` —— 不必再拿账号去换这条证据。
+
+    "读账号现场"这一处：脚本的 `--offline` 自己就换成了空现场（`read_armor_state_offline`），
+    因为真读数走 `owner._resolver`（真凭据 + 真网络）。这里把真实读数钉成**一调就炸**，
+    守住"离线段不许碰真读数"这条 —— 换成"回一份假数据"就守不住它（漏接回来照样绿）。
     """
     module = _load_module()
 
-    async def fake_read_armor_state(owner: object, player: str, character: str, char_id: str,
-                                    *, equipped_only: bool) -> dict:
-        return {"char_id": "", "pieces": {}}
+    async def no_real_armor_read(*args: object, **kwargs: object) -> dict:
+        raise AssertionError("--offline 不该调用真实读数 read_armor_state（那是真凭据 + 真网络）")
 
-    monkeypatch.setattr(module, "read_armor_state", fake_read_armor_state)
+    monkeypatch.setattr(module, "read_armor_state", no_real_armor_read)
 
     seen: list[object] = []
 
@@ -327,17 +329,17 @@ def test_manual_restore_hint_survives_a_raising_restore(
     该怎么办"一个字都没留下**。提示必须由快照 id 存不存在来判，不能由"回执说 ok"来判。
 
     复现方式：把 `restore_snapshot` 换成会抛的替身（离线、零网络），跑的就是 `run()` 本身。
+    真实读数（`read_armor_state`）同样钉成"一调就炸"：这条也必须是零网络、零凭据的一趟。
     """
     module = _load_module()
 
-    async def fake_read_armor_state(owner: object, player: str, character: str, char_id: str,
-                                    *, equipped_only: bool) -> dict:
-        return {"char_id": "", "pieces": {}}
+    async def no_real_armor_read(*args: object, **kwargs: object) -> dict:
+        raise AssertionError("--offline 不该调用真实读数 read_armor_state（那是真凭据 + 真网络）")
 
     async def boom(*args: object, **kwargs: object) -> dict:
         raise AttributeError("'NoneType' object has no attribute 'request_context'")
 
-    monkeypatch.setattr(module, "read_armor_state", fake_read_armor_state)
+    monkeypatch.setattr(module, "read_armor_state", no_real_armor_read)
     monkeypatch.setattr(module, "restore_snapshot", boom)
 
     out_path = tmp_path / "segments.json"

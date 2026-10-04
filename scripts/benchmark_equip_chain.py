@@ -25,6 +25,10 @@
     .venv/bin/python scripts/benchmark_equip_chain.py --help
     .venv/bin/python scripts/benchmark_equip_chain.py                 # 只读：find + 确认回显
     .venv/bin/python scripts/benchmark_equip_chain.py --write         # 真写一次并分段计时
+
+`--offline`（隐藏开关，给冒烟测试与人工验收用）是**零网络、零凭据**的一趟：四个工具入口换成
+`OfflineStub`、读账号现场换成空现场、服务容器也不建真实客户端（不读 `.env`/token，Manifest 也不下）。
+干净克隆（没有 `.env`）里必须跑得起来 —— 那正是这条开关存在的意义：它验的是"接线"，不是账号。
 """
 
 from __future__ import annotations
@@ -36,6 +40,8 @@ import inspect
 import json
 import time
 from collections import OrderedDict
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -190,6 +196,58 @@ class OfflineStub:
     async def subclass_assistant(self, *, ctx: Any, **kwargs: Any) -> dict:
         self.calls.append({"tool": "subclass_assistant", **kwargs})
         return {"ok": True, "data": {}}
+
+
+class _OfflineEquipment:
+    """`--offline` 下 `equip`（= `build_svc._equipment`）的替身：**碰真账号就炸**。
+
+    `run()` 只从服务容器拿这一个属性，而离线段连它都不该用（读现场已经换成
+    `read_armor_state_offline`）。所以这里**一个属性都不提供**：哪天有人把真读数接回
+    离线段，拿到的是本文件里这句写明原因的错误，而不是
+    `AttributeError: 'NoneType' object has no attribute '_resolver'` 那种看不出所以然的崩。
+    """
+
+    def __getattr__(self, name: str) -> Any:
+        raise RuntimeError(
+            f"--offline 不该走真实账号路径（equip.{name}）—— 这一趟的语义是零网络、零凭据"
+        )
+
+
+class _OfflineBuildService:
+    """`build_svc` 的离线替身：只给 `run()` 真正会读的那一个属性。"""
+
+    _equipment = _OfflineEquipment()
+
+
+@asynccontextmanager
+async def offline_service_context() -> AsyncIterator[dict[str, Any]]:
+    """`--offline` 的服务容器替身：**不建真实客户端、不读 OAuth、一次网络都不打**。
+
+    为什么不能照用 `app_lifespan(create_server())`：那条路第一件事就是 `BungieClient().start()` ——
+    `config.validate_credentials()` 要 `.env`、落盘 token 二选一，干净克隆（没有 `.env`）直接
+    `AuthenticationError`；就算有凭据，紧接着 `manifest.ensure_loaded()` 在本地没有 Manifest 缓存时
+    还要下几十 MB。于是"零网络、只走替身"的 `--offline` 反倒成了最需要凭据与网络的那种跑法。
+    2026-10-04 实测：干净树里 `tests/test_benchmark_equip_chain_smoke.py` 有 3 条就死在这儿，
+    子进程 stderr 是 `OAuth setup required`，最后两帧是 `raise SystemExit(main())` 与
+    `AuthenticationError: No valid Destiny OAuth tokens found`。
+
+    离线段真正从 `svc` 拿的只有 `build_svc._equipment` 一个属性（`_patch_instrumentation` 与
+    `verify_character` 都只在活体那半跑），所以替身给到这一个是够的 —— 给的也就只有它。
+    """
+    yield {"build_svc": _OfflineBuildService()}
+
+
+async def read_armor_state_offline(
+    owner: Any, player: str, character: str, char_id: str, *, equipped_only: bool
+) -> dict[str, Any]:
+    """`--offline` 的"读账号现场"替身：回一份**空现场**，形状与 `read_armor_state` 一致。
+
+    离线没有账号可读 —— 真读数要 `owner._resolver`（真凭据 + 真网络）。但存快照之后的现场、
+    逐槽 diff、位置缺口那几段要的是同一个形状，所以给 `{"char_id": …, "pieces": {}}` 这份
+    "一件都没有"的现场，让整条写段的接线照跑（替身不打网络，本来也就读不出件）。
+    参数一个都不用：替身就是"这一趟没有账号"这件事本身。
+    """
+    return {"char_id": str(char_id), "pieces": {}}
 
 
 def _here() -> str:
@@ -991,7 +1049,13 @@ async def run(args: argparse.Namespace) -> int:
         patch_profile_fetch()
         patch_resolver()
 
-    async with app_lifespan(create_server()) as svc:
+    # `--offline` 的两处替换都在这儿，别塞回下面：服务容器（不建真实客户端 = 不要凭据、不下 Manifest）
+    # 与"读账号现场"（真读数走 `owner._resolver` = 真凭据 + 真网络）。剩下那几处 `args.offline`
+    # 分支只关掉计时挂点与角色核对，本来就碰不到网络。
+    context = offline_service_context() if args.offline else app_lifespan(create_server())
+    read_state = read_armor_state_offline if args.offline else read_armor_state
+
+    async with context as svc:
         ctx = type("C", (), {"request_context": type("R", (), {"lifespan_context": svc})()})()
         equip = svc["build_svc"]._equipment
         build_svc = svc["build_svc"]
@@ -1100,10 +1164,10 @@ async def run(args: argparse.Namespace) -> int:
                 )
             # 写前拍**全账号**位置图（不只是身上那五件）：为腾能量被搬走的件会离开这一位，
             # 只读身上就看不见它原本在哪 —— 而"搬回原处"正是已知缺口要报的东西。
-            armor_before = await read_armor_state(
+            armor_before = await read_state(
                 equip, args.player, args.character, char_id, equipped_only=False
             )
-            equipped_before = await read_armor_state(
+            equipped_before = await read_state(
                 equip, args.player, args.character, char_id, equipped_only=True
             )
 
@@ -1179,7 +1243,7 @@ async def run(args: argparse.Namespace) -> int:
             # ── 安全网 3：独立回读 + 逐槽 diff ───────────────────────
             print("\n【安全网】独立回读（inventory_assistant intent=mods）→ 逐槽 diff")
             try:
-                live_after = await read_armor_state(
+                live_after = await read_state(
                     equip, args.player, args.character, char_id, equipped_only=False
                 )
                 armor_after = live_after
