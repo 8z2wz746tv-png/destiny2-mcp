@@ -19,10 +19,13 @@
    字面量的节点，再看它绑给了谁 —— 绑定名/字典键/关键字实参里带 `icon` 的判红。
    不看在哪儿出现、只看"结果是不是当图标在用"，所以 `bungie_client` 的
    `f"https://www.bungie.net{world_url}"`（Manifest 资源地址，不是图标）不在此列。
-2. **身份行必须带 `icon_url`**（`test_identity_rows_carry_icon_url`）：**四种**形状
-   （字典字面量 / 键清单常量 / `Model(...)` 构造调用 / **模型类的字段声明**）同时带
-   **名字键**与**身份 hash 键**时，必须也有 `icon_url`，除非登记在下面的 `_EXEMPT`
-   台账里（每条写明理由）。
+2. **身份行必须带 `icon_url`**（`test_identity_rows_carry_icon_url`）：**七种**形状
+   （字典字面量 / 键清单常量 / `Model(...)` 构造调用 / **模型类的字段声明** /
+   **逐次装配 `x.update(…)`+`x["k"]=v`** / **内联键清单** / **只有 `item_hash` 的字典字面量**）
+   同时带**名字键**与**身份 hash 键**时（后三种只需带身份 hash 键）必须也有 `icon_url`，
+   除非登记在下面的 `_EXEMPT` 台账里（每条写明理由）。后三种是 2026-10-05 补的，
+   每一种都对应一次"守门全绿、出口却没图"的现场（见各自 docstring 与
+   `docs/plans/ICON_URL_PLAN.md` §十四）。
 3. **活动身份行另算一套**（`test_activity_rows_carry_icon_url`）：带 `activity_name`/`activity`
    的行（活动、副本、PvP 场次）也必须带 `icon_url`。**为什么单列**：那类图标不是物品图，
    走的是另一条道（`pgcrImage`），用物品道的判据扫不到、也守不住 —— 2026-10-04 的缺口
@@ -45,14 +48,15 @@
 
 - 只认**字面量**形状的行：经过 `{key: item.get(key) for key in KEYS}` 投影出来的行，
   只有 `KEYS` 常量本身在扫描范围内（`_ROW_ITEM_FIELDS` 就是这么被抓到的）；
-- **`dict.update(**kwargs)` 这种"逐次装配"的行扫不到**（`loadout_service._build_template` 的
-  `class_data.update(subclass_item_hash=…, icon_url=…)` 就是这种形状）—— 2026-10-05 是靠人核
-  发现的，不是守门抓的；下次要收它得再加一种形状；
+- **`dict.update(**kwargs)` 这种"逐次装配"的行**：2026-10-05 收进第 5 种形状
+  （`_assembly_rows`）—— `loadout_service._build_template` 的
+  `class_data.update(subclass_item_hash=…, icon_url=…)` 当初是靠人核发现的，不是守门抓的；
 - 名字/hash 键表是**封闭词表**（见 `_NAME_KEYS` / `_HASH_KEYS`），换个键名就漏
   （2026-10-05 收进了 `subclass_name`/`subclass_hash` 与裸 `hash`；`record_hash`/`tier_hash`
   一类仍刻意在外）；
 - 只扫 `destiny_mcp/**`：`legacy/`（历史存档，不进包）与 `tests/` 不在范围内；
-- 不检查运行期拼装（例如把行交给另一个函数再补键）。
+- **跨函数/跨语句拼装**仍扫不到：一个函数返回名字、调用方再补 hash（或反过来），
+  以及 `Model(**row)`、`{**base, …}` 这类运行期合并 —— 判据只在**同一个函数内**聚合。
 """
 
 from __future__ import annotations
@@ -87,8 +91,32 @@ _NAME_KEYS = {"name", "plug_name", "item_name", "set_name", "perk_name", "subcla
 #: 2026-10-05 把这个理由**实测**了一遍（`_HASH_KEYS | {"hash"}` 跑一次扫描）：全仓只多出
 #: **21** 行，**没有一行**是套装层级/记录/档位表，全是 `{hash, name}` 形状的物品身份行。
 #: 所以假设不成立，裸 `hash` 一并收进来 —— 收进来之后那 21 行要么补图、要么进台账写清理由。
+#:
+#: 同日第二次扩表（**"逐次装配"那条判据的注入验证逼出来的**）：收进"物品/组件身份"那一族 ——
+#: `subclass_item_hash` / `plug_item_hash` / `new_plug_hash` / `enhanced_plug_hash` /
+#: `perk_hash` / `super_hash` / `grenade_hash` / `melee_hash` / `class_ability_hash` /
+#: `movement_hash`。**根因**：`loadout_service._build_template` 的
+#: `class_data.update(subclass_item_hash=…)` 写了 `icon_url` 却没人管 —— 不是因为形状漏了
+#: （第 5 种形状正好抓它），而是因为 `subclass_item_hash` **不在词表里**，判据根本认不出那是个
+#: 身份行。**先量后收**：这一族加进来全仓只多 **0** 行（都是已经带图的 build/subclass 行）。
+#: 同族里**故意不收**的（`name_hash`/`icon_hash`/`color_hash` 是配装外观标识、`vendor_hash`/
+#: `progression_hash`/`milestone_hash`/`metric_hash`/`node_hash`/`stat_hash`/`record_hash`/
+#: `tier_hash`/`with_hash` 不是物品）：实测收进来会多 **20** 行，其中 20 行全要写台账理由
+#: —— 那是把台账冲成噪声，不是覆盖（判据的价值在于"点名的每一行都能被核对"）。
 _HASH_KEYS = {"item_hash", "plug_hash", "itemHash", "plugItemHash", "set_hash",
-              "subclass_hash", "hash"}
+              "subclass_hash", "hash", "subclass_item_hash", "plug_item_hash", "new_plug_hash",
+              "enhanced_plug_hash", "perk_hash", "super_hash", "grenade_hash", "melee_hash",
+              "class_ability_hash", "movement_hash"}
+#: **光有 hash 也算身份行**的那一个键（2026-10-05 新增的判据）。
+#:
+#: 上面那套要求"名字键**和**身份 hash 键同时在"，因为只有 hash 的行未必是给人看的身份行
+#: （`{"plugItemHash": …}` 这种合成查询体到处都是）。但形状反过来漏掉了一整类真实出口：
+#: **副本行视图**每行只有"这把枪的实例 + 它属于哪个 hash"，名字在卡头说一次就够
+#: （`weapon_analysis_projection.compare_rows`）。真机实测：8 把同一个 hash 的行视图里
+#: `icon_url` 出现 **0** 次，而静态守门全绿 —— 因为它既没有名字键、hash 键也没配名字键。
+#: 只收 `item_hash`（"这是哪件物品"最强的那一个），不收 `plug_hash`/裸 `hash`：
+#: 后两者在全仓有 17 处是**取数中间体**（合成查询体、求解器入参），收进来只是台账噪声。
+_ITEM_IDENTITY_KEYS = {"item_hash"}
 #: 活动/副本身份行的键（与物品那套**分开**：它们的图标走另一条道，见模块开头第 3 条）
 _ACTIVITY_NAME_KEYS = {"activity_name", "activity"}
 _ICON_KEYS = {"icon_url", "iconUrl"}
@@ -174,6 +202,19 @@ _EXEMPT: dict[str, str] = {
     "destiny_mcp/build/process_types.py::ProcessItem": "求解器内部模型（同上，字典形状那条也登记着）",
     "destiny_mcp/build/tuning.py::TuningChoice": "求解器内部模型（`build_projection` 投影成候选行，那一层有图）",
     "destiny_mcp/build/tuning.py::PieceTuning": "求解器内部模型（同上）",
+    # ── ⑦ 2026-10-05 收进"只有 `item_hash` 的字典字面量"之后新进扫描面的 5 行 ──────
+    # 这条判据是为了**副本行视图**（每行只有"是哪一件"、名字在卡头说一次）才加的：
+    # 真机实测 8 行副本里 `icon_url` 出现 0 次而守门全绿。下面是它顺带扫出来的全部行，
+    # 逐条核过 —— 都是**取数/指纹的中间产物**，没有任何一行进响应。
+    "destiny_mcp/build/snapshot_version.py::snapshot_version": "库存指纹的输入行（`json.dumps` 成版本号给 `CanonicalBuild.snapshot_version`），不进响应",
+    "destiny_mcp/services/pvp_weapon_service.py::get_pvp_weapon_board": "逐场累计的暂存表 `totals`；出口行在同一函数下面另建（`name`/`icon_url` 都在）",
+    "destiny_mcp/services/weapon_compare_service.py::compare_weapon_instances": "`weapon_instances` 的收集行（146–185 两处），出口行在 `weapon_analysis_projection.compare_rows`（2026-10-05 起每行带图）",
+    "destiny_mcp/services/weapon_compare_service.py::_check_name_match": "同上：按名字兜底匹配时的收集行（`weapon_instances.append`），不进响应",
+    # ── ⑧ 同上，但形状是"逐次装配"（`x["k"] = v` 聚合成一行）───────────────────
+    # 这两行的**共同点**：`icon_url` 由**另一个具名工厂**放进对象，装配语句只补别的键 ——
+    # 静态扫描看不见"那个工厂给了什么"，所以只能逐条登记（两处都在真机响应里核过）。
+    "destiny_mcp/services/weapon_popularity_service.py::_weapon_identity()::block": "身份块由 `weapon_payload.lean_identity` 造（`LEAN_IDENTITY_KEYS` 含 `icon_url`，真机 `data.weapon.icon_url` 非空）；这里只覆盖 `item_hash` 与版本标签",
+    "destiny_mcp/services/weapon_popularity_service.py::_enrich_entry()::result": "定义级 perk 行，**按口径不带图**（§十 第 4 项；两条路一致由 `test_popularity_paths_agree_on_perk_rows` 钉住）：`plug_hash` 在这里补，图故意不给",
 }
 
 
@@ -380,11 +421,144 @@ def _model_identity_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
     return rows
 
 
+def _update_call_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
+    """**逐次装配**的第一半：`x.update(name=…, item_hash=…)`（关键字或字典实参）。
+
+    第 5 种形状，2026-10-05 收进来（用户点名的那个盲区）：`loadout_service._build_template`
+    的 `class_data.update(subclass_item_hash=…, icon_url=…)` 是靠**人核**发现的 ——
+    它既不是字典字面量、也不是构造调用，前四种形状一个都扫不到。
+
+    **按"每一次 update 调用"判，不按目标对象聚合**。理由是这个文件里真实的形状：
+    `class_data` 有两条**互斥分支**各 update 一次（组件 310 那条、`subclass_config` 那条），
+    聚合的话"其中一条漏了图"会被另一条盖住 —— 注入验证会假绿，而运行期那一支真的没有图。
+    代价：如果图是在**另一条语句**里补的（`x["icon_url"] = …` 之后
+    `x.update(name=…, item_hash=…)`），这一条会误报，登记台账或把图并进同一次调用即可。
+    """
+    owner = _functions(tree)
+    rows: list[tuple[str, int, set[str]]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if not (isinstance(func, ast.Attribute) and func.attr == "update"):
+            continue
+        keys = {kw.arg for kw in node.keywords if kw.arg}
+        for arg in node.args:
+            if isinstance(arg, ast.Dict):
+                keys |= _dict_keys(arg)
+        if (keys & _HASH_KEYS) and not (keys & _ICON_KEYS):
+            rows.append((f"{owner.get(id(node), '?')}()::{_target_name(func.value)}.update",
+                         node.lineno, keys))
+    return rows
+
+
+def _target_name(node: ast.AST) -> str:
+    """`x` / `self.row` 这种被装配的对象的可读名字（认不出给 `?`，不猜）。"""
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return f"{_target_name(node.value)}.{node.attr}"
+    return "?"
+
+
+def _subscript_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
+    """**逐次装配**的第二半：`x["name"] = …` / `x["item_hash"] = …`。
+
+    这一半必须按 **(函数, 目标对象) 聚合**：单看一条语句永远只有一个键，不聚合就一条都判不了。
+    动态键（`class_data[key] = …`，`key` 是循环变量）认不出，跳过 —— 不猜。
+
+    聚合的代价写在模块开头的边界里：同一目标上"图由另一条分支补"会被盖住。
+    """
+    owner = _functions(tree)
+    groups: dict[tuple[str, str], set[str]] = {}
+    lines: dict[tuple[str, str], int] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        for target in targets:
+            if not isinstance(target, ast.Subscript):
+                continue
+            key = target.slice
+            if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
+                continue
+            ident = (owner.get(id(node), "?"), _target_name(target.value))
+            groups.setdefault(ident, set()).add(key.value)
+            lines.setdefault(ident, node.lineno)
+    return [
+        (f"{func}()::{target}", lines[(func, target)], keys)
+        for (func, target), keys in groups.items()
+        if (keys & _HASH_KEYS) and not (keys & _ICON_KEYS)
+    ]
+
+
+def _assembly_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
+    """第 5 种形状的两半（`update` 调用 + 下标装配），键表与前四种一致。"""
+    return [*_update_call_rows(tree), *_subscript_rows(tree)]
+
+
+def _inline_key_list_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
+    """**内联**的键清单：`{k: row.get(k) for k in ("name", "item_hash")}`。
+
+    第 6 种形状。原来只认**命名**的键清单常量（`_ROW_ITEM_FIELDS = (…)`），
+    键清单写在字典推导的 `for … in (…)` 里就整片漏掉。2026-10-05 拿真实响应逆推时
+    抓到的第一个实例：`pattern_service` 的歧义候选行（`patterns` 出口的
+    `data.candidates[]`）投影时把 `icon_url` 丢了，而那个键清单正是内联元组。
+    """
+    owner = _functions(tree)
+    rows: list[tuple[str, int, set[str]]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.DictComp):
+            continue
+        for generator in node.generators:
+            source = generator.iter
+            if not isinstance(source, (ast.Tuple, ast.List, ast.Set)):
+                continue
+            keys = {
+                element.value
+                for element in source.elts
+                if isinstance(element, ast.Constant) and isinstance(element.value, str)
+            }
+            if (keys & _HASH_KEYS) and not (keys & _ICON_KEYS):
+                rows.append((owner.get(id(node), "?"), node.lineno, keys))
+    return rows
+
+
+def _item_hash_only_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
+    """**只有 `item_hash`** 的字典字面量（没有名字键）—— 第 7 种形状。
+
+    为什么单列：前面几条都要求"名字键**和**身份 hash 键同时在"，于是漏掉了
+    "名字在卡头说一次、每行只报是哪一件"这种**行视图**。真机实测就是用户实拍那一张：
+    `weapon_assistant(intent="compare")` 的 8 行副本里 `icon_url` 出现 **0** 次，
+    而守门全绿（那几行没有名字键，hash 键也没配名字键）。
+    只收 `item_hash`：`plug_hash`/裸 `hash` 有十几处是取数中间体（合成查询体、求解器入参），
+    收进来是台账噪声，不是覆盖（见 `_ITEM_IDENTITY_KEYS` 的注释）。
+    只扫**字典字面量**：`get_icon_url(item_hash=…)` 这种**调用**不是行。
+    """
+    owner = _functions(tree)
+    rows: list[tuple[str, int, set[str]]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Dict):
+            continue
+        keys = _dict_keys(node)
+        # 带名字键的行归前四种形状管（否则同一行会被报两遍）
+        if not (keys & _NAME_KEYS) and (keys & _ITEM_IDENTITY_KEYS):
+            rows.append((owner.get(id(node), "?"), node.lineno, keys))
+    return rows
+
+
 def _identity_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
-    """(kind, lineno, keys)：**四种**身份行 —— 字典字面量、键清单常量、构造调用、模型类。"""
+    """(kind, lineno, keys)：**七种**身份行形状。
+
+    字典字面量 / 键清单常量 / 构造调用 / 模型类 / 逐次装配 / 内联键清单 / 只有 `item_hash`。
+    后三种是 2026-10-05 补的，各有一次"守门全绿但出口缺图"的现场（见各自 docstring）。
+    """
     owner = _functions(tree)
     rows: list[tuple[str, int, set[str]]] = list(_keyword_identity_rows(tree))
     rows.extend(_model_identity_rows(tree))
+    rows.extend(_assembly_rows(tree))
+    rows.extend(_inline_key_list_rows(tree))
+    rows.extend(_item_hash_only_rows(tree))
     for node in ast.walk(tree):
         if isinstance(node, ast.Dict):
             keys = _dict_keys(node)
