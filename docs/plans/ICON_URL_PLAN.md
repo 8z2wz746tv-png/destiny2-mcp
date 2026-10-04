@@ -1,6 +1,6 @@
 # 图标 URL 全覆盖 + 模型侧 HTML 渲染（开发档案）
 
-状态：**图标覆盖已实现并验证，未提交**（HEAD `dff38c7` + 工作区 41 改 / 6 新）
+状态：**两轮都已实现并验证**（第一轮：物品/装备/perk 的 `icon_url` 覆盖；第二轮：活动道 + Starside 相对路径 + `popularity` 统一）。§十 的 7 项拍板**已落地**（第 6 项按"不刷基线夹具"处理）。
 下一阶段：渲染 skill（见 §九）
 最后更新：2026-10-04
 
@@ -66,8 +66,12 @@
 新增 `destiny_mcp/utils/icons.py`：
 
 - `BUNGIE_ORIGIN` —— **全仓唯一**的源站字面量
-- `icon_url(value)` —— 把 `displayProperties.icon` 的相对路径变成绝对地址；已是绝对地址则原样放过
-- `is_bungie_icon(url)` —— 白名单判据（照老 web 消费侧口径）
+- `icon_url(value)` —— 把相对路径变成绝对地址；已是绝对地址则原样放过（**两条道共用的归一**）
+- `is_bungie_icon(url)` / `is_bungie_activity_image(url)` / `is_bungie_image(url)` —— 形状判据（物品图与活动图**两条前缀**，不合成一条宽前缀）
+
+**出口函数**只有一个：`manifest_lookup.get_icon_url(*, item_hash=…, activity_hash=…)`，
+内部两条道（`_activity_image_path` 走活动表、`get_item_info` 走物品表）。活动道还要
+"从一组 hash 里挑第一个查得到图的"（副本有多个难度档）：`first_activity_with_icon`。
 
 `manifest_data.BUNGIE_BASE_URL` 改成**再导出**同一份字面量。
 
@@ -75,9 +79,17 @@
 
 ### 体量：先抽代码，上限只降不抬
 
-新增 3 个小模块 + 2 处搬家：`services/inventory_lookup.py`（`locate_instance`）、`services/pattern_records.py`（`cell/merge_cell`）、`services/rotation_tables.py`（`lost_sector_block`）、`_tuning_rows` → `build_results.tuning_rows`、`crafting_sources_block` → `tools/_farming.py`。
+第一轮：新增 3 个小模块 + 2 处搬家：`services/inventory_lookup.py`（`locate_instance`）、`services/pattern_records.py`（`cell/merge_cell`）、`services/rotation_tables.py`（`lost_sector_block`）、`_tuning_rows` → `build_results.tuning_rows`、`crafting_sources_block` → `tools/_farming.py`。
 
-上限随之**收紧**：`build_projection 137→120`、`inventory_service 783→762`、`pattern_service 488→465`、`rotation_service 313→300`、`_patterns_branches 215→200`。**一处理都没抬。**
+第二轮（补活动道时）：`services/pvp_match_tally.py`（PvP 榜的两张身份表）、
+`rotation_service._tables_block` → `rotation_tables.tables_block()`、
+`raid_report_service` 的组件读法 → `activity_counters_service.metric_progress`（顺带消掉
+**同一组件两份读法**）。
+
+上限随之**收紧**：`build_projection 137→120`、`inventory_service 783→762`、`pattern_service 488→465`、
+`rotation_service 313→300→285`、`_patterns_branches 215→200`、`raid_report_service 269→268`、
+`pvp_weapon_service 434→429`。**一处理都没抬。**
+
 
 ---
 
@@ -113,15 +125,20 @@
 
 ## 六、守门
 
-`tests/test_icon_url_output.py`，5 条：
+`tests/test_icon_url_output.py`，**10 条**（前 5 条是 2026-10-04 第一轮，后 5 条是同日补活动道时加的）：
 
 1. `test_no_second_icon_url_constructor` —— 谁再自己拼 Bungie 图标 URL 就红（判据：f-string / `+` 拼接里含 `bungie.net` 字面量，且绑给 `icon*` 名字 / `icon*` 字典键 / `icon*` 关键字实参）
 2. `test_the_icon_source_is_the_only_place_with_the_origin_literal` —— 源站字面量只许在 `utils/icons.py`
-3. `test_identity_rows_carry_icon_url` —— **三种**身份行（字典字面量 / 键清单常量 / `Model(item_hash=…, name=…)` 构造调用）必须带 `icon_url`，否则进 29 条 `_EXEMPT` 台账
+3. `test_identity_rows_carry_icon_url` —— **三种**身份行（字典字面量 / 键清单常量 / `Model(item_hash=…, name=…)` 构造调用）必须带 `icon_url`，否则进 25 条 `_EXEMPT` 台账
 4. `test_icon_exemption_ledger_is_not_stale` —— 台账条目过期也判红
 5. `test_recorded_baselines_use_openable_bungie_icon_urls` —— 基线里每个非空 `icon_url` 必须是 `is_bungie_icon()` 认可的地址
+6. `test_activity_rows_carry_icon_url` —— **活动/副本身份行**（带 `activity_name`/`activity` 的行）必须带 `icon_url`，**没有台账**（每一行都是真实活动，给不出图就是漏了）
+7. `test_activity_images_come_from_the_activity_lane` —— `pgcrImage` 在全仓**只有** `manifest_lookup.py` 读（按"代码里的字符串字面量"判，docstring 里提它不算）
+8. `test_the_two_lanes_are_dispatched_by_definition_table` —— 出口按**表**分道：活动 hash 去物品表会当场断言失败；`pgcrImage` 优先、占位横幅退到 `displayProperties.icon`、两个哨兵都给空串
+9. `test_popularity_paths_agree_on_perk_rows` —— 同一个 `popularity` intent 的两条路 perk 行**同一套键**（下次再漂就红）
+10. `test_duplicates_perk_rows_stay_lean_by_volume` —— `duplicates` 的 perk 行正面钉在 `{name, slot}`（体积口径，不是忘了）
 
-### 注入矩阵（6 种全咬红，`touch` + `PYTHONDONTWRITEBYTECODE=1`，恢复后 sha256/`cmp` 逐字节通过）
+### 注入矩阵（第一轮 6 种 + 本轮 4 种，全咬红；`touch` + `PYTHONDONTWRITEBYTECODE=1`，恢复后 sha256/`cmp` 逐字节通过）
 
 | 注入 | 结果 |
 | --- | --- |
@@ -131,12 +148,20 @@
 | 第二处源站字面量 | 红：`['weapon_profile.py', 'utils/icons.py']` |
 | 台账条目过期 | 红：点名 `build_results()→LoadoutItem` |
 | **全新模块里的新出口** | 红：`_probe_new_exit.py:8 new_weapon_rows` ← **证明能抓"以后新加的漏网出口"** |
+| 活动行去掉 `icon_url`（`activity_service` 的 history 行） | 红：点名 `activity_service.py:575 get_activity_history ['activity_name']` |
+| 第二处读 `pgcrImage` | 红：`['manifest_lookup.py', 'services/weapon_profile.py']` |
+| 两条道对调（活动 hash 走物品道） | 红：`AssertionError: 活动 hash 走进了 DestinyItemDefinition（不是活动道）` |
+| `popularity` 的 perk 行加回 `icon_url` | 红：键集合不一致（本地摘要 vs 选取率快照） |
+| `duplicates` 的 perk 行加 `icon_url` | 红：`duplicates 的 perk 行变胖了：['icon_url', 'name', 'slot']` |
+| Starside 图标退回"抹掉" | 红：`![](assets/…)` 断言失败 |
 
 ### 守门的已知边界（别当成"图标全查过了"）
 
 - 名字/hash 键表是**封闭词表**（**不含裸 `hash`**——那会把套装层级/记录/档位表全冲进来）
 - 只扫 `destiny_mcp/**`（`legacy/`、`tests/` 不在内）
 - **不追运行期拼装**
+- 活动行判据只看**字面量行**（`result["activity"] = …` 这种下标赋值扫不到）
+
 
 ---
 
@@ -157,22 +182,34 @@
 
 ---
 
-## 八、⚠️ 已知缺口：活动 / 副本的图标
+## 八、活动 / 副本的图标：**缺口已补**（2026-10-04 第二轮）
 
-**用户明确要求"活动/副本也带上"（突袭、地牢、PvP 场次），但清点表里没有这一类。**
+**用户明确要求"活动/副本也带上"（突袭、地牢、PvP 场次），第一轮清点表里没有这一类 —— 确实是漏了。**
 
-两种可能：做了没说，或者**漏了**。
+**两条道是这么分的**（共用一个出口函数 `manifest_lookup.get_icon_url()`，内部按参数分道）：
 
-**技术上必须走另一条道**：
+| 道 | 查什么 | 取哪个字段 | 谁在用 |
+| --- | --- | --- | --- |
+| **物品道**（`item_hash=`） | `DestinyInventoryItemDefinition` | `displayProperties.icon` | 武器、护甲、模组、perk、碎片、商品 |
+| **活动道**（`activity_hash=`） | `DestinyActivityDefinition` | `pgcrImage` →（占位时退）`displayProperties.icon` | 突袭、地牢、PvP 场次、里程碑/夜幕活动行 |
 
-| 道 | 查什么 | 例子 |
-| --- | --- | --- |
-| **物品道** | `hash → item definition → displayProperties.icon` | 武器、护甲、模组、perk、碎片、商品 |
-| **活动道** | `hash → activity definition → pgcrImage / activityIcon` | 突袭、地牢、PvP 场次 |
+活动道里那两条来源是**优先级**不是二选一：上游给 707 条活动塞了通用占位横幅
+（`/img/theme/destiny/bgs/pgcrs/placeholder.jpg`，**PvP 活动全在坑里**），占位与
+`missing_icon_d2.png` 两个哨兵都要往下退 —— 退不到就给空串，**不拿别的副本的图顶上**。
 
-**共用一个出口函数、内部走两条道**——硬塞进一条的结果是"物品都对、活动全裂图"，**而且裂得很难查**。
+### 覆盖到的出口
 
-**补的时候要单独验**：突袭 / 地牢 / PvP 各取一个出口，`curl` 一次。
+| 出口 | 加的字段 |
+| --- | --- |
+| `activity_assistant(intent="history")` | 每行 `activity_hash` + `icon_url`（与名字**同一个 hash**：`referenceId` 优先、退回 `directorActivityHash`） |
+| `activity_assistant(intent="pgcr")` | 顶层 `activity_hash` + `icon_url` |
+| `activity_assistant(intent="aggregate")` | 每行 `icon_url`（`activity_hash` 本来就有） |
+| `activity_assistant(intent="raid_report")` | 每行 `activity_hash` + `icon_url`（一个副本挂多个难度 hash → 取第一个**查得到图**的，**hash 与图同源**） |
+| `activity_assistant(intent="pvp_weapons")` | 新增 `activities[]`：本次分析里打过的活动（`activity_hash`/`name`/`icon_url`/`matches`） |
+| `world_assistant(intent="rotations")` | 里程碑 `activities[]` 与夜幕行各加 `icon_url` |
+| `activity_assistant(intent="weapon_history")` | 物品道改走同一个出口（顺手删掉一处 `get_item_info` + 自己拼 URL） |
+
+**真机验证**（三个出口各 `curl` 一次，见 §七 的验证表）。
 
 ---
 
@@ -201,25 +238,26 @@
 
 ---
 
-## 十、待拍板（含建议）
+## 十、7 项拍板 —— 结果（2026-10-04 第二轮，全部落地）
 
-| # | 事项 | 建议 |
+| # | 事项 | 拍板与落地 |
 | --- | --- | --- |
-| **1** | **Starside 社区资料给不给图** | **给，但给本地归档相对路径**（`assets/<topic>/icons/<hash>.webp`），**不给第三方外链**。理由：归档里有 **3767 个图标的绝对外链**（`data/starside/index.json`），**文件本地全在**（45 MB，`missing on disk: 0`）；但那是 `starside.work` 的外链、`redistribution_license: not_established`，热链 + 归因是授权问题。给相对路径就同时满足"按 hash 绑定"和"不越界"。<br>**另**：现在抹掉它们的 `services/starside_markup.py:82-84` 的注释写"那份资源没随归档给我们"——**这句已经不成立**，无论如何该改 |
-| **2** | 定义级 perk 池带不带图标 | **不带**。带 = **+13.2 KB/把**（P6 量过，三处测试钉着 `DEFINITION_ONLY_ABSENT`）。它是"**可能 roll 到什么**"、不是"你有这件"，**渲染价值低**；实例级 options **已经有图** |
-| **3** | `duplicates` 的 perk 行 | **不带**（现压成 `{name, slot}`，每实例 1.64 KB、占 91%；补图会破 20 KB 闸） |
-| **4** | `_popularity_summary` 的 perk 行没图，而**同一 `popularity` intent 的另一条路有** | **统一成不带**（按 #2 的口径）。**这是真不一致，不是有意为之**，已写进台账理由 |
-| **5** | 其余 25 条台账 | **接受**（每条写了理由、逐条可核） |
-| **6** | `tests/baselines/**` 要不要刷进本轮新键 | **待定**（夹具是冻结快照） |
-| **7** | 活动 / 副本图标 | **补**（见 §八） |
+| **1** | **Starside 社区资料给不给图** | **给相对路径**：`![](icons/<hash>.webp)` 不再抹掉，补成 `assets/<主题>/icons/<hash>.webp`（`services/starside_icons.py`）。理由写在那个模块开头：图标是本地文件（`missing on disk: 0`），而 `starside.work` 是第三方热链（`redistribution_license: not_established`）。**主题名从 `index.json` 反查**：同一 hash 出现在多个主题下时取字典序最小者（实测这 90 个多主题 key 的**字节完全相同**，所以不影响渲染）。那句过期注释（"那份资源没随归档给我们"）已改成真实原因 |
+| **2** | 定义级 perk 池带不带图标 | **不带**。带 = **+17 KB/把（图标 13.2 + 描述 4.0，P6 实测）**，出处 `docs/plans/WEAPON_FORMAT_PLAN.md:360`。台账理由已按这个口径重写（原来写的是"P6 体积口径"这种不点数的说法） |
+| **3** | `duplicates` 的 perk 行 | **不带**。每实例 1.81 KB 里 perk 占 **1.64 KB（91%）**，`limit=5` 有 **20 KB 闸**（`docs/adr/021…:15`、`RESPONSE_PROJECTION_PLAN.md:12`）。**正面钉住**：`test_duplicates_perk_rows_stay_lean_by_volume` |
+| **4** | `popularity` 两条路不一致 | **统一成不带**：`weapon_popularity_service._enrich_entry` 不再给 `icon_url`（连带 `popular_combinations[].perks[]`）。**守门**：`test_popularity_paths_agree_on_perk_rows` 比两条路的键集合 |
+| **5** | 其余台账 | **接受**：25 条，每条都在 `_EXEMPT` 里写明"是什么、凭什么不给图"。台账顶部单列了**两类不在扫描面里的**（定义级池 / duplicates 的 perk 行）与它们的正面守门 |
+| **6** | `tests/baselines/**` 要不要刷进本轮新键 | **没做**（仍是冻结快照）：它们只覆盖武器/护甲响应，与活动道无关；相关测试本来就绿 |
+| **7** | 活动 / 副本图标 | **已补**（见 §八） |
 
 ---
 
 ## 十一、副作用与工位卫生
 
-- **`data/dim_wishlists.json`**：跑真机时生成，**未跟踪且 `.gitignore` 没覆盖该路径**（现有规则只覆盖 `destiny_mcp/data/dim_wishlists.json`）。它是 DIM 愿单缓存的正常产物 → **建议 `.gitignore` 补一行**。
-- 工作区：41 改 + 6 新，**未提交**；`skills/**` 与未跟踪的 `showreel/` 未碰。
+- **`data/dim_wishlists.json`**：跑真机时生成，未跟踪。`.gitignore` 已补 `data/dim_wishlists.json`（原来只盖住了包内那份 `destiny_mcp/data/dim_wishlists.json`）。
+- 工作区（第一轮）：41 改 + 6 新；第二轮又动了活动道 / Starside / popularity / 守门 / 文档，**按主题拆成多条提交**。
 - 本轮操作中出现过两次失误（一个 shell 注入函数参数写错，在仓库根留下 4 个 0 字节怪名文件；同一次导致注入未自动恢复），**均已在核对绝对路径后复原并逐字节核对**。
+
 
 ---
 
