@@ -592,4 +592,19 @@ MCP 是长驻进程。**第一次复现时两个出口都没有 `icon_url`，但
 
 ### 14.7 本轮验证
 
-见 §十五（下面那张表按实跑结果填）。
+| 项 | 结果 |
+| --- | --- |
+| `ruff check`（`destiny_mcp tests scripts skills`） | 全过（仓库根的 `ruff check .` 只报未跟踪的 `showreel/`，那个目录没碰） |
+| 开发机全量 `pytest -q` | **2017 passed**（基线 2016 + 本轮新增 1 条 `test_ambiguous_candidates_carry_the_icon`） |
+| **干净树**（`git archive HEAD`、`env -i`、干净 HOME、**无 `.env`**、`PYTHONPATH` 钉住临时树） | `import destiny_mcp.server` OK + **1999 passed / 18 skipped**（= 2017 − 18 条要本地 `manifest/*.sqlite3` 的，**没有新增跳过**） |
+| 语料 runner | **266 PASS / 3 INFO / 0 FAIL / 0 SKIP**（269 行 = 基线 268 + 本轮新增的 compare 行视图那条；新那条的明细：`武器=M-17“快嘴” 把数=5 卡头=43f387aeede8d4c7b9bb.jpg 缺图=[] 同 hash 多图={}`） |
+| **受控基线 diff（`env={**os.environ}` 两侧同源）** | 武器面 27 例：**`compare` +4 条路径**（`instances[].icon_url`/`instances[].item_hash`/`weapon.icon_url`/`weapon.item_hash`），**消失路径 0**；护甲面 23 例：只有 `execution_id`/`next_actions[]` 这类既有非确定性值变化，**消失路径 0** |
+| 假绿对照（任务 4 的现场证据） | 同一棵树、同一条命令：**不带 `env`** 的旧脚本 → "改动前" capture 里 `icon_url` 出现 **3** 次、行里有 `icon_url`+`item_hash`（跑的是工作区新代码）；**带 `env={**os.environ}`** → `icon_url` **0** 次、行是旧键集合 |
+| 渲染字段表（`scripts/verify_render_fields.py`） | **377 条解析成功 / MISSING 0**（含本轮新写进 skill 的 4 条），EMPTY 2、条件字段这次没有 4 |
+| 注入矩阵 | 11 条全部咬红并逐字节恢复（在**最终提交的字节**上重跑过一遍，见 14.4） |
+| 真机出口 | `compare` 行视图：`icon_url` 0 → **6** 次、9,008 → **9,788 B**、行里缺图 5/5 → **0/5**、同一 hash 无多图；图 `curl` **200 + image/jpeg（4,228 B）** |
+
+**本轮没做的（如实记）**：`duplicates` 实例行**没有加字段**（14.2 的体积账与方案等拍板）；
+`loadout_assistant(intent="list")` 的行（整包 0 个 `icon_url`）、`rotations` 的轮换行头、
+`vendor` 的 `icon`（实测读的是定义里**不存在**的字段，永远空串 —— 供应商定义给的是
+`largeIcon`/`originalIcon`）这三处是"逆推扫出来、但这轮没动"的候选，需要先拍板"这一行该给哪张图"。
