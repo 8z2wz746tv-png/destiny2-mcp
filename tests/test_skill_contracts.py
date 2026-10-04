@@ -300,29 +300,47 @@ def test_render_skill_only_names_real_intents_and_parameters() -> None:
 # 或裸贴 HTML 时，整段 HTML 被**原样当源码显示**（用户亲眼看到另一个对话里吐出一大坨
 # `<div style=…>`）。skill 把"渲染哪些块、用哪些字段、什么 HTML 合法、图挂了怎么办"
 # 都教了，唯独没写"怎么把这个 HTML 交给宿主"，于是模型照 skill 做出来的卡片在豆包里
-# 是一坨源码 —— 卡在最后一公里。这条把包装协议变成可执行断言：
-# ① 两个入口（SKILL.md 的三档表、html-conventions.md 的约定）都要写出宿主认的起始行；
-# ② 都要说明它是**宿主特有**的（缺了这句，模型会把它当成 HTML 的通用写法带到别的宿主）；
-# ③ 都要写反面（普通 ```html / 裸 HTML 不渲染）—— 不写就会重犯；
-# ④ skill 里的 HTML 示例**只允许**用正确的起始行：示例写错比不写示例更糟（模型会照抄）。
+# 是一坨源码 —— 卡在最后一公里。
+#
+# ⚠️ 但包装是**宿主特有**的，而宿主不止一个：豆包验过，WorkBuddy / Codex 没有（用户明确说过
+# 要适配不同 agent，格式可能各不相同）。所以这一组守门断言的是**机制**，不是某一个值：
+# ① `html-conventions.md` §零 有一张**宿主表**（宿主 / 交付包装 / 依据）：至少一行实测、
+#    没验过的宿主如实写"未知 + 先探测"（**不许编** —— 编一个格式比留空更坏）；
+# ② 表下面要有**可操作的探测步骤**（最小一块、不带图、看"渲染还是吐源码"、定下来再发正式块）；
+# ③ 要有**切换规矩**：不许跨宿主套用标记、换环境重探、结论要能复用（记回表）；
+# ④ 要有**扩展位**：新宿主怎么加一行进来（加了行不用重写这一节）；
+# ⑤ 豆包那行的值仍要写对 —— 但**允许的围栏是从表里实测行现推的**：以后给 WorkBuddy
+#    加一行实测，示例就能用它的围栏，这一组守门都不用改。
+#
+# 为什么不能只断言"skill 里必须出现 type=\"renderer\""：那会把**豆包的值**写成**唯一答案**，
+# 以后加 WorkBuddy 的格式反而把守门撞红 —— 守门开始阻碍扩展。断言机制则相反：表越全越绿。
 
-#: 宿主认的包装标记。改它之前先看 SKILL.md §1 与 html-conventions.md §零：
-#: 这是**豆包**认的行，不是 HTML 的通用协议。
-RENDER_WRAPPER = '```html type="renderer"'
+#: html-conventions.md（§零 宿主表与探测步骤在这份里）。
+RENDER_CONVENTIONS = "references/html-conventions.md"
+#: 豆包实测的包装起始行。它是**表里的一行**，不是"唯一答案"：见 `_measured_wrappers()`。
+RENDER_WRAPPER_INFO = 'html type="renderer"'
+RENDER_WRAPPER = f"```{RENDER_WRAPPER_INFO}"
+#: 标记本身（不带围栏）。凡是在文档里出现它的地方，都要和**宿主名**写在一起
+#: —— 否则模型会把某宿主的值当成通用写法（这是"只许一个值"之外的另一半风险）。
+RENDER_WRAPPER_MARK = 'type="renderer"'
 #: "包装是宿主特有的"。两份文档各自的语言里都要有这句。
 RENDER_WRAPPER_HOST_SPECIFIC = {
     "SKILL.md": "host-specific",
-    "references/html-conventions.md": "宿主特有",
+    RENDER_CONVENTIONS: "宿主特有",
 }
 #: 反面：信息串只有 `html` 的普通围栏（`type="renderer"` 不算），或干脆裸贴 HTML。
 RENDER_WRAPPER_PLAIN = re.compile(r'```html(?!\s*type="renderer")')
 #: "那样交付不会被渲染"——两份文档各自的语言里的写法。
 RENDER_WRAPPER_FAILURE = {
     "SKILL.md": "shown as source text",
-    "references/html-conventions.md": "不渲染",
+    RENDER_CONVENTIONS: "原样当源码显示",
 }
 #: 围栏起始行：`^```<信息串>`。行内代码用的 4 个以上反引号不算（信息串首字符不是字母）。
 FENCE_LINE = re.compile(r"^\s*```(.*)$")
+#: 宿主表单元格里的内联围栏：`` ```` ```html type="renderer" ```` `` → `html type="renderer"`。
+FENCE_IN_CELL = re.compile(r"`{3,}\s*([A-Za-z][^`]*)`{3,}")
+#: 实测依据里要有日期 —— 没有日期，下一个人没法判断它还算不算数。
+RENDER_WRAPPER_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
 def _flat(text: str) -> str:
@@ -338,60 +356,259 @@ def _section(text: str, heading: str) -> str:
     return rest if end == -1 else rest[:end]
 
 
-def test_render_skill_wires_the_delivery_wrapper_into_the_host_tiers() -> None:
-    """SKILL.md 的三档表里，"能渲染 HTML"那一档必须先定交付包装，并给出豆包的值。
+def _subsection(text: str, heading: str) -> str:
+    """取 `### <heading>` 到下一个二级/三级标题之间的正文。
 
-    只写在别的章节不够：模型是照着那一档决定"这个宿主该怎么发"的，那里没写就等于没定协议。
+    断言要打在**该在的那一小节**上：0.2 丢了探测步骤、别处还留着一句"探测"，
+    整节扫 token 是抓不住的 —— 注入验证时踩到过（I2b/I2d 第一轮注入全绿）。
     """
-    section = _section((RENDER_ROOT / "SKILL.md").read_text(encoding="utf-8"), "## 1.")
+    start = text.index(heading) + len(heading)
+    rest = text[start:]
+    ends = [pos for pos in (rest.find("\n## "), rest.find("\n### ")) if pos != -1]
+    return rest[: min(ends)] if ends else rest
+
+
+def _render_doc(name: str) -> str:
+    return (RENDER_ROOT / name).read_text(encoding="utf-8")
+
+
+def _host_table() -> tuple[list[str], list[tuple[str, str, str]]]:
+    """§零 的宿主表：表头三列 + 每一行（宿主 / 交付包装 / 依据）。
+
+    这张表是包装协议的**唯一出处**：守门从它推"哪些宿主验过、哪些还没有"，
+    而不是在测试里另抄一份宿主清单（抄一份 = 加宿主时两边都要改，早晚不一致）。
+    """
+    lines = _section(_render_doc(RENDER_CONVENTIONS), "## 零").splitlines()
+    for index, line in enumerate(lines):
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if cells[:1] != ["宿主"]:
+            continue
+        rows: list[tuple[str, str, str]] = []
+        for row_line in lines[index + 2:]:  # 跳过表头与 `| --- |` 分隔行
+            if not row_line.strip().startswith("|"):
+                break
+            row = [cell.strip() for cell in row_line.strip().strip("|").split("|")]
+            assert len(row) == 3, f"§零 宿主表的行必须是三列：{row_line}"
+            rows.append((row[0], row[1], row[2]))
+        return cells, rows
+    raise AssertionError(
+        f"{RENDER_CONVENTIONS} §零 没有「宿主 / 交付包装 / 依据」这张表 —— "
+        "包装是宿主特有的，没有表就没有可切换的机制"
+    )
+
+
+def _host_row(keyword: str) -> tuple[str, str, str] | None:
+    return next((row for row in _host_table()[1] if keyword in row[0]), None)
+
+
+def _wrappers_in(cell: str) -> list[str]:
+    """取出单元格里内联围栏的信息串：`` ```` ```html type="renderer" ```` `` → `html type="renderer"`。"""
+    return [match.group(1).strip() for match in FENCE_IN_CELL.finditer(cell)]
+
+
+def _measured_wrappers() -> set[str]:
+    """宿主表里**实测**行（依据带日期）的围栏 —— 允许出现在示例里的起始行集合。
+
+    从表里现推，不写死：给 WorkBuddy 加一行实测，示例就能用它的围栏。
+    """
+    return {
+        wrapper
+        for _host, cell, basis in _host_table()[1]
+        if RENDER_WRAPPER_DATE.search(basis)
+        for wrapper in _wrappers_in(cell)
+    }
+
+
+def test_render_skill_host_table_has_measured_and_unknown_rows() -> None:
+    """§零 的宿主表：宿主 / 交付包装 / 依据，验过的与没验过的都要如实标。
+
+    - 表里必须**至少有一行实测**（依据带日期）—— 否则这张表全是猜的；
+    - 没验过的宿主必须写"未知 + 先探测"：**编一个格式比留空更坏**（模型会照着用；
+      本仓的铁律是"没查到" ≠ "没有"、"没探成" ≠ "试过没有"）；
+    - 但**验过的宿主可以直接改成实测行**（值 + 日期）—— 那是扩展路径，不是违规：
+      这条守门卡的是"没验过却写了个值"，不是"只许豆包有值"。
+    """
+    header, rows = _host_table()
+    assert header == ["宿主", "交付包装", "依据"], (
+        f"§零 宿主表的三列应是 宿主 / 交付包装 / 依据，实际 {header}"
+    )
+    hosts = [row[0] for row in rows]
+    for keyword in ("豆包", "WorkBuddy", "Codex", "未知"):
+        assert any(keyword in host for host in hosts), (
+            f"§零 的宿主表缺「{keyword}」那一行 —— 包装是宿主特有的，至少要有"
+            "豆包（实测）、WorkBuddy 与 Codex（各家格式）、未知宿主这几类"
+        )
+
+    doubao = _host_row("豆包")
+    assert doubao is not None
+    assert RENDER_WRAPPER in doubao[1], (
+        f"豆包那一行的交付包装写错了：实测值是 {RENDER_WRAPPER}"
+    )
+    assert "实测" in doubao[2] and RENDER_WRAPPER_DATE.search(doubao[2]), (
+        "豆包那一行必须把依据写成「实测 + 日期 + 怎么测的」—— 它是表里唯一验过的值，"
+        "没有日期别人无法判断它还算不算数"
+    )
+
+    for keyword in ("WorkBuddy", "Codex"):
+        row = _host_row(keyword)
+        assert row is not None
+        if RENDER_WRAPPER_DATE.search(row[2]):  # 验过了：值 + 日期，走扩展路径
+            assert _wrappers_in(row[1]), (
+                f"「{keyword}」那一行标了实测日期，却没写它认的围栏起始行 ——"
+                "日期是给一个**具体的值**作保的"
+            )
+            continue
+        assert "未知" in row[1] and "探测" in row[1], (
+            f"「{keyword}」那一行的依据里没有实测日期，包装就必须如实写「未知 —— 先探测」，"
+            "不许给它编一个格式（编了比留空更坏：模型会照着用）"
+        )
+        assert RENDER_WRAPPER_MARK not in row[1], (
+            f"「{keyword}」那一行不许把豆包的标记写成它的值 ——"
+            "「不许跨宿主套用标记」正是要防这件事"
+        )
+
+    catch_all = _host_row("未知")
+    assert catch_all is not None
+    assert "探测" in catch_all[1] and not RENDER_WRAPPER_DATE.search(catch_all[2]), (
+        "「未知宿主」那一行要**永远**留成「先探测」：没人验过的宿主是**开放集合**，"
+        "它不可能变成一行实测值（没有日期，也没有围栏可写）"
+    )
+    assert RENDER_WRAPPER_MARK not in catch_all[1], (
+        "「未知宿主」那一行不许把豆包的标记写成未知宿主的答案（换宿主 = 回到未知）"
+    )
+
+
+def test_render_skill_states_the_probe_and_the_cross_host_ban() -> None:
+    """§零 的重点是**换宿主时的机制**：怎么探、结论怎么记、不许做什么。
+
+    旧写法只对"其他宿主"说一句"先确认，别猜"—— 治不了换宿主：模型不知道该**怎么**确认、
+    确认完**怎么记**。这条把机制钉成可执行断言（机制缺了，换宿主就退回猜）。
+
+    断言分别打在**该在的那一小节**上（0.2 探测 / 0.3 切换规矩 / 0.4 扩展位）：整节扫 token
+    抓不住"探测步骤被删、别处还留着一句探测"这种退化 —— 注入验证时第一版就是栽在这上面。
+    """
+    zero = _section(_render_doc(RENDER_CONVENTIONS), "## 零")
+    probe = _flat(_subsection(zero, "### 0.2"))
+    switch = _flat(_subsection(zero, "### 0.3"))
+    extension = _flat(_subsection(zero, "### 0.4"))
+
+    for token, why in (
+        ("最小一块", "0.2 没写「先发最小一块」：模型会在不确定时先渲染一整张卡，错了就是一大坨源码"),
+        ("一整张卡", "0.2 没写「别先渲染一整张卡」这条禁令"),
+        ("不带图", "0.2 没写探测块不带图：图挂了会和包装不对混在一起，看不出是哪一种"),
+        ("原样", "0.2 没写探测的判据（渲染成卡片 vs 原样吐源码）"),
+    ):
+        assert token in probe, why
+
+    assert re.search(r"不许[^。]{0,60}带到[^。]{0,60}没验过", switch), (
+        "0.3 没写反面：不许把某个宿主的标记带到没验过的宿主"
+        "（豆包的 type=\"renderer\" 不是 HTML 规范属性，换宿主 = 回到未知）"
+    )
+    assert "换了环境" in switch and "重走" in switch, (
+        "0.3 没写「换了环境要重走一遍探测」—— 上次验过、在别处验过，都不算数"
+    )
+    assert "不在这个环境验过就当作未知" in switch, (
+        "0.3 没写清「不在这个环境验过就当作未知」这条判据"
+    )
+    assert "记回" in switch, (
+        "0.3 没写探测结果记在哪、下次怎么用（探测结果要能被复用：记回宿主表）"
+    )
+
+    for token, why in (
+        ("探测", "0.4 没写扩展位的第一步（在那个环境跑一遍探测）"),
+        ("加一行", "0.4 没写「在表里加一行」—— 表会变成封闭清单，加一行就得重写这一节"),
+        ("依据", "0.4 没写新那一行的依据怎么填（实测 + 日期 / 未知 —— 先探测）"),
+    ):
+        assert token in extension, why
+
+
+def test_render_skill_wires_the_delivery_wrapper_into_the_host_tiers() -> None:
+    """SKILL.md 三档表的"能渲染 HTML"那一档要接上 §零 的机制（不是只给豆包一个值）。
+
+    只写在别的章节不够：模型是照着那一档决定"这个宿主该怎么发"的，那里没写就等于没定协议；
+    而那里若只写"其他宿主先确认"，模型不知道该**怎么**确认 —— 换宿主照样卡住。
+    """
+    section = _section(_render_doc("SKILL.md"), "## 1.")
     flat = _flat(section)
 
-    assert RENDER_WRAPPER in section, (
-        f"SKILL.md §1 的三档里没写宿主包装协议（要出现 {RENDER_WRAPPER}）："
-        "「能渲染 HTML」这一档不先定包装，模型照 skill 做出来的 HTML 会被宿主当源码显示"
+    assert "html-conventions.md" in section and "§0" in section, (
+        "SKILL.md §1 没指到 html-conventions.md §0 的宿主表 / 探测步骤"
     )
     assert RENDER_WRAPPER_HOST_SPECIFIC["SKILL.md"] in flat, (
         "SKILL.md §1 没说明包装是宿主特有的 —— 模型会把它当成 HTML 的通用写法带到别的宿主"
     )
+    assert RENDER_WRAPPER in section, (
+        f"SKILL.md §1 没写豆包实测的那一行（{RENDER_WRAPPER}）"
+    )
+    # 值不许"挂空"：每一个 type="renderer" 的**附近**（±100 字）都要出现宿主名。
+    # 用带围栏的整串去找会漏 —— 正文里提到这个标记时通常不带 ```html（注入验证踩到过）。
+    for match in re.finditer(re.escape(RENDER_WRAPPER_MARK), flat):
+        window = flat[max(0, match.start() - 100): match.end() + 100]
+        assert "Doubao" in window or "豆包" in window, (
+            "SKILL.md §1 把 type=\"renderer\" 写成了没人认领的值 —— 它是**豆包**的值，"
+            "要和宿主名写在一起，模型才不会当成通用写法（更不能写成唯一答案）"
+        )
+    for token, why in (
+        ("probe", "§1 没写「没验过的宿主先探测」—— 换宿主时模型没有出路"),
+        ("minimal block", "§1 没写探测要发最小一块（拿整张卡试，错了就是一大坨源码）"),
+        ("no image", "§1 没写探测块不带图（图挂了会和包装不对混在一起）"),
+        ("source text", "§1 没写探测判据（渲染 vs 原样吐源码）"),
+        ("nobody checked", "§1 没写「不许把标记带到没人验过的宿主」"),
+        ("record the result", "§1 没写探测结果要记回 §0 的表（探测结果要能被复用）"),
+    ):
+        assert token in flat, why
     assert RENDER_WRAPPER_PLAIN.search(flat), (
-        "SKILL.md §1 没写反面：普通的 ```html / 裸 HTML 在豆包里不渲染（不写就会重犯）"
+        "SKILL.md §1 没写反面：普通的 ```html / 裸 HTML 在豆包里被当源码显示（不写就会重犯）"
     )
 
 
 def test_render_skill_states_the_delivery_wrapper_in_both_entrypoints() -> None:
-    """包装协议两个入口都要有，而且口径一致：SKILL.md（三档）与 html-conventions.md（约定）。
+    """两个入口口径一致：SKILL.md（§1 三档）与 html-conventions.md（§零 宿主表 + 探测）。
 
-    blocks.md 的骨架是照它交付的，所以也得指得到这条（它的示例本身由下面那条守门盯着）。
+    只改一个入口 = 模型从另一个入口进来时又退回"先确认，别猜"。blocks.md 的骨架是照它交付的，
+    也要指得到这条（它的 5 段示例本身由下面那条守门盯着）。
     """
-    documents = {
-        name: (RENDER_ROOT / name).read_text(encoding="utf-8")
-        for name in ("SKILL.md", "references/html-conventions.md")
-    }
-    for name, text in documents.items():
-        flat = _flat(text)
-        assert RENDER_WRAPPER in text, f"{name} 没写宿主认的包装起始行 {RENDER_WRAPPER}"
+    for name in ("SKILL.md", RENDER_CONVENTIONS):
+        flat = _flat(_render_doc(name))
         assert RENDER_WRAPPER_HOST_SPECIFIC[name] in flat, (
             f"{name} 没说明包装是宿主特有的（不是 HTML 的通用写法）"
         )
         assert RENDER_WRAPPER_PLAIN.search(flat), (
-            f"{name} 没写反面：普通的 ```html / 裸 HTML 在豆包里不会渲染"
+            f"{name} 没写反面：普通的 ```html / 裸 HTML 在那个宿主不会渲染"
         )
         assert RENDER_WRAPPER_FAILURE[name] in flat, (
             f"{name} 没写清那样交付的后果（会被原样当源码显示）"
         )
+        assert "探测" in flat or "probe" in flat, (
+            f"{name} 没写探测这条机制 —— 换到没验过的宿主时模型没有出路"
+        )
 
-    blocks = (RENDER_ROOT / "references" / "blocks.md").read_text(encoding="utf-8")
+    blocks = _render_doc("references/blocks.md")
     assert RENDER_WRAPPER in blocks and "html-conventions.md" in blocks, (
-        "blocks.md 的骨架就是交付内容：要写明按 html-conventions.md 的包装交付，示例用正确的起始行"
+        "blocks.md 的骨架就是交付内容：要写明按 html-conventions.md 的包装交付"
+    )
+    # 骨架是**豆包环境**的写法：别的地方提到"豆包"不算，这句得说清示例的适用面。
+    assert "豆包环境" in blocks and "§零" in blocks and "探测" in blocks, (
+        "blocks.md 要说清那 5 段示例是**豆包环境**的写法：换宿主按 §零 的机制重来"
+        "（示例只对豆包成立，照抄到别处就是吐源码）"
     )
 
 
-def test_render_skill_html_examples_use_the_host_wrapper() -> None:
-    """skill 里每一段 HTML 示例的起始行都必须是宿主认的那一行。
+def test_render_skill_html_examples_use_a_wrapper_the_host_table_measured() -> None:
+    """skill 里每一段 HTML 示例的起始行，都必须是**宿主表里某个实测行**的围栏。
 
     模型是照抄示例的：示例写成普通的 ```html，豆包就把整段当源码显示 ——
     「示例本身错了比没示例更糟」。
+
+    ⚠️ 这条**不是**"只许 type=\"renderer\" 这一个值"：允许的围栏是从 §零 宿主表的实测行**现推**
+    出来的 —— 以后给 WorkBuddy 加一行实测（§0.4 的三步），示例就能写它的围栏，这条守门不用改。
     """
+    measured = _measured_wrappers()
+    assert RENDER_WRAPPER_INFO in measured, (
+        f"§零 宿主表里没有任何实测行能推出 {RENDER_WRAPPER} —— "
+        "先看 0.1 的表是不是被写散了（守门的允许集就是从这张表来的）"
+    )
+
     offenders: list[str] = []
     examples = 0
     for path in sorted(RENDER_ROOT.rglob("*.md")):
@@ -402,13 +619,14 @@ def test_render_skill_html_examples_use_the_host_wrapper() -> None:
             info = match.group(1).strip()
             if not info or info.split()[0] != "html":
                 continue
-            if info == 'html type="renderer"':
+            if info in measured:
                 examples += 1
             else:
                 offenders.append(f"{path.relative_to(RENDER_ROOT)}:{lineno}: ```{info}")
 
     assert not offenders, (
-        "渲染 skill 里的 HTML 示例只能用它教的宿主包装起始行（示例会被照抄，写错就吐源码）：\n"
+        "渲染 skill 里的 HTML 示例只能用宿主表**实测过**的那一行起始行"
+        f"（示例会被照抄，写错就吐源码）。实测值：{sorted(f'```{m}' for m in measured)}\n"
         + "\n".join(offenders)
     )
     assert examples >= 5, f"只解析到 {examples} 段 HTML 示例，先看示例结构是不是变了"
