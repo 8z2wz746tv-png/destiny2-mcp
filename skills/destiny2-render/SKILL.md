@@ -19,15 +19,24 @@ whole card for "you own four copies of one hand cannon" is noise.
 
 | Host capability | What to emit |
 | --- | --- |
-| Renders HTML in the transcript (Doubao's chat renderer, a web client, a preview pane) | **fix the delivery wrapper first** (`references/html-conventions.md` §0): on Doubao the code fence must open with ` ```html type="renderer" ` — a plain ` ```html ` fence, or bare HTML, is *shown as source text* there. Then emit the HTML blocks in `references/blocks.md`, exactly as specified |
+| Renders HTML in the transcript (Doubao's chat renderer, a web client, a preview pane) | **fix the delivery wrapper first** (`references/html-conventions.md` §0): look the host up in the wrapper table, and on Doubao the measured line is ` ```html type="renderer" ` — a plain ` ```html ` fence, or bare HTML, is *shown as source text* there. Then emit the HTML blocks in `references/blocks.md`, exactly as specified |
 | Renders Markdown only | the same blocks as Markdown: a heading line, a table, `-` rows. Keep every field, drop the icons (write the name; do not paste an image tag) |
 | Plain text only | the same rows as text lines, one per item |
 
-The wrapper is **host-specific**: `type="renderer"` is a marker Doubao's renderer
-recognizes, not a general HTML convention. On any other host **confirm the wrapper
-before rendering** — or send one small block first and see whether it renders or comes
-back as source text — and never carry Doubao's marker onto a host nobody checked. The
-two lower tiers never need one: there is no HTML block to wrap.
+The wrapper is a **mechanism, not one magic string**, and it is host-specific. §0 of
+`references/html-conventions.md` holds the host table plus the probe:
+
+- host has a **measured** row (Doubao does) → use that line for every block in this environment;
+- host is **not measured** (WorkBuddy and Codex are both unknown — nobody has checked their
+  wrapper) → **probe before rendering**: send one minimal block, a `<div>` and a line of text,
+  with no image, no table and no account data, and see whether it renders or comes back as
+  source text. Never render a whole card to find out: a wrong guess prints a wall of source.
+- **never carry one host's marker onto a host nobody checked**: `type="renderer"` is a marker
+  Doubao's renderer recognizes, not a general HTML convention.
+- another environment (another host, another client build, another entry point) counts as
+  unknown: probe again, then record the result as a row in §0's table.
+
+The two lower tiers never need a wrapper: there is no HTML block to wrap.
 
 Never assume one host. Never emit `<style>`, a `<link>` to a stylesheet, a script,
 or an external font — a host that does render HTML still may strip them. All
@@ -75,8 +84,9 @@ A number without its window is a wrong number. The exact fields are in
 - [blocks.md](references/blocks.md) — block index (which intent feeds which block),
   the verified field table per block, the HTML skeleton, and the degradation rule
   for every optional field.
-- [html-conventions.md](references/html-conventions.md) — the host delivery wrapper (§0:
-  which code fence makes the host render instead of showing source), allowed tags, the
+- [html-conventions.md](references/html-conventions.md) — §0: the host table
+  (which code fence makes this host render instead of showing source), the probe for a host
+  nobody measured, and the switching rules; then allowed tags, the
   inline style subset, icon sizes, the escaping rule, layout baseline, and how to mount
   the archive-relative community images.
 
