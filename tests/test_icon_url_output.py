@@ -95,7 +95,7 @@ _EXEMPT: dict[str, str] = {
     # 要看效果走 `perk_description`、要图走实例级 options。
     # 见 `services/weapon_payload.socket_list` 与 `tests/test_weapon_key*` 的
     # `DEFINITION_ONLY_ABSENT`；要翻这条得先回答 17 KB/把 的账（用户 2026-10-04 拍板：不带）。
-    "destiny_mcp/services/weapon_profile.py::_plug_option": "定义级池子不带图标（+17 KB/把 的体积口径，P6 实测）",
+    "destiny_mcp/services/weapon_profile.py::_plug_option": "定义级池子不带图标：带 = +17 KB/把（图标 13.2 + 描述 4.0，P6 实测，docs/plans/WEAPON_FORMAT_PLAN.md:360）",
     "destiny_mcp/services/weapon_profile.py::intrinsic_plug": "固有特性走 socket 行的同一套投影",
     "destiny_mcp/services/weapon_profile.py::with_equipped": "`equipped` 只报「装着哪个」，图在 options 里",
     "destiny_mcp/services/weapon_payload.py::_normalize_equipped": "同上：每槽一个 name/hash 对，图在 options 里",
@@ -120,7 +120,7 @@ _EXEMPT: dict[str, str] = {
     "destiny_mcp/services/armor_mod_service.py::plan": "模组计划回执的用户输入回显，不是物品身份行",
     "destiny_mcp/services/loadout_recovery.py::_capture_recovery_state()→LoadoutItem": "回滚用的现场快照，不进响应（恢复时按实例 ID 逐件还原）",
     "destiny_mcp/services/vendor_service.py::_compact_response()→PerkInfo": "商人**菜单**的 perk 摘要：这里刻意只留名字 + [PvE]/[PvP] 标记（不是真 perk 身份，plug_hash 都被置 0）",
-    "destiny_mcp/services/weapon_profile.py::socket_options()→_plug_option": "定义级池子不带图标（P6 体积口径，与 `_plug_option` 同一条）",
+    "destiny_mcp/services/weapon_profile.py::socket_options()→_plug_option": "定义级池子不带图标（与 `_plug_option` 同一条，+17 KB/把）",
     # ── ④ 求解器内部模型：不是出口（`build_projection` 就是把这些投影掉的）──
     # `TuningChoice`/`PieceTuning` 是护甲求解器内部的行；默认出口走候选行投影，
     # 要执行走 `execution_id` → `canonical_build`。它们不该各自长成一个图标字段。
