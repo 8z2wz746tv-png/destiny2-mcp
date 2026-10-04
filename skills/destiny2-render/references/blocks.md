@@ -192,6 +192,8 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.comparison.instances[].options[].options[].stat_effects[].value` | `weapon_assistant(intent="compare", weapon_name="星狐座", item_instance_id="$weapon_instance")` | 属性影响值 |
 | `data.comparison.instances[].sockets[].equipped` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 行视图里 `equipped` 是**字符串**，不是对象 |
 | `data.comparison.instances[].sockets[].options[].name` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 行视图的可换项（**不带图**） |
+| `data.subclass.subclass_name` | `subclass_assistant(intent="get", character="hunter")` | **子职业自己**那一行（卡片标题） |
+| `data.subclass.icon_url` | `subclass_assistant(intent="get", character="hunter")` | 子职业本身的图（2026-10-05 补：以前只有 `plugs` 有图，标题行只能放色块） |
 | `data.subclass.plugs[].name` | `subclass_assistant(intent="get", character="hunter")` | 子职业当前装的技能/星象/碎片 |
 | `data.subclass.plugs[].icon_url` | `subclass_assistant(intent="get", character="hunter")` | 技能图 |
 | `data.subclass.plugs[].is_active` | `subclass_assistant(intent="get", character="hunter")` | 是否生效 |
@@ -327,6 +329,8 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.armor.identity.armor_system` | `inventory_assistant(intent="item", item_instance_id="$armor_instance")` | `armor_3` / `legacy` |
 | `data.armor.identity.icon_url` | `inventory_assistant(intent="item", item_instance_id="$armor_instance")` | 护甲图 |
 | `?data.armor.identity.archetype.name` | `inventory_assistant(intent="item", item_instance_id="$armor_instance")` | 词条原型 |
+| `?data.armor.identity.archetype.icon_url` | `inventory_assistant(intent="item", item_instance_id="$armor_instance")` | 词条原型的图（2026-10-05 补：它是真插件，Manifest 里有图） |
+| `?data.armor.instance.tuning.icon_url` | `inventory_assistant(intent="item", item_instance_id="$armor_instance")` | 调谐的图（与 `armor.sockets[]` 里同一颗同一张） |
 | `data.armor.instance.power` | `inventory_assistant(intent="item", item_instance_id="$armor_instance")` | 光等 |
 | `data.armor.instance.is_equipped` | `inventory_assistant(intent="item", item_instance_id="$armor_instance")` | 是否穿着 |
 | `data.armor.instance.location` | `inventory_assistant(intent="item", item_instance_id="$armor_instance")` | 位置 |
@@ -566,6 +570,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.next_offset` | `loadout_assistant(intent="list")` | 翻页偏移 |
 | `data.loadouts[].build_template.title` | `loadout_assistant(intent="get")` | 配装标题 |
 | `data.loadouts[].build_template.subclass` | `loadout_assistant(intent="get")` | 子职业 |
+| `data.loadouts[].build_template.class.icon_url` | `loadout_assistant(intent="get")` | 子职业**自己**的图（2026-10-05 补：以前只有 `class.plugs[]` 有图，标题行只能放色块） |
 | `data.loadouts[].build_template.weapons[].name` | `loadout_assistant(intent="get")` | 武器 |
 | `data.loadouts[].build_template.weapons[].icon_url` | `loadout_assistant(intent="get")` | 武器图 |
 | `data.loadouts[].build_template.armor.items[].name` | `loadout_assistant(intent="get")` | 护甲 |
@@ -690,3 +695,73 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 
 - `source="schedule"` 的行必须标"自维护表（带核对日期）"，不能和官方口径的行混在一张表里不区分。
 - 商人是**窗口数据**（本次刷新），卡头写 `next_refresh`。
+
+---
+
+## 十、社区配装卡
+
+**两档**（用户 2026-10-05 口径）：**列表先给简版**（每套只出护甲/武器/子职业的图 + 名字），
+**用户追问某一套的详细内容时再给全部**（`validation.requirements[]` 每一行都有图 + 名字）。
+
+这也解释了为什么有两组字段：`data.results[].visuals` 是简版，只在 `community` **列表**上；
+`data.selected_build.*` 是详情，只在带 `community_build_id` 时出现。
+
+### 10.1 列表（简版）
+
+```html type="renderer"
+<section style="background:#101317;border:1px solid #3a424b;border-radius:7px;overflow:hidden;color:#e8e9e6">
+  <header style="padding:12px 14px;background:#14181d;border-bottom:1px solid #2a3037">
+    <h3 style="margin:0;font-size:14px;color:#fafaf7">社区配装 · 第 1 套</h3>
+  </header>
+  <!-- 简版只有三行；每行 32px 图 + 名字。icon_url 为空串时画同尺寸占位块，别写 <img src=""> -->
+  <div style="padding:11px 14px">
+    <div style="display:grid;grid-template-columns:32px minmax(0,1fr);gap:9px;align-items:center">
+      <img src="{{visuals.subclass.icon_url}}" alt="子职业图标" loading="lazy" style="width:32px;height:32px;display:block;object-fit:cover;background:#1a2026;border:1px solid #2a3037;border-radius:2px">
+      <span style="font-size:12px;color:#e8e9e6">{{visuals.subclass.name}}</span>
+    </div>
+  </div>
+</section>
+```
+
+| 字段路径 | 出处 | 说明 |
+| --- | --- | --- |
+| `data.results[].title` | `build_assistant(intent="community", query="猎人", top_n=5)` | 套名（卡片标题） |
+| `data.results[].visuals.subclass.name` | `build_assistant(intent="community", query="猎人", top_n=5)` | 子职业名（解析出来的是 Manifest 的**全名**，如「棱镜猎人」） |
+| `data.results[].visuals.subclass.icon_url` | `build_assistant(intent="community", query="猎人", top_n=5)` | 子职业图；**可为空串** |
+| `data.results[].visuals.weapons[].name` | `build_assistant(intent="community", query="猎人", top_n=5)` | 武器名 |
+| `data.results[].visuals.weapons[].icon_url` | `build_assistant(intent="community", query="猎人", top_n=5)` | 武器图；**可为空串**（解析不到就不出图） |
+| `data.results[].visuals.armor.exotic.name` | `build_assistant(intent="community", query="猎人", top_n=5)` | 异域护甲名；职业金装给的是还原后的**金装名** |
+| `data.results[].visuals.armor.exotic.icon_url` | `build_assistant(intent="community", query="猎人", top_n=5)` | 异域护甲图；**可为空串** |
+| `?data.results[].visuals.armor.set.name` | `build_assistant(intent="community", query="猎人", top_n=5)` | 套装名；模板没写套装时整块没有 |
+| `?data.results[].visuals.armor.set.icon_url` | `build_assistant(intent="community", query="猎人", top_n=5)` | **恒为空串** —— 套装在 Manifest 里 `hasIcon: false`，没有这张图 |
+| `data.matched_count` | `build_assistant(intent="community", query="猎人", top_n=5)` | 命中多少套（卡片头写"第 N / 共 M 套"） |
+| `data.next_offset` | `build_assistant(intent="community", query="猎人", top_n=5)` | 翻页偏移；非 null 说明还有下一页 |
+
+### 10.2 详情（全部）
+
+| 字段路径 | 出处 | 说明 |
+| --- | --- | --- |
+| `data.selected_build.title` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | 套名 |
+| `data.selected_build.visuals.weapons[].name` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | 同简版三块（详情里也在，省得调用方再解析一遍） |
+| `data.selected_build.visuals.subclass.icon_url` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | 子职业图 |
+| `data.selected_build.validation.requirements[].name` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | **全部细节**：武器 / 武器 perk / 异域护甲 / 套装 / 护甲模组 / 神器 / 神器模组 / 子职业组件 |
+| `data.selected_build.validation.requirements[].kind` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | 这一行是什么（决定画哪个图标位） |
+| `data.selected_build.validation.requirements[].status` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | `resolved` / `ambiguous` / `unresolved`；**不是 resolved 就别画成"找到了"** |
+| `data.selected_build.validation.requirements[].icon_url` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | 这一行的图；**可为空串** |
+| `data.selected_build.validation.requirements[].definitions[].item_hash` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | 解析到的 Manifest hash（**可核**：图就是按它取的） |
+| `?data.selected_build.validation.requirements[].perk_resolutions[].name` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | 武器要求的 perk 行 |
+| `?data.selected_build.validation.requirements[].perk_resolutions[].icon_url` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | perk 图 |
+| `data.selected_build.inventory_match.inventory_status` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | 账号核对状态；账号不可用时是 `unavailable`，**不能读成"你没有"** |
+| `data.selected_build.validation.execution_supported` | `build_assistant(intent="community", community_build_id="builds/s29/00vivy2a-hunter/index.html#build-1")` | false 必须在卡片上写出来（社区模板不是可执行配装） |
+
+### 降级
+
+- **`icon_url` 是空串 → 画同尺寸占位块 + 只写名字，别写 `<img src="">`，也别去找别的图顶上。**
+  空串的含义是"这个名字解析不到、或同名定义的图不一致"，**不是漏了**：
+  社区模板给的是散文，名字→物品这一跳必须能核（判据在 `destiny_mcp/services/starside_build_icons.py`）。
+  实测反例：「斗牛士 64」精确名 0 命中、「埃希恩记忆」是套装（Manifest `hasIcon: false`）、
+  「重型弹药搜寻者」3 个定义里有 2 种图。
+- 套装行（`visuals.armor.set`）**永远**是空串 —— 别把套装的图省成"用某一件的图顶上"。
+- `status != "resolved"` 的行照实标"名字对不上 Manifest"，不要因为它有名字就画成已确认。
+- 列表是**简版**：不要顺手把 `data.results[].armor.mods`、`class.fragments` 这些也画出来 ——
+  那正是"列表该简单"要避免的。要全部细节就再问一次带 `community_build_id` 的那一档。
