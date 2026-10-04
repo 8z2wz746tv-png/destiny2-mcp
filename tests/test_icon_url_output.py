@@ -19,15 +19,22 @@
    字面量的节点，再看它绑给了谁 —— 绑定名/字典键/关键字实参里带 `icon` 的判红。
    不看在哪儿出现、只看"结果是不是当图标在用"，所以 `bungie_client` 的
    `f"https://www.bungie.net{world_url}"`（Manifest 资源地址，不是图标）不在此列。
-2. **身份行必须带 `icon_url`**（`test_identity_rows_carry_icon_url`）：字典字面量或
-   "键清单常量"同时带**名字键**与**身份 hash 键**时，必须也有 `icon_url`，
-   除非登记在下面的 `_EXEMPT` 台账里（每条写明理由）。
+2. **身份行必须带 `icon_url`**（`test_identity_rows_carry_icon_url`）：**四种**形状
+   （字典字面量 / 键清单常量 / `Model(...)` 构造调用 / **模型类的字段声明**）同时带
+   **名字键**与**身份 hash 键**时，必须也有 `icon_url`，除非登记在下面的 `_EXEMPT`
+   台账里（每条写明理由）。
 3. **活动身份行另算一套**（`test_activity_rows_carry_icon_url`）：带 `activity_name`/`activity`
    的行（活动、副本、PvP 场次）也必须带 `icon_url`。**为什么单列**：那类图标不是物品图，
    走的是另一条道（`pgcrImage`），用物品道的判据扫不到、也守不住 —— 2026-10-04 的缺口
    就是"物品全对、活动全裂"（见 `docs/plans/ICON_URL_PLAN.md` §八）。
 4. **活动道只能有一个出处**（`test_activity_images_come_from_the_activity_lane`）：
    全仓只有 `manifest_lookup` 读 `pgcrImage`。
+5. **社区配装的图不许猜**（§⑥ 那五条）：社区模板只给**名字**，名字→物品那一跳必须可核 ——
+   精确名解析、同名多版本**图一致**才出图、裸标签必须带类型过滤、套装没有图。
+   每条断言都对着一个**实测反例**（「贪婪之握」是活动名、「棱镜」命中武器皮肤、
+   「重型弹药搜寻者」3 个定义 2 种图）。判据在 `services/starside_build_icons.py`。
+   为什么单列：它守的是**不可信参考**那条边界（社区资料不是账号事实），
+   而"看出来像是同一件东西"正是这条边界上最容易破的一处。
 
 **台账是冻结的复核清单**，不是"让自己变绿的开关"：新增的漏网出口直接判红；
 台账里过期（代码已经补上图标或删掉）的条目也判红，逼着条目跟着代码走。
@@ -38,7 +45,12 @@
 
 - 只认**字面量**形状的行：经过 `{key: item.get(key) for key in KEYS}` 投影出来的行，
   只有 `KEYS` 常量本身在扫描范围内（`_ROW_ITEM_FIELDS` 就是这么被抓到的）；
-- 名字/hash 键表是**封闭词表**（见 `_NAME_KEYS` / `_HASH_KEYS`），换个键名就漏；
+- **`dict.update(**kwargs)` 这种"逐次装配"的行扫不到**（`loadout_service._build_template` 的
+  `class_data.update(subclass_item_hash=…, icon_url=…)` 就是这种形状）—— 2026-10-05 是靠人核
+  发现的，不是守门抓的；下次要收它得再加一种形状；
+- 名字/hash 键表是**封闭词表**（见 `_NAME_KEYS` / `_HASH_KEYS`），换个键名就漏
+  （2026-10-05 收进了 `subclass_name`/`subclass_hash` 与裸 `hash`；`record_hash`/`tier_hash`
+  一类仍刻意在外）；
 - 只扫 `destiny_mcp/**`：`legacy/`（历史存档，不进包）与 `tests/` 不在范围内；
 - 不检查运行期拼装（例如把行交给另一个函数再补键）。
 """
@@ -61,10 +73,22 @@ SOURCE_ROOT = Path(__file__).resolve().parents[1] / "destiny_mcp"
 ICON_SOURCE = "destiny_mcp/utils/icons.py"
 
 #: 名字键：一行"这是什么"靠它
-_NAME_KEYS = {"name", "plug_name", "item_name", "set_name", "perk_name"}
-#: 身份 hash 键：一行"是哪一件"靠它。刻意**不含**裸 `hash`/`record_hash`/`tier_hash`
-#: —— 那些在套装层级、记录、档位表里到处都是，收进来会把台账冲成噪声。
-_HASH_KEYS = {"item_hash", "plug_hash", "itemHash", "plugItemHash", "set_hash"}
+_NAME_KEYS = {"name", "plug_name", "item_name", "set_name", "perk_name", "subclass_name"}
+#: 身份 hash 键：一行"是哪一件"靠它。
+#:
+#: 2026-10-05 扩表（用户实拍的三处缺口之一）：原来只有 `item_hash`/`plug_hash`/`set_hash`
+#: 那一族，**不含** `subclass_name`/`subclass_hash`，也**不含裸 `hash`**。实测后果：
+#: `subclass_assistant(intent="get")` 的 `data.subclass`（`subclass_name` + `subclass_hash`）
+#: 明明是一行的身份，却在扫描面之外 —— `plugs[]`/`available[]` 每颗都有图，唯独
+#: "这是哪个子职业"那一行没有（模型于是在回复里写"本次响应未带图标字段，按文本行渲染"）。
+#: 这条盲区**不是裸 `hash`**：`subclass_hash` 根本不是 `hash`。
+#:
+#: 裸 `hash` 当时被排除的理由是"套装层级/记录/档位表到处都是，会把台账冲成噪声"。
+#: 2026-10-05 把这个理由**实测**了一遍（`_HASH_KEYS | {"hash"}` 跑一次扫描）：全仓只多出
+#: **21** 行，**没有一行**是套装层级/记录/档位表，全是 `{hash, name}` 形状的物品身份行。
+#: 所以假设不成立，裸 `hash` 一并收进来 —— 收进来之后那 21 行要么补图、要么进台账写清理由。
+_HASH_KEYS = {"item_hash", "plug_hash", "itemHash", "plugItemHash", "set_hash",
+              "subclass_hash", "hash"}
 #: 活动/副本身份行的键（与物品那套**分开**：它们的图标走另一条道，见模块开头第 3 条）
 _ACTIVITY_NAME_KEYS = {"activity_name", "activity"}
 _ICON_KEYS = {"icon_url", "iconUrl"}
@@ -129,6 +153,27 @@ _EXEMPT: dict[str, str] = {
     # ── ③ 收藏品：不在"武器/装备/perk"三类的口径里 ─────────────────────────
     "destiny_mcp/services/collection_service.py::get_collectible_item_status": "收藏品（徽章/机灵外壳等）不属于武器/护甲/perk",
     "destiny_mcp/services/collection_service.py::get_collectible_node_status": "同上（节点视图）",
+    # ── ⑤ 2026-10-05 收进裸 `hash` 之后新进扫描面的 10 行：都不是出口 ──────────
+    # 这一批是"把裸 `hash` 收进 `_HASH_KEYS`"的直接产物。每一条都当场核过：
+    # 要么是**求解器/取数的中间模型**（根本进不了响应），要么那一行**本来就不是物品**。
+    "destiny_mcp/build/process_types.py::armor_to_process_item()→ProcessItem": "求解器内部模型（护甲进程项的入参形状），不进响应",
+    "destiny_mcp/build/tuning.py::as_dict": "求解器内部模型（`TuningChoice.as_dict` 与 `PieceTuning.as_dict` 的 from/to 三处字典字面量都归这一个键）：投影成候选行的那一层有图",
+    "destiny_mcp/manifest_item_queries.py::find_items_by_plug_category": "取数中间行（原样带 `displayProperties`，出口自己 `_icon_url()`；消费方是 `fragment_service`，它的出口行有图）",
+    "destiny_mcp/services/build_service.py::_get_fragment_stats_by_names": "求解器输入回执（碎片名 → 六维向量），不是给人看的身份行",
+    "destiny_mcp/services/collection_service.py::_declared_children": "`DestinyPresentationNodeDefinition` 展示节点（收藏品的文件夹），不是物品：Manifest 里这类节点没有物品图标语义",
+    "destiny_mcp/tools/_armor_branches.py::armor_item": "护甲**套装**行（`equipableItemSetHash`）：套装不是物品 —— 实测 `DestinyEquipableItemSetDefinition` 741162535 写着 `hasIcon: false`，给不出图也不能拿别的顶（同 `_lookup_set_bonus`）",
+    "destiny_mcp/tools/_armor_branches.py::equip_mod": "`plan[\"from\"]` 的**空槽**占位（`hash`/`name` 都是 `None`），不是物品",
+    "destiny_mcp/tools/_perk_branches.py::perk_description_payload": "`{**(perk or {}), …}` 的**合并**：`icon_url` 运行时从上游 `get_perk_description()` 的载荷继承（那里 `_icon_url(...)` 已有），静态扫描看不见 spread",
+    # ── ⑥ 模型类（第四种身份行形状，2026-10-05 注入验证补上的判据）─────────────
+    # 这四行都是**求解器内部模型**：它们的实例从不进响应 —— `process_types.ProcessItem`
+    # 与 `build/tuning.py` 的 `TuningChoice`/`PieceTuning` 由 `build_projection` 投影成
+    # 候选行（那一层有图），`armor_rules.ArmorArchetype` 只在求解器里当键用。
+    # 同一批文件里的**字典**形状早就各自登记过了（`as_dict`、`armor_to_process_item`），
+    # 这里补的是"类体声明"这个形状 —— 判据本身是因为 `SubclassConfig` 那次漏网才加的。
+    "destiny_mcp/build/armor_rules.py::ArmorArchetype": "求解器内部模型（词条原型在求解器里的键），不进响应",
+    "destiny_mcp/build/process_types.py::ProcessItem": "求解器内部模型（同上，字典形状那条也登记着）",
+    "destiny_mcp/build/tuning.py::TuningChoice": "求解器内部模型（`build_projection` 投影成候选行，那一层有图）",
+    "destiny_mcp/build/tuning.py::PieceTuning": "求解器内部模型（同上）",
 }
 
 
@@ -313,10 +358,33 @@ def _keyword_identity_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
     return rows
 
 
+def _model_identity_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
+    """**模型类**的身份行：类体里同时声明了名字键字段与身份 hash 键字段。
+
+    为什么单列这一类（2026-10-05 注入验证抓出来的）：前三种形状都扫不到"pydantic 模型少了
+    一个字段"。`SubclassConfig` 当时只声明了 `subclass_name` + `subclass_hash`，
+    **把新补的 `icon_url` 删掉之后守门仍然是绿的** —— 类体既不是字典字面量、也不是构造调用。
+    而这正是用户实拍场景 3 的形状（"这个响应就是没有图那个字段"），所以必须能咬住。
+    """
+    rows: list[tuple[str, int, set[str]]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.ClassDef):
+            continue
+        fields = {
+            statement.target.id
+            for statement in node.body
+            if isinstance(statement, ast.AnnAssign) and isinstance(statement.target, ast.Name)
+        }
+        if (fields & _NAME_KEYS) and (fields & _HASH_KEYS):
+            rows.append((node.name, node.lineno, fields))
+    return rows
+
+
 def _identity_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
-    """(kind, lineno, keys)：三种身份行 —— 字典字面量、键清单常量、构造调用。"""
+    """(kind, lineno, keys)：**四种**身份行 —— 字典字面量、键清单常量、构造调用、模型类。"""
     owner = _functions(tree)
     rows: list[tuple[str, int, set[str]]] = list(_keyword_identity_rows(tree))
+    rows.extend(_model_identity_rows(tree))
     for node in ast.walk(tree):
         if isinstance(node, ast.Dict):
             keys = _dict_keys(node)
@@ -603,3 +671,163 @@ def test_duplicates_perk_rows_stay_lean_by_volume() -> None:
     group = analysis.duplicate_rows(groups)[0]
     assert set(group["instances"][0]["perks"][0]) == {"name", "slot"}
     assert group["icon_url"].startswith(BUNGIE_ORIGIN), "组级图标必须在（每组一个 URL，不占体积）"
+
+
+# ── ⑥ 社区配装的图：宁可不出图，不可出错图 ────────────────────────────────
+#
+# 用户 2026-10-05 的价值判断（原话）：**玩家看图比看名快 —— 很多时候是看了图标才想起名字。**
+# 所以错图比没图坏得多。社区模板是**不可信参考**，它给的是一段散文，唯一的输入是一串名字；
+# 名字→物品这一跳必须可核。下面五条把这件事钉成可执行断言 —— 每一条都对应一个**实测反例**
+# （2026-10-05 在本机 Manifest 上跑出来的，不是设想）：
+#
+# | 反例 | 实测结果 | 断言 |
+# | --- | --- | --- |
+# | 「贪婪之握」（其实是**活动**名） | 精确名 0 命中 | `test_community_build_icons_never_guess` |
+# | 「棱镜」（模板里的**分支**短标签） | 命中一件**武器皮肤**（`3373357626`，itemType=19） | `test_subclass_icon_requires_the_subclass_item_type` |
+# | 「重型弹药搜寻者」3 个 hash | **2 种图**（`2867719094` vs `644105`/`554409585`） | `test_same_name_must_agree_on_the_icon` |
+# | 「埃希恩记忆」套装 | `DestinyEquipableItemSetDefinition` 写着 `hasIcon: false` | `test_armor_set_row_never_carries_an_icon` |
+
+
+class _StubManifest:
+    """只实现 `_exact_definitions` 与 `agreed_icon` 真正读的两个方法。
+
+    为什么用替身而不是真 Manifest：这条守门钉的是**规则**（"图不一致就不出图"），
+    规则不该依赖本机那份 38k 行的 sqlite —— 干净克隆里没有它，那条测试会被跳过，
+    而"跳过的守门"等于没有（`docs/testing/TESTING_CORPUS.md` 的分层口径）。
+    真实反例的证据写在上面那张表和 `starside_build_icons` 的模块 docstring 里。
+    """
+
+    def __init__(self, items: list[dict]) -> None:
+        self._items = items
+
+    def search(self, name: str, limit: int = 0) -> list[dict]:
+        wanted = name.strip().casefold()
+        return [
+            item for item in self._items
+            if wanted in {str(item.get("name", "")).casefold(), str(item.get("nameEn", "")).casefold()}
+        ]
+
+    def get_item_info(self, item_hash: int) -> dict | None:
+        for item in self._items:
+            if int(item.get("itemHash", 0)) == int(item_hash):
+                return {"icon": item.get("icon", "")}
+        return None
+
+
+def _item(item_hash: int, name: str, icon: str, **extra) -> dict:
+    return {"itemHash": item_hash, "name": name, "nameEn": extra.pop("nameEn", name),
+            "icon": icon, "classType": 3, **extra}
+
+
+def test_same_name_must_agree_on_the_icon() -> None:
+    """同名多版本：**图一致才出图**（实测反例：「重型弹药搜寻者」3 个 hash / 2 种图）。"""
+    from destiny_mcp.services.starside_build_icons import agreed_icon
+
+    agree = _StubManifest([
+        _item(1, "驱逐引擎", "/common/destiny2_content/icons/same.jpg"),
+        _item(2, "驱逐引擎", "/common/destiny2_content/icons/same.jpg"),
+    ])
+    assert agreed_icon(agree, [1, 2]).endswith("/icons/same.jpg"), "图一致时必须给图"
+
+    differ = _StubManifest([
+        _item(2867719094, "重型弹药搜寻者", "/common/destiny2_content/icons/a.png"),
+        _item(644105, "重型弹药搜寻者", "/common/destiny2_content/icons/b.png"),
+        _item(554409585, "重型弹药搜寻者", "/common/destiny2_content/icons/b.png"),
+    ])
+    assert agreed_icon(differ, [2867719094, 644105, 554409585]) == "", (
+        "同名定义指到两张不同的图时必须给空串 —— 挑一个就是猜，看图记名字的人会记错"
+    )
+    assert agreed_icon(differ, []) == "", "没有定义就是没有图"
+
+
+def test_subclass_icon_requires_the_subclass_item_type() -> None:
+    """裸分支标签**必须**带 `item_type=16` 才解析：实测「棱镜」命中的是一件**武器皮肤**。
+
+    这条走的是**模块自己的 `_subclass_row`**（不是手工传 `item_type=`）—— 注入验证时发现：
+    如果测试自己把过滤写进调用，那把模块里的过滤删掉它照样绿。替身刻意**只留**那件皮肤
+    （没有名字能对上的子职业），于是"有过滤 → 空串、没过滤 → 皮肤图"这一对差别才咬得住。
+    """
+    from destiny_mcp.services.starside_build_icons import build_visuals
+
+    manifest = _StubManifest([
+        _item(3373357626, "棱镜", "/common/destiny2_content/icons/skin.jpg", itemType=19),
+    ])
+    build = {"class": {"name": "猎人", "id": "hunter"}, "subclass": "棱镜",
+             "weapons": [], "armor": {}}
+    visuals = build_visuals(manifest, build)
+
+    assert visuals["subclass"] == {"name": "棱镜", "icon_url": ""}, (
+        "裸标签只命中武器皮肤时必须空串 —— 去掉 item_type=16 就会画出那张皮肤图"
+    )
+
+
+def test_community_build_icons_never_guess() -> None:
+    """`build_visuals` 的三条出口行为：解析不到→空串、套装→空串、子职业走类型过滤。"""
+    from destiny_mcp.services.starside_build_icons import build_visuals
+
+    manifest = _StubManifest([
+        _item(2376481550, "混乱无序", "/common/destiny2_content/icons/anarchy.jpg", itemType=3, tier=6),
+        _item(4282591831, "棱镜猎人", "/common/destiny2_content/icons/subclass.png", itemType=16, classType=1),
+        _item(3373357626, "棱镜", "/common/destiny2_content/icons/skin.jpg", itemType=19),
+    ])
+    build = {
+        "class": {"name": "猎人", "id": "hunter"},
+        "subclass": "棱镜",
+        "weapons": [
+            {"name": "混乱无序", "tier": "exotic"},
+            {"name": "斗牛士 64", "tier": "legendary"},      # 实测精确名 0 命中
+        ],
+        "armor": {"exotic": "", "set_requirements": [{"name": "贪婪之握", "count": 4}]},
+    }
+    visuals = build_visuals(manifest, build)
+
+    assert visuals["weapons"][0]["icon_url"].endswith("/icons/anarchy.jpg")
+    assert visuals["weapons"][1]["icon_url"] == "", "解析不到武器就必须空串（不出图，也不编）"
+    assert visuals["armor"]["set"] == {"name": "贪婪之握", "icon_url": ""}, (
+        "套装行：名字照给、图一律空串（Manifest 的套装定义 hasIcon:false）"
+    )
+    assert visuals["subclass"]["icon_url"].endswith("/icons/subclass.png"), (
+        "子职业必须走「标签+职业名」+ item_type=16，不能拿裸标签命中的武器皮肤"
+    )
+    assert "exotic" not in visuals["armor"], "模板没写异域护甲就不该凭空造一行"
+
+
+def test_armor_set_row_never_carries_an_icon() -> None:
+    """套装行一律空串：`DestinyEquipableItemSetDefinition` 里有 `hasIcon: false`。
+
+    实测 `741162535`（埃希恩记忆）的原始定义就是 `"iconHash":0,"hasIcon":false` ——
+    这不是"还没做"，是**没有这张图**。**两条路都要钉**：`build_visuals` 的
+    `armor.set`（列表/详情共用）与 `with_requirement_icons` 的 `armor_set` 行
+    —— 只钉一条的话，注入另一条守门照样绿（第一版就是这样漏的）。
+    """
+    from destiny_mcp.services.starside_build_icons import (
+        build_visuals,
+        with_requirement_icons,
+    )
+
+    manifest = _StubManifest([_item(1, "某武器", "/common/destiny2_content/icons/w.jpg")])
+
+    visuals = build_visuals(manifest, {
+        "class": {"name": "猎人", "id": "hunter"}, "subclass": "",
+        "weapons": [], "armor": {"set_requirements": [{"name": "埃希恩记忆", "count": 4}]},
+    })
+    assert visuals["armor"]["set"] == {"name": "埃希恩记忆", "icon_url": ""}, (
+        "套装的图必须空串，不许拿任何一张图顶上"
+    )
+
+    validation = {
+        "requirements": [
+            {"kind": "armor_set", "name": "埃希恩记忆", "status": "resolved",
+             "definitions": [{"set_hash": 741162535, "set_name": "埃希恩记忆"}]},
+            {"kind": "weapon", "name": "某武器", "status": "resolved",
+             "definitions": [{"item_hash": 1}],
+             "perk_resolutions": [{"kind": "weapon_perk", "name": "某 perk",
+                                   "definitions": [{"item_hash": 1}]}]},
+        ]
+    }
+    with_requirement_icons(manifest, validation)
+    assert validation["requirements"][0]["icon_url"] == "", "套装没有图，不许拿别的顶"
+    assert validation["requirements"][1]["icon_url"].endswith("/icons/w.jpg")
+    assert validation["requirements"][1]["perk_resolutions"][0]["icon_url"].endswith("/icons/w.jpg"), (
+        "perk 行也要有图（详情那一档是「全部显示」）"
+    )
