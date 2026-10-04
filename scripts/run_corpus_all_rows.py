@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import re
 import sys
 import time
@@ -2393,10 +2394,15 @@ async def run_mcp(live: dict[str, Any]) -> None:
         )
 
     async def with_session(env_extra: dict[str, str], body: Any) -> Any:
+        # `**os.environ` 必须带上：MCP SDK 的 stdio 只转发白名单环境变量
+        # （`mcp.client.stdio.get_default_environment()`），只给 `DESTINY_MCP_ROOT` 的话
+        # `PYTHONPATH` 会丢 —— 在临时树里跑时子进程 import 的仍是**工作区**的代码
+        # （"基线/验收假绿"，2026-10-05 实测；规矩见 AGENTS.md 的"验收树能跑"那一条）。
         params = StdioServerParameters(
             command=str(command),
             args=[],
             env={
+                **os.environ,
                 "DESTINY_MCP_ROOT": str(ROOT),
                 **env_extra,
             },

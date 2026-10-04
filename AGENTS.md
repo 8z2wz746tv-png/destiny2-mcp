@@ -31,6 +31,15 @@ For any agent, not only Codex:
   **⚠️ 在临时树里跑之前先钉住 `PYTHONPATH=<临时树>`**：本机 `.venv` 里装着工作区的 editable 映射
   （`__editable__.destiny_mcp-*.pth`），子进程（`tests/test_benchmark_equip_chain_smoke.py` 会 spawn）
   会绕过临时树 import 到**工作区**的代码 —— 那样验的不是这棵树（第一次跑就被它骗过一次）。
+  **这条只对"直接 `python -c` / `pytest`"成立**：那种情况下 `PYTHONPATH` 真的被子进程继承。
+  **经 stdio 起 MCP 子进程时它会被丢掉**（2026-10-05 实测反例）：MCP SDK 的
+  `mcp.client.stdio` 默认只转发白名单环境变量（`get_default_environment()`；POSIX 是
+  `HOME/LOGNAME/PATH/SHELL/TERM/USER`），`PYTHONPATH` 不在里面 —— 起出来的服务器照旧 import
+  **工作区**的代码。症状是**基线 diff 假绿**：所谓"改动前"的 capture 里已经带着这次新加的字段
+  （`scripts/capture_weapon_baseline.py` 就是这么跑的）。所以**跑真机/基线脚本时必须在 harness 里
+  显式 `StdioServerParameters(..., env={**os.environ})`**，再在临时树里跑；脚本自己不带这个参数时，
+  临时树的验收对它无效 —— 这一条是**实测反例**改出来的（本仓"规矩也会错"的一类：写下来的规矩
+  只覆盖了它被写下来的那个场景）。
   另外：`ruff check`（CI 那套 E4/E7/E9/F）在这种断链上是**绿的** —— 它抓不到"从一个模块导入一个
   它根本没有的名字"，别拿 lint 绿当"树能跑"。
 - **转述会失真，关键事实必须自己核**：别的 agent 给的数字/结论，写进你的 prompt 前先验证

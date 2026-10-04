@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import time
 from pathlib import Path
 
@@ -251,7 +252,14 @@ def _resolve(args: dict, previous: dict | None) -> dict:
 
 async def capture(out_dir: Path, cases: list) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
-    params = StdioServerParameters(command=str(ROOT / ".venv" / "bin" / "destiny-mcp"), args=[])
+    # ⚠️ `env={**os.environ}` 是**必须**的，不是顺手加的：MCP SDK 的 stdio 默认只转发白名单
+    # （`mcp.client.stdio.get_default_environment()`，POSIX 是 HOME/LOGNAME/PATH/SHELL/TERM/USER），
+    # `PYTHONPATH` 会被丢掉 —— 在临时树里跑时子进程照旧 import **工作区**的代码，
+    # 于是"改动前"的基线里已经带着这次新加的字段（**基线 diff 假绿**，2026-10-05 实测）。
+    # 规矩写在 AGENTS.md 的"验收树能跑"那一条里。
+    params = StdioServerParameters(
+        command=str(ROOT / ".venv" / "bin" / "destiny-mcp"), args=[], env={**os.environ}
+    )
     index: list[dict] = []
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:

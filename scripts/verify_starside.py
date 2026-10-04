@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 from pathlib import Path
 import tempfile
 
@@ -33,9 +34,11 @@ def payload(result) -> dict:
 
 
 async def verify(root: Path, *, inventory: bool, timeout: float) -> None:
+    # `**os.environ` 见 AGENTS.md 的"验收树能跑"：stdio 只转发白名单环境变量，
+    # 少了它 `PYTHONPATH` 会被丢掉、子进程 import 的是工作区而不是 `root`（假绿）。
     params = StdioServerParameters(
         command=str(root / ".venv/bin/destiny-mcp"),
-        env={"DESTINY_MCP_ROOT": str(root)},
+        env={**os.environ, "DESTINY_MCP_ROOT": str(root)},
     )
     async with asyncio.timeout(timeout):
         with tempfile.TemporaryFile(mode="w+", encoding="utf-8") as server_log:
