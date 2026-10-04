@@ -106,7 +106,14 @@ _NAME_KEYS = {"name", "plug_name", "item_name", "set_name", "perk_name", "subcla
 _HASH_KEYS = {"item_hash", "plug_hash", "itemHash", "plugItemHash", "set_hash",
               "subclass_hash", "hash", "subclass_item_hash", "plug_item_hash", "new_plug_hash",
               "enhanced_plug_hash", "perk_hash", "super_hash", "grenade_hash", "melee_hash",
-              "class_ability_hash", "movement_hash"}
+              "class_ability_hash", "movement_hash",
+              # 2026-10-05 第三次扩表（**为了让商人那一行落在覆盖面里**）：`vendor_hash`
+              # 当初被归进"不是物品"那一族一起排除，理由是那**一族**会多 20 行噪声。
+              # 单收它一个实测只多 **4** 行：两行是商人身份出口（`VendorInfo` 类体 +
+              # `get_vendor_inventory` 的构造调用 —— 本轮补 `icon_url` 的对象，收进来才有守门）、
+              # 两行是 `vendor_menu.VendorIdentity`（匹配/排序的中间体，已登记台账）。
+              # 拿"一族"的量去否掉"一个键"是不成立的（同 §14.3 裸 `hash` 那次）。
+              "vendor_hash"}
 #: **光有 hash 也算身份行**的那一个键（2026-10-05 新增的判据）。
 #:
 #: 上面那套要求"名字键**和**身份 hash 键同时在"，因为只有 hash 的行未必是给人看的身份行
@@ -119,6 +126,21 @@ _HASH_KEYS = {"item_hash", "plug_hash", "itemHash", "plugItemHash", "set_hash",
 _ITEM_IDENTITY_KEYS = {"item_hash"}
 #: 活动/副本身份行的键（与物品那套**分开**：它们的图标走另一条道，见模块开头第 3 条）
 _ACTIVITY_NAME_KEYS = {"activity_name", "activity"}
+#: **只有活动 hash 也算活动身份行**（2026-10-05 新增的判据，与 `_ITEM_IDENTITY_KEYS` 同一个道理）。
+#:
+#: 上面那对名字键漏掉了一整类真实出口：**活动行只有 hash + 名字在别处**——`rotations` 的特色
+#: 突袭/地牢行头（`name` 是里程碑名、身份是那组 `activityHash`）、`nightfall` 行、
+#: `rotation_service._activity_row`、`pvp_match_tally.activity_rows`（`{activity_hash, name, …}`）。
+#: 实测：这几行**一条都没被扫到**（`test_activity_rows_carry_icon_url` 的 docstring 里
+#: 却写着"覆盖 rotations / pvp_weapons" —— 那是句假话，这一轮一并改成真的）。
+#:
+#: 两条边界（都按实测取的最窄口径，不是想当然）：
+#: - 只扫**字典字面量**：`get_icon_url(activity_hash=…)` 这种**调用**不是行；
+#: - **还要有名字键**：否则 `pvp_weapon_service` 逐场扫描的暂存行
+#:   （`candidates[instance_id] = {instance_id, class, period, activity_hash, …}`，
+#:   没有名字键）会被卷进来 —— 它不是给人看的行，也不该为它开一条活动行台账
+#:   （活动行的口径是"**没有**豁免台账"，见下面的测试）。
+_ACTIVITY_IDENTITY_KEYS = {"activity_hash"}
 _ICON_KEYS = {"icon_url", "iconUrl"}
 
 # ── 豁免台账 ──────────────────────────────────────────────────────────────
@@ -215,6 +237,13 @@ _EXEMPT: dict[str, str] = {
     # 静态扫描看不见"那个工厂给了什么"，所以只能逐条登记（两处都在真机响应里核过）。
     "destiny_mcp/services/weapon_popularity_service.py::_weapon_identity()::block": "身份块由 `weapon_payload.lean_identity` 造（`LEAN_IDENTITY_KEYS` 含 `icon_url`，真机 `data.weapon.icon_url` 非空）；这里只覆盖 `item_hash` 与版本标签",
     "destiny_mcp/services/weapon_popularity_service.py::_enrich_entry()::result": "定义级 perk 行，**按口径不带图**（§十 第 4 项；两条路一致由 `test_popularity_paths_agree_on_perk_rows` 钉住）：`plug_hash` 在这里补，图故意不给",
+    # ── ⑨ 2026-10-05 第六轮：收进 `vendor_hash`、活动 hash 后新进扫描面的 3 行 ───────────
+    # 前两条是**同一个中间体**的两半（模型类体 + 构造调用）。它**不进响应**：出口行是
+    # `VendorInfo`（`get_vendor_inventory` 里现造，两条形状判据都已覆盖，见
+    # `test_icon_url_output` 的 `VendorInfo` 类体与 `vendor_service.py:668` 的构造调用）。
+    # 这个 `VendorIdentity` 只用来做名字匹配、别名解析与排序（`services/vendor_menu.py`）。
+    "destiny_mcp/services/vendor_menu.py::VendorIdentity": "商人身份的**匹配/排序中间体**（不是出口行）：出口是 `VendorInfo`（本轮补了 `icon_url`，类体与构造调用两条判据都咬得住）",
+    "destiny_mcp/services/vendor_menu.py::vendor_identities()→VendorIdentity": "同上：`vendor_identities()` 造的就是上一条那个中间体，不进响应",
 }
 
 
@@ -613,10 +642,12 @@ def test_identity_rows_carry_icon_url() -> None:
 
 
 def _activity_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
-    """带活动名字键的行：字典字面量、`Model(activity_name=…)` 构造调用。
+    """带活动名字键、或**只有活动 hash** 的行：字典字面量、`Model(activity_name=…)` 构造调用。
 
     判据刻意**宽**：只要有 `activity_name`/`activity` 就算活动身份行，不要求它同时带 hash ——
     `history` 的行以前就只有名字没有 hash，正是这样漏掉的（补 hash 是这一步的副产品）。
+    **只有 `activity_hash` 的字典字面量**也算（2026-10-05 补，见 `_ACTIVITY_IDENTITY_KEYS`）：
+    那类行的名字在别处（行头的里程碑名、或者干脆只有 hash），以前一条都扫不到。
     """
     owner = _functions(tree)
     rows: list[tuple[str, int, set[str]]] = []
@@ -627,6 +658,12 @@ def _activity_rows(tree: ast.AST) -> list[tuple[str, int, set[str]]]:
         elif isinstance(node, ast.Call):
             keys = {kw.arg for kw in node.keywords if kw.arg}
         if keys and (keys & _ACTIVITY_NAME_KEYS):
+            rows.append((owner.get(id(node), "?"), node.lineno, keys))
+        elif (
+            isinstance(node, ast.Dict)
+            and (keys & _ACTIVITY_IDENTITY_KEYS)
+            and (keys & _NAME_KEYS)
+        ):
             rows.append((owner.get(id(node), "?"), node.lineno, keys))
     return rows
 
@@ -639,7 +676,10 @@ def _scan_activity_rows() -> list[str]:
         for kind, lineno, keys in _activity_rows(tree):
             if keys & _ICON_KEYS:
                 continue
-            missing.append(f"{rel}:{lineno} {kind} {sorted(keys & _ACTIVITY_NAME_KEYS)}")
+            missing.append(
+                f"{rel}:{lineno} {kind} "
+                f"{sorted(keys & (_ACTIVITY_NAME_KEYS | _ACTIVITY_IDENTITY_KEYS))}"
+            )
     return missing
 
 
