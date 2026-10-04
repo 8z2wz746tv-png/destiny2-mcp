@@ -21,6 +21,7 @@ from typing import get_args
 
 import pytest
 
+from destiny_mcp.manifest_lookup import DefinitionLookupMixin
 from destiny_mcp.services import rotation_service
 
 from destiny_mcp.data import rotations as tables
@@ -109,7 +110,7 @@ MILESTONES = {
 MILESTONE_NAMES = {3881495763: "玻璃拱顶", 999: "周常公会记忆水晶"}
 # 活动定义：(名字, 活动类型名)。类型名走 Manifest（实测这一批全是「突袭」，照实给）
 ACTIVITY_DEFS = {
-    3881495763: ("玻璃拱顶: 标准", "突袭"),
+    3881495763: ("玻璃拱顶: 标准", "突袭"),   # 图见 ACTIVITY_IMAGES
     101: ("切除: 宗师", "剧情"),
     102: ("日落: 大师", "日落"),
     103: ("智谋", "智谋"),
@@ -129,11 +130,18 @@ CHARACTER_ACTIVITIES = {
     ]},
     "char2": {"availableActivities": []},
 }
+#: 活动道要读的图字段（`pgcrImage` 优先，占位往下退）—— 真机口径见 manifest_lookup
+ACTIVITY_IMAGES = {3881495763: "/img/destiny_content/pgcr/raid_vault_of_glass.jpg",
+                   101: "/img/theme/destiny/bgs/pgcrs/placeholder.jpg"}
 MODIFIER_NAMES = {201: "团灭", 202: "勇士敌人", 0: ""}
 ITEM_NAMES = {301: "故我在", 302: "上维碎片（普通）"}
 
 
-class FakeManifest:
+class FakeManifest(DefinitionLookupMixin):
+    """替身只补数据源（`get_definition` / `get_item_definition`），**不重写**活动道那一套：
+    `get_icon_url` 直接从真的 mixin 继承 —— 假实现会在接口变化时静默漂掉
+    （2026-10-04：活动行加了 `icon_url`，替身没跟上，8 条测试当场红）。"""
+
     def get_definition(self, table: str, hash_id: int) -> dict | None:
         if table == "DestinyMilestoneDefinition":
             name = MILESTONE_NAMES.get(hash_id)
@@ -144,6 +152,7 @@ class FakeManifest:
                 return None
             name, type_name = entry
             return {"displayProperties": {"name": name},
+                    "pgcrImage": ACTIVITY_IMAGES.get(hash_id, ""),
                     "activityTypeHash": abs(hash(type_name)) % 1_000_000}
         if table == "DestinyActivityTypeDefinition":
             for _name, type_name in ACTIVITY_DEFS.values():
@@ -187,6 +196,10 @@ async def test_featured_rows_are_official_and_skip_activity_less_milestones() ->
     assert names == ["玻璃拱顶"], "没有活动的里程碑（公会记忆水晶）不该出现在轮换表里"
     assert raids[0]["source"] == "official" and raids[0]["activity_type"] == "突袭"
     assert raids[0]["week_of"] == "2026-09-15T17:00:00Z"
+    # 活动道：里程碑里的每个活动行都带图（`pgcrImage` 相对路径由出口归一成绝对地址）
+    assert raids[0]["activities"][0]["icon_url"] == (
+        "https://www.bungie.net/img/destiny_content/pgcr/raid_vault_of_glass.jpg"
+    )
     assert result["counts"]["official"] >= 1
 
 
@@ -200,6 +213,9 @@ async def test_nightfall_row_carries_modifiers_rewards_and_skips_empty_hash() ->
         ("故我在", 1), ("上维碎片（普通）", 0),
     ], "数量 0 是占位，原样给"
     assert row["source"] == "official"
+    # 夜幕行的图与 `activity_hash` 同源；夹具那条上游只给**占位横幅**（真机里 PvP 活动全是它），
+    # 占位不算图、又没有 displayProperties.icon 可退 → 空串，**不是那个占位地址**。
+    assert row["activity_hash"] and row["icon_url"] == ""
 
 
 async def test_nightfall_without_strike_name_keeps_the_difficulty_only() -> None:

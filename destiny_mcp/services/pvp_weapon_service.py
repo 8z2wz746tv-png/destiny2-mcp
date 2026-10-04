@@ -38,7 +38,9 @@ from ..exceptions import APIError, CharacterNotFoundError, InvalidArgumentError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager, class_type_name
 from ..player_resolver import PlayerResolver
+from ..utils.icons import icon_url as _icon_url
 from .activity_service import _unwrap_bungie_response
+from . import pvp_match_tally
 from .pgcr_cache import PgcrCache
 from .pgcr_values import days_span, rounded_int, stat_value
 
@@ -237,6 +239,8 @@ class PvpWeaponService:
                     "class": class_name,
                     "period": str(act.get("period", "") or ""),
                     "activity_mode": details.get("mode", 0),
+                    # 这一场**打的是哪个活动**（活动道取图要它；mode 是模式，不是活动）
+                    "activity_hash": details.get("referenceId", 0),
                 }
 
         if not candidates:
@@ -311,13 +315,7 @@ class PvpWeaponService:
         unresolved = 0
         for item_hash, row in totals.items():
             info = self._manifest.get_item_info(item_hash)
-            icon = info.get("icon", "") if isinstance(info, dict) else ""
-            icon_url = (
-                icon if isinstance(icon, str) and icon.startswith(("http://", "https://"))
-                else f"https://www.bungie.net{icon}"
-                if isinstance(icon, str) and icon.startswith("/")
-                else ""
-            )
+            icon_url = _icon_url(info.get("icon") if isinstance(info, dict) else "")
             name = self._manifest.get_item_name(item_hash)
             if not name or name.startswith("#"):
                 unresolved += 1
@@ -350,13 +348,9 @@ class PvpWeaponService:
             # 每个角色只取最近这一页历史：窗口是"这一页里最近的 N 场"。
             "history_page_size_per_character": HISTORY_PAGE_SIZE,
         }
-        tally = []
-        unnamed_modes: list[int] = []
-        for mode_id, count in sorted(mode_tally.items(), key=lambda kv: (-kv[1], kv[0])):
-            name = self._manifest.get_activity_mode_name(mode_id)
-            if not name:
-                unnamed_modes.append(mode_id)
-            tally.append({"mode": mode_id, "name": name or f"模式{mode_id}", "matches": count})
+        tally, unnamed_modes = pvp_match_tally.mode_rows(self._manifest, mode_tally)
+        # 活动行：这个出口的"活动身份"部分（突袭/地牢那两处走的是同一张活动道）
+        activities = pvp_match_tally.activity_rows(self._manifest, analyzed)
 
         warnings.append(
             "这是**最近 N 场**的 PvP 武器击杀，不是生涯累计："
@@ -418,6 +412,7 @@ class PvpWeaponService:
             },
             "window": window,
             "mode_tally": tally,
+            "activities": activities,
             "characters": per_character,
             "weapon_count": len(weapons),
             "total_weapon_kills": total_kills,

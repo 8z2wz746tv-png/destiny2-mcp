@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from destiny_mcp.exceptions import APIError, CharacterNotFoundError, ConfigError
+from destiny_mcp.manifest_lookup import DefinitionLookupMixin
 from destiny_mcp.services.activity_service import ActivityService
 
 
@@ -19,6 +20,10 @@ HUNTER_ID = "2305843009000000001"
 def dependencies() -> tuple[AsyncMock, MagicMock, AsyncMock]:
     bungie = AsyncMock()
     manifest = MagicMock()
+    # 图标出口（`get_icon_url`）用**真实现**绑到这个替身上，别在测试里再造一份归一逻辑：
+    # 出口内部会调 `self.get_item_info()`，也就是各测试自己设的 side_effect。
+    # 手写替身会在接口变化时静默漂掉（2026-10-04：物品/活动行改用统一出口，替身没跟上）。
+    manifest.get_icon_url.side_effect = DefinitionLookupMixin.get_icon_url.__get__(manifest)
     resolver = AsyncMock()
     resolver.resolve_player.return_value = {
         "membership_id": MEMBERSHIP_ID,

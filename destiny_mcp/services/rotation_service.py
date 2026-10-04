@@ -26,7 +26,9 @@ from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
-from . import profile_components
+from ..utils.icons import icon_url as _icon_url
+from . import profile_components, rotation_tables
+from .rotation_tables import lost_sector_block
 
 logger = get_logger(__name__)
 
@@ -78,6 +80,15 @@ class RotationService:
         definition = self._manifest.get_definition("DestinyActivityDefinition", activity_hash) or {}
         return (definition.get("displayProperties") or {}).get("name") or f"#{activity_hash}"
 
+    def _activity_row(self, activity_hash: Any) -> dict[str, Any]:
+        """活动引用行：名字 / hash / 图**三者同源**（活动道 —— 三样都从这一个 hash 出来）。"""
+        hashed = activity_hash or 0
+        return {
+            "name": self._activity_name(hashed),
+            "activity_hash": to_unsigned(hashed),
+            "icon_url": self._manifest.get_icon_url(activity_hash=hashed),
+        }
+
     def _item_name(self, item_hash: int) -> str:
         definition = self._manifest.get_item_definition(item_hash) or {}
         return (definition.get("displayProperties") or {}).get("name") or f"#{item_hash}"
@@ -111,8 +122,7 @@ class RotationService:
                 "week_of": milestone.get("startDate"),
                 "until": milestone.get("endDate"),
                 "activities": [
-                    {"name": self._activity_name(a.get("activityHash") or 0),
-                     "activity_hash": to_unsigned(a.get("activityHash") or 0)}
+                    self._activity_row(a.get("activityHash"))
                     for a in activities if isinstance(a, dict)
                 ],
                 "modifiers": [],
@@ -147,9 +157,8 @@ class RotationService:
         for entry in activities:
             if not isinstance(entry, dict):
                 continue
-            display = self._manifest.get_definition(
-                "DestinyActivityDefinition", entry.get("activityHash") or 0
-            ) or {}
+            activity_hash = entry.get("activityHash") or 0
+            display = self._manifest.get_definition("DestinyActivityDefinition", activity_hash) or {}
             entry_name = (display.get("displayProperties") or {}).get("name") or ""
             if not any(marker in entry_name for marker in _NIGHTFALL_MARKERS):
                 continue
@@ -167,7 +176,9 @@ class RotationService:
                 "strike_known": bool(strike),
                 "upstream_name": entry_name,
                 "difficulty": difficulty,
-                "activity_hash": to_unsigned(entry.get("activityHash") or 0),
+                "activity_hash": to_unsigned(activity_hash),
+                # 活动道：夜幕/宗师这一行的图与 `activity_hash` 同源
+                "icon_url": self._manifest.get_icon_url(activity_hash=activity_hash),
                 "recommended_light": entry.get("recommendedLight"),
                 "completed": entry.get("isCompleted"),
                 "modifiers": [m for m in modifiers if m],
@@ -196,9 +207,13 @@ class RotationService:
                 item_hash = quantity.get("itemHash")
                 if not isinstance(item_hash, int):
                     continue
+                # 奖励也是武器/装备，UI 要画卡片：名字与图标取同一次定义查询
+                display = ((self._manifest.get_item_definition(item_hash) or {})
+                           .get("displayProperties") or {})
                 rewards.append({
-                    "name": self._item_name(item_hash),
+                    "name": display.get("name") or f"#{item_hash}",
                     "item_hash": to_unsigned(item_hash),
+                    "icon_url": _icon_url(display.get("icon")),
                     # 数量 0 是占位（实测日落武器就是 0），原样给，不当成"掉 0 个"
                     "quantity": quantity.get("quantity"),
                 })
@@ -239,49 +254,6 @@ class RotationService:
             })
         return rows
 
-    def _tables_block(self) -> list[dict[str, Any]]:
-        block = [
-            {
-                "key": rotation.key,
-                "label": rotation.label,
-                "candidates": list(rotation.candidates),
-                "cycle_weeks": len(rotation.candidates),
-                "anchor_week": rotation.anchor_week_start_utc,
-                "verified_at": rotation.verified_at,
-                "verified_against": rotation.verified_against,
-            }
-            for rotation in tables.WEEKLY_ROTATIONS
-        ]
-        block.append({
-            "key": "wellspring",
-            "label": "泉源",
-            "candidates": list(tables.WELLSPRING_MODES),
-            "cycle_days": len(tables.WELLSPRING_MODES),
-            "anchor_day": tables.WELLSPRING_ANCHOR_DAY_UTC,
-            "verified_at": tables.WELLSPRING_VERIFIED_AT,
-            "verified_against": tables.WELLSPRING_VERIFIED_AGAINST,
-        })
-        return block
-
-    @staticmethod
-    def _lost_sector_block() -> dict[str, Any]:
-        """遗失区域：**专家是常驻列表**（27 个地点，按目的地分组，实测于游戏内截图），
-        传说/大师有没有「每日轮换」还没核对过 —— 所以不给"今天是谁"。"""
-        return {
-            "anchored": tables.LOST_SECTOR_ANCHORED,
-            "expert_always_available": True,
-            "groups": [{"destination": destination, "locations": list(names)}
-                       for destination, names in tables.LOST_SECTOR_GROUPS],
-            "candidates": list(tables.LOST_SECTOR_LOCATIONS),
-            "total": tables.LOST_SECTOR_TOTAL,
-            "verified_at": tables.LOST_SECTOR_VERIFIED_AT,
-            "verified_against": tables.LOST_SECTOR_VERIFIED_AGAINST,
-            "how_to_anchor": (
-                "看一眼游戏里「传说/大师遗失区域」那个入口：是常驻全部，还是每天只放一个？"
-                "如果是后者，把今天的地点名报出来即可补锚点（游戏已停更，核对一次长期有效）。"
-            ),
-        }
-
     # ── 入口 ─────────────────────────────────────────────────────────
     async def rotations(self, player_name: str = "", *, limit: int = 20) -> dict[str, Any]:
         now = datetime.now(timezone.utc)
@@ -305,8 +277,8 @@ class RotationService:
             "truncated": total > len(page),
             "week_of": tables.week_stamp(tables.week_start(now)),
             "today": tables.week_stamp(tables.day_start(now)),
-            "tables": self._tables_block(),
-            "lost_sector": self._lost_sector_block(),
+            "tables": rotation_tables.tables_block(),
+            "lost_sector": lost_sector_block(),
             "read": {"milestones": SOURCE_OFFICIAL, "character_activities": profile_components.describe(
                 [200, *profile_components.CHARACTER_ACTIVITIES]
             )},

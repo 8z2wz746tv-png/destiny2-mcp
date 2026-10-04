@@ -25,6 +25,7 @@ from destiny_mcp.data import activity_modes
 from destiny_mcp.exceptions import CharacterNotFoundError
 from destiny_mcp.services import pvp_weapon_service as app
 from destiny_mcp.services.pgcr_cache import PgcrCache
+from destiny_mcp.utils.icons import BUNGIE_ORIGIN
 from destiny_mcp.services.pvp_weapon_service import PvpWeaponService
 
 PLAYER = "TestGuardian#1234"
@@ -79,6 +80,13 @@ def _manifest() -> MagicMock:
         69: "多人竞技PvP", 73: "占领模式：快速游戏",
         84: "奥斯里斯试炼",
     }.get(mode_type, "")
+    # 活动道（`activity_hash` → 图）：照真出口的形状给 —— `activities` 那几行要它
+    # （不给 side_effect 的话 MagicMock 会返回一个 MagicMock 塞进响应里）。
+    manifest.get_activity_name.side_effect = lambda h: f"活动{h}"
+    manifest.get_icon_url.side_effect = lambda *, item_hash=0, activity_hash=0: (
+        f"{BUNGIE_ORIGIN}/img/destiny_content/pgcr/activity_{activity_hash}.jpg"
+        if activity_hash else ""
+    )
     return manifest
 
 
@@ -139,6 +147,13 @@ async def test_window_and_scope_are_always_reported(service: PvpWeaponService) -
     assert {row["name"] for row in result["mode_tally"]} == {
         "占领模式：快速游戏", "铁旗占领模式",
     }
+    # 活动行（活动道）：`activity_hash` 与图同源，取的是历史里的 `activityDetails.referenceId`
+    assert [(row["activity_hash"], row["name"], row["matches"]) for row in result["activities"]] == [
+        (1, "活动1", 2)
+    ]
+    assert result["activities"][0]["icon_url"] == (
+        f"{BUNGIE_ORIGIN}/img/destiny_content/pgcr/activity_1.jpg"
+    )
     assert any("最近" in warning and "不是生涯" in warning for warning in result["warnings"])
     assert result["mode_group"]["is_pvp_only"] is True
 

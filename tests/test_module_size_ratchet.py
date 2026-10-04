@@ -132,7 +132,12 @@ CEILINGS = {
     # 上限按拆分后的长度收紧 —— 缓存与聚合本来就是两个问题。
     # 性能六项：PGCR 数值解析与时间窗计算搬去 `services/pgcr_values.py`（与榜单逻辑无关）
     # → 468 → 434，上限跟着收紧。
-    "destiny_mcp/services/pvp_weapon_service.py": 434,
+    # 434 → 429（2026-10-04）：两张身份表（按模式、按活动）搬去 `pvp_match_tally.py`，
+    # 榜单本体这边只留一行调用 —— 腾出的位置放"活动行"这个新块。
+    "destiny_mcp/services/pvp_weapon_service.py": 429,
+    # 2026-10-04 新增：PvP 榜的两张身份表（模式名 + 活动名/图）。登记即上限：
+    # 它们要跟响应一起冻结，所以"再加一张表"得先回答"放这儿还是另起一处"。
+    "destiny_mcp/services/pvp_match_tally.py": 58,
     "destiny_mcp/services/pgcr_values.py": 49,
     "destiny_mcp/services/pgcr_cache.py": 106,
     # P4 新增：武器分支载荷与形状工厂。定在上限处是为了让"再加一个 intent"
@@ -172,7 +177,10 @@ CEILINGS = {
     # 463 = 427 + 角色级记录合并（真机事故：32 条角色级记录被漏读）+ read 块收敛。
     # 488 = 463 + 稀有度筛选与 by_tier 汇总（真机事故：只读第一页把 16 把金枪报成 2 把）。
     # 再往里加就该拆"目录/账号状态"，而不是抬上限。
-    "destiny_mcp/services/pattern_service.py": 488,
+    # 465（2026-10-04 图标出口）：图样行补 `icon_url` 时把"组件 900 一格怎么并"
+    # （`cell`/`merge_cell`，纯合并规则、不碰账号与 Manifest）拆去
+    # `services/pattern_records.py` —— 上限跟着收紧，不是抬。
+    "destiny_mcp/services/pattern_service.py": 465,
     # 同上：Starside「锻造武器来源」的名字索引（归一化 / 表格 / 正文兜底 / 出处）。
     # 名字归一化只此一处，别再抄到 pattern_service 或工具层。
     "destiny_mcp/services/starside_crafting_sources.py": 186,
@@ -181,7 +189,14 @@ CEILINGS = {
     # 遗失区域那 27 个地点按目的地分组写在这里（用户截图的「World Lost Sector」专家列表）。
     "destiny_mcp/data/rotations.py": 166,
     # 同上：把官方那半（里程碑 + 组件 204）与表那半拼起来，并给每行标 source。
-    "destiny_mcp/services/rotation_service.py": 313,
+    # 300（2026-10-04 图标出口）：周常奖励行补 `icon_url`，同时把"自维护表那半"的
+    # 遗失区域块拆去 `services/rotation_tables.py`（不碰账号、不碰 Bungie）。
+    # 300 → 285：周期表本身（`_tables_block`）搬去 `rotation_tables.tables_block()` ——
+    # 那一块只读 `data/rotations.py`，与"取数"无关；腾出的位置正好放活动行的图标。
+    "destiny_mcp/services/rotation_service.py": 285,
+    # 遗失区域块拆去 `services/rotation_tables.py`（不碰账号、不碰 Bungie）。
+    # 61 = 遗失区域块 + 周期表本身（2026-10-04 从服务搬来）：两块都是"表的只读渲染"。
+    "destiny_mcp/services/rotation_tables.py": 61,
     # 同上：`intent="rotations"` 的载荷与话术（口径分离 / 未锚点说明 / {var:} 提醒）。
     "destiny_mcp/tools/_rotation_branches.py": 111,
     # 只发标量的宿主（豆包 connector）把结构化参数写成文本时的还原：登记表 + 一次性还原。
@@ -196,7 +211,9 @@ CEILINGS = {
     # 同上：`intent="patterns"` 的载荷与话术（总览 / 单把 / 变体 / 术语对照 /「未开始」措辞）。
     # 211 是加上"玩家说红框、游戏说模式"的术语块与变体话术（含强化插槽）之后的长度；
     # 215 = 211 + 载荷里的 by_tier 汇总。
-    "destiny_mcp/tools/_patterns_branches.py": 215,
+    # 200（2026-10-04 图标出口）：图样行补 `icon_url`，同时把来源覆盖块
+    # （`crafting_sources_block`）搬去 `tools/_farming.py`（那边本来就是刷取/来源清单的家）。
+    "destiny_mcp/tools/_patterns_branches.py": 200,
     # —— 2026-09-24 补登记：这几块都是**拆出来的产物**（assistants / loadout_equipment_service
     # 的上限一路下调，靠的就是把代码挪进它们）。拆出来的模块不登记，等于给上限开了后门：
     # 往 `_loadout_branches.py` 堆代码时 `assistants.py` 仍然"达标"，总量却在涨
@@ -288,12 +305,16 @@ CEILINGS = {
     "destiny_mcp/services/starside_matching.py": 860,
     # 2026-10-03 登记（② 一次读回已装备护甲的插槽）：这个文件已经是"账号读取"里最大的一块，
     # 再加读取入口先回答"是拆出去还是复用"（读回那一段本身只有 70 行，形状工厂在 armor_payload）。
-    "destiny_mcp/services/inventory_service.py": 783,
+    # 762（2026-10-04 图标出口）：五件护甲补 `icon_url`，同时把"在 profile 里定位一件实例"
+    # （`locate_instance`，纯字典遍历、无服务状态）拆去 `services/inventory_lookup.py`。
+    "destiny_mcp/services/inventory_service.py": 762,
     # 2026-10-03 登记（②）：护甲只读分支（`item` 单件 + `mods` 多件插槽）。
     "destiny_mcp/tools/_armor_branches.py": 589,
     # 2026-10-03 新增（从 `_build_flow` 拆出，① 执行前提腾位置）：`find`/`recommend` 的
     # 候选行投影。登记即上限 —— 再往里加东西先回答"是不是该拆"。
-    "destiny_mcp/services/build_projection.py": 137,
+    # 120（2026-10-04 图标出口）：候选行补 `icon_url`（默认出口少了它，UI 那五件只能放色块），
+    # 同时把 `tuning_rows` 搬去 `services/build_results.py`（与 `tuning_note` 同一件事）。
+    "destiny_mcp/services/build_projection.py": 120,
     # 2026-10-03 新增（从 `build_service` 拆出）：求解输入指纹（`CanonicalBuild.snapshot_version`
     # 的重算口径）。登记即上限。
     "destiny_mcp/build/snapshot_version.py": 61,
@@ -337,7 +358,10 @@ CEILINGS = {
     # 表里每一行都有 `tests/test_raid_report.py` 对着 Manifest 核（hash 存在、描述里含副本名、
     # 且不是"本周/本赛季"变体），所以加行是"有意识的决定"，不是顺手抄一条。
     "destiny_mcp/data/raids.py": 163,
-    "destiny_mcp/services/raid_report_service.py": 269,
+    # 269 → 268（2026-10-04）：活动道给每行加了 `activity_hash`/`icon_url`，同时把
+    # `_int_or_none`/`_progress` 删掉 —— 组件 1100 的读法只有一处
+    # （`activity_counters_service.metric_progress`），两份对字符串的判定本来就不同。
+    "destiny_mcp/services/raid_report_service.py": 268,
     # 逐场索引（P4）：存从 PGCR 抠出来的原始事实 + 按副本分块扫描。两者同处一模块是因为
     # 扫描写的就是这里的格式，分开会让"字段名"有两个出处。
     "destiny_mcp/services/raid_runs.py": 319,

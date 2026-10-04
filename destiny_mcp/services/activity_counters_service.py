@@ -67,6 +67,25 @@ def _int_or_none(value: Any) -> int | None:
     return None
 
 
+def metric_progress(metrics: dict, metric_hash: int | None) -> int | None:
+    """从组件 1100 的 `metrics` 里取某个计数器当前的进度值（`None` = 没读到）。
+
+    放在这里而不是各处再写一份：**同一个组件的读法只能有一处**。突袭报表
+    （`raid_report_service`）与计数器列表读的是同一份 `metrics` —— 它以前自带一份
+    `_int_or_none`，两份对字符串的判定还不一样（那份只认 `-` 号，这份 `int()`
+    还认 `+`/下划线），正是"同一件事两个出处"的典型。
+    """
+    if metric_hash is None:
+        return None
+    entry = metrics.get(str(metric_hash)) or metrics.get(metric_hash)
+    if not isinstance(entry, dict):
+        return None
+    objective = entry.get("objectiveProgress")
+    if not isinstance(objective, dict):
+        return None
+    return _int_or_none(objective.get("progress"))
+
+
 def mode_label(mode: str, manifest: ManifestManager) -> str:
     """计数器家族 → 官方中文模式名（Manifest，zh 优先）。
 

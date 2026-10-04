@@ -16,6 +16,7 @@ from ..exceptions import InvalidArgumentError, APIError, CharacterNotFoundError,
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
+from ..utils.hash_utils import to_unsigned
 from ..utils.player_names import bungie_display_name, bungie_display_name_of_player
 
 logger = get_logger(__name__)
@@ -567,8 +568,14 @@ class ActivityService:
                         activity_name = ref_name
 
                 activity_mode = details.get("mode", 0)
+                # 活动身份：名字与图取**同一个 hash**（`ref_hash` 优先，与上面的取名同源）。
+                # 两个 hash 分开给会让"名字是这一场、图是另一个变体"——那正是活动道
+                # 最容易出的错（同一副本的普通/大师/竞赛是不同 hash、不同图）。
+                activity_key = ref_hash or director_hash
                 all_activities.append({
                     "activity_name": activity_name,
+                    "activity_hash": to_unsigned(activity_key),
+                    "icon_url": self._manifest.get_icon_url(activity_hash=activity_key),
                     "character": class_name,
                     "instance_id": details.get("instanceId", ""),
                     "mode": activity_mode,
@@ -646,6 +653,8 @@ class ActivityService:
 
         return {
             "activity_name": activity_name,
+            "activity_hash": to_unsigned(ref_hash),
+            "icon_url": self._manifest.get_icon_url(activity_hash=ref_hash),
             "instance_id": activity_id,
             "starting_phase": response.get("startingPhaseIndex", 0),
             "mode": response.get("activityDetails", {}).get("mode", 0),
@@ -681,19 +690,11 @@ class ActivityService:
             values = raw.get("values", {})
             kills = _first_stat(values, ["uniqueWeaponKills", "kills"])
             precision = _first_stat(values, ["uniqueWeaponPrecisionKills", "precisionKills"])
-            item_info = self._manifest.get_item_info(item_hash)
-            icon = item_info.get("icon", "") if isinstance(item_info, dict) else ""
-            icon_url = (
-                icon
-                if isinstance(icon, str) and icon.startswith(("http://", "https://"))
-                else f"https://www.bungie.net{icon}"
-                if isinstance(icon, str) and icon.startswith("/")
-                else ""
-            )
             weapons.append({
                 "item_hash": item_hash,
                 "name": self._manifest.get_item_name(item_hash),
-                "icon_url": icon_url,
+                # 物品道：出口只给 hash，走统一出口（别再自己查一次定义再拼 URL）
+                "icon_url": self._manifest.get_icon_url(item_hash=item_hash),
                 "kills": kills["value"],
                 "kills_display": kills["display"],
                 "precision_kills": precision["value"],
@@ -740,6 +741,8 @@ class ActivityService:
             activities.append({
                 "activity_hash": activity_hash,
                 "activity_name": self._manifest.get_activity_name(activity_hash),
+                # 活动道：这一行的图与名字取自同一个 hash（`activity_hash` 原样回给调用方）
+                "icon_url": self._manifest.get_icon_url(activity_hash=activity_hash),
                 "completions": completions["value"],
                 "completions_display": completions["display"],
                 "kills": kills["value"],

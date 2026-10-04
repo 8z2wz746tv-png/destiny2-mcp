@@ -129,9 +129,10 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[ServiceContext]:
         starside_entities_svc = StarsideEntities()
         pattern_svc = PatternService(bungie, manifest, resolver, starside_svc)
         # 突袭报表复用计数器服务的读法（同一个组件 1100、同一种抖动重试）；
-        # 扫描器负责逐场 PGCR → 本地索引（报表里「全程/最短用时」两列的唯一来源）
+        # 扫描器负责逐场 PGCR → 本地索引（报表里「全程/最短用时」两列的唯一来源）；
+        # manifest 只用来走**活动道**取每行的活动图（`get_icon_url(activity_hash=…)`）。
         raid_report_svc = RaidReportService(
-            activity_counters_svc, RaidScanner(bungie, resolver))
+            activity_counters_svc, RaidScanner(bungie, resolver), manifest)
         rotation_svc = RotationService(bungie, manifest, resolver)
         armor_mod_svc = ArmorModService(bungie, manifest, resolver)
 

@@ -26,7 +26,7 @@ from typing import Any
 from ..data import raids
 from ..exceptions import InvalidArgumentError
 from ..logging_config import get_logger
-from .activity_counters_service import ActivityCountersService
+from .activity_counters_service import ActivityCountersService, metric_progress
 from .raid_runs import RaidScanner, RaidRunStore, fresh_verdict
 
 logger = get_logger(__name__)
@@ -53,42 +53,24 @@ _UNAVAILABLE: tuple[dict[str, str], ...] = (
 _NOT_SCANNED = "本地还没扫过这个副本的结算，这一列给 null；跑 intent=\"raid_scan\" 补齐。"
 
 
-def _int_or_none(value: Any) -> int | None:
-    """计数器里的数字：可能是 int/float/字符串；取不到给 `None`（缺值不编 0）。"""
-    if isinstance(value, bool) or value is None:
-        return None
-    if isinstance(value, int):
-        return value
-    if isinstance(value, float):
-        return int(value)
-    if isinstance(value, str) and value.strip().lstrip("-").isdigit():
-        return int(value.strip())
-    return None
-
-
-def _progress(metrics: dict, metric_hash: int | None) -> int | None:
-    """从组件 1100 的 `metrics` 里取某个计数器当前的进度值。"""
-    if metric_hash is None:
-        return None
-    entry = metrics.get(str(metric_hash)) or metrics.get(metric_hash)
-    if not isinstance(entry, dict):
-        return None
-    objective = entry.get("objectiveProgress")
-    if not isinstance(objective, dict):
-        return None
-    return _int_or_none(objective.get("progress"))
-
-
 class RaidReportService:
     """`activity_assistant(intent="raid_report")` 的取数与组装。"""
 
-    def __init__(self, counters: ActivityCountersService, scanner: RaidScanner | None = None) -> None:
+    def __init__(
+        self,
+        counters: ActivityCountersService,
+        scanner: RaidScanner | None = None,
+        manifest: Any | None = None,
+    ) -> None:
         # 复用计数器服务的读法与抖动重试：两个功能读的是同一个组件 1100，
         # 重试节奏与"空不是 0"的话术只能有一处（`read_metrics`）。
         self._counters = counters
         # 逐场索引（PGCR 那两列的来源）。没注入就用默认路径 —— 单测里给替身。
         self._scanner = scanner
         self._store = scanner.store if scanner else RaidRunStore()
+        # 活动道（`get_icon_url(activity_hash=…)`）要查 DestinyActivityDefinition。
+        # 只读替身测试不带它 —— 那时给出的图标是空串，不是编出来的地址。
+        self._manifest = manifest
 
     async def scan(self, player_name: str, activity: str, limit: int) -> dict:
         """`raid_scan` 的取数：按副本扫一块 PGCR，落进逐场索引。"""
@@ -135,7 +117,13 @@ class RaidReportService:
         warnings: list[str] = []
         rows: list[dict[str, Any]] = []
         for entry in entries:
-            row: dict[str, Any] = {"activity": entry.name, "kind": entry.kind}
+            activity_hash, icon_url = self._activity_identity(entry)
+            row: dict[str, Any] = {
+                "activity": entry.name,
+                "activity_hash": activity_hash,
+                "icon_url": icon_url,
+                "kind": entry.kind,
+            }
             badges: list[dict[str, Any]] = []
             missing: list[str] = []
             for counter_kind in raids.COUNTER_ORDER:
@@ -144,7 +132,7 @@ class RaidReportService:
                     row[counter_kind] = None
                     missing.append(counter_kind)
                     continue
-                value = _progress(metrics, metric_hash)
+                value = metric_progress(metrics, metric_hash)
                 row[counter_kind] = value
                 if value is None:
                     # 表里有、这次却读不到：不是"没有"，值得单独说一句。
@@ -183,6 +171,16 @@ class RaidReportService:
             "sources": self._sources(),
             "warnings": warnings,
         }
+
+    def _activity_identity(self, entry: raids.RaidEntry) -> tuple[int, str]:
+        """这一行的活动身份：`activity_hash` 与 `icon_url` **同源**（活动道）。
+
+        `data/raids.py` 一个副本挂了好几个难度档的活动 hash（普通/大师/竞赛各自一张图），
+        所以不能"hash 给第一个、图随便查" —— 取第一个**查得到图**的那个。
+        替身测试不带 manifest：那时给 `(0, "")`，**不编一个别的副本的图**。
+        """
+        lookup = getattr(self._manifest, "first_activity_with_icon", None)
+        return lookup(entry.hashes) if callable(lookup) else (0, "")
 
     def _attach_pgcr_columns(self, row: dict[str, Any], entry: raids.RaidEntry) -> None:
         """把「全程次数」与「全程最短用时」接到行上 —— **只从本地逐场索引读**，不发请求。
