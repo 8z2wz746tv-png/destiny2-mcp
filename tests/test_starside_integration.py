@@ -352,6 +352,18 @@ class _Manifest:
                     }
         return None
 
+    def get_item_info(self, item_hash: int):
+        """图标由 hash 现推：让"社区模板 → 图"这条链在替身上也能走到底
+        （`starside_build_icons.agreed_icon` 只读 `icon`；`_icon_url()` 会把它拼成绝对地址）。"""
+        for rows in self.entries.values():
+            for row in rows:
+                if int(row["itemHash"]) == int(item_hash):
+                    return {
+                        "name": row["name"],
+                        "icon": f"/common/destiny2_content/icons/{int(item_hash)}.png",
+                    }
+        return None
+
     def get_all_set_bonuses(self) -> dict:
         return {20: {"set_name": "甲套"}, 21: {"set_name": "乙套"}}
 

@@ -17,6 +17,7 @@ from .. import config
 from ..exceptions import ConfigError
 from ..manifest import ManifestManager
 from .starside_builds import CLASS_ALIASES, clean, parse_build
+from . import starside_build_icons as build_icons
 from .starside_markdown import parse_markdown_document
 from .starside_rated_lists import MAX_QUERY_ROWS, RatedLists
 from .starside_text import cell_block, semantic_text
@@ -714,33 +715,13 @@ class StarsideService:
             and (not category or category.casefold() == build["category"].casefold())
         ]
         matches.sort(key=lambda build: build["build_id"])
-        keys = {
-            "build_id",
-            "title",
-            "author",
-            "updated_at",
-            "scenario",
-            "role",
-            "category",
-            "subclass",
-            "class",
-            "core",
-            "description",
-            "weapons",
-            "armor",
-            "review_notes",
-            "source",
-            "executable",
-        }
+        page = matches[offset : offset + limit]
         return deepcopy(
             self._status()
             | _pagination(len(matches), offset, limit)
-            | {
-                "results": [
-                    {key: value for key, value in build.items() if key in keys}
-                    for build in matches[offset : offset + limit]
-                ],
-            }
+            # 列表行只给**简版**图 + 名（护甲/武器/子职业）：用户口径是"列表简单显示，
+            # 问详情再全部显示"。投影键与解析规则都在 `starside_build_icons`。
+            | {"results": [build_icons.list_row(self._manifest, b) for b in page]},
         )
 
     def get_build(self, build_id: str) -> dict:
@@ -749,6 +730,10 @@ class StarsideService:
             raise ConfigError("找不到 community_build_id；请重新搜索本地配装。")
         build = deepcopy(self._builds[build_id])
         build["validation"] = validate_build(self._manifest, build)
+        # 详情这一档给**全部**细节的图 + 名：`requirements[]` 每行都带 icon_url
+        # （武器/武器 perk/异域护甲/模组/神器/子职业组件），另加一份简版 `visuals`。
+        build["visuals"] = build_icons.build_visuals(self._manifest, build)
+        build_icons.with_requirement_icons(self._manifest, build["validation"])
         return build
 
     def _lookup_sourcing(self, names: list[str]) -> dict:
