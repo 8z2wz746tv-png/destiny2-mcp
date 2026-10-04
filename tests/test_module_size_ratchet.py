@@ -365,7 +365,13 @@ CEILINGS = {
     "destiny_mcp/services/insertion_rule_diagnosis.py": 98,
     # 配装服务本体：清单/详情/存档/预览/官方槽都在这。真机走查连加了两块（`describe_save`
     # 与抽出的 `_read_equipment`），登记在 1030 就是"下次先想清楚放哪儿"。
-    "destiny_mcp/services/loadout_service.py": 1030,
+    # 1030 → 986（2026-10-05 第六轮）：**清单行**整块搬去 `services/loadout_rows.py` ——
+    # 清单行（每套一行 + 图块）与完整模板是两件事，清单行那边还要放"金装/子职业的图"。
+    "destiny_mcp/services/loadout_service.py": 986,
+    # 2026-10-05 新增（从 loadout_service 拆出）：`intent="list"` 的清单行形状 ——
+    # 只留"挑一套"要用的字段 + `visuals`（金装那一件、子职业那一行的图）。
+    # 图**只从这份配装自己的 `build_template` 里取**（账号数据，不做名字→Manifest 解析）。
+    "destiny_mcp/services/loadout_rows.py": 112,
     # 突袭报表新增登记（登记即上限）：表本体（副本 → 官方计数器 hash）+ 取数组装 + 分支话术。
     # 三块分开登记的理由：它们的上限不该互相借用 —— 表会随新副本长，服务与话术不该跟着长。
     # 表里每一行都有 `tests/test_raid_report.py` 对着 Manifest 核（hash 存在、描述里含副本名、

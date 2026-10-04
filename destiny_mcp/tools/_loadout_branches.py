@@ -98,7 +98,7 @@ async def list_or_get(
         )
 
     if intent == "list":
-        from ..services.loadout_service import loadout_rows
+        from ..services.loadout_rows import loadout_rows
 
         rows = loadout_rows(payload["loadouts"])
         return ok_response(
