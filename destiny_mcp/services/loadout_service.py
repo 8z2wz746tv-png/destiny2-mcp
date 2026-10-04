@@ -27,6 +27,7 @@ from ..build.constants import ARMOR_SLOT_MAP
 from . import profile_components
 from .armor_payload import slot_key_from_solver
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
+from ..utils.hash_utils import positive_hashes
 from ..utils.icons import icon_url as _icon_url
 from ..models import (
     Loadout,
@@ -279,18 +280,6 @@ class LoadoutService:
             return ""
         return str((definition.get("displayProperties") or {}).get("name") or "")
 
-    @staticmethod
-    def _hashes(values) -> list[int]:
-        hashes = []
-        for value in values or []:
-            try:
-                hash_id = int(value)
-            except (TypeError, ValueError):
-                continue
-            if hash_id:
-                hashes.append(hash_id)
-        return hashes
-
     def _plug_records(self, plug_hashes: list[int]) -> list[dict]:
         records = []
         for raw_hash in plug_hashes:
@@ -355,7 +344,7 @@ class LoadoutService:
             instance_id = str(raw_item.get("itemInstanceId") or "")
             item_info = self._manifest.get_item_info(item_hash) or {}
             item_type = item_info.get("itemType")
-            plug_hashes = self._hashes(raw_item.get("plugItemHashes", []))
+            plug_hashes = positive_hashes(raw_item.get("plugItemHashes", []))
             plugs = self._plug_records(plug_hashes)
             item_name = (
                 str(item_info.get("name") or self._manifest.get_item_name(item_hash))
@@ -410,6 +399,9 @@ class LoadoutService:
                 class_data.update(
                     subclass_item_hash=item_hash,
                     subclass_instance_id=instance_id,
+                    # 子职业**自己**的图标：`plugs` 每颗都有，唯独"这是哪个子职业"没有 ——
+                    # 卡片第一行只能放色块（用户实拍场景 3）。`item_info` 上面刚查过。
+                    icon_url=_icon_url(item_info.get("icon")),
                     plugs=plugs,
                 )
                 continue
@@ -421,6 +413,9 @@ class LoadoutService:
             class_data.update({
                 "subclass_item_hash": subclass_config.subclass_item_hash,
                 "subclass_instance_id": subclass_config.subclass_instance_id,
+                # 另一条路（`subclass_config`）是同一件事：`SubclassConfig` 本来就带
+                # `icon_url`（2026-10-05 与场景 3 一起补的），照抄即可。
+                "icon_url": subclass_config.icon_url,
             })
             for field, key in (
                 ("super_hash", "super"),
@@ -549,7 +544,7 @@ class LoadoutService:
                             icon_url=_icon_url(item_info.get("icon")),
                             slot=slot,
                             item_instance_id=instance_id,
-                            perks=self._hashes(lo_item.get("plugItemHashes", [])),
+                            perks=positive_hashes(lo_item.get("plugItemHashes", [])),
                         ))
 
                 loadout_id = f"bungie:{char_id}:{loadout_index}"

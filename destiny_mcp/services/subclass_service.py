@@ -413,6 +413,11 @@ class SubclassService:
 
         # Read the subclass definition from manifest for socket type hashes
         subclass_def = self._manifest.get_item_definition(subclass_hash)
+        # 子职业**自己**的图标：`plugs`/`available` 每一颗都有，唯独"这是哪个子职业"
+        # 那一行没有（用户实拍里卡片第一行只能放色块）。定义上面刚查过一次，不额外查库。
+        subclass_icon_url = _icon_url(
+            ((subclass_def or {}).get("displayProperties") or {}).get("icon")
+        )
         socket_entries = (
             subclass_def.get("sockets", {}).get("socketEntries", [])
             if subclass_def else []
@@ -473,6 +478,7 @@ class SubclassService:
             character_class=class_type_name(class_type),
             subclass_name=subclass_name,
             subclass_hash=subclass_hash,
+            icon_url=subclass_icon_url,
             item_instance_id=subclass_instance_id,
             plugs=plugs,
         )

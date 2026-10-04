@@ -36,6 +36,12 @@ class SubclassConfig(BaseModel):
     character_class: str = Field(description="Class name: Hunter/Warlock/Titan")
     subclass_name: str = Field(description="Subclass name (e.g. 'Gunslinger', 'Voidwalker')")
     subclass_hash: int = Field(description="Subclass item definition hash")
+    #: 子职业**自己**的图标（绝对 Bungie CDN 地址）。2026-10-05 补：`plugs`/`available`
+    #: 每一颗都有图，唯独"这是哪个子职业"那一行没有 —— 卡片只能给出一个色块 + 名字，
+    #: 而子职业恰恰是"看图比看名快"的第一行（用户实拍反馈）。它是一件真物品
+    #: （`subclass_hash` → `DestinyInventoryItemDefinition`，实测棱镜猎人
+    #: 4282591831 → `fab506e62fa4f188bfe2fb6d56b39614.png`）。
+    icon_url: str = Field(default="", description="Bungie CDN icon URL for rendering in web UI")
     item_instance_id: str = Field(default="", description="Subclass item instance ID")
     plugs: list[SubclassPlug] = Field(default_factory=list, description="All configured plugs")
 

@@ -28,6 +28,25 @@ def to_unsigned(h: int) -> int:
     return h & _MASK
 
 
+def positive_hashes(values) -> list[int]:
+    """`[能转成 int 且非 0]`：把上游给的杂值列表清成 hash 列表。
+
+    放在 `utils/` 而不是某个服务里：清洗口径只有一份，而调用方（账号配装模板）
+    所在的文件贴着登记上限（2026-10-05 从 `loadout_service` 的一个 `@staticmethod`
+    挪出来 —— 这条规则本身与配装无关）。非 int、`None`、空串一律丢掉**且不抛异常**：
+    上游的 `plugItemHashes` 里出现过空串，抛出去会把整次读取打挂。
+    """
+    hashes: list[int] = []
+    for value in values or []:
+        try:
+            hash_id = int(value)
+        except (TypeError, ValueError):
+            continue
+        if hash_id:
+            hashes.append(hash_id)
+    return hashes
+
+
 def hash_variants(*hashes: int | None) -> set[int]:
     """这组 hash 的**两套值域写法**：原样 + 有符号 + 无符号（`None` 跳过）。
 
