@@ -279,7 +279,8 @@ def test_dsh_mcp_registration_is_idempotent(tmp_path: Path, monkeypatch, capsys)
     profile.mkdir(parents=True)
     patch = profile / "cordis.patch.yml"
     patch.write_text("[]\n", encoding="utf-8")
-    monkeypatch.setattr(installer, "_dsh_profile_dir", lambda: profile)
+    # `_dsh_profile_dir` 现在收一个 profile 参数（支持 --profile / DSH_PROFILE / 探测宿主）。
+    monkeypatch.setattr(installer, "_dsh_profile_dir", lambda _profile=None: profile)
 
     assert installer.install_dsh_mcp(tmp_path / "repo", dry_run=False) is True
     first = patch.read_text(encoding="utf-8")

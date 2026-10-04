@@ -368,18 +368,50 @@ def dsh_patch_block(server_root: Path, *, server_name: str = "destiny") -> str:
     )
 
 
-def _dsh_profile_dir() -> Path:
+def _dsh_home() -> Path:
     home = os.environ.get("DSH_HOME")
-    root = Path(home).expanduser() if home else Path.home() / ".dsh"
-    return root / "profiles" / "web"
+    return Path(home).expanduser() if home else Path.home() / ".dsh"
 
 
-def install_dsh_mcp(server_root: Path, *, dry_run: bool) -> bool:
+def _running_dsh_profile() -> str | None:
+    """探测**正在跑的 DSH 宿主**用的是哪个 profile；探不到就给 None。
+
+    为什么需要它：写死 `web` 会让官方桌面端（用 `desktop` profile）收不到注册 ——
+    2026-09-28 实测踩到：桌面端启动参数是
+    `... dsh-desktop-host/lib/index.js <app.asar/dsh> <~/.dsh/profiles/desktop>`，
+    profile 是**位置参数**，不是 `--profile <name>` 那种形式，所以按 `profiles/<名字>` 匹配。
+
+    多个 profile 同时在跑（web 与 desktop 并存）时不猜：返回 None，由调用方回落 `web`
+    并把选择结果打印出来，用户看得见自己该改哪个。
+    """
+    try:
+        out = subprocess.run(
+            ["ps", "-eo", "command"], capture_output=True, text=True, timeout=5
+        ).stdout
+    except (OSError, subprocess.SubprocessError):
+        return None
+    found = set(re.findall(r"profiles/([A-Za-z0-9._-]+)", out))
+    return found.pop() if len(found) == 1 else None
+
+
+def _dsh_profile_dir(profile: str | None = None) -> Path:
+    """要写入的 DSH profile 目录。
+
+    优先级：显式参数 / `DSH_PROFILE` → 探测正在跑的宿主 → `web`。
+    回落 `web` 是为了跟老行为一致（那台机器上 DSH 一直是 web profile）。
+    """
+    name = (profile or os.environ.get("DSH_PROFILE") or _running_dsh_profile() or "web").strip()
+    return _dsh_home() / "profiles" / name
+
+
+def install_dsh_mcp(server_root: Path, *, dry_run: bool, profile: str | None = None) -> bool:
     """把 MCP 条目写进 DSH profile 的 patch 文件（幂等）。
 
     返回 True 表示这个宿主由本脚本负责注册；False 表示不认识（交给打印命令那条路）。
     """
-    patch = _dsh_profile_dir() / "cordis.patch.yml"
+    profile_dir = _dsh_profile_dir(profile)
+    print(f"DSH profile：{profile_dir.name}（{profile_dir}）")
+    patch = profile_dir / "cordis.patch.yml"
     block = dsh_patch_block(server_root)
     if patch.is_file():
         text = patch.read_text(encoding="utf-8")
@@ -449,6 +481,14 @@ def main() -> int:
     parser.add_argument("--host", default=None, help="只处理这个宿主（dsh/claude/codex/cursor）")
     parser.add_argument("--all", action="store_true", help="所有探测到的宿主（默认只装当前宿主）")
     parser.add_argument("--mcp", action="store_true", help="注册 MCP 服务器（DSH 写入配置，其它打印命令）")
+    parser.add_argument(
+        "--profile",
+        default=None,
+        help=(
+            "DSH 写哪个 profile（默认探测正在跑的宿主，探不到回落 web）；"
+            "也可以用 DSH_PROFILE 环境变量"
+        ),
+    )
     parser.add_argument("--server-root", type=Path, default=SOURCE.parents[1], help="MCP 服务器所在仓库根")
     parser.add_argument("--list", action="store_true", help="只列出探测结果")
     parser.add_argument("--dry-run", action="store_true", help="只报告将要做什么")
@@ -492,7 +532,7 @@ def main() -> int:
             return 1
         for host in selected:
             if host.mcp == "dsh-patch":
-                install_dsh_mcp(args.server_root, dry_run=args.dry_run)
+                install_dsh_mcp(args.server_root, dry_run=args.dry_run, profile=args.profile)
             else:
                 print(f"\n{host.name} 的 MCP 注册命令（自己确认后再跑）：")
                 print("  " + mcp_registration_hint(host, args.server_root))
