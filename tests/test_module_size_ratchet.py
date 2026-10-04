@@ -290,7 +290,15 @@ CEILINGS = {
     # 108 → 166（0.7.13）：同名多副本的**行视图**（`compare_rows`）也搬进来 —— 它和 analyze
     # 的投影是同一件事（把武器域的结果投影成"行 + 判定依据"），放一起比再开一个文件清楚。
     # 173 → 184（0.7.14）：roll 定义栏固定也照列（`fixed` 标记）——藏掉会被读成"没有这一栏"。
-    "destiny_mcp/services/weapon_analysis_projection.py": 184,
+    # 184 → 179（2026-10-05）：副本行视图补 `icon_url` 时这里已经 184/184 顶死，
+    # 按"超限先抽代码"把两条投影**共用**的 perk 选项行形状
+    # （`option_row`/`recommended`/`OPTION_KEYS`）抽去 `services/weapon_option_rows.py`，
+    # 上限跟着收紧（不是抬）。同一件事的另一半在上面 L290 的注释里：`compare_rows` 本就该留在这里。
+    "destiny_mcp/services/weapon_analysis_projection.py": 179,
+    # 2026-10-05 新增：perk 选项行的**唯一形状**（`analyze` 的插槽行与 `compare` 的副本行共用）。
+    # 抽出来的直接原因是上面那条（184 顶死），根本原因是"同一个形状写两份会漂"——
+    # 两处对模型是同一个问题（"这一栏能换成什么"）。登记即上限。
+    "destiny_mcp/services/weapon_option_rows.py": 44,
     # 0.7.10：重复武器的行视图（`duplicate_rows`；perk 从对象压成 {name, slot}）。
     # 0.7.12：按**类别**把插槽拆成 perks / mods / masterwork（"空模组插槽"不再是 perk）。
     "destiny_mcp/services/inventory_analysis_service.py": 654,

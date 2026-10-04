@@ -83,7 +83,7 @@
 | --- | --- | --- |
 | `inventory_assistant` 的 `location` | 只认 all/vault/角色名；传 `postmaster` 会得到「该账号上没有 'postmaster' 角色」 | 多认 `postmaster`（`邮政官`/`邮政长`）；取值不认时回 `invalid_argument_error` + 合法取值 |
 | 邮政官物品的 `location` | 标成 `hunter`/`warlock`（谎报"在身上"） | 标 `postmaster`（`bucket_type` 仍是 `Lost Items`） |
-| `weapon_assistant(intent="compare")` | 不带 `item_instance_id` → 全部副本的完整明细 + `differences`（每个副本十几 KB，没人一次读得完） | **副本行视图**：每行一把 × 只列有得选的栏 × `equipped` + 全部 `options`（`recommended` 是愿单结论）；带 `item_instance_id` 时仍是单副本完整明细 |
+| `weapon_assistant(intent="compare")` | 不带 `item_instance_id` → 全部副本的完整明细 + `differences`（每个副本十几 KB，没人一次读得完） | **副本行视图**：每行一把 × 只列有得选的栏 × `equipped` + 全部 `options`（`recommended` 是愿单结论）+ 每行的 `item_hash`/`icon_url`（**纯加法**，2026-10-05 补；卡头同理）；带 `item_instance_id` 时仍是单副本完整明细 |
 
 真机：`location="postmaster"` 列出 22 件武器（全部标 `postmaster`）；「岁时之巅」7 副本行视图 12.3 KB
 （此前按副本逐个拉，每次 16.4 KB）。**插件/模组的中文名与愿单结论照旧**；行视图里不再给 `stat_effects`。

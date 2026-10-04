@@ -330,14 +330,20 @@ async def test_type_items_are_list_rows_without_the_socket_pool(services) -> Non
 
 
 async def test_compare_defaults_to_instance_rows(services) -> None:
-    """0.7.13：不带 `item_instance_id` 时给**副本行视图**（每行一把 × 每栏全部可切换项）。"""
+    """0.7.13：不带 `item_instance_id` 时给**副本行视图**（每行一把 × 每栏全部可切换项）。
+
+    2026-10-05 起每行还带 `item_hash` + `icon_url`（用户实拍：8 把的行视图里一张图都没有）；
+    两者都取自**同一份身份块**，所以"同一 hash 出不同图"在形状上不可能 —— 真机那条断言在
+    `scripts/run_corpus_all_rows.py`（compare 行视图那条），这里钉的是**键集合**。
+    """
     response = await _call(services, intent="compare", weapon_name="测试武器")
 
     comparison = response["data"]["comparison"]
     assert sorted(comparison.keys()) == ["instances", "rows_note", "weapon"]
     row = comparison["instances"][0]
     assert sorted(row.keys()) == [
-        "instance_id", "is_equipped", "location", "locked", "power", "sockets",
+        "icon_url", "instance_id", "is_equipped", "item_hash", "location", "locked",
+        "power", "sockets",
     ]
     # 定义级身份块仍然带本地四块（`mode="lean"`：键都在、明说没查）
     assert comparison["weapon"]["popularity"]["available"] is False

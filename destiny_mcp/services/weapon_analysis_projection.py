@@ -23,6 +23,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from .weapon_option_rows import option_row, recommended
+
 #: 一栏里没有任何愿单结论时，退回展示前几个（够看清"这栏长什么样"，不假装池子很小）
 OPTION_SAMPLE = 6
 
@@ -30,36 +32,17 @@ OPTION_SAMPLE = 6
 #: 否则"这一栏没得选"会被读成"这一栏不存在"（0.7.13 的行视图踩过）。
 _ROLL_COLUMN_KINDS = frozenset({"intrinsic", "barrel", "magazine", "battery", "trait", "origin"})
 
-#: 选项里要保留的键（其余丢掉：`plug_hash`/`enhanced_plug_hash` 是给跨入口比对用的，
-#: 模型要按名字问详情有 `perk_description`）
-_OPTION_KEYS = ("name", "can_roll", "stat_effects", "recommended")
-
-
-def _option_row(option: dict[str, Any], *, with_effects: bool = True) -> dict[str, Any]:
-    """选项 → 行。`with_effects=False` 时丢掉 `stat_effects`（副本行视图里判断信号是愿单结论，
-    每项 75 B 的数值说明只会把 15 KB 撑成 30 KB；要看效果有 `perk_description`）。"""
-    keys = _OPTION_KEYS if with_effects else tuple(k for k in _OPTION_KEYS if k != "stat_effects")
-    row: dict[str, Any] = {
-        key: option[key] for key in keys if option.get(key) not in (None, [], {})
-    }
-    if option.get("enhanced_plug_hash"):
-        row["enhanced"] = True
-    return row
-
-
-def _recommended(option: dict[str, Any]) -> bool:
-    verdict = option.get("recommended")
-    if not isinstance(verdict, dict):
-        return False
-    wishlist = verdict.get("wishlist")
-    if isinstance(wishlist, dict):
-        return bool(wishlist.get("pve") or wishlist.get("pvp"))
-    return bool(verdict)
+#: 副本行视图里**卡头那一行**的键（`name` + `item_hash` + `icon_url` 三件套必须齐：
+#: 名字说"这是什么"、hash 说"是哪一个版本"、图给卡片一个能画的东西）。
+#: 单独提成常量：投影是"挑几个键抄出来"，键清单写在内联元组里的话，
+#: `tests/test_icon_url_output.py` 扫不到（它认的是**命名**的键清单常量）。
+_WEAPON_ROW_KEYS = ("name", "name_en", "weapon_type", "frame", "ammo_type", "damage_type",
+                    "has_enhanced", "roll_kind", "item_hash", "icon_url")
 
 
 def _socket_row(socket: dict[str, Any]) -> dict[str, Any]:
     options = [o for o in socket.get("options") or [] if isinstance(o, dict)]
-    picked = [o for o in options if _recommended(o)]
+    picked = [o for o in options if recommended(o)]
     note = ""
     if not picked:
         picked = options[:OPTION_SAMPLE]
@@ -74,8 +57,8 @@ def _socket_row(socket: dict[str, Any]) -> dict[str, Any]:
         if socket.get(key) not in (None, "")
     }
     row["option_count"] = socket.get("option_count") or len(options)
-    row["recommended_count"] = len([o for o in options if _recommended(o)])
-    row["options"] = [_option_row(o) for o in picked]
+    row["recommended_count"] = len([o for o in options if recommended(o)])
+    row["options"] = [option_row(o) for o in picked]
     if note:
         row["options_note"] = note
     return row
@@ -124,6 +107,13 @@ def compare_rows(comparison: dict[str, Any]) -> dict[str, Any]:
 
     只列**有得选**的栏（`options` 多于一项）——固定栏（框架/着色器）没有取舍价值；
     `equipped` 指出现在装着哪一颗，`recommended` 标愿单结论（PvE/PvP）。
+
+    **每一行都带武器自己的 `item_hash` 与 `icon_url`**（2026-10-05 补，用户实拍：8 把
+    「Better Devils」的行视图里 `icon_url` 出现 **0** 次 —— 连卡头都只能放色块）。
+    两个值取自**同一个身份块**（`instances[].weapon`，即 `weapon_payload.weapon_block`
+    按**这件副本自己的 hash** 查出来的），所以"同一 hash 出两种图"在形状上不可能：
+    图不是在这里按 hash 重算的，而是照抄那条已经走 `manifest_lookup.get_icon_url()`
+    的物品道结果（单一出处）。
     """
     weapon = comparison.get("weapon") if isinstance(comparison.get("weapon"), dict) else {}
     rows: list[dict[str, Any]] = []
@@ -149,13 +139,16 @@ def compare_rows(comparison: dict[str, Any]) -> dict[str, Any]:
             entry: dict[str, Any] = {
                 "slot": socket.get("slot") or kind or "",
                 "equipped": (socket.get("equipped") or {}).get("name") or "",
-                "options": [_option_row(o, with_effects=False) for o in options],
+                "options": [option_row(o, with_effects=False) for o in options],
             }
             if len(options) <= 1:
                 entry["fixed"] = True
             sockets.append(entry)
         row: dict[str, Any] = {
             "instance_id": instance.get("instance_id") or block.get("instance_id") or "",
+            # 身份对：hash 与图同源，缺定义时 hash=0、图=空串（"没查到"不是"没有"）
+            "item_hash": identity.get("item_hash") or 0,
+            "icon_url": identity.get("icon_url") or "",
             "location": instance.get("location") or block.get("location") or "",
             "power": instance.get("power") or block.get("power"),
             "is_equipped": bool(instance.get("is_equipped") or block.get("is_equipped")),
@@ -167,12 +160,14 @@ def compare_rows(comparison: dict[str, Any]) -> dict[str, Any]:
             row["god_roll_score"] = score
         rows.append(row)
     return {
+        # 卡头那一行也要能放图（行视图以前整包 0 个 `icon_url`）；`icon_url` 恒给，
+        # 空串 = 查不到定义，渲染侧画同尺寸占位块（缺值给空串，不编地址）
         "weapon": {
             key: weapon.get(key)
-            for key in ("name", "name_en", "weapon_type", "frame", "ammo_type", "damage_type",
-                        "has_enhanced", "roll_kind")
+            for key in _WEAPON_ROW_KEYS
             if weapon.get(key) not in (None, "")
-        },
+        }
+        | {"item_hash": weapon.get("item_hash") or 0, "icon_url": weapon.get("icon_url") or ""},
         "instances": rows,
         "rows_note": (
             "这是**副本行**：每行一把，`sockets[]` 只列有得选的栏（`equipped` 是现在装着的那颗，"

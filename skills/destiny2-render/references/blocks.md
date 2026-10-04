@@ -192,6 +192,10 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.comparison.instances[].options[].options[].stat_effects[].value` | `weapon_assistant(intent="compare", weapon_name="星狐座", item_instance_id="$weapon_instance")` | 属性影响值 |
 | `data.comparison.instances[].sockets[].equipped` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 行视图里 `equipped` 是**字符串**，不是对象 |
 | `data.comparison.instances[].sockets[].options[].name` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 行视图的可换项（**不带图**） |
+| `data.comparison.weapon.item_hash` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 行视图卡头那把枪的 hash（同名多版本时看这个） |
+| `data.comparison.instances[].item_hash` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 这一把属于哪个版本 |
+| `data.comparison.instances[].icon_url` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 行视图**每一行**的武器图（同一 hash 的行必然同一张图；空串 = 查不到定义 → 画占位块） |
+| `data.duplicate_weapons[].icon_url` | `inventory_assistant(intent="duplicates", limit=3)` | 组级武器图：**同一组里每一把都是这张图**。实例行没有自己的 `icon_url`（体积口径，见 `docs/adr/021`），渲染每把时复用它，别写成"每组只有第一把有图" |
 | `data.subclass.subclass_name` | `subclass_assistant(intent="get", character="hunter")` | **子职业自己**那一行（卡片标题） |
 | `data.subclass.icon_url` | `subclass_assistant(intent="get", character="hunter")` | 子职业本身的图（2026-10-05 补：以前只有 `plugs` 有图，标题行只能放色块） |
 | `data.subclass.plugs[].name` | `subclass_assistant(intent="get", character="hunter")` | 子职业当前装的技能/星象/碎片 |
@@ -243,7 +247,9 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 ## 四、副本对比卡
 
 两个视图，别混：**行视图**（不给 `item_instance_id`）每把一行、只有可切换栏；
-**明细**（给了 `item_instance_id`）带 `options[]` 与图。
+**明细**（给了 `item_instance_id`）带 `options[]` 与逐颗 perk 图。
+**两边都有武器图**：行视图每行取 `instances[].icon_url`（2026-10-05 起；同一把枪的两个视图以前
+只有明细给图，行视图整包 0 张图）—— 行视图的 perk 项仍然不带图，那不是漏了，是体积口径。
 
 ```html type="renderer"
 <section style="background:#101317;border:1px solid #3a424b;border-radius:7px;overflow:hidden;color:#e8e9e6">
@@ -279,7 +285,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.comparison.instances[].is_equipped` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 是否装着 |
 | `data.comparison.instances[].locked` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 是否锁定 |
 | `data.comparison.instances[].sockets[].slot` | `weapon_assistant(intent="compare", weapon_name="星狐座")` | 有得选的栏（行视图只列这些） |
-| `data.comparison.weapon.icon_url` | `weapon_assistant(intent="compare", weapon_name="星狐座", item_instance_id="$weapon_instance")` | **只有明细视图给武器图**；行视图没有这个键 |
+| `data.comparison.weapon.icon_url` | `weapon_assistant(intent="compare", weapon_name="星狐座", item_instance_id="$weapon_instance")` | 明细视图的武器图（**两个视图都有**：行视图那一份 2026-10-05 补上，见上面那张表的同名行） |
 | `data.comparison.instances[].weapon.gear_tier` | `weapon_assistant(intent="compare", weapon_name="星狐座", item_instance_id="$weapon_instance")` | T 级逐副本给；null = 无分级 |
 | `data.comparison.instances[].weapon.instance.location` | `weapon_assistant(intent="compare", weapon_name="星狐座", item_instance_id="$weapon_instance")` | 明细里的位置 |
 | `data.comparison.instances[].weapon.instance.power` | `weapon_assistant(intent="compare", weapon_name="星狐座", item_instance_id="$weapon_instance")` | 明细里的光等 |
@@ -639,7 +645,7 @@ perk 行有**两种形态**，选错就会出现"一排空图"：
 | `data.counts.unlocked` | `weapon_assistant(intent="patterns", rarity="异域", limit=5)` | 已解锁条数 |
 | `data.counts.total` | `weapon_assistant(intent="patterns", rarity="异域", limit=5)` | 本页筛出的总条数 |
 | `data.duplicate_weapons[].name` | `inventory_assistant(intent="duplicates", limit=3)` | 重复武器组 |
-| `data.duplicate_weapons[].icon_url` | `inventory_assistant(intent="duplicates", limit=3)` | 组级图标 |
+| `data.duplicate_weapons[].icon_url` | `inventory_assistant(intent="duplicates", limit=3)` | **组级**图标 —— 同一组里每一把都用它（实例行没有自己的 `icon_url`，那是体积口径） |
 | `data.duplicate_weapons[].weapon_type` | `inventory_assistant(intent="duplicates", limit=3)` | 类型 |
 | `data.duplicate_weapons[].instance_count` | `inventory_assistant(intent="duplicates", limit=3)` | 这一组几件 |
 | `data.duplicate_weapons[].instances[].location` | `inventory_assistant(intent="duplicates", limit=3)` | 副本位置 |

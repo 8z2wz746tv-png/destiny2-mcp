@@ -1545,6 +1545,33 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         f"{dup_bytes}B 组={len(dup_groups)}",
     )
 
+    # 副本对比的**行视图**（不给 item_instance_id）：每把一行、每行必须带武器图。
+    # 用户 2026-10-05 实拍：8 把同一把枪的行视图里 `icon_url` 出现 **0** 次（整包一张图都没有）——
+    # 那是静态守门当时扫不到的形状（见 tests/test_icon_url_output.py 第 6/7 种形状）。
+    # 这一条查**真机响应**，顺带钉住"同一 item_hash 只出一种图"（同 hash 不同图 = 拼错了）。
+    dup_weapon_name = str(dup_first.get("name") or "")
+    cmp_res, cmp_dt, cmp_err = await call(
+        "weapon_assistant", intent="compare", weapon_name=dup_weapon_name or "遗产"
+    )
+    cmp_block = ((cmp_res or {}).get("data") or {}).get("comparison") or {}
+    cmp_rows = cmp_block.get("instances") or []
+    icons_by_hash: dict[object, set] = {}
+    for row in cmp_rows:
+        icons_by_hash.setdefault(row.get("item_hash"), set()).add(row.get("icon_url"))
+    check(
+        "rows",
+        "weapon：compare 的行视图每把带武器图，且同一 item_hash 只出一种图",
+        cmp_err is None and (cmp_res or {}).get("ok") is True and bool(cmp_rows)
+        and bool((cmp_block.get("weapon") or {}).get("icon_url"))
+        and all(row.get("icon_url") for row in cmp_rows)
+        and all(len(icons) == 1 for icons in icons_by_hash.values()),
+        f"武器={dup_weapon_name} 把数={len(cmp_rows)} "
+        f"卡头={((cmp_block.get('weapon') or {}).get('icon_url') or '无')[-24:]} "
+        f"缺图={[row.get('instance_id') for row in cmp_rows if not row.get('icon_url')]} "
+        f"同 hash 多图={ {h: sorted(v) for h, v in icons_by_hash.items() if len(v) > 1} }",
+        seconds=cmp_dt,
+    )
+
     ident, dt, err = await call(
         "loadout_assistant", intent="search_identifiers", kind="color"
     )
