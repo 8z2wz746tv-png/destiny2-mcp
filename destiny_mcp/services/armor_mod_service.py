@@ -301,11 +301,18 @@ class ArmorModService(ModSocketMixin):
                 (c for c in (self._category_identifier(x) for x in candidates) if c), ""
             )
             occupant = int((sockets[socket_index] or {}).get("plugHash", 0) or 0)
+            # 话术是**真机改出来的**：第一版写成"第 9 格不是模组位「超能洗礼」"，读不通；
+            # 而且插槽没有插件时还会印出一对空引号「」。名字为空就别印那一段。
+            label = (
+                _mod_label(self._manifest.get_item_definition(occupant), "") if occupant else ""
+            )
+            where = f"（它是「{here}」那一类）" if here else ""
             raise InvalidArgumentError(
-                f"第 {socket_index} 格{'插不了' if is_mod_socket else '**不是模组位**'}「{mod_name}」"
-                + (f"：它是「{here}」那一类" if here else "")
-                + (f"，而这颗模组属于「{want}」" if want else "")
-                + (f"；那一格现在装着「{_mod_label(self._manifest.get_item_definition(occupant), '')}」" if occupant else "")
+                (f"第 {socket_index} 格**不是模组位**{where}，装不了「{mod_name}」"
+                 if not is_mod_socket
+                 else f"第 {socket_index} 格{where}，装不了「{mod_name}」")
+                + (f"（它属于「{want}」）" if want else "")
+                + (f"；那一格现在装着「{label}」" if label else "")
                 + "。模组只能装进模组位（属性位/皮肤位/大师位都不行）——"
                 "用 inventory_assistant(intent=\"item\") 看每一格是什么，再指名能装的那一格。"
             )

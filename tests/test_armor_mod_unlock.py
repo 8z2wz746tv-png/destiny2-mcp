@@ -931,7 +931,7 @@ async def test_plan_rejects_an_out_of_range_or_unsuitable_socket(
 
     with pytest.raises(InvalidArgumentError) as unsuitable:
         await service.plan("Tester#1234", "item-1", "弹药搜寻者", "hunter", 0)
-    assert "插不了" in str(unsuitable.value)
+    assert "装不了" in str(unsuitable.value)
 
 
 STAT_PLACEHOLDER = 888888  # 属性位的占位（类别不是 enhancements.*，也就是"不是模组位"）
