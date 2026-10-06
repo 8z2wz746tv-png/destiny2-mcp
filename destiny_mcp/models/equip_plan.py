@@ -89,6 +89,17 @@ class EquipPlan(BaseModel):
     target_slot: str = Field(
         default="", description="部位键：helmet/gauntlets/chest/legs/class_item（非护甲为空）"
     )
+    replaces: str = Field(
+        default="",
+        description=(
+            "**这一格现在是谁**：目标部位当前装备的那件（名字）。空串 = 这一格空着 / 认不出。"
+            "确认信封必须带上它 —— 写入前先让调用方看清「要换掉什么」，"
+            "免得确认的是 A、实际顶掉的是 B。"
+        ),
+    )
+    replaces_instance_id: str = Field(
+        default="", description="上面那件的实例 ID（空串同上，不编 0）"
+    )
     steps: list[EquipPlanStep] = Field(default_factory=list, description="按执行顺序排列的步骤")
     blockers: list[EquipPlanBlock] = Field(
         default_factory=list, description="挡住计划的事实；status=ready 时为空"

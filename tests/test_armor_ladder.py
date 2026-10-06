@@ -593,3 +593,24 @@ async def test_ladder_reports_insufficient_tuning_headroom_instead_of_silence() 
     rung = table["tuning_first"][0]
     assert rung["lever"] == "tuning_insufficient"
     assert "补不上这一档" in rung["why"]
+
+
+def test_a_blocked_ladder_says_the_precondition_was_the_cause() -> None:
+    """执行前提砍光时：表里带 `blocked_by`，`note` 不许说"目标同时满足不了"。"""
+    table = ladder.build_ladder(
+        _Request(health_target=200),
+        ceiling={},
+        precision="no_solution",
+        blocked_by=["指定的金装与当前穿着的那件冲突（1641）"],
+    )
+
+    assert table["blocked_by"] == ["指定的金装与当前穿着的那件冲突（1641）"]
+    assert "没有单独评估" in table["note"]
+    assert "同时满足不了" not in table["note"], "那是属性层的结论，这一档没算过"
+
+
+def test_an_unblocked_ladder_keeps_the_plain_no_solution_wording() -> None:
+    table = ladder.build_ladder(_Request(health_target=200), ceiling={}, precision="no_solution")
+
+    assert table["blocked_by"] == []
+    assert "试过" in table["note"] and "不是「没算」" in table["note"]

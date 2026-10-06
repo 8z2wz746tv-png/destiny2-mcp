@@ -13,7 +13,10 @@ import pytest
 from destiny_mcp.build.ladder_evidence import (
     PRECISIONS,
     classify_precision,
+    positive_single_stat,
     precision_note,
+    single_stat_note,
+    verdict_block,
 )
 
 
@@ -51,3 +54,56 @@ def test_an_unknown_precision_falls_back_instead_of_exploding() -> None:
     """历史调用传 `precision="exact"`（analyze 那条路）：不许 KeyError。"""
     assert precision_note("exact") == precision_note("no_solution")
     assert PRECISIONS == ("sampled", "no_solution", "not_computed")
+
+
+def test_a_blocked_run_never_claims_the_attributes_cannot_be_met() -> None:
+    """**执行前提砍光**时不许说「这些目标同时满足不了」——那是属性层的结论。
+
+    真机 2026-10-06：带套装约束/金装冲突时，阶梯的每一档也因为同一个前提而失败，
+    于是 `precision` 落到 `no_solution`；照那句口径念出来就变成"属性配不出来"，
+    而工具**从没单独评估过属性层**（`analyze` 也被同一条前提短路了）。
+    """
+    blocked = precision_note("no_solution", blocked=True)
+    assert blocked != precision_note("no_solution")
+    assert "没有单独评估" in blocked
+    assert "被拦" in blocked or "砍掉" in blocked
+
+
+@pytest.mark.parametrize(
+    ("single_stat", "expected_fragment"),
+    [
+        ({"weapons": 200, "health": 142}, "同时能达到"),
+        ({}, "没算出来"),
+    ],
+)
+def test_single_stat_note_distinguishes_empty_from_zero(
+    single_stat: dict, expected_fragment: str,
+) -> None:
+    assert expected_fragment in single_stat_note(single_stat)
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        # 0 = 没算出来（真机：带套装约束时六项全 0，同一账号本来是 200/142/200/195/180/185）
+        ({"weapons": 200, "health": 0, "class_stat": 0}, {"weapons": 200}),
+        ({"weapons": 0, "health": 0}, {}),
+        (None, {}),
+        ({}, {}),
+    ],
+)
+def test_zero_single_stat_entries_are_dropped_not_reported_as_zero(
+    raw: dict | None, expected: dict,
+) -> None:
+    assert positive_single_stat(raw) == expected
+
+
+def test_verdict_refuses_to_call_an_unfinished_search_infeasible() -> None:
+    """没搜完 → `satisfiable=None`：**no limit can create an infeasibility proof**。"""
+    covered = verdict_block(covered=True, truncated_by=None, rotated_ok=False)
+    unfinished = verdict_block(covered=False, truncated_by="预算", rotated_ok=True)
+
+    assert covered["satisfiable"] is False
+    assert unfinished["satisfiable"] is None
+    assert "没搜完" in unfinished["evidence"] and "预算" in unfinished["evidence"]
+    assert unfinished["solved_after_rotation"] is True

@@ -5,17 +5,10 @@
 
 ## 三态（2026-10-06 之前只有两态）
 
-| 值 | 含义 | 调用方该做什么 |
-| --- | --- | --- |
-| `sampled` | 至少一档跑成了，`ceiling` 是实采 | 正常读 `ceiling`/`shortfall` |
-| `no_solution` | **每一档都跑了**、一档都没解 —— "试过，没有" | 别报成"没算"；谈降目标/换件/反推待刷 |
-| `not_computed` | **至少一档没探成**（`ok: None` + `not_probed` + `reason`）—— "没算" | 别报成"无解"；去看 `probe_failures` 里的原因 |
-
-以前后两种**共用 `not_computed`**，于是"算了但没有解"被读成"根本没算"。
-真机 2026-10-06 用户报的"同一次无解、口径不稳定"（不带套装约束给了 ceiling、
-带套装约束变成空 + `not_computed`）就是这个：前者的探针跑成了、后者每档都失败，
-**两次都在如实报告，只是标签分不开**。仓库自己的规矩也要求分开：
-**「没探成」≠「试过没有」**。
+`sampled` = 至少一档跑成了、`ceiling` 是实采；`no_solution` = **每一档都跑了、一档都没解**
+（"试过，没有"）；`not_computed` = **至少一档没探成**（"没算"，看 `probe_failures`）。
+仓库自己的规矩要求分开：**「没探成」≠「试过没有」**。真机证据与逐条断言在
+`tests/test_ladder_evidence.py`，读法在 `docs/testing/TESTING_CORPUS.md`。
 """
 
 from __future__ import annotations
@@ -38,6 +31,13 @@ PRECISION_NOTES: dict[str, str] = {
 #: `precision` 的三态。`sampled` 之外的两种**不能合并**（见模块 docstring）。
 PRECISIONS: tuple[str, ...] = ("sampled", "no_solution", "not_computed")
 
+#: **执行前提先把候选砍光**时专用（`analysis.blocked_by` 非空）：这一档的 trials 也是
+#: "每档都跑了、都没解"，但**原因不是属性** —— 照 `no_solution` 念就成了一句没算过的结论。
+BLOCKED_NOTE = (
+    "执行前提先把候选砍掉了（见 `blocked_by`）：这不是「属性配不出来」——**属性层这次没有"
+    "单独评估**。先把前提解掉（腾一格 / 先顶下冲突的金装）再重新求解；那时才谈「降目标」。"
+)
+
 
 def classify_precision(trials: list[dict]) -> str:
     """五档探针结果 → `precision` 三态之一。
@@ -55,6 +55,65 @@ def classify_precision(trials: list[dict]) -> str:
     return "not_computed"
 
 
-def precision_note(precision: str) -> str:
-    """`precision` → `note`。认不出的取值退回 `no_solution` 那句（含 `"exact"` 这类历史调用）。"""
+def verdict_block(*, covered: bool, truncated_by: str | None, rotated_ok: bool) -> dict:
+    """`verdict` 那一块（口径，不是判据）。
+
+    `covered=False`（没搜完）时 `satisfiable` 必须是 `None`：**不许把"没搜完"写成"不可行"**
+    （no limit can create an infeasibility proof）。`rotated_ok` 是"换优先级顺序能出解"，
+    与原始请求是不是无解是两件事。
+    """
+    return {
+        "satisfiable": False if covered else None,
+        "evidence": (
+            "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）"
+            if covered
+            else "工具按原始优先级返回 0 候选，但**这次没搜完**"
+                 f"（截断原因：{truncated_by or '未说明'}），所以不能断言不可行"
+        ),
+        "note": (
+            "ceiling 是各次探测**逐项**取的最大值，不等于同一套护甲能同时达到；"
+            "trials 里 ok=true 的档是**换了优先级顺序或放下目标**之后的解，原始请求一个字没改；"
+            "ok=null 的档是**这次没探成**（带 reason），不能读成「试过、没有解」。"
+        ),
+        "solved_after_rotation": rotated_ok,
+    }
+
+
+def positive_single_stat(max_possible: dict | None) -> dict[str, int]:
+    """`analyze` 的 `max_possible` → 只留 **> 0** 的项。
+
+    **0 不是"这一项只能到 0"，是"这次没算出来"**（真机：带套装约束时六项全 0，而同一账号
+    的单项上限本来是 200/142/200/195/180/185）。缺值不给 0（仓库红线），剔空了下面的 note 会说清。
+    """
+    return {
+        str(stat): int(value)
+        for stat, value in (max_possible or {}).items()
+        if int(value) > 0
+    }
+
+
+def single_stat_note(single_stat: dict) -> str:
+    """`single_stat_ceiling` 的读法；它为空时说的是"没算出来"，**不是 0**。"""
+    if single_stat:
+        return (
+            "single_stat_ceiling 是「把点全堆在这一项上」的上限，**不是**同时能达到的值；"
+            "ceiling 才是同一套约束下按优先级实采出来的。"
+        )
+    return (
+        "single_stat_ceiling 这次**没算出来**（所以是空的，**不是 0**）："
+        "analyze 在当前约束下一个组合都没采到。"
+    )
+
+
+def precision_note(precision: str, *, blocked: bool = False) -> str:
+    """`precision` → `note`；`blocked=True` 时用执行前提那一段（`BLOCKED_NOTE`）。
+
+    为什么 blocked 要单独一句话：那种情况下 trials 也是"每档都跑了、都没解"，
+    但**没解的原因不在属性**——照 `no_solution` 说会变成"这些目标同时满足不了"，
+    这是一句工具没算过的结论（仓库红线：诊断只说自己算过的东西）。
+
+    认不出的 `precision` 退回 `no_solution` 那句（含 `"exact"` 这类历史调用）。
+    """
+    if blocked:
+        return BLOCKED_NOTE
     return PRECISION_NOTES.get(precision, PRECISION_NOTES["no_solution"])

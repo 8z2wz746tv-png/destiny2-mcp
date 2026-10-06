@@ -21,7 +21,13 @@ import asyncio
 from typing import Any, Sequence
 
 from ..build.constants import REQUEST_TARGET_FIELDS
-from ..build.ladder_evidence import classify_precision, precision_note
+from ..build.ladder_evidence import (
+    classify_precision,
+    positive_single_stat,
+    precision_note,
+    single_stat_note,
+    verdict_block,
+)
 from ..logging_config import get_logger
 from ..vocabulary import STAT_LABELS_ZH as STAT_LABELS  # 单一出处：vocabulary.py
 
@@ -150,8 +156,14 @@ def build_ladder(
     samples: Sequence[dict[str, int]] = (),
     tuning: dict[str, Any] | None = None,
     tuning_unavailable_reason: str = "",
+    blocked_by: Sequence[str] = (),
 ) -> dict[str, Any]:
-    """把上限、差距与台阶摊平成一张表（只提议，不改目标）。"""
+    """把上限、差距与台阶摊平成一张表（只提议，不改目标）。
+
+    `blocked_by` 非空 = **执行前提**（格满 / 与正穿着的金装冲突）把候选砍光了：
+    这一档的 trials 也会是"每档都没解"，但原因不在属性 —— `note` 与 `blocked_by`
+    都要把这件事说清楚，否则读的人会以为"这些目标同时满足不了"。
+    """
     targets = _targets(request)
     priority = _priority_order(request)
     shortfall = {
@@ -282,6 +294,7 @@ def build_ladder(
         "met": met,
         "precision": precision,
         "reason": reason,
+        "blocked_by": list(blocked_by),
         "samples": list(samples),
         "tuning_first": tuning_first,
         "tuning_first_note": (
@@ -304,7 +317,7 @@ def build_ladder(
         "suggestion": suggestion,
         # 三种 precision 各有各的话（`build/ladder_evidence`，唯一出处）：
         # 以前"试过没有"与"没算"共用一句"**可能**是约束互斥"，读的人分不出来。
-        "note": precision_note(precision),
+        "note": precision_note(precision, blocked=bool(blocked_by)),
     }
 
 
@@ -361,11 +374,9 @@ async def no_solution_ladder(
     协议输出一模一样：那一档本来也只会记成 `ok=false`。
     """
     analysis = await svc["build_svc"].analyze_build(player_name, request)
-    single_stat = {
-        str(stat): int(value)
-        for stat, value in (getattr(analysis, "max_possible", None) or {}).items()
-    }
+    single_stat = positive_single_stat(getattr(analysis, "max_possible", None))
     reason = str(getattr(analysis, "reason", ""))
+    blocked_by = [str(item) for item in (getattr(analysis, "blocked_by", None) or [])]
     analysis_precision = str(getattr(analysis, "precision", "exact"))
 
     probes = relaxation_probes(request, max_probes=max_probes)
@@ -435,36 +446,21 @@ async def no_solution_ladder(
         samples=samples,
         tuning=tuning_evidence,
         tuning_unavailable_reason=tuning_unavailable,
+        blocked_by=blocked_by,
     )
     table["trials"] = trials
     not_probed = [trial["label"] for trial in trials if trial.get("ok") is None]
     if not_probed:
         table["probe_failures"] = not_probed
-    # 「原样」那一档实测没解 = 这批护甲不可能同时满足原始目标。
-    # 说清楚 ceiling 是**逐项**取最大（来自不同探测），免得读成"其实都能满足"。
-    # 这张阶梯**只在工具按原始请求 0 候选时**才会生成，所以 satisfiable 一定是 false；
-    # 但 trials 里可能有 ok=true 的档 —— 那是"换了优先级顺序"或"放下目标"之后的结果。
-    # 实机踩过：把 trials[0].ok 当结论会说成"其实配得出来"，而工具自己那一次是 0 候选。
-    # `coverage` 是生成这张阶梯的那次求解的自证：只有"枚举完了"才敢说不可行。
-    # 没搜完（预算/配额截断）时 `satisfiable` 必须是 None —— **不许把"没搜完"写成"不可行"**
-    # （d2-armor-solver 的原话：no limit can create an infeasibility proof）。
+    # 「原样」那一档实测没解 = 这批护甲不可能同时满足原始目标。这一块的三句话在
+    # `build/ladder_evidence.verdict_block`（口径的唯一出处）；`coverage` 是生成这张阶梯的
+    # 那次求解的自证：只有"枚举完了"才敢说不可行。
     exhausted = True if coverage is None else bool(coverage.get("exhaustive"))
-    table["verdict"] = {
-        "satisfiable": False if exhausted else None,
-        "evidence": (
-            "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）"
-            if exhausted
-            else f"工具按原始优先级返回 0 候选，但**这次没搜完**"
-                 f"（截断原因：{(coverage or {}).get('truncated_by') or '未说明'}），"
-                 "所以不能断言不可行"
-        ),
-        "note": (
-            "ceiling 是各次探测**逐项**取的最大值，不等于同一套护甲能同时达到；"
-            "trials 里 ok=true 的档是**换了优先级顺序或放下目标**之后的解，原始请求一个字没改；"
-            "ok=null 的档是**这次没探成**（带 reason），不能读成「试过、没有解」。"
-        ),
-        "solved_after_rotation": bool(trials and trials[0]["ok"]),
-    }
+    table["verdict"] = verdict_block(
+        covered=exhausted,
+        truncated_by=(coverage or {}).get("truncated_by"),
+        rotated_ok=bool(trials and trials[0]["ok"]),
+    )
     table["single_stat_ceiling"] = single_stat
     table["analysis_precision"] = analysis_precision
     # 台阶优先给"最小改动就能穿"的那一档；全都没解就给 None（不编）。
@@ -485,11 +481,7 @@ async def no_solution_ladder(
                 + "。这一步要用户明确同意，不能自动降。"
             ),
         }
-    if single_stat:
-        table["single_stat_note"] = (
-            "single_stat_ceiling 是「把点全堆在这一项上」的上限，**不是**同时能达到的值；"
-            "ceiling 才是同一套约束下按优先级实采出来的。"
-        )
+    table["single_stat_note"] = single_stat_note(single_stat)
     return table
 
 

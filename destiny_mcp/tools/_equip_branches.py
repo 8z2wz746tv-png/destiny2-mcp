@@ -57,6 +57,9 @@ async def equip_branch(
             {
                 "item": plan.target_item,
                 "item_instance_id": plan.target_item_instance_id,
+                # 这一格现在是谁：确认前先看清"要换掉什么"（空串 = 空着 / 认不出，不编占位）
+                "replaces": plan.replaces,
+                "replaces_instance_id": plan.replaces_instance_id,
                 "steps": payload["steps"],
                 "blockers": payload["blockers"],
             },

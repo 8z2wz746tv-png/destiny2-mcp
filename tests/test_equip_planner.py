@@ -722,3 +722,32 @@ def test_conflict_names_each_piece_with_its_own_slot_from_the_manifest() -> None
     assert "没有可用的非异域胸部护甲·桶定义" in plan.message
     # 机器可读的那个字段仍然是槽位键（中文名只给人和模型读）
     assert plan.blockers[0].slot == "chest"
+
+
+def test_plan_says_which_piece_is_being_replaced() -> None:
+    """确认信封要能回答"这一格现在是谁" —— 否则误确认一次就是顶错一件。
+
+    以前 `EquipPlan` 只有目标那件（`target_item`），"要换掉什么"只能从 `steps` 的
+    `replaces` 反推，而且没有步骤（直接顶下）时反推不出来。
+    """
+    worn = item("i-worn", "旧胸甲", equipped=True, slot="chest")
+    target = item("i-target", "星火协议", location="vault", character_id="", slot="chest")
+    manifest = FakeManifest({target.item_hash: LEGENDARY}, {target.item_hash: target.name})
+
+    plan = plan_equip(
+        request_for(target, inventory=[worn], capacity=capacity_for()), manifest
+    )
+
+    assert plan.replaces == "旧胸甲"
+    assert plan.replaces_instance_id == "i-worn"
+
+
+def test_plan_leaves_replaces_empty_when_that_slot_is_empty() -> None:
+    """那一格空着就给空串 —— 不编占位、也不把"空着"说成某件装备。"""
+    target = item("i-target", "星火协议", location="vault", character_id="", slot="chest")
+    manifest = FakeManifest({target.item_hash: LEGENDARY}, {target.item_hash: target.name})
+
+    plan = plan_equip(request_for(target, capacity=capacity_for()), manifest)
+
+    assert plan.replaces == ""
+    assert plan.replaces_instance_id == ""

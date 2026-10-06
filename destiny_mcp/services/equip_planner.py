@@ -269,6 +269,12 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
     target = request.target
     # 槽位与互斥组都来自 Manifest（ADR-011）：武器和护甲同一套槽位键。
     target_slot, _target_display, target_label = item_traits(manifest, target)
+    # "这一格现在是谁"：确认信封要在写入前把它摆出来（误确认一次就是顶错一件）。
+    # 以 `request.worn()` 为准（它按 `equipped_keys` 判，见 `EquipPlanRequest` 的 docstring）。
+    worn_here = next(
+        (item for item in request.worn() if item_traits(manifest, item)[0] == target_slot),
+        None,
+    )
     plan = EquipPlan(
         status="ready",
         character=request.character,
@@ -276,6 +282,8 @@ def plan_equip(request: EquipPlanRequest, manifest: EquipItemInfo) -> EquipPlan:
         target_item=target.name,
         target_item_instance_id=target.item_instance_id,
         target_slot=target_slot,
+        replaces=worn_here.name if worn_here else "",
+        replaces_instance_id=worn_here.item_instance_id if worn_here else "",
     )
 
     if "equipped" in _locations(target, request.character_id):

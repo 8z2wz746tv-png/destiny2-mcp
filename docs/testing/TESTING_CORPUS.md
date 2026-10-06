@@ -257,7 +257,7 @@
 | 照抄社区配装的功能模组 | `build_assistant(intent="find")` + `functional_mods=["充沛", …]` | 回执带 `functional_mods.mods`（部位/同名版本/能量）与 `unresolved`（对不上名的点名）；候选的 `items[].functional_mod_groups` 按部位就位；摘要写明"含照抄社区配装的 N 颗功能模组"。**属性模组不照抄**（传了会进 `unresolved` 并说明原因） |
 | ⭐ 这套配装是哪五件（默认出口） | `build_assistant(intent="find")` | 每套只给**候选行**：`execution_id`/`score`/`completion_rate`/`stats`（六维）/`exotic`/`set`/`requires_tuning`/`tuning_changes`/`items[]`（名字、部位、实例 ID、光等、能量、六维、调谐名）。**`build` 与 `canonical_build` 不在默认响应里**（真机 21.5 KB → 8.6 KB / 2 套）；要看逐件预览或装备它，用 `execution_id` 调 `equip_build` |
 | ⭐ 重复武器挑哪把 | `inventory_assistant(intent="duplicates")` | 每实例只给 `instance_id`/`location`/`power`/`equipped`/`perks_complete` + `perks[]`（**`{name, slot}`**，slot 是插件类别最后一段如 `barrels`/`traits`）；组级与 perk 级的 `icon_url`、`plug_hash` 不进默认响应（真机 50.9 KB → 15.8 KB / 5 组） |
-| 写入失败/被挡住时去哪找原因 | 任意写入 intent 的失败，或 `equip` 的 `equip_blocked` | **只看 `data.result`**（`steps` / `blockers` / `message` 都在那儿）；`candidates` 只放真候选（多件同名、确认载荷）。成功时顶层 `summary` 就是服务层那句结论 |
+| 写入失败/被挡住时去哪找原因 | 任意写入 intent 的失败，或 `equip` 的 `equip_blocked` | **只看 `data.result`**（`steps` / `blockers` / `message` 都在那儿）；`candidates` 只放真候选（多件同名、确认载荷）。成功时顶层 `summary` 就是服务层那句结论。`equip` 的确认信封除 `item`/`item_instance_id`/`steps`/`blockers` 外还带 **`replaces`/`replaces_instance_id`**（这一格现在是谁，空串 = 空着/认不出）——确认前先看清「要换掉什么」，否则误确认一次就是顶错一件 |
 | 同名多件要玩家选一件 | `move` 只说名字，而账号里有 5 件同名护甲 | `item_disambiguation_required`（**不是** `move_failed`） | **没写、也没失败**：候选在信封 `candidates`（`data.result` 里不再重复一份），`data.result.question` 原样展示给玩家；拿到编号后带 `item_instance_id` 重发同一个 intent |
 
 ### D. 协议级拒绝与词表
