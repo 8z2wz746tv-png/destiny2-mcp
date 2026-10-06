@@ -26,6 +26,7 @@ from ..logging_config import get_logger
 from ..build.constants import ARMOR_SLOT_MAP
 from . import profile_components
 from .armor_payload import slot_key_from_solver
+from .loadout_official_identifiers import resolve_identifiers
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..utils.hash_utils import positive_hashes
 from ..utils.icons import icon_url as _icon_url
@@ -891,31 +892,33 @@ class LoadoutService:
         icon_hash: int | None = None,
         color_hash: int | None = None,
     ) -> LoadoutOperationResult:
-        """Save current character equipment into a Bungie official loadout slot."""
+        """Save current character equipment into a Bungie official loadout slot.
+
+        三个标识必须齐才发得出去（见 `loadout_official_identifiers`）：没给的从该槽
+        当前标识继承，空槽继承不到就如实报"要自己选"，不发必然 500 的请求。
+        """
         loadout_index = self._slot_number_to_index(slot_number)
         p = await self._resolver.resolve_player(player_name)
         mid, mtype = p["membership_id"], p["membership_type"]
         char_id = await self._resolver.resolve_character_id(mid, mtype, character)
-        class_name = class_type_name(resolve_character_name(character))
+        identifiers, problem = await resolve_identifiers(
+            self._resolver, mid=mid, mtype=mtype, char_id=char_id,
+            loadout_index=loadout_index, name_hash=name_hash,
+            icon_hash=icon_hash, color_hash=color_hash,
+        )
+        if identifiers is None:
+            return LoadoutOperationResult(success=False, message=problem)
 
         result = await self._bungie.snapshot_loadout(
-            loadout_index,
-            char_id,
-            mtype,
-            name_hash=name_hash,
-            icon_hash=icon_hash,
-            color_hash=color_hash,
+            loadout_index, char_id, mtype, **identifiers
         )
         ok = result.get("ErrorCode", 0) == 1
         self._cache_timestamp.pop(player_name, None)
-        return LoadoutOperationResult(
-            success=ok,
-            message=(
-                f"已把 {class_name} 当前装备保存到游戏内官方配装 {slot_number} 号槽。"
-                if ok
-                else f"保存官方配装失败：{result.get('Message', '未知错误')}"
-            ),
-        )
+        class_name = class_type_name(resolve_character_name(character))
+        return LoadoutOperationResult(success=ok, message=(
+            f"已把 {class_name} 当前装备保存到游戏内官方配装 {slot_number} 号槽。"
+            if ok else f"保存官方配装失败：{result.get('Message', '未知错误')}"
+        ))
 
     @serialized_account_action
     async def update_official_loadout_identifiers(
@@ -927,37 +930,32 @@ class LoadoutService:
         icon_hash: int | None = None,
         color_hash: int | None = None,
     ) -> LoadoutOperationResult:
-        """Update name/icon/color hashes for a Bungie official loadout slot."""
-        if name_hash is None and icon_hash is None and color_hash is None:
-            return LoadoutOperationResult(
-                success=False,
-                message="至少需要提供 name_hash、icon_hash 或 color_hash 中的一个。",
-            )
+        """Update name/icon/color hashes for a Bungie official loadout slot.
 
+        "只改一个"在 Bungie 那边是做不到的：没给的会从该槽当前标识继承后一起发。
+        """
         loadout_index = self._slot_number_to_index(slot_number)
         p = await self._resolver.resolve_player(player_name)
         mid, mtype = p["membership_id"], p["membership_type"]
         char_id = await self._resolver.resolve_character_id(mid, mtype, character)
-        class_name = class_type_name(resolve_character_name(character))
+        identifiers, problem = await resolve_identifiers(
+            self._resolver, mid=mid, mtype=mtype, char_id=char_id,
+            loadout_index=loadout_index, name_hash=name_hash,
+            icon_hash=icon_hash, color_hash=color_hash,
+        )
+        if identifiers is None:
+            return LoadoutOperationResult(success=False, message=problem)
 
         result = await self._bungie.update_loadout_identifiers(
-            loadout_index,
-            char_id,
-            mtype,
-            name_hash=name_hash,
-            icon_hash=icon_hash,
-            color_hash=color_hash,
+            loadout_index, char_id, mtype, **identifiers
         )
         ok = result.get("ErrorCode", 0) == 1
         self._cache_timestamp.pop(player_name, None)
-        return LoadoutOperationResult(
-            success=ok,
-            message=(
-                f"已更新 {class_name} 官方配装 {slot_number} 号槽的名称/图标/颜色。"
-                if ok
-                else f"更新官方配装标识失败：{result.get('Message', '未知错误')}"
-            ),
-        )
+        class_name = class_type_name(resolve_character_name(character))
+        return LoadoutOperationResult(success=ok, message=(
+            f"已更新 {class_name} 官方配装 {slot_number} 号槽的名称/图标/颜色。"
+            if ok else f"更新官方配装标识失败：{result.get('Message', '未知错误')}"
+        ))
 
     @serialized_account_action
     async def clear_official_loadout(

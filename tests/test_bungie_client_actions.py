@@ -122,7 +122,9 @@ async def test_official_loadout_write_endpoints_use_slot_index_payloads() -> Non
         icon_hash=22,
         color_hash=33,
     )
-    await client.update_loadout_identifiers(2, "230584", 3, icon_hash=44)
+    await client.update_loadout_identifiers(
+        2, "230584", 3, name_hash=11, icon_hash=44, color_hash=33
+    )
     await client.clear_loadout(2, "230584", 3)
 
     assert [call[1] for call in rest.calls] == [
@@ -138,17 +140,68 @@ async def test_official_loadout_write_endpoints_use_slot_index_payloads() -> Non
         "iconHash": 22,
         "colorHash": 33,
     }
+    # 改标识**也必须**带全三个：2026-10-06 真机实测，少给一个 Bungie 回
+    # HTTP 500 `DestinyInvalidRequest` ——「只改名字」这个动作在 API 上不存在。
     assert rest.calls[1][2]["json"] == {
         "loadoutIndex": 2,
         "characterId": 230584,
         "membershipType": 3,
+        "nameHash": 11,
         "iconHash": 44,
+        "colorHash": 33,
     }
     assert rest.calls[2][2]["json"] == {
         "loadoutIndex": 2,
         "characterId": 230584,
         "membershipType": 3,
     }
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "call",
+    [
+        lambda client: client.snapshot_loadout(0, "1", 3, name_hash=1, icon_hash=2),
+        lambda client: client.update_loadout_identifiers(0, "1", 3, color_hash=3),
+    ],
+)
+async def test_loadout_identifier_writes_refuse_partial_identifiers(call) -> None:
+    """三个标识是**必填参数**：漏一个在客户端就 `TypeError`，而不是发出去收 500。
+
+    2026-10-06 之前这里是 `name_hash: int | None = None` + `if ... is not None`：
+    调用方不传就静默省略，于是 `snapshot_official` **一次都没成功过**（真机原文
+    `DestinyInvalidRequest`）。
+    """
+    client, rest = make_client()
+    with pytest.raises(TypeError):
+        await call(client)
+    assert rest.calls == []
+
+
+def test_loadout_identifier_payload_is_the_only_builder() -> None:
+    """守门：这两个动作的请求体只能由 `_loadout_identifier_payload` 拼。
+
+    防"有人又抄一份 if 判断"—— 那份抄袭正是本次真机 bug 的形状
+    （`if name_hash is not None: payload["nameHash"] = ...`）。
+    """
+    import inspect
+
+    import destiny_mcp.bungie_client as client_module
+    import destiny_mcp.bungie_loadouts as loadouts_module
+
+    # 两个模块都要扫：门面在 `bungie_client`、请求体在 `bungie_loadouts` ——
+    # 抄袭可能出现在任何一边（这次拆模块之前它就在 `bungie_client` 里）。
+    for module in (client_module, loadouts_module):
+        source = inspect.getsource(module)
+        for forbidden in (
+            'payload["nameHash"]',
+            'payload["iconHash"]',
+            'payload["colorHash"]',
+            "if name_hash is not None",
+            "if icon_hash is not None",
+            "if color_hash is not None",
+        ):
+            assert forbidden not in source, f"{module.__name__} 里别再手写标识分支：{forbidden}"
 
 
 @pytest.mark.asyncio

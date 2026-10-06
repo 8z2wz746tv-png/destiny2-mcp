@@ -64,7 +64,12 @@ CEILINGS = {
     # +44：上游 HTTP 错误统一映射（以前只有 503 被翻译，4xx 裸抛到 MCP 客户端）。
     # P1：错误映射整段搬去 `bungie_errors.py`，活动统计端点搬去 `bungie_stats.py`（客户端只留
     # 门面方法）→ 1263 → 1164，上限跟着收紧：腾出来的位置已经用掉了（账号级 + 按模式统计）。
-    "destiny_mcp/bungie_client.py": 1164,
+    # 2026-10-06：官方配装槽那一族搬去 `bungie_loadouts.py`（只有门面留下），1164 → 1094，
+    # 上限跟着**下调**到 1120 —— 这次腾出来的位置留一点给门面签名，不预支给别的域。
+    "destiny_mcp/bungie_client.py": 1120,
+    # 2026-10-06 新增：官方配装槽端点族（读/装备/快照/改标识/清空）+ 那一族的真机结论。
+    # 登记即上限：里面大半是"为什么只能这么做"的注释，代码本身很短。
+    "destiny_mcp/bungie_loadouts.py": 192,
     # P7：结果翻译层（ProcessArmorSet → BuildResult/canonical_build + 目标统计）
     # 整个搬到 services/build_results.py，1114 → 906，上限跟着收紧 ——
     # 调谐（tuning）的对外字段也落在那边的翻译层里，不再往这里堆。
@@ -367,7 +372,12 @@ CEILINGS = {
     # 与抽出的 `_read_equipment`），登记在 1030 就是"下次先想清楚放哪儿"。
     # 1030 → 986（2026-10-05 第六轮）：**清单行**整块搬去 `services/loadout_rows.py` ——
     # 清单行（每套一行 + 图块）与完整模板是两件事，清单行那边还要放"金装/子职业的图"。
-    "destiny_mcp/services/loadout_service.py": 986,
+    "destiny_mcp/services/loadout_service.py": 984,
+    # 2026-10-06 新增（从 loadout_service 拆出）：官方槽**三个标识**怎么写才对 ——
+    # 里面存着一条真机踩出来的上级事实（SnapshotLoadout / UpdateLoadoutIdentifiers
+    # 三个标识必须都给，少一个就是 HTTP 500 DestinyInvalidRequest），
+    # 所以它不该混回服务本体，也别被别处的体积增长挤掉。
+    "destiny_mcp/services/loadout_official_identifiers.py": 100,
     # 2026-10-05 新增（从 loadout_service 拆出）：`intent="list"` 的清单行形状 ——
     # 只留"挑一套"要用的字段 + `visuals`（金装那一件、子职业那一行的图）。
     # 图**只从这份配装自己的 `build_template` 里取**（账号数据，不做名字→Manifest 解析）。

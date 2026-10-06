@@ -42,6 +42,12 @@ For any agent, not only Codex:
   只覆盖了它被写下来的那个场景）。
   另外：`ruff check`（CI 那套 E4/E7/E9/F）在这种断链上是**绿的** —— 它抓不到"从一个模块导入一个
   它根本没有的名字"，别拿 lint 绿当"树能跑"。
+- **别把一次性脚本放 `/tmp` 里跑**：`sys.path[0]` 是**脚本所在目录**，而 `/tmp` 下常常留着以前
+  `git archive` 解出来的 `destiny_mcp/`（本机 2026-10-06 就有一份 10-05 的），于是 import 到的是
+  **那份旧树**、不是工作区 —— 症状是改了代码没反应、报错出现在不相干的文件里
+  （实测：traceback 里路径是 `/private/tmp/destiny_mcp/...`）。规矩：脚本要么放仓库里跑，
+  要么加 `PYTHONSAFEPATH=1`（它把脚本目录从 `sys.path` 里摘掉）。与上面那条 `PYTHONPATH`
+  是同一族问题：**先确认你 import 的是哪棵树**。
 - **转述会失真，关键事实必须自己核**：别的 agent 给的数字/结论，写进你的 prompt 前先验证
   （真机踩过：一句算错的 hash 转换被照抄进守卫夹具，测试连红好几轮；后来改成"自己去查库"才定住）。
 - **单测绿 ≠ 真机对**：两者都要；只跑单测的修复不许宣布"修好了"。
@@ -247,6 +253,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - `destiny_mcp/audit.py`
 - `destiny_mcp/build_contracts.py`
 - `destiny_mcp/bungie_client.py`
+- `destiny_mcp/bungie_loadouts.py`
 - `destiny_mcp/bungie_stats.py`
 - `destiny_mcp/data/`
 - `destiny_mcp/manifest.py`
@@ -299,7 +306,8 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | `destiny_mcp/audit.py` | 每次 MCP 工具调用落盘审计，调用日志只在这里写。 |
 | `destiny_mcp/build_contracts.py` | 配装契约类型（`BuildRecipe`/`CanonicalBuild`/`ExecutableBuild`），见 ADR-001；只有最后一个能执行。 |
 | `destiny_mcp/bungie_errors.py` | 上游 HTTP 错误 → 领域错误的唯一翻译层（404 单独成码、503 归上游不可用）；客户端与取数模块共用，禁止在别处再写一套 except。 |
-| `destiny_mcp/bungie_client.py` | Bungie API 客户端门面：token 生命周期 + 各端点；活动统计端点已拆到 `bungie_stats.py`，错误映射在 `bungie_errors.py`。 |
+| `destiny_mcp/bungie_client.py` | Bungie API 客户端门面：token 生命周期 + 各端点；活动统计端点已拆到 `bungie_stats.py`、官方配装槽拆到 `bungie_loadouts.py`，错误映射在 `bungie_errors.py`。贴着 1120 上限，只做门面。 |
+| `destiny_mcp/bungie_loadouts.py` | **游戏内配装槽**（官方配装）端点族：读 / 应用 / 快照 / 改标识 / 清空，外加那一族的真机结论 —— **官方只给了四个动作，没有"把任意配装数据写进槽位"的接口**；`SnapshotLoadout`、`UpdateLoadoutIdentifiers` 的**三个标识必须都给**（少一个上游回 HTTP 500 `DestinyInvalidRequest`）；`EquipLoadout` 要求不在活动里。补齐标识的判据在 `services/loadout_official_identifiers.py`。 |
 | `destiny_mcp/bungie_stats.py` | 活动/战绩取数域：历史统计的按角色/账号级两条路；`modes` 只在按角色端点上生效、`periodType` 没有 Season（实测）。 |
 | `destiny_mcp/manifest.py` | Manifest 管理器门面（查名/搜索），其余按域拆到 `manifest_*.py`；贴着 262 上限，只做聚合。 |
 | `destiny_mcp/manifest_armor.py` | 护甲模组与套装加成域。 |

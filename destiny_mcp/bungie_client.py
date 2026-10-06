@@ -16,6 +16,7 @@ import httpx
 import aiobungie
 
 from . import config
+from . import bungie_loadouts
 from . import bungie_stats
 from .exceptions import (
     APIError,
@@ -562,57 +563,20 @@ class BungieClient:
             return {"ErrorCode": _http_error_code(exc), "Message": str(exc)}
 
     # ── Loadouts ────────────────────────────────────────────────────────
+    # 实现、请求体与那一族真机结论都在 `bungie_loadouts`（照 `bungie_stats` 的老规矩，
+    # 本类只留同名门面）。**没有"把任意配装数据写进游戏槽"的接口** —— 只有
+    # 快照/改标识/清空/应用四个动作，细节看那个模块的 docstring。
 
-    async def fetch_loadouts(
-        self,
-        membership_id: str,
-        membership_type: int,
-    ) -> dict:
-        """Fetch native loadouts for all characters.
-
-        Bungie API: GetProfile with component 206 (CHARACTER_LOADOUTS).
-
-        Returns:
-            Raw profile response with characterLoadouts.data populated.
-        """
-        return await self.get_profile(
-            membership_id, membership_type, components=[200, 206]
-        )
+    async def fetch_loadouts(self, membership_id: str, membership_type: int) -> dict:
+        return await bungie_loadouts.fetch_loadouts(self, membership_id, membership_type)
 
     async def equip_loadout(
-        self,
-        loadout_index: int,
-        character_id: str,
-        membership_type: int,
+        self, loadout_index: int, character_id: str, membership_type: int
     ) -> dict:
-        """Equip a native Bungie loadout.
-
-        Uses static_request to avoid aiobungie bug (membership_type vs membershipType).
-
-        Returns:
-            API response dict with ErrorCode.
-        """
-        try:
-            result = await self.rest.static_request(
-                "POST",
-                f"Destiny2/Actions/Loadouts/EquipLoadout/{membership_type}/",
-                auth=await self.get_access_token(),
-                json={
-                    "loadoutIndex": loadout_index,
-                    "characterId": int(character_id),
-                    "membershipType": membership_type,
-                },
-            )
-            code = result.get("ErrorCode", 0)
-            logger.debug("EquipLoadout OK: index=%s char=%s", loadout_index, character_id)
-            return {"ErrorCode": code, "Message": result.get("Message", "Ok")}
-        except aiobungie.HTTPError as exc:
-            unavailable = _bungie_unavailable_result(exc, "装备 Bungie 配装")
-            if unavailable:
-                return unavailable
-            code = _http_error_code(exc)
-            logger.error("EquipLoadout failed: index=%s error=%s", loadout_index, exc)
-            return {"ErrorCode": code, "Message": str(exc)}
+        """应用官方配装槽；**在活动里会回 `DestinyCannotPerformActionAtThisLocation`**。"""
+        return await bungie_loadouts.equip_loadout(
+            self, loadout_index, character_id, membership_type
+        )
 
     async def snapshot_loadout(
         self,
@@ -620,26 +584,14 @@ class BungieClient:
         character_id: str,
         membership_type: int,
         *,
-        name_hash: int | None = None,
-        icon_hash: int | None = None,
-        color_hash: int | None = None,
+        name_hash: int,
+        icon_hash: int,
+        color_hash: int,
     ) -> dict:
-        """Save the character's current equipment into an official Bungie loadout slot."""
-        payload = {
-            "loadoutIndex": loadout_index,
-            "characterId": int(character_id),
-            "membershipType": membership_type,
-        }
-        if name_hash is not None:
-            payload["nameHash"] = name_hash
-        if icon_hash is not None:
-            payload["iconHash"] = icon_hash
-        if color_hash is not None:
-            payload["colorHash"] = color_hash
-        return await self._post_action(
-            "Destiny2/Actions/Loadouts/SnapshotLoadout/",
-            payload,
-            "保存官方配装槽",
+        """把当前装备存进槽位；三个标识**必填**（少一个上游回 500）。"""
+        return await bungie_loadouts.snapshot_loadout(
+            self, loadout_index, character_id, membership_type,
+            name_hash=name_hash, icon_hash=icon_hash, color_hash=color_hash,
         )
 
     async def update_loadout_identifiers(
@@ -648,43 +600,21 @@ class BungieClient:
         character_id: str,
         membership_type: int,
         *,
-        name_hash: int | None = None,
-        icon_hash: int | None = None,
-        color_hash: int | None = None,
+        name_hash: int,
+        icon_hash: int,
+        color_hash: int,
     ) -> dict:
-        """Update official Bungie loadout name/icon/color identifiers."""
-        payload = {
-            "loadoutIndex": loadout_index,
-            "characterId": int(character_id),
-            "membershipType": membership_type,
-        }
-        if name_hash is not None:
-            payload["nameHash"] = name_hash
-        if icon_hash is not None:
-            payload["iconHash"] = icon_hash
-        if color_hash is not None:
-            payload["colorHash"] = color_hash
-        return await self._post_action(
-            "Destiny2/Actions/Loadouts/UpdateLoadoutIdentifiers/",
-            payload,
-            "更新官方配装槽标识",
+        """改标识；三个标识**必填**（"只改一个"在 API 上不存在）。"""
+        return await bungie_loadouts.update_loadout_identifiers(
+            self, loadout_index, character_id, membership_type,
+            name_hash=name_hash, icon_hash=icon_hash, color_hash=color_hash,
         )
 
     async def clear_loadout(
-        self,
-        loadout_index: int,
-        character_id: str,
-        membership_type: int,
+        self, loadout_index: int, character_id: str, membership_type: int
     ) -> dict:
-        """Clear an official Bungie loadout slot."""
-        return await self._post_action(
-            "Destiny2/Actions/Loadouts/ClearLoadout/",
-            {
-                "loadoutIndex": loadout_index,
-                "characterId": int(character_id),
-                "membershipType": membership_type,
-            },
-            "清空官方配装槽",
+        return await bungie_loadouts.clear_loadout(
+            self, loadout_index, character_id, membership_type
         )
 
     # ── Vendors & Milestones ─────────────────────────────────────────

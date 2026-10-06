@@ -921,3 +921,135 @@ README 里有一句对我们特别关键：**「use `origin` `"*"` for local too
 所以**这个响应体绝不能落进日志或审计**（项目规矩：密钥永不进日志）—— 出错只记 `code` 与 `message`，
 `apiKey` 字段一律丢弃。另外没带 key 是 `Missing API Key`、带错 key 是 `Invalid API Key`，
 两者要分开报（"没配 key"和"key 不对"是两件事，下一步动作不同）。
+
+
+## 十七、游戏内配装槽（官方配装）：只有四个动作，三个标识必须都给（2026-10-06 实测）
+
+要做"把配装存进游戏内配装槽、以后游戏内一键换"之前先看这一节。
+代码在 `destiny_mcp/bungie_loadouts.py`（端点族）与 `destiny_mcp/services/loadout_official_identifiers.py`（标识补齐）。
+当天全部实测都在真实账号上做（守护者等级 11，三个角色）。
+
+### 17.1 官方只给了四个动作 —— **没有"把任意配装数据写进槽位"的接口**
+
+`Destiny2/Actions/Loadouts/` 下只有这四条，别去找第五条：
+
+| 动作 | 干什么 | 位置要求 |
+| --- | --- | --- |
+| `SnapshotLoadout` | 把角色**当前装备**存进槽位 | 无（猎人在**活动中**也成功） |
+| `UpdateLoadoutIdentifiers` | 改名称/图标/颜色 | 无 |
+| `ClearLoadout` | 清空槽位 | 无 |
+| `EquipLoadout` | 应用某个槽位 | **必须不在活动里** |
+
+怎么排除掉"写任意数据"这条路的（三条独立证据，不是查不到就算了）：
+
+- 官方帮助页 `HelpDetail/POST?uri=Actions/Loadouts/SetLoadout/` → **HTTP 404**；
+  同一次同一种写法的 `...EquipLoadout/` → **HTTP 200**（对照组，证明 404 不是路径拼错）；
+- 文档全量（版本 2.21.8，`--check` 与线上一致）：`Destiny2` 一共 43 个端点，
+  `Actions/Loadouts/` 下**只有上表四个**；
+- DIM 源码（本地克隆）`src/app/bungie-api/destiny2-api.ts` 用的**就是这四个**；
+  它那个「保存为游戏内配装」按钮的弹窗标题是 `InGameLoadout.CreateTitle`
+  = **「从当前装备创建游戏内配装」**，动作名 `snapshotInGameLoadout`。
+
+**结论**：要让配装进游戏槽，只有"**先把配装穿到身上，再快照**"这一条路。
+
+### 17.2 三个标识**必须都给** —— 少一个就是 HTTP 500
+
+`SnapshotLoadout` 与 `UpdateLoadoutIdentifiers` 都吃 `nameHash` / `iconHash` / `colorHash`：
+
+| 请求 | 结果 |
+| --- | --- |
+| 三个都给真值（`characterId` 数字或字符串都行） | ✅ 成功（响应 `0`） |
+| 少给一个 | ❌ HTTP 500 `DestinyInvalidRequest` |
+| 给 `null` | ❌ 同上 |
+| **干脆省略** | ❌ 同上 |
+| 三个都给空哨兵 `2166136261` | ❌ 同上（**创建不出"没名字"的槽**） |
+
+上游原文（省略三个标识时）：
+
+    http_status: 500, message: Your request was invalid.,
+    error_status: DestinyInvalidRequest,
+    url: https://www.bungie.net/Platform/Destiny2/Actions/Loadouts/SnapshotLoadout/
+
+两个直接后果：
+
+1. **`update_official_identifiers`「只改名字」在 API 上不存在** —— 必须把另外两个旧值带上；
+2. 往**空槽**里存时，名称/图标/颜色必须由调用方选（`loadout_assistant(intent="search_identifiers")`
+   给候选）；这跟游戏内那个弹窗强制你选名字/图标/颜色是同一件事。
+
+**两个被证伪的想当然**（都做过对照实验，别再照着改）：
+
+- `characterId` 发**数字或字符串都能成** —— "int64 被 JS 精度截断"不成立
+  （`2305843009679355779` 确实 > 2^53，但两种写法都回了成功）；
+- HTTP 500 与"槽位没解锁"无关：同样的请求在**三种**槽位（已用/空/最大索引 19）上
+  失败与成功的分界**只跟三个标识齐不齐有关**。
+
+### 17.3 写入有同步窗口：改标识**立刻**读还是旧值
+
+`UpdateLoadoutIdentifiers` 回 `ErrorCode=1` 之后：**0 秒**回读三个标识**全是旧值**，
+**30 秒**回读才是新值（中间没再测更细的边界）。与本文档第五节（3～10 秒）同一族现象，
+但**别把"写完立刻读一次"当判据**——那会把成功的写入报成假失败。
+
+### 17.4 `EquipLoadout` 不能在活动里；另三个没这个限制
+
+同一天同一账号上：
+
+- 猎人正在活动里（组件 204 `currentActivityHash=82913930`，12 分钟前开始）→
+  `EquipLoadout` 回 **`DestinyCannotPerformActionAtThisLocation`**，
+  而**同一次会话里** `SnapshotLoadout` 与 `ClearLoadout` 都成功；
+- 术士/泰坦在轨道（`currentActivityHash=0`）→ `SnapshotLoadout` 同样因缺标识而失败，
+  补全标识后成功。
+
+DIM 专门捕获这个码并在界面上提示"回轨道再试"——我们的话术照它。
+
+### 17.5 槽位数组**永远 20 条**，数组长度不代表解锁了几个
+
+组件 206 `characterLoadouts.data.<charId>.loadouts` 是**定长 20 的数组**（索引 0–19，与
+`loadoutIndex` 字段无关——上游根本不回这个字段，位置即索引）。实测该账号：
+
+| 角色 | 有内容的槽 | 空槽 |
+| --- | --- | --- |
+| 猎人 | 8（本次测试后为 9） | 12 |
+| 术士 | 14 | 6 |
+| 泰坦 | 18 | 2 |
+
+空槽的判据（两个都要）：三个标识都是 `2166136261` **且** 十件 `itemInstanceId` 全是 `"0"`。
+
+**别拿 Manifest 的 `DestinyLoadoutConstantsDefinition.loadoutCountPerCharacter` 当上限**：
+它写的是 **10**，而这个账号泰坦已经用了 **18** 个 —— 那个字段是过期的。
+DIM 的做法是直接把"数组长度"当已解锁数（`availableLoadoutSlotsSelector`）。
+
+### 17.6 槽里存的是什么：10 件 + 一个插槽一个 plug
+
+每个槽固定 **10 件**（实测逐件查过桶）：
+
+| # | 桶 | 例 |
+| --- | --- | --- |
+| 1–3 | 动能 / 能量 / 威能武器 | 命运终结者、隐秘追猎、光芒复仇 |
+| 4–8 | 头 / 臂 / 胸 / 腿 / 职业护甲 | 星界夜鹰…光泽披风 |
+| 9 | **分支职业** | 棱镜猎人（14 个非空插槽，含全部碎片） |
+| 10 | **赛季神器** | 女王兰香炉（7 个非空插槽 = 神器天赋选择） |
+
+每件的原始字段**只有两个**：
+
+```json
+{"itemInstanceId": "6917530193641893728",
+ "plugItemHashes": [2166136261, 3250572790, "...一个插槽一个 hash，共 16 位..."]}
+```
+
+护甲上读回来能看到 `enhancements.v2_*` 模组、`core.gear_systems.armor_tiering.plugs.tuning.mods`
+调谐模组、`shader` 着色器、`armor_skins_*` 皮肤 —— 所以**快照会把皮肤和全部模组一起存进去**
+（用户看到的 DIM 行为就是这个）。但要说清：**快照是"照抄当时身上穿的"**——
+皮肤跟着装备走，神器天赋是"当时选的那套"，不会自动变成配装模板要的那套。
+
+**回读核对的一条纪律**（照抄 DIM 的注释，它踩过）：
+*"In game loadouts map any socket that has only a single option to UNSET_PLUG_HASH instead of
+the real plug hash"* —— 所以**单选项插槽不能要求逐位相等**，否则回读永远假红。
+
+### 17.7 代码位置
+
+| 判据/实现 | 在哪 |
+| --- | --- |
+| 端点族 + 上面这些结论 | `destiny_mcp/bungie_loadouts.py` |
+| 三个标识怎么补齐（继承现值 / 空槽必须给全） | `destiny_mcp/services/loadout_official_identifiers.py` |
+| 槽位与服务方法 | `destiny_mcp/services/loadout_service.py` |
+| 守门 | `tests/test_loadout_official_identifiers.py`、`tests/test_bungie_client_actions.py` |
