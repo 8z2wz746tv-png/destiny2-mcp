@@ -167,3 +167,24 @@ class PlugLookupMixin:
             if target in pool:
                 return True
         return False if known else None
+
+
+def socket_takes_plug(manifest, entry: dict, target: int) -> bool:
+    """这一位**能不能插**这颗：看它的 reusable / randomized plug set 里有没有。
+
+    落点策略（ADR-026）要在"空着能插"与"被占着能插"两个桶上问同一个问题，所以单独成一个函数；
+    放这里是因为本模块就是"这一位能不能插"的家。
+    """
+    for plug_set_hash in (
+        entry.get("reusablePlugSetHash", 0),
+        entry.get("randomizedPlugSetHash", 0),
+    ):
+        if not plug_set_hash:
+            continue
+        plug_set = manifest.get_definition("DestinyPlugSetDefinition", plug_set_hash)
+        if isinstance(plug_set, dict) and any(
+            to_unsigned(item.get("plugItemHash", 0)) == target
+            for item in plug_set.get("reusablePlugItems", [])
+        ):
+            return True
+    return False

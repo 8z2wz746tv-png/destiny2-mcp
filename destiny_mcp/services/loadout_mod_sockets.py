@@ -15,6 +15,7 @@ from . import profile_components, write_readback
 from .insertion_rule_diagnosis import insertion_rule_blocker_text, insertion_rule_preflight_text
 from .loadout_energy_budget import plan_energy_clearing
 from .loadout_mod_preflight import ModPreflightMixin
+from .loadout_plug_lookup import socket_takes_plug
 from .loadout_plug_lookup import PlugLookupMixin
 
 
@@ -439,49 +440,41 @@ class ModSocketMixin(ModPreflightMixin, PlugLookupMixin):
         # pass 1 还会把它当成"别的同类模组"返回错槽。
         target = to_unsigned(mod_hash)
         item_definition = self._manifest.get_item_definition(item_hash)
-        if isinstance(item_definition, dict):
-            socket_entries = (item_definition.get("sockets") or {}).get(
-                "socketEntries", []
-            )
-            for index, entry in enumerate(socket_entries):
-                if index >= len(sockets_data) or index in excluded_socket_indices:
-                    continue
-                if to_unsigned(sockets_data[index].get("plugHash", 0)) == target:
-                    return index
-                for plug_set_hash in {
-                    entry.get("reusablePlugSetHash", 0),
-                    entry.get("randomizedPlugSetHash", 0),
-                }:
-                    if not plug_set_hash:
-                        continue
-                    plug_set = self._manifest.get_definition(
-                        "DestinyPlugSetDefinition", plug_set_hash
-                    )
-                    if isinstance(plug_set, dict) and any(
-                        to_unsigned(item.get("plugItemHash", 0)) == target
-                        for item in plug_set.get("reusablePlugItems", [])
-                    ):
-                        return index
-
-        # Pass 1: find socket with matching category that doesn't already have this exact mod
+        socket_entries = (
+            (item_definition.get("sockets") or {}).get("socketEntries", [])
+            if isinstance(item_definition, dict)
+            else []
+        )
+        # 落点分两桶（2026-10-06，ADR-026）：**空槽优先**，都被占着才顶人。
+        # "空着"不是"没有插件"——每个护甲模组位默认装着插槽定义里的
+        # `singleInitialItemHash` 那颗 **Empty Mod Socket** 占位，而**它的类别跟真模组一模一样**
+        # （实测：至高狂徒面具 位0 = 1980618587 / 位1-3 = 1078080765，都是 `enhancements.v2_*`）——
+        # 所以"第一个同类槽"那条老口径会挑中空槽；问题只出在**它同样会挑中别人占着的槽**。
+        empty_takes: list[int] = []
+        occupied_takes: list[int] = []
+        for index, entry in enumerate(socket_entries):
+            if index >= len(sockets_data) or index in excluded_socket_indices:
+                continue
+            plug_hash = to_unsigned(sockets_data[index].get("plugHash", 0))
+            if plug_hash == target:
+                return index
+            if not socket_takes_plug(self._manifest, entry, target):
+                continue
+            placeholder = to_unsigned(entry.get("singleInitialItemHash", 0))
+            if not plug_hash or (placeholder and plug_hash == placeholder):
+                empty_takes.append(index)
+            else:
+                occupied_takes.append(index)
+        if empty_takes:
+            return empty_takes[0]
+        if occupied_takes:
+            return occupied_takes[0]
+        # 兜底：类别对得上（没有 plug set 的槽走这条，口径与改动前一致）
         for i, socket in enumerate(sockets_data):
-            if i in excluded_socket_indices:
+            if i in excluded_socket_indices or not socket.get("plugHash"):
                 continue
-            plug_hash = socket.get("plugHash", 0)
-            if to_unsigned(plug_hash) == target:
-                continue
-            if plug_hash:
-                current_category = self._plug_category_hash(plug_hash)
-                if current_category == mod_category:
-                    return i
-
-        # Pass 2: already has this mod
-        for i, socket in enumerate(sockets_data):
-            if i in excluded_socket_indices:
-                continue
-            if to_unsigned(socket.get("plugHash", 0)) == target:
+            if self._plug_category_hash(socket["plugHash"]) == mod_category:
                 return i
-
         return None
 
     async def _insert_armor_mod(

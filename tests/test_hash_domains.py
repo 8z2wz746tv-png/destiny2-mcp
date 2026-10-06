@@ -1222,7 +1222,7 @@ def test_normalization_is_positively_recognized() -> None:
         "destiny_mcp/services/weapon_compare_service.py::raw.get('itemHash') in target_hashes": "widened",
         "destiny_mcp/services/inventory_service.py::item.item_hash in match_hashes": "widened",
         # 两边都过 `to_unsigned`
-        "destiny_mcp/services/loadout_mod_sockets.py::to_unsigned(plug_hash) == target": "aligned",
+        "destiny_mcp/services/loadout_mod_sockets.py::plug_hash == target": "aligned",
         # 回读核对的两条（2026-10-03 真机：社区模板给有符号、账号侧给无符号 → 恒为 False，
         # 两次回读窗口白烧 147.8 秒；修好之后必须**认得出来**，不是"扫不到"）
         "destiny_mcp/services/loadout_matches.py::to_unsigned(installed.get('plugHash', 0) or 0) != to_unsigned(plug_hash)": "aligned",

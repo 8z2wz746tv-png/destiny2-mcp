@@ -264,7 +264,10 @@ CEILINGS = {
     # 518 → 519：这次把"预检两趟"（`_mod_write_snapshot` / `_mod_preflight`）整段搬去
     # `loadout_mod_preflight.py`（守门与规划语义相反，混一处最容易让规划复用守门的过期快照），
     # 净剩 2 行：多继承一个 `ModPreflightMixin` 与那一行 import。
-    "destiny_mcp/services/loadout_mod_sockets.py": 519,
+    # 2026-10-06（ADR-026）：落点改成空槽优先，两趟扫描收成一趟；"能不能插"那份判据
+    # 搬去 `loadout_plug_lookup.socket_takes_plug`（那边就是"这一位能不能插"的家）
+    # → 517 → 510，上限跟着收紧。
+    "destiny_mcp/services/loadout_mod_sockets.py": 512,
     # 2026-10-03 新增（从 loadout_equipment_service 拆出）：回读核对 —— 写入之后账号上到底是
     # 不是要的那套。单独成模块的直接原因有二：那边贴着 521 没有位置；而"核对"与"执行"本来
     # 就是两件事（`equip_with_recovery` 的外层与 `_equip_local_unlocked` 的 Step 4 共用同一份判据，

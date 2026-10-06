@@ -232,6 +232,81 @@ async def test_find_mod_socket_matches_an_installed_signed_hash(
     assert index == 1, "其余槽是同类模组，只有 1 号槽真的装着它 —— 必须按无符号比才认得出"
 
 
+def _three_socket_manifest() -> "_SearchingManifest":
+    """三格部位模组位，各自带 `singleInitialItemHash`（真机就是那颗 Empty Mod Socket 占位）。"""
+    manifest = _plan_manifest()
+    manifest._definitions[HELMET_ITEM]["sockets"]["socketEntries"] = [
+        {"reusablePlugSetHash": PLUG_SET, "singleInitialItemHash": EMPTY_PLUG}
+        for _ in range(3)
+    ]
+    manifest._definitions[UNLOCKED_MOD] = _mod(UNLOCKED_MOD, "别的模组")
+    return manifest
+
+
+async def test_find_mod_socket_prefers_an_empty_socket_over_displacing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """**有空槽时不许去抢别人占着的那一格**（ADR-026）。
+
+    老口径是"第一个能插这个类别的槽"—— 三个部位模组位共享同一份 plug set，所以它永远返回
+    index 0，把玩家留在那儿的那颗顶掉。真机上这就是"越换越差"的来源。
+    """
+    manifest = _three_socket_manifest()
+    _patch_plug_set(monkeypatch, manifest)
+    service = _equipment(manifest)
+    sockets = [
+        {"plugHash": UNLOCKED_MOD},   # 0 被别的模组占着
+        {"plugHash": EMPTY_PLUG},     # 1 空着 ← 该选这个
+        {"plugHash": EMPTY_PLUG},     # 2 空着
+    ]
+
+    index = await service._find_mod_socket(
+        "item-1", HELMET_ITEM, LOCKED_MOD, "1", 3, {"item-1": sockets},
+    )
+
+    assert index == 1, "有空的同类槽就用空的，别去顶 index 0 上那颗"
+
+
+async def test_find_mod_socket_does_not_move_a_mod_that_is_already_installed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """目标**已经装在后面某一格**时不许动它 —— 老口径会返回 index 0 把它搬一遍。
+
+    这条与上面那条是同一个坑的另一半：扫到 index 0 时"plug set 里有这颗"就返回了，
+    根本走不到 index 2 上那颗真身。
+    """
+    manifest = _three_socket_manifest()
+    _patch_plug_set(monkeypatch, manifest)
+    service = _equipment(manifest)
+    sockets = [
+        {"plugHash": UNLOCKED_MOD},
+        {"plugHash": UNLOCKED_MOD},
+        {"plugHash": LOCKED_MOD},     # 真身在这儿
+    ]
+
+    index = await service._find_mod_socket(
+        "item-1", HELMET_ITEM, LOCKED_MOD, "1", 3, {"item-1": sockets},
+    )
+
+    assert index == 2, "已经装着它就该原样不动（上游对重插回 1679，白花约 10 秒）"
+
+
+async def test_find_mod_socket_displaces_only_when_every_socket_is_taken(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """三格全被占着时才顶人 —— 这是**有意保留**的兜底：玩家要的那一刻没别处可放。"""
+    manifest = _three_socket_manifest()
+    _patch_plug_set(monkeypatch, manifest)
+    service = _equipment(manifest)
+    sockets = [{"plugHash": UNLOCKED_MOD} for _ in range(3)]
+
+    index = await service._find_mod_socket(
+        "item-1", HELMET_ITEM, LOCKED_MOD, "1", 3, {"item-1": sockets},
+    )
+
+    assert index == 0, "都没空位就顶第一格；顶的是谁由调用方从 sockets_data 读出来给玩家看"
+
+
 # ── 插入条件 ────────────────────────────────────────────────────────────
 
 
