@@ -222,6 +222,10 @@ CEILINGS = {
     # 126 → 125（错误码收口）：两个候选拒绝码改用 `ErrorCode`（+1 行 import），
     # `describe_candidate` 的签名收成一行（-2）—— 上限跟着收紧。
     "destiny_mcp/services/build_candidates.py": 125,
+    # 2026-10-06 新增（ADR-025）：候选 ID 的**取回与四个状态的话术**（expired / consumed /
+    # unknown / player_mismatch）从 `build_candidates` 与 `equip_build` 两处收拢到这里 ——
+    # 这两处以前各写一份，措辞已经漂了（真机把"用过了"报成了"不认识"）。
+    "destiny_mcp/services/candidate_messages.py": 66,
     # 同上：`intent="patterns"` 的载荷与话术（总览 / 单把 / 变体 / 术语对照 /「未开始」措辞）。
     # 211 是加上"玩家说红框、游戏说模式"的术语块与变体话术（含强化插槽）之后的长度；
     # 215 = 211 + 载荷里的 by_tier 汇总。

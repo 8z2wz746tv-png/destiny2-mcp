@@ -380,7 +380,7 @@
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | ⭐ 这套穿上会换成什么 | `build_assistant(intent="equip_build")`，`confirmed=false` | `candidates[0].items_preview` 五件齐全，逐件给 `slot`/`slot_display`/`name`/`power`/`energy`/`current_mods`（现在装着什么）/`mods`（要装什么、是否已装）；`canonical_build` **保持可原样回传**（展示字段不许塞进去，否则回传会被拒） |
-| 只给候选 ID 能不能装（只发标量的宿主） | `equip_build` + `execution_id`（不给 `canonical_build`），`confirmed=false` | 与给整块候选**同一个结果**：`confirmation_required` + `candidates[0].execution_id` 回显同一个 ID + 五件 `items_preview`；候选行顶层的 `execution_id` 与 `canonical_build.execution_id` 同源。ID 过期/不是自己的 → `expired_execution_id`/`unknown_execution_id` + 重新求解的下一步 |
+| 只给候选 ID 能不能装（只发标量的宿主） | `equip_build` + `execution_id`（不给 `canonical_build`），`confirmed=false` | 与给整块候选**同一个结果**：`confirmation_required` + `candidates[0].execution_id` 回显同一个 ID + 五件 `items_preview`；候选行顶层的 `execution_id` 与 `canonical_build.execution_id` 同源。ID 过期/不是自己的/**已经用过了** → `expired_execution_id`/`unknown_execution_id`/`used_execution_id` + 各自的下一步（ADR-025：被拦下的执行**不消耗**候选，所以同一个 ID 可以在「没写成功」之后反复用） |
 
 ### E. 无解时的六维阶梯
 

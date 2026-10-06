@@ -72,6 +72,10 @@ class ErrorCode(StrEnum):
     POPULARITY_LOOKUP_FAILED = "popularity_lookup_failed"
     STALE_INVENTORY_SNAPSHOT = "stale_inventory_snapshot"
     UNKNOWN_EXECUTION_ID = "unknown_execution_id"
+    # 「这次候选**已经用过了**」——与 expired / unknown 是三件不同的事（2026-10-06 真机）：
+    # 一次被**执行前提拦下**的执行过去会把候选一起烧掉，调用方拿到的却是 unknown
+    # （"已失效或不属于当前玩家"），于是去重解而不是重试。现在焚烧推迟到写成功之后。
+    USED_EXECUTION_ID = "used_execution_id"
     UNSUPPORTED_INTENT = "unsupported_intent"
     WEAPON_ANALYSIS_FAILED = "weapon_analysis_failed"
     WEAPON_CATALOG_LOOKUP_FAILED = "weapon_catalog_lookup_failed"

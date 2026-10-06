@@ -30,6 +30,7 @@ from destiny_mcp.models import (
     MoveItemStep,
 )
 from destiny_mcp.services import build_candidates as build_candidates_module
+from destiny_mcp.services import build_service as build_service_module
 from destiny_mcp.services import loadout_exact_flow as exact_flow_module
 from destiny_mcp.services import loadout_verify
 from destiny_mcp.services import write_readback
@@ -401,11 +402,13 @@ async def test_equip_build_by_execution_id_against_the_real_service(
 
     assert done["ok"] is True
     service._equipment.equip_with_recovery.assert_awaited_once()
-    # 一次确认只能用一次：同一个 ID 再来一次就是"不认识"
+    # 一次确认只能用一次：写**成功**之后候选就烧了。重放报 `used_execution_id`
+    # （"用过了"），不是 `unknown_execution_id` —— 后者会让调用方去重解，
+    # 而这里该说的是"要再装一次就重新求解确认"（ADR-025）。
     replay = await armor_branches.equip_build(
         services, "Alpha#0100", None, build.execution_id, "hunter", True
     )
-    assert replay["error"]["code"] == "unknown_execution_id"
+    assert replay["error"]["code"] == "used_execution_id"
 
 
 @pytest.mark.asyncio
@@ -1037,7 +1040,8 @@ async def test_build_candidate_is_one_time_and_score_path_is_disabled() -> None:
     )
 
     assert first["success"] is True
-    assert replay["code"] == "unknown_execution_id"
+    # 写成功才烧；重放报"用过了"而不是"不认识"（ADR-025）。
+    assert replay["code"] == "used_execution_id"
     assert score["code"] == "exact_build_required"
 
 
@@ -1059,3 +1063,93 @@ async def test_build_candidate_expires(
 
     assert result["code"] == "expired_execution_id"
     service._inventory.get_armor_snapshot.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_a_refused_execution_does_not_burn_the_candidate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """**核心守门（ADR-025）**：被执行前提拦下的执行不消耗候选。
+
+    真机 2026-10-06：`equip_build` 因为"与身上那件金装冲突（1641）"被拦下 —— 账号一个
+    字节没改 —— 但候选在**写之前**就被 `consume()` 烧掉了，于是处理完冲突拿同一个 ID
+    重试只拿到 `unknown_execution_id`，被迫整条重解重确认。
+
+    判据：拦下之后 `resolve()` 还是 `ok`，且执行器一次都没被调用。
+    """
+    from destiny_mcp.tools import _armor_branches as armor_branches
+
+    service = _build_service()
+    snapshot, build = _exact_contract()
+    service._candidates.register(build, "Alpha#0100")
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
+    service._equipment.equip_with_recovery = AsyncMock()
+
+    # 复检拦下这次执行（真机上这条是 1641 冲突或指纹变了）。
+    async def _refuse(**_kwargs):
+        return {
+            "success": False,
+            "code": "execution_precondition_failed",
+            "message": "指定的金装与当前穿着的那件冲突。",
+        }
+
+    monkeypatch.setattr(build_service_module, "recheck_confirmed_build", _refuse)
+
+    refused = await armor_branches.equip_build(
+        {"build_svc": service}, "Alpha#0100", None, build.execution_id, "hunter", True
+    )
+
+    assert refused["error"]["code"] == "execution_precondition_failed"
+    service._equipment.equip_with_recovery.assert_not_awaited()
+    # 账号没改 → 候选还该能用（这就是本次改动要保住的东西）。
+    still_there, status = service._candidates.resolve(build.execution_id, "Alpha#0100")
+    assert status == "ok", "被拦下的执行把候选烧掉了"
+    assert still_there is not None
+
+    # 处理完冲突、拿同一个 ID 再来一次：这次它得真的走进执行器。
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
+    service._equipment.equip_with_recovery = AsyncMock(
+        return_value=LoadoutOperationResult(success=True, loadout_name="Exact", message="OK")
+    )
+    monkeypatch.setattr(
+        build_service_module, "recheck_confirmed_build",
+        AsyncMock(return_value=None),
+    )
+    retry = await armor_branches.equip_build(
+        {"build_svc": service}, "Alpha#0100", None, build.execution_id, "hunter", True
+    )
+    assert retry["ok"] is True, "同一个 ID 重试应该能跑通，不必重解"
+    service._equipment.equip_with_recovery.assert_awaited_once()
+
+
+def test_a_burned_candidate_does_not_leak_to_another_player(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """墓碑也要判属主：别人的 ID 一律 `player_mismatch`，不能回"用过了"。
+
+    回 `consumed` 就等于承认"这个 ID 存在过" —— 仓库对 unknown 那一路的要求是
+    "别人的候选与不存在的候选回同一句话"，墓碑不能开后门（ADR-025 的配套第 1 条）。
+    """
+    store = build_candidates_module.BuildCandidateStore(clock=lambda: 0.0)
+    build = _exact_contract()[1]
+    store.register(build, "Alpha#0100")
+    store.consume(build.execution_id)
+
+    assert store.resolve(build.execution_id, "Alpha#0100")[1] == "consumed"
+    assert store.resolve(build.execution_id, "Bravo#0200")[1] == "player_mismatch"
+
+
+def test_a_burned_candidate_is_forgotten_after_the_ttl() -> None:
+    """墓碑按同一条 TTL 清：留久了是内存泄漏，而且那么老的 ID 报"过期"更有用。"""
+    now = [0.0]
+    store = build_candidates_module.BuildCandidateStore(
+        ttl_seconds=10, clock=lambda: now[0]
+    )
+    build = _exact_contract()[1]
+    store.register(build, "Alpha#0100")
+    store.consume(build.execution_id)
+
+    now[0] = 11.0
+    store.evict_expired()
+
+    assert store.resolve(build.execution_id, "Alpha#0100")[1] == "unknown"

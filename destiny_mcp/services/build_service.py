@@ -51,7 +51,8 @@ from ..build.process_types import SearchDiagnostics
 from ..build.ranking import rank_results
 from ..build.snapshot_version import snapshot_version
 from .build_tuning import apply_local_tuning, solve_with_tuning
-from .build_candidates import BuildCandidateStore, describe_candidate
+from .build_candidates import BuildCandidateStore
+from .candidate_messages import candidate_failure, describe_candidate
 from .build_execution_guard import recheck_confirmed_build
 from .build_fragments import replace_fragment_config
 from .build_results import (
@@ -645,7 +646,7 @@ class BuildService:
     def get_build_candidate(self, player_name: str, execution_id: str) -> dict:
         """按候选 ID 取回服务端签发的那份方案（只读，不焚烧）—— 给只发标量的宿主用。
 
-        判定与话术在 `services/build_candidates.describe_candidate`（那边与暂存同一处），
+        判定与话术在 `services/candidate_messages`（与四个失败的翻译同处），
         这里只转发。
         """
         return describe_candidate(self._candidates, player_name, execution_id)
@@ -675,26 +676,20 @@ class BuildService:
                 "message": "配装缺少服务端候选 ID，请重新运行 find_build 后再确认。",
             }
         trusted, status = self._candidates.resolve(build.execution_id, player_name)
-        if status == "expired":
-            return {
-                "success": False,
-                "code": ErrorCode.EXPIRED_EXECUTION_ID,
-                "message": "该配装候选已过期，请重新求解并确认。",
-            }
-        if trusted is None:
-            # 别人的候选与不存在的候选回同一句话：不泄露"这个 ID 存在，只是不属于你"。
-            return {
-                "success": False,
-                "code": ErrorCode.UNKNOWN_EXECUTION_ID,
-                "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
-            }
+        if status != "ok" or trusted is None:
+            # 四个状态各有各的话术（唯一出处 `services/candidate_messages`）。
+            return candidate_failure(status) or candidate_failure("unknown") or {}
         if trusted.model_dump(mode="json") != build.model_dump(mode="json"):
             return {
                 "success": False,
                 "code": ErrorCode.CANONICAL_BUILD_MISMATCH,
                 "message": "确认后的配装内容发生变化，已拒绝执行。请重新选择候选。",
             }
-        self._candidates.consume(build.execution_id)
+        # ⚠️ 焚烧**不在这里**：以前在这一行 `consume()`，于是写账号之前被执行的
+        # 前提复检（金装冲突 1641 / 指纹变了，见下面 `recheck_confirmed_build`）拦下时，
+        # 账号一个字节没改、候选却已经烧掉 —— 调用方处理完冲突拿同一个 ID 重试只会拿到
+        # `unknown_execution_id`，被迫整条重解重确认（ADR-025）。
+        # 现在焚烧推迟到写成功之后（见本方法末尾）。
         build = trusted
         if build.class_type:
             build_character = class_type_name(
@@ -760,6 +755,11 @@ class BuildService:
             source="build",
         )
         result = await self._equipment.equip_with_recovery(player_name, loadout)
+        # 焚烧的时刻：**写成功之后**。失败的执行（被拦、搬运失败、回滚过）不消耗候选 ——
+        # 那种情况下账号要么没动、要么已经回到执行前的样子，重试同一个 ID 是正当的。
+        # 重放保护没削弱：成功照样烧，而且写之前的复检每次都会重读现场（ADR-025）。
+        if result.success:
+            self._candidates.consume(build.execution_id)
         return {
             "success": result.success,
             "character": normalized_character,

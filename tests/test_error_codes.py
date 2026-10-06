@@ -85,6 +85,7 @@ _EXPECTED_LITERAL_CODES = {
     "stale_inventory_snapshot",
     "unknown_execution_id",
     "unsupported_intent",
+    "used_execution_id",
     "weapon_analysis_failed",
     "weapon_catalog_lookup_failed",
     "weekly_reset_unavailable",

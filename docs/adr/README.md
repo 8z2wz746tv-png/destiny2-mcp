@@ -33,6 +33,7 @@
 | [ADR-022](022-candidates-must-be-equippable.md) | 求解器不许产出**注定装不上**的候选：格满搬不进来（`NoRoomInDestination`）与"另一部位还穿着异域"（1641）在求解阶段判死、0 候选必须说清是哪条约束卡的 | accepted |
 | [ADR-023](023-one-call-readback-for-equipped-mods.md) | 独立回读要有**一次调用拿全**的入口：`inventory_assistant(intent="mods")` 一次读回已装备护甲的插槽（槽行与 `intent="item"` 同形状），不替代写入路径的 `verify` | accepted |
 | [ADR-024](024-recheck-premises-before-writing.md) | 写账号前按**当时**的现场复检 ADR-022 那两条执行前提（判据仍是同一份，不重解）；指纹只收"写入前复算得出来的求解输入"（补入已装功能模组的能量占用） | accepted |
+| [ADR-025](025-candidate-burns-after-a-successful-write.md) | 候选在**写成功之后**才焚烧（被执行前提拦下的执行不消耗它），并给「用过了」单独一个错误码 `used_execution_id` | accepted |
 
 ## 编号规矩
 
