@@ -21,6 +21,7 @@ import asyncio
 from typing import Any, Sequence
 
 from ..build.constants import REQUEST_TARGET_FIELDS
+from ..build.ladder_evidence import classify_precision, precision_note
 from ..logging_config import get_logger
 from ..vocabulary import STAT_LABELS_ZH as STAT_LABELS  # 单一出处：vocabulary.py
 
@@ -301,13 +302,9 @@ def build_ladder(
         "tuning_attempted": attempted,
         "tuning_unavailable_reason": tuning_unavailable_reason or None,
         "suggestion": suggestion,
-        "note": (
-            "ceiling = 同一套约束下、按某种优先级**同时**能达到的值（实采，逐项取最大）；"
-            "它不等于「游戏里最多能到多少」，也不等于单项上限。降级只能由用户确认后执行。"
-            if precision == "sampled"
-            else "没采到任何一个可行解：可能是约束互斥到没有任何组合能同时满足，"
-            "ceiling 留空而不是编 0。"
-        ),
+        # 三种 precision 各有各的话（`build/ladder_evidence`，唯一出处）：
+        # 以前"试过没有"与"没算"共用一句"**可能**是约束互斥"，读的人分不出来。
+        "note": precision_note(precision),
     }
 
 
@@ -427,7 +424,8 @@ async def no_solution_ladder(
     )))
     samples = [trial["reached"] for trial in trials if trial.get("ok") is True]
     ceiling = ceiling_from_samples(samples)
-    precision = "sampled" if samples else "not_computed"
+    # 三态：`sampled` / `no_solution`（每档都跑了、都没有解）/ `not_computed`（至少一档没探成）。
+    precision = classify_precision(trials)
     tuning_evidence, tuning_unavailable = await _tuning_evidence(svc, player_name, request)
     table = build_ladder(
         request,
