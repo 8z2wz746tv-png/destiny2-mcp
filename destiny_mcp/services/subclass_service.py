@@ -61,6 +61,13 @@ _CATEGORY_TO_TYPE: dict[str, str] = {
     "movement": "movement",
     "aspects": "aspect",
     "fragments": "fragment",
+    # **冰影用的是另外两个词**（2026-10-06 真机 + 本地 Manifest 全表核对）：
+    # `totems` 只出现在 `<职业>.stasis`（= 星象），`trinkets` 只出现在 `shared.stasis`
+    # （= 碎片），别的元素一个都没有 —— 所以这两个词可以无歧义地映射过来。
+    # 不映射的后果是真机原文：`Slot 'aspect' not found on this subclass (only 0 aspect slot(s))`
+    # （棱镜/烈日那些走 `aspects`/`fragments`，所以以前一直没暴露）。
+    "totems": "aspect",
+    "trinkets": "fragment",
 }
 
 

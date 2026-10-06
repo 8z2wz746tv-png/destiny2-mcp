@@ -13,7 +13,7 @@ from __future__ import annotations
 import pytest
 
 from destiny_mcp.services import write_readback
-from destiny_mcp.services.subclass_service import SubclassService
+from destiny_mcp.services.subclass_service import SubclassService, identify_socket_type
 from destiny_mcp.utils.hash_utils import to_unsigned
 
 @pytest.fixture(autouse=True)
@@ -237,3 +237,29 @@ async def test_switch_then_plug_change_writes_on_the_new_item() -> None:
     assert switch.success is True
     assert [c.socket_type for c in result.changes] == ["super"], "subclass 不是插槽，不该出现在 changes 里"
     assert all(w[0] == "inst-solar" for w in bungie.writes), "插槽要写在新物品上"
+
+
+@pytest.mark.parametrize(
+    ("category", "expected"),
+    [
+        # 常规元素（棱镜/烈日/虚空/电弧/编织）走这两个词，一直是对的
+        ("hunter.prism.aspects", "aspect"),
+        ("shared.prism.fragments", "fragment"),
+        ("warlock.solar.supers", "super"),
+        # **冰影用的是另外两个词** —— 2026-10-06 真机踩到：
+        # 不映射时 `changes={"aspect": …}` 回
+        # "Slot 'aspect' not found on this subclass (only 0 aspect slot(s))"，
+        # 于是整个 modify 被报成失败，而冰影的星象/碎片一个都没换。
+        # 本地 Manifest 全表核对过：`totems` 只出现在 `<职业>.stasis`、
+        # `trinkets` 只出现在 `shared.stasis`，别的元素一个都没有。
+        ("hunter.stasis.totems", "aspect"),
+        ("titan.stasis.totems", "aspect"),
+        ("warlock.stasis.totems", "aspect"),
+        ("shared.stasis.trinkets", "fragment"),
+    ],
+)
+def test_identify_socket_type_maps_stasis_totems_and_trinkets(
+    category: str, expected: str,
+) -> None:
+    """冰影的星象=`totems`、碎片=`trinkets` —— 不加这两条映射，冰影改不了星象与碎片。"""
+    assert identify_socket_type(category) == expected
