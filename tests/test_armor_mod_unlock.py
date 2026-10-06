@@ -932,3 +932,31 @@ async def test_plan_rejects_an_out_of_range_or_unsuitable_socket(
     with pytest.raises(InvalidArgumentError) as unsuitable:
         await service.plan("Tester#1234", "item-1", "弹药搜寻者", "hunter", 0)
     assert "插不了" in str(unsuitable.value)
+
+
+STAT_PLACEHOLDER = 888888  # 属性位的占位（类别不是 enhancements.*，也就是"不是模组位"）
+
+
+async def test_plan_says_when_a_named_socket_is_not_a_mod_socket(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """指名到一个**不是模组位**的格子（属性位/皮肤位/大师位）时，话术要说清这件事。
+
+    真机踩过（2026-10-06 晚）：指名第 9 格（属性位）时老话术只念"那一格现在装着「（空）」"，
+    读起来像"空着为什么不给装" —— 真正的原因是**那根本不是模组位**。
+    """
+    manifest = _three_socket_manifest()
+    _patch_plug_set(monkeypatch, manifest)
+    manifest._definitions[HELMET_ITEM]["sockets"]["socketEntries"][1] = {
+        "reusablePlugSetHash": 12345,  # 打补丁的 get_definition 只认 PLUG_SET → 这一格不收这颗
+        "singleInitialItemHash": STAT_PLACEHOLDER,
+    }
+    manifest._definitions[STAT_PLACEHOLDER] = {"plug": {"plugCategoryIdentifier": "armor_stats"}}
+    service = _service(manifest, _three_slot_profile())
+
+    with pytest.raises(InvalidArgumentError) as exc:
+        await service.plan("Tester#1234", "item-1", "弹药搜寻者", "hunter", 1)
+
+    text = str(exc.value)
+    assert "不是模组位" in text, text
+    assert "armor_stats" in text, "要把那一格的类别说出来，调用方才知道自己指错了哪"

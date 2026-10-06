@@ -99,6 +99,11 @@ class ArmorModService(ModSocketMixin):
             if row.get("itemType") == _MOD_ITEM_TYPE
         ]
 
+    def _category_identifier(self, plug_hash: int) -> str:
+        """一颗插件的 `plugCategoryIdentifier`（拿不到给空串 —— **不编**）。"""
+        definition = self._manifest.get_item_definition(plug_hash) or {}
+        return str((definition.get("plug") or {}).get("plugCategoryIdentifier") or "")
+
     def _resolve_mod_candidates(self, mod_name: str) -> list[int]:
         """按名字找护甲模组（同名可能有多个 hash，只有其中一个在该槽的 plug set 里）。
 
@@ -284,12 +289,25 @@ class ArmorModService(ModSocketMixin):
             if found is not None:
                 fits.append((found, candidate))
         if not fits and socket_index is not None:
+            # 真机踩过（2026-10-06 晚，指名第 9 格 = 属性位）：老话术只念"那一格装着（空）"，
+            # 读起来像"空着为什么不给装" —— 真正的原因往往是**那根本不是模组位**。
+            here = (
+                self._category_identifier(entries[socket_index].get("singleInitialItemHash", 0))
+                if socket_index < len(entries)
+                else ""
+            )
+            is_mod_socket = here.startswith(("enhancements", "core.gear_systems"))
+            want = next(
+                (c for c in (self._category_identifier(x) for x in candidates) if c), ""
+            )
             occupant = int((sockets[socket_index] or {}).get("plugHash", 0) or 0)
             raise InvalidArgumentError(
-                f"第 {socket_index} 格插不了「{mod_name}」：那一格现在装着"
-                f"「{_mod_label(self._manifest.get_item_definition(occupant), '（空）')}」。"
-                "这一格不收这个类别的模组 —— 换一格，或换成那一格能装的模组；"
-                "要看每一格现在是什么，用 inventory_assistant(intent=\"item\")。"
+                f"第 {socket_index} 格{'插不了' if is_mod_socket else '**不是模组位**'}「{mod_name}」"
+                + (f"：它是「{here}」那一类" if here else "")
+                + (f"，而这颗模组属于「{want}」" if want else "")
+                + (f"；那一格现在装着「{_mod_label(self._manifest.get_item_definition(occupant), '')}」" if occupant else "")
+                + "。模组只能装进模组位（属性位/皮肤位/大师位都不行）——"
+                "用 inventory_assistant(intent=\"item\") 看每一格是什么，再指名能装的那一格。"
             )
 
         def _unlock_state(socket_index: int, plug_hash: int) -> bool | None:
