@@ -111,6 +111,27 @@ async def test_item_action_endpoints_use_official_paths_and_payloads() -> None:
 
 
 @pytest.mark.asyncio
+async def test_equip_loadout_path_has_no_membership_type_segment() -> None:
+    """`EquipLoadout` 的 URL **不带 `{membershipType}` 路径段**（membershipType 在请求体里）。
+
+    2026-10-06 真机对照：`.../EquipLoadout/3/` → **HTTP 404**
+    （`Expected JSON response, Got text/html`），`.../EquipLoadout/` → 成功（响应 `0`）。
+    在这条守门之前，这个入口**一次都没成功过** —— 404 被包装成"装备失败"，看起来像上游故障。
+    """
+    client, rest = make_client()
+
+    await client.equip_loadout(8, "2305843009679355779", 3)
+
+    assert rest.calls[0][1] == "Destiny2/Actions/Loadouts/EquipLoadout/"
+    assert "/3/" not in rest.calls[0][1], "membershipType 不能出现在路径里"
+    assert rest.calls[0][2]["json"] == {
+        "loadoutIndex": 8,
+        "characterId": 2305843009679355779,
+        "membershipType": 3,
+    }
+
+
+@pytest.mark.asyncio
 async def test_official_loadout_write_endpoints_use_slot_index_payloads() -> None:
     client, rest = make_client()
 

@@ -989,7 +989,21 @@ README 里有一句对我们特别关键：**「use `origin` `"*"` for local too
 **30 秒**回读才是新值（中间没再测更细的边界）。与本文档第五节（3～10 秒）同一族现象，
 但**别把"写完立刻读一次"当判据**——那会把成功的写入报成假失败。
 
-### 17.4 `EquipLoadout` 不能在活动里；另三个没这个限制
+### 17.4 `EquipLoadout` 的 URL **不带 `{membershipType}` 路径段**（曾经一直是 404）
+
+同一个请求体，只改路径（2026-10-06 真机，猎人 9 号槽 = 身上这套，等价 no-op）：
+
+| 路径 | 结果 |
+| --- | --- |
+| `Destiny2/Actions/Loadouts/EquipLoadout/3/` | ❌ **HTTP 404**（`Expected JSON response, Got text/html`） |
+| `Destiny2/Actions/Loadouts/EquipLoadout/` | ✅ **成功**（响应 `0`） |
+
+`membershipType` 在**请求体**里，和另外三个动作一样；官方帮助页给的 URL 也没有路径参数。
+**这意味着 `loadout_assistant(intent="equip_loadout")` 在 2026-10-06 之前一次都没成功过** ——
+404 被包成"装备失败"，看着像上游故障。守门逐字钉住 URL：
+`tests/test_bungie_client_actions.py::test_equip_loadout_path_has_no_membership_type_segment`。
+
+### 17.5 `EquipLoadout` 不能在活动里；另三个没这个限制
 
 同一天同一账号上：
 
@@ -1001,7 +1015,7 @@ README 里有一句对我们特别关键：**「use `origin` `"*"` for local too
 
 DIM 专门捕获这个码并在界面上提示"回轨道再试"——我们的话术照它。
 
-### 17.5 槽位数组**永远 20 条**，数组长度不代表解锁了几个
+### 17.6 槽位数组**永远 20 条**，数组长度不代表解锁了几个
 
 组件 206 `characterLoadouts.data.<charId>.loadouts` 是**定长 20 的数组**（索引 0–19，与
 `loadoutIndex` 字段无关——上游根本不回这个字段，位置即索引）。实测该账号：
@@ -1018,7 +1032,7 @@ DIM 专门捕获这个码并在界面上提示"回轨道再试"——我们的�
 它写的是 **10**，而这个账号泰坦已经用了 **18** 个 —— 那个字段是过期的。
 DIM 的做法是直接把"数组长度"当已解锁数（`availableLoadoutSlotsSelector`）。
 
-### 17.6 槽里存的是什么：10 件 + 一个插槽一个 plug
+### 17.7 槽里存的是什么：10 件 + 一个插槽一个 plug
 
 每个槽固定 **10 件**（实测逐件查过桶）：
 
@@ -1045,7 +1059,7 @@ DIM 的做法是直接把"数组长度"当已解锁数（`availableLoadoutSlotsS
 *"In game loadouts map any socket that has only a single option to UNSET_PLUG_HASH instead of
 the real plug hash"* —— 所以**单选项插槽不能要求逐位相等**，否则回读永远假红。
 
-### 17.7 代码位置
+### 17.8 代码位置
 
 | 判据/实现 | 在哪 |
 | --- | --- |
