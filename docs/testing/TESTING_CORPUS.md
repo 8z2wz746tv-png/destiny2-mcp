@@ -366,6 +366,7 @@
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
+| ⭐ 三格全满时**只换第 2 格**那一颗 | `intent="equip_mod"` + `mod_name` + `character` + **`socket_index=2`**（索引与每格装着什么读 `intent="item"`） | `candidates[0].socket_index=2`，`from` 就是那一格原来的模组 —— 不传 `socket_index` 时工具自己挑（**空槽优先**，ADR-026），三格全满则会顶第一格能插的（往往是玩家想留的那颗）；指名越界或那一格不收这个类别 → `invalid_arguments` + 说清是哪一格、原来装着什么（**写入之前**拦） |
 | ⭐ 把槽 0 换成手雷模组（**不说"确认"**） | `intent="equip_mod"` + `mod_name` + `character`，`confirmed=false` | 返回 `confirmation_required`；`candidates[0]` 带 `from`（空槽给 `null`）、`to`（含 `stat_bonus`）、`energy{capacity,used,after}` 与一句中文摘要；**账号未被改动** |
 | 用旧名说同一个模组 | `mod_name="纪律模组"`（旧六维名） | 自动映射成新名（纪律→手雷）后找到同一个模组，摘要里写的是新名 |
 | 装错部位的模组 | `mod_name="手雷快速启动"`（手套模组）装到腿甲 | `invalid_argument_error`，说明"没有能装它的插槽"，并指路 `intent="item"` 看槽位 |

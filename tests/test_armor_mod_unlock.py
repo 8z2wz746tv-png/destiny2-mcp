@@ -857,3 +857,78 @@ async def test_apply_treats_an_already_installed_plug_as_a_no_op() -> None:
     assert result["success"] is True
     assert result["already_installed"] is True
     assert result["socket_index"] == 0
+
+
+# ── 指定插槽（`socket_index`，ADR-026 的配套）────────────────────────────
+
+OCCUPYING_MOD = 999999  # 占位用的"别的模组"：不在 plug set 里也无所谓，只要能占住格子
+
+
+def _three_slot_profile() -> dict:
+    """三格护甲模组位（供指定插槽的测试用）。"""
+    profile = _profile({UNLOCKED_MOD})
+    profile["itemComponents"]["sockets"]["data"]["item-1"]["sockets"] = [
+        {"plugHash": EMPTY_PLUG} for _ in range(3)
+    ]
+    return profile
+
+
+async def test_plan_honours_a_named_socket_even_when_others_are_free(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """指名第几格就必须写第几格 —— 自动挑槽只是**不指名时**的默认（ADR-026）。"""
+    manifest = _three_socket_manifest()
+    _patch_plug_set(monkeypatch, manifest)
+    service = _service(manifest, _three_slot_profile())
+
+    auto = await service.plan("Tester#1234", "item-1", "弹药搜寻者", "hunter")
+    named = await service.plan("Tester#1234", "item-1", "弹药搜寻者", "hunter", 2)
+
+    assert auto["socket_index"] == 0, "不指名：空槽优先，落第一格空的"
+    assert named["socket_index"] == 2, "指名第 2 格就必须写第 2 格"
+
+
+async def test_plan_can_target_one_specific_slot_when_all_three_are_taken(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """**三格全满时的唯一出路**：指名那一格。
+
+    没有这个参数时，工具只能顶第一格能插的 —— 而三格全满恰恰是"想只换其中某一颗"的场景
+    （真机：模板缺的模组要靠它补进去，顶错一格就把已经对的那颗换掉了）。
+    """
+    manifest = _three_socket_manifest()
+    _patch_plug_set(monkeypatch, manifest)
+    profile = _three_slot_profile()
+    profile["itemComponents"]["sockets"]["data"]["item-1"]["sockets"] = [
+        {"plugHash": OCCUPYING_MOD} for _ in range(3)
+    ]
+    service = _service(manifest, profile)
+
+    auto = await service.plan("Tester#1234", "item-1", "弹药搜寻者", "hunter")
+    named = await service.plan("Tester#1234", "item-1", "弹药搜寻者", "hunter", 2)
+
+    assert auto["socket_index"] == 0, "不指名就顶第一格（有意保留的兜底）"
+    assert named["socket_index"] == 2
+    assert named["from"]["hash"] == OCCUPYING_MOD, "信封要写清这一格原来是谁"
+
+
+async def test_plan_rejects_an_out_of_range_or_unsuitable_socket(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """指名要**校验**：越界、或那一格不收这个类别，都必须在写入之前说清。"""
+    manifest = _three_socket_manifest()
+    _patch_plug_set(monkeypatch, manifest)
+    # 第 0 格换一份 plug set（打补丁的 get_definition 只认 PLUG_SET）→ 它不收这颗
+    manifest._definitions[HELMET_ITEM]["sockets"]["socketEntries"][0] = {
+        "reusablePlugSetHash": 12345,
+        "singleInitialItemHash": EMPTY_PLUG,
+    }
+    service = _service(manifest, _three_slot_profile())
+
+    with pytest.raises(InvalidArgumentError) as out_of_range:
+        await service.plan("Tester#1234", "item-1", "弹药搜寻者", "hunter", 9)
+    assert "没有第 9 格" in str(out_of_range.value)
+
+    with pytest.raises(InvalidArgumentError) as unsuitable:
+        await service.plan("Tester#1234", "item-1", "弹药搜寻者", "hunter", 0)
+    assert "插不了" in str(unsuitable.value)

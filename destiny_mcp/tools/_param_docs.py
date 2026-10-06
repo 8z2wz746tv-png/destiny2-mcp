@@ -260,6 +260,16 @@ ModName = Annotated[
     )),
 ]
 
+SocketIndex = Annotated[
+    int | None,
+    Field(ge=0, description=(
+        "要换的是**哪一格**（插槽索引）。只有 intent=\"equip_mod\" 读它；不传 = 工具自己挑"
+        "（优先空槽）。用 inventory_assistant(intent=\"item\") 看每格的索引与现在装着什么 —— "
+        "**三格全满、又想只动其中某一颗时必须传它**，否则工具会顶第一格能插的"
+        "（通常正是你想留的那颗）。"
+    )),
+]
+
 Query = Annotated[
     str,
     Field(description=(

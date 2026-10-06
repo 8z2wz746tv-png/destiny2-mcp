@@ -101,7 +101,7 @@
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
-| `equip_mod` | 给一件护甲换一个模组：先返回「哪件、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写。**调谐同一条路**：判据是那颗在不在**这件护甲允许的清单**里（组件 310）。在 → `writable=true`，`confirmed=true` 就写（实测不花材料、回读核对）；不在 → `writable=false` + 原因（上游回 1675「这颗装不到这件上」，不是「你没材料」） | `item_instance_id`、`mod_name`、`character` |
+| `equip_mod` | 给一件护甲换一个模组：先返回「哪件、**哪个槽**、从什么换成什么、能量怎么变」的确认请求，确认后才写。**调谐同一条路**：判据是那颗在不在**这件护甲允许的清单**里（组件 310）。在 → `writable=true`，`confirmed=true` 就写（实测不花材料、回读核对）；不在 → `writable=false` + 原因（上游回 1675「这颗装不到这件上」，不是「你没材料」）。**不传 `socket_index` 时工具自己挑槽（空槽优先，ADR-026）**；三格全满时它会顶第一格能插的 —— 要只动其中某一颗就自己指名（索引与每格装着什么读 `intent="item"`） | `item_instance_id`、`mod_name`、`character`、`socket_index` |
 | `move` | 移动物品，可顺带装备 | `item_name`、`destination`、`equip`、`from_character`、`item_instance_id` |
 | `transfer` | 按实例 ID 转移到指定角色 | `item_instance_id`、`to_character`、`from_character` |
 | `equip` | 按实例 ID 装备到指定角色 | `item_instance_id`、`character` |
@@ -425,6 +425,7 @@ Manifest 侧（**不代表拥有**）：
 | `set_bonus_count` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `set_bonus_name` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend`、`set_bonus` |
 | `slot_number` | `loadout_assistant`：`clear_official`、`snapshot_official`、`update_official_identifiers` |
+| `socket_index` | `inventory_assistant`：`equip_mod` |
 | `stat_caps` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `statid` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
 | `super_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |

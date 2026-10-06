@@ -152,6 +152,14 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint='看有哪些模组用 build_assistant(intent="armor_mods")；换模组本身用 intent="equip_mod"。',
         suggestion=("build_assistant", "armor_mods"),
     ),
+    ("inventory_assistant", "socket_index"): _contract(
+        _only("equip_mod"),
+        hint=(
+            '只有换模组（equip_mod）需要指名"换哪一格"；每格的索引与现在装着什么用 '
+            'inventory_assistant(intent="item") 看。'
+        ),
+        suggestion=("inventory_assistant", "item"),
+    ),
     ("inventory_assistant", "rarity"): _contract(
         _only(*_INV_GET), hint="稀有度过滤只有列出清单的 intent 读它。"
     ),

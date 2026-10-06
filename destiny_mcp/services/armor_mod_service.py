@@ -28,6 +28,7 @@ from .insertion_rule_diagnosis import (
     insertion_rule_preflight_text,
 )
 from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
+from .loadout_plug_lookup import socket_takes_plug
 from ..utils.hash_utils import to_unsigned
 
 # 属性模组（+5/+10 六维）与部位功能模组在插槽里分属不同 plug 类别，名字可能撞车，
@@ -195,8 +196,15 @@ class ArmorModService(ModSocketMixin):
         item_instance_id: str,
         mod_name: str,
         character: str,
+        socket_index: int | None = None,
     ) -> dict[str, Any]:
-        """算出"换成这个模组"的方案，不写账号。"""
+        """算出"换成这个模组"的方案，不写账号。
+
+        `socket_index` 指定要换的是**哪一格**（不传就自己挑，口径见 ADR-026：空槽优先）。
+        三格全满时，自己挑会顶第一格能插的 —— 而"要顶哪一颗"是玩家的选择，
+        所以想只动某一颗就必须由调用方指名（索引与每格装着什么都能从
+        `inventory_assistant(intent="item")` 读到）。
+        """
         if not item_instance_id.strip():
             raise InvalidArgumentError(
                 "intent=equip_mod 需要 item_instance_id（护甲实例 ID）；"
@@ -250,14 +258,39 @@ class ArmorModService(ModSocketMixin):
         pools = self.insertable_plugs(profile, character_id)
         candidates = self._resolve_mod_candidates(mod_name)
         fits: list[tuple[int, int]] = []
-        for candidate in candidates:
-            # _find_mod_socket 会按 plug set 校验：槽位不接受这个模组就返回 None
-            found = await self._find_mod_socket(
-                item_instance_id, item_hash, candidate, membership_id, membership_type,
-                {item_instance_id: sockets},
+        entries = (definition.get("sockets") or {}).get("socketEntries") or []
+        if socket_index is not None and socket_index >= len(sockets):
+            raise InvalidArgumentError(
+                f"这件护甲只有 {len(sockets)} 格，没有第 {socket_index} 格（索引从 0 开始）。"
+                "用 inventory_assistant(intent=\"item\") 看每一格的索引与现在装着什么。"
             )
+        for candidate in candidates:
+            if socket_index is None:
+                # _find_mod_socket 会按 plug set 校验：槽位不接受这个模组就返回 None
+                found = await self._find_mod_socket(
+                    item_instance_id, item_hash, candidate, membership_id, membership_type,
+                    {item_instance_id: sockets},
+                )
+            else:
+                # 指定格：只认这一格 —— 判据与自动挑槽共用 `socket_takes_plug`（单一出处）
+                found = (
+                    socket_index
+                    if socket_index < len(entries)
+                    and socket_takes_plug(
+                        self._manifest, entries[socket_index], to_unsigned(candidate)
+                    )
+                    else None
+                )
             if found is not None:
                 fits.append((found, candidate))
+        if not fits and socket_index is not None:
+            occupant = int((sockets[socket_index] or {}).get("plugHash", 0) or 0)
+            raise InvalidArgumentError(
+                f"第 {socket_index} 格插不了「{mod_name}」：那一格现在装着"
+                f"「{_mod_label(self._manifest.get_item_definition(occupant), '（空）')}」。"
+                "这一格不收这个类别的模组 —— 换一格，或换成那一格能装的模组；"
+                "要看每一格现在是什么，用 inventory_assistant(intent=\"item\")。"
+            )
 
         def _unlock_state(socket_index: int, plug_hash: int) -> bool | None:
             """这一位能不能插这颗；None = 上游没给这个槽的 plug set（不判断）。"""

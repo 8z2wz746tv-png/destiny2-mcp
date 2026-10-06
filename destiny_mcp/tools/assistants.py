@@ -159,13 +159,13 @@ async def inventory_assistant(
     limit: fields.Limit = None,
     offset: fields.Offset = 0,
     mod_name: fields.ModName = "",
+    socket_index: fields.SocketIndex = None,
     ctx: Context = None,
 ) -> dict:
     """背包/仓库聚合入口。
 
     intent=duplicates 会按精确 item_hash 返回可核对的重复武器组。
-    具体武器类型查询使用 intent=type，不要把“手炮”等类型
-    传给 intent=get 的 item_type。
+    具体武器类型查询用 intent=type，别把“手炮”等类型传给 intent=get 的 item_type。
     """
     svc = get_ctx(ctx)
     intent = cast(InventoryIntent, (intent or "summary").strip().lower())
@@ -243,7 +243,7 @@ async def inventory_assistant(
 
     if intent == "equip_mod":
         return await armor_branches.equip_mod(
-            svc, resolved, item_instance_id, mod_name, character, confirmed
+            svc, resolved, item_instance_id, mod_name, character, confirmed, socket_index
         )
 
     if intent in {"get", "inventory", "list"}:

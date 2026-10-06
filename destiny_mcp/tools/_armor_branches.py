@@ -388,13 +388,16 @@ async def equip_mod(
     mod_name: str,
     character: str,
     confirmed: bool,
+    socket_index: int | None = None,
 ) -> dict:
     """`inventory_assistant(intent="equip_mod")`：给一件护甲换一个模组。
 
     自己管确认：`confirmed=false` 时返回**带 from/to/能量变化**的确认请求（通用写入
     确认只能回显参数，看不出到底要改什么），确认后才写账号。
     """
-    plan = await svc["armor_mod_svc"].plan(player_name, item_instance_id, mod_name, character)
+    plan = await svc["armor_mod_svc"].plan(
+        player_name, item_instance_id, mod_name, character, socket_index
+    )
     if plan["from"].get("name") and "空" in plan["from"]["name"]:
         plan["from"] = {"hash": None, "name": None, "energy_cost": 0}
     plan["summary"] = _mod_echo(plan)
