@@ -20,15 +20,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import aiobungie
-
-from .bungie_errors import _bungie_unavailable_result, _http_error_code
-from .logging_config import get_logger
 
 if TYPE_CHECKING:  # 只为类型标注：运行时不 import，免得与 bungie_client 形成环
     from .bungie_client import BungieClient
-
-logger = get_logger(__name__)
 
 # 官方配装槽"未设置"哨兵：空槽的三个标识、以及每个槽里没插东西的插槽位都长这样（实测）。
 UNSET_LOADOUT_IDENTIFIER = 2166136261
@@ -95,24 +89,17 @@ async def equip_loadout(
     ⚠️ 这个端点**不带 `{membershipType}` 路径段**（见 `EQUIP_LOADOUT_PATH`），
     且**要求不在活动里**，否则回 `DestinyCannotPerformActionAtThisLocation`。
     两条都是 2026-10-06 真机实测，对照表在 `docs/reference/bungie_api.md` 第十七节。
+
+    必须走 `client._post_action` 而不是自己 `static_request` + `result.get(...)`：
+    **成功时 `static_request` 返回的是裸的 `Response`（这个动作是 int `0`），不是 dict** ——
+    2026-10-06 修路径之前它一直 404 所以没暴露，修完路径立刻变成
+    `'int' object has no attribute 'get'`。信封归一只有 `_post_action` 一处。
     """
-    try:
-        result = await client.rest.static_request(
-            "POST",
-            EQUIP_LOADOUT_PATH,
-            auth=await client.get_access_token(),
-            json=_slot_payload(loadout_index, character_id, membership_type),
-        )
-        code = result.get("ErrorCode", 0)
-        logger.debug("EquipLoadout OK: index=%s char=%s", loadout_index, character_id)
-        return {"ErrorCode": code, "Message": result.get("Message", "Ok")}
-    except aiobungie.HTTPError as exc:
-        unavailable = _bungie_unavailable_result(exc, "装备 Bungie 配装")
-        if unavailable:
-            return unavailable
-        code = _http_error_code(exc)
-        logger.error("EquipLoadout failed: index=%s error=%s", loadout_index, exc)
-        return {"ErrorCode": code, "Message": str(exc)}
+    return await client._post_action(
+        EQUIP_LOADOUT_PATH,
+        _slot_payload(loadout_index, character_id, membership_type),
+        "装备 Bungie 配装",
+    )
 
 
 async def snapshot_loadout(

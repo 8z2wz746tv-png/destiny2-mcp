@@ -1003,7 +1003,16 @@ README 里有一句对我们特别关键：**「use `origin` `"*"` for local too
 404 被包成"装备失败"，看着像上游故障。守门逐字钉住 URL：
 `tests/test_bungie_client_actions.py::test_equip_loadout_path_has_no_membership_type_segment`。
 
-### 17.5 `EquipLoadout` 不能在活动里；另三个没这个限制
+### 17.5 `EquipLoadout` 成功时返回的是**裸 int**，不是信封对象
+
+`static_request` 对这条动作**已经剥掉信封**：成功时返回的是 `Response`（这里是 `0`），
+不是 `{"ErrorCode": 1, ...}`。所以"自己 `static_request` + `result.get("ErrorCode")`"会炸
+`'int' object has no attribute 'get'`（2026-10-06 真机：URL 修好后立刻暴露）。
+归一只有一处：`BungieClient._post_action`（它把裸值包成 `{"ErrorCode": 1, "Response": ...}`），
+四个动作**都**走它。守门：
+`tests/test_bungie_client_actions.py::test_equip_loadout_tolerates_a_bare_int_response`。
+
+### 17.6 `EquipLoadout` 不能在活动里；另三个没这个限制
 
 同一天同一账号上：
 
@@ -1015,7 +1024,7 @@ README 里有一句对我们特别关键：**「use `origin` `"*"` for local too
 
 DIM 专门捕获这个码并在界面上提示"回轨道再试"——我们的话术照它。
 
-### 17.6 槽位数组**永远 20 条**，数组长度不代表解锁了几个
+### 17.7 槽位数组**永远 20 条**，数组长度不代表解锁了几个
 
 组件 206 `characterLoadouts.data.<charId>.loadouts` 是**定长 20 的数组**（索引 0–19，与
 `loadoutIndex` 字段无关——上游根本不回这个字段，位置即索引）。实测该账号：
@@ -1032,7 +1041,7 @@ DIM 专门捕获这个码并在界面上提示"回轨道再试"——我们的�
 它写的是 **10**，而这个账号泰坦已经用了 **18** 个 —— 那个字段是过期的。
 DIM 的做法是直接把"数组长度"当已解锁数（`availableLoadoutSlotsSelector`）。
 
-### 17.7 槽里存的是什么：10 件 + 一个插槽一个 plug
+### 17.8 槽里存的是什么：10 件 + 一个插槽一个 plug
 
 每个槽固定 **10 件**（实测逐件查过桶）：
 
@@ -1059,7 +1068,7 @@ DIM 的做法是直接把"数组长度"当已解锁数（`availableLoadoutSlotsS
 *"In game loadouts map any socket that has only a single option to UNSET_PLUG_HASH instead of
 the real plug hash"* —— 所以**单选项插槽不能要求逐位相等**，否则回读永远假红。
 
-### 17.8 代码位置
+### 17.9 代码位置
 
 | 判据/实现 | 在哪 |
 | --- | --- |

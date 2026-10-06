@@ -132,6 +132,22 @@ async def test_equip_loadout_path_has_no_membership_type_segment() -> None:
 
 
 @pytest.mark.asyncio
+async def test_equip_loadout_tolerates_a_bare_int_response() -> None:
+    """成功时 `static_request` 返回**裸的 `Response`**（这个动作是 int `0`），不是 dict。
+
+    2026-10-06 真机：URL 修好之后立刻炸 `'int' object has no attribute 'get'` ——
+    只要自己写 `static_request` + `result.get("ErrorCode")` 就会这样。
+    信封归一只有 `_post_action` 一处，所以这条路必须走它（`snapshot`/`update`/`clear` 本来就走）。
+    """
+    client, rest = make_client()
+    rest.response = 0
+
+    result = await client.equip_loadout(8, "2305843009679355779", 3)
+
+    assert result["ErrorCode"] == 1
+
+
+@pytest.mark.asyncio
 async def test_official_loadout_write_endpoints_use_slot_index_payloads() -> None:
     client, rest = make_client()
 

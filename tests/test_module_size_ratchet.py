@@ -71,7 +71,9 @@ CEILINGS = {
     # 登记即上限：里面大半是"为什么只能这么做"的注释，代码本身很短。
     # 同日 192 → 180：把四动作表与标识表**搬去 `docs/reference/bungie_api.md` 第十七节**
     # （那是唯一出处），模块里只留指针 —— 抄第二份就会两边走样，位置也腾出来了。
-    "destiny_mcp/bungie_loadouts.py": 180,
+    # 同日 180 → 170：`equip_loadout` 改成走 `_post_action`（信封归一只此一处），
+    # 自己那套 try/except 与三个 import 一起删掉 —— 位置跟着收紧。
+    "destiny_mcp/bungie_loadouts.py": 170,
     # P7：结果翻译层（ProcessArmorSet → BuildResult/canonical_build + 目标统计）
     # 整个搬到 services/build_results.py，1114 → 906，上限跟着收紧 ——
     # 调谐（tuning）的对外字段也落在那边的翻译层里，不再往这里堆。
