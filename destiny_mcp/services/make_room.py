@@ -254,9 +254,13 @@ async def _settled_snapshot(
     """
     snapshot = await inventory.get_armor_snapshot(player_name, character)
     for _ in range(_STABLE_ATTEMPTS - 1):
-        facts = read_facts(snapshot, target_class_type, manifest)
-        if slots and not any(facts.blocks_vault_piece(slot) for slot in slots):
-            return snapshot
         await asyncio.sleep(_STABLE_DELAY_SECONDS)
-        snapshot = await inventory.get_armor_snapshot(player_name, character)
+        again = await inventory.get_armor_snapshot(player_name, character)
+        facts = read_facts(again, target_class_type, manifest)
+        freed = not slots or not any(facts.blocks_vault_piece(slot) for slot in slots)
+        # **两个条件都要**：格子真空了（否则前提复检照样判满 —— 真机第五次翻车），
+        # 且与上一次读到的版本相同（否则记下的基线比复检看到的旧一拍 —— 第六次翻车）。
+        if freed and snapshot_version(again) == snapshot_version(snapshot):
+            return again
+        snapshot = again
     return snapshot
