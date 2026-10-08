@@ -55,7 +55,7 @@ from .build_tuning import apply_local_tuning, solve_with_tuning
 from .build_candidates import BuildCandidateStore
 from .candidate_messages import candidate_failure, describe_candidate
 from .build_baseline import rebaseline_note
-from .make_room import make_room_for_build, make_room_steps
+from .make_room import equip_with_make_room_retry, make_room_for_build, make_room_steps
 from .build_execution_guard import recheck_confirmed_build
 from .build_fragments import replace_fragment_config
 from .build_results import (
@@ -456,8 +456,7 @@ class BuildService:
         pool, tuning_map = apply_local_tuning(
             pool, tuning_map, snapshot, parsed, self._manifest, top_n=parsed.top_n
         )
-        # 执行前提砍掉了哪些件（格子满搬不进来 / 与角色正穿着的金装冲突）：0 候选时
-        # 调用方必须能分清"属性配不出来"与"这套装不上"——后者会在写第一颗模组之前整批回滚。
+        # 执行前提砍掉了哪些件（格满 / 金装冲突）：0 候选时要能分清"配不出来"与"这套装不上"。
         blocked_by = execution_blockers(snapshot, parsed, self._manifest)
         if diagnostics is not None:
             diagnostics.append(SearchDiagnostics(
@@ -488,10 +487,8 @@ class BuildService:
             ),
         )
 
-        # 展示排序与**求解器内部**共用同一个比较器（`build/ranking.rank_results`）。
-        # 以前这里是第三套口径：`completion_rate` 打头、再按优先级、最后才是加权总分 ——
-        # 而求解器堆里用的是另一套字典序，`score` 又是第三套。三套口径必然互相打架，
-        # "超一点就扣分"就是加权那套写出来的。
+        # 展示排序与**求解器内部**共用同一个比较器（`build/ranking.rank_results`）：以前这里是第三套
+        # 口径（`completion_rate` 打头 → 优先级 → 加权总分），三套必然互相打架。
         results = rank_results(results, parsed)
 
         # 每套方案"要先准备什么"（ADR-027）：件现在也在池里，所以这句话要跟着方案走。
@@ -683,9 +680,8 @@ class BuildService:
                 "code": ErrorCode.CANONICAL_BUILD_MISMATCH,
                 "message": "确认后的配装内容发生变化，已拒绝执行。请重新选择候选。",
             }
-        # ⚠️ 焚烧**不在这里**：以前在这一行 `consume()`，于是写前复检（金装冲突 1641 / 指纹变了，
-        # 见 `recheck_confirmed_build`）拦下时账号没改、候选却烧掉了 → 同 ID 重试只能拿到
-        # `unknown_execution_id`（ADR-025）。现在推迟到写成功之后（见本方法末尾）。
+        # ⚠️ 焚烧**不在这里**：以前在这一行 `consume()`，于是写前复检拦下时账号没改、候选却烧掉了
+        # → 同 ID 重试只能拿到 `unknown_execution_id`（ADR-025）。现在推迟到写成功之后。
         build = trusted
         if build.class_type:
             build_character = class_type_name(
@@ -729,9 +725,8 @@ class BuildService:
                 "message": "配装包含无效模组 Hash，请重新生成配装。",
             }
 
-        # 写账号之前的最后一段只读闸：重取现场 → 执行前提复检（格满 / 与当前金装冲突，
-        # ADR-022 的判据）→ 指纹比对 → 实例核对。四步的顺序与"为什么先查执行前提"写在
-        # `services/build_execution_guard` 的模块 docstring 里。
+        # 写账号之前的最后一段只读闸：重取现场 → 执行前提复检（ADR-022）→ 指纹比对 → 实例核对。
+        # 四步的顺序与"为什么先查执行前提"写在 `services/build_execution_guard` 的 docstring 里。
         # 目标格满而计划里有件在仓库 → **自动腾一件**再复检（ADR-029；只在这条已确认的写入里做）
         room_steps, room_prefix = await make_room_for_build(
             player_name=player_name, character=normalized_character, inventory=self._inventory, equipment=self._equipment, manifest=self._manifest, build=build, candidates=self._candidates)
@@ -753,7 +748,11 @@ class BuildService:
             subclass=canonical_subclass(build),
             source="build",
         )
-        result = await self._equipment.equip_with_recovery(player_name, loadout)
+        # 先试一次；撞上上游格满（NoRoomInDestination）就按回执点名的件腾一格、再试一次（ADR-029 P2）
+        result, retry_steps, retry_note = await equip_with_make_room_retry(
+            attempt=lambda: self._equipment.equip_with_recovery(player_name, loadout),
+            make_room=make_room_for_build, room_args={  # 预判那份参数照传，重试时只补 names
+                "player_name": player_name, "character": normalized_character, "inventory": self._inventory, "equipment": self._equipment, "manifest": self._manifest, "build": build, "candidates": self._candidates})
         # 焚烧的时刻：**写成功之后**。失败的执行（被拦、搬运失败、回滚过）不消耗候选 ——
         # 那种情况账号要么没动、要么已回到执行前；重放保护没削弱：写前复检每次重读现场。
         if result.success:
@@ -764,8 +763,8 @@ class BuildService:
             "success": result.success,
             "character": normalized_character,
             "snapshot_version": build.snapshot_version,
-            "message": room_prefix + result.message,  # 腾过就说（ADR-029 §5：动过别的件必须看得见）
-            "steps": make_room_steps(room_steps) + [s.model_dump() for s in result.steps],
+            "message": room_prefix + retry_note + result.message,  # 腾过就说（ADR-029 §5）
+            "steps": make_room_steps(room_steps + retry_steps) + [s.model_dump() for s in result.steps],
         }
 
     async def equip_by_score(

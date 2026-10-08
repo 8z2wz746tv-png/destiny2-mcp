@@ -312,3 +312,85 @@ async def test_a_blocked_piece_frees_exactly_one_slot() -> None:
 
     assert prefix, "该腾的时候要腾"
     assert len(equipment.moved) == 1, f"该只腾一件，实际 {len(equipment.moved)} 件"
+
+
+# ── P2：撞上上游格满 → 按回执点名的件腾一格 → 重试一次 ──────────────────────
+
+_NO_ROOM_DETAIL = (
+    "'光泽袖甲' 装备失败: 操作失败：Transfer vault→character。Internalservererror: (\n"
+    "  http_status: 500,\n  message: There are no item slots available to transfer this item.,\n"
+    "  error_status: DestinyNoRoomInDestination,"
+)
+
+
+def _failed(detail: str) -> "LoadoutOperationResult":
+    from destiny_mcp.models import LoadoutOperationResult, MoveItemStep
+
+    return LoadoutOperationResult(
+        success=False, loadout_name="Exact", message="执行失败，已恢复执行前状态。",
+        steps=[MoveItemStep(action="error", detail=detail, success=False)],
+    )
+
+
+def test_only_no_room_failures_are_treated_as_make_room_cases() -> None:
+    """只有**上游真的回格满**（回执里带那句/那个错误码）才算腾格场景 —— 别的失败不许去搬东西。"""
+    from destiny_mcp.services.make_room import no_room_failed_item_names
+
+    assert no_room_failed_item_names(_failed(_NO_ROOM_DETAIL)) == {"光泽袖甲"}
+    assert no_room_failed_item_names(_failed("'某件' 装备失败: 网络超时")) == set()
+    # 成功的那条不算
+    from destiny_mcp.models import LoadoutOperationResult, MoveItemStep
+
+    ok = LoadoutOperationResult(success=True, loadout_name="Exact", steps=[
+        MoveItemStep(action="transfer", detail=_NO_ROOM_DETAIL, success=True)])
+    assert no_room_failed_item_names(ok) == set()
+
+
+@pytest.mark.asyncio
+async def test_a_full_slot_failure_is_retried_once_after_making_room() -> None:
+    """第一次撞格满 → 按点名腾一格 → **重试一次**；回执里要写明"第一次撞了、已重试"。"""
+    from destiny_mcp.models import LoadoutOperationResult
+    from destiny_mcp.services.make_room import equip_with_make_room_retry
+
+    attempts: list[int] = []
+    asked: list[set[str]] = []
+
+    async def attempt():
+        attempts.append(1)
+        if len(attempts) == 1:
+            return _failed(_NO_ROOM_DETAIL)
+        return LoadoutOperationResult(success=True, loadout_name="Exact", message="已装备，回读核对通过。")
+
+    async def make_room(**kwargs):
+        asked.append(kwargs["names"])
+        return ["腾格：'某个备用的' → 仓库（臂铠）"], "已自动腾出某个备用的（搬到仓库）。"
+
+    result, steps, note = await equip_with_make_room_retry(
+        attempt=attempt, make_room=make_room, room_args={})
+
+    assert len(attempts) == 2, "该重试一次"
+    assert asked == [{"光泽袖甲"}], "只给回执点名的那件腾地方"
+    assert result.success and len(steps) == 1
+    assert "已重试一次" in note and "格子满" in note
+
+
+@pytest.mark.asyncio
+async def test_a_full_slot_failure_without_anything_to_move_does_not_retry() -> None:
+    """腾不出来 → **不重试**、把第一次的失败原样交回去（不许硬写第二次）。"""
+    from destiny_mcp.services.make_room import equip_with_make_room_retry
+
+    attempts: list[int] = []
+
+    async def attempt():
+        attempts.append(1)
+        return _failed(_NO_ROOM_DETAIL)
+
+    async def make_room(**kwargs):
+        return [], "这个格子里没有可腾的件"
+
+    result, steps, note = await equip_with_make_room_retry(
+        attempt=attempt, make_room=make_room, room_args={})
+
+    assert len(attempts) == 1, "腾不出来就不许再试"
+    assert not result.success and steps == []
+    assert "没有可腾的件" in note

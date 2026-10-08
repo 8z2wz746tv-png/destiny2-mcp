@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from collections.abc import Awaitable, Callable, Collection, Sequence
 from dataclasses import dataclass, field
 
@@ -142,6 +143,7 @@ async def make_room_for_build(
     candidates=None,
     official_instance_ids: Collection[str] = (),
     limit: int = 1,
+    names: set[str] | None = None,
 ) -> tuple[list[str], str]:
     """一次 `equip_build` 的腾格入口：读现场 → 该腾就腾 → 返回 `(回执行, 话术前缀)`。
 
@@ -159,6 +161,7 @@ async def make_room_for_build(
         move_to_vault=lambda armor: equipment.move_single_to_vault(player_name, armor),
         official_instance_ids=official_instance_ids,
         limit=limit,
+        only_names=names,
     )
     if not moved:
         return steps, ""
@@ -186,6 +189,7 @@ async def _make_room_for_build(
     move_to_vault: Callable[[Armor], Awaitable[None]],
     official_instance_ids: Collection[str] = (),
     limit: int = DEFAULT_LIMIT,
+    only_names: set[str] | None = None,
 ) -> tuple[list[str], list[str], set[str]]:
     """给"这五件能不能落地"腾地方：**只看计划里在仓库、且目标格满的那些部位**。
 
@@ -212,7 +216,11 @@ async def _make_room_for_build(
         if armor is None or armor.source_location != "vault":
             continue  # 本来就在角色身上的件不撞 NoRoomInDestination
         solver_slot = loadout_to_solver.get(item.slot, item.slot)
-        if not facts.blocks_vault_piece(solver_slot):
+        if only_names is not None:
+            # P2：上游**真的**回了格满（回执点名了这件）→ 不再信预判，直接给它腾一格。
+            if getattr(item, "name", "") not in only_names:
+                continue
+        elif not facts.blocks_vault_piece(solver_slot):
             continue
         outcome = await make_room(
             candidates=snapshot.get_slot(solver_slot),
@@ -264,3 +272,43 @@ async def _settled_snapshot(
             return again
         snapshot = again
     return snapshot
+
+
+#: 上游格满的两种写法（错误码与那句话；只在**我们自己的回执字符串**里找，不猜别的）
+_NO_ROOM_MARKERS = ("NoRoomInDestination", "no item slots available")
+
+
+def no_room_failed_item_names(result) -> set[str]:
+    """这次失败是不是"目标格满"？是的话，回执点名了哪些件。
+
+    回执行长这样：`'光泽袖甲' 装备失败: 操作失败：Transfer vault→character。… error_status:
+    DestinyNoRoomInDestination …` —— 名字由我们自己写，引号也是我们加的，所以解析是稳的。
+    """
+    names: set[str] = set()
+    for step in getattr(result, "steps", []) or []:
+        if getattr(step, "success", True):
+            continue
+        detail = str(getattr(step, "detail", ""))
+        if any(marker in detail for marker in _NO_ROOM_MARKERS):
+            names |= set(re.findall(r"'([^']+)'", detail))
+    return names
+
+
+async def equip_with_make_room_retry(*, attempt, make_room, room_args: dict):
+    """先试一次；**撞上格满就腾一格再试一次**（ADR-029 P2）。
+
+    `attempt()` 是装备动作（第一次失败时它已经把自己回滚干净了），`make_room(**room_args,
+    names=…)` 只给**回执点名的那几件**腾地方。腾不出来就把第一次的失败原样交回去 —— 不许硬写。
+    """
+    result = await attempt()
+    if getattr(result, "success", False):
+        return result, [], ""
+    names = no_room_failed_item_names(result)
+    if not names:
+        return result, [], ""
+    steps, prefix = await make_room(**room_args, names=names)
+    if not steps:
+        return result, [], prefix
+    retried = await attempt()
+    note = f"第一次撞上格子满（上游 NoRoomInDestination）：{prefix}已重试一次。"
+    return retried, steps, note
