@@ -206,6 +206,18 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - 口径写进可执行断言，不靠人记；计划文档（`*_FORMAT_PLAN.md`）记实机证据与取舍。
 - 提交信息见下面的「提交信息格式」：一行标题、一次只做一件事。
 - 密钥永不进日志、提交与截图（`.env`、token、client secret）。
+- **一个口径只写一处**（2026-10-06 定，起因是"工具面描述与 skill 说法不一致"这类事故）：
+  **工具面**（参数的 `Field(description=…)`、工具 docstring）写"**不传会做错**"的信息与该参数的取值；
+  **skill** 写流程与"结果怎么读"，同一句话**不在两处写全文** —— skill 里写一句指针。
+  理由：工具 schema 永远在模型上下文里，skill 可能没有；反过来 skill 抄一份就变成第二个出处。
+  - **结构性口径不用手写**：参数归属由 `_param_contracts.py` **生成**（`--write-doc` 写进 routing.md），
+    `tests/test_skill_contracts.py` 逐字比对 —— 手写那一段会被生成器覆盖（2026-10-06 现场踩到）。
+  - **参数取值的唯一出处是代码词表**（`vocabulary.py` 这类）。**描述里承诺的每个值都必须能被代码解析**：
+    `rarity` 那次事故就是说明写着中文可用、代码只映射英文，取不到**静默跳过过滤**（用户以为筛过了）。
+    守门：`tests/test_vocabulary.py::test_param_descriptions_only_promise_values_the_code_accepts`。
+  - **"禁止再抄"的扫描器要能扫到数字键的表**：`_dicts_with` 以前只收字符串键，
+    于是 `{6: "异域", …}` 这种拷贝一路免检（稀有度那份就是这么活下来的）。
+
 
 ## 提交信息格式
 
