@@ -27,7 +27,7 @@ TOOL_USAGE: dict[str, str] = {
 
 读（不传 `confirmed`）：
 - `summary`（别名 `summarize`、`概况`）：数量概况（每类多少件、仓库占多少）。
-- `get`（别名 `inventory`、`list`）：列清单；`location` 选 `vault`/角色名，`item_type` 按中文类型筛。
+- `get`（别名 `inventory`、`list`）：列清单；`location` 选 `vault`/角色名（**问"我身上穿着什么"就用角色名** —— 已装备的件在里面，带 `is_equipped`）；`item_type` **只认 weapon/armor/all**（按「手炮」这类具体类型列请用 `intent="type"` + `type_name`）。
 - `search`（别名 `find_item`）：**按名字找东西**（`item_name`）。
 - `type`（别名 `search_type`）：按**类型**列武器（`type_name`，如"手炮"）—— 按名字请用 `search`。
 - `duplicates`（别名 `duplicate_weapons`、`find_duplicates`、`重复武器`）：**重复武器分组**（要不要分解/留哪把）。

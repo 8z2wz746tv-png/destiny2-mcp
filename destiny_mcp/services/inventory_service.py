@@ -129,6 +129,11 @@ class InventoryService:
         # Apply filters
         items = self._filter_items(items, item_type, armor_slot, rarity)
 
+        # **已装备的排最前**（稳定排序，其余保持原顺序）：盲测 2026-10-06 里
+        # "我泰坦现在身上穿着什么" 返回的前 100 件**一件 is_equipped 都没有** ——
+        # 玩家要翻到第 2 页才看得到身上那套。装备是这类查询第一眼要看的东西。
+        items.sort(key=lambda item: not item.is_equipped)
+
         # 截断与自证：以前一次能把整个仓库倒出来（真机 1260 件 ≈ 511 KB / 13–15 万 tokens），
         # 而响应里没有总数也没有 truncated，调用方既没法少要一点、也察觉不到自己只看到一部分。
         total = len(items)

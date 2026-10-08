@@ -321,3 +321,51 @@ def test_zero_threshold_disables_the_gate(monkeypatch) -> None:
     monkeypatch.setattr(analyzer, "_max_possible_stats", lambda snapshot, constraints: {"health": 1})
 
     assert analyzer.analyze(_snapshot(6), _constraints()).max_possible == {"health": 1}
+
+
+@pytest.mark.asyncio
+async def test_equipped_items_come_first_in_a_listing() -> None:
+    """清单里**已装备的排最前**（稳定排序）。
+
+    盲测 2026-10-06：「我泰坦现在身上穿着什么」返回的前 100 件**一件 `is_equipped` 都没有**，
+    玩家要翻到第 2 页才看得到身上那套 —— 而"身上穿什么"正是这类查询第一眼要找的东西。
+
+    夹具用**真的 `InventoryItem`**（不是手编 dict/namespace）：2026-10-06 一天里，
+    手编形状已经骗过三次"单测全绿、真机是错的"。
+    """
+    from destiny_mcp.models import InventoryItem
+    from destiny_mcp.services import inventory_service as svc_module
+
+    def _item(instance_id: str, *, equipped: bool) -> InventoryItem:
+        return InventoryItem(
+            item_instance_id=instance_id,
+            item_hash=1000,
+            name=f"武器-{instance_id}",
+            location="titan",
+            item_type="Weapon",
+            bucket_type="Kinetic Weapons",
+            is_equipped=equipped,
+        )
+
+    service = object.__new__(svc_module.InventoryService)
+    service._items_at_location = lambda profile, location: (  # type: ignore[method-assign]
+        [
+            _item("a", equipped=False),
+            _item("b", equipped=True),
+            _item("c", equipped=False),
+            _item("d", equipped=True),
+        ],
+        "titan",
+    )
+
+    async def _resolve_and_fetch(player_name: str, components: Any) -> tuple[Any, Any]:
+        return None, {}
+
+    service._resolve_and_fetch = _resolve_and_fetch  # type: ignore[method-assign]
+
+    response = await service.get_inventory("Tester#1234", "titan", limit=2)
+
+    ids = [item.item_instance_id for item in response.items]
+    assert ids == ["b", "d"], (
+        "前两条必须是已装备的（稳定排序：同组内保持原顺序）—— 否则「身上穿什么」又要翻页"
+    )

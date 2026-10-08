@@ -50,8 +50,19 @@ def perk_description_payload(svc: dict[str, Any], perk_name: str) -> dict[str, A
     # perk 不是武器，没有 weapon 块可挂；社区资料单独给一块，且必须**照实说**
     # 资料可不可用（语料里"腐坏的可选资料不能静默消失"这条横切规则）。
     community = community_enrichment(svc.get("starside_svc"), perk_name, "weapons")
+    # **不是 perk 就点破**（盲测 2026-10-06）：用户问「亡者复仇」这个 perk，实际它是「亡者传说」的
+    # 一件**武器皮肤**（类别 `*_skins`）；老话术照样回"已读取 Perk「亡者复仇」的说明"，
+    # 用户会以为拿到了 perk 效果。皮肤/外观/着色器一律照实说。
+    label = (perk or {}).get("name") or perk_name
+    category = str((perk or {}).get("plug_category") or "")
+    cosmetic = any(word in category for word in ("skin", "ornament", "shader"))
+    summary = (
+        f"「{label}」**不是一个 perk**，是武器的外观（类别 `{category}`）—— 下面是它的说明。"
+        if cosmetic
+        else f"已读取 Perk「{label}」的说明。"
+    )
     return ok_response(
-        f"已读取 Perk「{(perk or {}).get('name') or perk_name}」的说明。",
+        summary,
         {
             "perk": perk,
             "community_references": community,

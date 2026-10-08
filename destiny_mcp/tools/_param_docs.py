@@ -64,8 +64,9 @@ CharacterOptional = Annotated[
 Location = Annotated[
     str,
     Field(description=(
-        "位置过滤：vault=仓库，character=角色身上，all=全部；留空由服务默认。"
-        "只被 summary、get、search、type 读。"
+        "位置过滤：vault/仓库、角色名（hunter/warlock/titan 或中文职业名）、postmaster/邮政官、all/全部；"
+        "留空由服务默认。只被 summary、get、search、type 读。"
+        "**问「我身上穿着什么」用 location=<职业名>** —— 已装备的件也在结果里，看 `is_equipped`。"
     )),
 ]
 
@@ -99,8 +100,9 @@ ItemInstanceIds = Annotated[
 ItemType = Annotated[
     str,
     Field(description=(
-        "物品类型（中文分类，如 手炮、火箭筒、头盔）。被 summary/get/type 读；"
-        "按名字查要用 item_name，不是这个。"
+        "物品类型：**只认 weapon / armor / all 三个值**（传「手炮」这类中文分类会被拒）。被 summary、get 读；"
+        '**按具体武器类型列（手炮、火箭筒…）要用 intent="type" + `type_name`**，不是这个参数。'
+        "按名字查用 `item_name`。"
     )),
 ]
 
@@ -235,7 +237,7 @@ WorldIntentField = Annotated[
 
 _LIMIT_DESCRIPTION = (
     "最多返回多少条；null（或不传）= 没指定，按该 intent 的默认条数（背包清单 100 件、"
-    "配装 5 套、按类型列武器 20／锻造图样 20、武器目录/筛选 50、重复武器 10、商人菜单 15／详情 40）。传 0 或负数等于没指定。"
+    "配装 5 套、锻造图样 20、武器目录/筛选 50、重复武器 10、商人菜单 15／详情 40）。传 0 或负数等于没指定。**`intent=type` 不读 limit**（那是全量列表），要收窄用 offset 翻页或换 intent。"
     "只限制返回条数，不限制扫描范围；被截断时响应里会带 truncated、总数与 next_offset，"
     "翻页把 next_offset 传给 offset。"
     "上面这些默认值只在声明了 limit 的工具里生效：同一个工具里不读它的 intent 传了会拿到"
@@ -363,7 +365,7 @@ RequiredPerks = Annotated[
     list[str] | str | None,
     Field(description=(
         "必须全部命中的 Perk（同栏任一即可满足其中一项）。只有 catalog 与 filter_rolls 支持。"
-        '多个 Perk 写成 "亡者复仇,速射"；单个 Perk 直接写名字。'
+        '多个 Perk 写成 "急切刀锋,速射"；单个 Perk 直接写名字。'
     )),
 ]
 
@@ -371,7 +373,7 @@ AnyPerks = Annotated[
     list[str] | str | None,
     Field(description=(
         "命中任意一个即可的 Perk。只有 catalog 与 filter_rolls 支持。"
-        '多个 Perk 写成 "亡者复仇,速射"。'
+        '多个 Perk 写成 "急切刀锋,速射"。'
     )),
 ]
 
@@ -379,7 +381,7 @@ ExcludedPerks = Annotated[
     list[str] | str | None,
     Field(description=(
         "命中就排除的 Perk。只有 catalog 与 filter_rolls 支持。"
-        '多个 Perk 写成 "亡者复仇,速射"。'
+        '多个 Perk 写成 "急切刀锋,速射"。'
     )),
 ]
 
