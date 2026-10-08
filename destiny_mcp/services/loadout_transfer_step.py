@@ -213,10 +213,21 @@ class ExoticDequipMixin:
         steps: list[MoveItemStep] = []
         moved_names: list[str] = []
         for slot in _ARMOR_SLOT_KEYS:
+            # ⚠️ 不能"取第一件穿着的、再看它是不是金装"：写入的同步窗口里**同一格会同时有两件
+            # `is_equipped`**（刚换下的旧的 + 新的），旧的那件往往非金装、还排在前面 —— 冲突就被漏判、
+            # 顶下不发生，而写前复检（读的是另一份刚取的现场）照样拒绝。2026-10-09 真机抓到的就是这个：
+            # 刚穿上金装护腿，这里却报"没冲突"。所以扫**所有**穿着的件。
             current = next(
-                (i for i in worn if i.slot == slot and i.is_equipped), None
+                (
+                    i
+                    for i in worn
+                    if self._armor_slot_of(i) == slot
+                    and i.is_equipped
+                    and self._item_is_exotic(i.item_hash)
+                ),
+                None,
             )
-            if current is None or not self._item_is_exotic(current.item_hash):
+            if current is None:
                 continue
             if slot in exotic_slots:
                 continue  # 这一格本来就要换成金装（DIM：we aren't already equipping into that slot）

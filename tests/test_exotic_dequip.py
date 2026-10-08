@@ -189,3 +189,35 @@ async def test_equip_build_entry_maps_solver_slots_and_reuses_the_same_judgement
 
     assert ok and transfer.equipped == ["w2"], (steps, ok, transfer.equipped)
     assert steps[0].action == "downgrade" and "顶下" in note
+
+
+@pytest.mark.asyncio
+async def test_a_stale_second_equipped_piece_does_not_hide_the_conflict() -> None:
+    """写入同步窗口里同一格会**同时有两件 `is_equipped`** —— 旧的那件非金装排在前面时，
+    「取第一件再看是不是金装」会把冲突漏判掉，顶下不发生、写前复检照样拒绝。
+
+    2026-10-09 真机：刚穿上金装护腿、紧接着 `equip_build`，这里却报"没冲突"（而 guard 读的是另一份
+    刚取的现场，看到了冲突）→ 用户拿到的还是"你自己去顶下"。判据必须是"扫所有穿着的件"。
+    """
+    manifest = {_H_EXOTIC_HELM: _TIER_EXOTIC, _H_EXOTIC_ARMS: _TIER_EXOTIC,
+                _H_LEGEND_ARMS: _TIER_LEGENDARY}
+    worn = [
+        # ① 旧的那件（同步窗口里还没消掉 `is_equipped`）：非金装，排在前面
+        _item("old", "刚换下的普通臂铠", slot="gauntlets", hash_=_H_LEGEND_ARMS,
+              power=540, equipped=True),
+        # ② 真的穿着的那件：金装
+        _item("new", "刚穿上的金装臂铠", slot="gauntlets", hash_=_H_EXOTIC_ARMS, equipped=True),
+        # ③ 顶下用的替身
+        _item("spare", "备用的普通臂铠", slot="gauntlets", hash_=_H_LEGEND_ARMS, power=530),
+    ]
+    transfer = _Transfer(worn)
+    service = _Service(manifest, transfer)
+    loadout = _loadout([
+        LoadoutItem(item_hash=_H_EXOTIC_HELM, name="金装头盔", slot="helmet", item_instance_id="p1"),
+    ])
+
+    steps, ok, note = await service.dequip_conflicting_exotics("Tester#1234", loadout)
+
+    assert ok, (steps, note)
+    assert transfer.equipped == ["spare"], f"该顶下 spare，实际 {transfer.equipped}"
+    assert steps[0].action == "downgrade"
