@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from ._empty_message import empty_message
 from ._preparation_note import preparation_note
 from . import _armor_ladder as armor_ladder
 from ._armor_branches import with_slot_keys
@@ -116,19 +117,24 @@ async def recommend(
         # 有执行前提挡路时，**不能**把 0 候选念成"属性配不出来"：那会把下一步指到
         # "降目标/反推待刷"上，而真正要做的是腾一格或先顶下冲突的金装。
         blocked_by = (recommendation.get("analysis") or {}).get("blocked_by") or []
+        # **约束本身凑不出来**（例：套装在这个职业上只有 3 个部位）优先：它才是原因，
+        # 属性/前提在那之后都没有意义（真机 2026-10-06 泰坦那条）。
+        infeasible = (recommendation.get("analysis") or {}).get("infeasible_by") or []
         return ok_response(
             (
-                "没有**能装上**的候选：执行前提先把候选砍掉了 —— " + "；".join(blocked_by)
+                "真实库存中没有满足原始硬约束的配装：" + "；".join(infeasible)
+                if infeasible
+                else "没有**能装上**的候选：执行前提先把候选砍掉了 —— " + "；".join(blocked_by)
                 if blocked_by
                 else "真实库存中没有满足原始硬约束的配装；金装和全部属性目标都保持不变。"
             ),
             {"recommendation": recommendation, "query": query, "ladder": ladder},
             next_actions=(
                 [
-                    "这几条是**执行前提**，不是属性不够：先按 analysis.reason 里的出路做"
-                    "（腾一格 / 用 equip 先把冲突的金装顶下来），再原参数重新求解。"
+                    "先照 analysis.reason 里的出路做（套装凑不齐就换一套/先拿缺的部位；"
+                    "格子满就腾一格 / 先顶下冲突的金装），再原参数重新求解。"
                 ]
-                if blocked_by
+                if infeasible or blocked_by
                 else [
                     "如果玩家想知道如何达标，保留本次全部参数调用 "
                     "build_assistant(intent='farm_target', max_replacements=2)；"
@@ -137,8 +143,8 @@ async def recommend(
                 ]
             ),
             warnings=(
-                list(blocked_by)
-                if blocked_by
+                list(infeasible or blocked_by)
+                if infeasible or blocked_by
                 else [
                     "原始硬约束未改变。无解时不能自动降低属性目标、替换指定金装或去掉碎片设置。"
                 ]
@@ -152,30 +158,6 @@ async def recommend(
         next_actions=[row_hint(rows[0])] if rows else [],
     )
 
-
-
-def _empty_message(search: dict[str, Any] | None) -> str:
-    """0 候选时说的话**必须自证"搜完了"**，并且分清"配不出来"与"有件要先准备"。
-
-    读的人要能分清三件事：枚举完了真没有满足下限的方案、没搜完/被截断、以及
-    **这次有件要先准备**（格子满搬不进来 / 与当前金装冲突）。
-
-    ADR-027 起第三种**不是** 0 候选的原因 —— 那些件照样进池、照样算（只是装备前要先解决），
-    所以这里只把它当**附注**。以前它排在第一位当原因，真机上就会把"约束凑不出来"
-    引到"去腾格子"上（2026-10-06 泰坦那趟就是这么念错的）。
-    """
-    blockers = (search or {}).get("blockers") or []
-    prep = ("另外：这次有件要先准备（" + "；".join(blockers) + "）—— 它**不是**这次 0 候选的原因，"
-            "那些件已经算进搜索了（ADR-027）。") if blockers else ""
-    if search is None or search.get("exhaustive"):
-        combos = (search or {}).get("combos")
-        scope = f"（枚举了 {combos:,} 套组合）" if isinstance(combos, int) else ""
-        return f"找到 0 个候选配装：枚举完了，没有任何一套能满足这些下限{scope}。" + prep
-    return (
-        "这次**没有搜完**，所以不能说「没有满足下限的方案」"
-        f"（截断原因：{search.get('truncated_by') or '未说明'}）。"
-        "可以收窄请求后重试，或调高搜索预算。" + prep
-    )
 
 
 async def find(
@@ -209,8 +191,9 @@ async def find(
             svc, player_name, request, coverage=search, base_order_empty=True
         )
         blocked = (search or {}).get("blockers") or []
+        infeasible = [str(item) for item in ((ladder or {}).get("infeasible_by") or [])]
         return ok_response(
-            _empty_message(search),
+            empty_message(search, infeasible),
             {"builds": builds, "query": query, "ladder": ladder, "search": search},
             next_actions=[
                 "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；"

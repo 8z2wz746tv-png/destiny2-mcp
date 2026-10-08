@@ -1040,6 +1040,16 @@ class BuildAnalysis(BaseModel):
             "不是降属性目标。判据与话术的唯一出处：`build/execution_feasibility`。"
         ),
     )
+
+    infeasible_by: list[str] = Field(
+        default_factory=list,
+        description=(
+            "**约束本身**就凑不出来时说清是哪一条（例：指定的套装在这个职业身上只有 3 个部位，"
+            "凑不出 4 件套）。与 `blocked_by` 分开：那条是执行前提（腾格子就能解决），"
+            "这条是**数出来的不可能**（换约束/先拿装备才谈得上）。"
+        ),
+    )
+
     max_possible: dict[str, int] = Field(
         default_factory=dict,
         description="Max achievable stats given current inventory",

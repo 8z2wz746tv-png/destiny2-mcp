@@ -22,7 +22,6 @@ from ..build.analyzer import (
     analyze_from_probes,
     ensure_within_combination_limit,
     execution_blockers,
-    oversized_reason,
     probe_stat,
 )
 from ..build.constants import MAIN_STAT_HASHES, STAT_NAMES, SUBCLASS_BONUSES
@@ -39,6 +38,7 @@ from ..build.models import (
 from ..bungie_client import BungieClient
 from ..build_contracts import CanonicalBuild, ExecutableBuild
 from . import profile_components
+from .build_analysis_guards import early_analysis
 from .build_preparation import annotate_analysis, annotate_preparation, preparation_index
 from ..error_codes import ErrorCode
 from ..exceptions import BuildValidationError
@@ -534,9 +534,9 @@ class BuildService:
             )
             parsed.subclass_stats = subclass_stats
             parsed.fragment_stats = fragment_stats
-        oversized = oversized_reason(snapshot, parsed)
-        if oversized:
-            return BuildAnalysis(reason=oversized, precision="not_computed")
+        early = early_analysis(snapshot, parsed)
+        if early is not None:
+            return early
         # 执行前提**不再短路**（ADR-027 修订 ADR-022）：件现在照样进池，属性层就必须照算 ——
         # 短路会把"差多少"整个吞掉（真机 2026-10-06 泰坦：三个格 10/10 满，用户连数字都问不出来）。
         # 那几条仍然带出去，但身份变了：从"为什么没有解"降级成"这些件要先准备"。

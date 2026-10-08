@@ -491,6 +491,72 @@ async def test_recommend_branch_says_unusable_not_unsatisfiable(monkeypatch) -> 
     assert reason in response["warnings"]
 
 
+@pytest.mark.asyncio
+async def test_find_branch_leads_with_the_set_shortfall(monkeypatch) -> None:
+    """约束本身凑不出来时，摘要要**先说它** —— 通用的"枚举完了…"会把下一步指错。
+
+    真机 2026-10-06 泰坦：要「移民号陨落」4 件套，他能穿的只有 3 个部位，
+    而当时回的是"各项目标单看都在单项上限之内……"（面向属性的话术）。
+    """
+    from destiny_mcp.build.process_types import SearchCoverage, SearchDiagnostics
+
+    shortfall = (
+        "这套**凑不出 4 件**：这个职业身上只有 3 个部位有它（头盔、腿甲、臂铠），"
+        "缺 胸甲、职业护甲。每个部位只能穿一件，所以这是**数出来的上限**，不是猜的。"
+    )
+
+    class _Build:
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
+            coverage.append(SearchDiagnostics(
+                coverage=SearchCoverage(exhaustive=True, combos=4408950),
+                blocked_by=["泰坦的头盔格已经满了（10/10）"],
+            ))
+            return []
+
+    async def _ladder(*args, **kwargs):
+        return {"infeasible_by": [shortfall]}
+
+    monkeypatch.setattr(_build_flow.armor_ladder, "no_solution_ladder", _ladder)
+    response = await _build_flow.find(
+        {"build_svc": _Build()}, "Tester#1234",
+        SimpleNamespace(**_request_fields()), {"character": "titan"}, lambda value: value,
+    )
+
+    summary = response["summary"]
+    assert shortfall in summary, "约束判死就该是摘要里的原因"
+    assert "枚举完了" not in summary, "这时候再说那句通用的，等于把原因藏起来"
+    assert "不是**这次 0 候选的原因" in summary, "（ADR-027）前提那串仍然只是附注"
+    assert response["data"]["ladder"]["infeasible_by"] == [shortfall], "结构化字段也要给"
+
+
+@pytest.mark.asyncio
+async def test_recommend_branch_leads_with_the_set_shortfall(monkeypatch) -> None:
+    """`recommend` 的 0 候选同理：约束凑不齐优先于"装不上"那句。"""
+    from destiny_mcp.build.models import BuildAnalysis, BuildRecommendation
+
+    shortfall = "这套**凑不出 4 件**：这个职业身上只有 3 个部位有它（头盔、腿甲、臂铠）……"
+
+    class _Build:
+        async def recommend_build(self, player_name, request, functional_mods=None):
+            return BuildRecommendation(
+                results=[],
+                analysis=BuildAnalysis(reason=shortfall, infeasible_by=[shortfall]),
+            )
+
+    async def _no_ladder(*args, **kwargs):
+        return {}
+
+    monkeypatch.setattr(_build_flow.armor_ladder, "no_solution_ladder", _no_ladder)
+    response = await _build_flow.recommend(
+        {"build_svc": _Build()}, "Tester#1234",
+        SimpleNamespace(**_request_fields()), {"character": "titan"},
+        lambda value: value.model_dump(mode="json"),
+    )
+
+    assert shortfall in response["summary"]
+    assert shortfall in response["warnings"]
+
+
 def _request_fields() -> dict:
     """`_has_hard_targets` 会按 `REQUEST_TARGET_FIELDS` 读这些字段。"""
     return {

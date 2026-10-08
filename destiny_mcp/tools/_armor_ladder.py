@@ -157,6 +157,7 @@ def build_ladder(
     tuning: dict[str, Any] | None = None,
     tuning_unavailable_reason: str = "",
     blocked_by: Sequence[str] = (),
+    infeasible_by: Sequence[str] = (),
 ) -> dict[str, Any]:
     """把上限、差距与台阶摊平成一张表（只提议，不改目标）。
 
@@ -295,6 +296,7 @@ def build_ladder(
         "precision": precision,
         "reason": reason,
         "blocked_by": list(blocked_by),
+        "infeasible_by": list(infeasible_by),
         "samples": list(samples),
         "tuning_first": tuning_first,
         "tuning_first_note": (
@@ -377,6 +379,7 @@ async def no_solution_ladder(
     single_stat = positive_single_stat(getattr(analysis, "max_possible", None))
     reason = str(getattr(analysis, "reason", ""))
     blocked_by = [str(item) for item in (getattr(analysis, "blocked_by", None) or [])]
+    infeasible_by = [str(item) for item in (getattr(analysis, "infeasible_by", None) or [])]
     analysis_precision = str(getattr(analysis, "precision", "exact"))
 
     probes = relaxation_probes(request, max_probes=max_probes)
@@ -447,6 +450,7 @@ async def no_solution_ladder(
         tuning=tuning_evidence,
         tuning_unavailable_reason=tuning_unavailable,
         blocked_by=blocked_by,
+        infeasible_by=infeasible_by,
     )
     table["trials"] = trials
     not_probed = [trial["label"] for trial in trials if trial.get("ok") is None]

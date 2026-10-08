@@ -107,18 +107,18 @@ def test_process_result_defaults_to_exhaustive() -> None:
 
 
 def test_empty_result_message_certifies_the_exhaustive_search() -> None:
-    from destiny_mcp.tools._build_flow import _empty_message
+    from destiny_mcp.tools._empty_message import empty_message
 
-    message = _empty_message({"exhaustive": True, "combos": 3125})
+    message = empty_message({"exhaustive": True, "combos": 3125})
 
     assert "枚举完了" in message
     assert "3,125" in message
 
 
 def test_truncated_search_never_claims_there_is_no_solution() -> None:
-    from destiny_mcp.tools._build_flow import _empty_message
+    from destiny_mcp.tools._empty_message import empty_message
 
-    message = _empty_message({"exhaustive": False, "truncated_by": "budget"})
+    message = empty_message({"exhaustive": False, "truncated_by": "budget"})
 
     assert "没有搜完" in message
     assert "budget" in message
