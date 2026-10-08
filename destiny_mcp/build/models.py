@@ -1006,6 +1006,15 @@ class BuildResult(BaseModel):
         description="调谐改动的人话说明；不用动调谐时为空串",
     )
 
+    requires_preparation: list[str] = Field(
+        default_factory=list,
+        description=(
+            "这套用到的件里，哪几件**这次要先准备**（腾格子 / 先顶下冲突的金装）；"
+            "空 = 现在就能直接装。句子的唯一出处是 `execution_feasibility` —— "
+            "与确认那一刻复检用的是同一句（ADR-027）。"
+        ),
+    )
+
     @computed_field
     @property
     def execution_id(self) -> str:

@@ -605,7 +605,9 @@ def test_a_blocked_ladder_says_the_precondition_was_the_cause() -> None:
     )
 
     assert table["blocked_by"] == ["指定的金装与当前穿着的那件冲突（1641）"]
-    assert "没有单独评估" in table["note"]
+    assert "已经算进" in table["note"] and "先准备" in table["note"], (
+        "有件要先准备时，note 要说清『它们已经算进这些结论』—— ADR-027 之后不再是『没评估』"
+    )
     assert "同时满足不了" not in table["note"], "那是属性层的结论，这一档没算过"
 
 

@@ -398,14 +398,16 @@ def solve(
 
     # ── Prepare items per slot ─────────────────────────────────────────
     # Keep both Armor objects (for output) and ProcessItem (for computation).
-    # **装不上的件直接不进候选**（`Armor.execution_blocker`：仓库件遇上满格、与角色正穿着的
-    # 另一件金装冲突）。这不是"事后过滤失败候选"，而是把注定写不进账号的组合从搜索空间里
-    # 去掉 —— 真机实测：那两种方案会在写第一颗模组之前中止，整批回滚、0 颗落地。
+    # **装不上的件照样进池**（ADR-027 修订 ADR-022）：仓库件遇上满格、或与角色正穿着的
+    # 另一件金装冲突时，`Armor.execution_blocker` 记着"这次要先准备什么"，但**不再据此剔除**。
+    # 原因：剔掉的代价是**属性层结论也一起没了**（真机 2026-10-06 泰坦：三个格 10/10 满，
+    # 仓库里 10/14/20 件被排除，用户连"差多少"都问不出来）。
+    # 两条安全网还在，所以不会退回"确认后才发现装不上"：
+    #   ① 候选行带 `requires_preparation`（`build_candidates`），调用方看得见要先做什么；
+    #   ② 确认那一刻 `build_execution_guard.recheck_confirmed_build` 拿新鲜快照逐件复检，
+    #      前提没解决就**拒绝写入**（上游一次都不会被撞到）。
     # 判据与话术的唯一出处在 `execution_feasibility`；这里只读它的结论。
-    armor_by_slot = {
-        slot: [armor for armor in snapshot.get_slot(slot) if not armor.execution_blocker]
-        for slot in SOLVER_SLOTS
-    }
+    armor_by_slot = {slot: list(snapshot.get_slot(slot)) for slot in SOLVER_SLOTS}
     helmets_armor = armor_by_slot["helmets"]
     gauntlets_armor = armor_by_slot["gauntlets"]
     chests_armor = armor_by_slot["chests"]

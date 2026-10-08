@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+from ._preparation_note import preparation_note
 from . import _armor_ladder as armor_ladder
 from ._armor_branches import with_slot_keys
 from ._responses import ok_response
@@ -245,11 +246,9 @@ async def find(
             f"其中 {tuning['build_count']} 个要先改调谐才能达标"
             "（调谐不占能量、不影响模组；逐件改动见各自的 tuning_changes）。"
         )
-    # 有解时也给"每项单独能顶到多少" —— 用户说"不够极限"时，答案就在这几个数里。
+    # 有解时也给"每项单独能顶到多少"（用户说"不够极限"时答案就在这几个数里）；
     # `reachable_note` 必须一起带上：逐项可达**不等于**同一套能同时达到。
-    #
-    # "没量过就不给"这条规则在形状工厂里（`SearchDiagnostics.to_dict`：全 0 视为没量过），
-    # 这里只管照发，别在这里再判一次。
+    # "没量过就不给"的规则在形状工厂里（`SearchDiagnostics.to_dict`：全 0 视为没量过）。
     if report and report.get("reachable"):
         payload["reachable"] = report["reachable"]
         payload["reachable_note"] = report.get("reachable_note")
@@ -264,7 +263,8 @@ async def find(
             f"其中 {len(violated)} 套超过了指定的属性上限（见各自的 max_violations），"
             "已排到没超上限的方案后面。"
         )
-    return ok_response(message, payload, next_actions=[row_hint(builds[0])] if builds else [])
+    prep_note, prep_warnings = preparation_note(builds)
+    return ok_response(message + prep_note, payload, next_actions=[row_hint(builds[0])] if builds else [], warnings=prep_warnings)
 
 
 async def analyze(

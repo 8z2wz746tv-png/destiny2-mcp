@@ -34,8 +34,9 @@ PRECISIONS: tuple[str, ...] = ("sampled", "no_solution", "not_computed")
 #: **执行前提先把候选砍光**时专用（`analysis.blocked_by` 非空）：这一档的 trials 也是
 #: "每档都跑了、都没解"，但**原因不是属性** —— 照 `no_solution` 念就成了一句没算过的结论。
 BLOCKED_NOTE = (
-    "执行前提先把候选砍掉了（见 `blocked_by`）：这不是「属性配不出来」——**属性层这次没有"
-    "单独评估**。先把前提解掉（腾一格 / 先顶下冲突的金装）再重新求解；那时才谈「降目标」。"
+    "这次能用的件里有需要**先准备**的（见 `blocked_by`：腾一格 / 先顶下冲突的金装）。"
+    "注意它们**已经算进**上面这些结论了（ADR-027 起求解不再剔件）——这条是装备前要做的事，"
+    "不是「属性配不出来」，也不是「没算」。"
 )
 
 
@@ -108,9 +109,9 @@ def single_stat_note(single_stat: dict) -> str:
 def precision_note(precision: str, *, blocked: bool = False) -> str:
     """`precision` → `note`；`blocked=True` 时用执行前提那一段（`BLOCKED_NOTE`）。
 
-    为什么 blocked 要单独一句话：那种情况下 trials 也是"每档都跑了、都没解"，
-    但**没解的原因不在属性**——照 `no_solution` 说会变成"这些目标同时满足不了"，
-    这是一句工具没算过的结论（仓库红线：诊断只说自己算过的东西）。
+    为什么 blocked 要单独一句话：有件要先准备时，`ceiling`/`shortfall` 说的仍然是**含那些件的
+    全量结论**（ADR-027 起不再剔件），但调用方必须知道"装备前还得先做一件事" ——
+    照 `no_solution` 念会把"要先准备"读成"这些目标同时满足不了"。
 
     认不出的 `precision` 退回 `no_solution` 那句（含 `"exact"` 这类历史调用）。
     """

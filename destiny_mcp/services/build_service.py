@@ -39,6 +39,7 @@ from ..build.models import (
 from ..bungie_client import BungieClient
 from ..build_contracts import CanonicalBuild, ExecutableBuild
 from . import profile_components
+from .build_preparation import annotate_analysis, annotate_preparation, preparation_index
 from ..error_codes import ErrorCode
 from ..exceptions import BuildValidationError
 from ..logging_config import get_logger
@@ -495,6 +496,9 @@ class BuildService:
         # "超一点就扣分"就是加权那套写出来的。
         results = rank_results(results, parsed)
 
+        # 每套方案"要先准备什么"（ADR-027）：件现在也在池里，所以这句话要跟着方案走。
+        annotate_preparation(results, preparation_index(snapshot))
+
         if register:
             for result in results:
                 if result.canonical_build:
@@ -533,17 +537,13 @@ class BuildService:
         oversized = oversized_reason(snapshot, parsed)
         if oversized:
             return BuildAnalysis(reason=oversized, precision="not_computed")
-        # 执行前提先说话：那几条会把某件（甚至指定的金装）整个挡在候选外，
-        # 而单项上限探测对此一无所知 —— 不先说的话，"配不出来"会被归到属性上（错因）。
-        if blocked_by := execution_blockers(snapshot, parsed, self._manifest):
-            return BuildAnalysis(
-                reason="；".join(blocked_by)
-                + "（这几条是执行前提，不是属性不够：先解决它们再重新求解。）",
-                blocked_by=blocked_by,
-                precision="exact",
-                assumptions=["本次分析没有把被执行前提挡住的件算进「单项上限」。"],
-            )
-        return analyze_from_probes(parsed, await self._probe_single_stat_ceilings(snapshot, parsed))
+        # 执行前提**不再短路**（ADR-027 修订 ADR-022）：件现在照样进池，属性层就必须照算 ——
+        # 短路会把"差多少"整个吞掉（真机 2026-10-06 泰坦：三个格 10/10 满，用户连数字都问不出来）。
+        # 那几条仍然带出去，但身份变了：从"为什么没有解"降级成"这些件要先准备"。
+        return annotate_analysis(
+            analyze_from_probes(parsed, await self._probe_single_stat_ceilings(snapshot, parsed)),
+            execution_blockers(snapshot, parsed, self._manifest),
+        )
 
     async def probe_find_build(
         self, player_name: str, request: BuildRequest

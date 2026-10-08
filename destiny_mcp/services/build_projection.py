@@ -64,6 +64,8 @@ def candidate_rows(results: Any) -> list[dict[str, Any]]:
                 if isinstance(item, dict)
             ],
         }
+        if prep := result.get("requires_preparation"):  # ADR-027：这套要先准备什么（腾格 / 先顶金装）
+            row["requires_preparation"] = list(prep)
         if result.get("tuning_note"):
             row["tuning_note"] = result["tuning_note"]
         if result.get("functional_mods"):
@@ -78,9 +80,7 @@ def candidate_rows(results: Any) -> list[dict[str, Any]]:
 
 
 ROWS_NOTE = (
-    "这里是**候选行**：分数/六维/金装/套装 + 这套是哪五件（名字、部位、实例 ID、光等、能量、"
-    "调谐名）。求解器内部字段与可执行载荷（canonical_build）不在默认响应里 —— "
-    "要看逐件预览或装备它，用 execution_id 调 equip_build。"
+    "这里是**候选行**：分数/六维/金装/套装 + 这套是哪五件（名字、部位、实例 ID、光等、能量、调谐名）。求解器内部字段与可执行载荷（canonical_build）不在默认响应里；要看逐件预览或装备它，用 execution_id 调 equip_build。"
 )
 
 

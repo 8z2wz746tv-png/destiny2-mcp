@@ -57,16 +57,20 @@ def test_an_unknown_precision_falls_back_instead_of_exploding() -> None:
 
 
 def test_a_blocked_run_never_claims_the_attributes_cannot_be_met() -> None:
-    """**执行前提砍光**时不许说「这些目标同时满足不了」——那是属性层的结论。
+    """有件**要先准备**时不许说「这些目标同时满足不了」——那是属性层的结论。
 
-    真机 2026-10-06：带套装约束/金装冲突时，阶梯的每一档也因为同一个前提而失败，
-    于是 `precision` 落到 `no_solution`；照那句口径念出来就变成"属性配不出来"，
-    而工具**从没单独评估过属性层**（`analyze` 也被同一条前提短路了）。
+    两代事故都钉在这一条上：
+    · 2026-10-06 上午（ADR-022 时代）：执行前提把候选砍光，`precision` 落到 `no_solution`，
+      而那次的属性层**根本没算**（`analyze` 被同一条前提短路）——照那句念就是编结论；
+    · 2026-10-06 晚（ADR-027 起）：件不再被剔，属性层**照算**了 —— 但"要先准备"仍然
+      不等于"属性配不出来"，所以这句话还得单独说。
     """
     blocked = precision_note("no_solution", blocked=True)
+
     assert blocked != precision_note("no_solution")
-    assert "没有单独评估" in blocked
-    assert "被拦" in blocked or "砍掉" in blocked
+    assert "先准备" in blocked, "点出这件事本身（装备前要先腾格 / 先顶下冲突的金装）"
+    assert "已经算进" in blocked, "说明那些件**在**这些结论里（ADR-027 起不再剔件）"
+    assert "同时满足不了" not in blocked, "绝不替属性层下结论"
 
 
 @pytest.mark.parametrize(

@@ -45,14 +45,11 @@ def estimate_combinations(
     纯计数、不枚举：五个部位件数相乘，指定金装时该部位只算金装那几件
     （所以"指定金装"是最有效的收窄手段）。
 
-    **装不上的件不算**（`Armor.execution_blocker`）：它们根本进不了求解器的候选，
-    算进来的后果是"闸门拿一个求解器永远不会跑的数字去拒绝一次请求"（真机里格子满
-    会一次性砍掉该部位大半件数），而且它给的第一条建议"指定一件金装"可能正是被挡的那件。
+    **闸门数的空间必须与求解器一致**（ADR-027）：求解器现在把带执行前提的件也算进池
+    （不再剔除，见 `solver.solve`），所以这里也照数 —— 两边数不同的空间会得到
+    "闸门放行了一个求解器根本不会跑的量"或反过来误拒。
     """
-    slots = [snapshot.get_slot(slot) for slot in SOLVER_SLOTS]
-    usable = [
-        [piece for piece in pieces if not piece.execution_blocker] for pieces in slots
-    ]
+    usable = [list(snapshot.get_slot(slot)) for slot in SOLVER_SLOTS]
     # 比 hash 必须归一：快照是无符号、`manifest.search()` 是有符号（见
     # `constraints.allowed_exotic_hashes` 的说明）。漏归一的后果是"指定金装收窄"
     # **静默失效** —— 这个闸门一边建议"指定一件金装"，一边不认它。

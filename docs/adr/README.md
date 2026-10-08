@@ -35,6 +35,7 @@
 | [ADR-024](024-recheck-premises-before-writing.md) | 写账号前按**当时**的现场复检 ADR-022 那两条执行前提（判据仍是同一份，不重解）；指纹只收"写入前复算得出来的求解输入"（补入已装功能模组的能量占用） | accepted |
 | [ADR-025](025-candidate-burns-after-a-successful-write.md) | 候选在**写成功之后**才焚烧（被执行前提拦下的执行不消耗它），并给「用过了」单独一个错误码 `used_execution_id` | accepted |
 | [ADR-026](026-mods-land-on-an-empty-socket-first.md) | 护甲模组落点**空槽优先**（三格共享 plug set 时不再一律打位 1、也不再把人占着的那颗无谓顶掉），三格全满才顶第一格 | accepted |
+| [ADR-027](027-solve-does-not-drop-blocked-pieces.md) | 求解**不再剔掉**带执行前提的件（先算属性层，前提降级成候选上的 `requires_preparation`；确认那一刻的复检照旧拦）—— 修订 ADR-022 的决定第 1 条 | accepted |
 
 ## 编号规矩
 

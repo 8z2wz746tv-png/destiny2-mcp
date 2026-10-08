@@ -211,11 +211,12 @@ def _instance_ids(armor_sets) -> list[list[str]]:
 # ── (a) 仓库件遇上满格 ────────────────────────────────────────────────────
 
 
-def test_vault_piece_in_a_full_bucket_is_never_selected() -> None:
-    """臂铠格 10/10 时，仓库里那件臂铠（哪怕属性最好）不进任何候选。
+def test_a_vault_piece_in_a_full_bucket_is_still_solved_and_flagged() -> None:
+    """臂铠格 10/10 时，仓库里那件臂铠**照样进池、也可能被选中**（ADR-027 修订 ADR-022）。
 
-    注入验证：把 `solver` 里那句 `if not armor.execution_blocker` 去掉 → 本用例红
-    （那件 60 点手雷的仓库臂铠会立刻成为首选，而写入会在搬运时撞 NoRoomInDestination）。
+    代价不再是"剔掉它"，而是"方案自己带着要先准备什么" —— 判据仍在件上那一句里。
+
+    注入验证：把 `solver` 的 `armor_by_slot` 改回按 `execution_blocker` 过滤 → 本用例红。
     """
     snapshot = _snapshot()
     blocked = [armor for armor in snapshot.gauntlets if armor.execution_blocker]
@@ -226,12 +227,14 @@ def test_vault_piece_in_a_full_bucket_is_never_selected() -> None:
 
     result = solve(snapshot, BuildConstraints(class_type=2))
 
-    assert result.sets, "格满只该砍掉搬不进来的件，不该整套配不出来"
-    assert "gauntlet-vault" not in {
-        instance_id for ids in _instance_ids(result.sets) for instance_id in ids
-    }
-    assert result.combos == 20, (
-        "组合数只数能装的件：1 头盔（异域那件被挡）× 10 臂铠（仓库那件被挡）× 2 胸甲 × 1 腿 × 1 职业"
+    shipped = {instance_id for ids in _instance_ids(result.sets) for instance_id in ids}
+
+    assert result.sets, "格满不该让整套配不出来"
+    assert result.combos == 44, (
+        "闸门与求解器数同一个空间：2 头盔 × 11 臂铠 × 2 胸甲 × 1 腿 × 1 职业（都不再剔件）"
+    )
+    assert "gauntlet-vault" in shipped, (
+        "件进了池子就该可能被选中 —— 要准备什么由方案上的 requires_preparation 说出来"
     )
 
 
@@ -251,8 +254,11 @@ def test_vault_piece_is_still_selectable_when_the_bucket_has_room() -> None:
 # ── (b) 与角色正穿着的金装冲突 ───────────────────────────────────────────
 
 
-def test_exotic_is_confined_to_the_slot_of_the_worn_exotic() -> None:
-    """身上穿着异域胸甲时，异域头盔不进候选；同部位换金装仍然可以。"""
+def test_a_conflicting_exotic_is_still_solvable_with_a_preparation_note() -> None:
+    """身上穿着异域胸甲时，异域头盔**仍然进池**（ADR-027）：冲突不再是"不许选"。
+
+    它的代价变成一句可执行的前提 —— "先顶下身上那件异域胸甲" —— 由件上那句话带出去。
+    """
     snapshot = _snapshot()
 
     helmet = next(a for a in snapshot.helmets if a.item_hash == EXOTIC_HELMET)
@@ -260,19 +266,20 @@ def test_exotic_is_confined_to_the_slot_of_the_worn_exotic() -> None:
     assert "星火协议" in helmet.execution_blocker, "要说清是与哪一件冲突"
     assert not any(a.execution_blocker for a in snapshot.chests), "冲突的是别的部位，不是胸甲本身"
 
-    result = solve(snapshot, BuildConstraints(class_type=2))
-
-    assert result.sets
-    chosen_exotics = [
-        (armor.slot, armor.name)
-        for armor_set in result.sets
-        for armor in armor_set.armor
-        if armor.is_exotic
-    ]
-    assert chosen_exotics, "身上正穿着的那件金装胸甲本来就在候选池里（同部位替换，不冲突）"
-    assert {slot for slot, _ in chosen_exotics} == {"chests"}, (
-        "金装只允许出现在当前穿着金装的那个部位：别处戴上去就撞 1641"
+    wanted = solve(
+        snapshot,
+        parse_constraints(
+            BuildRequest(character_class="warlock", exotic_name="光耀之冠"), _Manifest()
+        ),
     )
+
+    assert wanted.sets, (
+        "点名要那件异域头盔就该出得来 —— 代价是先顶下身上那件异域胸甲（同部位替换不算冲突）"
+    )
+    assert any(
+        any(armor.item_hash == EXOTIC_HELMET for armor in armor_set.armor)
+        for armor_set in wanted.sets
+    ), "请求里点名的那件必须真在解里"
 
 
 def test_exotic_in_the_worn_slot_is_still_allowed() -> None:
@@ -296,7 +303,11 @@ def test_exotic_in_the_worn_slot_is_still_allowed() -> None:
 
 
 def test_conflicting_requested_exotic_reports_the_constraint_instead_of_silence() -> None:
-    """指定了一件装不上的金装：0 候选 + 原因点名"1641 + 是哪两件"（不许静默返回空）。"""
+    """指定了一件与身上金装冲突的异域：**解得出来**，同时原因照旧点名"1641 + 是哪两件"。
+
+    ADR-027 之前这里是 0 候选 —— 那等于把"你身上那件得先脱下来"这件**用户能做的事**
+    说成了"配不出来"。
+    """
     snapshot = _snapshot()
     constraints = parse_constraints(
         BuildRequest(character_class="warlock", exotic_name="光耀之冠"), _Manifest()
@@ -305,8 +316,8 @@ def test_conflicting_requested_exotic_reports_the_constraint_instead_of_silence(
     result = solve(snapshot, constraints)
     reasons = analyzer.execution_blockers(snapshot, constraints, _Manifest())
 
-    assert result.sets == [], "指定的金装被挡在候选外 → 一套都出不来"
-    assert result.combos == 0
+    assert result.sets, "点名要的异域现在解得出来（前置条件是「先顶下冲突那件」）"
+    assert result.combos > 0
     assert len(reasons) == 2, "金装冲突 + 满格各一条"
     assert "1641" in reasons[0] and "光耀之冠" in reasons[0] and "星火协议" in reasons[0]
     assert "DestinyNoRoomInDestination" in reasons[1]
@@ -353,21 +364,21 @@ def test_unknown_target_character_blocks_nothing() -> None:
 # ── 闸门数的是同一个空间 ─────────────────────────────────────────────────
 
 
-def test_combination_gate_counts_only_usable_pieces() -> None:
-    """规模闸门必须数求解器真正会枚举的那些件，否则会拿一个不会跑的数字拒绝请求。"""
+def test_combination_gate_counts_the_same_space_as_the_solver() -> None:
+    """规模闸门数的空间必须与求解器**逐件一致**（两边都含带执行前提的件）。"""
     snapshot = _snapshot()
     total, counts = analyzer.estimate_combinations(snapshot, BuildConstraints(class_type=2))
 
-    assert counts[1] == 10, "臂铠 11 件里有 1 件搬不进来"
-    assert total == 20
+    assert counts[1] == 11, "臂铠 11 件全算：剔件的日子过去了（ADR-027）"
+    assert total == 44
 
 
 # ── 服务与工具面：0 候选要说"装不上"，不是"配不出来" ─────────────────────
 
 
 @pytest.mark.asyncio
-async def test_find_build_reports_blockers_in_diagnostics_and_never_ships_a_doomed_piece() -> None:
-    """`find_build` 的候选里不会出现装不上的件，且诊断里带着原因。"""
+async def test_find_build_ships_the_flagged_piece_and_says_what_to_prepare() -> None:
+    """带前提的件**照常签发**（ADR-027），但方案自己带 `requires_preparation`；诊断里仍有原因。"""
     snapshot = _snapshot()
     service = BuildService(MagicMock(), _Manifest(), MagicMock())
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
@@ -378,20 +389,26 @@ async def test_find_build_reports_blockers_in_diagnostics_and_never_ships_a_doom
     )
 
     assert results, "格满不等于配不出来"
-    shipped = {
-        item.item_instance_id
+    flagged = [
+        result
         for result in results
-        for item in result.canonical_build.items
-    }
-    assert "gauntlet-vault" not in shipped
+        if any(item.item_instance_id == "gauntlet-vault" for item in result.canonical_build.items)
+    ]
+    assert flagged, "件进了池子就该可能被签发出去"
+    for result in flagged:
+        assert result.requires_preparation, "用了带前提的件就必须带着「要先准备什么」"
+        assert "DestinyNoRoomInDestination" in result.requires_preparation[0]
+    for result in results:
+        if not flagged or result is not flagged[0]:
+            assert not result.requires_preparation or result in flagged
     report = diagnostics[0].to_dict()
-    assert report["blockers"], "砍掉了件就要在诊断里说清为什么"
+    assert report["blockers"], "有件要先准备就要在诊断里说清为什么"
     assert "DestinyNoRoomInDestination" in report["blockers"][0]
 
 
 @pytest.mark.asyncio
-async def test_analyze_build_leads_with_the_execution_reason() -> None:
-    """`analyze_build` 先说执行前提，别把"装不上"归因到属性上。"""
+async def test_analyze_build_gives_the_attribute_conclusion_and_a_premise_note() -> None:
+    """`analyze_build` **照算属性层**（ADR-027），执行前提降级成 `blocked_by` 标注。"""
     snapshot = _snapshot()
     service = BuildService(MagicMock(), _Manifest(), MagicMock())
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
@@ -401,8 +418,12 @@ async def test_analyze_build_leads_with_the_execution_reason() -> None:
     )
 
     assert analysis.blocked_by, "结构化字段要给出来（工具层靠它换话术）"
-    assert "1641" in analysis.reason
-    assert analysis.precision == "exact", "这不算「没算」：执行前提是确定性结论"
+    assert "1641" in "".join(analysis.blocked_by)
+    assert analysis.reason, "属性层结论必须照给 —— 短路掉它就等于把「差多少」吞了"
+    assert "1641" not in analysis.reason, "原因那段不该再被执行前提占满"
+    assert any("先准备" in item for item in analysis.assumptions), (
+        "前提要作为**标注**说清楚（它们已经算进上限，但装备前要先解决）"
+    )
 
 
 @pytest.mark.asyncio
