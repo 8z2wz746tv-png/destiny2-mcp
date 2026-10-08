@@ -28,7 +28,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from destiny_mcp.models import LoadoutOperationResult
+from destiny_mcp.models import LoadoutOperationResult, MoveItemStep
 
 os.environ.setdefault("BUNGIE_API_KEY", "dummy")
 os.environ.setdefault("BUNGIE_CLIENT_ID", "1")
@@ -737,3 +737,38 @@ async def test_equip_build_refuses_when_the_worn_exotic_changed() -> None:
     assert "星火协议" in result["message"], "要说清是与哪一件冲突"
     assert "先用一件非异域" in result["message"], "出路"
     service._equipment.equip_with_recovery.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_equip_build_dequips_conflicting_exotics_before_the_recheck() -> None:
+    """写前准备必须**真的调**「顶下冲突金装」（ADR-030）。
+
+    2026-10-08 真机（豆包那侧）：`equip_build` 漏了这一步 —— 撞金装冲突时复检直接拒绝，给出的出路还是
+    「你自己去 `inventory equip` 顶下」，而 `equip_loadout` 早就自动做了。同一条规则不该因入口不同
+    变成手工活。注入验证过：把这一步从写前准备里去掉，这条会红。
+    """
+    at_find = _snapshot(on_character_gauntlets=9)
+    service = _confirm_service(_Manifest(), at_find)
+    build = await _candidate_containing(
+        service,
+        BuildRequest(character_class="warlock", grenade_target=50),
+        "gauntlet-vault",
+    )
+    step = MoveItemStep(
+        action="downgrade", detail="先穿「某件普通头盔」把「某金装头盔」顶下来", success=True,
+    )
+    service._equipment.dequip_conflicting_exotics_for_build = AsyncMock(
+        return_value=([step], True, "已先把「某金装头盔」顶下来（金装全身只能穿一件）。")
+    )
+    service._equipment.equip_with_recovery = AsyncMock(
+        return_value=LoadoutOperationResult(
+            success=True, loadout_name="Exact", message="已装备，回读核对通过。",
+        )
+    )
+
+    result = await service.equip_build("Tester#1234", build, "warlock")
+
+    service._equipment.dequip_conflicting_exotics_for_build.assert_awaited()
+    assert result.get("code") != "execution_precondition_failed", result
+    assert "顶下来" in result["message"], result["message"]
+    assert result["steps"][0]["action"] == "downgrade", result["steps"][:2]

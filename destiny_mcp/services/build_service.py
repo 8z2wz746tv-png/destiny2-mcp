@@ -55,7 +55,7 @@ from .build_tuning import apply_local_tuning, solve_with_tuning
 from .build_candidates import BuildCandidateStore
 from .candidate_messages import candidate_failure, describe_candidate
 from .build_baseline import rebaseline_note
-from .make_room import equip_with_make_room_retry, make_room_for_build, make_room_steps
+from .make_room import equip_with_make_room_retry, make_room_for_build, make_room_steps, prepare_build_write
 from .build_execution_guard import recheck_confirmed_build
 from .build_fragments import replace_fragment_config
 from .build_results import (
@@ -95,8 +95,7 @@ class BuildService:
         self._compute = BuildCompute()
         # 只读诊断探测走这条：允许 4 个并发（见 _probe_single_stat_ceilings）
         self._probe_compute = BuildCompute(capacity=_PROBE_CONCURRENCY)
-        # 候选暂存（execution_id → 签发的那份方案）：怎么存、什么时候过期在
-        # services/build_candidates.py，这里只管签发与执行。
+        # 候选暂存（execution_id → 签发的那份方案）：过期规则见 services/build_candidates.py。
         self._candidates = BuildCandidateStore()
 
     async def _get_subclass_and_fragment_stats(
@@ -726,10 +725,12 @@ class BuildService:
             }
 
         # 写账号之前的最后一段只读闸：重取现场 → 执行前提复检（ADR-022）→ 指纹比对 → 实例核对。
-        # 四步的顺序与"为什么先查执行前提"写在 `services/build_execution_guard` 的 docstring 里。
-        # 目标格满而计划里有件在仓库 → **自动腾一件**再复检（ADR-029；只在这条已确认的写入里做）
-        room_steps, room_prefix = await make_room_for_build(
+        # 顺序与理由见 `services/build_execution_guard` 的 docstring。
+        # 写前准备：格满自动腾一件（ADR-029）+ 顶下冲突金装（ADR-030）—— 都在复检之前
+        room_steps, room_prefix, room_refusal = await prepare_build_write(
             player_name=player_name, character=normalized_character, inventory=self._inventory, equipment=self._equipment, manifest=self._manifest, build=build, candidates=self._candidates)
+        if room_refusal is not None:
+            return room_refusal
         refusal = await recheck_confirmed_build(
             inventory=self._inventory,
             player_name=player_name,
@@ -764,7 +765,7 @@ class BuildService:
             "character": normalized_character,
             "snapshot_version": build.snapshot_version,
             "message": room_prefix + retry_note + result.message,  # 腾过就说（ADR-029 §5）
-            "steps": make_room_steps(room_steps + retry_steps) + [s.model_dump() for s in result.steps],
+            "steps": room_steps + make_room_steps(retry_steps) + [s.model_dump() for s in result.steps],
         }
 
     async def equip_by_score(

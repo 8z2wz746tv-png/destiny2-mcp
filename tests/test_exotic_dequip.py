@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
 import pytest
@@ -161,3 +162,30 @@ async def test_the_replacement_can_come_from_the_vault() -> None:
     assert transfer.moved == ["v1"], f"该先把仓库那件搬进来，实际 {transfer.moved}"
     assert transfer.equipped == ["v1"], f"再穿上它，实际 {transfer.equipped}"
     assert [s.action for s in steps] == ["transfer", "downgrade"], steps
+
+
+@pytest.mark.asyncio
+async def test_equip_build_entry_maps_solver_slots_and_reuses_the_same_judgement() -> None:
+    """`equip_build` 走同一个判据 —— 它的计划件是**求解器槽位名**（"helmets"/"chest"），先归一。
+
+    2026-10-08 真机（豆包那侧）：`equip_build` 撞金装冲突时给的出路还是"你自己去 inventory equip 顶下"，
+    因为自动顶下当时只接在 `equip_loadout` 上。同一条规则不该因入口不同变成手工活（ADR-030）。
+    """
+    manifest = {_H_EXOTIC_HELM: _TIER_EXOTIC, _H_EXOTIC_ARMS: _TIER_EXOTIC,
+                _H_LEGEND_ARMS: _TIER_LEGENDARY}
+    worn = [
+        _item("w1", "金装臂铠", slot="gauntlets", hash_=_H_EXOTIC_ARMS, equipped=True),
+        _item("w2", "普通臂铠", slot="gauntlets", hash_=_H_LEGEND_ARMS, power=540),
+    ]
+    transfer = _Transfer(worn)
+    service = _Service(manifest, transfer)
+    # 计划件用的**求解器**槽位名，属性名与 LoadoutItem 也不同（item_hash / item_instance_id）
+    build = SimpleNamespace(items=[
+        SimpleNamespace(slot="helmets", item_hash=_H_EXOTIC_HELM, item_instance_id="p1"),
+    ])
+
+    steps, ok, note = await service.dequip_conflicting_exotics_for_build(
+        "Tester#1234", "warlock", build)
+
+    assert ok and transfer.equipped == ["w2"], (steps, ok, transfer.equipped)
+    assert steps[0].action == "downgrade" and "顶下" in note

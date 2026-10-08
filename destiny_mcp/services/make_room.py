@@ -19,6 +19,7 @@ import re
 from collections.abc import Awaitable, Callable, Collection, Sequence
 from dataclasses import dataclass, field
 
+from ..error_codes import ErrorCode
 from ..build.constants import SOLVER_SLOTS, SOLVER_SLOT_TO_LOADOUT
 from ..build.execution_feasibility import VAULT_LOCATION, read_facts
 from ..build.models import Armor
@@ -371,3 +372,42 @@ def is_no_room_error(exc_or_text: object) -> bool:
     """这次失败是不是"目标格满"（异常或回执原文都认）。判据只有一个出处。"""
     text = str(exc_or_text)
     return any(marker in text for marker in _NO_ROOM_MARKERS)
+
+
+async def prepare_build_write(
+    *,
+    player_name: str,
+    character: str,
+    inventory,
+    equipment,
+    manifest,
+    build,
+    candidates=None,
+) -> tuple[list[str], str, dict | None]:
+    """`equip_build` 的**写前准备**：先腾格（ADR-029），再顶下冲突金装（ADR-030）。
+
+    两件事都必须排在写前复检**之前** —— 复检就是据当前现场（格满 / 金装冲突）拒绝的，
+    而这两件正是它要拒的理由。合成一个入口是因为 `build_service` 贴着体量上限，只能净增一行；
+    判据本身仍在各自该在的地方（`make_room` 与 `ExoticDequipMixin`），这里只做编排。
+
+    返回 `(回执行, 话术前缀, 失败回执或 None)`；失败回执与复检那条**同形**，调用方直接返回它。
+    """
+    details, prefix = await make_room_for_build(
+        player_name=player_name, character=character, inventory=inventory,
+        equipment=equipment, manifest=manifest, build=build, candidates=candidates,
+    )
+    # 出口统一成"已经 dump 的步骤 dict"：腾格那条给的是**字符串 detail**（由 `make_room_steps` 包装），
+    # 顶下那条给的是 `MoveItemStep` 对象 —— 两种混在一起会让调用方的包装函数把对象当字符串塞进去，
+    # 真机上直接 ValidationError。2026-10-08 由 `test_equip_build_dequips_conflicting_exotics…` 抓到。
+    exotic_steps, ok, note = await equipment.dequip_conflicting_exotics_for_build(
+        player_name, character, build
+    )
+    steps = make_room_steps(details) + [step.model_dump() for step in exotic_steps]
+    if not ok:
+        return steps, prefix + note, {
+            "success": False,
+            "code": ErrorCode.EXECUTION_PRECONDITION_FAILED,
+            "message": note,
+            "blockers": [note],
+        }
+    return steps, prefix + note, None

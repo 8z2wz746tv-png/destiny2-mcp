@@ -23,6 +23,7 @@ from .make_room import is_no_room_error
 from ..manifest import class_type_name
 from ..utils.hash_utils import to_signed
 from .item_parser import armor_slot_from_bucket
+from ..build.constants import SOLVER_SLOT_TO_LOADOUT
 from ..models import Loadout, LoadoutItem, MoveItemStep
 
 
@@ -172,18 +173,43 @@ class ExoticDequipMixin:
     async def dequip_conflicting_exotics(
         self, player_name: str, loadout: Loadout
     ) -> tuple[list[MoveItemStep], bool, str]:
+        """`equip_loadout` 的入口。"""
+        return await self._dequip_conflicting_exotics(
+            player_name,
+            loadout.character,
+            [(i.slot, i.item_hash, i.item_instance_id) for i in loadout.items],
+        )
+
+    async def dequip_conflicting_exotics_for_build(
+        self, player_name: str, character: str, build: Any
+    ) -> tuple[list[MoveItemStep], bool, str]:
+        """`equip_build` 的入口：计划件用的是**求解器槽位名**，先换成护甲槽位键再走同一套判据。
+
+        2026-10-08 真机（豆包那侧）：`equip_build` 撞金装冲突时复检直接拒绝，给出的出路是
+        「你自己去 inventory equip 顶下」—— 而这套自动顶下只接在 `equip_loadout` 上。同一条规则
+        不该因为入口不同就变成手工活，所以补这个入口（ADR-030）。
+        """
+        items = [
+            (
+                SOLVER_SLOT_TO_LOADOUT.get(getattr(item, "slot", ""), getattr(item, "slot", "")),
+                getattr(item, "item_hash", 0),
+                getattr(item, "item_instance_id", ""),
+            )
+            for item in (build.items or [])
+        ]
+        return await self._dequip_conflicting_exotics(player_name, character, items)
+
+    async def _dequip_conflicting_exotics(
+        self, player_name: str, character: str, items: list[tuple[str, int, str]]
+    ) -> tuple[list[MoveItemStep], bool, str]:
         """返回 `(步骤, 能不能继续批量装备, 话术)`；没有冲突时是 `([], True, "")`。"""
-        exotic_slots = {
-            item.slot
-            for item in loadout.items
-            if item.item_hash and self._item_is_exotic(item.item_hash)
-        }
+        exotic_slots = {slot for slot, item_hash, _ in items if item_hash and self._item_is_exotic(item_hash)}
         if not exotic_slots:
             return [], True, ""
         worn = await self._transfer.list_character_items(
-            player_name, loadout.character, include_vault=True
+            player_name, character, include_vault=True
         )
-        plan_ids = {i.item_instance_id for i in loadout.items if i.item_instance_id}
+        plan_ids = {iid for _slot, _hash, iid in items if iid}
         steps: list[MoveItemStep] = []
         moved_names: list[str] = []
         for slot in _ARMOR_SLOT_KEYS:
@@ -201,7 +227,7 @@ class ExoticDequipMixin:
                 and not i.is_equipped
                 and i.item_instance_id not in plan_ids
                 and not self._item_is_exotic(i.item_hash)
-                and (i.location != "vault" or self._class_matches(i.item_hash, loadout.character))
+                and (i.location != "vault" or self._class_matches(i.item_hash, character))
             ]
             if not rivals:
                 return steps, False, (
@@ -216,7 +242,7 @@ class ExoticDequipMixin:
             )[-1]
             if replacement.location == "vault":
                 moved = await self._transfer.move_item(
-                    player_name, replacement.name, loadout.character,
+                    player_name, replacement.name, character,
                     item_instance_id=replacement.item_instance_id,
                 )
                 steps.append(MoveItemStep(
@@ -230,7 +256,7 @@ class ExoticDequipMixin:
                         f"{moved.message}"
                     )
             equipped = await self._transfer.equip_item(
-                player_name, replacement.item_instance_id, loadout.character
+                player_name, replacement.item_instance_id, character
             )
             steps.append(MoveItemStep(
                 action="downgrade",
