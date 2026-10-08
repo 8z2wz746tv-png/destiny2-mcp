@@ -375,6 +375,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/community/小黑盒_更新公告_2026-09-18.md` — 上次发文以来的**新增与修复**发布稿（计数器/生涯三档/纯 PvP 武器榜 + 一串口径修复）；要发更新文章或对齐对外口径时看它。
 - `docs/design/DESKTOP_SHELL.md` — 要动桌面客户端的外壳（导航模型、工作区形态、装备页尺寸、数据来源标签、Flutter 落地）之前看它：token 与尺寸出自老 webui 的 `tokens.css`/`AppShell.tsx`/`inventory.css`，附可点击原型与三张实拍图。
 - `docs/plans/ARMOR_FORMAT_PLAN.md` — 动护甲载荷格式（体积口径、字段取舍）之前看实机证据与取舍。
+- `docs/plans/AUTO_MAKE_ROOM_PLAN.md` — 要动「挪装备撞上目标格满」这条（自动腾哪一件、腾到哪、绝不腾什么）之前看它：DIM v8.143.0 的判据与其源码位置、我们的五条硬口径与四个接入点、验收与三项待拍板。
 - `docs/plans/EQUIP_FLOW_PLAN.md` — 动装备流程（候选签发 → `confirmed` → 回读）之前看它为什么长这样。
 - `docs/plans/EQUIP_WRITE_PATH_PLAN.md` — 动装备**写入路径**（求解前提 → 确认复检 → 预检次序 → 写入 → 回读/回滚）之前看它：2026-10-03 那一轮逐条的证据等级（故障侧是真机原文）、**2026-10-04 真机轮的修复侧结果**（§八：回读跳过、写入回执、逐槽还原、分段实测）、验收点、仍然**未取得**的清单（§六），以及 ADR-024 结尾「三条注入」的可核对记录在哪一节。
 - `docs/plans/ICON_URL_PLAN.md` — 动**图标 URL 覆盖**（哪个出口带 `icon_url`、图片 URL 从哪来）或要给模型加**HTML 渲染 skill** 之前看它：老 web（`~/项目/Destiny_MCP`）的口径、设计决定（内部只传 hash / 出口现取 / 图片只走 Bungie CDN）、44 有 / 29 台账的清点表、守门与注入矩阵、受控基线 diff、**活动副本图标走另一条道**这个缺口，以及 7 项待拍板。
