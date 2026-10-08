@@ -456,6 +456,8 @@ async def test_write_prep_polls_the_recheck_until_it_sees_our_own_write(monkeypa
     # 我们自己动过账号 → 基线必须推到现在，否则指纹比对必然 stale（真机就栽在这一步）
     store.register.assert_called_once()
     assert store.register.call_args.args[0] == "重新登记的那份"
+    # **调用方手里那份也要跟着走** —— 写前复检读的就是它（只推 store 的话真机仍判 stale）
+    assert build.snapshot_version == mr.snapshot_version(_snapshot_stub()), build.snapshot_version
     assert calls["n"] >= 3, f"复检要轮询到可见，实际只读了 {calls['n']} 次"
     assert steps and steps[0]["action"] == "make_room", steps
     assert "已自动腾出" in prefix

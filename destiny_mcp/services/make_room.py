@@ -432,7 +432,12 @@ async def prepare_build_write(
         # `stale_inventory_snapshot`（2026-10-09 真机：顶下成功之后就是这一步把它拦下的）。
         if candidates is not None:
             fresh = await inventory.get_armor_snapshot(player_name, character)
+            fresh_version = snapshot_version(fresh)
+            # ⚠️ 两处都要推：store 里那份（重试/后续解析用）+ **调用方手里那份**。
+            # 只推 store 的后果 2026-10-09 真机撞到：写前复检读的是 `build.snapshot_version`（调用方那份，
+            # 还是求解那一刻的），于是"顶下成功了、紧接着指纹比对还是判 stale"。
+            build.snapshot_version = fresh_version
             candidates.register(
-                build.model_copy(update={"snapshot_version": snapshot_version(fresh)}), player_name
+                build.model_copy(update={"snapshot_version": fresh_version}), player_name
             )
     return steps, prefix + note, None
