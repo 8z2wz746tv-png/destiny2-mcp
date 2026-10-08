@@ -67,3 +67,4 @@
 - `Date` 写决定日期 `YYYY-MM-DD`；回顾补记的写补记日期，并在正文里说明是补记。
 - `Decision By` 写拍板的人或角色（个人项目可写 `maintainer`）；不要留空。
 - `029-auto-make-room-on-full-slots.md` — 挪装备撞上目标格满时**自动腾一件**（判据照 DIM v8.143.0）：只在已确认的写入里做、只搬仓库、五条绝不腾、上限 3 件、结果记 `make_room` steps 且可还原；落地分 P0–P3，见 `docs/plans/AUTO_MAKE_ROOM_PLAN.md`。
+- `030-dequip-conflicting-exotics-before-batch.md` — `equip_loadout` 批量装备**之前**先顶下冲突金装（照 DIM 的 move aside exotics）：替身要同部位、非金装、同职业，优先身上、没有就去仓库拉；挑不到就不发批量、点名要你先脱哪件。

@@ -76,6 +76,12 @@
   改 `execution_diagnosis` 的话术（"确认后会自动腾出 X"）。
 - **P2**：接 `inventory move/equip/equip_many` 与 `equip_loadout`；兜底重试一次。
 - **P3**：文档与技能同步（`TESTING_CORPUS.md` 的 steps 说明、`routing.md` 的"格满了会怎样"）。
+- ~~**P2**~~ / ~~**P3**~~ / **P4**（补做）**已完成**（2026-10-06）：
+  · P2 落地为 `equip_build` 撞上游 `NoRoomInDestination` 时按回执点名的件腾一格并**重试一次**（`services/make_room.py::equip_with_make_room_retry`）；
+  · P4 把同一套编排接到**会搬运**的另外两条入口：`move` 与 `equip_loadout`（`services/transfer_service.py::make_room_in_bucket` + `_transfer_item_with_make_room`）。**`equip`/`equip_many` 不需要接** —— 它们走上游 `EquipItem`、不搬运，撞不到这条错（实测）；
+  · 真机验证过：`equip_build`、`move`、`equip_loadout` 三条都跑通（原文见 CHANGELOG 与 ADR-029 补记）。
+  · 途中抓到 4 个只有真机才暴露的缺陷并全部修掉：挑中仓库件（搬到仓库 = 没腾）、腾动让候选指纹过期、写入同步窗口（回读到的还是旧状态）、一次格满按默认 3 腾了三件、以及仓库件`bucket_type`/`slot` 报的是 `Vault (General)`/空串。
+- **P5（计划外补做）**：`equip_loadout` 批量装备**之前**顶下冲突金装 —— 见 `docs/adr/030-dequip-conflicting-exotics-before-batch.md`。
 
 ## 五、验收
 

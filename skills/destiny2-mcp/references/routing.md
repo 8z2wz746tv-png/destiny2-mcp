@@ -66,6 +66,8 @@
 
 ### `inventory_assistant` —— 背包与仓库
 
+物品行（`get`/`type`/`search`/`move` 等）都带 **`is_locked`**（游戏内锁定，组件 `state` bit0）：问「哪些件锁了」直接读它；自动腾格与顶下也靠它执行「**锁定的绝不腾**」（ADR-029）。
+
 只读：
 
 | intent | 做什么 | 关键参数 |

@@ -68,6 +68,7 @@
 | 字段 | 说明 |
 | --- | --- |
 | `exotic_armor` 要求的 `status` | `unresolved` → **`resolved`**（翻回金装名后按普通金装解析） |
+| `items[].is_locked` | 新增（`inventory get`/`type`/`search`/`move` 等出口的物品行）：游戏内**锁定**，读组件 `state` bit0；读不到当 `false`（缺值不拿「锁了」当默认）。自动腾格与顶下靠它执行 ADR-029 的「锁定的绝不腾」 |
 | `class_item_name` | 新增：翻出来的金装名（如「相对主义」） |
 | `required_class_item_perks` | 新增：要求的两个特性（`item_hash` 无符号 + `name`）。**只点名一颗也是合法的** |
 | `class_item_perk_status` | 新增，四种取值：`verified`（有副本同时 roll 到要求的组合，`class_item_perk_match` 指出是哪一个）/ `owned_wrong_perks`（持有但没有任何副本满足，`class_item_perk_rolled` 列出各副本实际滚到的）/ `unknown`（读不到组件 305 或宿主读不了插槽，`class_item_perk_reason` 说明原因）。另有 `class_item_perk_rolled` 在 `verified` 时也给出各副本的组合 |
