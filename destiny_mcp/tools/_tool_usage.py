@@ -59,6 +59,7 @@ TOOL_USAGE: dict[str, str] = {
 
 - `recommend`（默认）：按数值目标推荐**候选行**（含 `execution_id`）。
 - `find`：**按硬约束找一套能装的**（指定金装/套装/属性下限）；社区模板给的参数直接照传。
+  ⚠️ **不给金装、也不给属性下限时组合规模常常超上限**：`find`/`recommend` 会直接回"没算（这不是配不出来）"并给收窄选项 —— **指定一件金装**是最快的出路；"尽量高"要写 `priority_stats`，硬下限才写 `*_target`。
 - `analyze`：**失败诊断** —— 说清"差多少 / 是哪条前提卡的"，目标达不到时看它。
 - `farm_target`：反推**该去刷哪一件**（`baseline`、`max_replacements`）。
 - `equip_build`：**装备**（先 `confirmed=false` 拿预览，同意后 `confirmed=true`；传 `execution_id`）。

@@ -588,9 +588,10 @@ async def build_assistant(
     set_bonus_count: fields.SetBonusCount = None,
     functional_mods: fields.FunctionalMods = None,
     priority_stats: Annotated[list[str] | str | None, Field(description=(
-        "所有硬目标达标后才按顺序最大化的属性。使用 "
-        "weapons/health/class/grenade/melee/super；力量/strength 必须写为 melee。"
-        '只发标量的宿主写成 "weapons,grenade"（顺序就是优先级）。'
+        "**「尽量高」用这个**（硬目标都达标后按顺序最大化）。weapons/health/class/grenade/melee/super；"
+        "力量/strength 写 melee；只发标量的宿主写 「weapons,grenade」（顺序即优先级）。"
+        "要**硬下限**用 `grenade_target` 这类 `*_target`（达不到会报差多少）。"
+        "⚠️ 不给金装也不给下限时组合规模常超限（`find`/`recommend` 会回「没算」并给收窄选项）——**指定一件金装**最有效。"
     ))] = None,
     priority_stat: fields.PriorityStat = None,
     replacement_slot: Annotated[str | None, Field(description=(
