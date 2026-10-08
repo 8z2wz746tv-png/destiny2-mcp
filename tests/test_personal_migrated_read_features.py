@@ -612,7 +612,10 @@ async def test_the_profile_intent_actually_carries_the_triumph_score() -> None:
 
     assert profile.triumph_score == 24680
     requested = resolver.get_profile.await_args.args[2]
-    assert 1000 in requested, f"要拉 profileRecords（组件 1000）才拿得到凯旋分，实际请求 {requested}"
+    assert 900 in requested, (
+        f"账户级 profileRecords 由**组件 900** 带回（真机实测：要 1000 只回 profile，值是 None），"
+        f"实际请求 {requested}"
+    )
 
     # 上游没给这一块 → None，不许变成 0
     resolver.get_profile.return_value = {"characters": {"data": {"c": {"classType": 0, "light": 550}}}}

@@ -256,9 +256,10 @@ class PlayerService:
 
         mid = p["membership_id"]
         mtype = p["membership_type"]
-        # 1000 = profileRecords：凯旋分在这里（工具描述承诺了它，就得真去拉 —— 盲测 2026-10-06
-        # 就是"描述写了、实回没有"）。读不到给 None，不编 0。
-        profile = await self._resolver.get_profile(mid, mtype, [100, 200, 1000])
+        # 凯旋分（账户级 `profileRecords.activeScore`）**由组件 900 带回来** —— 真机 2026-10-06 实测：
+        # 要 `[100, 1000]` 只回 `profile`（`profileRecords` 是 None），要 `[100, 900]` 才回它。
+        # 工具描述承诺了凯旋分就得真给；读不到给 None，**不编 0**。
+        profile = await self._resolver.get_profile(mid, mtype, [100, 200, 900])
         records = (profile.get("profileRecords") or {}).get("data") or {}
         raw_score = records.get("activeScore")
         triumph_score = int(raw_score) if isinstance(raw_score, int) else None
