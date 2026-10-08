@@ -630,3 +630,20 @@ def test_render_skill_html_examples_use_a_wrapper_the_host_table_measured() -> N
         + "\n".join(offenders)
     )
     assert examples >= 5, f"只解析到 {examples} 段 HTML 示例，先看示例结构是不是变了"
+
+
+def test_the_skill_points_at_the_actionable_part_of_the_handoff() -> None:
+    """`solver_handoff` **不能只写"它不是可执行方案"** —— 那是负向描述，会把人劝退。
+
+    2026-10-06 真机：skill 里只有"不是可执行方案"，没有"照它的参数去跑 `find`"。
+    我读了 skill，记住的是「别拿它去装备」，于是自己拼参数、白跑一轮 0 候选。
+    **只划红线、不给用法** 和 **货在深处、出口空着** 是同一个病的两面。
+    """
+    routing = _routing_text()
+    assert "solver_handoff.arguments" in routing, (
+        "要点名**可执行的那个子字段**：`solver_handoff.arguments` 就是「该拿什么参数跑 find」"
+    )
+    skill = (Path(__file__).resolve().parents[1] / "skills/destiny2-mcp/SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    assert "solver_handoff.arguments" in skill, "SKILL.md 的简短清单里也要给出正向用法"

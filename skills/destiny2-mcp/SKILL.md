@@ -30,7 +30,9 @@ Read only the relevant reference before a complex request:
 1. Never infer account ownership from Manifest results, community templates, or a previous conversation.
 2. Never call `loadout_assistant` to answer a community-build question.
 3. Never call `catalog` to answer what the player owns; use `filter_rolls` or an account inventory query.
-4. `build_template`, community records, `farm_options`, and `solver_handoff` are not executable builds.
+4. `build_template`, community records, `farm_options`, and `solver_handoff` are not executable builds —
+   but **`solver_handoff.arguments` is exactly what you pass to `find`** (copy it verbatim; it already
+   dropped names this Manifest cannot resolve, so a `null` set bonus is deliberate).
 5. Only a server-returned, instance-bound candidate may be sent to `equip_build`: either its
    `canonical_build` or its scalar `execution_id`. Never assemble hashes or instance IDs yourself.
    A build that needs tuning carries the tuning plugs inside `canonical_build.items[].mods`
