@@ -155,27 +155,26 @@ async def recommend(
 
 
 def _empty_message(search: dict[str, Any] | None) -> str:
-    """0 候选时说的话**必须自证"搜完了"**，并且分清"配不出来"与"装不上"。
+    """0 候选时说的话**必须自证"搜完了"**，并且分清"配不出来"与"有件要先准备"。
 
     读的人要能分清三件事：枚举完了真没有满足下限的方案、没搜完/被截断、以及
-    **执行前提把候选砍掉了**（格子满搬不进来 / 与当前金装冲突）。第三种最要紧：
-    真机实测那两次都是"求解成功、写入在动第一颗模组之前整批回滚"，用户看到的
-    "0 候选"如果被念成"属性配不出来"，下一步就全错了。
+    **这次有件要先准备**（格子满搬不进来 / 与当前金装冲突）。
+
+    ADR-027 起第三种**不是** 0 候选的原因 —— 那些件照样进池、照样算（只是装备前要先解决），
+    所以这里只把它当**附注**。以前它排在第一位当原因，真机上就会把"约束凑不出来"
+    引到"去腾格子"上（2026-10-06 泰坦那趟就是这么念错的）。
     """
     blockers = (search or {}).get("blockers") or []
-    if blockers:
-        return (
-            "找到 0 个**能装上**的候选配装：执行前提先把候选砍掉了 —— "
-            + "；".join(blockers)
-        )
+    prep = ("另外：这次有件要先准备（" + "；".join(blockers) + "）—— 它**不是**这次 0 候选的原因，"
+            "那些件已经算进搜索了（ADR-027）。") if blockers else ""
     if search is None or search.get("exhaustive"):
         combos = (search or {}).get("combos")
         scope = f"（枚举了 {combos:,} 套组合）" if isinstance(combos, int) else ""
-        return f"找到 0 个候选配装：枚举完了，没有任何一套能满足这些下限{scope}。"
+        return f"找到 0 个候选配装：枚举完了，没有任何一套能满足这些下限{scope}。" + prep
     return (
         "这次**没有搜完**，所以不能说「没有满足下限的方案」"
         f"（截断原因：{search.get('truncated_by') or '未说明'}）。"
-        "可以收窄请求后重试，或调高搜索预算。"
+        "可以收窄请求后重试，或调高搜索预算。" + prep
     )
 
 
@@ -213,16 +212,16 @@ async def find(
         return ok_response(
             _empty_message(search),
             {"builds": builds, "query": query, "ladder": ladder, "search": search},
-            next_actions=(
+            next_actions=[
+                "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；"
+                "降级要用户同意后再重试。",
+            ] + (
                 [
-                    "这几条是**执行前提**，不是属性不够：先按上面每一条里的出路做"
-                    "（腾一格 / 用 equip 先把冲突的金装顶下来），再原参数重新求解。",
+                    "warnings 里那几条是**要先准备**的件（**不是**这次 0 候选的原因）："
+                    "装备前按每条里的出路做 —— 腾一格 / 先顶下冲突的金装。",
                 ]
                 if blocked
-                else [
-                    "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；"
-                    "降级要用户同意后再重试。",
-                ]
+                else []
             ),
             warnings=blocked,
         )

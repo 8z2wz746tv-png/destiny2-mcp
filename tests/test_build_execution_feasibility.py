@@ -449,11 +449,17 @@ async def test_find_branch_says_unusable_not_unsatisfiable(monkeypatch) -> None:
         SimpleNamespace(**_request_fields()), {"character": "warlock"}, lambda value: value,
     )
 
-    assert "能装上" in response["summary"]
-    assert "DestinyNoRoomInDestination" in response["summary"]
+    summary = response["summary"]
+    assert "枚举完了" in summary, "0 候选必须自证搜完了（AND-027：这次真的搜的是全量）"
+    assert "DestinyNoRoomInDestination" in summary, "有件要先准备这件事要说出来"
+    assert "不是**这次 0 候选的原因" in summary or "不是这次 0 候选的原因" in summary, (
+        "前提**不是** 0 候选的原因（件已经进池）——以前那句话现在会把人指去腾格子"
+    )
     assert response["data"]["search"]["blockers"] == [reason]
     assert reason in response["warnings"]
-    assert "执行前提" in response["next_actions"][0]
+    assert any("ladder" in action for action in response["next_actions"]), (
+        "0 候选先看差距（shortfall/ceiling），别只指去腾格子"
+    )
 
 
 @pytest.mark.asyncio
