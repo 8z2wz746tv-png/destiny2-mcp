@@ -254,3 +254,61 @@ async def test_making_room_advances_the_candidate_baseline() -> None:
         "腾完必须把候选基线推进到**腾完之后**那份快照；否则复检拿旧指纹比 → 报 stale"
     )
     assert store.registered[0] != "v-solve-time"
+
+
+@pytest.mark.asyncio
+async def test_a_blocked_piece_frees_exactly_one_slot() -> None:
+    """一个卡住的件只腾**一格**就够 —— 多腾是白搬（真机上等于白丢几个格子）。
+
+    2026-10-06 真机第四次翻车：`limit` 用了默认 3，一次格满搬走三件，用户白丢三个格子。
+    """
+    from destiny_mcp.build.models import InventorySnapshot
+    from destiny_mcp.services.make_room import make_room_for_build
+
+    def _piece(instance_id: str, name: str, *, location: str) -> Armor:
+        armor = _armor(instance_id, name, power=10)
+        armor.source_location = location
+        return armor
+
+    def _snap(on_body: int) -> InventorySnapshot:
+        return InventorySnapshot(gauntlets=[
+            _piece("plan", "计划那件", location="vault"),
+            *[_piece(f"on{i}", f"身上{i}", location="character") for i in range(on_body)],
+        ])
+
+    class _Inventory:
+        def __init__(self) -> None:
+            self.n = 0
+
+        async def get_armor_snapshot(self, player_name: str, character: str) -> InventorySnapshot:
+            self.n += 1
+            return _snap(10) if self.n == 1 else _snap(9)
+
+    class _Equipment:
+        def __init__(self) -> None:
+            self.moved: list[str] = []
+
+        async def move_single_to_vault(self, player_name: str, armor: Armor) -> None:
+            self.moved.append(armor.item_instance_id)
+
+    class _ManifestStub:
+        def get_bucket_definition(self, _hash: int) -> dict:
+            return {"itemCount": 10, "displayProperties": {"name": "臂铠"}}
+
+    class _Plan:
+        class_type = "warlock"
+        snapshot_version = "v"
+        execution_id = "e"
+        items = [type("I", (), {"item_instance_id": "plan", "slot": "gauntlets"})()]
+
+        def model_copy(self, update: dict):
+            return self
+
+    equipment = _Equipment()
+    steps, prefix = await make_room_for_build(
+        player_name="Tester#1234", character="warlock", inventory=_Inventory(),
+        equipment=equipment, manifest=_ManifestStub(), build=_Plan(),
+    )
+
+    assert prefix, "该腾的时候要腾"
+    assert len(equipment.moved) == 1, f"该只腾一件，实际 {len(equipment.moved)} 件"

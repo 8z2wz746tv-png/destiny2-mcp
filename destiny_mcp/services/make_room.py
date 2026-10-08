@@ -141,9 +141,12 @@ async def make_room_for_build(
     build,
     candidates=None,
     official_instance_ids: Collection[str] = (),
-    limit: int = DEFAULT_LIMIT,
+    limit: int = 1,
 ) -> tuple[list[str], str]:
     """一次 `equip_build` 的腾格入口：读现场 → 该腾就腾 → 返回 `(回执行, 话术前缀)`。
+
+    `limit=1` 是**每个卡住的件只腾一件**：一个部位的计划件只有一件，腾一格就够；
+    多腾是白搬（2026-10-06 真机第四次翻车：按默认 3 腾了三件，用户白丢三个格子）。
 
     整个编排放在这里（`build_service` 贴着行数上限）；调用方只负责把结果拼进回执。
     """
