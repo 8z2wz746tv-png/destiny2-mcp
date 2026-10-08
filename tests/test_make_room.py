@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import pytest
 
+from unittest.mock import AsyncMock
+
 from destiny_mcp.build.models import Armor
 from destiny_mcp.build.snapshot_version import snapshot_version
 from destiny_mcp.models import LoadoutOperationResult
@@ -395,3 +397,46 @@ async def test_a_full_slot_failure_without_anything_to_move_does_not_retry() -> 
     assert len(attempts) == 1, "腾不出来就不许再试"
     assert not result.success and steps == []
     assert "没有可腾的件" in note
+
+
+@pytest.mark.asyncio
+async def test_write_prep_polls_the_recheck_until_it_sees_our_own_write(monkeypatch) -> None:
+    """我们自己动过账号后，复检要**轮询到写可见**再判。
+
+    2026-10-09 真机原样撞到：顶下已把金装护腿换成非金装，而复检读到的还是写之前的现场 →
+    照样报「正穿着异域…装不上」—— 用户看到"没装成"，装备却已经被我们换了（既拒绝、又改了账号）。
+    这条直接钉轮询：前两次复检返回旧现场、第三次才干净；只读一次（旧行为）会误拒。
+    """
+    from destiny_mcp.error_codes import ErrorCode
+    from destiny_mcp.services import make_room as mr
+
+    calls = {"n": 0}
+
+    async def fake_guard(**_kwargs):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            return {
+                "success": False,
+                "code": ErrorCode.EXECUTION_PRECONDITION_FAILED,
+                "message": "写之前的旧现场",
+                "blockers": ["写之前的旧现场"],
+            }
+        return None
+
+    async def fake_make_room(**_kwargs):
+        return ["腾格：'某件' → 仓库"], "已自动腾出某件（搬到仓库）。"
+
+    monkeypatch.setattr(mr, "recheck_confirmed_build", fake_guard)
+    monkeypatch.setattr(mr, "make_room_for_build", fake_make_room)
+    equipment = AsyncMock()
+    equipment.dequip_conflicting_exotics_for_build = AsyncMock(return_value=([], True, ""))
+
+    steps, prefix, refusal = await mr.prepare_build_write(
+        player_name="Tester#1234", character="warlock", inventory=AsyncMock(),
+        equipment=equipment, manifest=AsyncMock(), build=AsyncMock(),
+    )
+
+    assert refusal is None, f"读到写可见就该放行，实际仍拒绝：{refusal}"
+    assert calls["n"] >= 3, f"复检要轮询到可见，实际只读了 {calls['n']} 次"
+    assert steps and steps[0]["action"] == "make_room", steps
+    assert "已自动腾出" in prefix

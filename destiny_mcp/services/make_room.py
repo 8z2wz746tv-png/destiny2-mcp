@@ -20,6 +20,7 @@ from collections.abc import Awaitable, Callable, Collection, Sequence
 from dataclasses import dataclass, field
 
 from ..error_codes import ErrorCode
+from .build_execution_guard import recheck_confirmed_build
 from ..build.constants import SOLVER_SLOTS, SOLVER_SLOT_TO_LOADOUT
 from ..build.execution_feasibility import VAULT_LOCATION, read_facts
 from ..build.models import Armor
@@ -410,4 +411,21 @@ async def prepare_build_write(
             "message": note,
             "blockers": [note],
         }
+    if details or exotic_steps:
+        # ⚠️ 我们自己**动过账号**了 → 复检要**读到写可见**为止再判（与 `_settled_snapshot` 同一个道理）。
+        # 2026-10-09 真机：顶下已经把金装护腿换成非金装了，而复检读到的还是写之前的现场 → 照样报
+        # 「正穿着异域…装不上」：用户看到的回执是"没装成"，装备却已经被我们换了（既拒绝、又改了账号）。
+        # 只重读一次不够 —— 上游 profile 有同步窗口，要轮询到它追上（最多 `_STABLE_ATTEMPTS` 次）。
+        refusal = None
+        for attempt in range(_STABLE_ATTEMPTS):
+            refusal = await recheck_confirmed_build(
+                inventory=inventory, player_name=player_name, character=character, build=build,
+            )
+            if refusal is None:
+                break
+            if attempt < _STABLE_ATTEMPTS - 1:
+                await asyncio.sleep(_STABLE_DELAY_SECONDS)
+        if refusal is not None:
+            refusal = {**refusal, "message": prefix + note + str(refusal.get("message", ""))}
+            return steps, prefix + note, refusal
     return steps, prefix + note, None
