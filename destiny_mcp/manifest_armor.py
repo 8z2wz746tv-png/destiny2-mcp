@@ -472,3 +472,25 @@ class ArmorCatalogMixin:
                 return {"set_hash": set_hash, **info}
 
         return None
+
+
+def set_name_candidates(manifest: Any, name: str, *, limit: int = 3) -> list[str]:
+    """给"名字对不上"的套装名找几个相似候选，让调用方去问用户，而不是只剩一句"查不到"。
+
+    **2026-10-06 从 `services/starside_matching` 下沉到这里**：求解器报「无法确认套装加成」
+    时也要给候选，而 `build/` 不能反向 import `services/`（分层只许向下）—— 这是纯 Manifest
+    知识，本来就该住在这一层。`services/starside_matching` 与 `build/constraints` 共用它。
+    """
+    from difflib import SequenceMatcher
+
+    wanted = name.strip().casefold()
+    scored = []
+    for info in manifest.get_all_set_bonuses().values():
+        set_name = str(info.get("set_name", "")).strip()
+        if not set_name:
+            continue
+        score = SequenceMatcher(None, wanted, set_name.casefold()).ratio()
+        shared = len({char for char in wanted} & {char for char in set_name.casefold()})
+        scored.append((round(score, 3), shared, set_name))
+    scored.sort(key=lambda row: (-row[0], -row[1], row[2]))
+    return [row[2] for row in scored[:limit] if row[0] > 0.2 or row[1] >= 2]

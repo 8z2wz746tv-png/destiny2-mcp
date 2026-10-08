@@ -1153,3 +1153,52 @@ def test_a_burned_candidate_is_forgotten_after_the_ttl() -> None:
     store.evict_expired()
 
     assert store.resolve(build.execution_id, "Alpha#0100")[1] == "unknown"
+
+
+@pytest.mark.asyncio
+async def test_a_failed_equip_pushes_the_candidate_baseline_forward() -> None:
+    """**工具自己动过账号**之后，要把候选的库存基线推进到最新。
+
+    不然同一个 `execution_id` 重试必然 `stale_inventory_snapshot`（2026-10-06 真机：一次半途
+    失败后，第三次带同一个 ID 重试被拒 → 被迫整轮重解 + 重新确认，用户白等一轮）。
+
+    安全边界（这条测试一并钉住）：**基线没变时什么都不做** —— 回滚成功的那次基线还是对的，
+    不许解锁任何东西。写前复检（格满 / 金装冲突 / 实例核对）在 `recheck_confirmed_build` 里
+    每次照跑，不受这里影响。
+    """
+    from destiny_mcp.build.snapshot_version import snapshot_version
+    from destiny_mcp.services.build_baseline import rebaseline_note
+    from destiny_mcp.services.build_candidates import BuildCandidateStore
+
+    snapshot, plan = _exact_contract()
+    store = BuildCandidateStore()
+    store.register(plan, "Alpha#0100")
+
+    # ① 基线没变（账号没动 / 已经回滚）→ 不说任何话，也不改基线
+    class _SameInventory:
+        async def get_armor_snapshot(self, player_name: str, character: str):
+            return snapshot
+
+    note = await rebaseline_note(store, _SameInventory(), "Alpha#0100", "hunter", plan)
+    assert note == "", f"基线没变时不该说话，实际：{note}"
+    assert store.resolve(plan.execution_id, "Alpha#0100")[0].snapshot_version == plan.snapshot_version
+
+    # ② 基线变了（我们自己写了一半）→ 给一句说明，并把候选的基线推进过去
+    class _ChangedInventory:
+        async def get_armor_snapshot(self, player_name: str, character: str):
+            moved = snapshot.model_copy(deep=True)
+            moved.helmets[0].source_location = "vault"
+            return moved
+
+    from_there = await rebaseline_note(store, _ChangedInventory(), "Alpha#0100", "hunter", plan)
+    assert "同一个 execution_id" in from_there, from_there
+    assert "改动过账号" in from_there, from_there
+
+    refreshed, status = store.resolve(plan.execution_id, "Alpha#0100")
+    assert status == "ok"
+    changed = snapshot.model_copy(deep=True)
+    changed.helmets[0].source_location = "vault"
+    assert refreshed.snapshot_version == snapshot_version(changed), (
+        "候选基线要推进到**当前实况**，否则下一次重试还是 stale"
+    )
+    assert refreshed.snapshot_version != plan.snapshot_version

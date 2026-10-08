@@ -1,13 +1,10 @@
 """服务端配装候选的暂存：签发一次、绑定玩家、限时、**写成功之后**才焚。
 
-`equip_build` 的信任来源是「这份方案是服务端自己签发的」，不是调用方回传的内容 ——
-所以候选必须留在服务端（进程内存，个人版单进程够用；重启后候选失效，重新求解即可）。
+`equip_build` 的信任来源是「这份方案是服务端自己签发的」，不是调用方回传的内容 —— 候选留在
+服务端（进程内存；重启后失效，重新求解即可）。`resolve()` 返回状态而不是抛异常：
+unknown / expired / consumed / player_mismatch 是**四件不同的事**，话术在 `candidate_messages`。
 
-`resolve()` 返回状态而不是抛异常：unknown / expired / consumed / player_mismatch
-是**四件不同的事**，取回与话术在 `services/candidate_messages`（唯一出处）。
-
-**焚烧时机**：写成功之后才烧，被拦下/失败的执行不消耗候选 —— 为什么改、代价是什么
-见 ADR-025；重放保护由"成功才烧 + 写前每次都重读现场"两层兜住。
+**焚烧时机**：写成功之后才烧；被拦下/失败的执行不消耗候选（ADR-025）。
 """
 
 from __future__ import annotations
@@ -19,9 +16,9 @@ from typing import Literal
 
 from ..build_contracts import CanonicalBuild
 
-# 200 条够一个人连着试配装；10 分钟够走完"看预览 → 确认"。
+# 200 条够一个人连着试配装；TTL 30 分钟：0.7.10 起 execution_id 是默认出口的唯一引用。
 MAX_CANDIDATES = 200
-TTL_SECONDS = 30 * 60  # 0.7.10 起 execution_id 是默认出口的唯一引用，"给玩家看→等回话"常超 10 分钟
+TTL_SECONDS = 30 * 60
 
 CandidateStatus = Literal["ok", "unknown", "expired", "consumed", "player_mismatch"]
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Callable
 
+from ..manifest_armor import set_name_candidates
 from ..manifest import ITEM_ALIASES, ManifestManager
 from ..exceptions import DestinyMCPError
 from ..utils.hash_utils import to_unsigned
@@ -171,23 +172,6 @@ UNVERIFIABLE_REASONS: dict[str, str] = {
 }
 
 
-def _set_name_candidates(manifest: ManifestManager, name: str, *, limit: int = 3) -> list[str]:
-    """给"名字对不上"的套装名找几个相似候选，让调用方能去问用户，而不是只剩"查不到"。"""
-    from difflib import SequenceMatcher
-
-    wanted = name.strip().casefold()
-    scored = []
-    for info in manifest.get_all_set_bonuses().values():
-        set_name = str(info.get("set_name", "")).strip()
-        if not set_name:
-            continue
-        score = SequenceMatcher(None, wanted, set_name.casefold()).ratio()
-        shared = len({char for char in wanted} & {char for char in set_name.casefold()})
-        scored.append((round(score, 3), shared, set_name))
-    scored.sort(key=lambda row: (-row[0], -row[1], row[2]))
-    return [row[2] for row in scored[:limit] if row[0] > 0.2 or row[1] >= 2]
-
-
 def _resolution(kind: str, name: str, definitions: list[dict]) -> dict:
     identities = {
         item.get("name_en") or item.get("name") or item.get("set_name")
@@ -233,7 +217,7 @@ def _set_resolution(manifest: ManifestManager, name: str) -> dict:
                 return resolution
     resolution = _resolution("armor_set", name, matches)
     if resolution["status"] == "unresolved":
-        candidates = _set_name_candidates(manifest, name)
+        candidates = set_name_candidates(manifest, name)
         if candidates:
             resolution["set_name_candidates"] = candidates
             resolution["unresolved_reason"] = "name_not_matched_candidates_available"
@@ -367,6 +351,22 @@ def validate_build(manifest: ManifestManager, build: dict) -> dict:
         if len(set_requirements) == 1
         else None,
     }
+    # 对不上的套装名要**明写**（2026-10-06 真机：作者写的"玻璃拱顶"是副本名、套装名是
+    # "埃希恩记忆"，零重叠；调用方看到 null 就自己塞回去 → 求解报错白跑一轮）。
+    unresolved_sets = [
+        row for row in unresolved if row.get("kind") in ("armor_set", "set_bonus")
+    ]
+    if unresolved_sets:
+        solver_handoff["set_bonus_hint"] = {
+            "author_wrote": unresolved_sets[0].get("name"),
+            "resolved": False,
+            "candidates": unresolved_sets[0].get("set_name_candidates") or [],
+            "note": (
+                "作者写的这个套装名在本库**对不上**（不是「你没有」）—— 别把它直接传给 "
+                "`set_bonus_name`（会报「无法确认套装加成」）；先按 candidates 与用户确认正式名，"
+                "或干脆不带套装约束先求解。"
+            ),
+        }
     return {
         "requirements": requirements,
         "manifest_validation_complete": not unresolved and class_type is not None,

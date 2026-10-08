@@ -7,6 +7,7 @@ character class names to classType integers.
 from __future__ import annotations
 
 from ..exceptions import BuildValidationError
+from ..manifest_armor import set_name_candidates
 from ..vocabulary import STAT_LABELS_ZH
 from ..logging_config import get_logger
 from .constants import STAT_NAMES
@@ -107,9 +108,19 @@ def parse(request: BuildRequest, manifest) -> BuildConstraints:
             )
         else:
             logger.warning("Set bonus not found: %s", request.set_bonus_name)
+            # 名字对不上时就只回一句"请使用正式名称"—— 用户只能自己猜（2026-10-06 真机：
+            # 用户写的是**副本名**「玻璃拱顶」，套装名是「埃希恩记忆」，两串字符零重叠，
+            # 模糊匹配也找不到 → 所以既要给候选，也要点破"这可能是活动/副本名"）。
+            candidates = set_name_candidates(manifest, request.set_bonus_name)
+            hint = (
+                "名字接近的套装：" + "、".join(candidates) + "；用正式名重试。"
+                if candidates
+                else "它可能是**活动/副本名**（副本名与套装名常常不一样）—— 用 "
+                     'build_assistant(intent="set_bonus", set_bonus_name=…) 试，'
+                     "或看社区模板给的 set_name_candidates。"
+            )
             raise BuildValidationError(
-                f"无法确认指定套装加成“{request.set_bonus_name}”。"
-                "请先查询可用套装并使用正式名称。"
+                f"无法确认指定套装加成“{request.set_bonus_name}”。{hint}"
             )
 
     requested_priorities = (

@@ -54,6 +54,7 @@ from ..build.snapshot_version import snapshot_version
 from .build_tuning import apply_local_tuning, solve_with_tuning
 from .build_candidates import BuildCandidateStore
 from .candidate_messages import candidate_failure, describe_candidate
+from .build_baseline import rebaseline_note
 from .build_execution_guard import recheck_confirmed_build
 from .build_fragments import replace_fragment_config
 from .build_results import (
@@ -685,11 +686,9 @@ class BuildService:
                 "code": ErrorCode.CANONICAL_BUILD_MISMATCH,
                 "message": "确认后的配装内容发生变化，已拒绝执行。请重新选择候选。",
             }
-        # ⚠️ 焚烧**不在这里**：以前在这一行 `consume()`，于是写账号之前被执行的
-        # 前提复检（金装冲突 1641 / 指纹变了，见下面 `recheck_confirmed_build`）拦下时，
-        # 账号一个字节没改、候选却已经烧掉 —— 调用方处理完冲突拿同一个 ID 重试只会拿到
-        # `unknown_execution_id`，被迫整条重解重确认（ADR-025）。
-        # 现在焚烧推迟到写成功之后（见本方法末尾）。
+        # ⚠️ 焚烧**不在这里**：以前在这一行 `consume()`，于是写前复检（金装冲突 1641 / 指纹变了，
+        # 见 `recheck_confirmed_build`）拦下时账号一个字节没改、候选却烧掉了 → 同 ID 重试只能拿到
+        # `unknown_execution_id`（ADR-025）。现在焚烧推迟到写成功之后（见本方法末尾）。
         build = trusted
         if build.class_type:
             build_character = class_type_name(
@@ -756,10 +755,11 @@ class BuildService:
         )
         result = await self._equipment.equip_with_recovery(player_name, loadout)
         # 焚烧的时刻：**写成功之后**。失败的执行（被拦、搬运失败、回滚过）不消耗候选 ——
-        # 那种情况下账号要么没动、要么已经回到执行前的样子，重试同一个 ID 是正当的。
-        # 重放保护没削弱：成功照样烧，而且写之前的复检每次都会重读现场（ADR-025）。
+        # 那种情况下账号要么没动、要么已回到执行前；重放保护没削弱：成功照样烧，写前复检每次重读现场。
         if result.success:
             self._candidates.consume(build.execution_id)
+        else:  # 自己动过账号 → 推进候选基线，否则同一个 ID 重试必然 stale（见 build_baseline）
+            result.message += await rebaseline_note(self._candidates, self._inventory, player_name, normalized_character, build)
         return {
             "success": result.success,
             "character": normalized_character,

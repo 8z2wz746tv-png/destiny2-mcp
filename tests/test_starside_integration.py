@@ -1402,3 +1402,26 @@ async def test_the_tool_exit_actually_carries_the_handoff_actions() -> None:
     assert (f"{len(mods)} 颗" in response["summary"]) is bool(mods), (
         "有 N 颗就报 N 颗；一颗都没有时不许编一句出来"
     )
+
+
+def test_an_unresolvable_set_name_is_written_into_the_handoff() -> None:
+    """作者写的套装名对不上时，handoff 要**明写**出来（含候选与"别再塞它"）。
+
+    2026-10-06 真机：社区模板写「玻璃拱顶」（那其实是**副本名**），套装名是「埃希恩记忆」，
+    两串字符零重叠 → `validate_build` 只能给 `set_bonus_name: null`，而下一步的 agent
+    自己把作者原话塞进了求解 → 求解报「无法确认套装加成」→ 白跑一轮。
+    """
+    from destiny_mcp.services.starside_matching import validate_build
+
+    manifest = _Manifest()
+    # 用真机那次的写法：作者写的是**副本名**，套装名另有其人（字符零重叠）。
+    markup = BUILD.replace("套装：甲套 2 件 × 甲套 4 件 × 乙套 2 件", "套装：玻璃拱顶 4 件")
+    build = parse_build(markup, build_id="a", source={"title": "A"})
+    result = validate_build(manifest, build)
+    arguments = result["solver_handoff"]["arguments"]
+
+    hint = arguments.get("set_bonus_hint")
+    assert hint, f"对不上的套装名必须明写出来，实际 arguments={arguments}"
+    assert hint["resolved"] is False
+    assert hint["author_wrote"], "要保留作者原话（调用方才知道别再塞它）"
+    assert "别把它直接传给" in hint["note"]

@@ -411,12 +411,12 @@ class LoadoutService:
                 unparsed.append(f"未分类配装物品：{item_name or item_hash or instance_id}")
 
         if subclass_config:
+            # 图标按 hash 现查（同 item_type==16）：`icon_url` 属另一个同名类，以前每次 save 都崩。
+            info = self._manifest.get_item_info(subclass_config.subclass_item_hash) or {}
             class_data.update({
                 "subclass_item_hash": subclass_config.subclass_item_hash,
                 "subclass_instance_id": subclass_config.subclass_instance_id,
-                # 另一条路（`subclass_config`）是同一件事：`SubclassConfig` 本来就带
-                # `icon_url`（2026-10-05 与场景 3 一起补的），照抄即可。
-                "icon_url": subclass_config.icon_url,
+                "icon_url": _icon_url(info.get("icon")),
             })
             for field, key in (
                 ("super_hash", "super"),

@@ -308,3 +308,41 @@ async def test_get_reports_only_the_count_of_the_snapshot_armor_state() -> None:
     row = response["data"]["loadouts"][0]
     assert row["armor_state_count"] == 50, "件数要报（`0` = 这套快照没有护甲现场，还原不了别的件）"
     assert "armor_state" not in row, "几十上百件的现场不许进响应"
+
+
+def test_save_can_build_a_template_from_a_real_subclass_config() -> None:
+    """`save` 必须能处理**真的** `LoadoutSubclassConfig`。
+
+    2026-10-06 真机事故：`_build_template` 里读 `subclass_config.icon_url`，而
+    `LoadoutSubclassConfig` **没有**这个字段（有它的是另一个同名类
+    `models/subclass.py` 的 `SubclassConfig`）→ 每一次 `save` 都在预览阶段
+    `AttributeError: 'LoadoutSubclassConfig' object has no attribute 'icon_url'`；
+    又因为 `_build_template` 排在 `_save_local` 前面，整条保存路径彻底走不通。
+
+    这条测试**故意用真模型当夹具**：当初的单元测试之所以全绿，正因为它手编了一个
+    带 `icon_url` 的假配置 —— 字段名写错必须炸，不能被假夹具吞掉。
+    """
+    from destiny_mcp.models.loadout import LoadoutSubclassConfig
+
+    manifest = FakeManifest()
+    manifest.items[301] = {"itemType": 16, "name": "棱镜术士",
+                           "icon": "/common/destiny2_content/icons/subclass.png"}
+    service = LoadoutService(FakeClient(), manifest, SimpleNamespace())
+
+    config = LoadoutSubclassConfig(
+        subclass_item_hash=301, subclass_instance_id="subclass-1",
+        super_hash=0, grenade_hash=0,
+    )
+    template = service._build_template(
+        build_id="local-1", title="测试", character="warlock",
+        raw_items=[{"itemInstanceId": "subclass-1", "itemHash": 301, "plugItemHashes": []}],
+        provider="local", content_scope="account_loadout_snapshot",
+        character_id="character-1", notes="", subclass_config=config,
+    )
+
+    # 形状来自**真实返回**（不是猜的）：子职业那一块挂在 `template["class"]` 下。
+    block = template["class"]
+    assert block["subclass_item_hash"] == 301
+    assert block["icon_url"].endswith("subclass.png"), (
+        "图标要**按 hash 现查**（同 item_type==16 那条路），不能去读 config 上没有的字段"
+    )
