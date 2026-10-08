@@ -1,0 +1,167 @@
+"""自动腾格（ADR-029）的判据守门。
+
+夹具一律用**真 `Armor`**（不是手编 dict/namespace）：这个项目的教训是"夹具形状写错 → 单测全绿、
+真机是错的"（2026-10-06 一天栽了三次）。
+"""
+
+from __future__ import annotations
+
+import pytest
+
+from destiny_mcp.build.models import Armor
+from destiny_mcp.services.make_room import (
+    DEFAULT_LIMIT,
+    make_room,
+    pick_move_aside,
+    sort_key,
+)
+
+
+def _armor(
+    instance_id: str,
+    name: str,
+    *,
+    tier: int = 5,
+    power: int | None = 550,
+    equipped: bool = False,
+    locked: bool = False,
+    masterworked: bool = True,
+    artifice: bool = False,
+    slot: str = "gauntlets",
+) -> Armor:
+    return Armor(
+        item_instance_id=instance_id,
+        item_hash=123,
+        name=name,
+        slot=slot,
+        power=power,
+        tier=tier,
+        is_equipped=equipped,
+        is_locked=locked,
+        is_masterworked=masterworked,
+        is_artifice=artifice,
+    )
+
+
+# ── "绝不腾"四条 ────────────────────────────────────────────────────────────
+
+
+def test_never_moves_what_is_being_worn() -> None:
+    worn = _armor("a", "在穿的", equipped=True)
+    assert pick_move_aside([worn]) == []
+    assert pick_move_aside([worn, _armor("b", "没穿的")])[0].item_instance_id == "b"
+
+
+def test_never_moves_a_locked_piece() -> None:
+    """锁定的绝不腾 —— 这一条**比 DIM 保守**（DIM 那段代码没按锁过滤，见 ADR-029）。"""
+    locked = _armor("a", "锁了的", locked=True)
+    assert pick_move_aside([locked]) == []
+
+
+def test_never_moves_a_piece_the_plan_needs() -> None:
+    plan_piece = _armor("a", "本次要装的")
+    assert pick_move_aside([plan_piece], reserved_instance_ids={"a"}) == []
+
+
+def test_never_moves_a_piece_an_official_loadout_uses() -> None:
+    used = _armor("a", "官方槽在用")
+    assert pick_move_aside([used], official_instance_ids={"a"}) == []
+    assert pick_move_aside(
+        [used, _armor("b", "没人用")], official_instance_ids={"a"}
+    )[0].item_instance_id == "b"
+
+
+# ── 排序：越靠前越先腾 ──────────────────────────────────────────────────────
+
+
+def test_lower_tier_goes_first() -> None:
+    legendary = _armor("a", "传说", tier=5)
+    exotic = _armor("b", "异域", tier=6)
+    assert [a.item_instance_id for a in pick_move_aside([exotic, legendary])] == ["a", "b"]
+
+
+def test_lower_power_goes_first() -> None:
+    low = _armor("a", "低光等", power=500)
+    high = _armor("b", "高光等", power=550)
+    assert [a.item_instance_id for a in pick_move_aside([high, low])] == ["a", "b"]
+
+
+def test_masterworked_and_artifice_are_kept_longer() -> None:
+    plain = _armor("a", "没大师化", masterworked=False)
+    mw = _armor("b", "大师化", masterworked=True)
+    artifice = _armor("c", "巧匠", masterworked=True, artifice=True)
+    assert [a.item_instance_id for a in pick_move_aside([artifice, mw, plain])] == ["a", "b", "c"]
+
+
+def test_unknown_power_is_not_moved_first() -> None:
+    """光等未知 = **最后**才动它（不知道就别先动），不是当 0 处理。"""
+    unknown = _armor("a", "光等未知", power=None)
+    known = _armor("b", "光等 500", power=500)
+    assert [a.item_instance_id for a in pick_move_aside([unknown, known])] == ["b", "a"]
+
+
+def test_ordering_is_stable_without_reading_input_order() -> None:
+    first = _armor("a", "同分甲")
+    second = _armor("b", "同分乙")
+    assert [a.item_instance_id for a in pick_move_aside([second, first])] == ["a", "b"]
+    assert [a.item_instance_id for a in pick_move_aside([first, second])] == ["a", "b"]
+
+
+def test_sort_key_reads_the_real_model_fields() -> None:
+    """字段名拼错必须炸：这条防止"夹具与真模型一起写错"那类事故。"""
+    armor = _armor("a", "甲")
+    assert sort_key(armor)[:4] == (5, 550, True, False)
+
+
+def test_limit_caps_how_many_we_move() -> None:
+    many = [_armor(f"{i:02d}", f"件{i}") for i in range(10)]
+    assert len(pick_move_aside(many)) == DEFAULT_LIMIT
+    assert len(pick_move_aside(many, limit=1)) == 1
+
+
+# ── 执行：搬了哪几件、说了什么、什么时候不搬 ───────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_make_room_moves_and_reports_each_piece() -> None:
+    moved: list[str] = []
+
+    async def move_to_vault(armor: Armor) -> None:
+        moved.append(armor.item_instance_id)
+
+    result = await make_room(
+        candidates=[_armor("a", "该走的", power=500), _armor("b", "在穿的", equipped=True)],
+        move_to_vault=move_to_vault,
+    )
+
+    assert moved == ["a"], "穿着的不能被搬"
+    moved_names = [a.name for a in result.moved]
+    assert moved_names == ["该走的"]
+    assert result.steps and "→ 仓库" in result.steps[0]
+    assert result.blocked_reason == ""
+
+
+@pytest.mark.asyncio
+async def test_make_room_says_why_nothing_could_move() -> None:
+    async def move_to_vault(armor: Armor) -> None:  # pragma: no cover - 不该被调用
+        raise AssertionError("没有可腾的件时不许搬")
+
+    result = await make_room(
+        candidates=[_armor("a", "在穿的", equipped=True), _armor("b", "锁了的", locked=True)],
+        move_to_vault=move_to_vault,
+    )
+
+    assert result.moved == [] and result.steps == []
+    assert "没有可腾的件" in result.blocked_reason
+    assert "锁定的" in result.blocked_reason, "要如实说清为什么没动它"
+
+
+@pytest.mark.asyncio
+async def test_a_failed_move_is_not_swallowed() -> None:
+    """搬不动就**抛出来**（调用方去如实报），不许静默换下一件。"""
+
+    async def move_to_vault(armor: Armor) -> None:
+        raise RuntimeError("上游拒了")
+
+    with pytest.raises(RuntimeError):
+        await make_room(candidates=[_armor("a", "该走的")], move_to_vault=move_to_vault)

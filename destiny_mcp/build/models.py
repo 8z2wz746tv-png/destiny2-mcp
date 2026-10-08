@@ -213,6 +213,9 @@ class Armor(BaseModel):
     source_location: str = ""
     source_character_id: str = ""
     is_equipped: bool = False
+    #: 游戏内**锁定**（组件 `state` 的 bit0）。自动腾格时「锁定的绝不腾」靠它（ADR-029）；
+    #: 这个模型只进求解快照、不进任何响应，所以加字段不动对外的形状。
+    is_locked: bool = False
     #: 这次装备流程**能不能用到这件**（空 = 能）。判据是账号现场，不是属性 ——
     #: 详见 `build/execution_feasibility`：仓库件遇上满格（上游 NoRoomInDestination）、
     #: 与角色正穿着的另一件金装冲突（上游 1641）。求解器只从没有这一项的件里挑，
@@ -450,6 +453,9 @@ class InventorySnapshot(BaseModel):
             item_hash = raw.get("itemHash", 0)
             info = manifest.get_item_info(item_hash) or {}
             bucket_hash = raw.get("bucketHash", 0)
+            # `state` 的 bit0 = 游戏内锁定（DestinyItemState.Locked = 1）。原始 item 就在手上，
+            # 不用再加一次请求；缺值当没锁（`or 0`）—— 读不到时不拿锁了当默认挡掉腾格。
+            is_locked = bool(int(raw.get("state") or 0) & 1)
             if bucket_hash == 138197802:
                 bucket_hash = info.get("bucketTypeHash", 0)
             slot = armor_slot_from_bucket(bucket_hash)
@@ -642,6 +648,7 @@ class InventorySnapshot(BaseModel):
             )
 
             return Armor(
+                is_locked=is_locked,
                 item_instance_id=inst_id,
                 item_hash=item_hash,
                 name=manifest.get_item_name(item_hash),

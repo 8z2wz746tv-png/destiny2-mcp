@@ -28,6 +28,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from destiny_mcp.models import LoadoutOperationResult
+
 os.environ.setdefault("BUNGIE_API_KEY", "dummy")
 os.environ.setdefault("BUNGIE_CLIENT_ID", "1")
 os.environ.setdefault("BUNGIE_CLIENT_SECRET", "dummy")
@@ -581,6 +583,8 @@ def _confirm_service(manifest: _Manifest, snapshot: InventorySnapshot) -> BuildS
     service = BuildService(MagicMock(), manifest, MagicMock())
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
     service._equipment.equip_with_recovery = AsyncMock()
+    # 自动腾格（ADR-029）会调它；单测里默认"搬成功但不改快照"，要验腾格的用例自己给 side_effect。
+    service._equipment.move_single_to_vault = AsyncMock()
     return service
 
 
@@ -633,11 +637,11 @@ async def test_equip_build_rechecks_the_premises_the_find_stage_could_not_judge(
 
 
 @pytest.mark.asyncio
-async def test_equip_build_refuses_when_the_bucket_filled_up_after_find() -> None:
-    """求解时臂铠格 9/10、确认时 10/10：拒绝理由是"腾一格"，不是泛泛的"重新求解"。
+async def test_equip_build_makes_room_when_the_bucket_filled_up_after_find() -> None:
+    """求解时臂铠格 9/10、确认时 10/10：**先替用户腾一件**，再走复检（ADR-029）。
 
-    这件事用户真的会做（求解完回游戏里捡东西/挪装备）。指纹这时**也**对不上，而复检排在
-    指纹比对之前 —— 两个信号都指向"别写"，但只有前者说得清是哪条约束、出路是什么。
+    这件事用户真的会做（求解完回游戏里捡东西/挪装备）。以前这里是拒绝 + "先在游戏里腾出一格"
+    —— 用户得自己进游戏点；现在按 DIM 的判据自动腾，腾走的件写进回执。
     """
     at_find = _snapshot(on_character_gauntlets=9)
     service = _confirm_service(_Manifest(), at_find)
@@ -647,14 +651,51 @@ async def test_equip_build_refuses_when_the_bucket_filled_up_after_find() -> Non
         "gauntlet-vault",
     )
 
+    moved: list[str] = []
+
+    async def fake_move(player_name: str, armor) -> None:
+        moved.append(armor.name)
+
+    service._equipment.move_single_to_vault = AsyncMock(side_effect=fake_move)
+    service._equipment.equip_with_recovery = AsyncMock(
+        return_value=LoadoutOperationResult(
+            success=True, loadout_name="Exact", message="已装备，回读核对通过。",
+        )
+    )
+    # ① 腾格那把读到 10/10（满），② 腾完复检读到 9/10（腾出来了）—— 真机就是这个次序。
     service._inventory.get_armor_snapshot = AsyncMock(
-        return_value=_snapshot(on_character_gauntlets=10)
+        side_effect=[_snapshot(on_character_gauntlets=10), _snapshot(on_character_gauntlets=9)]
     )
     result = await service.equip_build("Tester#1234", build, "warlock")
 
-    assert result["code"] == "execution_precondition_failed"
-    assert "臂铠" in result["message"] and "10/10" in result["message"]
+    assert moved, "格满时应当自动腾一件"
+    assert result.get("code") != "execution_precondition_failed", result
+    assert "已自动腾出" in result["message"], result["message"]
+    assert result["steps"][0]["action"] == "make_room"
+    service._equipment.equip_with_recovery.assert_awaited()
+
+
+@pytest.mark.asyncio
+async def test_equip_build_still_refuses_when_nothing_can_be_moved() -> None:
+    """腾不出来（格子里的件全都穿着/锁着/本次要用）→ **仍然拒绝**，且不许硬写（ADR-029 §3）。"""
+    at_find = _snapshot(on_character_gauntlets=9)
+    service = _confirm_service(_Manifest(), at_find)
+    build = await _candidate_containing(
+        service,
+        BuildRequest(character_class="warlock", grenade_target=50),
+        "gauntlet-vault",
+    )
+
+    full = _snapshot(on_character_gauntlets=10)
+    for armor in full.get_slot("gauntlets"):  # 全是"用户在意"的：锁起来，一件都不许腾
+        armor.is_locked = True
+        armor.is_equipped = True
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=full)
+    result = await service.equip_build("Tester#1234", build, "warlock")
+
+    assert result["code"] == "execution_precondition_failed", result
     assert "先在游戏里腾出" in result["message"]
+    service._equipment.move_single_to_vault.assert_not_awaited()
     service._equipment.equip_with_recovery.assert_not_awaited()
 
 

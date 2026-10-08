@@ -55,6 +55,7 @@ from .build_tuning import apply_local_tuning, solve_with_tuning
 from .build_candidates import BuildCandidateStore
 from .candidate_messages import candidate_failure, describe_candidate
 from .build_baseline import rebaseline_note
+from .make_room import make_room_for_build, make_room_steps
 from .build_execution_guard import recheck_confirmed_build
 from .build_fragments import replace_fragment_config
 from .build_results import (
@@ -156,12 +157,8 @@ class BuildService:
         # Look up subclass base stat bonus from constants
         subclass_vector = SUBCLASS_BONUSES.get(subclass_hash, [0] * 6)
 
-        # Sum fragment stat bonuses from investmentStats.
-        # Don't filter by fragment category — different elements use different
-        # category hashes (Solar=3119191718, Prismatic=2696330562, etc).
-        # Instead, read ALL sockets that contribute to the 6 main stats.
-        # This automatically includes fragments and excludes aspects (which
-        # contribute to non-main stats like "unknown(2223994109)").
+        # 碎片属性加成**不按碎片类别筛**（不同元素类别 hash 不同），而是读所有对六维有贡献的
+        # 插槽 —— 这样自动含碎片、排除星象（星象不走 investmentStats）。别改回按类别筛。
         fragment_vector = [0] * 6
         for socket in sockets_data:
             plug_hash = socket.get("plugHash", 0)
@@ -687,8 +684,8 @@ class BuildService:
                 "message": "确认后的配装内容发生变化，已拒绝执行。请重新选择候选。",
             }
         # ⚠️ 焚烧**不在这里**：以前在这一行 `consume()`，于是写前复检（金装冲突 1641 / 指纹变了，
-        # 见 `recheck_confirmed_build`）拦下时账号一个字节没改、候选却烧掉了 → 同 ID 重试只能拿到
-        # `unknown_execution_id`（ADR-025）。现在焚烧推迟到写成功之后（见本方法末尾）。
+        # 见 `recheck_confirmed_build`）拦下时账号没改、候选却烧掉了 → 同 ID 重试只能拿到
+        # `unknown_execution_id`（ADR-025）。现在推迟到写成功之后（见本方法末尾）。
         build = trusted
         if build.class_type:
             build_character = class_type_name(
@@ -735,6 +732,9 @@ class BuildService:
         # 写账号之前的最后一段只读闸：重取现场 → 执行前提复检（格满 / 与当前金装冲突，
         # ADR-022 的判据）→ 指纹比对 → 实例核对。四步的顺序与"为什么先查执行前提"写在
         # `services/build_execution_guard` 的模块 docstring 里。
+        # 目标格满而计划里有件在仓库 → **自动腾一件**再复检（ADR-029；只在这条已确认的写入里做）
+        room_steps, room_prefix = await make_room_for_build(
+            player_name=player_name, character=normalized_character, inventory=self._inventory, equipment=self._equipment, manifest=self._manifest, build=build)
         refusal = await recheck_confirmed_build(
             inventory=self._inventory,
             player_name=player_name,
@@ -755,7 +755,7 @@ class BuildService:
         )
         result = await self._equipment.equip_with_recovery(player_name, loadout)
         # 焚烧的时刻：**写成功之后**。失败的执行（被拦、搬运失败、回滚过）不消耗候选 ——
-        # 那种情况下账号要么没动、要么已回到执行前；重放保护没削弱：成功照样烧，写前复检每次重读现场。
+        # 那种情况账号要么没动、要么已回到执行前；重放保护没削弱：写前复检每次重读现场。
         if result.success:
             self._candidates.consume(build.execution_id)
         else:  # 自己动过账号 → 推进候选基线，否则同一个 ID 重试必然 stale（见 build_baseline）
@@ -764,8 +764,8 @@ class BuildService:
             "success": result.success,
             "character": normalized_character,
             "snapshot_version": build.snapshot_version,
-            "message": result.message,
-            "steps": [step.model_dump() for step in result.steps],
+            "message": room_prefix + result.message,  # 腾过就说（ADR-029 §5：动过别的件必须看得见）
+            "steps": make_room_steps(room_steps) + [s.model_dump() for s in result.steps],
         }
 
     async def equip_by_score(

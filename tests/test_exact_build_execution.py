@@ -1226,8 +1226,9 @@ async def test_a_failed_write_pushes_the_baseline_through_the_real_service(
     changed_version = snapshot_version(changed)
     assert changed_version != build.snapshot_version
 
-    # 第一次读给守卫（版本必须**没变**才放行写入），第二次读给基线推进。
-    service._inventory.get_armor_snapshot = AsyncMock(side_effect=[snapshot, changed])
+    # 读快照的顺序（别写错，2026-10-06 加了自动腾格后变成三次）：
+    # ① 腾格那把（ADR-029）、② 写前复检、③ 失败后推进基线。
+    service._inventory.get_armor_snapshot = AsyncMock(side_effect=[snapshot, snapshot, changed])
     service._equipment.equip_with_recovery = AsyncMock(return_value=LoadoutOperationResult(
         success=False,
         loadout_name="Exact",
@@ -1245,3 +1246,57 @@ async def test_a_failed_write_pushes_the_baseline_through_the_real_service(
     assert refreshed.snapshot_version == changed_version, (
         "基线要推进到当前实况，否则同 ID 重试必然 stale"
     )
+
+
+@pytest.mark.asyncio
+async def test_a_full_bucket_makes_room_before_the_preflight_guard() -> None:
+    """目标格满、而计划里有件在仓库 → **先自动腾一件**，再走写前复检（ADR-029）。
+
+    2026-10-06 真机：求解出来的候选明明能装，却因为"术士臂铠格 10/10"被
+    `execution_blocker` 拦下，话术是"先在游戏里腾出一格" —— 用户得自己去游戏里点。
+    这条钉子要求：腾发生在**复检之前**（否则复检先拒），腾走的件**写进 steps**、
+    摘要里说清"腾了什么"，且**穿着的/本次要装的都不许动**。
+    """
+    service = _build_service()
+    snapshot, build = _exact_contract()
+
+    # 计划的头盔在**仓库**里，而角色头盔格 10/10 满 —— 正是真机那次的形态。
+    helmet = build.items[0]
+    vault_helmet = next(a for a in snapshot.helmets if a.item_instance_id == helmet.item_instance_id)
+    vault_helmet.source_location = "vault"
+    # 容量走 `read_facts` 的真实判据：manifest 的 `itemCount` 减去**角色上**的件数
+    # （`snapshot.execution` 只是求解时那份结论，腾格这里重新读现场，不直接采信）。
+    service._manifest.get_bucket_definition = lambda _h: {
+        "itemCount": 2, "displayProperties": {"name": "头盔"},
+    }
+    # 角色头盔格里另有两件：一件穿着（绝不动）、一件没穿（就是它该被腾走）
+    worn = Armor(item_instance_id="worn", item_hash=1, name="在穿的头盔", slot="helmet",
+                 power=550, tier=6, is_equipped=True)
+    spare = Armor(item_instance_id="spare", item_hash=2, name="备用的头盔", slot="helmet",
+                  power=500, tier=5, is_locked=False)
+    snapshot.helmets = [worn, spare, vault_helmet]
+
+    # 改过快照就要把候选的版本号**同步**过来，否则写前复检会判 stale（这是夹具自洽问题，
+    # 不是被测逻辑）—— 真实现里求解那一刻的版本号就是这份快照算出来的。
+    from destiny_mcp.build.snapshot_version import snapshot_version
+
+    build = build.model_copy(update={"snapshot_version": snapshot_version(snapshot)})
+    moved: list[str] = []
+
+    async def fake_move(player_name: str, armor: Armor) -> None:
+        moved.append(armor.item_instance_id)
+
+    service._candidates.register(build, "Alpha#0100")
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
+    service._equipment.move_single_to_vault = AsyncMock(side_effect=fake_move)
+    service._equipment.equip_with_recovery = AsyncMock(return_value=LoadoutOperationResult(
+        success=True, loadout_name="Exact", message="已装备，回读核对通过。",
+    ))
+
+    result = await service.equip_build("Alpha#0100", build, "hunter")
+
+    assert moved == ["spare"], f"该腾的是没穿的那件，实际 {moved}"
+    assert "已自动腾出备用的头盔" in result["message"], result["message"]
+    make_room_steps = [s for s in result["steps"] if s["action"] == "make_room"]
+    assert make_room_steps and "备用的头盔" in make_room_steps[0]["detail"]
+    assert result["steps"][0]["action"] == "make_room", "腾格要排在回执最前面"

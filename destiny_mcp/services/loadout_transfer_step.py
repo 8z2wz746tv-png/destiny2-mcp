@@ -77,3 +77,20 @@ class TransferStepMixin:
             else:
                 all_ok = False
         return steps, transferred_ids, all_ok
+
+    async def move_single_to_vault(self, player_name: str, armor) -> None:
+        """把**一件**护甲搬进仓库（自动腾格用；ADR-029）。
+
+        `transfer_item` 的目标是"某个角色名"或 `vault`（见 `TransferService`）——这里固定给
+        `vault`。失败或搬不动都**抛给调用方**：腾格是"要么腾成、要么如实说没腾成"，
+        不许静默跳过（换下一件会让"到底动了什么"说不清）。
+        """
+        if not armor.item_instance_id:
+            raise ItemNotFoundError(f"'{armor.name}' 没有实例 ID，搬不动")
+        result = await self._transfer.transfer_item(
+            player_name, armor.item_instance_id, "vault",
+        )
+        if not result.success:
+            raise TransferError(
+                f"把 '{armor.name}' 搬进仓库失败：{result.message or '上游没给原因'}"
+            )
