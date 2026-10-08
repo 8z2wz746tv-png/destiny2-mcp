@@ -18,6 +18,7 @@ from ..exceptions import DestinyMCPError
 from ..services.inventory_analysis_service import duplicate_rows
 from ._registry import mcp
 from ._coerce import coerce_scalar_arguments
+from ._tool_usage import TOOL_USAGE
 from ._community_handoff import community_handoff
 from ._build_confirmation import resolve_exotic, verify_exotic_confirmation_token
 from ._farm_target_response import serialize_farm_target_analysis
@@ -101,7 +102,7 @@ def _confirmation_required(intent: str, payload: dict[str, Any]) -> dict[str, An
     return confirmation_required_response(intent, payload)
 
 
-@mcp.tool()
+@mcp.tool(description=TOOL_USAGE["player_assistant"])
 @handle_tool_error
 @check_intent_parameters
 async def player_assistant(
@@ -133,7 +134,7 @@ async def player_assistant(
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"player_assistant 不支持 intent={intent!r}。")
 
 
-@mcp.tool()
+@mcp.tool(description=TOOL_USAGE["inventory_assistant"])
 @handle_tool_error
 @coerce_scalar_arguments
 @validate_request(InventoryRequest)
@@ -365,7 +366,7 @@ async def inventory_assistant(
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"inventory_assistant 不支持 intent={intent!r}。")
 
 
-@mcp.tool()
+@mcp.tool(description=TOOL_USAGE["weapon_assistant"])
 @handle_tool_error
 @coerce_scalar_arguments
 @check_intent_parameters
@@ -530,7 +531,7 @@ async def weapon_assistant(
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"weapon_assistant 不支持 intent={intent!r}。")
 
 
-@mcp.tool()
+@mcp.tool(description=TOOL_USAGE["build_assistant"])
 @handle_tool_error
 @coerce_scalar_arguments
 @check_intent_parameters
@@ -622,11 +623,9 @@ async def build_assistant(
 ) -> dict:
     """配装聚合入口：推荐、查候选、失败诊断、确认后装备。
 
-    priority_stats 从高到低严格排序；include_subclass_fragment=True 时算上目标角色
-    当前已装备的子职业与碎片。指定金装和数值目标都是硬约束；首次查金装要等玩家确认，
-    无解时不得自动降低目标。指定 community_build_id 读完整模板 + Manifest 校验，
-    include_inventory 决定要不要读账号。社区模板及其 solver_handoff **不是**可执行计划，
-    不能直接传给 equip_build —— 要按 next_actions 给的参数跑 find 再确认。
+    priority_stats 从高到低严格排序；include_subclass_fragment 决定要不要算上当前子职业与碎片。
+    指定金装和数值目标都是硬约束；首次查金装要等玩家确认，无解时不得自动降低目标。
+    能力清单与"该用哪个 intent"见工具描述（`_tool_usage`）。
     """
     svc = get_ctx(ctx)
     intent = cast(BuildIntent, (intent or "recommend").strip().lower())
@@ -875,7 +874,7 @@ async def build_assistant(
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"build_assistant 不支持 intent={intent!r}。")
 
 
-@mcp.tool()
+@mcp.tool(description=TOOL_USAGE["loadout_assistant"])
 @handle_tool_error
 @validate_request(LoadoutRequest)
 @check_intent_parameters
@@ -965,7 +964,7 @@ async def loadout_assistant(
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"loadout_assistant 不支持 intent={intent!r}。")
 
 
-@mcp.tool()
+@mcp.tool(description=TOOL_USAGE["subclass_assistant"])
 @handle_tool_error
 @coerce_scalar_arguments
 @validate_request(SubclassRequest)
@@ -1048,7 +1047,7 @@ async def subclass_assistant(
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"subclass_assistant 不支持 intent={intent!r}。")
 
 
-@mcp.tool()
+@mcp.tool(description=TOOL_USAGE["activity_assistant"])
 @handle_tool_error
 @check_intent_parameters
 async def activity_assistant(
@@ -1123,7 +1122,7 @@ async def activity_assistant(
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"activity_assistant 不支持 intent={intent!r}。")
 
 
-@mcp.tool()
+@mcp.tool(description=TOOL_USAGE["world_assistant"])
 @handle_tool_error
 @check_intent_parameters
 async def world_assistant(
