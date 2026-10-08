@@ -19,7 +19,13 @@ from typing import Any
 
 def community_handoff(selected: dict[str, Any] | None) -> tuple[list[str], str]:
     """返回 `(next_actions, 加在摘要后面的一句)`；模板没有 `solver_handoff` 时给 `([], "")`。"""
-    args = ((selected or {}).get("solver_handoff") or {}).get("arguments") or {}
+    # ⚠️ 真路径是 `validation.solver_handoff`（它是**校验**那一步产出的，不是模板自带的）。
+    # 2026-10-06 真机探针抓到：第一版读的是顶层 —— 而我的假夹具也正好编成顶层，
+    # 于是单测 + 注入全绿，出口却一句指路都没有。夹具换成真的 `validate_build(...)`
+    # 输出才算数（同一天第二次栽在"我自己编的形状"上）。
+    validation = (selected or {}).get("validation") or {}
+    handoff = validation.get("solver_handoff") or (selected or {}).get("solver_handoff") or {}
+    args = handoff.get("arguments") or {}
     if not args:
         return [], ""
     mods = args.get("functional_mods") or []

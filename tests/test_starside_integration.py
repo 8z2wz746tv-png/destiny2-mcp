@@ -1332,14 +1332,14 @@ async def test_community_match_asks_for_selectable_plugs() -> None:
 
 def test_handoff_actions_point_at_the_arguments_the_template_handed_over() -> None:
     actions, note = community_handoff({
-        "solver_handoff": {
+        "validation": {"solver_handoff": {
             "arguments": {
                 "character": "warlock",
                 "exotic_name": "横断之步",
                 "functional_mods": ["helmet:a", "chest:b", "legs:c"],
                 "set_bonus_name": None,
             }
-        }
+        }}
     })
 
     assert actions, "给了 solver_handoff 就必须指路"
@@ -1375,17 +1375,11 @@ async def test_the_tool_exit_actually_carries_the_handoff_actions() -> None:
             "matched_count": 1,
             "results": [{"title": "T"}],
         }),
+        # 用**真服务**产出 validation（含它真正的嵌套形状）——手编形状会把我自己的
+        # 错误假设固化进夹具（2026-10-06 就是这么全绿却出口空着的）。
         get_build=MagicMock(return_value={
             "title": "火术运动套",
-            "validation": {"execution_supported": False, "execution_blockers": []},
-            "solver_handoff": {
-                "arguments": {
-                    "character": "warlock",
-                    "exotic_name": "横断之步",
-                    "functional_mods": ["helmet:a"],
-                    "set_bonus_name": None,
-                }
-            },
+            "validation": validate_build(_Manifest(), parse_build(BUILD, build_id="a", source={"title": "A"})),
         }),
     )
     ctx = SimpleNamespace(
@@ -1401,4 +1395,10 @@ async def test_the_tool_exit_actually_carries_the_handoff_actions() -> None:
 
     assert response["next_actions"], "出口必须带指路（真机这里就是空的）"
     assert "solver_handoff" in response["next_actions"][0]
-    assert "1 颗" in response["summary"], "摘要里也要报可照抄几颗"
+
+    # 摘要那句只在**真有**功能模组时才加 —— 按夹具实际产出的数量断言，不写死。
+    handoff = response["data"]["selected_build"]["validation"]["solver_handoff"]
+    mods = handoff["arguments"].get("functional_mods") or []
+    assert (f"{len(mods)} 颗" in response["summary"]) is bool(mods), (
+        "有 N 颗就报 N 颗；一颗都没有时不许编一句出来"
+    )
