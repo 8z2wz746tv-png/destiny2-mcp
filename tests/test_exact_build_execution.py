@@ -1202,3 +1202,46 @@ async def test_a_failed_equip_pushes_the_candidate_baseline_forward() -> None:
         "候选基线要推进到**当前实况**，否则下一次重试还是 stale"
     )
     assert refreshed.snapshot_version != plan.snapshot_version
+
+
+@pytest.mark.asyncio
+async def test_a_failed_write_pushes_the_baseline_through_the_real_service(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """**接线守门**：`equip_build` 写失败、且账号已被改过时，回执要带那句话、候选基线要推进。
+
+    2026-10-06 真机：一次半途失败后，第三次带同一个 `execution_id` 重试被
+    `stale_inventory_snapshot` 拒掉 → 被迫整轮重解 + 重新确认。`build_baseline` 就是修这个的；
+    这条用**真服务**跑，替身只替换上游两处（设备执行 + 快照读取），验的是"它真的被调到了"。
+    """
+    from destiny_mcp.services.build_baseline import rebaseline_note as _note_fn  # noqa: F401
+    from destiny_mcp.build.snapshot_version import snapshot_version
+
+    service = _build_service()
+    snapshot, build = _exact_contract()
+    service._candidates.register(build, "Alpha#0100")
+
+    changed = snapshot.model_copy(deep=True)
+    changed.helmets[0].source_location = "vault"
+    changed_version = snapshot_version(changed)
+    assert changed_version != build.snapshot_version
+
+    # 第一次读给守卫（版本必须**没变**才放行写入），第二次读给基线推进。
+    service._inventory.get_armor_snapshot = AsyncMock(side_effect=[snapshot, changed])
+    service._equipment.equip_with_recovery = AsyncMock(return_value=LoadoutOperationResult(
+        success=False,
+        loadout_name="Exact",
+        message="写到一半失败了",
+        steps=[MoveItemStep(action="equip_many", detail="上游报错", success=False)],
+    ))
+
+    result = await service.equip_build("Alpha#0100", build, "hunter")
+
+    assert result["success"] is False
+    assert "同一个 execution_id" in result["message"], result["message"]
+    assert "改动过账号" in result["message"], result["message"]
+    refreshed, status = service._candidates.resolve(build.execution_id, "Alpha#0100")
+    assert status == "ok", "失败不该烧掉候选（ADR-025）"
+    assert refreshed.snapshot_version == changed_version, (
+        "基线要推进到当前实况，否则同 ID 重试必然 stale"
+    )
