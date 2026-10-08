@@ -629,7 +629,7 @@ async def test_equip_build_rechecks_the_premises_the_find_stage_could_not_judge(
     assert result["code"] == "execution_precondition_failed"
     assert "DestinyNoRoomInDestination" in result["message"]
     assert "10/10" in result["message"], "要说清是哪一格、满到什么程度"
-    assert "先在游戏里腾出" in result["message"], (
+    assert "自动腾出" in result["message"], (
         "要给出路（腾一格）：只报装不上，下一步会被指去降属性目标"
     )
     assert result["blockers"]
@@ -704,7 +704,7 @@ async def test_equip_build_still_refuses_when_nothing_can_be_moved() -> None:
     result = await service.equip_build("Tester#1234", build, "warlock")
 
     assert result["code"] == "execution_precondition_failed", result
-    assert "先在游戏里腾出" in result["message"]
+    assert "自动腾出" in result["message"]
     service._equipment.move_single_to_vault.assert_not_awaited()
     service._equipment.equip_with_recovery.assert_not_awaited()
 

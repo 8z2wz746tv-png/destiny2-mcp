@@ -63,6 +63,7 @@ TOOL_USAGE: dict[str, str] = {
 - `analyze`：**失败诊断** —— 说清"差多少 / 是哪条前提卡的"，目标达不到时看它。
 - `farm_target`：反推**该去刷哪一件**（`baseline`、`max_replacements`）。
 - `equip_build`：**装备**（先 `confirmed=false` 拿预览，同意后 `confirmed=true`；传 `execution_id`）。
+  **目标格满时会自动腾出一件**放仓库（穿着的/锁定的/本次要装的/官方配装在用的都不动），腾走的件记在 `steps` 的 `make_room` 里 —— **别让玩家自己去游戏里腾**；腾不出来会如实拒绝。
 - `armor_mods`：**护甲模组有哪些**（换模组用 `inventory_assistant(intent="equip_mod")`）。
 - `exotic_armor`：金装护甲候选。`set_bonus`：套装的 2/4 件效果。
 - `community`（别名 `starside`）：搜本地社区配装（返回 `build_id`）。

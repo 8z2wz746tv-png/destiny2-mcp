@@ -10,6 +10,7 @@ import pytest
 
 from destiny_mcp.build.models import Armor
 from destiny_mcp.build.snapshot_version import snapshot_version
+from destiny_mcp.models import LoadoutOperationResult
 from destiny_mcp.services.make_room import (
     DEFAULT_LIMIT,
     make_room,
@@ -323,8 +324,8 @@ _NO_ROOM_DETAIL = (
 )
 
 
-def _failed(detail: str) -> "LoadoutOperationResult":
-    from destiny_mcp.models import LoadoutOperationResult, MoveItemStep
+def _failed(detail: str) -> LoadoutOperationResult:
+    from destiny_mcp.models import MoveItemStep
 
     return LoadoutOperationResult(
         success=False, loadout_name="Exact", message="执行失败，已恢复执行前状态。",
