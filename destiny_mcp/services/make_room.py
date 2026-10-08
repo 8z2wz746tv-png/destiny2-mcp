@@ -416,20 +416,19 @@ async def prepare_build_write(
         # 2026-10-09 真机：顶下已经把金装护腿换成非金装了，而复检读到的还是写之前的现场 → 照样报
         # 「正穿着异域…装不上」：用户看到的回执是"没装成"，装备却已经被我们换了（既拒绝、又改了账号）。
         # 只重读一次不够 —— 上游 profile 有同步窗口，要轮询到它追上（最多 `_STABLE_ATTEMPTS` 次）。
-        # ⚠️ **顺序要紧**：先把候选基线推到现在，**再**复检。反过来是死锁 —— 复检正因为基线没推而判
-        # `stale_inventory_snapshot`（我们自己刚改过账号），于是永远走不到"推进"那一步。
-        # 2026-10-09 真机三次报的版本号一模一样，就是这个死锁。
-        if candidates is not None:
-            fresh = await inventory.get_armor_snapshot(player_name, character)
-            fresh_version = snapshot_version(fresh)
-            # 两处都要推：store 里那份（重试/后续解析用）+ **调用方手里那份** —— 写前复检读的是后者，
-            # 只推 store 的话"顶下成功了、紧接着指纹比对还是判 stale"（真机撞过）。
-            build.snapshot_version = fresh_version
-            candidates.register(
-                build.model_copy(update={"snapshot_version": fresh_version}), player_name
-            )
+        # ⚠️ **基线要在每一轮复检之前重取一次**，而不是只取一次：顶下刚写完时读到的那份**还在同步窗口里**
+        # （还是旧版本），拿它当基线 → 复检读得更晚、看到的是新版本 → 照样判 stale。
+        # 2026-10-09 真机四次"版本号一模一样"就是这个：推进用旧读、复检用新读，两者永远错开。
         refusal = None
         for attempt in range(_STABLE_ATTEMPTS):
+            if candidates is not None:
+                fresh = await inventory.get_armor_snapshot(player_name, character)
+                build.snapshot_version = snapshot_version(fresh)
+                # store 里那份 + **调用方手里那份**都要推（写前复检读的是后者）
+                candidates.register(
+                    build.model_copy(update={"snapshot_version": build.snapshot_version}),
+                    player_name,
+                )
             refusal = await recheck_confirmed_build(
                 inventory=inventory, player_name=player_name, character=character, build=build,
             )

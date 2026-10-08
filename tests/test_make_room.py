@@ -461,8 +461,8 @@ async def test_write_prep_polls_the_recheck_until_it_sees_our_own_write(monkeypa
     assert seen_versions and seen_versions[0] == mr.snapshot_version(_snapshot_stub()), (
         f"第一次复检看到的还是旧版本：{seen_versions[:1]}"
     )
-    store.register.assert_called_once()
-    assert store.register.call_args.args[0] == "重新登记的那份"
+    assert store.register.called, '动过账号就该推基线'
+    assert store.register.call_args.args[0] == "重新登记的那份"   # 每轮复检前各推一次
     # **调用方手里那份也要跟着走** —— 写前复检读的就是它（只推 store 的话真机仍判 stale）
     assert build.snapshot_version == mr.snapshot_version(_snapshot_stub()), build.snapshot_version
     assert calls["n"] >= 3, f"复检要轮询到可见，实际只读了 {calls['n']} 次"
