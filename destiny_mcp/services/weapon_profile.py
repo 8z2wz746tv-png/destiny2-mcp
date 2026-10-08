@@ -22,11 +22,11 @@ from typing import TYPE_CHECKING, Any, Callable, Mapping
 
 from ..manifest_names import RPM_STAT_HASH
 from ..utils.icons import icon_url as _icon_url
+from ..vocabulary import rarity_label
 
 if TYPE_CHECKING:  # pragma: no cover
     from .manifest import ManifestManager
 
-RARITY: dict[int, str] = {6: "异域", 5: "传说", 4: "稀有", 3: "罕见", 2: "普通"}
 
 # 生成物：基础 perk ↔ 强化 perk。由 scripts/generate_weapon_metadata.py 产出，
 # 里面记着生成时的 Manifest 指纹（见 manifest_fingerprint）。
@@ -142,9 +142,14 @@ def find_weapon(manifest: "ManifestManager", weapon_name: str) -> tuple[int, dic
 
 
 def rarity_of(tier: Any) -> str:
-    """稀有度中文名；未知档位照实说，不猜。"""
-    if isinstance(tier, int) and tier in RARITY:
-        return RARITY[tier]
+    """稀有度中文名；未知档位照实说，不猜。
+
+    表在 `vocabulary.RARITY_LABELS_ZH`（唯一出处）—— 这里以前自己抄了一份，
+    多 3/2 两档，那种"两份表"必然会漂（2026-10-06 并回去）。
+    """
+    label = rarity_label(tier)
+    if label:
+        return label
     return f"未知({tier})" if tier not in (None, 0) else ""
 
 

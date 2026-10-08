@@ -54,8 +54,12 @@ def _dicts_with(path: Path, predicate) -> list[tuple[int, str]]:
             (t.id for t in targets if isinstance(t, ast.Name)),
             "",
         )
+        # 键要**字符串和数字都收**：只收字符串时，`{6: "异域", 5: "传说"}` 这种数字键的拷贝
+        # 永远扫不到 —— 稀有度那份拷贝就是这么活下来的（2026-10-06 才发现）。
         keys = [
-            k.value for k in value.keys if isinstance(k, ast.Constant) and isinstance(k.value, str)
+            k.value
+            for k in value.keys
+            if isinstance(k, ast.Constant) and isinstance(k.value, (str, int))
         ]
         values = [
             val.value
@@ -135,11 +139,19 @@ def test_vocabulary_tables_are_not_copied_again() -> None:
             lambda keys, values: len(keys & set(v.ELEMENT_ALIASES)) >= 6
             and set(values) <= set(v.ELEMENT_LABELS_ZH),
         )
+        # 稀有度：2026-10-06 才发现 `services/weapon_profile.py` 自己抄了一份
+        # （多 3/2 两档）—— 这份扫描以前只覆盖六维/职业/元素，所以它活了下来。
+        rarity_hits = _dicts_with(
+            path,
+            lambda keys, values: len(keys & set(v.RARITY_LABELS_ZH)) >= 2
+            and set(values) <= set(v.RARITY_LABELS_ZH.values()),
+        )
         for kind, hits in (
             ("六维中文", stat_hits),
             ("职业中文", class_hits),
             ("中文职业→键", reverse_hits),
             ("元素别名", element_hits),
+            ("稀有度中文", rarity_hits),
         ):
             offenders.extend(
                 f"{path.relative_to(SOURCE_ROOT.parent)}:{line} {name}（{kind}）"
@@ -151,3 +163,23 @@ def test_vocabulary_tables_are_not_copied_again() -> None:
         "这些地方又抄了一份词表，请改成从 destiny_mcp/vocabulary.py 导入"
         "（确实语义不同就加进 _ALLOWED_TABLE_NAMES 并写明理由）：\n  " + "\n  ".join(offenders)
     )
+
+
+def test_param_descriptions_only_promise_values_the_code_accepts() -> None:
+    """**参数说明里列举的取值，代码必须都认**（这条是被真 bug 换来的）。
+
+    历史事故（`CHANGELOG`）：`rarity` 的参数说明写着"传说/异域"可用，而代码只映射英文，
+    中文取不到就被**静默跳过过滤** —— 用户以为筛过了，其实拿到的是全量。
+    两个方向都钉：说明里提到的值要能解析；代码收的别名也要出现在说明里（否则模型不会用）。
+    """
+    from destiny_mcp.tools import _param_docs as fields
+
+    description = fields.Rarity.__metadata__[0].description
+    promised = ("传说", "异域", "稀有", "legendary", "exotic", "rare", "金枪", "金装", "紫枪", "紫装")
+    for value in promised:
+        assert value in description, f"说明里没提 {value!r}，模型就不会用它"
+        assert v.rarity_key(value) is not None, (
+            f"说明承诺了 {value!r}，而 rarity_key 解析不出来 —— 这就会变成静默跳过过滤"
+        )
+    for alias in v.RARITY_ALIASES:
+        assert alias in description, f"代码收 {alias!r}，说明里却没写 —— 模型不会用它"

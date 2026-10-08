@@ -17,6 +17,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import unicodedata
 
 # ── 六维（Armor 3.0 的叫法；官方中文来自 DestinyStatDefinition）────────────
@@ -207,7 +209,19 @@ RARITY_ALIASES: dict[str, int] = {
     "legendary": 5, "传说": 5, "紫枪": 5, "紫装": 5,
     "rare": 4, "稀有": 4,
 }
-RARITY_LABELS_ZH: dict[int, str] = {6: "异域", 5: "传说", 4: "稀有"}
+# 档位 → 中文名。**唯一出处**：`services/weapon_profile.rarity_of` 以前自己抄了一份
+# （多 3/2 两档），两份表必然漂 —— 2026-10-06 并回这里。
+RARITY_LABELS_ZH: dict[int, str] = {6: "异域", 5: "传说", 4: "稀有", 3: "罕见", 2: "普通"}
+
+
+def rarity_label(tier: Any) -> str:
+    """`tierType` → 中文名；未知档位给空串（**不猜、也不编**，调用方自己决定怎么显示）。
+
+    与 `rarity_key` 对称：一个"输入词 → 档位"，一个"档位 → 显示名"，同一张表。
+    """
+    if isinstance(tier, bool) or not isinstance(tier, int):
+        return ""
+    return RARITY_LABELS_ZH.get(tier, "")
 
 
 def rarity_key(value: str | None) -> int | None:
