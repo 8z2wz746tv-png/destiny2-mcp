@@ -103,17 +103,11 @@ class InventoryService:
         """Get inventory for a specific character or the vault.
 
         Args:
-            player_name: Bungie name.
-            location: 'hunter', 'warlock', 'titan', 'vault' (or Chinese).
-            item_type: Filter by type — 'weapon'/'armor'/'all'. None = all.
-            armor_slot: Filter by armor slot — 'helmet'/'gauntlets'/'chest'/'legs'/'class_item'/'all'. None = all.
-            rarity: Filter by rarity — 'exotic'/'legendary'/'rare'/'all'. None = all.
-            limit: 最多返回多少件；None 或 <=0 = 不限（调用方负责给默认上限）。
-            offset: 从第几件开始（配合 next_offset 翻页）。
+            location: 'hunter'/'warlock'/'titan'/'vault'（或中文）；`item_type` 只认 weapon/armor/all；
+            `armor_slot` 见部位名；`rarity` 见稀有度词表；`limit`/`offset` 管翻页（None = 不限）。
 
         Raises:
-            PlayerNotFoundError: If the player name cannot be resolved.
-            ConfigError: If item_type is not weapon/armor/all.
+            PlayerNotFoundError: 名字解析不出来。ConfigError: item_type 不是 weapon/armor/all。
         """
         item_type = _normalize_inventory_item_type(item_type)
         logger.info(
@@ -129,9 +123,7 @@ class InventoryService:
         # Apply filters
         items = self._filter_items(items, item_type, armor_slot, rarity)
 
-        # **已装备的排最前**（稳定排序，其余保持原顺序）：盲测 2026-10-06 里
-        # "我泰坦现在身上穿着什么" 返回的前 100 件**一件 is_equipped 都没有** ——
-        # 玩家要翻到第 2 页才看得到身上那套。装备是这类查询第一眼要看的东西。
+        # 已装备的排最前（稳定排序）：盲测里"我身上穿什么"的前 100 件一件装备都没有，要翻页。
         items.sort(key=lambda item: not item.is_equipped)
 
         # 截断与自证：以前一次能把整个仓库倒出来（真机 1260 件 ≈ 511 KB / 13–15 万 tokens），
