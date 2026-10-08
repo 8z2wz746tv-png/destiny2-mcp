@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field, computed_field
 from ..logging_config import get_logger
 from ..models import ArmorStats
 from ..utils.hash_utils import to_unsigned
+from ..utils.item_state import is_locked
 from ..utils.icons import icon_url as _icon_url
 from ..build_contracts import CanonicalBuild
 from .armor_rules import (
@@ -453,9 +454,8 @@ class InventorySnapshot(BaseModel):
             item_hash = raw.get("itemHash", 0)
             info = manifest.get_item_info(item_hash) or {}
             bucket_hash = raw.get("bucketHash", 0)
-            # `state` 的 bit0 = 游戏内锁定（DestinyItemState.Locked = 1）。原始 item 就在手上，
-            # 不用再加一次请求；缺值当没锁（`or 0`）—— 读不到时不拿锁了当默认挡掉腾格。
-            is_locked = bool(int(raw.get("state") or 0) & 1)
+            # `state` 的 bit0 = 游戏内锁定；判定收在 `utils/item_state`（唯一出处）。
+            locked = is_locked(raw.get("state"))
             if bucket_hash == 138197802:
                 bucket_hash = info.get("bucketTypeHash", 0)
             slot = armor_slot_from_bucket(bucket_hash)
@@ -648,7 +648,7 @@ class InventorySnapshot(BaseModel):
             )
 
             return Armor(
-                is_locked=is_locked,
+                is_locked=locked,
                 item_instance_id=inst_id,
                 item_hash=item_hash,
                 name=manifest.get_item_name(item_hash),

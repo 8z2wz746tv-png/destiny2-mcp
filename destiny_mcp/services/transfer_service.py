@@ -8,12 +8,14 @@ character-to-character transfers (must go through vault).
 from __future__ import annotations
 
 import asyncio
+from typing import Any
 
 from ..bungie_client import BungieClient
 from ..exceptions import AuthenticationError, ItemNotFoundError, TransferError
 from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
+from .make_room import is_no_room_error, pick_move_aside_items
 from ..models import (
     EquipPlan,
     EquipResult,
@@ -55,6 +57,105 @@ class TransferService:
         self._account_action_lock = account_action_lock(bungie)
 
     # ── Helpers ──────────────────────────────────────────────────────
+
+    # ── 目标格满：自动腾一件（ADR-029 P4） ──────────────────────────────
+
+    async def make_room_in_bucket(
+        self, player_name: str, destination: str, *, for_instance_id: str
+    ) -> tuple[list[MoveItemStep], str]:
+        """目标角色**同一个桶**里腾一件进仓库（通用版：武器/护甲都走这条）。
+
+        桶由**要搬的那件**决定（按实例 ID 在账号里查它属于哪个桶），所以 `move` 与
+        `equip_loadout` 两条入口共用一个助手。判据在 `services/make_room`（唯一出处）；
+        品阶从 Manifest 的 `tierType` 取，别抄表。读不到现场/没有可腾的件 → 空步骤 + 一句话。
+        """
+        try:
+            p = await self._resolver.resolve_player(player_name)
+            char_id = await self._resolver.resolve_character_id(
+                p["membership_id"], p["membership_type"], destination
+            )
+            items = await self._fetch_all_items(p["membership_id"], p["membership_type"])
+        except Exception as exc:  # 读不到就不腾 —— 不许因为腾格失败把原始失败原因盖掉
+            logger.warning("腾格：读目标角色现场失败 %s：%s", destination, exc)
+            return [], ""
+        wanted = next(
+            (item for item in items if item.item_instance_id == for_instance_id), None
+        )
+        if wanted is None or not wanted.bucket_type:
+            return [], ""
+        same_bucket = [
+            item
+            for item in items
+            if item.bucket_type == wanted.bucket_type
+            and item.character_id == char_id
+            and item.location != "vault"
+        ]
+        picked = pick_move_aside_items(
+            same_bucket,
+            limit=1,
+            tier_of=lambda item: int(
+                ((self._manifest.get_item_info(item.item_hash) or {}).get("tier") or 0)
+            ),
+        )
+        if not picked:
+            return [], "（目标桶里没有可腾的件：穿着的、锁定的都不动。）"
+        steps: list[MoveItemStep] = []
+        names: list[str] = []
+        for item in picked:
+            result = await self.transfer_item(player_name, item.item_instance_id, "vault")
+            steps.append(MoveItemStep(
+                action="make_room",
+                detail=f"腾格：'{item.name}' → 仓库（{item.bucket_type}）",
+                success=result.success,
+            ))
+            if result.success:
+                names.append(item.name)
+        if not names:
+            return steps, ""
+        return steps, f"已自动腾出{'、'.join(names)}（搬到仓库）。"
+
+    async def _transfer_item_with_make_room(
+        self, player_name: str, item: Any, destination: str, *, source: str | None = None
+    ) -> tuple[TransferResult, list[MoveItemStep], str]:
+        """搬一件；撞目标格满就**腾一件再搬一次**。返回 `(结果, 步骤, 话术前缀)`。
+
+        返回**真的 `TransferResult`**（不是手拼的 namespace）：调用方要用 `from_location`/`to_location`，
+        少一个字段就会在真机上炸 —— 2026-10-06 写这条时先拼了 namespace，测试当场抓到。
+        """
+        def _failed(message: str) -> TransferResult:
+            return TransferResult(
+                success=False, item_name=getattr(item, "name", ""),
+                item_instance_id=item.item_instance_id, message=message,
+            )
+
+        try:
+            moved = await self.transfer_item(
+                player_name, item.item_instance_id, destination, from_character=source
+            )
+            return moved, [
+                MoveItemStep(action="transfer", detail=moved.message, success=bool(moved.success))
+            ], ""
+        except TransferError as exc:
+            first = MoveItemStep(action="transfer", detail=str(exc), success=False)
+            if not is_no_room_error(exc):
+                return _failed(str(exc)), [first], ""
+            room_steps, note = await self.make_room_in_bucket(
+                player_name, destination, for_instance_id=item.item_instance_id
+            )
+            if not room_steps:
+                return _failed(str(exc)), [first] + room_steps, note
+            try:
+                retried = await self.transfer_item(
+                    player_name, item.item_instance_id, destination, from_character=source
+                )
+            except TransferError as retry_exc:
+                return _failed(str(retry_exc)), [first] + room_steps + [
+                    MoveItemStep(action="transfer", detail=str(retry_exc), success=False)
+                ], note
+            return retried, [first] + room_steps + [
+                MoveItemStep(action="transfer", detail=retried.message, success=bool(retried.success))
+            ], note + "已重试一次。"
+
 
     async def _fetch_all_items(
         self, membership_id: str, membership_type: int
@@ -991,18 +1092,16 @@ class TransferService:
             )
 
         # Name lookup only selects an instance; all mutations use the exact-ID path.
-        try:
-            moved = await self.transfer_item(
-                player_name, target_item.item_instance_id, destination,
-                from_character=source,
-            )
-        except TransferError as exc:
-            steps.append(MoveItemStep(action="transfer", detail=str(exc), success=False))
+        # 目标格满时由助手腾一件再试一次（ADR-029 P4）。
+        moved, transfer_steps, room_note = await self._transfer_item_with_make_room(
+            player_name, target_item, destination, source=source
+        )
+        steps += transfer_steps
+        if not moved.success:
             return MoveItemResult(
                 success=False, item_name=target_item.name,
-                from_location=target_item.location, steps=steps, message=str(exc),
+                from_location=target_item.location, steps=steps, message=room_note + moved.message,
             )
-        steps.append(MoveItemStep(action="transfer", detail=moved.message, success=moved.success))
         equip_ok = False
         if equip and moved.success:
             try:

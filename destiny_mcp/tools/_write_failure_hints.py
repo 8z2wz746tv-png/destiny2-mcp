@@ -32,7 +32,7 @@ _WRITE_FAILURE_HINTS: tuple[tuple[tuple[str, ...], str], ...] = (
     ),
     (
         ("No space", "空间不足", "InventoryFull", "NoRoomInDestination"),
-        "目标位置空间不足：`equip_build` 会自动腾一件后重试（见 steps 的 `make_room`）；其它入口要先清出一格。",
+        "目标位置空间不足：`equip_build`/`move`/`equip_loadout` 都会自动腾一件后重试（见 steps 的 `make_room`）；腾不出来才需要先清一格。",
     ),
 )
 

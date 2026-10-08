@@ -19,6 +19,8 @@ class InventoryItem(BaseModel):
     power: int | None = Field(default=None, description="Attack/Defense value")
     bucket_type: str = Field(default="", description="Inventory bucket (Kinetic/Energy/etc.)")
     is_equipped: bool = Field(default=False)
+    #: 游戏内**锁定**（组件 `state` bit0）。自动腾格靠它执行「锁定的绝不腾」（ADR-029）。
+    is_locked: bool = Field(default=False)
     quantity: int = Field(default=1)
     location: str = Field(description="Where the item is: vault, hunter, warlock, titan")
     character_id: str = Field(default="", description="Character ID if on a character")

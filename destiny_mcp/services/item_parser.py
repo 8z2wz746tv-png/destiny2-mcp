@@ -9,6 +9,7 @@ from __future__ import annotations
 from ..build.constants import STAT_HASH_TO_NAME as _STAT_HASHES
 from ..build.constants import ARMOR_SLOT_MAP
 from ..manifest import ManifestManager, class_type_name
+from ..utils.item_state import is_locked
 from ..models import ArmorStats, InventoryItem
 from ..services.armor_payload import (
     SLOT_DISPLAY,
@@ -128,6 +129,7 @@ def parse_items_from_profile(
                 raw.get("isEquipped", False)
                 or instance.get("isEquipped", False)
             ),
+            is_locked=is_locked(raw.get("state")),
             quantity=raw.get("quantity", 1),
             location=location,
             character_id=character_id,

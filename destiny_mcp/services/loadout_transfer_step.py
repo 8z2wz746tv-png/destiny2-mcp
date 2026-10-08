@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from ..exceptions import ItemNotFoundError, TransferError
+from .make_room import is_no_room_error
 from ..models import Loadout, LoadoutItem, MoveItemStep
 
 
@@ -45,33 +46,50 @@ class TransferStepMixin:
             else:
                 moved.append(item)
 
-        async def _transfer_one(item: LoadoutItem) -> tuple[MoveItemStep, bool]:
+        async def _transfer_one(item: LoadoutItem) -> tuple[list[MoveItemStep], bool]:
+            """搬一件；撞目标格满就腾一件再搬一次（ADR-029 P4）。"""
             try:
                 result = await self._transfer.transfer_item(
                     player_name, item.item_instance_id, loadout.character,
                 )
-                return (
-                    MoveItemStep(
-                        action="transfer",
-                        detail=f"转移 '{item.name}' → {loadout.character}",
-                        success=result.success,
-                    ),
-                    bool(result.success),
-                )
+                return ([MoveItemStep(
+                    action="transfer",
+                    detail=f"转移 '{item.name}' → {loadout.character}",
+                    success=result.success,
+                )], bool(result.success))
             except (ItemNotFoundError, TransferError) as exc:
-                return (
-                    MoveItemStep(
-                        action="error",
-                        detail=f"'{item.name}' 装备失败: {exc}",
-                        success=False,
-                    ),
-                    False,
+                failed = MoveItemStep(
+                    action="error",
+                    detail=f"'{item.name}' 装备失败: {exc}",
+                    success=False,
                 )
+                if not is_no_room_error(exc) or not item.item_instance_id:
+                    return [failed], False
+                room_steps, _note = await self._transfer.make_room_in_bucket(
+                    player_name, loadout.character, for_instance_id=item.item_instance_id
+                )
+                if not room_steps:
+                    return [failed], False
+                try:
+                    retried = await self._transfer.transfer_item(
+                        player_name, item.item_instance_id, loadout.character,
+                    )
+                except (ItemNotFoundError, TransferError) as retry_exc:
+                    return [failed] + room_steps + [MoveItemStep(
+                        action="error",
+                        detail=f"'{item.name}' 重试仍失败: {retry_exc}",
+                        success=False,
+                    )], False
+                return [failed] + room_steps + [MoveItemStep(
+                    action="transfer",
+                    detail=f"转移 '{item.name}' → {loadout.character}（腾格后重试）",
+                    success=retried.success,
+                )], bool(retried.success)
 
         transferred_ids: list[str] = []
         for item in moved:
-            step, ok = await _transfer_one(item)
-            steps.append(step)
+            item_steps, ok = await _transfer_one(item)
+            steps += item_steps
             if ok:
                 transferred_ids.append(str(item.item_instance_id))
             else:

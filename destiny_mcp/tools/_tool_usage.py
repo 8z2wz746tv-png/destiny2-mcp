@@ -34,7 +34,7 @@ TOOL_USAGE: dict[str, str] = {
 - `item`：某件护甲的完整载荷（插槽、能量、三层属性）—— 换模组前先读它拿 `socket_index`。
 - `mods`：某位角色**已装备护甲**上的模组（可只读一位角色）。
 写（**必须 `confirmed=true`**，服务端先给候选）：
-- `move`（别名 `transfer`，目标 `destination`=vault 或角色名；`equip=true` 顺带装上）：搬运。
+- `move`（别名 `transfer`，目标 `destination`=vault 或角色名；`equip=true` 顺带装上）：搬运。**目标格满时会自动腾出一件**（同 `equip_build` 的判据），腾走的件记在 `steps` 的 `make_room` 里。
 - `equip`：装备一件（会给"先顶下、再装目标"的两步计划，信封里有 `replaces` 说明会顶掉谁）。
 - `equip_many`（别名 `equip_items`）：批量装备（传 `item_instance_ids`）。
 - `equip_mod`：换护甲模组；**三格全满时用 `socket_index` 指名换哪一格**。

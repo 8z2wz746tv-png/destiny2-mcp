@@ -312,3 +312,62 @@ async def equip_with_make_room_retry(*, attempt, make_room, room_args: dict):
     retried = await attempt()
     note = f"第一次撞上格子满（上游 NoRoomInDestination）：{prefix}已重试一次。"
     return retried, steps, note
+
+
+# ── 通用版（P4）：武器与护甲都走这条；判据与护甲版同源（`is_movable_common`） ──────────
+
+
+def is_movable_common(
+    *,
+    instance_id: str,
+    is_equipped: bool,
+    is_locked: bool,
+    reserved_instance_ids: Collection[str] = (),
+    official_instance_ids: Collection[str] = (),
+) -> bool:
+    """「绝不腾」的**共享判据**（护甲版与通用版都调它，避免两处各写一遍慢慢漂）。"""
+    if is_equipped or is_locked:
+        return False
+    if instance_id in reserved_instance_ids:
+        return False
+    return instance_id not in official_instance_ids
+
+
+def pick_move_aside_items(
+    items: Sequence,
+    *,
+    reserved_instance_ids: Collection[str] = (),
+    official_instance_ids: Collection[str] = (),
+    limit: int = 1,
+    tier_of: Callable[[object], int] | None = None,
+) -> list:
+    """通用挑件（`InventoryItem` 这类）：低品阶 → 低光等 → 实例 ID（稳定）。
+
+    与护甲版的差别只有一个：`InventoryItem` 里**没有大师化/巧匠**标志，所以排序里少了那两条
+    （护甲版有 `Armor.is_masterworked`/`is_artifice`）。别把两条排序写成"看起来一样"的两份 ——
+    调用方要给 `tier_of`（品阶从 Manifest 的 `tierType` 取，别在代码里抄一张表）。
+    """
+    get_tier = tier_of or (lambda _item: 0)
+    movable = [
+        item
+        for item in items
+        if is_movable_common(
+            instance_id=str(getattr(item, "item_instance_id", "")),
+            is_equipped=bool(getattr(item, "is_equipped", False)),
+            is_locked=bool(getattr(item, "is_locked", False)),
+            reserved_instance_ids=reserved_instance_ids,
+            official_instance_ids=official_instance_ids,
+        )
+    ]
+    movable.sort(key=lambda item: (
+        get_tier(item),
+        getattr(item, "power", None) if getattr(item, "power", None) is not None else _UNKNOWN_POWER,
+        str(getattr(item, "item_instance_id", "")),
+    ))
+    return movable[: max(0, limit)]
+
+
+def is_no_room_error(exc_or_text: object) -> bool:
+    """这次失败是不是"目标格满"（异常或回执原文都认）。判据只有一个出处。"""
+    text = str(exc_or_text)
+    return any(marker in text for marker in _NO_ROOM_MARKERS)
