@@ -583,3 +583,37 @@ async def test_candidate_profile_failures_are_not_cached() -> None:
     assert resolver.get_profile.await_count == 2
     assert {row["triumph_score"] for row in first["players"]} == {0}
     assert {row["triumph_score"] for row in second["players"]} == {0}
+
+
+@pytest.mark.asyncio
+async def test_the_profile_intent_actually_carries_the_triumph_score() -> None:
+    """工具描述承诺「凯旋分」，`profile` 就必须真去拉（组件 1000）。
+
+    盲测 2026-10-06：描述写着「（光等、职业、最近游玩、凯旋分）」，实回里**一个凯旋分字段都没有**、
+    `warnings` 还是空的 —— 承诺了不给比不承诺更糟。
+
+    **读不到给 `None`，不编 0**（"没读到"≠"0 分"）。
+    """
+    from destiny_mcp.services import player_service as ps
+
+    resolver = AsyncMock()
+    resolver.resolve_player.return_value = {
+        "membership_id": "4611686018492803873",
+        "membership_type": 3,
+        "display_name": "Tester#1234",
+    }
+    resolver.get_profile.return_value = {
+        "characters": {"data": {"c": {"classType": 0, "light": 550}}},
+        "profileRecords": {"data": {"activeScore": 24680}},
+    }
+    service = ps.PlayerService(AsyncMock(), MagicMock(), resolver)
+
+    profile = await service.get_profile("Tester#1234")
+
+    assert profile.triumph_score == 24680
+    requested = resolver.get_profile.await_args.args[2]
+    assert 1000 in requested, f"要拉 profileRecords（组件 1000）才拿得到凯旋分，实际请求 {requested}"
+
+    # 上游没给这一块 → None，不许变成 0
+    resolver.get_profile.return_value = {"characters": {"data": {"c": {"classType": 0, "light": 550}}}}
+    assert (await service.get_profile("Tester#1234")).triumph_score is None

@@ -31,3 +31,10 @@ class ProfileResponse(BaseModel):
     membership_id: str = Field(description="Destiny membership ID")
     membership_type: int = Field(default=0, description="Platform membership type")
     characters: list[CharacterInfo] = Field(default_factory=list)
+    triumph_score: int | None = Field(
+        default=None,
+        description=(
+            "账号级凯旋分（组件 1000 `profileRecords.activeScore`）。**None = 这次没读到**"
+            "（不是 0 分）—— 上游没给这一块时不许编 0。"
+        ),
+    )

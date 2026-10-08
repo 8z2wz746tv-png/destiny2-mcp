@@ -255,7 +255,12 @@ class PlayerService:
 
         mid = p["membership_id"]
         mtype = p["membership_type"]
-        profile = await self._resolver.get_profile(mid, mtype, [100, 200])
+        # 1000 = profileRecords：凯旋分在这里（工具描述承诺了它，就得真去拉 —— 盲测 2026-10-06
+        # 就是"描述写了、实回没有"）。读不到给 None，不编 0。
+        profile = await self._resolver.get_profile(mid, mtype, [100, 200, 1000])
+        records = (profile.get("profileRecords") or {}).get("data") or {}
+        raw_score = records.get("activeScore")
+        triumph_score = int(raw_score) if isinstance(raw_score, int) else None
 
         chars = profile.get("characters", {}).get("data", {})
         characters: list[CharacterInfo] = []
@@ -281,6 +286,7 @@ class PlayerService:
             membership_id=mid,
             membership_type=mtype,
             characters=characters,
+            triumph_score=triumph_score,
         )
 
     async def resolve_character_id(

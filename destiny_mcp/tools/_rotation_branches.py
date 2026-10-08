@@ -1,10 +1,8 @@
 """`world_assistant(intent="rotations")` 的载荷：本周轮换表 + 口径标注 + 缺口说明。
 
 三条话术红线（与服务层同一套，见 `services/rotation_service.py` 的模块注释）：
-
-1. `source=official`（里程碑 / 组件 204）与 `source=schedule`（自维护表）**必须分开说**；
-2. 遗失区域顺序没核对过就**不给"今天是谁"**，只给候选与核对办法；
-3. `{var:...}` 未插值、奖励数量 0 一律按原文给，不猜。
+1. `source=official`（里程碑/组件 204）与 `source=schedule`（自维护表）**必须分开说**；
+2. 遗失区域顺序没核对过就**不给"今天是谁"**；3. `{var:...}` 未插值、奖励 0 一律按原文给，不猜。
 """
 
 from __future__ import annotations
@@ -32,10 +30,8 @@ def _nightfall_text(row: dict[str, Any]) -> str:
     elif not row.get("strike_known"):
         head = f"夜幕/宗师（{row.get('difficulty') or '难度未给'}）"
     modifiers = "、".join(row.get("modifiers") or [])[:80]
-    rewards = "、".join(
-        item["name"] + (f"×{item['quantity']}" if item.get("quantity") else "")
-        for item in (row.get("rewards") or [])[:2]
-    )
+    rewards = "、".join(item["name"] + (f"×{item['quantity']}" if item.get("quantity") else "")
+                       for item in (row.get("rewards") or [])[:2])
     parts = [head]
     if modifiers:
         parts.append(f"词缀 {modifiers}")
@@ -55,7 +51,11 @@ def _summary(result: dict[str, Any]) -> str:
         text = "、".join(featured)
         if total_featured > len(featured):
             text += f" 等 {total_featured} 项"
-        parts.append("特色突袭/地牢 " + text)
+        # 标签按实际类别给：没有地牢行就别写"地牢"（"本周没有"与"没读到"分不清，标签不许下结论）。
+        kinds = {row.get("kind") for row in rows}
+        label = ("特色突袭/地牢" if {"raid", "dungeon"} <= kinds else
+                 "特色突袭" if "raid" in kinds else "特色地牢" if "dungeon" in kinds else "特色活动")
+        parts.append(label + " " + text)
     nightfall = _first(rows, "nightfall")
     if nightfall:
         parts.append("夜幕/宗师 " + _nightfall_text(nightfall))

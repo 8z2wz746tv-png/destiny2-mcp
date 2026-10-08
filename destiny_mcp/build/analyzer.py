@@ -89,7 +89,7 @@ def narrowing_actions() -> list[str]:
         "指定一件金装：该部位直接锁成它，收窄最明显。",
         "减少属性目标，或只留最在意的一两项。",
         "只想补某一个部位，用 build_assistant(intent=\"farm_target\") 反推那一件。",
-        "确实要跑，把 DESTINY_BUILD_MAX_COMBINATIONS 设为 0 或调高上限后重试。",
+        "确实要跑：把服务器的 DESTINY_BUILD_MAX_COMBINATIONS 设为 0 或调高（**改配置，普通提问用不到**）。",
     ]
 
 
@@ -100,8 +100,8 @@ def too_large_reason(total: int, counts: list[int], limit: int) -> str:
         f"{counts[3]}/{counts[4]} 件，预估约 {total:,} 种组合，超过上限 {limit:,}），"
         "没有做精确的属性上限推算。可以这样收窄：①指定一件金装（该部位直接锁成它，"
         "收窄最明显）；②减少属性目标，或只留最在意的一两项；③只想补某一个部位，"
-        "用 intent=\"farm_target\" 反推那一件；④确实要跑精确分析，把 "
-        "DESTINY_BUILD_MAX_COMBINATIONS 设为 0 或调高上限后重试。"
+        "用 intent=\"farm_target\" 反推那一件；④确实要跑精确分析：把服务器的 "
+        "DESTINY_BUILD_MAX_COMBINATIONS 设为 0 或调高（**那是改配置，普通提问用不到**）。"
     )
 
 def oversized_reason(

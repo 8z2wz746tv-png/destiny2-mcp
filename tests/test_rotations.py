@@ -291,9 +291,34 @@ async def test_payload_separates_official_from_schedule() -> None:
     assert "遗失区域" in text and "不给" in text
     assert payload["data"]["counts"]["official"] + payload["data"]["counts"]["schedule"] == \
         payload["data"]["counts"]["total"]
-    assert payload["summary"].startswith("特色突袭/地牢 玻璃拱顶")
+    # 标签按**实际有的类别**给：这份夹具只有突袭，就不许写"地牢"（盲测 2026-10-06 的发现）。
+    assert payload["summary"].startswith("特色突袭 玻璃拱顶")
     assert "夜幕/宗师 切除（宗师）" in payload["summary"]
     assert "上维挑战 辛梅里安卫戍营" in payload["summary"]
+
+
+def _rows_with(kinds: list[str]) -> dict:
+    """构造最小 rows：只为验标签，不碰服务层。"""
+    return {
+        "rows": [
+            {"kind": kind, "name": f"{kind}-名", "source": "official"} for kind in kinds
+        ],
+        "lost_sector": {"anchored": True},
+        "counts": {"official": len(kinds), "schedule": 0, "total": len(kinds)},
+    }
+
+
+def test_the_featured_label_follows_what_is_actually_there() -> None:
+    """有地牢才写地牢 —— 标签不许替"本周有没有地牢"下结论。
+
+    盲测原文：摘要自称「特色突袭/地牢」，明细里**一行 dungeon 都没有**，
+    也没说清是"本周没有"还是"这次没读到"。
+    """
+    from destiny_mcp.tools import _rotation_branches
+
+    assert _rotation_branches._summary(_rows_with(["raid"])).startswith("特色突袭 ")
+    assert _rotation_branches._summary(_rows_with(["dungeon"])).startswith("特色地牢 ")
+    assert _rotation_branches._summary(_rows_with(["raid", "dungeon"])).startswith("特色突袭/地牢 ")
 
 
 async def test_payload_flags_uninterpolated_variables() -> None:

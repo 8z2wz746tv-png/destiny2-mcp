@@ -591,7 +591,7 @@ async def build_assistant(
         "**「尽量高」用这个**（硬目标都达标后按顺序最大化）。weapons/health/class/grenade/melee/super；"
         "力量/strength 写 melee；只发标量的宿主写 「weapons,grenade」（顺序即优先级）。"
         "要**硬下限**用 `grenade_target` 这类 `*_target`（达不到会报差多少）。"
-        "⚠️ 不给金装也不给下限时组合规模常超限（`find`/`recommend` 会回「没算」并给收窄选项）——**指定一件金装**最有效。"
+        "⚠️ 组合规模只由五部位候选件数决定（与目标无关）：不钉金装时常超上限，会回「没算」并给收窄选项；**指定一件金装**最有效。"
     ))] = None,
     priority_stat: fields.PriorityStat = None,
     replacement_slot: Annotated[str | None, Field(description=(
