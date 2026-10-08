@@ -29,14 +29,14 @@ from .loadout_exact_flow import ExactFlowMixin
 from .loadout_armor_state import restore_after_equip
 from .loadout_functional_mods import FunctionalModMixin
 from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
-from .loadout_transfer_step import TransferStepMixin
+from .loadout_transfer_step import ExoticDequipMixin, TransferStepMixin
 from .loadout_recovery import RecoveryStateMixin
 from .loadout_subclass_sockets import SubclassSocketMixin
 from . import loadout_verify
 
 
 class LoadoutEquipmentService(
-    ExactFlowMixin, RecoveryStateMixin, ModSocketMixin, FunctionalModMixin,
+    ExactFlowMixin, RecoveryStateMixin, ModSocketMixin, FunctionalModMixin, ExoticDequipMixin,
     SubclassSocketMixin, TransferStepMixin,
 ):
     """Apply loadout equipment: transfer, equip, mods, subclass config."""
@@ -104,13 +104,10 @@ class LoadoutEquipmentService(
                 message=f"找不到角色 '{loadout.character}'。",
             )
 
-        # Step 0: 模组预检 —— **必须在任何写入之前**。真机 2026-10-03：预检（插槽读不到 /
-        # 找不到唯一兼容槽 / 能量腾不出来）排在搬运+装备**之后**，于是注定失败的那一批已经把
-        # 装备换好了，只能整条回滚，实测一次白烧 3.5 分钟。预检要的数据（插槽、能量、
-        # 可插入清单）在同一次 profile 里就有，换装前拿得到，所以前置不产生假阴性。
-        # 守门跑在**副本**上：规划会往 `LoadoutItem.mod_sockets` 记下"挑中的槽位"（回读核对要它），
-        # 而这一趟的结果有意丢弃 —— 真机 2026-10-03 那 15 对「同一颗模组既写成功、又被报
-        # `插槽 -1` 装不上」就是它留下的槽位被写入那一趟读成了"调用方指定"。
+        # Step 0: 模组预检 —— **必须在任何写入之前**（真机 2026-10-03：排在搬运+装备之后，
+        # 注定失败的那批已把装备换好，只能整条回滚）。**守门跑在副本上**：规划会往
+        # `LoadoutItem.mod_sockets` 写"挑中的槽位"，这一趟的结果有意丢弃（真机那 15 对
+        # 「同一颗既写成功、又被报插槽 -1」就是它留下的槽位被写入那趟读成了"调用方指定"）。
         preflight_ok, preflight_error = await self._mod_preflight(
             loadout.model_copy(deep=True), mid, mtype, profile, char_id
         )
@@ -127,7 +124,7 @@ class LoadoutEquipmentService(
                 )],
             )
 
-        # Step 1: 搬运（**顺序**、不是并发；先都搬过来再一起装 —— 原因见 loadout_transfer_step）。
+        # Step 1: 搬运（顺序、不是并发；先都搬过来再一起装 —— 原因见 loadout_transfer_step）。
         transfer_steps, transferred_ids, transfers_ok = await self.transfer_loadout_items(
             player_name, loadout
         )
@@ -135,13 +132,22 @@ class LoadoutEquipmentService(
         if not transfers_ok:
             all_ok = False
 
-        if loadout.items and len(transferred_ids) == len(loadout.items):
+        # 批量装备前先顶下冲突的金装（DIM 同款，见 `ExoticDequipMixin`）；成败都并进 `all_ok`
+        # —— 回滚由调用方按 `all_ok` 触发，这里不许早退绕过它。
+        exotic_steps, exotic_ok, exotic_note = await self.dequip_conflicting_exotics(
+            player_name, loadout)
+        steps += exotic_steps
+        if not exotic_ok:
+            steps.append(MoveItemStep(action="error", detail=exotic_note, success=False))
+            all_ok = False
+
+        if loadout.items and len(transferred_ids) == len(loadout.items) and exotic_ok:
             try:
                 equip_result = await self._transfer.equip_items(
                     player_name, transferred_ids, loadout.character
                 )
                 equipped = bool(equip_result.get("success"))
-                # 失败要说清上游为什么（以前只写"批量装备 N 件物品"，真机排查时只能靠猜）。
+                # 失败要说清上游为什么（以前只写"批量装备 N 件"，真机排查只能靠猜）。
                 steps.append(MoveItemStep(
                     action="equip_many",
                     detail=(
@@ -159,7 +165,7 @@ class LoadoutEquipmentService(
                     success=False,
                 ))
                 all_ok = False
-        elif loadout.items:
+        elif loadout.items and exotic_ok:
             steps.append(MoveItemStep(
                 action="equip_many",
                 detail="存在转移失败，未执行批量装备。",
@@ -175,12 +181,8 @@ class LoadoutEquipmentService(
                 steps=steps,
             )
 
-        # Step 2: 按**换装之后**的现场重读一次再规划写入。
-        #
-        # 不复用 Step 0 那份 profile：搬运与批量装备刚改过账号，那份快照已经过期 ——
-        # 拿它规划写入会照旧快照的插槽号/能量去写新现场（Step 0 只当"守门"，不当"抄近路"）。
-        # 预检已经在这一趟里判过一次，所以这里再失败只会是刚换上去的件还没同步到；
-        # `_prepare_mod_operations` → `_read_sockets` 自带同步窗口重试（见 loadout_mod_sockets）。
+        # Step 2: 按**换装之后**的现场重读一次再规划写入。不复用 Step 0 那份 profile：搬运与批量
+        # 装备刚改过账号，拿旧快照的插槽号/能量去写新现场会写错。重试见 `loadout_mod_sockets`。
         profile = await self._resolver.get_profile(
             mid, mtype, profile_components.EQUIP_LOADOUT
         )
@@ -292,12 +294,9 @@ class LoadoutEquipmentService(
                     all_ok = False
                     break
 
-        # Step 3: 子职业 —— **无条件跑**，不再让模组阶段的结论把它吞掉。
-        #
-        # 真机 2026-10-03 第 1 轮：`equip_build` 里 1 颗模组被上游挡住（1676），旧代码在这个
-        # 分支提前 return，Step 3（子职业/碎片）整段没跑，而回执只说"装备已经换上" ——
-        # **少做了一步却不说**。碎片是这套配装的独立一半，模组写不动不影响它，
-        # 所以这里不设门；跑没跑、成没成，一律写进 steps 与 message。
+        # Step 3: 子职业 —— **无条件跑**，不再让模组阶段的结论把它吞掉（真机 2026-10-03 第 1 轮：
+        # `equip_build` 里 1 颗模组被上游挡住 1676，旧代码在这个分支提前 return，子职业整段没跑，
+        # 而回执只说"装备已经换上" —— **少做了一步却不说**）。跑没跑、成没成一律写进 steps。
         subclass_ok: bool | None = None
         subclass_why = ""
         if loadout.subclass:
@@ -318,14 +317,10 @@ class LoadoutEquipmentService(
             # 调用方还得自己去翻一遍步骤才知道为什么 —— 真机 2026-10-03 第 3 轮就是这么丢的。
             subclass_receipt = f"做了但没成（{subclass_why}）"
 
-        # Step 4: 回读核对 —— **这一趟是全流程唯一的核对**（没核对过就不能说"已装备"：真机
-        # 2026-09-24 这条路直接以"已装备"收尾，回执里没有一步证明装备真在身上）。
-        # 判据（`loadout_matches`）、窗口（`write_readback`）、话术（`readback_verdict`）、
-        # "写不成的模组算不算"（`loadout_blocked_mods`）各只有一处；`equip_with_recovery` 的
-        # 外层直接读这里的 `verified`，**不再自己开第二个窗口**
-        # —— 真机 2026-10-03 audit 123435：内侧这一轮 8 次读没对上之后，外层又读了一整轮，
-        # 两次读的是同一份状态、同一个函数，结论不可能变，那 147.8 秒全是白等。
-        # 核对不上只报"没确认"，**不改写入结论**。
+        # Step 4: 回读核对 —— **这一趟是全流程唯一的核对**（没核对过就不能说"已装备"）。
+        # 判据/窗口/话术/`loadout_blocked_mods` 各只有一处；`equip_with_recovery` 外层直接读这里的
+        # `verified`、**不再开第二个窗口**（真机 2026-10-03 audit 123435：内侧 8 次没对上后外层又读
+        # 一整轮，同一份状态同一个函数，那 147.8 秒全是白等）。核对不上只报"没确认"，不改写入结论。
         detail, verified = await loadout_verify.readback_verdict(
             self, player_name, loadout, blocked=blocked
         )

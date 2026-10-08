@@ -112,3 +112,78 @@ class TransferStepMixin:
             raise TransferError(
                 f"把 '{armor.name}' 搬进仓库失败：{result.message or '上游没给原因'}"
             )
+
+
+#: 金装在 Manifest 里的 `inventory.tierType`（与 build/models 的 `tier` 同一口径）。
+_TIER_EXOTIC = 6
+
+#: 护甲部位键（`InventoryItem.slot` 用的就是这套）
+_ARMOR_SLOT_KEYS = ("helmet", "gauntlets", "chest", "legs", "class_item")
+
+
+class ExoticDequipMixin:
+    """批量装备前**先把冲突的金装顶下来**。
+
+    金装规则是**全身只能穿一件**，而上游的批量 `EquipItems` 撞上冲突会**整批**回 `1641`
+    （真机 2026-10-06 实测：配装里的金装头盔 + 身上正穿的金装臂铠 → `equip_many` 全灭）。
+    DIM 的做法（`src/app/inventory/item-move-service.ts` 的 "Check for (and move aside) exotics"）是
+    发批量**之前**：给它找一件**同部位、非金装**的替身先穿上（`getSimilarItem({excludeExotic: true,
+    exclusions})`），找不到替身就明确报"先把那件脱下来"。这里照做。
+    """
+
+    def _item_is_exotic(self, item_hash: int) -> bool:
+        definition = self._manifest.get_item_definition(item_hash) or {}
+        tier = (definition.get("inventory") or {}).get("tierType") or 0
+        return int(tier) == _TIER_EXOTIC
+
+    async def dequip_conflicting_exotics(
+        self, player_name: str, loadout: Loadout
+    ) -> tuple[list[MoveItemStep], bool, str]:
+        """返回 `(步骤, 能不能继续批量装备, 话术)`；没有冲突时是 `([], True, "")`。"""
+        exotic_slots = {
+            item.slot
+            for item in loadout.items
+            if item.item_hash and self._item_is_exotic(item.item_hash)
+        }
+        if not exotic_slots:
+            return [], True, ""
+        worn = await self._transfer.list_character_items(player_name, loadout.character)
+        plan_ids = {i.item_instance_id for i in loadout.items if i.item_instance_id}
+        steps: list[MoveItemStep] = []
+        moved_names: list[str] = []
+        for slot in _ARMOR_SLOT_KEYS:
+            current = next(
+                (i for i in worn if i.slot == slot and i.is_equipped), None
+            )
+            if current is None or not self._item_is_exotic(current.item_hash):
+                continue
+            if slot in exotic_slots:
+                continue  # 这一格本来就要换成金装（DIM：we aren't already equipping into that slot）
+            # 替身：同部位、**非金装**、没穿着、不在本次要装的清单里（DIM 的 excludeExotic + exclusions）
+            rivals = [
+                i for i in worn
+                if i.slot == slot
+                and not i.is_equipped
+                and i.item_instance_id not in plan_ids
+                and not self._item_is_exotic(i.item_hash)
+            ]
+            if not rivals:
+                return steps, False, (
+                    f"「{current.name}」占着全身唯一的金装位（金装全身只能穿一件），而这套配装要穿"
+                    f"另一件金装。角色身上没有能顶下它的非金装{current.slot_display or slot}。"
+                    f"出路：先把「{current.name}」脱下来（或搬一件同部位的非金装过来），再重试。"
+                )
+            replacement = sorted(rivals, key=lambda i: (i.power or 0))[-1]
+            equipped = await self._transfer.equip_item(
+                player_name, replacement.item_instance_id, loadout.character
+            )
+            steps.append(MoveItemStep(
+                action="downgrade",
+                detail=f"先穿「{replacement.name}」把「{current.name}」顶下来（金装全身只能穿一件）",
+                success=bool(equipped.success),
+            ))
+            if not equipped.success:
+                return steps, False, f"顶下「{current.name}」失败：{equipped.message}"
+            moved_names.append(current.name)
+        note = f"已先把{'、'.join(f'「{n}」' for n in moved_names)}顶下来（金装全身只能穿一件）。" if moved_names else ""
+        return steps, True, note

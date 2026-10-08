@@ -14,26 +14,20 @@ from typing import Any
 # next_actions —— 以前失败分支只有 candidates（多数是空的），调用方拿不到下一步，
 # 只能自己想到「先换下来再搬」。
 _WRITE_FAILURE_HINTS: tuple[tuple[tuple[str, ...], str], ...] = (
-    (
-        ("UniqueEquipRestricted", "只能装备一件", "一件异域"),
-        "同类的异域只能穿一件（异域**武器**一件 + 异域**护甲**一件，两类互不冲突）：目标与已经"
-        "穿着的那件同属一类，先从该角色背包里挑一件**非异域的同部位**装备穿上去顶下它，再装目标"
-        '（`inventory_assistant` 的 `intent="get"`：武器用 `item_type="武器"`，护甲用 `armor_slot=…`）。',
-    ),
-    (
-        ("equipped item", "CannotPerformActionOnEquippedItem", "已装备"),
-        "目标正装备在身上：先用 intent=\"equip\" 把同槽位的另一件换上（或 equip 到别的角色），再对它执行 transfer/move。",
-    ),
-    (
-        ("not found in the character's inventory", "ItemNotFound", "不在该角色身上"),
-        "`EquipItem` 只接受**在该角色身上**的实例：仓库或别的角色身上的要先搬过来"
-        '（`intent="move"`，destination 传角色名；他背包满了会撞 NoRoomInDestination），'
-        "或者直接换用他背包里已有的那件。",
-    ),
-    (
-        ("No space", "空间不足", "InventoryFull", "NoRoomInDestination"),
-        "目标位置空间不足：`equip_build`/`move`/`equip_loadout` 都会自动腾一件后重试（见 steps 的 `make_room`）；腾不出来才需要先清一格。",
-    ),
+    (("UniqueEquipRestricted", "只能装备一件", "一件异域"),
+     "同类的异域只能穿一件（异域**武器**一件 + 异域**护甲**一件，两类互不冲突）：目标与已经"
+     "穿着的那件同属一类，先从该角色背包里挑一件**非异域的同部位**装备穿上去顶下它，再装目标"
+     '（`inventory_assistant` 的 `intent="get"`：武器用 `item_type="武器"`，护甲用 `armor_slot=…`）。'),
+    (("equipped item", "CannotPerformActionOnEquippedItem", "已装备"),
+     "目标正装备在身上：先用 intent=\"equip\" 把同槽位的另一件换上，再对它执行 transfer/move。"),
+    (("not found in the character's inventory", "ItemNotFound", "不在该角色身上"),
+     "`EquipItem` 只接受**在该角色身上**的实例：仓库或别的角色身上的要先搬过来"
+     '（`intent="move"`，destination 传角色名；他背包满了会撞 NoRoomInDestination），'
+     "或者直接换用他背包里已有的那件。"),
+    (("CannotEquip", "金装冲突", "1641", "DestinyCannotEquipItem"),
+     "金装全身只能穿一件：`equip_loadout` 会先顶下冲突的那件再发批量，顶不下来会点名要你先脱哪件。"),
+    (("No space", "空间不足", "InventoryFull", "NoRoomInDestination"),
+     "目标位置空间不足：`equip_build`/`move`/`equip_loadout` 会先自动腾一件再重试（见 steps 的 `make_room`）。"),
 )
 
 

@@ -80,6 +80,18 @@ class TransferService:
                     return name
         return item.bucket_type
 
+    async def list_character_items(self, player_name: str, character: str) -> list[Any]:
+        """列这个角色**身上**（不含仓库）的件 —— 给"批量装备前顶下冲突金装"用。"""
+        p = await self._resolver.resolve_player(player_name)
+        char_id = await self._resolver.resolve_character_id(
+            p["membership_id"], p["membership_type"], character
+        )
+        items = await self._fetch_all_items(p["membership_id"], p["membership_type"])
+        return [
+            item for item in items
+            if item.character_id == char_id and item.location != "vault"
+        ]
+
     async def make_room_in_bucket(
         self, player_name: str, destination: str, *, for_instance_id: str
     ) -> tuple[list[MoveItemStep], str]:
