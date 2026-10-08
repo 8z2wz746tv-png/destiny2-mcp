@@ -15,6 +15,7 @@ from ..exceptions import AuthenticationError, ItemNotFoundError, TransferError
 from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
+from ..utils.hash_utils import to_signed
 from .make_room import is_no_room_error, pick_move_aside_items
 from ..models import (
     EquipPlan,
@@ -60,6 +61,23 @@ class TransferService:
 
     # ── 目标格满：自动腾一件（ADR-029 P4） ──────────────────────────────
 
+
+    def _equipment_bucket_name(self, item: Any) -> str:
+        """这件**真正**属于哪个装备桶。
+
+        ⚠️ 别用 profile 给的 `bucket_type`：**在仓库里的件**报的是 `Vault (General)`，不是它真正的
+        装备桶（2026-10-06 真机第六次翻车：`move` 撞满后去找"角色身上的 Vault (General) 桶"，
+        永远找不到可腾的件）。按物品定义的 `inventory.bucketTypeHash` 查才准；读不到才退回 profile 值。
+        """
+        info = self._manifest.get_item_info(item.item_hash) or {}
+        raw = (info.get("inventory") or {}).get("bucketTypeHash") or 0
+        if raw:
+            for candidate in (int(raw), to_signed(int(raw))):
+                name = self._manifest.bucket_name(candidate)
+                if name:
+                    return name
+        return item.bucket_type
+
     async def make_room_in_bucket(
         self, player_name: str, destination: str, *, for_instance_id: str
     ) -> tuple[list[MoveItemStep], str]:
@@ -81,14 +99,17 @@ class TransferService:
         wanted = next(
             (item for item in items if item.item_instance_id == for_instance_id), None
         )
-        if wanted is None or not wanted.bucket_type:
+        if wanted is None:
+            return [], ""
+        bucket = self._equipment_bucket_name(wanted)
+        if not bucket:
             return [], ""
         same_bucket = [
             item
             for item in items
-            if item.bucket_type == wanted.bucket_type
-            and item.character_id == char_id
+            if item.character_id == char_id
             and item.location != "vault"
+            and self._equipment_bucket_name(item) == bucket
         ]
         picked = pick_move_aside_items(
             same_bucket,

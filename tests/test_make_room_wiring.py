@@ -41,7 +41,7 @@ def _service(items: list[InventoryItem]) -> TransferService:
     service._fetch_all_items = AsyncMock(return_value=items)
     # 取件路径不止一处（名字检索 / 实例检索 / 现场读取）——这条用例验的是**重试接线**，
     # 所以把"按实例 ID 取回那件"直接打桩；取件本身不是这里的被测对象。
-    target = next(i for i in items if i.item_instance_id == "t1")
+    target = next((i for i in items if i.item_instance_id == "t1"), None)
     service._find_item = AsyncMock(return_value=target)
     service._manifest.get_item_info = lambda _h: {"tier": 5}
     # `move_item` **总是先按名字查 Manifest**（即使传了实例 ID），所以这条也要给真的检索结果。
@@ -152,3 +152,21 @@ async def test_equip_loadout_frees_a_slot_and_retries_that_item() -> None:
     assert calls.count("b") == 2, f"那一件要重试一次，实际 {calls}"
     assert any(s.action == "make_room" for s in steps), steps
     assert transferred == ["a", "b"]
+
+
+def test_the_equipment_bucket_comes_from_the_manifest_not_from_the_vault_bucket() -> None:
+    """**仓库里的件**在 profile 里报的是 `Vault (General)`，不是真正的装备桶 —— 要按定义查。
+
+    2026-10-06 真机第六次翻车：`move` 往满的臂铠格搬，腾格去找"角色身上的 Vault (General) 桶"，
+    永远找不到可腾的件，于是白报"没有可腾的件"。判据一旦用错桶，整条自动腾格就是死的。
+    """
+    service = _service([])
+    service._manifest.get_item_info = lambda _h: {"inventory": {"bucketTypeHash": 3448274439}}
+    service._manifest.bucket_name = lambda h: "Gauntlets" if h in (3448274439, -846692857) else ""
+
+    vault_item = _item("v1", "仓库里的臂铠", bucket="Vault (General)", location="vault")
+    assert service._equipment_bucket_name(vault_item) == "Gauntlets"
+
+    # 定义里查不到才退回 profile 值（缺数据不编名字）
+    service._manifest.get_item_info = lambda _h: {}
+    assert service._equipment_bucket_name(vault_item) == "Vault (General)"
