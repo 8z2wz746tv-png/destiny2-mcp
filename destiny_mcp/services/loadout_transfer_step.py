@@ -16,9 +16,13 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from ..exceptions import ItemNotFoundError, TransferError
 from .make_room import is_no_room_error
 from ..manifest import class_type_name
+from ..utils.hash_utils import to_signed
+from .item_parser import armor_slot_from_bucket
 from ..models import Loadout, LoadoutItem, MoveItemStep
 
 
@@ -141,6 +145,25 @@ class ExoticDequipMixin:
         name = class_type_name(class_type) if class_type in (0, 1, 2) else ""
         return name.lower() == character.lower()
 
+    def _armor_slot_of(self, item: Any) -> str:
+        """这件是哪个护甲部位。
+
+        ⚠️ 身上的件 `slot` 已经填好；**仓库里的件是空串**（profile 给的是 `Vault (General)`）——
+        2026-10-06 真机：顶下金装时按 `slot` 过滤，把仓库里所有替身都丢了，误报"没得顶"。
+        认不出来就按物品定义的 `bucketTypeHash` 查（定义里是**无符号**值，两边都试）。
+        """
+        if item.slot:
+            return item.slot
+        info = self._manifest.get_item_info(item.item_hash) or {}
+        raw = info.get("bucketTypeHash") or 0
+        if not raw:
+            return ""
+        for candidate in (int(raw), to_signed(int(raw))):
+            key = armor_slot_from_bucket(candidate)
+            if key:
+                return key
+        return ""
+
     def _item_is_exotic(self, item_hash: int) -> bool:
         definition = self._manifest.get_item_definition(item_hash) or {}
         tier = (definition.get("inventory") or {}).get("tierType") or 0
@@ -174,7 +197,7 @@ class ExoticDequipMixin:
             # 替身：同部位、**非金装**、没穿着、不在本次要装的清单里（DIM 的 excludeExotic + exclusions）
             rivals = [
                 i for i in worn
-                if i.slot == slot
+                if self._armor_slot_of(i) == slot
                 and not i.is_equipped
                 and i.item_instance_id not in plan_ids
                 and not self._item_is_exotic(i.item_hash)

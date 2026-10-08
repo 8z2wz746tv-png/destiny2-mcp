@@ -142,13 +142,15 @@ async def test_the_replacement_can_come_from_the_vault() -> None:
                 _H_LEGEND_ARMS: _TIER_LEGENDARY}
     worn = [
         _item("w1", "金装臂铠", slot="gauntlets", hash_=_H_EXOTIC_ARMS, equipped=True),
-        # 仓库里的那件：职业要对得上才允许拿来顶（classType 2 = 术士）
-        _item("v1", "仓库里的普通臂铠", slot="gauntlets", hash_=_H_LEGEND_ARMS,
+        # 仓库里的那件：**`slot` 是空串**（profile 给 Vault (General)，这是真形状！）→ 部位只能按
+        # 物品定义的 bucketTypeHash 认；职业也要对得上（classType 2 = 术士）
+        _item("v1", "仓库里的普通臂铠", slot="", hash_=_H_LEGEND_ARMS,
               power=540).model_copy(update={"location": "vault", "character_id": ""}),
     ]
     transfer = _Transfer(worn)
     service = _Service(manifest, transfer)
-    service._manifest.get_item_info = lambda _h: {"classType": 2}
+    # 真形状：`get_item_info` 里 `classType`/`bucketTypeHash` 都在**顶层**（3551918588 = 臂铠桶）
+    service._manifest.get_item_info = lambda _h: {"classType": 2, "bucketTypeHash": 3551918588}
     loadout = _loadout([
         LoadoutItem(item_hash=_H_EXOTIC_HELM, name="金装头盔", slot="helmet", item_instance_id="p1"),
     ])
