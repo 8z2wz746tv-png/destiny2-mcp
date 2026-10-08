@@ -667,13 +667,15 @@ async def test_equip_build_makes_room_when_the_bucket_filled_up_after_find() -> 
     # 第 ② 次是 2026-10-06 真机第二次翻车修出来的：**腾动本身会让指纹过期**，不回读推进基线，
     # 复检就会判 `stale_inventory_snapshot`（把"我们刚替她腾的那一下"报成"库存已变化"）。
     # 所以这条用例不只验"腾了"，还验"腾完指纹跟得上"。
-    service._inventory.get_armor_snapshot = AsyncMock(
-        side_effect=[
-            _snapshot(on_character_gauntlets=10),
-            _snapshot(on_character_gauntlets=9),
-            _snapshot(on_character_gauntlets=9),
-        ]
-    )
+    reads = {"n": 0}
+
+    async def _snapshots(_player, _character):
+        reads["n"] += 1
+        # ① 判格满 → 10/10；之后（腾完回读、复检）都是 9/10。用函数而不是固定列表：
+        # "腾完回读到稳定"要读几次是实现细节，别让用例钉死次数。
+        return _snapshot(on_character_gauntlets=10 if reads["n"] == 1 else 9)
+
+    service._inventory.get_armor_snapshot = AsyncMock(side_effect=_snapshots)
     result = await service.equip_build("Tester#1234", build, "warlock")
 
     assert moved, "格满时应当自动腾一件"

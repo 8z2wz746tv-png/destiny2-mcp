@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Awaitable, Callable, Collection, Sequence
 from dataclasses import dataclass, field
 
@@ -163,7 +164,7 @@ async def make_room_for_build(
     # 与 `build_baseline` 同一套道理：这是**我们自己的写入**，把基线推到当前实况即可；
     # 复检照样会重读现场并逐件核对，安全网没削弱。
     if candidates is not None:
-        fresh = await inventory.get_armor_snapshot(player_name, character)
+        fresh = await _stable_snapshot(inventory, player_name, character)
         candidates.register(
             build.model_copy(update={"snapshot_version": snapshot_version(fresh)}), player_name
         )
@@ -226,3 +227,21 @@ def make_room_steps(details: Sequence[str]) -> list[dict]:
         MoveItemStep(action="make_room", detail=detail, success=True).model_dump()
         for detail in details
     ]
+
+
+#: 读到"连续两次相同"才当基线时的间隔与次数。写入有**同步窗口**：刚搬完立刻回读，
+#: 读到的可能还是旧状态 —— 2026-10-06 真机第三次翻车就是这么来的（记下的基线比复检看到的旧一拍）。
+_STABLE_DELAY_SECONDS = 0.6
+_STABLE_ATTEMPTS = 3
+
+
+async def _stable_snapshot(inventory, player_name: str, character: str):
+    """读到**连续两次版本相同**为止（最多 `_STABLE_ATTEMPTS` 次）。"""
+    snapshot = await inventory.get_armor_snapshot(player_name, character)
+    for _ in range(_STABLE_ATTEMPTS - 1):
+        await asyncio.sleep(_STABLE_DELAY_SECONDS)
+        again = await inventory.get_armor_snapshot(player_name, character)
+        if snapshot_version(again) == snapshot_version(snapshot):
+            break
+        snapshot = again
+    return snapshot
