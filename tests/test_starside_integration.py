@@ -15,6 +15,8 @@ from destiny_mcp.exceptions import ConfigError
 from destiny_mcp.services.starside_builds import parse_build
 from destiny_mcp.services.starside_matching import match_inventory, validate_build
 
+from destiny_mcp.tools._community_handoff import community_handoff
+
 
 from destiny_mcp.services.starside_service import StarsideService
 from destiny_mcp.tools.assistants import build_assistant
@@ -1317,3 +1319,86 @@ async def test_community_match_asks_for_selectable_plugs() -> None:
     assert detail_service.get_weapon_details_by_type.await_args.kwargs[
         "include_selectable_plugs"
     ] is True
+
+
+# ── 指路：模板给了 solver_handoff，出口就必须把它抬出来 ─────────────────────
+#
+# 2026-10-06 真机：`community_build` 的 122 KB 响应里，`solver_handoff.arguments`
+# 就是"下一步该拿什么参数跑 find"（15 颗功能模组连部位前缀都写好了、套装还故意置 null），
+# 但它埋在第 1111 行，而 `next_actions` 是**空的**。连写这个工具的人都没读到，
+# 于是照着社区模板自己拼参数、白跑一轮 0 候选（还多传了它明确剔除的套装约束）。
+# **货在深处、指路又没有 = 指望模型把 122 KB 读完。**
+
+
+def test_handoff_actions_point_at_the_arguments_the_template_handed_over() -> None:
+    actions, note = community_handoff({
+        "solver_handoff": {
+            "arguments": {
+                "character": "warlock",
+                "exotic_name": "横断之步",
+                "functional_mods": ["helmet:a", "chest:b", "legs:c"],
+                "set_bonus_name": None,
+            }
+        }
+    })
+
+    assert actions, "给了 solver_handoff 就必须指路"
+    assert "solver_handoff" in actions[0], "要说清货在哪"
+    assert "'warlock'" in actions[0] and "横断之步" in actions[0], "参数要原样给出来"
+    assert "3 颗" in actions[0], "功能模组要报数（照抄的那份清单）"
+    assert "故意" in actions[0], "套装是 null 属于故意剔除，不说清会被当成漏传"
+    assert any("equip_build" in action for action in actions), "还要说清怎么走到写入"
+    assert "3" in note, "摘要里也报一下可照抄几颗"
+
+
+def test_no_handoff_means_no_invented_action() -> None:
+    """没给 handoff（例如只搜了目录、没选中具体一套）时不许编一句出来。"""
+    assert community_handoff(None) == ([], "")
+    assert community_handoff({"title": "某套"}) == ([], "")
+
+
+@pytest.mark.asyncio
+async def test_the_tool_exit_actually_carries_the_handoff_actions() -> None:
+    """**接线级**守门：helper 有测试还不够 —— 忘了把 `next_actions` 接上出口就白搭。
+
+    真机就是这么漏的：`_community_handoff` 那两句从没被接出来过（出口只传了 `warnings`）。
+    这条测试直接调工具函数，所以删掉 `next_actions=actions` 就会红。
+    """
+    from unittest.mock import MagicMock
+
+    from destiny_mcp.tools.assistants import build_assistant
+
+    starside = SimpleNamespace(
+        search_builds=MagicMock(return_value={
+            "archive_available": True,
+            "build_count": 1,
+            "matched_count": 1,
+            "results": [{"title": "T"}],
+        }),
+        get_build=MagicMock(return_value={
+            "title": "火术运动套",
+            "validation": {"execution_supported": False, "execution_blockers": []},
+            "solver_handoff": {
+                "arguments": {
+                    "character": "warlock",
+                    "exotic_name": "横断之步",
+                    "functional_mods": ["helmet:a"],
+                    "set_bonus_name": None,
+                }
+            },
+        }),
+    )
+    ctx = SimpleNamespace(
+        request_context=SimpleNamespace(lifespan_context={"starside_svc": starside})
+    )
+
+    response = await build_assistant(
+        intent="community_build",
+        community_build_id="x",
+        include_inventory=False,
+        ctx=ctx,
+    )
+
+    assert response["next_actions"], "出口必须带指路（真机这里就是空的）"
+    assert "solver_handoff" in response["next_actions"][0]
+    assert "1 颗" in response["summary"], "摘要里也要报可照抄几颗"

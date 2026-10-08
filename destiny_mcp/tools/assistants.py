@@ -18,6 +18,7 @@ from ..exceptions import DestinyMCPError
 from ..services.inventory_analysis_service import duplicate_rows
 from ._registry import mcp
 from ._coerce import coerce_scalar_arguments
+from ._community_handoff import community_handoff
 from ._build_confirmation import resolve_exotic, verify_exotic_confirmation_token
 from ._farm_target_response import serialize_farm_target_analysis
 from ._formatters import inventory_search_summary
@@ -621,13 +622,11 @@ async def build_assistant(
 ) -> dict:
     """配装聚合入口：推荐、查候选、失败诊断、确认后装备。
 
-    priority_stats 按从高到低严格排序；include_subclass_fragment=True
-    时使用目标角色当前已装备的子职业和碎片属性。指定金装和数值目标都是
-    硬约束；指定金装首次查询必须等玩家确认，无解时不得自动降低目标。
-    community 通过 query/character/scenario/category 搜索本地配装，offset 翻页。
-    指定 community_build_id 后读取完整模板及 Manifest 校验；include_inventory=false
-    不读账号。true 检查精确装备持有和当前 Perk，单列未解析/未验证要求。
-    社区模板及其 solver_handoff 不是完整可执行计划，不能直接传给 equip_build。
+    priority_stats 从高到低严格排序；include_subclass_fragment=True 时算上目标角色
+    当前已装备的子职业与碎片。指定金装和数值目标都是硬约束；首次查金装要等玩家确认，
+    无解时不得自动降低目标。指定 community_build_id 读完整模板 + Manifest 校验，
+    include_inventory 决定要不要读账号。社区模板及其 solver_handoff **不是**可执行计划，
+    不能直接传给 equip_build —— 要按 next_actions 给的参数跑 find 再确认。
     """
     svc = get_ctx(ctx)
     intent = cast(BuildIntent, (intent or "recommend").strip().lower())
@@ -688,9 +687,8 @@ async def build_assistant(
             )
         if result.get("matched_count", 0) > 1 and not selected:
             warnings.append("搜索到多套配装；指定 community_build_id 后才会读取账号库存进行匹配。")
-        # 可执行性必须出现在 summary 里：实机复盘（2026-09-14）里调用方正是**越过**了
-        # payload 里的 execution_supported=false，回了"核心件都在，这套能直接玩"——
-        # 因为 summary 只说"已读取社区配装：X"，而 summary 是唯一一定会被引用的字段。
+        # 可执行性必须出现在 summary 里：2026-09-14 调用方正是**越过**了 payload 里的
+        # execution_supported=false（summary 与 next_actions 才是唯一一定会被读到的地方）。
         verdict = ""
         if selected:
             validation = selected.get("validation") or {}
@@ -705,13 +703,15 @@ async def build_assistant(
                     + (f"；首要原因：{blockers[0].rstrip('。')}" if blockers else "")
                     + "。要装备必须先用 intent='find' 生成服务端签发的 canonical_build，再让用户确认。",
                 )
+        actions, handoff_note = community_handoff(selected)
         return ok_response(
             (
-                f"已读取社区配装：{selected['title']}{verdict}。"
+                f"已读取社区配装：{selected['title']}{verdict}{handoff_note}。"
                 if selected
                 else f"Starside 找到 {result['matched_count']} 套配装。"
             ),
             payload,
+            next_actions=actions,
             warnings=warnings,
         )
     if community_build_id:
