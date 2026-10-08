@@ -151,7 +151,7 @@ async def make_room_for_build(
     整个编排放在这里（`build_service` 贴着行数上限）；调用方只负责把结果拼进回执。
     """
     snapshot = await inventory.get_armor_snapshot(player_name, character)
-    steps, moved = await _make_room_for_build(
+    steps, moved, freed_slots = await _make_room_for_build(
         snapshot=snapshot,
         target_class_type=resolve_character_name(build.class_type),
         manifest=manifest,
@@ -167,7 +167,10 @@ async def make_room_for_build(
     # 与 `build_baseline` 同一套道理：这是**我们自己的写入**，把基线推到当前实况即可；
     # 复检照样会重读现场并逐件核对，安全网没削弱。
     if candidates is not None:
-        fresh = await _stable_snapshot(inventory, player_name, character)
+        fresh = await _settled_snapshot(
+            inventory, player_name, character, resolve_character_name(build.class_type),
+            manifest, freed_slots,
+        )
         candidates.register(
             build.model_copy(update={"snapshot_version": snapshot_version(fresh)}), player_name
         )
@@ -183,15 +186,15 @@ async def _make_room_for_build(
     move_to_vault: Callable[[Armor], Awaitable[None]],
     official_instance_ids: Collection[str] = (),
     limit: int = DEFAULT_LIMIT,
-) -> tuple[list[str], list[str]]:
+) -> tuple[list[str], list[str], set[str]]:
     """给"这五件能不能落地"腾地方：**只看计划里在仓库、且目标格满的那些部位**。
 
-    返回 `(steps, 腾走的件名)`。"格满"的判据**复用** `execution_feasibility.read_facts`
+    返回 `(steps, 腾走的件名, 腾过的槽位)`。"格满"的判据**复用** `execution_feasibility.read_facts`
     （ADR-029 §7：不另写一套）；认不出目标角色、或容量读不到时**不下结论**（与那边同一条纪律）。
     """
     facts = read_facts(snapshot, target_class_type, manifest)
     if not facts.character:
-        return [], []
+        return [], [], set()
     # 计划里的部位名是**单数**（`helmet`，`build_service` 就是按它校验的），快照与现场是**复数**
     # （`helmets`）。换算用 `SOLVER_SLOT_TO_LOADOUT`（那边的注释写着"换算只此一处"），别另写一张表。
     loadout_to_solver = {SOLVER_SLOT_TO_LOADOUT[solver]: solver for solver in SOLVER_SLOTS}
@@ -203,6 +206,7 @@ async def _make_room_for_build(
     plan_ids = {item.item_instance_id for item in plan_items}
     steps: list[str] = []
     moved_names: list[str] = []
+    freed_slots: set[str] = set()
     for item in plan_items:
         armor = by_id.get(item.item_instance_id)
         if armor is None or armor.source_location != "vault":
@@ -219,7 +223,9 @@ async def _make_room_for_build(
         )
         steps += outcome.steps
         moved_names += [a.name for a in outcome.moved]
-    return steps, moved_names
+        if outcome.moved:
+            freed_slots.add(solver_slot)
+    return steps, moved_names, freed_slots
 
 
 def make_room_steps(details: Sequence[str]) -> list[dict]:
@@ -234,17 +240,23 @@ def make_room_steps(details: Sequence[str]) -> list[dict]:
 
 #: 读到"连续两次相同"才当基线时的间隔与次数。写入有**同步窗口**：刚搬完立刻回读，
 #: 读到的可能还是旧状态 —— 2026-10-06 真机第三次翻车就是这么来的（记下的基线比复检看到的旧一拍）。
-_STABLE_DELAY_SECONDS = 0.6
-_STABLE_ATTEMPTS = 3
+_STABLE_DELAY_SECONDS = 1.0
+_STABLE_ATTEMPTS = 6  # 最多等 5 秒：D2 的写入同步窗口是**秒级**的
 
 
-async def _stable_snapshot(inventory, player_name: str, character: str):
-    """读到**连续两次版本相同**为止（最多 `_STABLE_ATTEMPTS` 次）。"""
+async def _settled_snapshot(
+    inventory, player_name: str, character: str, target_class_type: int, manifest, slots: set[str],
+):
+    """等到**腾出来的格子真的空了**为止（最多 `_STABLE_ATTEMPTS` 次）。
+
+    只等"连续两次相同"不够：写出去了、但还没同步时，连续两次读到的都是**搬之前**的旧状态
+    （2026-10-06 真机第五次翻车：搬是搬了，紧接着的前提复检读到的还是 10/10，直接判"装不上"）。
+    """
     snapshot = await inventory.get_armor_snapshot(player_name, character)
     for _ in range(_STABLE_ATTEMPTS - 1):
+        facts = read_facts(snapshot, target_class_type, manifest)
+        if slots and not any(facts.blocks_vault_piece(slot) for slot in slots):
+            return snapshot
         await asyncio.sleep(_STABLE_DELAY_SECONDS)
-        again = await inventory.get_armor_snapshot(player_name, character)
-        if snapshot_version(again) == snapshot_version(snapshot):
-            break
-        snapshot = again
+        snapshot = await inventory.get_armor_snapshot(player_name, character)
     return snapshot
