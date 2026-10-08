@@ -161,7 +161,8 @@ def test_the_equipment_bucket_comes_from_the_manifest_not_from_the_vault_bucket(
     永远找不到可腾的件，于是白报"没有可腾的件"。判据一旦用错桶，整条自动腾格就是死的。
     """
     service = _service([])
-    service._manifest.get_item_info = lambda _h: {"inventory": {"bucketTypeHash": 3448274439}}
+    # 真形状：`get_item_info` 把 `bucketTypeHash` 放**顶层**（2026-10-06 实测键清单）。
+    service._manifest.get_item_info = lambda _h: {"bucketTypeHash": 3448274439}
     service._manifest.bucket_name = lambda h: "Gauntlets" if h in (3448274439, -846692857) else ""
 
     vault_item = _item("v1", "仓库里的臂铠", bucket="Vault (General)", location="vault")

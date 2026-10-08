@@ -70,7 +70,9 @@ class TransferService:
         永远找不到可腾的件）。按物品定义的 `inventory.bucketTypeHash` 查才准；读不到才退回 profile 值。
         """
         info = self._manifest.get_item_info(item.item_hash) or {}
-        raw = (info.get("inventory") or {}).get("bucketTypeHash") or 0
+        # `get_item_info` 把 `bucketTypeHash` 放在**顶层**（实测键清单里有它）；定义原文里才在
+        # `inventory` 下 —— 两处都认，别只认一边（2026-10-06：先按 `inventory` 写，真机上永远取不到桶）。
+        raw = info.get("bucketTypeHash") or (info.get("inventory") or {}).get("bucketTypeHash") or 0
         if raw:
             for candidate in (int(raw), to_signed(int(raw))):
                 name = self._manifest.bucket_name(candidate)
