@@ -127,7 +127,7 @@ class LoadoutEquipmentService(
                 )],
             )
 
-        # Step 1: 搬运（有界并发）。顺序不能动：先都搬过来、再一起装，见 loadout_transfer_step。
+        # Step 1: 搬运（**顺序**、不是并发；先都搬过来再一起装 —— 原因见 loadout_transfer_step）。
         transfer_steps, transferred_ids, transfers_ok = await self.transfer_loadout_items(
             player_name, loadout
         )
