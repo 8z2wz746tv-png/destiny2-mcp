@@ -418,9 +418,11 @@ async def test_write_prep_polls_the_recheck_until_it_sees_our_own_write(monkeypa
     from destiny_mcp.services import make_room as mr
 
     calls = {"n": 0}
+    seen_versions: list = []
 
     async def fake_guard(**_kwargs):
         calls["n"] += 1
+        seen_versions.append(build.snapshot_version)
         if calls["n"] < 3:
             return {
                 "success": False,
@@ -454,6 +456,11 @@ async def test_write_prep_polls_the_recheck_until_it_sees_our_own_write(monkeypa
 
     assert refusal is None, f"读到写可见就该放行，实际仍拒绝：{refusal}"
     # 我们自己动过账号 → 基线必须推到现在，否则指纹比对必然 stale（真机就栽在这一步）
+    # 顺序也要钉：复检必须在**基线推进之后**跑 —— 反了就是死锁（复检因基线旧而判 stale，
+    # 于是永远走不到推进那一步；2026-10-09 真机三次版本号一模一样就是这个）
+    assert seen_versions and seen_versions[0] == mr.snapshot_version(_snapshot_stub()), (
+        f"第一次复检看到的还是旧版本：{seen_versions[:1]}"
+    )
     store.register.assert_called_once()
     assert store.register.call_args.args[0] == "重新登记的那份"
     # **调用方手里那份也要跟着走** —— 写前复检读的就是它（只推 store 的话真机仍判 stale）
