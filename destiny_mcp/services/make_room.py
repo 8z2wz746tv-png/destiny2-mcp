@@ -18,7 +18,7 @@ from collections.abc import Awaitable, Callable, Collection, Sequence
 from dataclasses import dataclass, field
 
 from ..build.constants import SOLVER_SLOTS, SOLVER_SLOT_TO_LOADOUT
-from ..build.execution_feasibility import read_facts
+from ..build.execution_feasibility import VAULT_LOCATION, read_facts
 from ..build.models import Armor
 from ..manifest import resolve_character_name
 
@@ -48,7 +48,14 @@ def is_movable(
     reserved_instance_ids: Collection[str] = (),
     official_instance_ids: Collection[str] = (),
 ) -> bool:
-    """这一件能不能腾（"绝不腾"四条；同部位由调用方在候选里保证）。"""
+    """这一件能不能腾（"绝不腾"四条 + 一条"腾了也没用"；同部位由调用方在候选里保证）。
+
+    ⚠️ **在仓库里的件不算候选**：快照里同一个槽位既有角色身上的、也有仓库里的（真机上臂铠格
+    57 件），把仓库件"搬进仓库"什么都不会发生 —— 格子还是满的、复检照样拒（2026-10-06 真机
+    就是这么翻的车：单测绿、真机没腾成）。
+    """
+    if armor.source_location == VAULT_LOCATION:
+        return False
     if armor.is_equipped:  # DIM 第一条："Try our hardest never to unequip something"
         return False
     if armor.is_locked:

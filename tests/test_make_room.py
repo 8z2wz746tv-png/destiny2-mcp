@@ -165,3 +165,18 @@ async def test_a_failed_move_is_not_swallowed() -> None:
 
     with pytest.raises(RuntimeError):
         await make_room(candidates=[_armor("a", "该走的")], move_to_vault=move_to_vault)
+
+
+def test_never_picks_a_piece_that_is_already_in_the_vault() -> None:
+    """仓库里的件不算候选：**把仓库件搬进仓库什么都不会发生**（格子还是满的）。
+
+    2026-10-06 真机翻的车：快照里同一槽位既有身上的、也有仓库里的（臂铠格 57 件），
+    判据没排掉仓库件，于是"腾了"却一格没空、复检照样拒 —— 而单测当时是绿的。
+    """
+    vault_piece = _armor("a", "仓库里的")  # source_location 默认空 = 身上
+    vault_piece.source_location = "vault"
+    assert pick_move_aside([vault_piece]) == []
+
+    on_body = _armor("b", "身上的")
+    on_body.source_location = "character"
+    assert [a.item_instance_id for a in pick_move_aside([vault_piece, on_body])] == ["b"]
