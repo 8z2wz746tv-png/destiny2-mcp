@@ -734,7 +734,7 @@ class BuildService:
         # `services/build_execution_guard` 的模块 docstring 里。
         # 目标格满而计划里有件在仓库 → **自动腾一件**再复检（ADR-029；只在这条已确认的写入里做）
         room_steps, room_prefix = await make_room_for_build(
-            player_name=player_name, character=normalized_character, inventory=self._inventory, equipment=self._equipment, manifest=self._manifest, build=build)
+            player_name=player_name, character=normalized_character, inventory=self._inventory, equipment=self._equipment, manifest=self._manifest, build=build, candidates=self._candidates)
         refusal = await recheck_confirmed_build(
             inventory=self._inventory,
             player_name=player_name,

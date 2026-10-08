@@ -9,6 +9,7 @@ from __future__ import annotations
 import pytest
 
 from destiny_mcp.build.models import Armor
+from destiny_mcp.build.snapshot_version import snapshot_version
 from destiny_mcp.services.make_room import (
     DEFAULT_LIMIT,
     make_room,
@@ -180,3 +181,76 @@ def test_never_picks_a_piece_that_is_already_in_the_vault() -> None:
     on_body = _armor("b", "身上的")
     on_body.source_location = "character"
     assert [a.item_instance_id for a in pick_move_aside([vault_piece, on_body])] == ["b"]
+
+
+@pytest.mark.asyncio
+async def test_making_room_advances_the_candidate_baseline() -> None:
+    """腾完要把候选基线推到**腾完之后**的实况，否则紧接着的写前复检必然判 stale。
+
+    2026-10-06 真机第二次翻车：腾动本身改了快照（`source_location` 在里面），复检拿求解那一刻的
+    指纹比 → 报"库存或护甲状态已变化，请重新求解"，而"变化"正是我们刚替用户腾的那一下。
+    """
+    from destiny_mcp.build.models import InventorySnapshot
+    from destiny_mcp.services.make_room import make_room_for_build
+
+    def _piece(instance_id: str, name: str, *, location: str) -> Armor:
+        armor = _armor(instance_id, name)
+        armor.source_location = location
+        return armor
+
+    # 计划里那件在**仓库**、角色臂铠格 10/10（含 10 件身上的）→ 必须腾一件出来。
+    plan_piece = _piece("plan", "计划那件", location="vault")
+    full = InventorySnapshot(gauntlets=[
+        plan_piece] + [_piece(f"on{i}", f"身上{i}", location="character") for i in range(10)])
+    freed = InventorySnapshot(gauntlets=[plan_piece] + [
+        _piece(f"on{i}", f"身上{i}", location="character") for i in range(9)
+    ])
+
+    class _Inventory:
+        def __init__(self) -> None:
+            self.n = 0
+
+        async def get_armor_snapshot(self, player_name: str, character: str) -> InventorySnapshot:
+            self.n += 1
+            return full if self.n == 1 else freed  # 第一次判格满，之后都是"腾完的样子"
+
+    class _Equipment:
+        async def move_single_to_vault(self, player_name: str, armor: Armor) -> None:
+            return None
+
+    class _ManifestStub:
+        def get_bucket_definition(self, _hash: int) -> dict:
+            return {"itemCount": 10, "displayProperties": {"name": "臂铠"}}
+
+    class _Plan:
+        """只需要 `items` 与 `model_copy` —— 不为这一条测试去拼整个 CanonicalBuild。"""
+
+        def __init__(self) -> None:
+            self.class_type = "warlock"
+            self.snapshot_version = "v-solve-time"
+            self.execution_id = "exec-1"
+            self.items = [type("I", (), {"item_instance_id": "plan", "slot": "gauntlets"})()]
+
+        def model_copy(self, update: dict):
+            clone = _Plan()
+            clone.snapshot_version = update["snapshot_version"]
+            return clone
+
+    class _Store:
+        def __init__(self) -> None:
+            self.registered: list[str] = []
+
+        def register(self, build, player_name: str) -> None:
+            self.registered.append(build.snapshot_version)
+
+    store = _Store()
+    steps, prefix = await make_room_for_build(
+        player_name="Tester#1234", character="warlock", inventory=_Inventory(),
+        equipment=_Equipment(), manifest=_ManifestStub(), build=_Plan(), candidates=store,
+    )
+
+    assert prefix, "这个用例的前提是确实腾了一件"
+    assert store.registered == [snapshot_version(freed)], (
+        "腾完必须把候选基线推进到**腾完之后**那份快照；否则复检拿旧指纹比 → 报 stale"
+    )
+    assert store.registered[0] != "v-solve-time"

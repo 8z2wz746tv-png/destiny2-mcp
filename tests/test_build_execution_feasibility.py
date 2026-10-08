@@ -662,9 +662,17 @@ async def test_equip_build_makes_room_when_the_bucket_filled_up_after_find() -> 
             success=True, loadout_name="Exact", message="已装备，回读核对通过。",
         )
     )
-    # ① 腾格那把读到 10/10（满），② 腾完复检读到 9/10（腾出来了）—— 真机就是这个次序。
+    # 读快照的次序（三次，一个都不能少）：
+    #   ① 腾格判格满 → 10/10；② 腾完回读、把候选基线推到现在 → 9/10；③ 写前复检 → 9/10。
+    # 第 ② 次是 2026-10-06 真机第二次翻车修出来的：**腾动本身会让指纹过期**，不回读推进基线，
+    # 复检就会判 `stale_inventory_snapshot`（把"我们刚替她腾的那一下"报成"库存已变化"）。
+    # 所以这条用例不只验"腾了"，还验"腾完指纹跟得上"。
     service._inventory.get_armor_snapshot = AsyncMock(
-        side_effect=[_snapshot(on_character_gauntlets=10), _snapshot(on_character_gauntlets=9)]
+        side_effect=[
+            _snapshot(on_character_gauntlets=10),
+            _snapshot(on_character_gauntlets=9),
+            _snapshot(on_character_gauntlets=9),
+        ]
     )
     result = await service.equip_build("Tester#1234", build, "warlock")
 

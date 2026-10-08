@@ -20,6 +20,7 @@ from dataclasses import dataclass, field
 from ..build.constants import SOLVER_SLOTS, SOLVER_SLOT_TO_LOADOUT
 from ..build.execution_feasibility import VAULT_LOCATION, read_facts
 from ..build.models import Armor
+from ..build.snapshot_version import snapshot_version
 from ..manifest import resolve_character_name
 
 #: 单次最多腾几件（ADR-029 §4）。超过就如实拒绝，不无限搬。
@@ -137,6 +138,7 @@ async def make_room_for_build(
     equipment,
     manifest,
     build,
+    candidates=None,
     official_instance_ids: Collection[str] = (),
     limit: int = DEFAULT_LIMIT,
 ) -> tuple[list[str], str]:
@@ -154,8 +156,18 @@ async def make_room_for_build(
         official_instance_ids=official_instance_ids,
         limit=limit,
     )
-    prefix = f"已自动腾出{'、'.join(moved)}（搬到仓库）。" if moved else ""
-    return steps, prefix
+    if not moved:
+        return steps, ""
+    # ⚠️ **腾动本身会让候选的指纹过期**（快照含 `source_location`/`is_equipped`）—— 不推进基线，
+    # 紧接着的写前复检必然判 `stale_inventory_snapshot`（2026-10-06 真机第二次翻车就是这个）。
+    # 与 `build_baseline` 同一套道理：这是**我们自己的写入**，把基线推到当前实况即可；
+    # 复检照样会重读现场并逐件核对，安全网没削弱。
+    if candidates is not None:
+        fresh = await inventory.get_armor_snapshot(player_name, character)
+        candidates.register(
+            build.model_copy(update={"snapshot_version": snapshot_version(fresh)}), player_name
+        )
+    return steps, f"已自动腾出{'、'.join(moved)}（搬到仓库）。"
 
 
 async def _make_room_for_build(
