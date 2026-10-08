@@ -13,6 +13,7 @@ from ._enrichment import community_enrichment
 from ._responses import ok_response
 from ..logging_config import get_logger
 from ..services.weapon_payload import schema_block
+from ..utils.icons import icon_url
 
 
 logger = get_logger(__name__)
@@ -56,17 +57,64 @@ def perk_description_payload(svc: dict[str, Any], perk_name: str) -> dict[str, A
     label = (perk or {}).get("name") or perk_name
     category = str((perk or {}).get("plug_category") or "")
     cosmetic = any(word in category for word in ("skin", "ornament", "shader"))
-    summary = (
-        f"「{label}」**不是一个 perk**，是武器的外观（类别 `{category}`）—— 下面是它的说明。"
-        if cosmetic
-        else f"已读取 Perk「{label}」的说明。"
-    )
+    # 近似候选：名字对不上/不是 perk 时，给几个**名字接近的真 perk**（盲测 2026-10-06：
+    # 玩家问「亡者复仇」这个 perk，工具只说"它不是 perk"，然后就断了 —— 该告诉他可能想找哪个）。
+    near = _near_perks(svc, perk_name) if cosmetic else []
+    if cosmetic:
+        summary = (
+            f"「{label}」**不是一个 perk**，是武器的外观（类别 `{category}`）—— 下面是它的说明。"
+            + (
+                "名字接近的 perk：" + "、".join(entry["name"] for entry in near) + "。"
+                if near
+                else "名字接近的 perk 也没找到，换一个名字或用 weapon_assistant(intent=\"catalog\") 搜。"
+            )
+        )
+    else:
+        summary = f"已读取 Perk「{label}」的说明。"
     return ok_response(
         summary,
         {
             "perk": perk,
+            "near_matches": near,
             "community_references": community,
             "starside": starside,
             **schema_block(),
         },
     )
+
+
+def _near_perks(svc: dict[str, Any], query: str, limit: int = 3) -> list[dict[str, Any]]:
+    """名字接近的**真 perk**（排除皮肤/着色器/装饰 —— 那些看着像 perk，其实不是）。
+
+    用与 `get_perk_description` 同一个搜索口（`manifest.search`），只是把结果按类别过滤一遍。
+    """
+    manifest = svc.get("manifest")
+    if manifest is None or not query.strip():
+        return []
+    try:
+        rows = manifest.search(query, limit=8) or []
+    except Exception as exc:  # 搜索失败不该把整次调用打挂，但要留痕
+        logger.warning("perk_description：近似候选搜索 %r 失败：%s", query, exc)
+        return []
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        name = str(row.get("name") or "")
+        if not name or name == query:
+            continue
+        definition = manifest.get_item_definition(row.get("itemHash", 0)) or {}
+        plug = definition.get("plug") or {}
+        category = str(plug.get("plugCategoryIdentifier") or "")
+        if any(word in category for word in ("skin", "ornament", "shader")):
+            continue
+        if int(definition.get("itemType") or 0) != 19 or not category:
+            continue
+        # 身份行一律带 `icon_url`（仓库规矩：`tests/test_icon_url_output.py` 扫得出来）。
+        out.append({
+            "name": name,
+            "hash": int(row.get("itemHash") or 0),
+            "category": category,
+            "icon_url": icon_url((definition.get("displayProperties") or {}).get("icon")),
+        })
+        if len(out) >= limit:
+            break
+    return out

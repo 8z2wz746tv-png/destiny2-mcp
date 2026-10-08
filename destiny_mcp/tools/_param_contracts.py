@@ -144,6 +144,11 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint='按类型查询用 intent="type"；按名字查用 intent="search"；duplicates 用的是 type_name。',
         suggestion=("inventory_assistant", "type"),
     ),
+    ("inventory_assistant", "equipped_only"): _contract(
+        _only(*_INV_GET),
+        hint='只看已装备的：问「我身上穿着什么」用它；只有列出清单的 intent 读它。',
+        suggestion=("inventory_assistant", "item"),
+    ),
     ("inventory_assistant", "armor_slot"): _contract(
         _only(*_INV_GET), hint="部位过滤只作用于护甲，且只有列出清单的 intent 读它。"
     ),

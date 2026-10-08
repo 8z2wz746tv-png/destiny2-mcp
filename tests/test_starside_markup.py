@@ -272,3 +272,46 @@ def test_every_icon_in_the_archive_is_resolved_to_a_real_asset(payloads) -> None
     unresolved = sorted(path for path in seen if path not in archived)
     assert not unresolved, f"这些图标路径不在归档索引里：{unresolved}"
     assert not [path for path in seen if "://" in path], "响应里不许出现外链或绝对地址"
+
+
+def test_a_non_perk_answer_offers_near_perks_instead_of_stopping() -> None:
+    """问错名字时要给「你是不是想找 X」，不能只回「它不是 perk」就断掉。
+
+    盲测 2026-10-06：玩家问「亡者复仇」这个 perk，工具（正确地）说它不是 perk，
+    但**没有给任何近似候选**，这一问就到此为止 —— 而玩家多半只是记错了名字。
+    """
+    from destiny_mcp.tools import _perk_branches as perk_branches
+
+    class _Query:
+        def get_perk_description(self, name: str) -> dict:
+            return {
+                "name": name, "hash": 2452241573, "plug_category": "v510_new_scout_rifle0_skins",
+                "description": "装备此武器皮肤以改变外观。",
+            }
+
+    class _Manifest:
+        def search(self, query: str, limit: int = 8) -> list[dict]:
+            return [
+                {"itemHash": 1, "name": f"{query}（皮肤）"},
+                {"itemHash": 2, "name": "亡者复仇者"},
+            ]
+
+        def get_item_definition(self, item_hash: int) -> dict:
+            if item_hash == 1:  # 皮肤：要排除
+                return {"itemType": 19, "plug": {"plugCategoryIdentifier": "v510_new_scout_rifle0_skins"}}
+            return {"itemType": 19, "plug": {"plugCategoryIdentifier": "frames"}}
+
+    svc = {
+        "manifest_query_svc": _Query(),
+        "manifest": _Manifest(),
+        "starside_entities_svc": None,
+        "starside_svc": None,
+    }
+    response = perk_branches.perk_description_payload(svc, "亡者复仇")
+
+    assert "不是一个 perk" in response["summary"]
+    near = response["data"]["near_matches"]
+    assert [entry["name"] for entry in near] == ["亡者复仇者"], (
+        f"只该给**真 perk**（皮肤要排除），实际 {near}"
+    )
+    assert "亡者复仇者" in response["summary"], "摘要要说出来，别让调用方自己去 data 里翻"

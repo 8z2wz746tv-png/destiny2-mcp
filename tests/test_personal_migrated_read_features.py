@@ -617,3 +617,30 @@ async def test_the_profile_intent_actually_carries_the_triumph_score() -> None:
     # 上游没给这一块 → None，不许变成 0
     resolver.get_profile.return_value = {"characters": {"data": {"c": {"classType": 0, "light": 550}}}}
     assert (await service.get_profile("Tester#1234")).triumph_score is None
+
+
+@pytest.mark.asyncio
+async def test_the_profile_class_name_is_chinese_like_everywhere_else() -> None:
+    """角色展示名走**中文词表**（盲测 2026-10-06：只有这一处回 `Hunter/Warlock/Titan`）。
+
+    注意别去改 `manifest.class_type_name` —— 那是机器键（`build_service` 拿它 lower() 当角色名）。
+    认不出的 classType 退回英文原值（**不编**中文）。
+    """
+    from destiny_mcp.services import player_service as ps
+
+    resolver = AsyncMock()
+    resolver.resolve_player.return_value = {"membership_id": "1", "membership_type": 3}
+    resolver.get_profile.return_value = {
+        "characters": {"data": {
+            "a": {"classType": 0, "light": 550},
+            "b": {"classType": 1, "light": 540},
+            "c": {"classType": 2, "light": 530},
+            "d": {"classType": -1, "light": 0},
+        }},
+    }
+    service = ps.PlayerService(AsyncMock(), MagicMock(), resolver)
+
+    names = {c.class_type: c.class_name for c in (await service.get_profile("T#1")).characters}
+
+    assert names[0] == "泰坦" and names[1] == "猎人" and names[2] == "术士"
+    assert names[-1] == "Unknown", "认不出的 classType 不许编一个中文名出来"

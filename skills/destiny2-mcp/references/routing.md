@@ -376,6 +376,7 @@ Manifest 侧（**不代表拥有**）：
 | `destination` | `inventory_assistant`：`move` |
 | `element` | `subclass_assistant`：`community`、`fragments`、`options` |
 | `equip` | `inventory_assistant`：`move` |
+| `equipped_only` | `inventory_assistant`：`get`、`inventory`、`list` |
 | `excluded_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
 | `execution_id` | `build_assistant`：`equip_build` |
 | `exotic_confirmation_token` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |

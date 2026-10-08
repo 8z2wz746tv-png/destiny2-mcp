@@ -71,23 +71,23 @@ def _summary(result: dict[str, Any]) -> str:
         parts.append(text)
     summary = "；".join(parts) if parts else "这次没读到轮换数据。"
     if not result["lost_sector"]["anchored"]:
-        summary += (f"。遗失区域：专家是常驻列表（{result['lost_sector']['total']} 个地点），"
-                    "传说/大师的每日轮换还没核对过，暂不给「今天是谁」")
+        summary += f"。遗失区域：专家是常驻列表（{result['lost_sector']['total']} 个地点），每日轮换没核对过，不给「今天是谁」"
     return summary + "。"
 
 
 def rotations_payload(result: dict[str, Any]) -> dict[str, Any]:
     rows = result["rows"]
     warnings = [
-        "`source=official` 是官方口径（本周特色突袭/地牢来自里程碑、夜幕/宗师来自角色活动组件 204）；"
-        "`source=schedule` 是我们自己维护的周期表（上维挑战 / 异域任务 / 泉源），名字来自游戏内轮换页。",
+        "`source=official` 是官方口径（特色突袭/地牢来自里程碑、夜幕/宗师来自组件 204）；"
+        "`source=schedule` 是自维护周期表（上维挑战/异域任务/泉源），名字来自游戏内轮换页。",
     ]
     lost = result["lost_sector"]
     if lost.get("expert_always_available"):
         warnings.append(
             f"遗失区域：**专家难度是常驻列表**（{lost['total']} 个地点，按目的地分组，实测于游戏内截图），"
-            "没有「今天轮到哪个」这回事；传说/大师是否有每日轮换还没核对过 —— 所以这里不给「今天是谁」。"
+            "没有「今天轮到哪个」这回事；传说/大师的每日轮换还没核对过 —— 不给「今天是谁」。"
         )
+    warnings.extend(result.get("gaps") or [])  # 「本周没有」vs「没读到」：判据在服务层
     text = str(rows)
     if "{var:" in text:
         warnings.append("有些词缀/奖励文案里有未插值的 `{var:...}` 变量，按原文给，不要猜数字。")

@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 from typing import Any
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -42,6 +42,7 @@ def _inventory_svc(items: int = 250) -> SimpleNamespace:
         rarity=None,
         limit=None,
         offset=0,
+        equipped_only: bool = False,
     ) -> dict:
         everything = [{"name": f"物品{i}"} for i in range(items)]
         window = everything[offset : offset + limit] if limit and limit > 0 else everything[offset:]
@@ -369,3 +370,76 @@ async def test_equipped_items_come_first_in_a_listing() -> None:
     assert ids == ["b", "d"], (
         "前两条必须是已装备的（稳定排序：同组内保持原顺序）—— 否则「身上穿什么」又要翻页"
     )
+
+
+def test_type_listing_reports_kinds_not_only_copies() -> None:
+    """**件数 ≠ 种数**：问「有哪些手炮」时，摘要要同时给"多少件/多少种"，并按名字归并。
+
+    盲测 2026-10-06：117 **件**逐条列（月之狂嚎 3 把、备用口粮 5 把…），玩家要自己归并才知道"有哪些"。
+    """
+    from destiny_mcp.models import InventoryItem
+    from destiny_mcp.tools import _inventory_branches as branches
+
+    def _item(iid: str, name: str, power: int, *, equipped: bool = False, where: str = "vault") -> InventoryItem:
+        return InventoryItem(
+            item_instance_id=iid, item_hash=1000, name=name, location=where,
+            item_type="Weapon", bucket_type="Kinetic Weapons", is_equipped=equipped, power=power,
+        )
+
+    # 用**真模型** dump 出来的形状（不是手编 dict）：今天已经栽过三次"夹具编错形状"。
+    items = [
+        _item("1", "月之狂嚎", 1800),
+        _item("2", "月之狂嚎", 1810, equipped=True, where="titan"),
+        _item("3", "备用口粮", 1750),
+    ]
+
+    manifest = MagicMock()
+    manifest.get_item_definition.return_value = {"itemType": 3}
+    payload = branches.inventory_type_payload(
+        {"manifest": manifest},
+        {"items": [item.model_dump(mode="json") for item in items]},
+        "手炮",
+        "vault",
+    )
+    data = payload["data"]["result"]
+
+    assert data["total"] == 3 and data["kinds_count"] == 2, "3 件 2 种"
+    grouped = {entry["name"]: entry for entry in data["by_name"]}
+    assert grouped["月之狂嚎"]["count"] == 2
+    assert grouped["月之狂嚎"]["best_power"] == 1810, "要给出**最高的那把**光等"
+    assert grouped["月之狂嚎"]["equipped"] == 1
+    assert "3 件／2 种" in payload["summary"], f"摘要要报两个数：{payload['summary']}"
+
+
+@pytest.mark.asyncio
+async def test_equipped_only_returns_just_what_is_worn() -> None:
+    """`equipped_only=True` 只回身上那几件。
+
+    盲测 2026-10-06：「我泰坦身上穿着什么」拿到的是 100 件（背包+装备混在一起、还被截断），
+    玩家得自己筛 `is_equipped` —— 用例回答的问题是同一个，工具就该有一个开关。
+    """
+    from destiny_mcp.models import InventoryItem
+    from destiny_mcp.services import inventory_service as svc_module
+
+    def _item(instance_id: str, *, equipped: bool) -> InventoryItem:
+        return InventoryItem(
+            item_instance_id=instance_id, item_hash=1000, name=f"件-{instance_id}",
+            location="titan", item_type="Weapon", bucket_type="Kinetic Weapons",
+            is_equipped=equipped,
+        )
+
+    service = object.__new__(svc_module.InventoryService)
+    service._items_at_location = lambda profile, location: (  # type: ignore[method-assign]
+        [_item("a", equipped=False), _item("b", equipped=True), _item("c", equipped=False)],
+        "titan",
+    )
+
+    async def _resolve_and_fetch(player_name: str, components: Any) -> tuple[Any, Any]:
+        return None, {}
+
+    service._resolve_and_fetch = _resolve_and_fetch  # type: ignore[method-assign]
+
+    response = await service.get_inventory("Tester#1234", "titan", equipped_only=True)
+
+    assert [item.item_instance_id for item in response.items] == ["b"]
+    assert response.total_items == 1, "总数也只剩身上那几件"

@@ -317,6 +317,14 @@ IncludeInventory = Annotated[
     )),
 ]
 
+EquippedOnly = Annotated[
+    bool,
+    Field(description=(
+        "**只看已装备的**。只有 `inventory_assistant(intent=get/list/inventory)` 读它；"
+        "问「我身上穿着什么」用它 —— 否则要在整份清单里自己筛 `is_equipped`。"
+    )),
+]
+
 ArmorSlot = Annotated[
     str,
     Field(description="护甲部位过滤：helmet/gauntlets/chest/legs/class_item（也认头盔/手套/胸甲/腿甲/职业物品）。"),

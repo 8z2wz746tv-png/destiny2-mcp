@@ -11,6 +11,7 @@ from typing import Any
 
 from ..services import weapon_payload, weapon_profile
 from ..services.weapon_payload import schema_block
+from ._name_grouping import group_by_name
 from ._responses import ok_response
 
 
@@ -31,36 +32,26 @@ def inventory_type_payload(
     rows: list[dict[str, Any]] = []
     weapons = 0
     for item in payload.get("items") or []:
-        definition = (
-            manifest.get_item_definition(item.get("item_hash", 0)) if manifest else None
-        )
+        definition = manifest.get_item_definition(item.get("item_hash", 0)) if manifest else None
         if not isinstance(definition, dict) or definition.get("itemType") != 3:
             rows.append({"kind": "item", **item})
             continue
         weapons += 1
-        row = weapon_payload.lean_identity(
-            manifest,
-            definition,
-            roll_kind=weapon_profile.roll_kind(definition),
-            fallback_name=str(item.get("name") or ""),
-        )
-        row.update({
-            "kind": "weapon",
-            "instance_id": item.get("item_instance_id", ""),
-            "location": item.get("location", ""),
-            "power": item.get("power"),
-            "is_equipped": item.get("is_equipped", False),
-            "bucket_type": item.get("bucket_type", ""),
-            "icon_url": row.get("icon_url") or item.get("icon_url", ""),
-        })
+        row = weapon_payload.lean_identity(manifest, definition, roll_kind=weapon_profile.roll_kind(definition),
+                                           fallback_name=str(item.get("name") or ""))
+        row.update({"kind": "weapon", "instance_id": item.get("item_instance_id", ""),
+                    "location": item.get("location", ""), "power": item.get("power"),
+                    "is_equipped": item.get("is_equipped", False),
+                    "bucket_type": item.get("bucket_type", ""),
+                    "icon_url": row.get("icon_url") or item.get("icon_url", "")})
         rows.append(row)
 
     label = type_name or "全部"
     scope = f"（{location}）" if location else ""
+    kinds = group_by_name(rows)  # 件数 ≠ 种数（盲测：117 件要自己归并才知道"有哪些"）
     return ok_response(
-        f"「{label}」{scope}持有 {len(rows)} 件（其中武器 {weapons} 件）；"
-        "这里只有身份与位置；要看某一件的插槽与可换部件用 weapon_assistant(intent=\"compare\", "
-        "weapon_name=…, item_instance_id=…)。",
+        f"「{label}」{scope}持有 {len(rows)} 件／{len(kinds)} 种（件数是副本数，下面按名字归并了）；"
+        '要看某一件的插槽与可换部件用 weapon_assistant(intent="compare", weapon_name=…, item_instance_id=…)。',
         {
             "result": {
                 "query": payload.get("query", type_name),
@@ -68,6 +59,8 @@ def inventory_type_payload(
                 "total": len(rows),
                 "returned": len(rows),
                 "truncated": False,
+                "kinds_count": len(kinds),
+                "by_name": kinds,
                 "items": rows,
                 "weapon_count": weapons,
             },

@@ -16,6 +16,7 @@ from datetime import datetime
 from ..bungie_client import BungieClient
 from ..exceptions import APIError, PlayerNotFoundError
 from ..logging_config import get_logger
+from ..vocabulary import CLASS_LABELS_ZH, CLASS_TYPE_KEYS
 from ..manifest import ManifestManager, class_type_name
 from ..models import CharacterInfo, PlayerInfo, ProfileResponse
 from ..player_resolver import CURRENT_OAUTH_PLAYER, PlayerResolver
@@ -269,7 +270,13 @@ class PlayerService:
                 CharacterInfo(
                     id=char_id,
                     class_type=data.get("classType", -1),
-                    class_name=class_type_name(data.get("classType", -1)),
+                    # 展示名走中文词表（其余工具面全是中文，盲测里只有这里是 Hunter/Warlock）。
+                    # 注意**不要**去改 `manifest.class_type_name` —— 它是机器键（`build_service`
+                    # 拿它 lower() 当角色名），改成中文会把那条链弄坏。
+                    class_name=CLASS_LABELS_ZH.get(
+                        CLASS_TYPE_KEYS.get(data.get("classType", -1), ""),
+                        class_type_name(data.get("classType", -1)),
+                    ),
                     light=data.get("light", 0),
                     emblem_path=data.get("emblemPath"),
                     last_played=str(data.get("dateLastPlayed", "")),

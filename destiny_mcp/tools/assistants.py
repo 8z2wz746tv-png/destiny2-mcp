@@ -63,7 +63,7 @@ from ._responses import (
 
 # world_assistant 里「没传 limit」时各 intent 用的条数（vendor 除外，它按菜单/详情取默认）。
 _WORLD_LIMIT_DEFAULT = 12
-# 轮换表：默认 30 行（本周特色突袭/地牢 + 夜幕/宗师 + 周期表那半）
+# 轮换表：默认 30 行（特色突袭/地牢 + 夜幕/宗师 + 周期表那半）
 _WORLD_ROTATION_LIMIT = 30
 _INVENTORY_DEFAULT_LIMIT = 100
 _INVENTORY_PAGE_INTENTS = {"get", "inventory", "list"}
@@ -146,6 +146,7 @@ async def inventory_assistant(
     item_name: fields.ItemName = "",
     item_type: fields.ItemType = "",
     armor_slot: fields.ArmorSlot = "",
+    equipped_only: fields.EquippedOnly = False,
     rarity: fields.Rarity = "",
     type_name: fields.TypeName = "",
     item_instance_id: fields.ItemInstanceId = "",
@@ -166,9 +167,8 @@ async def inventory_assistant(
 ) -> dict:
     """背包/仓库聚合入口。
 
-    intent=duplicates 会按精确 item_hash 返回可核对的重复武器组。
-    具体武器类型查询用 intent=type，别把“手炮”等类型传给 intent=get 的 item_type。
-    """
+    intent=duplicates 会按精确 item_hash 返回可核对的重复武器组。具体类型用 intent=type；
+    `item_type` 只认 weapon/armor/all。能力清单见工具描述（`_tool_usage`）。"""
     svc = get_ctx(ctx)
     intent = cast(InventoryIntent, (intent or "summary").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
@@ -259,6 +259,7 @@ async def inventory_assistant(
             rarity=rarity or None,
             limit=page_limit,
             offset=offset,
+            equipped_only=equipped_only,
         )
         inventory = dump(result)
         warnings = []
@@ -414,8 +415,7 @@ async def weapon_assistant(
     svc = get_ctx(ctx)
     intent = cast(WeaponIntent, (intent or "analyze").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
-    # 按类型列武器（列表行，约 2.3k 字符/件）默认 10 件、锻造图样默认 20 条；其余 50
-    # （目录/筛选命中行很轻，且是"全库找枪"，条数少了反而要反复问）。
+    # 按类型列武器默认 10 件（行重）、图样 20 条；其余 50（目录命中行很轻，少了要反复问）。
     weapon_defaults = dict.fromkeys(WEAPON_PATTERN_INTENTS, _WEAPON_PATTERN_DEFAULT_LIMIT)
     weapon_defaults["type"] = _WEAPON_TYPE_DEFAULT_LIMIT
     limit = positive_or_default(limit, weapon_defaults.get(intent, 50))

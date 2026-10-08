@@ -805,6 +805,13 @@ async def match_inventory(
             }
         )
     attach_sourcing(ownership, lookup)
+    # 投影：没做账号校验的行是体积大头（真机 41 行 × 整套 definitions）→ 压成哈希列表；`sourcing` 留着。
+    for row in ownership:
+        if row.get("inventory_status") == "not_account_checked" and "definitions" in row:
+            row["definition_hashes"] = [
+                entry.get("item_hash") or entry.get("set_hash")
+                for entry in row.pop("definitions") or []
+            ]
     return {
         "inventory_status": "complete",
         "requirements": ownership,

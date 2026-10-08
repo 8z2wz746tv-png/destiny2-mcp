@@ -238,7 +238,8 @@ async def _call(services: dict[str, Any], **kwargs) -> dict:
         ("perk_description", {"perk_name": "快速命中"},
          # `starside` = 作者给的 perk 层结构化注记（实机细节/效果/属性变化/冷却/来源 + 套装/反查）；
          # `community_references` 是页面正文检索，两者分工不同、都要留。
-         ["community_references", "perk", "starside", "weapon_schema_version"]),
+         # `near_matches` = 名字对不上/不是 perk 时给的近似**真 perk**（盲测：只回"它不是 perk"会断线）。
+         ["community_references", "near_matches", "perk", "starside", "weapon_schema_version"]),
         ("filter_rolls", {"weapon_type": "手炮"},
          ["checked_count", "coverage_complete", "farming_list", "filters", "matched",
           "matched_count", "not_matched", "perk_scope", "returned_count", "scope",

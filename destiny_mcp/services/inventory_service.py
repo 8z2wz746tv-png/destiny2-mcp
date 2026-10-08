@@ -99,6 +99,7 @@ class InventoryService:
         rarity: str | None = None,
         limit: int | None = None,
         offset: int = 0,
+        equipped_only: bool = False,
     ) -> InventoryResponse:
         """Get inventory for a specific character or the vault.
 
@@ -125,6 +126,8 @@ class InventoryService:
 
         # 已装备的排最前（稳定排序）：盲测里"我身上穿什么"的前 100 件一件装备都没有，要翻页。
         items.sort(key=lambda item: not item.is_equipped)
+        if equipped_only:
+            items = [item for item in items if item.is_equipped]
 
         # 截断与自证：以前一次能把整个仓库倒出来（真机 1260 件 ≈ 511 KB / 13–15 万 tokens），
         # 而响应里没有总数也没有 truncated，调用方既没法少要一点、也察觉不到自己只看到一部分。

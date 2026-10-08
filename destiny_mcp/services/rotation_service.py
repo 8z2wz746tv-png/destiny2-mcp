@@ -2,16 +2,14 @@
 
 两半的来源、口径与实测证据见 `docs/plans/ROTATION_PLAN.md`：
 
-- **官方**：本周特色突袭/地牢 = `/Destiny2/Milestones/`（带官方起止时间）；
-  本周夜幕/宗师 = profile 组件 204 的 `characterActivities.availableActivities[]`
-  （每条带 `modifierHashes` 与 `visibleRewards`，三个角色实测完全一致）。
+- **官方**：特色突袭/地牢 = `/Destiny2/Milestones/`（带官方起止时间）；夜幕/宗师 = profile
+  组件 204 的 `characterActivities.availableActivities[]`（带 `modifierHashes`/`visibleRewards`）。
 - **自维护表**：上维挑战 / 异域任务 / 泉源 / 遗失区域（`data/rotations.py`，带锚点与核对日期）。
 
-三条口径红线（写在这里是为了让读代码的人一眼看到）：
+三条口径红线：
 
 1. `source` 只能取 `official` 或 `schedule`——表算出来的**不许**写成官方数据；
-2. 没核对过锚点的轮换（遗失区域）**不猜**：只给候选名单 + 说明怎么核对；
-3. 词缀/奖励里出现 `{var:...}` 或数量 0 一律**原样给**，不插值、不当成"掉 0 个"。
+2. 没核对过锚点的轮换（遗失区域）**不猜**：只给候选；3. `{var:...}` 与数量 0 一律**原样给**，不插值。
 """
 
 from __future__ import annotations
@@ -229,10 +227,8 @@ class RotationService:
                 })
         return rewards
 
-    # ── 自维护表那半 ─────────────────────────────────────────────────
+    # ── 自维护表那半搬去了 `rotation_tables.schedule_rows(now)`（只读 data/rotations.py）──
     #
-    # 那半（上维挑战 / 异域任务 / 泉源）搬去了 `rotation_tables.schedule_rows(now)`：
-    # 它只读 `data/rotations.py`，与"取数"无关，而这个模块贴着 285 行上限。
 
     # ── 入口 ─────────────────────────────────────────────────────────
     async def rotations(self, player_name: str = "", *, limit: int = 20) -> dict[str, Any]:
@@ -251,9 +247,13 @@ class RotationService:
             "official": sum(1 for row in rows if row["source"] == SOURCE_OFFICIAL),
             "schedule": sum(1 for row in rows if row["source"] == SOURCE_SCHEDULE),
         }
+        kinds = {row.get("kind") for row in rows}
+        gaps = (["特色地牢：里程碑读到了数据但没有地牢条目 —— 是「本周没有」，不是「没读到」。"]
+                if counts["official"] and "raid" in kinds and "dungeon" not in kinds else [])
         return {
             "rows": page,
             "counts": counts,
+            "gaps": gaps,
             "truncated": total > len(page),
             "week_of": tables.week_stamp(tables.week_start(now)),
             "today": tables.week_stamp(tables.day_start(now)),
