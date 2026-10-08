@@ -6,7 +6,9 @@
   装备还把插槽数据发三遍），行里保留"能不能执行"与"去哪看详情"；
 - `get` 才给完整 `build_template`，并且可以用 `loadout_id` 只取一套；快照的"账号护甲现场"只报件数；
 - "被截断"与"怎么翻页"由这一段讲清楚（列表类响应都要能自证全量）。
-"""
+
+详情分支是**完整模板**（真机实测单套 ~139 KB）：出口必须给"更小的出口"（`list`/`inventory item`），
+否则模型拿到这一坨就以为"看完了"，不会再去找那两条路。"""
 
 from __future__ import annotations
 
@@ -139,13 +141,11 @@ async def list_or_get(
             "next_offset": payload["next_offset"],
             "scope": payload["scope"],
             "loadout_format": payload["loadout_format"],
-            "community_route": {
-                "tool": "build_assistant",
-                "arguments": {
-                    "intent": "community",
-                    "character": character or "",
-                },
-            },
+            "community_route": {"tool": "build_assistant", "arguments": {"intent": "community", "character": character or ""}},
         },
+        next_actions=[
+            "这一份是**完整模板**（很大）：只要清单用 `intent=\"list\"`（每套一行）；只要某一件的细节用 `inventory_assistant(intent=\"item\")`。",
+            '要穿这一套：loadout_assistant(intent="equip_loadout", loadout_id="…", confirmed=true)。',
+        ],
         warnings=[*warnings, _SCOPE_WARNING],
     )
