@@ -53,8 +53,8 @@ def full_bucket_reasons(
         reasons.append(
             f"{facts.character_label}的{facts.label(slot)}格已经满了"
             f"（{bucket.used}/{bucket.capacity}），仓库里那 {len(blocked)} 件搬不进来"
-            "（上游会回 DestinyNoRoomInDestination）—— 这次只从他身上/背包里已有的"
-            f"{facts.label(slot)}里挑；要用仓库那几件：{vault_full_way_out(facts, slot)}。"
+            "（上游会回 DestinyNoRoomInDestination）—— 那些件**照样参与求解**"
+            f"（ADR-027）；只是要用它们得先准备：{vault_full_way_out(facts, slot)}。"
         )
     return reasons
 
