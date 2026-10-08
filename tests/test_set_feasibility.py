@@ -25,8 +25,10 @@ LABELS = {
 
 
 class _Armor:
-    def __init__(self, *, set_bonus: int | None = None, wildcard: bool = False) -> None:
-        self.set_bonus = set_bonus
+    """替身只带这个判定读的两个字段 —— **名字必须与 `Armor` 一致**（见文件末那条守门）。"""
+
+    def __init__(self, *, set_bonus_hash: int | None = None, wildcard: bool = False) -> None:
+        self.set_bonus_hash = set_bonus_hash
         self.has_set_bonus_mod_socket = wildcard
 
 
@@ -47,7 +49,7 @@ def _constraints(*, set_hash: int | None = 4242, need: int = 4) -> SimpleNamespa
 
 def _snapshot_with(covered: set[str], *, wildcard: set[str] = frozenset()) -> _Snapshot:
     return _Snapshot({
-        slot: [_Armor(set_bonus=4242)] if slot in covered
+        slot: [_Armor(set_bonus_hash=4242)] if slot in covered
         else [_Armor(wildcard=True)] if slot in wildcard
         else []
         for slot in SOLVER_SLOTS
@@ -97,10 +99,27 @@ def test_no_set_constraint_means_no_claim() -> None:
 def test_a_piece_counted_twice_does_not_fake_coverage() -> None:
     """同一部位有 3 件这套也**只算 1 件**（一个部位只能穿一件）—— 上界不许被件数撑大。"""
     snapshot = _Snapshot({
-        slot: [_Armor(set_bonus=4242), _Armor(set_bonus=4242), _Armor(set_bonus=4242)]
+        slot: [_Armor(set_bonus_hash=4242), _Armor(set_bonus_hash=4242), _Armor(set_bonus_hash=4242)]
         for slot in ("helmets", "legs", "gauntlets")
     })
 
     sentence = set_bonus_shortfall(snapshot, _constraints(need=4))
 
     assert sentence and "只有 3 个部位" in sentence, "3 个部位 × 每处 3 件，仍然是 3 < 4"
+
+
+def test_the_two_fields_this_module_reads_exist_on_the_real_armor_model() -> None:
+    """**夹具是手写的替身，字段名可能是我编的** —— 真类上有没有这两个名字单独钉一条。
+
+    2026-10-06 真机踩到：`Armor` 上根本没有 `set_bonus`（那是 `ProcessItem` 的字段），
+    而 `getattr(armor, "set_bonus", None)` 让覆盖率**静默数成 0** —— 工具于是说
+    "这个职业身上一个部位都没有"，而真实是 3 个部位（头盔/腿甲/臂铠）。
+    这条守门跟真实账号无关，但它把"替身编出来的字段名"挡在门外。
+    """
+    from destiny_mcp.build.models import Armor
+
+    assert "set_bonus_hash" in Armor.model_fields, (
+        "判定读的是 Armor.set_bonus_hash；名字变了这条要跟着改，"
+        "否则会像 2026-10-06 那样静默数成 0"
+    )
+    assert "has_set_bonus_mod_socket" in Armor.model_fields

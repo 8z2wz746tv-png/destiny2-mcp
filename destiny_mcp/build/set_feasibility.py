@@ -32,9 +32,13 @@ def set_bonus_shortfall(snapshot: Any, constraints: Any) -> str | None:
     wildcard: list[str] = []
     for slot in SOLVER_SLOTS:
         pieces = snapshot.get_slot(slot)
-        if any(getattr(armor, "set_bonus", None) == want for armor in pieces):
+        # ⚠️ 直接取属性，**不要** `getattr(..., None)`：这两个名字分属两个类
+        # （`Armor.set_bonus_hash` vs `ProcessItem.set_bonus`），2026-10-06 真机上就是
+        # 名字写错 + `getattr` 默认值 = 覆盖率**静默数成 0**，工具因此回了一句
+        # "这个职业一个部位都没有"（真实是 3 个部位）。写错就该当场炸。
+        if any(armor.set_bonus_hash == want for armor in pieces):
             covered.append(slot)
-        elif any(getattr(armor, "has_set_bonus_mod_socket", False) for armor in pieces):
+        elif any(armor.has_set_bonus_mod_socket for armor in pieces):
             wildcard.append(slot)
 
     most = len(covered) + len(wildcard)
