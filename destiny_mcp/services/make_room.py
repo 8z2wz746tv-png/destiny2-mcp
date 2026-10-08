@@ -428,4 +428,11 @@ async def prepare_build_write(
         if refusal is not None:
             refusal = {**refusal, "message": prefix + note + str(refusal.get("message", ""))}
             return steps, prefix + note, refusal
+        # 我们自己动过账号 → **候选基线也要推到现在**：否则复检过了、紧接着的指纹比对必然报
+        # `stale_inventory_snapshot`（2026-10-09 真机：顶下成功之后就是这一步把它拦下的）。
+        if candidates is not None:
+            fresh = await inventory.get_armor_snapshot(player_name, character)
+            candidates.register(
+                build.model_copy(update={"snapshot_version": snapshot_version(fresh)}), player_name
+            )
     return steps, prefix + note, None

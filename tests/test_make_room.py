@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 from destiny_mcp.build.models import Armor
 from destiny_mcp.build.snapshot_version import snapshot_version
@@ -19,6 +19,13 @@ from destiny_mcp.services.make_room import (
     pick_move_aside,
     sort_key,
 )
+
+
+def _snapshot_stub():
+    """最小快照桩：这条用例只关心"注册时用的是不是新读到的版本"。"""
+    from destiny_mcp.build.models import InventorySnapshot
+
+    return InventorySnapshot(gauntlets=[])
 
 
 def _armor(
@@ -430,13 +437,25 @@ async def test_write_prep_polls_the_recheck_until_it_sees_our_own_write(monkeypa
     monkeypatch.setattr(mr, "make_room_for_build", fake_make_room)
     equipment = AsyncMock()
     equipment.dequip_conflicting_exotics_for_build = AsyncMock(return_value=([], True, ""))
+    store = MagicMock()
+    build = MagicMock()
+    build.model_copy.return_value = "重新登记的那份"
+
+    async def _snapshot(*_a, **_k):
+        return _snapshot_stub()
+
+    inventory = MagicMock()
+    inventory.get_armor_snapshot = _snapshot
 
     steps, prefix, refusal = await mr.prepare_build_write(
-        player_name="Tester#1234", character="warlock", inventory=AsyncMock(),
-        equipment=equipment, manifest=AsyncMock(), build=AsyncMock(),
+        player_name="Tester#1234", character="warlock", inventory=inventory,
+        equipment=equipment, manifest=AsyncMock(), build=build, candidates=store,
     )
 
     assert refusal is None, f"读到写可见就该放行，实际仍拒绝：{refusal}"
+    # 我们自己动过账号 → 基线必须推到现在，否则指纹比对必然 stale（真机就栽在这一步）
+    store.register.assert_called_once()
+    assert store.register.call_args.args[0] == "重新登记的那份"
     assert calls["n"] >= 3, f"复检要轮询到可见，实际只读了 {calls['n']} 次"
     assert steps and steps[0]["action"] == "make_room", steps
     assert "已自动腾出" in prefix
