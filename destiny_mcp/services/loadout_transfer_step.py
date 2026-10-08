@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from ..exceptions import ItemNotFoundError, TransferError
 from .make_room import is_no_room_error
+from ..manifest import class_type_name
 from ..models import Loadout, LoadoutItem, MoveItemStep
 
 
@@ -131,6 +132,15 @@ class ExoticDequipMixin:
     exclusions})`），找不到替身就明确报"先把那件脱下来"。这里照做。
     """
 
+    def _class_matches(self, item_hash: int, character: str) -> bool:
+        """这件能不能给这个职业穿（`classType`：0=泰坦 1=猎人 2=术士 3=任意）。"""
+        info = self._manifest.get_item_info(item_hash) or {}
+        class_type = int(info.get("classType") or 3)
+        if class_type == 3:
+            return True
+        name = class_type_name(class_type) if class_type in (0, 1, 2) else ""
+        return name.lower() == character.lower()
+
     def _item_is_exotic(self, item_hash: int) -> bool:
         definition = self._manifest.get_item_definition(item_hash) or {}
         tier = (definition.get("inventory") or {}).get("tierType") or 0
@@ -147,7 +157,9 @@ class ExoticDequipMixin:
         }
         if not exotic_slots:
             return [], True, ""
-        worn = await self._transfer.list_character_items(player_name, loadout.character)
+        worn = await self._transfer.list_character_items(
+            player_name, loadout.character, include_vault=True
+        )
         plan_ids = {i.item_instance_id for i in loadout.items if i.item_instance_id}
         steps: list[MoveItemStep] = []
         moved_names: list[str] = []
@@ -166,14 +178,34 @@ class ExoticDequipMixin:
                 and not i.is_equipped
                 and i.item_instance_id not in plan_ids
                 and not self._item_is_exotic(i.item_hash)
+                and (i.location != "vault" or self._class_matches(i.item_hash, loadout.character))
             ]
             if not rivals:
                 return steps, False, (
                     f"「{current.name}」占着全身唯一的金装位（金装全身只能穿一件），而这套配装要穿"
-                    f"另一件金装。角色身上没有能顶下它的非金装{current.slot_display or slot}。"
-                    f"出路：先把「{current.name}」脱下来（或搬一件同部位的非金装过来），再重试。"
+                    f"另一件金装；身上和仓库里都没有能给这个职业顶下它的非金装{current.slot_display or slot}。"
+                    f"出路：先把「{current.name}」脱下来，或去弄一件同部位的非金装。"
                 )
-            replacement = sorted(rivals, key=lambda i: (i.power or 0))[-1]
+            # 优先身上那件（不用搬）；都没有才去仓库拉一件（DIM 同款：搬进来再穿）
+            on_body = [i for i in rivals if i.location != "vault"]
+            replacement = sorted(
+                on_body or rivals, key=lambda i: (i.power or 0)
+            )[-1]
+            if replacement.location == "vault":
+                moved = await self._transfer.move_item(
+                    player_name, replacement.name, loadout.character,
+                    item_instance_id=replacement.item_instance_id,
+                )
+                steps.append(MoveItemStep(
+                    action="transfer",
+                    detail=f"把顶下用的「{replacement.name}」从仓库搬过来",
+                    success=bool(moved.success),
+                ))
+                if not moved.success:
+                    return steps, False, (
+                        f"要拿仓库里的「{replacement.name}」顶下「{current.name}」，但搬运失败："
+                        f"{moved.message}"
+                    )
             equipped = await self._transfer.equip_item(
                 player_name, replacement.item_instance_id, loadout.character
             )

@@ -22,13 +22,21 @@ _TIER_LEGENDARY = 5
 
 @dataclass
 class _Transfer:
-    """替身：只实现 mixin 用到的那两个方法（`list_character_items` / `equip_item`）。"""
+    """替身：只实现 mixin 用到的那三个方法（列件 / 搬件 / 装件）。"""
 
     worn: list[InventoryItem]
     equipped: list[str] = field(default_factory=list)
+    moved: list[str] = field(default_factory=list)
 
-    async def list_character_items(self, player_name: str, character: str):
-        return self.worn
+    async def list_character_items(self, player_name: str, character: str, *, include_vault: bool = False):
+        vault = [i for i in self.worn if i.location == "vault"]
+        body = [i for i in self.worn if i.location != "vault"]
+        return body + vault if include_vault else body
+
+    async def move_item(self, player_name: str, name: str, character: str, item_instance_id: str = ""):
+        self.moved.append(item_instance_id)
+        return TransferResult(success=True, item_instance_id=item_instance_id,
+                              item_name=name, message=f"搬 {name}")
 
     async def equip_item(self, player_name: str, instance_id: str, character: str):
         self.equipped.append(instance_id)
@@ -124,3 +132,30 @@ async def test_no_conflict_does_nothing_at_all() -> None:
 
     assert steps == [] and ok and note == "", (steps, ok, note)
     assert transfer.equipped == []
+
+
+@pytest.mark.asyncio
+async def test_the_replacement_can_come_from_the_vault() -> None:
+    """身上没有非金装时**去仓库拉一件**再搬进来穿（DIM：*including de-equip replacements pulled
+    from the vault*）—— 只看身上会把"仓库里有 79 件"误判成"没得顶"。"""
+    manifest = {_H_EXOTIC_HELM: _TIER_EXOTIC, _H_EXOTIC_ARMS: _TIER_EXOTIC,
+                _H_LEGEND_ARMS: _TIER_LEGENDARY}
+    worn = [
+        _item("w1", "金装臂铠", slot="gauntlets", hash_=_H_EXOTIC_ARMS, equipped=True),
+        # 仓库里的那件：职业要对得上才允许拿来顶（classType 2 = 术士）
+        _item("v1", "仓库里的普通臂铠", slot="gauntlets", hash_=_H_LEGEND_ARMS,
+              power=540).model_copy(update={"location": "vault", "character_id": ""}),
+    ]
+    transfer = _Transfer(worn)
+    service = _Service(manifest, transfer)
+    service._manifest.get_item_info = lambda _h: {"classType": 2}
+    loadout = _loadout([
+        LoadoutItem(item_hash=_H_EXOTIC_HELM, name="金装头盔", slot="helmet", item_instance_id="p1"),
+    ])
+
+    steps, ok, note = await service.dequip_conflicting_exotics("Tester#1234", loadout)
+
+    assert ok, (steps, note)
+    assert transfer.moved == ["v1"], f"该先把仓库那件搬进来，实际 {transfer.moved}"
+    assert transfer.equipped == ["v1"], f"再穿上它，实际 {transfer.equipped}"
+    assert [s.action for s in steps] == ["transfer", "downgrade"], steps

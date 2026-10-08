@@ -80,8 +80,15 @@ class TransferService:
                     return name
         return item.bucket_type
 
-    async def list_character_items(self, player_name: str, character: str) -> list[Any]:
-        """列这个角色**身上**（不含仓库）的件 —— 给"批量装备前顶下冲突金装"用。"""
+    async def list_character_items(
+        self, player_name: str, character: str, *, include_vault: bool = False
+    ) -> list[Any]:
+        """列这个角色身上的件（`include_vault=True` 时连仓库一起）。
+
+        给"批量装备前顶下冲突金装"用：DIM 的同类逻辑会**去仓库拉替身**再搬进来
+        （`item-move-service.ts`：*including de-equip replacements pulled from the vault*），
+        所以找替身时要把仓库算进来 —— 只看身上会误判成"没得顶"。
+        """
         p = await self._resolver.resolve_player(player_name)
         char_id = await self._resolver.resolve_character_id(
             p["membership_id"], p["membership_type"], character
@@ -89,7 +96,8 @@ class TransferService:
         items = await self._fetch_all_items(p["membership_id"], p["membership_type"])
         return [
             item for item in items
-            if item.character_id == char_id and item.location != "vault"
+            if (item.location == "vault" if include_vault else False)
+            or (item.character_id == char_id and item.location != "vault")
         ]
 
     async def make_room_in_bucket(
