@@ -158,7 +158,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | 中文词表（六维/职业/位置/元素/旧名） | `destiny_mcp/vocabulary.py` | `tests/test_vocabulary.py`（官方名钉住、旧名必须指向存在的规范名、禁止再抄） |
 | 活动统计形状 | `destiny_mcp/activity_stats.py` | `tests/test_activity_stats.py`（上游键清单当夹具，拼错或新增会红） |
 | intent 取值 / 写作清单 | `tools/_requests.py` | `tests/test_skill_contracts.py`、`tests/test_ignored_parameters.py` |
-| 参数归属 | `tools/_param_contracts.py` | 同上（认领了必须真读、没认领必须拒收） |
+| 参数归属 | `tools/_param_contracts.py` | 同上（认领了必须真读；没认领的照做并在 `warnings` 点名，见 ADR-031） |
 | 响应信封 | `tools/_responses.py` | 语料 `sweep` 组的信封规则（110 个 intent 全查） |
 | 服务容器 | `service_context.py` | `tests/test_architecture_layers.py` |
 

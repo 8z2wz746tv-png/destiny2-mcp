@@ -40,7 +40,7 @@ Read only the relevant reference before a complex request:
    with the armor and mods — tell the player what `tuning_changes` says before they confirm,
    and never claim a target is unreachable while a returned build meets it.
 6. If a response is incomplete, failed, or has an uncertainty/coverage warning, report that limitation instead of filling it from model memory.
-7. A parameter the chosen `intent` does not read is rejected with `ignored_parameter`; switch to the intent named in the message instead of retrying the same call.
+7. A parameter the chosen `intent` does not read is **accepted** and named in the response `warnings`; the answer follows the `intent`, so switch to the intent the warning names instead of re-sending the call.
 8. The `community` intent of `weapon`, `build`, `subclass` and `activity` searches only its own category. A zero result there does not mean the archive lacks the topic; retry with `world_assistant(intent="community")` and name the category searched.
 9. Hosts that can only send scalar arguments (the Doubao connector does this) write list and map
    parameters as text (`"亡者复仇,速射"`, `"grenade=100"`) and use `execution_id` instead of the

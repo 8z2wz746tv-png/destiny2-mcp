@@ -194,7 +194,7 @@ def pointer_block(installed: Path | None = None, repo_url: str | None = None) ->
             "三条不能破的线：",
             "",
             "1. 账号数据（我有什么）、Manifest（游戏里有什么）、社区资料（别人怎么说）互不替代；",
-            "2. 参数传给了当前 `intent` 不读的字段会返回 `ignored_parameter` —— 按提示换 intent，不要重试同样的调用；",
+            "2. 参数传给了当前 `intent` 不读的字段**照常执行**，回执 `warnings` 里会点名并告诉你该用哪个 intent —— 按它换 intent，不要重发同样的调用；",
             "3. 任何写入（移动、装备、保存、修改）都要用户明确确认后才能执行。",
             END,
         ]

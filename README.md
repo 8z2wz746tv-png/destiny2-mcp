@@ -94,7 +94,7 @@ skills/destiny2-mcp/SKILL.md。
 - 填写 API Key、OAuth client_id、OAuth client_secret 到 `.env`
 - Redirect URL 添加：`https://localhost:8765/callback`
 - 常用权限建议勾选：`ReadDestinyInventoryAndVault`、`MoveEquipDestinyItems`、`ReadDestinyVendorsAndAdvisors`
-- 如果要让工具修改模组等更深层配置，再按 Bungie 页面提示开启 `AdvancedWriteActions`
+- 模组写入走的是**普通**写入接口，**不需要** `AdvancedWriteActions`（ADR-002 实测：门户后台根本没有这一项，去找只会白找）
 
 ### 2. 本地安装
 
@@ -229,7 +229,7 @@ VERIFY_OK=Destiny MCP is ready
 
 ## 前置条件与已知限制
 
-- 写入权限：读操作不受限制；消耗能量的插槽写入需要在 Bungie 应用里勾选 `AdvancedWriteActions`。
+- 写入权限：读操作不受限制；模组等写入走免费接口即可，**不需要**勾选 `AdvancedWriteActions`（见 ADR-002、ADR-012）。
   没有该权限时接口返回 403 `AccessNotPermittedByApplicationScope`，工具会指出这一权限；
   这属于权限配置问题，重试不会成功。
 - 调谐怎么换：调谐**能通过 API 换**，条件只有一条 —— 那颗在**这件护甲允许的清单**里
@@ -248,7 +248,7 @@ VERIFY_OK=Destiny MCP is ready
 | Python | 3.12+（只在 3.13 上长期实测） |
 | 平台 | macOS 实测通过；Linux 应当可用但未逐一验证；Windows 未实测——命令要换成 `.venv\Scripts\...`，且登录助手生成临时证书依赖 `openssl`，缺了就用 `destiny-mcp-oauth --manual`（自检脚本已按平台分支，不再用 POSIX 权限位判 Windows） |
 | 网络 | 需要能访问 `bungie.net`、GitHub（下预构建 Manifest）、PyPI |
-| Bungie 应用 | 每个使用者必须用自己的 API Key + Confidential client_id/secret，回调地址填 `https://localhost:8765/callback`（创建应用即分配 key，不需要等审批）；不要共用同一份 key，写操作还要在门户里额外勾选 `AdvancedWriteActions` |
+| Bungie 应用 | 每个使用者必须用自己的 API Key + Confidential client_id/secret，回调地址填 `https://localhost:8765/callback`（创建应用即分配 key，不需要等审批）；不要共用同一份 key。**本项目只用免费接口**（含模组写入），不需要 `AdvancedWriteActions`，也没有实现 AWA 流程 |
 | 首次运行 | 要下载并建库约 717 MB Manifest，几十分钟内不可用；可先取预构建库跳过（见第 3 步）。DIM 愿单在启动时自动下载，失败只降级 |
 | 构建/测试 | `pip install -e .` 只装运行依赖；跑 `pytest` 需要 `pip install -e ".[dev]"`。干净克隆（没有 `.env`）时 `tests/test_bungie_client_lifecycle.py` 与 `tests/test_exact_build_execution.py` 共 5 条会失败，先按第 2 步建 `.env` 即可全绿 |
 | Docker | 不支持。早期那份 `Dockerfile` 引用了不存在的 `src/` 目录，已删除 |

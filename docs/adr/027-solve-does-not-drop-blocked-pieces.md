@@ -6,7 +6,7 @@
 - Scope: `build/solver.py`、`build/analyzer.py`、`build/models.py`（`BuildResult.requires_preparation`）、
   `services/build_preparation.py`、`services/build_service.py`、`services/build_projection.py`、
   `tools/_build_flow.py`、`tools/_preparation_note.py`
-- 修订：[ADR-022](022-unequippable-candidates-are-refused-at-solve-time.md) 的 **Decision 第 1 条**
+- 修订：[ADR-022](022-candidates-must-be-equippable.md) 的 **Decision 第 1 条**
   （"求解器只从没有 `execution_blocker` 的件里挑"）。ADR-022 的其余部分仍然有效。
 
 ## Context

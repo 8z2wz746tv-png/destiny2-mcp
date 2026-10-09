@@ -10,7 +10,7 @@
 | 编号 | 标题 | 状态 |
 | --- | --- | --- |
 | [ADR-001](001-canonical-build-strategy.md) | Canonical build strategy：配装分三层类型，只有 `ExecutableBuild` 能执行 | accepted |
-| [ADR-002](002-armor-mods-require-in-game.md) | 护甲模组只能游戏内装：工具只列清单，且不因此回滚已换上的装备 | accepted |
+| [ADR-002](002-armor-mods-require-in-game.md) | 护甲模组只能游戏内装：工具只列清单，且不因此回滚已换上的装备 | superseded by ADR-012 |
 | [ADR-003](003-measurement-beats-docs.md) | 实测优先于文档：冲突以真机结果为准并留痕，官方快照不进仓库 | accepted |
 | [ADR-004](004-component-numbers-are-named.md) | 组件号只能来自 `profile_components.py`；读 305 必须带清单类组件 | accepted |
 | [ADR-005](005-career-numbers-follow-in-game-counters.md) | 生涯数字以游戏内计数器为准、统计接口只作明细；三档三来源不许混 | accepted |
@@ -37,6 +37,10 @@
 | [ADR-026](026-mods-land-on-an-empty-socket-first.md) | 护甲模组落点**空槽优先**（三格共享 plug set 时不再一律打位 1、也不再把人占着的那颗无谓顶掉），三格全满才顶第一格 | accepted |
 | [ADR-027](027-solve-does-not-drop-blocked-pieces.md) | 求解**不再剔掉**带执行前提的件（先算属性层，前提降级成候选上的 `requires_preparation`；确认那一刻的复检照旧拦）—— 修订 ADR-022 的决定第 1 条 | accepted |
 | [ADR-028](028-set-shortfall-is-a-first-class-conclusion.md) | **约束凑不齐**是一等结论：套装覆盖率（每个部位最多穿一件）数出上界，不够就说死，不再让面向属性的话术去套 | accepted |
+| [ADR-029](029-auto-make-room-on-full-slots.md) | 目标格满时自动腾一件（判据照 DIM v8.143.0） | accepted |
+| [ADR-030](030-dequip-conflicting-exotics-before-batch.md) | 批量装备前先顶下冲突金装 | accepted |
+| [ADR-031](031-accept-ignored-params-with-warning.md) | 没认领的参数照做并警告，不再整通拒收 | accepted |
+| [ADR-032](032-write-prep-order-and-baseline.md) | 写前把关在先、基线只吸收自己的写入、执行现场接线 | accepted |
 
 ## 编号规矩
 
@@ -66,7 +70,3 @@
 - `Status` 取值：`accepted` / `superseded by ADR-NNN` / `rejected`（记被否掉的方案时用）。
 - `Date` 写决定日期 `YYYY-MM-DD`；回顾补记的写补记日期，并在正文里说明是补记。
 - `Decision By` 写拍板的人或角色（个人项目可写 `maintainer`）；不要留空。
-- `029-auto-make-room-on-full-slots.md` — 挪装备撞上目标格满时**自动腾一件**（判据照 DIM v8.143.0）：只在已确认的写入里做、只搬仓库、五条绝不腾、上限 3 件、结果记 `make_room` steps 且可还原；落地分 P0–P3，见 `docs/plans/AUTO_MAKE_ROOM_PLAN.md`。
-- `030-dequip-conflicting-exotics-before-batch.md` — `equip_loadout` 批量装备**之前**先顶下冲突金装（照 DIM 的 move aside exotics）：替身要同部位、非金装、同职业，优先身上、没有就去仓库拉；挑不到就不发批量、点名要你先脱哪件。
-- `031-accept-ignored-params-with-warning.md` — 调用方把参数传给当前 intent 不读的字段时**照做 + 在 warnings 里说明**，不再整通拒收（实测这类拒收 247 次、全是无害多余参数）；参数归属表、「认领了必须真读」、「值解析不了照样失败」三条不变。治理方案见 `docs/plans/MODEL_LOOP_PLAN.md`。
-- `032-write-prep-order-and-baseline.md` — 写前把关在先（指纹对不上就一个字节都不写）、指纹拆成"物质层 / 放哪儿"两半、失败不再推进基线、执行现场接线（`annotate` 以前从没被调用过）；**逐条点明**推翻了 ADR-022/024/025/027/029#6 的哪一项（2026-10-09 审查 #1–#4）。

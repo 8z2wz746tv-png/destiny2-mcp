@@ -508,7 +508,7 @@ async def equip_build(
     - 它的 `execution_id`（只发标量的宿主，实测豆包 connector 发不出结构体）——
       服务端凭 ID 取回自己签发的那份，方案内容不经过调用方。
 
-    两条路最后都走 `equip_build` 的服务端校验：玩家绑定、10 分钟 TTL、内容一致、
+    两条路最后都走 `equip_build` 的服务端校验：玩家绑定、30 分钟 TTL、内容一致、
     一次确认只能执行一次。
 
     写后证据就在响应里：`result.steps[]` 的 `verify` 步骤是服务端**回读核对**过的结论

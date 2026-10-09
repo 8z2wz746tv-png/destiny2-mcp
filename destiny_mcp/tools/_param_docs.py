@@ -46,8 +46,8 @@ Character = Annotated[
         "角色：hunter/warlock/titan，或猎人/术士/泰坦。"
         "只在该 intent 需要指定角色时才有意义（如 vendor、collectible_node、equip）。"
         # 实机复盘（2026-09-14）：调用方连续给 armor_mods / subclass.fragments 传了 character，
-        # 两次都拿 ignored_parameter。这里把"哪些 intent 不读它"写在参数说明里，省一轮试错。
-        "**不读它的 intent**（传了会得到 ignored_parameter）：build_assistant 的 armor_mods/set_bonus、"
+        # 两次都白跑。这里把"哪些 intent 不读它"写在参数说明里，省一轮试错。
+        "**不读它的 intent**（传了**照常执行**，只在回执 `warnings` 里点名）：build_assistant 的 armor_mods/set_bonus、"
         "subclass_assistant 的 fragments/options/fragment_details/artifact/artifact_mod、"
         "weapon_assistant 的 catalog/filter_rolls 等。"
     )),
@@ -186,7 +186,7 @@ ExecutionId = Annotated[
         "服务端签发的配装候选 ID（在候选的 canonical_build.execution_id 里，"
         "候选行上也单独给了一份）。**只发标量的宿主（如豆包 connector）用这个**："
         'intent="equip_build" 传它就不必回传整个 canonical_build，服务端凭 ID 取回'
-        "自己签发的那份。与 canonical_build 二选一，10 分钟内、同一玩家、一次确认只能用一次。"
+        "自己签发的那份。与 canonical_build 二选一，30 分钟内（服务端 TTL）、同一玩家，写成功才作废（失败不焚烧）。"
     )),
 ]
 
@@ -241,7 +241,7 @@ _LIMIT_DESCRIPTION = (
     "只限制返回条数，不限制扫描范围；被截断时响应里会带 truncated、总数与 next_offset，"
     "翻页把 next_offset 传给 offset。"
     "上面这些默认值只在声明了 limit 的工具里生效：同一个工具里不读它的 intent 传了会拿到"
-    "`ignored_parameter` 并被指到该用的 intent；而没声明 limit 的工具（如 build_assistant、"
+    "回执 `warnings` 里点名并指到该用的 intent；而没声明 limit 的工具（如 build_assistant、"
     "player_assistant）传了会在 schema 层被拒（`extra_forbidden`），不是被忽略。"
 )
 

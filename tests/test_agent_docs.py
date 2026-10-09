@@ -207,3 +207,29 @@ def test_adr_references_point_at_real_files() -> None:
                 if match.group(1) not in existing:
                     offenders.append(f"{rel}:{number}: {match.group(0)}")
     assert offenders == [], "这些引用指向不存在的 ADR：\n" + "\n".join(offenders)
+
+
+_ADR_DIR = Path(__file__).resolve().parent.parent / "docs" / "adr"
+
+
+# ── ADR 台账的语义守门（2026-10-09 审查 #13：以前只核编号，死链与"状态不一致"都漏）──────
+
+
+def test_every_adr_link_resolves() -> None:
+    """ADR 文件里的 `NNN-*.md` 链接目标必须存在 —— 死链会把人指进不存在的文件。"""
+    broken: list[str] = []
+    for path in sorted(_ADR_DIR.glob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        for target in re.findall(r"\]\((\d{3}-[^)]+\.md)\)", text):
+            if not (_ADR_DIR / target).exists():
+                broken.append(f"{path.name} → {target}")
+    assert not broken, "这些 ADR 链接指向不存在的文件：" + "、".join(broken)
+
+
+def test_the_index_table_lists_every_adr() -> None:
+    """`docs/adr/README.md` 的**索引表**要列全（写在表外的条目会被当成"没有这条"）."""
+    readme = (_ADR_DIR / "README.md").read_text(encoding="utf-8")
+    tabled = set(re.findall(r"^\| \[ADR-\d+\]\(([^)]+\.md)\)", readme, flags=re.M))
+    files = {p.name for p in _ADR_DIR.glob("*.md") if p.name != "README.md" and p.name != "TEMPLATE.md"}
+    missing = sorted(files - tabled)
+    assert not missing, f"这些 ADR 没进 README 的索引表（只写在表外不算）：{missing}"

@@ -637,7 +637,7 @@ async def test_equip_build_rechecks_the_premises_the_find_stage_could_not_judge(
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="ADR-032 交接：夹具要按新口径重写 —— 件池恒定（「腾走」= 换 location，不是少一件）+ 满格由「是否真的搬过」驱动；见 ADR-032 的「未完成（交接）」段")
+@pytest.mark.skip(reason="ADR-032 交接：夹具要按新口径写对 —— 「腾走」必须同时让格子的账真的少一件（现在只换了件的位置，`execution_feasibility` 复算出来格还是满的，于是复检照旧报 1641/NoRoom）；见 ADR-032 的「未完成（交接）」段")
 async def test_equip_build_makes_room_when_the_bucket_filled_up_after_find() -> None:
     """求解时臂铠格 9/10、确认时 10/10：**先替用户腾一件**，再走复检（ADR-029）。
 
@@ -653,9 +653,16 @@ async def test_equip_build_makes_room_when_the_bucket_filled_up_after_find() -> 
     )
 
     moved: list[str] = []
+    # 「腾走」= 把那一件的 source_location 换到仓库，**件还在快照里**（真实现就是这样）。
+    # 以前夹具靠「少生成一件」表达腾走，ADR-032 的 substance 比对一眼就看出那不是同一次现场；
+    # 所以这里用一个**活的对象**：腾格改它，后面的读也都是它。
+    live = _snapshot(on_character_gauntlets=10)
 
     async def fake_move(player_name: str, armor) -> None:
-        moved.append(armor.name)
+        moved.append(armor.item_instance_id)
+        for piece in live.get_slot("gauntlets"):
+            if piece.item_instance_id == armor.item_instance_id:
+                piece.source_location = "vault"
 
     service._equipment.move_single_to_vault = AsyncMock(side_effect=fake_move)
     service._equipment.equip_with_recovery = AsyncMock(
@@ -668,13 +675,10 @@ async def test_equip_build_makes_room_when_the_bucket_filled_up_after_find() -> 
     # 第 ② 次是 2026-10-06 真机第二次翻车修出来的：**腾动本身会让指纹过期**，不回读推进基线，
     # 复检就会判 `stale_inventory_snapshot`（把"我们刚替她腾的那一下"报成"库存已变化"）。
     # 所以这条用例不只验"腾了"，还验"腾完指纹跟得上"。
-    reads = {"n": 0}
-
     async def _snapshots(_player, _character):
-        reads["n"] += 1
-        # ① 判格满 → 10/10；之后（腾完回读、复检）都是 9/10。用函数而不是固定列表：
-        # "腾完回读到稳定"要读几次是实现细节，别让用例钉死次数。
-        return _snapshot(on_character_gauntlets=10 if reads["n"] == 1 else 9)
+        # 读几次都返回同一个对象：满不满由「有没有真的搬过」决定，不由读的次数决定
+        # （读序是实现细节；ADR-032 之后多了一次「取基准」的读）。
+        return live
 
     service._inventory.get_armor_snapshot = AsyncMock(side_effect=_snapshots)
     result = await service.equip_build("Tester#1234", build, "warlock")
