@@ -104,7 +104,7 @@
 | 编号 | 状态 | 证据 |
 | --- | --- | --- |
 | **C** | ✅ 完成、真机验过 | 审计出现 `client='dsh-mcp-client/0.0.1'`；守门 `tests/test_audit_client.py`（注入 58 红） |
-| **B** | ◐ **前半完成**（`confirmation_required`）；**后半未做**（`stale` 的可回放调用） | 真机：`next_actions[0]` = 补 `confirmed=true` 的完整调用；守门 `tests/test_replay_actions.py`（注入 59/60 红） |
+| **B** | ✅ 完成（前半 `confirmation_required` + 后半 `stale`） | 前半真机：`next_actions[0]` = 补 `confirmed=true` 的完整调用；后半：候选里存下求解参数（`candidate_search_args.py`），失败时原样回带"用原来的条件重新求解"。守门 `tests/test_replay_actions.py`（注入 59/60/63 红） |
 | **A** | ✅ 完成、真机验过 | 真机 `summary` + `item_name` → `ok: true` 且 `warnings[0]` 点名；`tests/test_ignored_parameters.py` 翻向 407 条（注入 61 红） |
 | **D** | ✅ 完成 | `scripts/audit_failure_report.py`（按宿主 + 前十错误码 + 环比 + 真实样例）；守门 `tests/test_audit_failure_report.py`（注入 62 红） |
 
@@ -112,9 +112,12 @@
 `dsh-mcp-client`（C 刚上线）。注意这一窗口里包含**本轮自己的验证风暴**（大量故意失败的调用），
 不要直接当成"真实使用"的失败率 —— 下一个窗口才是可比基线。
 
-**还没做**：B 的后半（`stale_inventory_snapshot` 的 `next_actions` 现在给的是 `intent="recommend"`，
-会把用户的**金装/套装/属性目标换掉**，属于正确性问题）—— 修法是让候选**存下求解时的原始查询参数**，
-失败时原样回带。
+**还没做**：无（四件事全部落地）。
+
+**真机上的一个意外收获**（2026-10-09，B 后半验证时撞到）：故意"先求解、再挪一件、再 `equip_build`"**没有**触发
+`stale_inventory_snapshot` —— 写前准备动过账号后会把候选基线推到现在（P5 那条修的），**把这次失效吸收了**，
+回执直接是"已装备，回读核对通过"。也就是说豆包那 3 次 `stale` 重试现在会直接消失，后半的"原条件回放"是
+**兜底**（给写完仍失效、或不在写前准备路径上的失败用），只在单测/注入上验过。
 
 ## 五、明确不做
 
