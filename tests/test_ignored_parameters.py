@@ -2,12 +2,14 @@
 
 `_param_contracts.PARAMETER_OWNERS` 是一份声明。这里用三条断言把它钉死在代码上：
 
-1. **没认领的 intent 必须拒绝**（ignored_parameter），不能静默忽略；
+1. **没认领的 intent 照做，但必须点名警告**（`warnings` 第一条，ADR-031）——
+   以前是整通拒收 `ignored_parameter`：实测 247 次这类拒收、参数 100% 无害，代价是每次白跑一个
+   模型来回（中位 ~40 秒）；
 2. **认领了就必须真读**：换一个值，服务层记录必须跟着变；
 3. **没认领的就真没读**：换一个值，服务层记录必须一模一样。
 
-第 2 条防的是「表写得比代码宽」（该拦的没拦），第 3 条防的是「表写得比代码窄」
-（把本来能用的调用拒了）。少任何一条，这张表都会慢慢长歪。
+第 2 条防的是「表写得比代码宽」（声明读了却没读），第 3 条防的是「表写得比代码窄」。
+少任何一条，这张表都会慢慢长歪。
 
 判据用「换个值，调用记录变不变」而不是「在参数里找哨兵值」：后者会被同名的
 布尔值、模型 dump 里的默认值误伤 —— 那些假阳性已经在这个文件的历史里出现过。
@@ -23,7 +25,7 @@ slot_number 的 1），就没法区分"显式传了默认值"和"没传"，参�
 from __future__ import annotations
 
 import inspect
-from typing import Any, get_args, get_origin
+from typing import Any, Literal, get_args, get_origin
 
 import pytest
 
@@ -370,22 +372,25 @@ async def _unguarded(tool: str, intent: str, parameter: str = "", **passed: Any)
 
 
 @pytest.mark.parametrize("tool,parameter", sorted(contracts.PARAMETER_OWNERS))
-async def test_non_owner_intents_reject_the_parameter(tool: str, parameter: str) -> None:
-    """没认领这个参数的 intent 必须拒绝，而不是静默丢掉它。"""
+async def test_non_owner_intents_warn_about_the_parameter(tool: str, parameter: str) -> None:
+    """没认领这个参数的 intent **照做**，但必须在 `warnings` 里点名它（ADR-031）。
+
+    这里原来是"必须拒绝（ignored_parameter）"。改了：实测这类拒收 247 次、参数 100% 无害，
+    而每次拒收都要用户多等一个模型来回；改成"照做 + 大声说"，仍然**不静默**。
+    """
     contract = contracts.PARAMETER_OWNERS[(tool, parameter)]
     value, _other = _probe(TOOLS[tool], parameter)
 
-    silently_ignored = []
+    not_flagged: list[str] = []
     for intent in sorted(contracts.TOOL_INTENTS[tool] - contract.intents):
-        result, calls = await _guarded(tool, intent, parameter, **{parameter: value})
-        code = result.get("error", {}).get("code")
-        if code != "ignored_parameter":
-            silently_ignored.append(
-                f"{intent} -> {code or '接受了'}{'（已调用服务层）' if calls else ''}"
-            )
+        result, _calls = await _guarded(tool, intent, parameter, **{parameter: value})
+        code = (result.get("error") or {}).get("code")
+        warnings = [str(w) for w in (result.get("warnings") or [])]
+        if code == "ignored_parameter" or not any(parameter in w for w in warnings):
+            not_flagged.append(f"{intent} -> code={code or '无'}、warnings={warnings[:1]}")
 
-    assert not silently_ignored, (
-        f"{tool} 的 {parameter} 在这些 intent 上没有被拒绝：{silently_ignored}"
+    assert not not_flagged, (
+        f"{tool} 的 {parameter} 在这些 intent 上没被点名警告：{not_flagged}"
     )
 
 
@@ -491,13 +496,15 @@ async def test_real_session_failures_are_now_rejected() -> None:
     - summary + item_name：问的是刚玉战锤，工具返回了背包概况。
     """
     result, calls = await _guarded("inventory_assistant", "get", item_instance_id=SENTINEL)
-    assert result["error"]["code"] == "ignored_parameter"
-    assert not calls, "拒绝要发生在调用服务层之前"
-    assert "compare" in result["error"]["message"]
+    assert result.get("error", {}).get("code") != "ignored_parameter", (
+        "ADR-031 起不再整通拒收：照做 + 警告"
+    )
+    assert calls, "要真的调用服务层（这才是那两次会话里模型想要的答案）"
+    assert "compare" in " ".join(str(w) for w in (result.get("warnings") or [])), result.get("warnings")
 
     result, _ = await _guarded("inventory_assistant", "summary", item_name="刚玉战锤")
-    assert result["error"]["code"] == "ignored_parameter"
-    assert 'intent="search"' in result["error"]["message"]
+    warnings = " ".join(str(w) for w in (result.get("warnings") or []))
+    assert 'intent="search"' in warnings, warnings
 
 
 async def test_loadout_get_accepts_an_id_and_non_owners_reject_it() -> None:
@@ -510,9 +517,11 @@ async def test_loadout_get_accepts_an_id_and_non_owners_reject_it() -> None:
     assert result.get("error") is None, result.get("error")
     assert calls, "get 必须真的把 id 传给服务层"
 
-    rejected, rejected_calls = await _guarded("loadout_assistant", "save", loadout_id="local:1")
-    assert rejected["error"]["code"] == "ignored_parameter"
-    assert not rejected_calls
+    saved, _saved_calls = await _guarded("loadout_assistant", "save", loadout_id="local:1")
+    assert saved.get("error", {}).get("code") != "ignored_parameter", (
+        "ADR-031 起不再整通拒收：照做 + 警告"
+    )
+    assert any("loadout_id" in str(w) for w in (saved.get("warnings") or [])), saved.get("warnings")
 
 
 def _description(annotation: object) -> str:
@@ -602,21 +611,25 @@ def test_assistant_signature_defaults_are_sentinels() -> None:
 async def test_explicit_body_default_counts_as_passed(
     tool: str, parameter: str, value: Any
 ) -> None:
-    """显式传"函数体里的默认值"也必须算传了 —— 不认领它的 intent 必须拒绝。
+    """显式传"函数体里的默认值"也必须**算传了** —— 不认领它的 intent 要在 warnings 里点名。
 
-    这一条就是 `limit=12` 那类静默黑洞的通用回归：修之前 12（=签名默认值）
-    会被当成没传，于是在不读 limit 的 intent 上一路 ok=true。
+    这一条就是 `limit=12` 那类静默黑洞的通用回归：修之前 12（=签名默认值）会被当成没传，
+    于是在不读 limit 的 intent 上**一路安静地** ok=true。现在仍然不许安静 —— 只是从
+    "整通拒收"改成"照做 + 点名警告"（ADR-031），所以断言看的是 warnings 而不是 error。
     """
     contract = contracts.PARAMETER_OWNERS[(tool, parameter)]
-    accepted = []
+    not_flagged = []
     for intent in sorted(contracts.TOOL_INTENTS[tool] - contract.intents):
         result, _calls = await _guarded(tool, intent, parameter, **{parameter: value})
-        if result.get("error", {}).get("code") != "ignored_parameter":
-            accepted.append(f"{intent} -> {result.get('error', {}).get('code') or '接受了'}")
+        warnings = [str(w) for w in (result.get("warnings") or [])]
+        if result.get("error", {}).get("code") == "ignored_parameter" or not any(
+            parameter in w for w in warnings
+        ):
+            not_flagged.append(f"{intent} -> warnings={warnings[:1]}")
 
-    assert not accepted, (
+    assert not not_flagged, (
         f"{tool} 的 {parameter} 显式传 {value!r}（函数体默认值）时，"
-        f"这些不认领它的 intent 没有拒绝：{accepted}"
+        f"这些不认领它的 intent 没有点名警告：{not_flagged}"
     )
 
 
@@ -649,3 +662,25 @@ async def test_owner_intent_treats_omitted_and_explicit_default_alike(
         f"{tool}({intent}) 不传 {parameter} 与显式传 {value!r} 的服务调用不一致：\n"
         f"不传={_trace(omitted_calls)}\n显式={_trace(explicit_calls)}"
     )
+
+
+async def test_the_unused_parameter_warning_comes_first() -> None:
+    """警告要排 `warnings` **第一条** —— 它是"你这次问的不是这个"的更正，淹在后面就等于没说。
+
+    ADR-031：照做 + 大声说。直接测装饰器（造一条**本来就带警告**的回执），因为真实调用里
+    那种回执的 `warnings` 常常是空的 —— 空的列表里 `append` 和 `insert(0)` 一样，测不出位置。
+    """
+    from destiny_mcp.tools._param_contracts import check_intent_parameters
+
+    # 形状要像真工具：`__name__` 决定查哪张归属表、`Literal` 决定 intent 名单 —— 少了任何一样
+    # 都会走"名单读不出来"那条分支，于是测不到我们要测的东西（第一次写就踩了）。
+    @check_intent_parameters
+    async def inventory_assistant(
+        intent: Literal["summary", "search"] = "summary", item_name: str = ""
+    ) -> dict:
+        return {"ok": True, "warnings": ["本来就有的警告"]}
+
+    out = await inventory_assistant(intent="summary", item_name="刚玉战锤")
+    assert out["warnings"][0] != "本来就有的警告", f"没用上的参数警告要排第一：{out['warnings']}"
+    assert "item_name" in out["warnings"][0]
+    assert out["warnings"][1] == "本来就有的警告"

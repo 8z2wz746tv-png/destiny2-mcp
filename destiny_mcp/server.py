@@ -416,7 +416,7 @@ def create_server() -> FastMCP:
             "Account loadouts expose a normalized build_template, but it is not an executable "
             "canonical_build. Unknown or unchecked requirements must not be reported as missing "
             "or satisfied. Game writes require explicit user confirmation. "
-            "A parameter the chosen intent does not read is rejected with ignored_parameter; "
+            "A parameter the chosen intent does not read is accepted but reported in warnings; "
             f"full tool/intent/parameter index: {ROUTING_GUIDE_URL}"
         ),
         json_response=True,

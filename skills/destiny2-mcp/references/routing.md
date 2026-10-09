@@ -261,7 +261,7 @@ Manifest 侧（**不代表拥有**）：
 | `update_official_identifiers` | 改官方槽位标识（写入） | `character`、`slot_number`、`name_hash`／`icon_hash`／`color_hash` 至少一个 |
 | `clear_official` | 清空官方槽位（写入） | `character`、`slot_number`（1–20） |
 
-`list` 和 `get` 只按 `character` 过滤，**返回全部配装**：`loadout_id`、`slot_number`、`kind`、`query` 在这两个 intent 上会被拒绝（返回 `ignored_parameter`）。要哪一套由你从结果里按名字或槽位号挑出来，不要假设第一条就是用户说的那套。
+`list` 和 `get` 只按 `character` 过滤，**返回全部配装**：`loadout_id`、`slot_number`、`kind`、`query` 在这两个 intent 上用不上（回执 `warnings` 里会点名，但**不再打断调用**）。要哪一套由你从结果里按名字或槽位号挑出来，不要假设第一条就是用户说的那套。
 
 官方槽位的名称、图标、颜色 hash 只是 Bungie 的展示元数据，**不是**配装内容，也不是热度依据。
 
@@ -330,13 +330,13 @@ Manifest 侧（**不代表拥有**）：
 
 ## 三、参数：传错会当场报错
 
-同一个工具只有一个宽签名，任何 `intent` 都能收到全部参数。每个参数只有一部分 intent 真正读它，其余 intent 传了会**在调用服务层之前**返回 `ignored_parameter`，消息里列出认领者，能给出替代入口的还会带 `next_actions`。
+同一个工具只有一个宽签名，任何 `intent` 都能收到全部参数。每个参数只有一部分 intent 真正读它，其余 intent 传了**照常执行**，只在回执 `warnings` 第一条点名它（谁认它、该换哪个 intent）；能给出替代入口的还会带 `next_actions`。
 
-这是**保证**，不是建议：`intent="get"` 配 `item_instance_id`、`intent="summary"` 配 `item_name`、`intent="get"` 配 `loadout_id` 都拿不到「看起来像答案」的结果，只会拿到一条要求改路由的错误。看到 `ignored_parameter` 不要重试同样的调用，按消息里的提示换 intent。
+这是**保证**，不是建议：`intent="get"` 配 `item_instance_id`、`intent="summary"` 配 `item_name` 这类，**答案按 intent 给**（不是按那个多余参数给），同时 `warnings` 会告诉你要哪条路由才对。读到那条警告就按它换 intent，别重试同一个调用。
 
 判据是「行为上读没读」，不是「签名里有没有」：传了不改变任何结果的参数一律算没人认。
 
-**有没有传**只按「是不是空值」判断：`null`／`""`／`0`／`false`（也就是签名默认值）算没传，宿主把 schema 默认值一起发过来（`confirmed=false`、`offset=0`）不会被拒；**任何具体值都算传了**，在不读它的 intent 上会拿到 `ignored_parameter`。所以 `limit=12`、`locked=true`、`slot_number=1` 这些既是默认值又是合法请求的值不会被静默吞掉 —— 签名默认值统一是 `null`，真正的默认条数在工具内部补。
+**有没有传**只按「是不是空值」判断：`null`／`""`／`0`／`false`（也就是签名默认值）算没传，宿主把 schema 默认值一起发过来（`confirmed=false`、`offset=0`）不会被拒；**任何具体值都算传了**，在不读它的 intent 上会在 `warnings` 里被点名（不再打断调用）。所以 `limit=12`、`locked=true`、`slot_number=1` 这些既是默认值又是合法请求的值不会被静默吞掉 —— 签名默认值统一是 `null`，真正的默认条数在工具内部补。
 
 **只发标量的宿主怎么写结构化参数**（实测：豆包 connector 转发工具调用时只序列化标量，`list[str]`／`dict` 参数根本送不到服务端）。这类宿主把同一件事写成文本即可，两种形态在 schema 里并列：
 

@@ -6,7 +6,7 @@ item_instance_id，然后像没事一样返回整包清单 —— 信封完整�
 调用方没有任何线索发现自己问错了入口。
 
 这张表登记**每个参数由哪些 intent 真正读取**。没认领的 intent 收到它，
-就在调用服务层之前返回 `ignored_parameter`，消息里直接列出认领者，
+就在回执的 `warnings` 里点名（ADR-031：照常执行、不打断），那句话直接列出认领者，
 能给出替代入口的还会带上 `next_actions`。
 
 表的判据是「行为上读没读」而不是「签名里有没有」：一个参数如果传了不改变
@@ -801,6 +801,18 @@ def check_parameter_ownership(
     )
 
 
+def parameter_misuse_note(tool: str, intent: str, supplied: Mapping[str, Any]) -> str | None:
+    """这次有参数用不上时给**一句说明**（谁认它、该换哪个 intent）；都有人认给 None。
+
+    与 `check_parameter_ownership` **同源** —— 那句错误消息就是这句说明。ADR-031 起不再打断调用，
+    改成放进回执 `warnings`（248 次实测里这些参数 100% 无害，打断只是让模型白跑一个来回）。
+    """
+    rejected = check_parameter_ownership(tool, intent, supplied)
+    if rejected is None:
+        return None
+    return str((rejected.get("error") or {}).get("message") or "")
+
+
 def declared_intents(function: Callable) -> frozenset[str]:
     """从签名上的 Literal 注解读出这个工具声明支持的 intent。
 
@@ -855,6 +867,7 @@ def check_intent_parameters(function: Callable) -> Callable:
                     "参数归属校验不完整：没能读出这个工具的 intent 名单（看服务端日志）。"
                 )
             return response
+        unused_note: str | None = None
         # intent 不在声明名单里时不插嘴：那种情况原有的 unsupported_intent 说得更准
         if intent and intent in intents:
             supplied = {
@@ -862,10 +875,12 @@ def check_intent_parameters(function: Callable) -> Callable:
                 for name, value in bound.arguments.items()
                 if name != "intent" and _is_supplied(value, defaults.get(name, _MISSING))
             }
-            rejected = check_parameter_ownership(tool, intent, supplied)
-            if rejected is not None:
-                return rejected
-        return await function(*args, **kwargs)
+            unused_note = parameter_misuse_note(tool, intent, supplied)
+        response = await function(*args, **kwargs)
+        if unused_note and isinstance(response, dict):
+            # ADR-031：照做 + 大声说。放在 warnings 第一条，别让它淹在后面。
+            response.setdefault("warnings", []).insert(0, unused_note)
+        return response
 
     return wrapped
 
