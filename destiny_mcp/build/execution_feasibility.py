@@ -39,7 +39,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from ..vocabulary import CLASS_LABELS_ZH, CLASS_TYPE_KEYS
+from ..vocabulary import CLASS_LABELS_ZH, CLASS_TYPE_KEYS, class_type_of
 from .constants import ARMOR_SLOT_NAMES, SOLVER_SLOTS
 
 if TYPE_CHECKING:  # 只用于标注：models.py 要 import 本模块，运行时不能反向依赖
@@ -87,8 +87,7 @@ class ExecutionFacts(BaseModel):
     character: str = ""
     #: 求解器槽位 → 该角色这一格的占用（缺键 = 容量读不到）
     buckets: dict[str, BucketUsage] = Field(default_factory=dict)
-    #: 求解器槽位 → 部位中文名（Manifest 桶定义；读不到就用该部位那件的类型名）。
-    #: 话术里的"臂铠格"必须说中文，而**名字只有 Manifest 有** —— 不在代码里另抄一张表。
+    #: 求解器槽位 → 部位中文名（Manifest 桶定义；读不到就用该部位那件的类型名）。 : 话术里的"臂铠格"必须说中文，而**名字只有 Manifest 有** —— 不在代码里另抄一张表。
     slot_labels: dict[str, str] = Field(default_factory=dict)
     #: 角色当前穿着的**护甲**金装（部位 + 名字）；空 = 没穿 / 没读到
     worn_exotic_slot: str = ""
@@ -212,12 +211,12 @@ def _piece_blocker(armor: Armor, slot: str, facts: ExecutionFacts) -> str:
 
 
 def annotate(
-    snapshot: InventorySnapshot, target_class_type: int, manifest: ManifestManager
+    snapshot: InventorySnapshot, character_class: str, manifest: ManifestManager
 ) -> ExecutionFacts:
-    """给每一件写上"这次装不装得上"，并把现场挂回快照（`InventorySnapshot.execution`）。
-
-    在 `from_profile` 末尾调一次：那正是"账号事实已经解析完、请求还没进来的时刻"。
-    """
+    """给每一件写上"这次装不装得上"（按类名；认不出就什么都不做，不猜）。见 ADR-032。"""
+    target_class_type = class_type_of(character_class)
+    if target_class_type is None:
+        return ExecutionFacts()
     facts = read_facts(snapshot, target_class_type, manifest)
     for slot in SOLVER_SLOTS:
         for armor in snapshot.get_slot(slot):
@@ -228,3 +227,4 @@ def annotate(
 def blocked_pieces(snapshot: InventorySnapshot, slot: str) -> list[Armor]:
     """这一部位里"这次装不上"的件（给分析器数"砍掉了多少件"用）。"""
     return [armor for armor in snapshot.get_slot(slot) if armor.execution_blocker]
+

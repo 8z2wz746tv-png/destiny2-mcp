@@ -24,7 +24,7 @@ from .build_execution_guard import recheck_confirmed_build
 from ..build.constants import SOLVER_SLOTS, SOLVER_SLOT_TO_LOADOUT
 from ..build.execution_feasibility import VAULT_LOCATION, read_facts
 from ..build.models import Armor
-from ..build.snapshot_version import snapshot_version
+from ..build.snapshot_version import snapshot_version, substance_version
 from ..manifest import resolve_character_name
 
 #: 单次最多腾几件（ADR-029 §4）。超过就如实拒绝，不无限搬。
@@ -393,6 +393,16 @@ async def prepare_build_write(
 
     返回 `(回执行, 话术前缀, 失败回执或 None)`；失败回执与复检那条**同形**，调用方直接返回它。
     """
+    # ⚠️ **写前先取一份基准，再动账号**（ADR-032）。这份基准只用来回答一个问题：
+    # **在这之后、到我们写完为止，有没有人动过这套里的件**（见下面 `substance_version` 的比对）。
+    #
+    # 为什么**不**在这里比整份 `snapshot_version`：那个口径把"格子被填满 / 金装换了一身"也算成
+    # "库存变了" —— 而那正是 ADR-029/030 要**替用户处理**的事（2026-10-09 试过，`test_equip_build_
+    # makes_room_when_the_bucket_filled_up_after_find` 当场把它打回：用户求解完回游戏里捡了件、
+    # 格子满了，工具该腾一件，不是让用户重新求解）。指纹里"放哪儿 / 穿没穿"这一半是**工具的业务**，
+    # "这件是什么"（属性/能量/已装模组/件数）才是"确认的那套还算不算数"。
+    baseline = await inventory.get_armor_snapshot(player_name, character)
+
     details, prefix = await make_room_for_build(
         player_name=player_name, character=character, inventory=inventory,
         equipment=equipment, manifest=manifest, build=build, candidates=candidates,
@@ -423,6 +433,19 @@ async def prepare_build_write(
         for attempt in range(_STABLE_ATTEMPTS):
             if candidates is not None:
                 fresh = await inventory.get_armor_snapshot(player_name, character)
+                # 只允许"放哪儿 / 穿没穿"变（那是我们刚做的腾格与顶下）；`stats` / 能量 /
+                # `installed_mod_energy` / 件数变了 = **别人动过这套里的件** → 照旧 stale（ADR-032）。
+                if substance_version(fresh) != substance_version(baseline):
+                    refusal_note = (
+                        "在你确认之后、我们准备装备之前，这套配装里的护甲又变过了"
+                        "（属性/模组/件数），为避免装成另一套，请重新求解并确认。"
+                    )
+                    return steps, prefix + note, {
+                        "success": False,
+                        "code": ErrorCode.STALE_INVENTORY_SNAPSHOT,
+                        "message": prefix + note + refusal_note,
+                        "blockers": [refusal_note],
+                    }
                 build.snapshot_version = snapshot_version(fresh)
                 # store 里那份 + **调用方手里那份**都要推（写前复检读的是后者）
                 candidates.register(

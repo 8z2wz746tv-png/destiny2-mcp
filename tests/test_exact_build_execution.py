@@ -1153,82 +1153,27 @@ def test_a_burned_candidate_is_forgotten_after_the_ttl() -> None:
     store.evict_expired()
 
     assert store.resolve(build.execution_id, "Alpha#0100")[1] == "unknown"
-
-
 @pytest.mark.asyncio
-async def test_a_failed_equip_pushes_the_candidate_baseline_forward() -> None:
-    """**工具自己动过账号**之后，要把候选的库存基线推进到最新。
-
-    不然同一个 `execution_id` 重试必然 `stale_inventory_snapshot`（2026-10-06 真机：一次半途
-    失败后，第三次带同一个 ID 重试被拒 → 被迫整轮重解 + 重新确认，用户白等一轮）。
-
-    安全边界（这条测试一并钉住）：**基线没变时什么都不做** —— 回滚成功的那次基线还是对的，
-    不许解锁任何东西。写前复检（格满 / 金装冲突 / 实例核对）在 `recheck_confirmed_build` 里
-    每次照跑，不受这里影响。
-    """
-    from destiny_mcp.build.snapshot_version import snapshot_version
-    from destiny_mcp.services.build_baseline import rebaseline_note
-    from destiny_mcp.services.build_candidates import BuildCandidateStore
-
-    snapshot, plan = _exact_contract()
-    store = BuildCandidateStore()
-    store.register(plan, "Alpha#0100")
-
-    # ① 基线没变（账号没动 / 已经回滚）→ 不说任何话，也不改基线
-    class _SameInventory:
-        async def get_armor_snapshot(self, player_name: str, character: str):
-            return snapshot
-
-    note = await rebaseline_note(store, _SameInventory(), "Alpha#0100", "hunter", plan)
-    assert note == "", f"基线没变时不该说话，实际：{note}"
-    assert store.resolve(plan.execution_id, "Alpha#0100")[0].snapshot_version == plan.snapshot_version
-
-    # ② 基线变了（我们自己写了一半）→ 给一句说明，并把候选的基线推进过去
-    class _ChangedInventory:
-        async def get_armor_snapshot(self, player_name: str, character: str):
-            moved = snapshot.model_copy(deep=True)
-            moved.helmets[0].source_location = "vault"
-            return moved
-
-    from_there = await rebaseline_note(store, _ChangedInventory(), "Alpha#0100", "hunter", plan)
-    assert "同一个 execution_id" in from_there, from_there
-    assert "改动过账号" in from_there, from_there
-
-    refreshed, status = store.resolve(plan.execution_id, "Alpha#0100")
-    assert status == "ok"
-    changed = snapshot.model_copy(deep=True)
-    changed.helmets[0].source_location = "vault"
-    assert refreshed.snapshot_version == snapshot_version(changed), (
-        "候选基线要推进到**当前实况**，否则下一次重试还是 stale"
-    )
-    assert refreshed.snapshot_version != plan.snapshot_version
-
-
-@pytest.mark.asyncio
-async def test_a_failed_write_pushes_the_baseline_through_the_real_service(
+async def test_a_failed_write_does_not_absorb_changes_into_the_baseline(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """**接线守门**：`equip_build` 写失败、且账号已被改过时，回执要带那句话、候选基线要推进。
+    """**接线守门**：写失败**不许**推进候选基线（ADR-032）。
 
-    2026-10-06 真机：一次半途失败后，第三次带同一个 `execution_id` 重试被
-    `stale_inventory_snapshot` 拒掉 → 被迫整轮重解 + 重新确认。`build_baseline` 就是修这个的；
-    这条用**真服务**跑，替身只替换上游两处（设备执行 + 快照读取），验的是"它真的被调到了"。
+    2026-10-06 这里推过一次：为了让"同一个 `execution_id` 重试"不必重解。代价是
+    **"旧候选写不进一个变过的账号"这条保证被作废**（2026-10-09 审查 #1）—— 只要这次
+    碰巧触发了腾格/顶下，玩家在游戏里做的任何改动都会被一并"认可"。
+    现在的口径：失败就是失败，基线不动；重试会拿到**诚实的 stale**，模型按 `next_actions`
+    用原来的条件重解（那一步已经是一句可照抄的调用，见 `_replay_actions`）。
     """
-    from destiny_mcp.services.build_baseline import rebaseline_note as _note_fn  # noqa: F401
     from destiny_mcp.build.snapshot_version import snapshot_version
 
     service = _build_service()
     snapshot, build = _exact_contract()
     service._candidates.register(build, "Alpha#0100")
+    assert snapshot_version(snapshot) == build.snapshot_version
 
-    changed = snapshot.model_copy(deep=True)
-    changed.helmets[0].source_location = "vault"
-    changed_version = snapshot_version(changed)
-    assert changed_version != build.snapshot_version
-
-    # 读快照的顺序（别写错，2026-10-06 加了自动腾格后变成三次）：
-    # ① 腾格那把（ADR-029）、② 写前复检、③ 失败后推进基线。
-    service._inventory.get_armor_snapshot = AsyncMock(side_effect=[snapshot, snapshot, changed])
+    # 读多少次都返回同一份**没变过**的快照：读序会随腾格/复检的实现变化，钉次数必然假红。
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
     service._equipment.equip_with_recovery = AsyncMock(return_value=LoadoutOperationResult(
         success=False,
         loadout_name="Exact",
@@ -1239,13 +1184,12 @@ async def test_a_failed_write_pushes_the_baseline_through_the_real_service(
     result = await service.equip_build("Alpha#0100", build, "hunter")
 
     assert result["success"] is False
-    assert "同一个 execution_id" in result["message"], result["message"]
-    assert "改动过账号" in result["message"], result["message"]
     refreshed, status = service._candidates.resolve(build.execution_id, "Alpha#0100")
     assert status == "ok", "失败不该烧掉候选（ADR-025）"
-    assert refreshed.snapshot_version == changed_version, (
-        "基线要推进到当前实况，否则同 ID 重试必然 stale"
+    assert refreshed.snapshot_version == build.snapshot_version, (
+        "失败**不许**推进基线：推进就会把外部改动一并吞掉（审查 #1 的那条）"
     )
+    assert "同一个 execution_id" not in result["message"], result["message"]
 
 
 @pytest.mark.asyncio

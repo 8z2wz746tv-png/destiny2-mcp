@@ -442,6 +442,9 @@ async def test_write_prep_polls_the_recheck_until_it_sees_our_own_write(monkeypa
     store = MagicMock()
     build = MagicMock()
     build.model_copy.return_value = "重新登记的那份"
+    # 夹具自洽：写前把关拿 `build.snapshot_version` 与**当前现场**比（ADR-032），
+    # 真实现里这两者本来就一致（都是求解那一刻算出来的）。
+    build.snapshot_version = mr.snapshot_version(_snapshot_stub())
 
     async def _snapshot(*_a, **_k):
         return _snapshot_stub()
@@ -468,3 +471,51 @@ async def test_write_prep_polls_the_recheck_until_it_sees_our_own_write(monkeypa
     assert calls["n"] >= 3, f"复检要轮询到可见，实际只读了 {calls['n']} 次"
     assert steps and steps[0]["action"] == "make_room", steps
     assert "已自动腾出" in prefix
+
+
+@pytest.mark.asyncio
+async def test_substance_drift_during_the_prep_is_refused_before_the_batch_write(monkeypatch) -> None:
+    """我们自己动完账号之后要再核一次**物质层**：别人在这中间改了这套里的件 → 拒（ADR-032）。
+
+    为什么比的不是整份指纹：腾格/顶下**必然**改"放哪儿 / 穿没穿"，那是工具自己的业务
+    （ADR-029/030）；"这件是什么"（属性/能量/已装模组/件数）变了才是"确认的那套不算数了"。
+    2026-10-09 审查 #1 的原场景（先求解 → 玩家改件 → 照样装上）就是靠这一条挡住。
+    """
+    from destiny_mcp.error_codes import ErrorCode
+    from destiny_mcp.services import make_room as mr
+
+    monkeypatch.setattr(mr, "_STABLE_DELAY_SECONDS", 0)
+
+    def _snap(mod_energy: int):
+        snap = _snapshot_stub()
+        snap.gauntlets = [_armor("g1", "某臂铠")]
+        snap.gauntlets[0].installed_mod_energy = mod_energy
+        return snap
+
+    before, drifted = _snap(5), _snap(15)   # 同一件、同一个 id，只有已装模组能量变了
+    reads = {"n": 0}
+
+    async def _snapshots(*_a, **_k):
+        reads["n"] += 1
+        return before if reads["n"] == 1 else drifted
+
+    made = AsyncMock(return_value=(["腾格：'某件' → 仓库"], "已自动腾出某件（搬到仓库）。"))
+    monkeypatch.setattr(mr, "make_room_for_build", made)
+    equipment = AsyncMock()
+    equipment.dequip_conflicting_exotics_for_build = AsyncMock(return_value=([], True, ""))
+    store = MagicMock()
+    build = MagicMock()
+    build.model_copy.return_value = "重新登记的那份"
+    build.snapshot_version = mr.snapshot_version(before)
+
+    steps, _prefix, refusal = await mr.prepare_build_write(
+        player_name="Tester#1234", character="warlock",
+        inventory=MagicMock(get_armor_snapshot=_snapshots),
+        equipment=equipment, manifest=AsyncMock(), build=build, candidates=store,
+    )
+
+    assert refusal is not None, "物质层变过就必须拒绝"
+    assert refusal["code"] == ErrorCode.STALE_INVENTORY_SNAPSHOT, refusal
+    assert steps, "腾格已经发生（这是我们自己的动作，会记在 steps 里）"
+    assert not store.register.called, "物质层变了就不许把基线推过去"
+    assert not equipment.equip_with_recovery.called, "拒绝要在批量写之前"

@@ -54,7 +54,6 @@ from ..build.snapshot_version import snapshot_version
 from .build_tuning import apply_local_tuning, solve_with_tuning
 from .build_candidates import BuildCandidateStore
 from .candidate_messages import candidate_failure, describe_candidate
-from .build_baseline import rebaseline_note
 from .make_room import equip_with_make_room_retry, make_room_for_build, make_room_steps, prepare_build_write
 from .build_execution_guard import recheck_confirmed_build
 from .build_fragments import replace_fragment_config
@@ -758,8 +757,9 @@ class BuildService:
         # 那种情况账号要么没动、要么已回到执行前；重放保护没削弱：写前复检每次重读现场。
         if result.success:
             self._candidates.consume(build.execution_id)
-        else:  # 自己动过账号 → 推进候选基线，否则同一个 ID 重试必然 stale（见 build_baseline）
-            result.message += await rebaseline_note(self._candidates, self._inventory, player_name, normalized_character, build)
+        # 失败**不推进**基线（ADR-032）：上一版在这里无条件推进，等于把"旧候选写不进变过的账号"
+        # 这条保证作废（审查 #1）。现在失败就是失败 —— 同一个 ID 重试会拿到诚实的 stale，
+        # 模型按 next_actions 用**原来的条件**重新求解即可（MODEL_LOOP B 的回放就干这个）。
         return {
             "success": result.success,
             "character": normalized_character,

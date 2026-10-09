@@ -232,3 +232,21 @@ def rarity_key(value: str | None) -> int | None:
     if key in ("", "all", "全部"):
         return None
     return RARITY_ALIASES.get(key)
+
+
+def class_type_of(character_class: str | int) -> int | None:
+    """类名（英文键或中文名）或 classType 数字 → classType；空/认不出给 None（不猜）。
+
+    收 int 是因为 `execution_feasibility.annotate` 以前收的就是 classType 数字（老调用方还在）。
+    """
+    if isinstance(character_class, bool):        # bool 是 int 的子类，别把它当 classType
+        return None
+    if isinstance(character_class, int):
+        return character_class if 0 <= character_class <= 2 else None
+    wanted = (character_class or "").strip().lower()
+    if not wanted:
+        return None
+    for class_type, name in CLASS_TYPE_KEYS.items():
+        if wanted in {name, CLASS_LABELS_ZH.get(name, "")}:
+            return class_type
+    return None

@@ -351,7 +351,8 @@ CEILINGS = {
     "destiny_mcp/services/build_projection.py": 120,
     # 2026-10-03 新增（从 `build_service` 拆出）：求解输入指纹（`CanonicalBuild.snapshot_version`
     # 的重算口径）。登记即上限。
-    "destiny_mcp/build/snapshot_version.py": 61,
+    "destiny_mcp/build/snapshot_version.py": 20,
+    "destiny_mcp/build/snapshot_fingerprint.py": 79,
     # 2026-10-03 新增（①）：求解阶段就要判死的两条执行前提（仓库件遇上满格、与角色正穿着的
     # 金装冲突）。单独成模块是因为它同时被求解器（滤件）、分析器（说话术）与规模闸门（数件数）
     # 读，放进任何一边都会变成两处判据。登记即上限。

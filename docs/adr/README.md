@@ -69,3 +69,4 @@
 - `029-auto-make-room-on-full-slots.md` — 挪装备撞上目标格满时**自动腾一件**（判据照 DIM v8.143.0）：只在已确认的写入里做、只搬仓库、五条绝不腾、上限 3 件、结果记 `make_room` steps 且可还原；落地分 P0–P3，见 `docs/plans/AUTO_MAKE_ROOM_PLAN.md`。
 - `030-dequip-conflicting-exotics-before-batch.md` — `equip_loadout` 批量装备**之前**先顶下冲突金装（照 DIM 的 move aside exotics）：替身要同部位、非金装、同职业，优先身上、没有就去仓库拉；挑不到就不发批量、点名要你先脱哪件。
 - `031-accept-ignored-params-with-warning.md` — 调用方把参数传给当前 intent 不读的字段时**照做 + 在 warnings 里说明**，不再整通拒收（实测这类拒收 247 次、全是无害多余参数）；参数归属表、「认领了必须真读」、「值解析不了照样失败」三条不变。治理方案见 `docs/plans/MODEL_LOOP_PLAN.md`。
+- `032-write-prep-order-and-baseline.md` — 写前把关在先（指纹对不上就一个字节都不写）、指纹拆成"物质层 / 放哪儿"两半、失败不再推进基线、执行现场接线（`annotate` 以前从没被调用过）；**逐条点明**推翻了 ADR-022/024/025/027/029#6 的哪一项（2026-10-09 审查 #1–#4）。

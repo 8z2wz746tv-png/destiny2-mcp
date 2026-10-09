@@ -17,6 +17,7 @@ from ..exceptions import (
 )
 from ..logging_config import get_logger
 from . import profile_components
+from ..build.execution_feasibility import annotate
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..build.models import InventorySnapshot
 from ..build.constants import ARMOR_SLOT_MAP, SOLVER_SLOTS, STAT_HASH_TO_NAME
@@ -129,8 +130,7 @@ class InventoryService:
         if equipped_only:
             items = [item for item in items if item.is_equipped]
 
-        # 截断与自证：以前一次能把整个仓库倒出来（真机 1260 件 ≈ 511 KB / 13–15 万 tokens），
-        # 而响应里没有总数也没有 truncated，调用方既没法少要一点、也察觉不到自己只看到一部分。
+        # 截断与自证：以前一次能把整个仓库倒出来（真机 1260 件 ≈ 511 KB / 13–15 万 tokens）， 而响应里没有总数也没有 truncated，调用方既没法少要一点、也察觉不到自己只看到一部分。
         total = len(items)
         start = max(0, offset)
         if limit is not None and limit > 0:
@@ -190,9 +190,7 @@ class InventoryService:
             if target_bucket:
                 result = [i for i in result if i.bucket_type == target_bucket]
 
-        # Filter by rarity (tier)。封闭词表：认不出来就报错，不能当成"没传"。
-        # 以前只映射英文，传"异域"会安静地返回未过滤的清单 —— 而参数说明里写着中文可用，
-        # 调用方会以为筛过了，把传说件当异域答。
+        # Filter by rarity (tier)。封闭词表：认不出来就报错，不能当成"没传"。 以前只映射英文，传"异域"会安静地返回未过滤的清单 —— 而参数说明里写着中文可用， 调用方会以为筛过了，把传说件当异域答。
         if rarity and rarity.strip().lower() not in ("all", "", "全部"):
             key = rarity.strip().lower()
             target_tier = vocabulary.rarity_key(key)
@@ -607,6 +605,8 @@ class InventoryService:
             profile, self._manifest, character_class,
             reserved_mod_energy=reserved_mod_energy,
         )
+        # 执行现场：每件写"这次装不装得上"。以前**从没接过**（复检第一关是死代码，审查 #1）。
+        annotate(snapshot, character_class, self._manifest)
         logger.info(
             "Armor snapshot ready: %d pieces across 5 slots",
             snapshot.total_pieces,

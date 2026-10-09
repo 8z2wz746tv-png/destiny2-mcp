@@ -164,6 +164,9 @@ _ICON_KEYS = {"icon_url", "iconUrl"}
 # 台账里剩下的每一条都是"这一行**不是出口**（中间产物/回滚快照/求解器内部模型）"，
 # 或者"它本来就不是物品"（套装行、收藏品）。
 _EXEMPT: dict[str, str] = {
+    # 指纹载荷（不是给模型看的输出行）：那几行是 hash 的输入，加 icon_url 会改指纹、
+    # 把已签发候选全部作废 —— 登记豁免。
+    "destiny_mcp/build/snapshot_fingerprint.py::_rows": "指纹载荷：加 icon_url 会改指纹",
     # ── ① 定义级 perk 池：体积口径（见上面 ⚠️ ①，+17 KB/把）──────────────────
     # `scope="definition"` 的 perk 池默认不带 description/icon_url —— 池子回答"能滚到什么"，
     # 要看效果走 `perk_description`、要图走实例级 options。
@@ -228,7 +231,6 @@ _EXEMPT: dict[str, str] = {
     # 这条判据是为了**副本行视图**（每行只有"是哪一件"、名字在卡头说一次）才加的：
     # 真机实测 8 行副本里 `icon_url` 出现 0 次而守门全绿。下面是它顺带扫出来的全部行，
     # 逐条核过 —— 都是**取数/指纹的中间产物**，没有任何一行进响应。
-    "destiny_mcp/build/snapshot_version.py::snapshot_version": "库存指纹的输入行（`json.dumps` 成版本号给 `CanonicalBuild.snapshot_version`），不进响应",
     "destiny_mcp/services/pvp_weapon_service.py::get_pvp_weapon_board": "逐场累计的暂存表 `totals`；出口行在同一函数下面另建（`name`/`icon_url` 都在）",
     "destiny_mcp/services/weapon_compare_service.py::compare_weapon_instances": "`weapon_instances` 的收集行（146–185 两处），出口行在 `weapon_analysis_projection.compare_rows`（2026-10-05 起每行带图）",
     "destiny_mcp/services/weapon_compare_service.py::_check_name_match": "同上：按名字兜底匹配时的收集行（`weapon_instances.append`），不进响应",
