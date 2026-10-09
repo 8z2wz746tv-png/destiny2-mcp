@@ -51,8 +51,8 @@ def test_every_confirmation_call_site_declares_its_tool() -> None:
         for match in re.finditer(r"(confirmation_required_response|_confirmation_required)\(", text):
             line_no = text[: match.start()].count("\n") + 1
             line = text.splitlines()[line_no - 1]
-            if line.lstrip().startswith(("def ", "return confirmation_required_response(")):
-                continue          # 定义本身 / 转发入口（后者在 assistants 里已带 tool=）
+            if line.lstrip().startswith("def "):
+                continue          # 定义本身不算调用点
             # 只看**这次调用自己的前几行**：往后扫太多会读到下一次调用的 `tool=`，
             # 于是"漏接"永远扫不出来（2026-10-09 注入验证当场抓到这条太松）。
             window = text.splitlines()[line_no - 1: line_no + 12]
