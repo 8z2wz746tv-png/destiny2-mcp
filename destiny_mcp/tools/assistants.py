@@ -86,10 +86,7 @@ def _perk_filter_terms(required_perks: list[str] | str | None, perk_name: str) -
     return required_perks
 
 
-# 这些写入由工具自己校验，不走通用确认入口：equip_build 必须先验证服务端签发的一次性
-# 候选，确认时必须原样回传该候选。它们仍然在 WRITE_INTENTS 里，契约测试会检查两条路径
-# 合起来覆盖全部写入 intent，避免出现无人守卫的写入。
-# equip 也在这里：它要先出计划、再由调用方 confirmed=true 才写（见 _equip_branches）。
+# 这些写入由工具自己校验，不走通用确认入口（equip_build 要验证一次性候选、equip 要先出计划）。
 SELF_GUARDED_WRITE_INTENTS: frozenset[str] = frozenset({"equip", "equip_build", "equip_mod"})
 
 
@@ -98,8 +95,11 @@ def _requires_confirmation(intent: str) -> bool:
     return intent in WRITE_INTENTS and intent not in SELF_GUARDED_WRITE_INTENTS
 
 
-def _confirmation_required(intent: str, payload: dict[str, Any]) -> dict[str, Any]:
-    return confirmation_required_response(intent, payload)
+def _confirmation_required(
+    intent: str, payload: dict[str, Any], *, tool: str = ""
+) -> dict[str, Any]:
+    """通用确认入口。`payload` 就是这次调用的有效参数 → 直接当"可回放调用"的参数。"""
+    return confirmation_required_response(intent, payload, tool=tool, replay=payload or None)
 
 
 @mcp.tool(description=TOOL_USAGE["player_assistant"])
@@ -192,7 +192,7 @@ async def inventory_assistant(
             "item_instance_ids": item_instance_ids or [],
             "destination": destination,
             "character": character or to_character,
-        })
+        }, tool="inventory_assistant")
 
     if intent in {"summary", "summarize", "概况"}:
         result = await svc["inventory_analysis_svc"].summarize_inventory(
@@ -1014,7 +1014,7 @@ async def subclass_assistant(
     if _requires_confirmation(intent) and not confirmed:
         return _confirmation_required(intent, {
             "intent": intent, "character": character, "changes": changes or {},
-        })
+        }, tool="subclass_assistant")
 
     if intent in {"get", "subclass"}:
         result = await svc["subclass_svc"].get_subclass(resolved, character)

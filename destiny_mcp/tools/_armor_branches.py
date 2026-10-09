@@ -421,7 +421,14 @@ async def equip_mod(
         )
 
     if not confirmed:
-        return confirmation_required_response("equip_mod", plan)
+        return confirmation_required_response(
+            "equip_mod", plan, tool="build_assistant",
+            replay={
+                "intent": "equip_mod", "item_instance_id": item_instance_id,
+                "mod_name": mod_name, "character": character,
+                **({"socket_index": socket_index} if socket_index is not None else {}),
+            },
+        )
 
     result = await svc["armor_mod_svc"].apply(plan)
     # 六维净变化：换模组是**有代价**的（−10 武器 / +10 手雷）。以前只说"加了什么"，
@@ -542,6 +549,9 @@ async def equip_build(
             "items_preview": await equip_preview(
                 svc, player_name, exact_build.model_dump(mode="json")
             ),
+        }, tool="build_assistant", replay={
+            "intent": "equip_build", "execution_id": exact_build.execution_id,
+            "character": character,
         })
 
     result = await svc["build_svc"].equip_build(player_name, exact_build, character)

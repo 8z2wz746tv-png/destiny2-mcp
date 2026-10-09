@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..error_codes import ErrorCode, write_failed
+from ._replay_actions import replay_action
 from ._write_failure_hints import write_failure_hints
 
 
@@ -50,11 +51,9 @@ def failure_response(
 def action_response(intent: str, summary: str, result: Any) -> dict:
     """写入类服务的统一信封：`success` 归顶层，失败给码 + 原因 + 下一步。
 
-    - 失败走 `failure_response`（详情在 `data.result`）；
-    - `candidates` 只在信封里发一份：以前信封与 `data.result` 各发一份，同一个清单读两遍；
+    - 失败走 `failure_response`（详情在 `data.result`）；`candidates` 只在信封里发一份（以前两处各发一份）；
     - 「同名多件先选一件」不是失败，走 `disambiguation_response`（写入没发生）；
-    - **成功摘要优先用服务层那句 `message`**：它带着"改了什么/核对结果"（如"已装备，回读核对通过"），
-      固定话术（"…流程已执行。"）会把真正有用的信息埋在 `data.result` 里，模型常常只念摘要。
+    - **成功摘要优先用服务层那句 `message`**：固定话术会把"改了什么/核对结果"埋在 `data.result` 里。
     """
     payload = dump(result)
     if payload.get("success") is not True:
@@ -120,12 +119,12 @@ def confirmation_required_response(
     payload: dict[str, Any],
     *,
     next_actions: list[dict[str, Any] | str] | None = None,
+    tool: str = "",
+    replay: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Return the standard two-step confirmation response for account writes.
+    """账户写入的两步确认信封：统一话术 + （给了 `tool`/`replay` 时）一条可照抄的回放调用。
 
-    确认信封也要能自证"下一步做什么"：以前 `next_actions` 恒为空，模型只能自己想到
-    「把 candidates 给玩家看、他同意后再传 confirmed=true」；这里给一条统一话术，
-    具体意图（保存/装备/搬东西）再各自补自己的那条。
+    可回放调用为什么必要、怎么拼：见 `_replay_actions`（唯一出处，别在这再写一遍）。
     """
     return error_response(
         ErrorCode.CONFIRMATION_REQUIRED,
@@ -133,6 +132,7 @@ def confirmation_required_response(
         recoverable=True,
         candidates=[payload],
         next_actions=[
+            *replay_action(tool, replay),
             "把 candidates[0] 里这次要改的东西说给玩家听（中文、别念字段名），"
             "得到明确同意后用同一组参数加 confirmed=true 重发；在那之前账号不会被改动。",
             *(next_actions or []),

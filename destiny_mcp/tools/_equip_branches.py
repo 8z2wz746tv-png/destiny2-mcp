@@ -63,6 +63,12 @@ async def equip_branch(
                 "steps": payload["steps"],
                 "blockers": payload["blockers"],
             },
+            tool="inventory_assistant",
+            replay={
+                "intent": "equip",
+                "item_instance_id": item_instance_id,
+                "character": character,
+            },
         )
 
     result = await svc["transfer_svc"].execute_equip_plan(resolved, plan, character)

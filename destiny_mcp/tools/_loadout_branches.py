@@ -60,15 +60,15 @@ async def confirm_write(
         payload.update({"character": character, "name": name, "notes": notes})
         payload["save_preview"] = await save_preview(svc, resolved, character, name)
     elif intent in {"delete", "equip_loadout"}:
-        # 这两个不读 character（delete 按 id、equip 用配装自己的职业），别塞空键进信封
-        payload["loadout_id"] = loadout_id
+        payload["loadout_id"] = loadout_id   # 这两个不读 character，别塞空键进信封
     elif intent in {"snapshot_official", "update_official_identifiers", "clear_official"}:
         payload.update({
-            "character": character,
-            "slot_number": slot_number,
+            "character": character, "slot_number": slot_number,
             "name_hash": name_hash, "icon_hash": icon_hash, "color_hash": color_hash,
         })
-    return confirmation_required_response(intent, payload)
+    return confirmation_required_response(
+        intent, payload, tool="loadout_assistant", replay=payload,
+    )
 
 
 async def list_or_get(
