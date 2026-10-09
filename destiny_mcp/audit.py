@@ -20,6 +20,22 @@ _DEFAULT_AUDIT_DIR = Path.home() / ".destiny_mcp" / "audit"
 _MAX_RESULT_CHARS = 50_000  # Truncate large results
 
 
+def client_label(session: Any) -> str:
+    """这次调用来自哪个客户端，形如 `名字/版本`；读不到给**空串**。
+
+    MCP 握手时客户端自报家门（`InitializeRequestParams.clientInfo`），会话上取得到
+    （`ServerSession.client_params`）。取不到的常见原因：握手还没完成，或者根本不是经协议调用
+    （单测、脚本直调）。**不编名字** —— 塞一个 "unknown" 会让人以为那是观测到的事实。
+    """
+    params = getattr(session, "client_params", None)
+    info = getattr(params, "clientInfo", None)
+    name = str(getattr(info, "name", "") or "").strip()
+    if not name:
+        return ""
+    version = str(getattr(info, "version", "") or "").strip()
+    return f"{name}/{version}" if version else name
+
+
 class AuditLogger:
     """Logs every MCP tool call to a JSON file on disk."""
 
@@ -33,6 +49,7 @@ class AuditLogger:
         result: Any = None,
         duration_ms: float = 0,
         error: str | None = None,
+        client: str = "",
     ) -> None:
         """Write an audit record for a tool invocation.
 
@@ -42,6 +59,7 @@ class AuditLogger:
             result: Tool result (will be summarized if too large).
             duration_ms: Execution time in milliseconds.
             error: Error message if the call failed.
+            client: Which MCP client made the call (`名字/版本`), empty when unknown.
         """
         try:
             now = datetime.now(timezone.utc)
@@ -59,6 +77,8 @@ class AuditLogger:
                 "duration_ms": round(duration_ms, 1),
                 "result_summary": result_summary,
                 "error": error,
+                # 哪个宿主调的。旧的审计条目没有这个字段 —— 读取侧按缺失处理，不要回填。
+                "client": client,
             }
 
             filepath = day_dir / filename

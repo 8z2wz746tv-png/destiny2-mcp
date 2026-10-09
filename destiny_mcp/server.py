@@ -25,7 +25,9 @@ from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp.utilities.func_metadata import ArgModelBase
 from pydantic import ConfigDict
 
-from .audit import AuditLogger
+from mcp.server.lowlevel.server import request_ctx
+
+from .audit import AuditLogger, client_label
 from .bungie_client import BungieClient
 from .config import (
     MCP_HOST,
@@ -367,12 +369,18 @@ class AuditedMCP(FastMCP):
 
     async def call_tool(self, name: str, arguments: dict):
         start = time.monotonic()
+        # 哪个宿主在调：握手时客户端自报的名字（读不到就是空串，不编）。见 `audit.client_label`。
+        client = client_label(getattr(request_ctx.get(None), "session", None))
         try:
             result = await super().call_tool(name, arguments)
-            self._audit.log(name, arguments, result, (time.monotonic() - start) * 1000)
+            self._audit.log(
+                name, arguments, result, (time.monotonic() - start) * 1000, client=client
+            )
             return result
         except Exception as exc:
-            self._audit.log(name, arguments, None, (time.monotonic() - start) * 1000, str(exc))
+            self._audit.log(
+                name, arguments, None, (time.monotonic() - start) * 1000, str(exc), client=client
+            )
             raise
 
 
