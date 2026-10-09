@@ -79,7 +79,9 @@ def test_pointer_block_names_both_ways_to_read_the_guide() -> None:
 
     assert "/tmp/skills/destiny2-mcp/SKILL.md" in block
     assert config.ROUTING_GUIDE_URL in block
-    assert "ignored_parameter" in block  # 最容易踩的一条行为约定
+    # 最容易踩的一条行为约定：ADR-031 起"没认领的参数"是**照常执行 + warnings 点名**，
+    # 不再返回 `ignored_parameter`（守门跟着口径走，别把旧说法钉死）。
+    assert "照常执行" in block and "warnings" in block
 
 
 def test_sync_mirrors_updates_and_removals(tmp_path: Path) -> None:
