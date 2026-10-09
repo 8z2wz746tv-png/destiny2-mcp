@@ -18,6 +18,7 @@ from ..services.starside_notes import (
     perk_note_for_plug,
     set_notes,
 )
+from ._replay_actions import resolve_again_action
 from ._responses import confirmation_required_response, error_response, failure_response, ok_response
 from ..exceptions import DestinyMCPError, InvalidArgumentError
 from ..services.armor_payload import armor_payload
@@ -490,6 +491,7 @@ def _mod_stat_delta(from_plug: dict[str, Any] | None, to_plug: dict[str, Any] | 
     return {"text": " / ".join(parts), "stats": stats}
 
 
+
 async def equip_build(
     svc: Any,
     player_name: str,
@@ -560,11 +562,7 @@ async def equip_build(
             result.get("code") or write_failed("build_equip"),
             result.get("message") or "配装装备失败。",
             result,
-            next_actions=[{
-                "label": "重新求解并确认配装",
-                "tool": "build_assistant",
-                "arguments": {"intent": "recommend", "character": character},
-            }],
+            next_actions=[resolve_again_action(svc, player_name, exact_build, character)],
         )
     blocked = [
         step for step in (result.get("steps") or [])

@@ -171,7 +171,9 @@ async def find(
     diagnostics: list[Any] = []
     try:
         result = await svc["build_svc"].find_build(
-            player_name, request, diagnostics, functional_mods=functional_mods
+            player_name, request, diagnostics, functional_mods=functional_mods,
+            # 存下这次调用的参数：候选过期时回执要能"用同样的条件重新求解"
+            search_args=query,
         )
     except BuildTooLargeError as exc:
         return _not_computed(str(exc), query, key="builds")

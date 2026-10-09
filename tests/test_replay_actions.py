@@ -61,3 +61,42 @@ def test_every_confirmation_call_site_declares_its_tool() -> None:
     assert not offenders, (
         "这些确认入口没给 tool=（回执里就没有\"照抄就行\"的调用）：" + "、".join(offenders)
     )
+
+
+def test_the_resolve_again_action_replays_the_original_conditions() -> None:
+    """`stale` 后的回放必须是**原来那组条件** —— 不是 `intent="recommend"`。
+
+    2026-10-09：这类失败在审计里 15 次，`next_actions` 给的都是
+    `{"intent": "recommend", "character": "warlock"}` —— 换了词、还丢掉了金装/套装/属性目标，
+    模型照做会求出**另一套配装**（用户要的那套被换掉了）。求解参数存在候选里，原样回带。
+    """
+    from types import SimpleNamespace
+
+    from destiny_mcp.tools._replay_actions import resolve_again_action
+
+    original = {
+        "intent": "find", "character": "warlock", "exotic_name": "阿罕卡拉之颅",
+        "set_bonus_name": "移民号陨落", "grenade_target": 100, "super_target": 150,
+        "priority_stats": "grenade", "top_n": 1,
+    }
+    svc = {"build_svc": SimpleNamespace(
+        get_build_candidate=lambda _player, _exec_id: {"success": True, "search_args": original},
+    )}
+    action = resolve_again_action(svc, "Tester#1234", SimpleNamespace(execution_id="exec-1"), "warlock")
+
+    assert action["tool"] == "build_assistant"
+    assert action["arguments"] == original, action["arguments"]
+    assert "原来" in action["label"]
+
+
+def test_the_resolve_again_action_falls_back_without_inventing_conditions() -> None:
+    """候选里没存参数（老候选）→ 退回最朴素的一条，**不编**金装/目标。"""
+    from types import SimpleNamespace
+
+    from destiny_mcp.tools._replay_actions import resolve_again_action
+
+    svc = {"build_svc": SimpleNamespace(
+        get_build_candidate=lambda _player, _exec_id: {"success": False, "code": "unknown_execution_id"},
+    )}
+    action = resolve_again_action(svc, "Tester#1234", SimpleNamespace(execution_id="gone"), "warlock")
+    assert action["arguments"] == {"intent": "find", "character": "warlock"}, action["arguments"]

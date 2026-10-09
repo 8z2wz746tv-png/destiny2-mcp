@@ -57,4 +57,9 @@ def describe_candidate(
     failure = candidate_failure(status)
     if failure is not None:
         return failure
-    return {"success": True, "build": build.model_dump(mode="json")}
+    return {
+        "success": True,
+        "build": build.model_dump(mode="json"),
+        # 求解那次调用的参数：失败回执用它拼"同样的条件重新求解"（见 build_candidates.register）
+        "search_args": store.search_args_book.get(execution_id),
+    }

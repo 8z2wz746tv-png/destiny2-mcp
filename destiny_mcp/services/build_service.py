@@ -113,7 +113,6 @@ class BuildService:
         mid = p["membership_id"]
         mtype = p["membership_type"]
 
-        # Fetch equipment + socket data for all characters
         profile = await self._resolver.get_profile(mid, mtype, profile_components.INVENTORY_SOCKETS)
         chars = profile.get("characters", {}).get("data", {})
         equip = profile.get("characterEquipment", {}).get("data", {})
@@ -150,7 +149,6 @@ class BuildService:
         if not subclass_inst_id:
             return [0] * 6, [0] * 6, None
 
-        # Read socket data for the subclass
         sockets_data = sockets_map.get(subclass_inst_id, {}).get("sockets", [])
 
         # Look up subclass base stat bonus from constants
@@ -353,6 +351,7 @@ class BuildService:
         compute: BuildCompute | None = None,
         register: bool = True,
         functional_mods: list[str] | str | None = None,
+        search_args: dict[str, Any] | None = None,
     ) -> list[BuildResult]:
         """`compute` / `register` 只给**只读探测**用（阶梯的逐档试解）：
 
@@ -496,7 +495,9 @@ class BuildService:
         if register:
             for result in results:
                 if result.canonical_build:
-                    self._candidates.register(result.canonical_build, player_name)
+                    self._candidates.register(
+                        result.canonical_build, player_name, search_args
+                    )
 
         return results
 
@@ -724,9 +725,8 @@ class BuildService:
                 "message": "配装包含无效模组 Hash，请重新生成配装。",
             }
 
-        # 写账号之前的最后一段只读闸：重取现场 → 执行前提复检（ADR-022）→ 指纹比对 → 实例核对。
-        # 顺序与理由见 `services/build_execution_guard` 的 docstring。
-        # 写前准备：格满自动腾一件（ADR-029）+ 顶下冲突金装（ADR-030）—— 都在复检之前
+        # 写账号之前的最后一段只读闸（顺序与理由见 `services/build_execution_guard`）。
+        # 写前准备：格满腾一件 + 顶下冲突金装（ADR-029/030），都排在复检之前
         room_steps, room_prefix, room_refusal = await prepare_build_write(
             player_name=player_name, character=normalized_character, inventory=self._inventory, equipment=self._equipment, manifest=self._manifest, build=build, candidates=self._candidates)
         if room_refusal is not None:
