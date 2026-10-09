@@ -99,6 +99,23 @@
 
 每条做完都：`pytest` 全量 + ruff + **注入验证**（去掉新行为必须变红）+（涉及行为的）真机一轮。
 
+### 进度（2026-10-09）
+
+| 编号 | 状态 | 证据 |
+| --- | --- | --- |
+| **C** | ✅ 完成、真机验过 | 审计出现 `client='dsh-mcp-client/0.0.1'`；守门 `tests/test_audit_client.py`（注入 58 红） |
+| **B** | ◐ **前半完成**（`confirmation_required`）；**后半未做**（`stale` 的可回放调用） | 真机：`next_actions[0]` = 补 `confirmed=true` 的完整调用；守门 `tests/test_replay_actions.py`（注入 59/60 红） |
+| **A** | ✅ 完成、真机验过 | 真机 `summary` + `item_name` → `ok: true` 且 `warnings[0]` 点名；`tests/test_ignored_parameters.py` 翻向 407 条（注入 61 红） |
+| **D** | ✅ 完成 | `scripts/audit_failure_report.py`（按宿主 + 前十错误码 + 环比 + 真实样例）；守门 `tests/test_audit_failure_report.py`（注入 62 红） |
+
+**第一份基线**（`--days 2`，2026-10-09）：250 次调用 / 失败 68（27.2%）；按宿主 247 条"未记录" + 3 条
+`dsh-mcp-client`（C 刚上线）。注意这一窗口里包含**本轮自己的验证风暴**（大量故意失败的调用），
+不要直接当成"真实使用"的失败率 —— 下一个窗口才是可比基线。
+
+**还没做**：B 的后半（`stale_inventory_snapshot` 的 `next_actions` 现在给的是 `intent="recommend"`，
+会把用户的**金装/套装/属性目标换掉**，属于正确性问题）—— 修法是让候选**存下求解时的原始查询参数**，
+失败时原样回带。
+
 ## 五、明确不做
 
 - **不指望模型读文档**：skill / 工具描述该写的继续写，但不作为治理手段。
