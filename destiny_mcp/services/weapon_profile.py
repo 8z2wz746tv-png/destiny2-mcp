@@ -135,6 +135,16 @@ def find_weapon(manifest: "ManifestManager", weapon_name: str) -> tuple[int, dic
     return int(versions[0]["item_hash"]), versions[0]["definition"]
 
 
+def _weapon_english_name(manifest: "ManifestManager", item_hash: int) -> str:
+    """这个 hash 的英文名（小写）；查不到给空串 —— 不编。"""
+    getter = getattr(manifest, "get_english_name", None)
+    if getter is None:
+        return ""
+    try:
+        return str(getter(item_hash) or "").strip().casefold()
+    except Exception:  # noqa: BLE001 - 只是拿不到备用名，不影响主路径
+        return ""
+
 def weapon_versions(manifest: "ManifestManager", weapon_name: str) -> list[dict]:
     """这个名字下的**所有版本**，**最新的一版排第一**。
 
@@ -167,7 +177,11 @@ def weapon_versions(manifest: "ManifestManager", weapon_name: str) -> list[dict]
         # ⚠️ **只收精确同名**：`search` 也会命中名字相近的其他枪（实测「Judgment」会带出 13 条，
         # 其中 index 最高的那条是**别的枪**）—— 拿它当"最新版"就是把另一把枪塞给用户。
         # 名字里有中文/英文两种写法，所以两边都 casefold 后比。
-        bucket = exact if str(row["name"]).strip().casefold() == wanted else fallback
+        # ⚠️ 精确同名要**中英两种名字都认**：名字索引是中英双语的，用英文名查会返回一堆
+        # **中文名**的条目（实测 search("Judgment") 带出「审判 / 公平审判 / 旅行者的审判5…」），
+        # 只比 `displayProperties.name` 会全部落空 → 退回全部结果 → "最新"就成了**另一把枪**。
+        names = {str(row["name"]).strip().casefold(), _weapon_english_name(manifest, item_hash)}
+        bucket = exact if wanted in names else fallback
         bucket.setdefault(item_hash, row)
     found = exact or fallback           # 精确同名一条都没有时（比如半截名字）才退回搜索顺序
     return sorted(found.values(), key=lambda row: -row["index"])
