@@ -41,6 +41,7 @@
 | [ADR-030](030-dequip-conflicting-exotics-before-batch.md) | 批量装备前先顶下冲突金装 | accepted |
 | [ADR-031](031-accept-ignored-params-with-warning.md) | 没认领的参数照做并警告，不再整通拒收 | accepted |
 | [ADR-032](032-write-prep-order-and-baseline.md) | 写前把关在先、基线只吸收自己的写入、执行现场接线 | accepted |
+| [ADR-033](033-weapon-version-defaults-to-newest.md) | 同名多版本武器默认取最新一版（判据 `index`）；精确同名认中英两种名字 | accepted |
 
 ## 编号规矩
 
