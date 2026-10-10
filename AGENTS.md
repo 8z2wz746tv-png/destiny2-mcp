@@ -159,7 +159,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | 活动统计形状 | `destiny_mcp/activity_stats.py` | `tests/test_activity_stats.py`（上游键清单当夹具，拼错或新增会红） |
 | intent 取值 / 写作清单 | `tools/_requests.py` | `tests/test_skill_contracts.py`、`tests/test_ignored_parameters.py` |
 | 参数归属 | `tools/_param_contracts.py` | 同上（认领了必须真读；没认领的照做并在 `warnings` 点名，见 ADR-031） |
-| 响应信封 | `tools/_responses.py` | 语料 `sweep` 组的信封规则（110 个 intent 全查） |
+| 响应信封 | `tools/_responses.py` | 语料 `sweep` 组的信封规则（**每个 intent 都查**，条数现算别抄） |
 | 服务容器 | `service_context.py` | `tests/test_architecture_layers.py` |
 
 不要复制一张表、一份映射、一段正则到第二个文件。要共享就抽模块，并加一条"禁止再抄"的扫描测试。
@@ -204,7 +204,7 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 
 | 动作 | 实测耗时 | 什么时候才跑 |
 | --- | --- | --- |
-| `pytest -q`（1652 条） | ≈ 2.5 分钟 | 代码改完、提交前跑一次；**文档改动不要跑全量** |
+| `pytest -q`（**条数以它末行为准**，别抄数） | ≈ 1.5 分钟 | 代码改完、提交前跑一次；**文档改动不要跑全量** |
 | `pytest -q tests/test_agent_docs.py` | 5 秒 | 只动 `docs/**` 时 |
 | `+ tests/test_skill_contracts.py` | 3 秒 | 动了 `skills/**` 或 intent/参数契约时 |
 | `scripts/run_corpus_all_rows.py`（260 行，打真机） | ≈ 4–5 分钟 | 一个功能**只在提交前跑一次**；不要每改一处就跑 |

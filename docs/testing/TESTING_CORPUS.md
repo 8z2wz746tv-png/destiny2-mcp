@@ -7,7 +7,7 @@
 
 | 层 | 跑什么 | 什么时候跑 |
 | --- | --- | --- |
-| **L1 自动化**（不需要账号） | `pytest -q`（1272 条）／`scripts/verify_mcp.py`／`tests/agent_behavior_cases.yaml`（路由） | 每次提交 |
+| **L1 自动化**（不需要账号） | `pytest -q`（**条数以末行为准**）／`scripts/verify_mcp.py`／`tests/agent_behavior_cases.yaml`（路由） | 每次提交 |
 | **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 26 行）／`scripts/run_corpus_starside_entities.py`（Starside 实体层 8 行，见文末那一章）／**
 - `scripts/run_corpus_pvp_rows.py` —— PvP/生涯**口径**的真机语料（19 行，冷启约 1 分钟）：游戏内 ID、生涯三档（现存/已删/账号级）、计数器 124,495、试炼/铁旗/赛季、`period=season` 如实失败、武器榜 `all_modes`、模式词表外报错、equip 只给计划、**PGCR 参与者名一律游戏内 ID**、**排行榜空响应如实上报**、**PvP 武器榜（`pvp_weapons`）的窗口/口径/模式过滤与智谋 PvPvE 标记**、**PvE 模式词被拒**、**`count=0` 与不传等价（哨兵规则）**。
    真机提示：这批行会真的打上游，偶发上游读抖动（profile 类读失败）会让个别行红；先重跑一次再判断是不是回归 —— 连续两次红才是回归。盯的是**口径**，信封与形状仍归 `run_corpus_all_rows.py`。
@@ -21,7 +21,7 @@
 - **P2/P3**（措辞、别名、文档不一致）→ 记进 backlog，**攒够一批再改**，不为一句话走一轮验证。
 - 一轮回归发现 0 条 P0/P1，即视为**绿灯**，可以停。
 
-**一轮只跑：L2 冒烟集 + 被改动工具的那一章 + 相关 L1。** 全文 108 个 intent 的全量回归只在
+**一轮只跑：L2 冒烟集 + 被改动工具的那一章 + 相关 L1。** 全部 intent 的全量回归只在
 发布前冻结版本时跑一次。
 
 写法约定：`<...>` 是占位符，用前一步查到的真实值替换（`<职业>`、`<完整名>`、`<武器>`、`<Perk>`、
