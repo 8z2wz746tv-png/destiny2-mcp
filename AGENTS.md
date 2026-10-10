@@ -373,6 +373,7 @@ ADR 单独一张台账，见 `docs/adr/README.md`。
 - `docs/community/COMMUNITY_DATA_NOTICE.md` — 引用或再分发社区资料（Starside）之前看授权与边界。
 - `docs/community/小黑盒_功能总览.md` — 面向中文玩家的八工具功能总览；写对外说明或话术时对齐口径。
 - `docs/community/小黑盒_更新公告_2026-09-18.md` — 上次发文以来的**新增与修复**发布稿（计数器/生涯三档/纯 PvP 武器榜 + 一串口径修复）；要发更新文章或对齐对外口径时看它。
+- `docs/community/小黑盒_更新公告_2026-10-10.md` — 要发**新一期**更新文章、或对齐对外口径时看它：覆盖 2026-09-18 之后的 294 项改动，按「解决用户遇到的问题 / 新增功能 / 时间优化 / 还差什么」四段写，全部数字来自实测。
 - `docs/design/DESKTOP_SHELL.md` — 要动桌面客户端的外壳（导航模型、工作区形态、装备页尺寸、数据来源标签、Flutter 落地）之前看它：token 与尺寸出自老 webui 的 `tokens.css`/`AppShell.tsx`/`inventory.css`，附可点击原型与三张实拍图。
 - `docs/plans/ARMOR_FORMAT_PLAN.md` — 动护甲载荷格式（体积口径、字段取舍）之前看实机证据与取舍。
 - `docs/plans/AUTO_MAKE_ROOM_PLAN.md` — 要动「挪装备撞上目标格满」这条（自动腾哪一件、腾到哪、绝不腾什么）之前看它：DIM v8.143.0 的判据与其源码位置、我们的五条硬口径与四个接入点、验收与三项待拍板。
