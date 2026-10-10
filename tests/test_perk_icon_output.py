@@ -78,10 +78,10 @@ async def test_perk_pool_includes_weapon_and_perk_icons_with_description_fallbac
     assert result["weapon"]["icon_url"] == "https://www.bungie.net/weapon.png"
     assert len(result["sockets"]) == 1
     perk = result["sockets"][0]["options"][0]
-    # P6 体积口径：定义级池子不带描述与图标（要看效果用 perk_description，
-    # 要图用实例级 options）——这里反向确认没带。
+    # 2026-10-10 起：定义级池子**带描述**（实测玉兔 2.4 → 3.0 KB），**不带图标**
+    # （13.2 KB/把，要图走实例级 options）—— 这条钉的是后者没被顺带放开。
     assert "icon_url" not in perk
-    assert "description" not in perk
+    assert perk.get("description"), perk
 
 
 def test_instance_option_includes_icon_and_description_fallback() -> None:

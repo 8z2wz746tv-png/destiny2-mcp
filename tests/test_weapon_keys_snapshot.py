@@ -283,9 +283,15 @@ async def test_socket_and_option_keys(services, intent) -> None:
         assert socket["scope"] == "definition"
         # 单把武器才展开池子；列表类用 column_list（options_available=false）
         assert socket["options_available"] is True
+        # `perk_pool` 从 2026-10-10 起**带描述**（实测玉兔 2.4 → 3.0 KB）；`info` 仍照 P6 的体积口径
+        # 不带 —— 两个 intent 的差别只有这一项，别把口径写成一句。
+        absent_keys = tuple(
+            key for key in DEFINITION_ONLY_ABSENT
+            if not (intent == "perk_pool" and key == "description")
+        )
         for option in socket["options"]:
             assert set(OPTION_KEYS).issubset(option.keys()), option
-            for absent in DEFINITION_ONLY_ABSENT:
+            for absent in absent_keys:
                 assert absent not in option, (socket["slot"], option["name"])
 
 

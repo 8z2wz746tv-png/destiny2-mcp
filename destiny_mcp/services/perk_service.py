@@ -57,7 +57,7 @@ class PerkService:
 
         return lookup
 
-    async def get_weapon_perks(self, weapon_name: str) -> dict:
+    async def get_weapon_perks(self, weapon_name: str, *, include_descriptions: bool = True) -> dict:
         """武器 perk 池：`{weapon, sockets}`（与 info/analyze 同一形状）。
 
         插槽不再只挑 WEAPON PERKS 两类，也不再把 `slot_name` 写成英文：
@@ -74,6 +74,9 @@ class PerkService:
             definition,
             names=names,
             god_roll_lookup=self.god_roll_lookup(item_hash),
+            # 这条出口默认给描述（实测玉兔 2.4 → 3.0 KB，只多 0.6 KB）：池子回答「能滚到什么」，
+            # 没有描述的选项让模型答不出「这个 perk 什么效果」，还得再查一次。图标仍不给（13.2 KB/把）。
+            include_descriptions=include_descriptions,
         )
         logger.info(
             "Perk pool for '%s': %d socket(s), %d option(s)",
