@@ -129,16 +129,48 @@ def find_weapon(manifest: "ManifestManager", weapon_name: str) -> tuple[int, dic
     """
     from ..exceptions import ManifestError
 
+    versions = weapon_versions(manifest, weapon_name)
+    if not versions:
+        raise ManifestError(f"找不到武器: {weapon_name}")
+    return int(versions[0]["item_hash"]), versions[0]["definition"]
+
+
+def weapon_versions(manifest: "ManifestManager", weapon_name: str) -> list[dict]:
+    """这个名字下的**所有版本**，**最新的一版排第一**。
+
+    为什么需要它（2026-10-10 实测）：1318 个武器名里 **580 个（44%）同名多版本** —— 同一把枪
+    每次复刻都是一个新的 `item_hash`（例：鹰月 `235827225` index 23927 是旧版、`386864872`
+    index 35200 是新版）。旧口径取 `search` 结果里的**第一条**，而 search 只按**匹配分**排序，
+    于是"哪一版"纯属偶然 —— 用户问新枪，拿到老版本的 perk 池（老版本游戏里已经刷不到）。
+
+    "哪一版新"的判据是 **`index`**（Manifest 里定义的自增序号，越大越新）：实测鹰月 23927 vs
+    35200、Judgment 六版 35186→23837，都与赛季顺序一致。`search` **本来就返回全部版本**
+    （名字索引是 `名字 → 多条`），所以这里不需要任何新扫描 —— 只是别再取第一条。
+    """
+    wanted = weapon_name.strip().casefold()
+    exact, fallback = {}, {}
     for item in manifest.search(weapon_name, limit=0, item_type=ITEM_TYPE_WEAPON):
         # 搜索已经按类型过滤过了；这里再判一次是**自证契约**（"只取 weapon"这句话在本函数里
         # 必须成立），顺带挡住"将来 search 的过滤被改松"这种回归。
         if item.get("itemType") != ITEM_TYPE_WEAPON:
             continue
-        item_hash = item.get("itemHash") or item.get("hash") or 0
+        item_hash = int(item.get("itemHash") or item.get("hash") or 0)
         definition = manifest.get_item_definition(item_hash)
-        if definition:
-            return int(item_hash), definition
-    raise ManifestError(f"找不到武器: {weapon_name}")
+        if not definition or item_hash in exact or item_hash in fallback:
+            continue
+        row = {
+            "item_hash": item_hash,
+            "index": definition.get("index") or 0,
+            "name": (definition.get("displayProperties") or {}).get("name") or weapon_name,
+            "definition": definition,
+        }
+        # ⚠️ **只收精确同名**：`search` 也会命中名字相近的其他枪（实测「Judgment」会带出 13 条，
+        # 其中 index 最高的那条是**别的枪**）—— 拿它当"最新版"就是把另一把枪塞给用户。
+        # 名字里有中文/英文两种写法，所以两边都 casefold 后比。
+        bucket = exact if str(row["name"]).strip().casefold() == wanted else fallback
+        bucket.setdefault(item_hash, row)
+    found = exact or fallback           # 精确同名一条都没有时（比如半截名字）才退回搜索顺序
+    return sorted(found.values(), key=lambda row: -row["index"])
 
 
 def rarity_of(tier: Any) -> str:

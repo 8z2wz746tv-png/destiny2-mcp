@@ -164,6 +164,8 @@ _ICON_KEYS = {"icon_url", "iconUrl"}
 # 台账里剩下的每一条都是"这一行**不是出口**（中间产物/回滚快照/求解器内部模型）"，
 # 或者"它本来就不是物品"（套装行、收藏品）。
 _EXEMPT: dict[str, str] = {
+    # `weapon_versions` 造的是**查找行**（hash → index → 定义），不是给模型看的输出行。
+    "destiny_mcp/services/weapon_profile.py::weapon_versions": "版本查找行，不是输出行",
     # 指纹载荷（不是给模型看的输出行）：那几行是 hash 的输入，加 icon_url 会改指纹、
     # 把已签发候选全部作废 —— 登记豁免。
     "destiny_mcp/build/snapshot_fingerprint.py::_rows": "指纹载荷：加 icon_url 会改指纹",
