@@ -38,6 +38,9 @@ async def test_perk_pool_asks_for_descriptions(monkeypatch: pytest.MonkeyPatch) 
     result = await svc.get_weapon_perks("玉兔")
 
     assert seen.get("include_descriptions") is True, f"池子出口必须打开描述：{seen}"
+    # 图标同样要开（2026-10-10 用户要求）：没图渲染不出卡片，还得再查一次。
+    # 实测：玉兔 11/11 带图 4.9 KB；鹰月 89/89 带图 31.5 KB（不带图 22.3 KB）。
+    assert seen.get("include_icons") is True, f"池子出口必须打开图标：{seen}"
     options = result["sockets"][0]["options"]
     assert options[0].get("description"), "描述必须一路带到出口"
 
@@ -61,3 +64,6 @@ async def test_descriptions_can_be_turned_off(monkeypatch: pytest.MonkeyPatch) -
 
     await svc.get_weapon_perks("玉兔", include_descriptions=False)
     assert seen.get("include_descriptions") is False, seen
+
+    await svc.get_weapon_perks("玉兔", include_icons=False)
+    assert seen.get("include_icons") is False, seen

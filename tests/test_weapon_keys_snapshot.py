@@ -285,9 +285,11 @@ async def test_socket_and_option_keys(services, intent) -> None:
         assert socket["options_available"] is True
         # `perk_pool` 从 2026-10-10 起**带描述**（实测玉兔 2.4 → 3.0 KB）；`info` 仍照 P6 的体积口径
         # 不带 —— 两个 intent 的差别只有这一项，别把口径写成一句。
+        # `perk_pool` 从 2026-10-10 起**带描述与图标**（实测鹰月 89/89 选项带图、31.5 KB）；
+        # `info` 仍照 P6 的体积口径不带 —— 两个 intent 的差别就是这两项。
         absent_keys = tuple(
             key for key in DEFINITION_ONLY_ABSENT
-            if not (intent == "perk_pool" and key == "description")
+            if not (intent == "perk_pool" and key in {"description", "icon_url"})
         )
         for option in socket["options"]:
             assert set(OPTION_KEYS).issubset(option.keys()), option
