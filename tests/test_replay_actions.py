@@ -100,3 +100,25 @@ def test_the_resolve_again_action_falls_back_without_inventing_conditions() -> N
     )}
     action = resolve_again_action(svc, "Tester#1234", SimpleNamespace(execution_id="gone"), "warlock")
     assert action["arguments"] == {"intent": "find", "character": "warlock"}, action["arguments"]
+
+
+def test_a_location_failure_asks_to_retry_the_same_candidate() -> None:
+    """D3 回归（2026-10-18 真机 1671）：位置性失败**不能**只给「重新求解」。
+
+    求解结果没错，错的是执行时机。给成重新求解会把调用方带进「重解 → 重写 → 再失败」的循环；
+    正确的下一步是：回轨道/社交空间，用**同一个** execution_id 重试。
+    """
+    from destiny_mcp.tools._replay_actions import location_retry_action
+
+    result = {"steps": [
+        {"action": "transfer", "detail": "转移 '至高狂徒面具' → hunter", "success": True},
+        {"action": "equip_many",
+         "detail": "批量装备失败：…至高狂徒面具 (equipStatus=1671)；…请刷新装备确认状态。",
+         "success": False},
+    ]}
+    action = location_retry_action(result, "EXEC1", "hunter")
+    assert action is not None, "1671 必须给「回轨道重试同一候选」，不能落回重新求解"
+    assert action["arguments"] == {"intent": "equip_build", "character": "hunter", "execution_id": "EXEC1"}
+    assert "重试" in action["label"]
+    # 非位置性失败不抢原有的下一步
+    assert location_retry_action({"steps": [{"detail": "NoRoomInDestination"}]}, "E", "h") is None

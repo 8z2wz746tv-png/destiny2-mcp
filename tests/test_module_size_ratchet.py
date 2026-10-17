@@ -251,7 +251,8 @@ CEILINGS = {
     # 186 → 180：失败话术表拆去 `_write_failure_hints.py`（形状与措辞分开）。
     "destiny_mcp/tools/_responses.py": 180,
     # 上游原文关键词 → 下一步话术（会随实测加条目，所以单独登记，别挤回信封模块）。
-    "destiny_mcp/tools/_write_failure_hints.py": 43,
+    "destiny_mcp/tools/_write_failure_hints.py": 12,
+    "destiny_mcp/tools/_failure_hints.py": 68,
     # 执行前状态快照与回滚（从 loadout_equipment_service 拆出）。
     # 385 → 317：三块搬走 —— 回滚核对（`_verify_restored_items`）去 `loadout_verify.py`
     # （它和 `verify_loadout` 是同一件事：拿一份 profile 逐槽比，且共用"哪些实例在身上"）；

@@ -41,3 +41,27 @@ def resolve_again_action(svc: Any, player_name: str, exact_build: Any, character
         else "重新求解并确认配装"
     )
     return {"label": label, "tool": "build_assistant", "arguments": args}
+
+
+def location_retry_action(
+    result: dict[str, Any], execution_id: str, character: str
+) -> dict[str, Any] | None:
+    """位置性失败（1671 等）的下一步：**回轨道后用同一个 execution_id 重试**。
+
+    2026-10-18 真机：`equip_build` 五件全 `equipStatus=1671`，回执却只给「重新求解」——
+    求解结果根本没错，错的是执行时机；照它做会变成「重解 → 重写 → 再失败」的循环。
+    返回 None 表示这不是位置性失败（调用方沿用原来的下一步）。
+    """
+    details = " ".join(
+        str(step.get("detail", "")) for step in (result.get("steps") or []) if isinstance(step, dict)
+    )
+    if not any(key in details for key in ("1671", "AtThisLocation", "CannotPerformActionAtThisLocation")):
+        return None
+    arguments: dict[str, Any] = {"intent": "equip_build", "character": character}
+    if execution_id:
+        arguments["execution_id"] = execution_id
+    return {
+        "label": "回轨道/社交空间后，用**同一个** execution_id 重试（不用重新求解）",
+        "tool": "build_assistant",
+        "arguments": arguments,
+    }
