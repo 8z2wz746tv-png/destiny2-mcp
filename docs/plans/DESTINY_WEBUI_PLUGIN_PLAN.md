@@ -73,3 +73,26 @@ dsh-plugin-destiny（npm 包）
 - 2026-10-27 范围收窄：用户拍板**只搬仓库页**；实读发现这 27 个文件里的 `dim/` **已是 DIM v8.133.0 的适配件**
   （MIT 许可 + UPSTREAM 记录齐全）→ 结论：搬它，**不**整搬 DIM 原版。搬的时候**必须保留**
   `dim/LICENSE.md` 与 `dim/UPSTREAM.md`（MIT 要求 + 以后挑新特性的依据）。
+
+## 七、工具与红线（2026-10-27 补：已装 `dsh-plugin-guide`）
+
+用户此前装过一个做插件的技能包 **`dsh-plugin-guide`**（v0.3.39），装在 **`~/.dsh/profiles/web`** 里
+（所以 desktop 这边一直没发现）。它同时是：
+
+- **skill**（`SKILL.md` + `guide/` 速查/版本矩阵 + `references/official-docs/` 官方文档全文副本）；
+- **CLI `dsh-plugin-dev`**（`new` 脚手架 / `check` 静态检查 / `verify` 在干净临时 profile 里装-启-卸 /
+  `seams <query>` 问宿主某个 API 或扩展点**是否存在**）。
+
+**按它的红线，原方案要改三处**：
+
+1. **UI 必须是 slot 里的 React 组件，禁止 iframe 托管整页**；样式只用 `--dsw-alias-*` 主题 token；
+   `dsh.client.inject` 必须是静态数组；不 `require` Harness Client 包。
+   → 「仓库页」按**槽位视图**做，不做整页 iframe。
+2. **禁止**：会话运行期间改 profile 的 `cordis.patch.yml`（HMR 会丢工具、杀在途 turn）、
+   **手写 profile 的 `package.json`**、在 profile 目录里跑 pnpm。
+   → 安装走 `dsh plugin add`（CLI 的 `verify` 就是这么验的），不手改文件。
+3. **先认版本**：本机 `dsh --version` = **0.1.7-rc.2** → 属于指南里的「中间线」，
+   会话格式 V4 已生效、§13 的 19 条不适用。
+
+**落地顺序调整**：P0 之前先跑 `dsh-plugin-dev seams` 把「有没有页面/路由扩展点」问清楚
+（这是方案 §五 三条未验的第一条），再用 `new` 脚手架起骨架；验收用它的 `check` + `verify`。
