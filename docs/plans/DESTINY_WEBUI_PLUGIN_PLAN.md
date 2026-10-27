@@ -17,17 +17,25 @@
 | DSH 客户端注册 API | `window.__ModuleLoader__.load({ id, factory })`；注册 `route` / `nav` / `page`（task-board 里 110 处 `route`、29 处 `nav`）|
 | 参照模板 | `@linxin666/dsh-client-ui-task-board`（host `lib/index.js` 11.4k 行 + client 13.8k 行；① **不修改 DSH 源码** ② 有 cordis service 在两端通信）|
 
-## 二、范围（砍掉一半以上）
+## 二、范围（2026-10-27 用户拍板：**只搬仓库页**）
 
-**搬**：
-1. **仓库页**（最值钱）：装备列表、详情、perk 面板、按类型分组；
-2. **任务页**（若有独立数据源则看情况）；
-3. **渲染块**（`api/destiny_render_blocks.py` 对应的卡片/面板渲染规则与样式 token）。
+**唯一要搬的**：老 web 的 `webui/src/features/inventory/` —— **27 个文件**：
+`InventoryPage` + `InventoryPanelResizer` + `dim/`（17 个）+ `assistant/`（4 个）。
 
-**不搬**：聊天壳、会话管理、流式输出、认证/登录、上传、命令系统 —— 这些 **DSH 本身就有**，
-老 web 的 `server.py + api/*` 本质上是在重造一个 DSH，搬过来是白干。
+**关键事实（实读）**：这 27 个里的 `dim/` 那 17 个**本身就是 DIM 的适配件** —— `dim/UPSTREAM.md` 记着来源：
+**DIM v8.133.0，commit `028644e35f51a160f86d30192395d7ecc4b91c71`**，对应上游
+`src/app/item-popup/ItemSockets*.tsx`、`Socket.tsx`、`ArchetypeSocket.tsx`、`src/app/inventory/store/sockets.ts` 等；
+`dim/LICENSE.md` 是 DIM 的 **MIT** 许可。作者已经把 DIM 的 Redux / 认证 / manifest 运行时 / 通知系统
+换成了本项目的 MCP 后端 + 类型化 WebUI API（原文见 UPSTREAM.md）。
 
-> 一句话：**只搬 Destiny 的"皮和面板"，不搬"壳和会话"**。
+> **所以「直接搬 DIM」= 重做一遍已经做过、而且做得很规范的那件事** ✗：DIM 原版 1120 个 ts/tsx、
+> `src/app` 下 49 个子目录、自带认证/manifest/Redux，换数据层是大工程。正确做法是搬这 27 个文件，
+> 以后要 DIM 的新交互就照同一个 UPSTREAM 流程挑着搬（记版本 + commit + 许可）。
+
+**不搬**：任务页、聊天壳、会话管理、流式输出、认证/登录、上传、命令系统 —— 前两项 DSH 有/不值得，
+其余是老 web 在重造 DSH；`api/destiny_render_blocks.py` 那套渲染先不动（等仓库页跑通再说）。
+
+> 一句话：**只搬仓库页这一块，它已经是「DIM 的皮 + 我们的数据」**。
 
 ## 三、架构
 
@@ -62,3 +70,6 @@ dsh-plugin-destiny（npm 包）
 ## 六、状态
 
 - 2026-10-27：**调研完成**（上表全部为实读）；**代码零落地**；等确认后从 **P0** 开始。
+- 2026-10-27 范围收窄：用户拍板**只搬仓库页**；实读发现这 27 个文件里的 `dim/` **已是 DIM v8.133.0 的适配件**
+  （MIT 许可 + UPSTREAM 记录齐全）→ 结论：搬它，**不**整搬 DIM 原版。搬的时候**必须保留**
+  `dim/LICENSE.md` 与 `dim/UPSTREAM.md`（MIT 要求 + 以后挑新特性的依据）。
