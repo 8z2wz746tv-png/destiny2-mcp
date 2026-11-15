@@ -267,9 +267,10 @@ class ActivityCountersService:
 
         Args:
             player_name: 玩家 BungieName。
-            query: 名称或描述的子串过滤（大小写不敏感）。默认空 = 不过滤（本账号约 402 条）；
-                只要 PvP 相关的就传 `"crucible"`（试炼/铁旗/智谋都在 Crucible 描述下），
-                要试炼就传 `"trials"`。
+            query: 名称或描述的子串过滤（大小写不敏感），**匹配的是中文原文** ——
+                传 `"熔炉"` / `"已击败对手"` / `"胜场"` 这类中文词；传英文（`crucible`、
+                `trials`）会一条都匹配不到（真机实测 `query="crucible"` → 0 条），
+                按模式筛请用 `mode=`，按周期筛用 `period=`。
             limit: 最多返回几条，默认 20；`total`/`truncated` 说明一共筛出多少。
             mode: 按对照表的模式家族筛（crucible/trials/iron_banner/competitive/gambit/raid）。
                 三条件计数器的名字会重名，靠它区分；词表外的取值报 `invalid_argument_error`。
@@ -301,9 +302,8 @@ class ActivityCountersService:
             empty["warnings"] = []
             return empty
 
-        counters = filter_counters(
-            parse_counters(raw_metrics, self._manifest), query, mode, period
-        )
+        parsed = parse_counters(raw_metrics, self._manifest)
+        counters = filter_counters(parsed, query, mode, period)
         logger.info(
             "生涯计数器：player=%s 原始=%d 过滤后=%d query=%r mode=%r period=%r",
             player_name, len(raw_metrics), len(counters), query, mode, period,
@@ -312,6 +312,15 @@ class ActivityCountersService:
         # 可选数据的降级（名字查不到、进度缺失）只写进 warnings，不改 `counters` 的形状：
         # 每一行始终是同一组键，缺的是值，不是结构。
         result["warnings"] = self._degradation_warnings(counters)
+        if query.strip() and result["total"] == 0 and parsed:
+            # 别让"英文词匹配不到中文计数器"被读成"这个账号没有这条计数"：
+            # 真机就踩过（`query="crucible"` → 0 条，而熔炉那批计数器明明在）。
+            result["warnings"].append(
+                f"query={query!r} 没有匹配到任何计数器：`query` 做的是**名称与描述的子串匹配**"
+                "（既不是模式词、也不是模糊搜索）。按模式筛请用 mode=，按周期筛用 period=；"
+                "按名字找先试中文名 —— 真机实测 `query=\"crucible\"` → 0 条，"
+                "`query=\"熔炉\"` → 13 条（本账号的计数器名称来自中文 Manifest）。"
+            )
         return result
 
     @staticmethod

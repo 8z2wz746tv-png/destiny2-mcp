@@ -15,7 +15,7 @@ from ..exceptions import ManifestError
 from ..logging_config import get_logger
 from ..manifest import ManifestManager
 from ..manifest_names import names_for
-from . import armor_payload, weapon_payload, weapon_profile
+from . import armor_payload, weapon_payload, weapon_profile, weapon_stats_payload
 
 logger = get_logger(__name__)
 
@@ -217,7 +217,7 @@ class ManifestQueryService:
                 self._manifest, weapon_def, sockets=sockets, names=names
             ),
             "sockets": sockets,
-            "stats": weapon_payload.stat_list(
+            "stats": weapon_stats_payload.stat_list(
                 self._manifest, weapon_def, instance_stats, names=names
             ),
         }
@@ -245,7 +245,7 @@ class ManifestQueryService:
                 names=names,
                 roll_kind=weapon_profile.roll_kind(definition),
             ),
-            "stats": weapon_payload.stat_list(self._manifest, definition, names=names),
+            "stats": weapon_stats_payload.stat_list(self._manifest, definition, names=names),
         }
 
     # ── Catalyst ─────────────────────────────────────────────────────

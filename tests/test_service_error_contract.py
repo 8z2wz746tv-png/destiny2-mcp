@@ -29,7 +29,7 @@ SERVICES_DIR = Path(__file__).parents[1] / "destiny_mcp" / "services"
 class _EmptyManifest:
     """只提供「什么都搜不到」的 Manifest 替身。"""
 
-    def search(self, query: str, limit: int = 10) -> list:
+    def search(self, query: str, limit: int = 10, item_type: int | None = None) -> list:
         return []
 
     def get_all_set_bonuses(self) -> dict:

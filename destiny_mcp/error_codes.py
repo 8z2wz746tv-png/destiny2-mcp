@@ -39,6 +39,9 @@ class ErrorCode(StrEnum):
     INVALID_EXOTIC_CONFIRMATION = "invalid_exotic_confirmation"
     INVALID_MAX_REPLACEMENTS = "invalid_max_replacements"
     INVENTORY_SUMMARY_FAILED = "inventory_summary_failed"
+    # 「同名多件，先选一件」：写入没发生，也不该报成 `xxx_failed`（真机 2026-09-24 之前是
+    # `move_failed`，而语义是"需要你选"；报成失败会让调用方以为出错、甚至重试同一个调用）。
+    ITEM_DISAMBIGUATION_REQUIRED = "item_disambiguation_required"
     MISSING_ARTIFACT_MOD_HASH = "missing_artifact_mod_hash"
     MISSING_ARTIFACT_NAME = "missing_artifact_name"
     EQUIP_BLOCKED = "equip_blocked"

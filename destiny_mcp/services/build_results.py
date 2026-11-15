@@ -19,11 +19,18 @@ from dataclasses import dataclass, field
 from typing import Any, Sequence
 
 from ..build.constants import STAT_NAMES
-from ..build.models import BuildCandidate, BuildResult
+from ..build.functional_mods import FunctionalModPlan
+from ..build.models import (
+    BuildCandidate,
+    BuildConstraints,
+    BuildResult,
+    tuning_is_allowed,
+)
 from ..build.scorer import score as _score
 from ..build.tuning import TuningPlan
-from ..build_contracts import ExecutableBuild
+from ..build_contracts import CanonicalBuild, ExecutableBuild
 from ..models import LoadoutItem, LoadoutSubclassConfig
+from ..vocabulary import STAT_LABELS_ZH
 
 
 LOADOUT_SLOT_NAMES = {
@@ -52,6 +59,8 @@ class ResultContext:
     execution_subclass: LoadoutSubclassConfig | None = None
     #: 护甲实例 ID 组合（排序后）→ 这套的调谐改动；空表示这套不用动调谐。
     tuning: dict[tuple[str, ...], TuningPlan] = field(default_factory=dict)
+    #: 社区配装里照抄来的功能模组（按部位成组）；None = 这次没有要照抄的。
+    functional_mods: FunctionalModPlan | None = None
 
 
 def set_key(items: Sequence[Any]) -> tuple[str, ...]:
@@ -62,9 +71,10 @@ def set_key(items: Sequence[Any]) -> tuple[str, ...]:
 def tuning_note(plan: TuningPlan | None, item_names: dict[str, str] | None = None) -> str:
     """把调谐改动说成人话（没有改动就返回空串）。
 
-    口径（0.1.8 实机修正）：调谐**不能在游戏外改** —— Bungie 的插槽接口实测回
-    "This action can only be done in-game."（ErrorCode 1663）。所以这句话是"要你在游戏里
-    手动改哪几件"，不是"确认后我们会替你改"。
+    口径（2026-09-22）：调谐**能替你写**，条件只有一条 —— **这颗在这件护甲允许的清单里**
+    （组件 310）。真机已验证：写入 `ErrorCode=1`、回读插槽与六维一致、不花材料
+    （见 ADR-014 的修订与 `docs/plans/TUNING_WRITE_PLAN.md`）。
+    所以这句话现在是"**确认后会一起改**"，不再是"要你进游戏手动改"。
     """
     if plan is None or not plan.feasible or not plan.changes:
         return ""
@@ -75,9 +85,13 @@ def tuning_note(plan: TuningPlan | None, item_names: dict[str, str] | None = Non
         parts.append(f"{who} 改成「{change.to_name}」")
     head = (
         f"这套方案要先把 {len(plan.changes)} 件护甲的调谐改掉才能达标"
-        "（调谐免费、不占能量、不影响模组，但**只能在游戏内手动改**）："
+        "（调谐不占能量、不影响模组；确认后**一起改**，改不了会说明是哪一件、为什么）："
     )
-    return head + "；".join(parts) + "。"
+    tail = ""
+    if plan.exhausted:
+        # 碰了步数上限就是"没吃干净"，不能装成已经最优（P4 的局部最优不变量会抓这个）。
+        tail = "（这轮局部优化是碰到步数上限停的，可能还有别的改法没试到，不代表已经最优。）"
+    return head + "；".join(parts) + "。" + tail
 
 
 def build_results(
@@ -113,11 +127,22 @@ def build_results(
 
         key = set_key(armor_set.armor)
         plan = context.tuning.get(key)
-        # 调谐**不进** `mods`：实测 Bungie 的插槽接口对调谐回
-        # "This action can only be done in-game."（ErrorCode 1663），
-        # 写进去只会让 equip_build 失败或静默少做一步。调谐只作为"要你在游戏里改"的清单。
+        # 调谐**并进** `mods`（2026-09-22 开放代写）：执行器按插件类别找插槽，本来就会往调谐槽写，
+        # 回读也会一起核对 —— 走同一条可执行路径，不新增字段。只放"这件允许的"那几颗：
+        # 不在组件 310 清单里的调谐**不进计划**（否则等于让 equip_build 去撞 1675）。
+        tuning_plugs: dict[str, int] = {}
+        if plan is not None and plan.feasible:
+            by_id = {str(getattr(item, "item_instance_id", "")): item for item in armor_set.armor}
+            for change in plan.changes:
+                armor = by_id.get(str(change.item_instance_id))
+                # `tuning_is_allowed` 两边过 `to_unsigned`（求解器给的是无符号，但这条比较
+                # 是"写入前的兜底"，不许依赖上游有没有归一 —— 一个规矩只写一次）
+                if armor is not None and tuning_is_allowed(
+                    getattr(armor, "tuning_option_hashes", ()) or (), change.to_plug
+                ):
+                    tuning_plugs[str(change.item_instance_id)] = int(change.to_plug)
         # 注意 `requires_tuning` 要按**方案**算，不能按"有没有插件要写"算 ——
-        # 后者在调谐不可写之后恒为 False（实机语料第 ⑩ 行抓到的回归）。
+        # 后者在调谐不可写那阵子恒为 False（实机语料第 ⑩ 行抓到的回归）。
         has_plan = bool(plan is not None and plan.feasible and plan.changes)
         item_names = {
             str(getattr(item, "item_instance_id", "")): str(getattr(item, "name", ""))
@@ -130,12 +155,18 @@ def build_results(
                 completion_rate=_count_met(candidate, parsed) / max(1, _count_targets(parsed)),
                 build=candidate,
                 missing_requirements=_missing_requirements(candidate, parsed),
+                max_violations=_max_violations(candidate, parsed),
                 fragment_details=context.fragment_details,
                 active_set_bonuses=_calculate_set_bonuses(list(armor_set.armor), context.manifest),
                 tuning_changes=(
                     [change.as_dict() for change in plan.changes]
                     if plan is not None and plan.feasible
                     else []
+                ),
+                functional_mods=(
+                    context.functional_mods.as_payload()
+                    if context.functional_mods and context.functional_mods.mods
+                    else {}
                 ),
                 requires_tuning=has_plan,
                 tuning_note=tuning_note(plan, item_names),
@@ -213,12 +244,25 @@ def build_results(
                             name=armor.name,
                             slot=LOADOUT_SLOT_NAMES.get(armor.slot, armor.slot),
                             item_instance_id=armor.item_instance_id,
-                            # 只有属性模组：调谐插件不在里面（见上面 has_plan 的说明）
-                            mods=list(
-                                armor_set.stat_mod_assignments.get(
-                                    armor.item_instance_id, []
-                                )
+                            # 属性模组 +（如果这套要改调谐）调谐插件：执行器按类别找槽，
+                            # 调谐槽本来就是插槽，回读一视同仁。
+                            # 照抄来的功能模组（社区作者写的流派取向）：与属性模组分开放，
+                            # 因为它们的失败口径不同 —— 装不上只跳过并点名，不许整条回退。
+                            functional_mod_groups=(
+                                (context.functional_mods.groups_by_slot().get(
+                                    LOADOUT_SLOT_NAMES.get(armor.slot, armor.slot), []
+                                ) if context.functional_mods else [])
                             ),
+                            mods=[
+                                *armor_set.stat_mod_assignments.get(
+                                    armor.item_instance_id, []
+                                ),
+                                *(
+                                    [tuning_plugs[armor.item_instance_id]]
+                                    if armor.item_instance_id in tuning_plugs
+                                    else []
+                                ),
+                            ],
                             source_location=getattr(armor, "source_location", ""),
                             source_character_id=getattr(armor, "source_character_id", ""),
                             was_equipped=getattr(armor, "is_equipped", False),
@@ -234,6 +278,24 @@ def build_results(
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# 上限违规（对外字段：max_violations）—— 超了不拦，只标注 + 排序时靠后
+
+
+def _max_violations(candidate: BuildCandidate, constraints: BuildConstraints) -> list[dict]:
+    """哪几项超过了 `stat_caps`。没给上限的项（0）永远不算违规。"""
+    caps = constraints.max_vector()
+    return [
+        {
+            "stat": STAT_NAMES[index],
+            "label": STAT_LABELS_ZH[STAT_NAMES[index]],
+            "actual": candidate.stat(STAT_NAMES[index]),
+            "max": caps[index],
+        }
+        for index in range(6)
+        if caps[index] > 0 and candidate.stat(STAT_NAMES[index]) > caps[index]
+    ]
+
+
 # 目标达成统计（对外字段：completion_rate / missing_requirements）
 # ═══════════════════════════════════════════════════════════════════════════
 
@@ -316,3 +378,31 @@ __all__ = [
     "set_key",
     "tuning_note",
 ]
+
+
+def canonical_subclass(build: CanonicalBuild) -> LoadoutSubclassConfig | None:
+    """`CanonicalBuild` 的子职业字段 → 装备流程要的 `LoadoutSubclassConfig`（空则 None）。"""
+    values = {
+        "subclass_item_hash": build.subclass_item_hash or 0,
+        "subclass_instance_id": build.subclass_instance_id,
+        "super_hash": build.super_hash or 0,
+        "grenade_hash": build.grenade_hash or 0,
+        "melee_hash": build.melee_hash or 0,
+        "class_ability_hash": build.class_ability_hash or 0,
+        "movement_hash": build.movement_hash or 0,
+        "aspect_hashes": build.aspect_hashes,
+        "fragment_hashes": build.fragment_hashes,
+        "plug_sockets": build.subclass_plug_sockets,
+    }
+    if not any([
+        values["super_hash"],
+        values["grenade_hash"],
+        values["melee_hash"],
+        values["class_ability_hash"],
+        values["movement_hash"],
+        values["aspect_hashes"],
+        values["fragment_hashes"],
+        values["plug_sockets"],
+    ]):
+        return None
+    return LoadoutSubclassConfig(**values)

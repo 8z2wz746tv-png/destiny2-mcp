@@ -12,6 +12,7 @@
 
 import asyncio
 import sys
+import time
 
 from destiny_mcp.server import create_server, app_lifespan
 from destiny_mcp.tools.assistants import build_assistant, inventory_assistant
@@ -23,13 +24,21 @@ T5_LEGS = "6917530198796768597"
 LEGACY_PIECE = "6917529740500777594"
 
 
+# 每一行"花了多久"：从上一行结束到现在。脚本直调工具，所以这是**服务端口径**
+# （不含 agent 的模型回合与用户确认）；要那个口径看 scripts/audit_chain_timing.py。
+_SINCE = [time.perf_counter()]
+
+
 def check(row: str, ok: bool, evidence: str) -> None:
-    RESULTS.append((row, ok, evidence))
-    print(f"{'PASS' if ok else 'FAIL'} | {row}\n       {evidence}")
+    now = time.perf_counter()
+    elapsed = now - _SINCE[0]
+    _SINCE[0] = now
+    RESULTS.append((row, ok, evidence, elapsed))
+    print(f"{'PASS' if ok else 'FAIL'} | {row}  [{elapsed:6.1f}s]\n       {evidence}")
 
 
 async def main():
-    async with app_lifespan(create_server("normal")) as svc:
+    async with app_lifespan(create_server()) as svc:
         ctx = type("C", (), {"request_context": type("R", (), {"lifespan_context": svc})()})()
 
         async def inv(**kwargs):
@@ -207,8 +216,11 @@ async def main():
             "⑫ 社区核对：护甲需求的已拥有副本带 slot/slot_display",
             r["ok"] and bool(armor_reqs)
             and (not owned or all("slot" in inst for inst in owned)),
+            # 调用失败时把错误码写进证据：否则"0 需求"看起来像回归，其实是上游读抖动
+            # （2026-09-24 实测：同一条调用单独重跑就正常，脚本自己也写着"先重跑一次"）。
             f"护甲需求={len(armor_reqs)} 已拥有副本={len(owned)} "
-            f"样例={owned[0] if owned else None}",
+            f"样例={owned[0] if owned else None} "
+            f"error={(r.get('error') or {}).get('code')}",
         )
 
         # 7. 列表保持轻量：不带插槽/能量（要看这些走 intent=item）
@@ -277,6 +289,30 @@ async def main():
             f"code={(again.get('error') or {}).get('code')} 预览件数={len((again.get('candidates') or [{}])[0].get('items_preview') or [])}",
         )
 
+        # 10b. 只发标量的宿主：给候选 ID 等于给整块 canonical_build（豆包 connector 那条路）。
+        # **必须现解一次**：候选 10 分钟过期，而这一行离上面那次求解已经十几分钟了
+        # （2026-09-23 实跑抓到：拿旧 ID 只会得到 unknown_execution_id，那是行的错不是代码的错）。
+        # 顺便验证候选行顶层那个标量 execution_id —— 标量宿主就是靠它取 ID 的。
+        fresh = await build(intent="find", character="hunter", exotic_name="快速装弹松身裤",
+                            weapons_target=150, class_target=100,
+                            grenade_target=70, melee_target=70, super_target=80)
+        if (fresh.get("error") or {}).get("code") == "exotic_confirmation_required":
+            fresh = await build(**dict(fresh["candidates"][0]["arguments"]))
+        fresh_top = ((fresh.get("data") or {}).get("builds") or [{}])[0]
+        fresh_id = fresh_top.get("execution_id") or ""
+        by_id = await build(intent="equip_build", execution_id=fresh_id, confirmed=False)
+        by_id_echo = (by_id.get("candidates") or [{}])[0]
+        check(
+            "⑯b 只给 execution_id 也能确认：回显同一个 ID + 五件预览（标量宿主不被卡住）",
+            bool(fresh_id)
+            and by_id.get("error", {}).get("code") == "confirmation_required"
+            and by_id_echo.get("execution_id") == fresh_id
+            and len(by_id_echo.get("items_preview") or []) == 5,
+            f"顶层 ID={fresh_id!r} code={(by_id.get('error') or {}).get('code')} "
+            f"回显 ID={by_id_echo.get('execution_id')!r} "
+            f"预览件数={len(by_id_echo.get('items_preview') or [])}",
+        )
+
         # 11. 只给优先级时 completion_rate 不是 0.0
         only_priority = await build(intent="recommend", character="hunter",
                                     exotic_name="快速装弹松身裤",
@@ -305,10 +341,12 @@ async def main():
             f"副本={[(row.get('item_instance_id'), row.get('power')) for row in copies[:3]]}",
         )
 
-        # 13. 稀有度：中英必须同结果；乱填必须报错（以前中文被静默忽略）
+        # 13. 稀有度：中英必须同结果；乱填必须报错（以前中文被静默忽略）。
+        # 乱填用**确实不认识**的词：`紫装`/`金枪` 是登记过的玩家口语别名（= 传说/异域），
+        # 拿它们当乱填会让这一行判错（2026-09-23 实跑抓到这条过期期望）。
         zh = await inv(intent="get", armor_slot="legs", rarity="异域", limit=50)
         en = await inv(intent="get", armor_slot="legs", rarity="exotic", limit=50)
-        bad = await inv(intent="get", armor_slot="legs", rarity="紫装", limit=5)
+        bad = await inv(intent="get", armor_slot="legs", rarity="彩虹", limit=5)
         zh_total = ((zh.get("data") or {}).get("inventory") or {}).get("total_items")
         en_total = ((en.get("data") or {}).get("inventory") or {}).get("total_items")
         all_total = (((await inv(intent="get", armor_slot="legs", limit=1)).get("data") or {})
@@ -333,28 +371,27 @@ async def main():
             f"next_actions={len(heavy.get('next_actions') or [])}",
         )
 
-        # 15. 调谐（P7）：写路径认得调谐插件名，歧义说法让调用方挑，且确认前不写
+        # 15. 调谐：写路径认得调谐插件名（2026-09-22 起可写，见 ADR-014），
+        # 方案在 candidates[0]（equip_mod 是自守卫写入：confirmed=false 只出方案，不写账号）
         legs_id = T5_LEGS
         plan_tuning = await inv(intent="equip_mod", item_instance_id=legs_id,
                                 mod_name="+武器 / -生命值", character="hunter",
                                 confirmed=False)
-        pending = (plan_tuning.get("data") or {}).get("armor_mod") or {}
+        pending = (plan_tuning.get("candidates") or [{}])[0]
         bonus = (pending.get("to") or {}).get("stat_bonus") or {}
         energy = pending.get("energy") or {}
         check(
-            "㉑ 调谐写不进去：equip_mod 给方案 + 明说「只能在游戏内改」，一个字节都不写",
-            plan_tuning["ok"] is True
+            "㉑ 调谐可写：equip_mod 给方案 + writable=true + 零能量 + 确认前一个字节都不写",
+            (plan_tuning.get("error") or {}).get("code") == "confirmation_required"
             and pending.get("kind") == "tuning"
-            and pending.get("writable") is False
-            and pending.get("written") is False
-            and "游戏" in str((plan_tuning.get("warnings") or [""])[0])
-            and "in-game" in str((plan_tuning.get("warnings") or [""])[0])
+            and pending.get("writable") is True
+            and "written" not in pending
             and (pending.get("to") or {}).get("energy_cost") == 0
             and energy.get("after") == energy.get("used")
             and any(value < 0 for value in bonus.values()),
-            f"ok={plan_tuning.get('ok')} kind={pending.get('kind')} "
-            f"writable={pending.get('writable')} written={pending.get('written')} "
-            f"to={(pending.get('to') or {}).get('name')!r} stat_bonus={bonus}",
+            f"code={(plan_tuning.get('error') or {}).get('code')} kind={pending.get('kind')} "
+            f"writable={pending.get('writable')} 计划里带 written={'written' in pending} "
+            f"to={(pending.get('to') or {}).get('name')!r} stat_bonus={bonus} energy={energy}",
         )
 
         # 16. 调谐是零和的：歧义说法（只说加哪一项）必须让调用方挑一个
@@ -395,24 +432,38 @@ async def main():
             evidence,
         )
 
-        # 18. 付费写入（要 AdvancedWriteActions 权限）：失败必须如实报，不能说"已装上"
+        # 18. 真写一次模组：**成功要有回执，失败要如实说原因**，两边都不许反着说。
+        # 旧行钉的是"没有 AdvancedWriteActions 就必须失败"，而权限取决于应用配置；
+        # 这句话不能当成行为断言（2026-09-23 实跑：写入成功，旧行反而红）。
         paid = await inv(intent="equip_mod", item_instance_id=legs_id,
                          mod_name="手雷模组", character="hunter", confirmed=True)
         paid_msg = str((paid.get("error") or {}).get("message") or "")
+        paid_data = (paid.get("data") or {}).get("armor_mod") or {}
+        paid_summary = str(paid.get("summary") or "")
+        echoed = bool(paid_data.get("installed") or paid_data.get("already_installed"))
+        wrote_honestly = paid.get("ok") is True and echoed and (
+            "已把" in paid_summary or "已经装着" in paid_summary
+        )
+        failed_honestly = (
+            paid.get("ok") is False and bool(paid_msg) and "已把" not in paid_summary
+        )
         check(
-            "㉔ 付费模组写入：权限不足时如实报错（不把失败说成成功）",
-            (paid.get("ok") is False
-             and "AdvancedWriteActions" in paid_msg
-             and "已把" not in str(paid.get("summary"))),
+            "㉔ 模组写入：成功要有回执（installed/energy），失败要如实说原因（不许反着说）",
+            wrote_honestly or failed_honestly,
             f"ok={paid.get('ok')} code={(paid.get('error') or {}).get('code')} "
-            f"msg={paid_msg[:90]!r}",
+            f"回执={echoed} summary={paid_summary[:40]!r} msg={paid_msg[:70]!r}",
         )
 
     print("\n=== 汇总 ===")
-    failed = [row for row, ok, _ in RESULTS if not ok]
+    failed = [row for row, ok, _, _ in RESULTS if not ok]
     print(f"共 {len(RESULTS)} 行，PASS {len(RESULTS) - len(failed)}，FAIL {len(failed)}")
     for row in failed:
         print("  FAIL:", row)
+
+    total = sum(row[3] for row in RESULTS)
+    print(f"\n=== 每行反馈时间（服务端口径，合计 {total:.1f}s / {total / 60:.1f} 分钟）===")
+    for row, _ok, _evidence, elapsed in sorted(RESULTS, key=lambda item: -item[3]):
+        print(f"  {elapsed:7.1f}s  {row}")
     return 1 if failed else 0
 
 

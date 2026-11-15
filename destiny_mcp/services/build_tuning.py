@@ -17,19 +17,22 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Any, Iterable, Sequence
 
 from ..build.constants import STAT_NAMES
-from ..build.models import Armor, ArmorStats, BuildConstraints
+from ..build.models import Armor, BuildConstraints
 from ..build.process_types import (
     ARTIFICE_STAT_BOOST,
     MAJOR_STAT_BOOST,
     ProcessArmorSet,
+    SearchCoverage,
     armor_to_process_item,
 )
 from ..build.solver import prepare_fixed_set_context, validate_fixed_process_items
 from ..build.tuning import (
+    armor_with_tuning,
+    improve_pool_with_local_tuning,
     PieceTuning,
     TuningChange,
     TuningChoice,
@@ -167,18 +170,6 @@ def _mod_budget(arms: Sequence[Armor], context: Any) -> int:
     return num_artifice * ARTIFICE_STAT_BOOST + general * MAJOR_STAT_BOOST
 
 
-def armor_with_tuning(armor: Armor, piece: PieceTuning, choice: TuningChoice) -> Armor:
-    """把一件护甲换成指定的调谐（属性与 tuning 字段一起改，别只改一半）。"""
-    values = piece.stats_with(choice)
-    return armor.model_copy(
-        update={
-            "stats": ArmorStats(**dict(zip(STAT_NAMES, values))),
-            "tuning_mod_hash": choice.plug_hash,
-            "tuning_name": choice.name,
-        }
-    )
-
-
 @dataclass(slots=True)
 class Rescue:
     """一套被调谐救回来的方案。"""
@@ -217,7 +208,9 @@ def rescue_sets(
         if len(arms) != 5:
             continue
         pieces = [piece_tuning(armor, manifest) for armor in arms]
-        tunable = [piece for piece in pieces if piece is not None]
+        # 只动"反推得出基础六维"的件：反推不出来的件连它现在是什么都算不准，
+        # 更不该拿它去规划改法（`movable` 是机器可读的那一份，见 build/tuning.py）。
+        tunable = [piece for piece in pieces if piece is not None and piece.movable]
         if not tunable:
             continue
 
@@ -353,7 +346,7 @@ def _pick_and_rescue(
         tunable = [
             piece
             for armor in arms
-            if (piece := piece_tuning(armor, manifest)) is not None
+            if (piece := piece_tuning(armor, manifest)) is not None and piece.movable
         ]
         if not _worth_search(
             arms,
@@ -549,11 +542,72 @@ def _rebuild(verified: ProcessArmorSet, arms: Sequence[Armor]) -> ProcessArmorSe
         bonus_stats=list(verified.bonus_stats),
         stat_mods=list(verified.stat_mods),
         stat_mod_assignments=dict(verified.stat_mod_assignments),
-        enabled_stats_total=verified.enabled_stats_total,
-        stats_total=verified.stats_total,
-        stat_mix=verified.stat_mix,
+        rank_key=verified.rank_key,
         power=verified.power,
     )
+
+
+def apply_local_tuning(
+    pool: list[ProcessArmorSet],
+    tuning_map: dict[tuple[str, ...], TuningPlan],
+    snapshot: Any,
+    constraints: BuildConstraints,
+    manifest: Any,
+    *,
+    top_n: int = 5,
+) -> tuple[list[ProcessArmorSet], dict[tuple[str, ...], TuningPlan]]:
+    """把**免费的调谐额度**在一池候选上吃干净（有解时走的便宜路）。
+
+    与 `solve_with_tuning` 的分工：那个是"差得补不上"时的穷举补救（贵，只在严格解为空时走）；
+    这个是"已经达标、还想更好"时的局部提升（池子大小 × 单件选项，亚秒级）。
+    `improve_pool_with_local_tuning` 在 `build/tuning.py`，判据与补救路径相同。
+
+    放在这里的理由：`build_service.py` 卡在 901 行上限，判断逻辑按约定落服务层。
+    """
+    if not pool:
+        return pool, tuning_map
+    context = prepare_fixed_set_context(snapshot, constraints)
+    # ── 成本护栏：只吃"有机会被返回"的那一段 ────────────────────────────────
+    # 内核一次会交回整整一池（`RETURNED_ARMOR_SETS` = 200 套），而用户看到的只有 `top_n` 套。
+    # 逐套跑贪心的代价实测是 **60–120 秒**（titan 那条：内核实测 8s，端到端 130s）——
+    # 也就是说这一趟比枚举本身贵一个数量级。窗口按当前 `rank_key` 取前 K 套，
+    # K = max(2 × top_n, 10)：调谐提升的幅度有上界（每件几十点），窗口外的套要挤进
+    # 前 top_n 得先跨过整个窗口，这不是证明、是**有意的成本取舍**（数字见计划文档 P5 记录）。
+    window = max(top_n * 2, 10)
+    plans = dict(tuning_map)
+    if len(pool) <= window:
+        pairs = improve_pool_with_local_tuning(pool, context, manifest)
+    else:
+        head_index = sorted(
+            range(len(pool)), key=lambda index: pool[index].rank_key, reverse=True
+        )[:window]
+        improved_head = improve_pool_with_local_tuning(
+            [pool[index] for index in head_index], context, manifest
+        )
+        pairs = [(armor_set, None) for armor_set in pool]
+        for slot, index in enumerate(head_index):
+            pairs[index] = improved_head[slot]
+    for armor_set, plan in pairs:
+        if plan is not None and plan.changes:
+            plans[set_key(armor_set.armor)] = plan
+    return [armor_set for armor_set, _ in pairs], plans
+
+
+@dataclass(frozen=True)
+class TuningOutcome:
+    """一次"求解 + 调谐补救"的完整结果。
+
+    为什么不是三元组：`coverage` 必须跟着候选一起走 —— 调用方拿它区分"搜完了真没解"
+    与"没搜完"，这个判断不能被漏掉（P1 的整条纪律见 `SearchCoverage` 的注释）。
+    """
+
+    pool: list[ProcessArmorSet]
+    tuning_map: dict[tuple[str, ...], TuningPlan]
+    coverage: SearchCoverage
+    #: 这一趟有没有动用"放宽目标 + 调谐补救"（给话术与诊断用，不参与判定）
+    rescued: bool
+    #: 逐项可达上限，**只取严格那一趟**的（放宽目标那趟的口径和请求不一样，混起来是错的）
+    reachable_ceilings: list[int] = field(default_factory=list)
 
 
 async def solve_with_tuning(
@@ -561,18 +615,18 @@ async def solve_with_tuning(
     snapshot: Any,
     constraints: BuildConstraints,
     manifest: Any,
-) -> tuple[list[ProcessArmorSet], dict[tuple[str, ...], TuningPlan]]:
+) -> TuningOutcome:
     """按原目标求解；没达标时再用调谐额度复解一遍并逐套复核。
 
-    Returns:
-        (候选池, 键为护甲实例 ID 组合的调谐方案表)。候选池里被调谐救回来的方案排在
-        前面 —— `find_build` 只取前 top_n 套，得先保证它们进得来。
+    候选池里被调谐救回来的方案排在前面 —— `find_build` 只取前 top_n 套，得先保证它们进得来。
     """
     solved = await compute.run(_solve, snapshot, constraints)
     strict_sets = list(solved.sets)
     if strict_sets and sets_meet_targets(strict_sets, constraints):
         # 已经达标：一个字都不改（基线里那些本来就绿的方案必须保持一致）
-        return strict_sets, {}
+        return TuningOutcome(
+            strict_sets, {}, solved.coverage, False, solved.reachable_ceilings
+        )
 
     rescues = rescue_sets(snapshot, constraints, manifest, strict_sets)
     rescued_keys = {set_key(rescue.armor_set.armor) for rescue in rescues}
@@ -605,7 +659,9 @@ async def solve_with_tuning(
         for armor_set in strict_sets
         if set_key(armor_set.armor) not in rescued_keys
     )
-    return pool, plans
+    return TuningOutcome(
+        pool, plans, solved.coverage, True, solved.reachable_ceilings
+    )
 
 
 def _solve(snapshot: Any, constraints: BuildConstraints) -> Any:
@@ -645,11 +701,13 @@ def headroom_payload(snapshot: Any, manifest: Any) -> dict[str, Any]:
 __all__ = [
     "Rescue",
     "SLOT_ATTRS",
+    "apply_local_tuning",
     "armor_with_tuning",
     "headroom_payload",
     "relax_targets",
     "rescue_sets",
     "sets_meet_targets",
+    "TuningOutcome",
     "solve_with_tuning",
     "tuning_allowance",
     "verification_search",

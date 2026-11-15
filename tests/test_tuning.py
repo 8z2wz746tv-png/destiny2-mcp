@@ -1,7 +1,7 @@
 """调谐（Tuning）纯计算层的特征测试。
 
 口径来自实机 + Manifest（docs/plans/ARMOR_FORMAT_PLAN.md P7）：
-30 个方向型（+5/−5，零和）+ 平衡调整（六维 +1）+ 空插件；有调谐槽的护甲
+30 个方向型（+5/−5，零和）+ 平衡调整（**恰好三项并列最低时各 +1**）+ 空插件；有调谐槽的护甲
 件件都能装这 31 个非空插件。这里钉住四件事：
 
 1. 目录本身（数量、增量、hash）；
@@ -58,12 +58,24 @@ def _stats(
     )
 
 
+def _MANIFEST_FOR_FIXTURES():
+    return _manager()
+
+
+def _all_tuning_hashes(manifest=None) -> tuple[int, ...]:
+    """夹具里的件**允许装全部调谐**（真实清单来自组件 310，每件只有 6 颗）。"""
+    from destiny_mcp.build.tuning import tuning_catalog
+
+    return tuple(choice.plug_hash for choice in tuning_catalog(manifest or _manager()))
+
+
 def _armor(
     name: str,
     stats: ArmorStats,
     *,
     tuning: int | None = None,
     item_hash: int = T5_ARMOR_HASH,
+    legal: tuple[int, ...] | None = None,
 ) -> Armor:
     return Armor(
         item_instance_id=f"inst-{name}",
@@ -74,6 +86,9 @@ def _armor(
         armor_system="armor_3",
         gear_tier=5,
         tuning_mod_hash=tuning,
+        # `legal=None` = 夹具不模拟组件 310，显式声明"全部允许"；
+        # 真机那条清单用 `legal=(…)` 传进来（下面的两条金标准就是）。
+        tuning_option_hashes=_all_tuning_hashes() if legal is None else legal,
     )
 
 
@@ -150,11 +165,45 @@ def test_directional_choices_move_exactly_five_points_between_two_stats() -> Non
         assert choice.increased is not None and choice.decreased is not None
 
 
-def test_balanced_choice_adds_one_to_every_stat() -> None:
-    catalog = tuning_catalog(_manager())
+def test_balanced_tuning_bonus_lands_on_the_three_lowest_stats() -> None:
+    """平衡调整给谁 +1：**恰好三项并列最低**的那三项 —— 真机实测（2026-09-22）。
 
+    光芒领主面具未调谐基值 武器30/生命5/职业5/手雷30/超能25/近战5，装上平衡调整后
+    武器30/生命6/职业6/手雷30/超能25/近战6：只有最低的三项各 +1，30 的那三项一动不动。
+    Manifest 的 `investmentStats` 写的是"六维各 +1"，照它建模每项都会多算 1。
+    证据脚本：`scripts/verify_tuning_write.py --apply --to 3122197216`（写进去 → 回读
+    插槽 → 回读组件 304 的六维 → 换回原样）。
+    """
+    catalog = tuning_catalog(_manager())
     balanced = next(choice for choice in catalog if choice.kind == "balanced")
-    assert balanced.delta == (1, 1, 1, 1, 1, 1)
+
+    # 目录里那份是**占位**（真实增量得看这件的基础六维才定得下来），所以它必须是全 0，
+    # 而不是"六维各 +1"；同时它不能被当成空操作，否则求解器会直接跳过它。
+    assert balanced.delta == (0, 0, 0, 0, 0, 0)
+    assert balanced.is_noop is False
+
+    # 真机那一件的现装调谐是 +超能/−生命值，观测六维是含它的值。
+    piece = _piece(
+        "面具",
+        _stats(weapons=30, health=0, class_stat=5, grenade=30, super_stat=30, melee=5),
+        tuning=directional_tuning_hash("super_stat", "health"),
+    )
+
+    # STAT_NAMES 顺序：武器/生命/职业/手雷/近战/超能
+    assert piece.base == (30, 5, 5, 30, 5, 25)  # 生命 0 − (−5) = 5，超能 30 − 5 = 25
+    assert piece.choice_delta(balanced) == (0, 1, 1, 0, 1, 0)  # 最低的三项：生命/职业/近战
+    assert piece.stats_with(balanced) == (30, 6, 6, 30, 6, 25)  # 真机读到的就是这六个
+
+
+def test_balanced_tuning_does_nothing_without_exactly_three_lowest() -> None:
+    """并列最低不是恰好三项时平衡调整一项都不加（真机只验了"三项"这一档）。"""
+    catalog = tuning_catalog(_manager())
+    balanced = next(choice for choice in catalog if choice.kind == "balanced")
+
+    piece = _piece("腿甲", _stats(weapons=30, grenade=30, health=0, super_stat=0))
+
+    assert piece.choice_delta(balanced) == (0, 0, 0, 0, 0, 0)
+    assert piece.stats_with(balanced) == piece.base
 
 
 def test_catalog_uses_manifest_names_and_falls_back_for_unknown_plugs() -> None:
@@ -251,9 +300,14 @@ def test_tuning_headroom_counts_every_piece_that_can_help() -> None:
 # ── 分配器 ───────────────────────────────────────────────────────────
 
 
-def _piece(name: str, stats: ArmorStats, tuning: int | None = None):
+def _piece(
+    name: str,
+    stats: ArmorStats,
+    tuning: int | None = None,
+    legal: tuple[int, ...] | None = None,
+):
     manager = _manager()
-    piece = piece_tuning(_armor(name, stats, tuning=tuning), manager)
+    piece = piece_tuning(_armor(name, stats, tuning=tuning, legal=legal), manager)
     assert piece is not None
     return piece
 
@@ -272,8 +326,9 @@ def test_plan_closes_a_five_point_gap_with_one_change() -> None:
     change = plan.changes[0]
     assert change.increased == "grenade"
     assert plan.final_delta[STAT_NAMES.index("grenade")] == 5
-    # 这件护甲的近战本来就是 0，−5 打上去是白给的：不用动任何非零项
-    assert change.decreased == "melee"
+    # 被牺牲的那一项必须**没有目标**（这件上就是 生命/职业/超能/近战 里的一件）。
+    # 具体挑哪一件由捐赠代价排序决定 —— 新算术下每种牺牲都一样贵，别把某一件写死。
+    assert change.decreased not in {"weapons", "grenade"}
 
 
 def test_plan_refuses_when_the_decreased_side_would_break_a_target() -> None:
@@ -332,14 +387,17 @@ def test_plan_can_undo_a_tuning_that_hurts_the_target() -> None:
 
     assert plan.feasible is True
     assert plan.change_count == 1
-    # 换个"不再减手雷"的调谐即可：手雷 +5，被减的那一项本来就是 0（夹在 0 不动），
-    # 比直接撤掉调谐更好 —— 撤掉会把武器 +5 也一起丢掉。
+    # 换个"不再减手雷"的调谐即可：手雷 +5，代价是丢掉现在这条调谐给的武器 +5
+    # （新算术下这笔代价如实出现在 delta 里，不再被夹 0 抹掉）。
     change = plan.changes[0]
     assert change.delta[STAT_NAMES.index("grenade")] == 5
-    assert all(
-        value >= 0 for index, value in enumerate(change.delta)
-        if index != STAT_NAMES.index("grenade")
+    assert change.delta[STAT_NAMES.index("grenade")] > 0
+    # 要害是**没有目标被掉破**：生命卡在 5，换完还得 ≥ 5
+    after = tuple(
+        now + delta for now, delta in zip((35, 5, 0, 15, 0, 0), change.delta)
     )
+    assert after[STAT_NAMES.index("health")] >= 5
+    assert after[STAT_NAMES.index("grenade")] >= 20
 
 
 def test_plan_rejects_a_gap_larger_than_all_five_pieces_can_cover() -> None:
@@ -396,7 +454,11 @@ def test_plan_reports_a_cap_instead_of_claiming_infeasible() -> None:
 
 
 def test_plan_uses_balanced_tuning_for_a_one_point_gap() -> None:
-    """六维都非零、又都卡在目标上：只有平衡调整（六维 +1）不伤任何一项。"""
+    """缺口正好落在"最低三项"之一、别的项又都卡在目标上：只有平衡调整不伤任何一项。
+
+    （缺口必须在最低三项上：平衡调整只给那三项 +1。缺口在 20 那一档上是补不了的 ——
+    这条就是被真机数据纠正过的旧夹具。）
+    """
     piece = _piece(
         "腿甲",
         _stats(weapons=20, health=20, class_stat=1, grenade=20, melee=1, super_stat=1),
@@ -406,8 +468,8 @@ def test_plan_uses_balanced_tuning_for_a_one_point_gap() -> None:
         [piece],
         stats_now=(20, 20, 1, 20, 1, 1),
         targets={
-            "weapons": 20, "health": 20, "class_stat": 1,
-            "grenade": 21, "melee": 1, "super_stat": 1,
+            "weapons": 20, "health": 20, "class_stat": 2,
+            "grenade": 20, "melee": 1, "super_stat": 1,
         },
     )
 
@@ -434,6 +496,13 @@ def test_plan_is_deterministic() -> None:
     ]
 
 
+def change_decreased_of(payload: dict) -> str:
+    """载荷里那项负收益的键名（代价项）。"""
+    return next(
+        key for key, value in payload["changes"][0]["delta"].items() if value < 0
+    )
+
+
 def test_plan_delta_payload_only_lists_changed_stats() -> None:
     piece = _piece("腿甲", _stats(weapons=40, health=30, grenade=15))
 
@@ -441,7 +510,8 @@ def test_plan_delta_payload_only_lists_changed_stats() -> None:
     payload = plan.as_dict()
 
     assert payload["change_count"] == 1
-    # 代价那一项本来就见底（职业 = 0），所以净变化只有手雷 +5
+    # 代价那一项本来就见底（职业/超能 = 0）→ 白给：净变化里**只有手雷 +5**
+    # （没动的项一样不许出现：武器 40、生命 30 都不在里面）
     assert payload["changes"][0]["delta"] == {"grenade": 5}
     assert payload["final_delta"] == {"grenade": 5}
 
@@ -457,7 +527,16 @@ def test_choice_as_dict_keeps_hash_and_kind(kind: str) -> None:
 
 
 def test_dumping_a_stat_that_is_already_zero_is_free() -> None:
-    """T5 词条本来就只有三项非零：把 −5 打在本就为 0 的项上，净代价是 0。"""
+    """把 −5 打在已经见底的项上**是白给**的：效果上夹在 0，人物那一项不掉点数。
+
+    口径来源：用户在游戏里确认（2026-09-22）——"属性到 0 之后，就算是负数也没有数值上的影响"。
+    组件 304 报的 `生命−5` 只是**记录值**，不代表人物真的少 5 点。
+
+    **但"白给"只能夹在比较层（`delta_of`）**：`base`/`stats_with` 必须保持不夹（跟 304 一致），
+    否则反推 `observed − delta` 会把被夹掉的 5 点当成本来就有，贪心每走一步凭空长 5 点
+    （上午那个 bug：真机同一件几步后从 武器25/生命−5/手雷0/超能0 变成 武器30/生命5/手雷5/超能5）。
+    存储层与比较层分开，是这条口径的正确实现。
+    """
     piece = _piece("腿甲", _stats(weapons=30, health=25, grenade=20))
 
     plan = plan_tuning(
@@ -471,5 +550,147 @@ def test_dumping_a_stat_that_is_already_zero_is_free() -> None:
     change = plan.changes[0]
     assert change.increased == "grenade"
     assert change.delta[STAT_NAMES.index("grenade")] == 5
-    assert change.delta[STAT_NAMES.index("weapons")] == 0, "武器不能被扣"
-    assert min(change.delta) == 0, "整条改动不应该有任何负数（减的那项已经见底）"
+    assert change.delta[STAT_NAMES.index("weapons")] == 0, "武器不能被扣（它卡在目标上）"
+    assert min(change.delta) == 0, "被牺牲的项已经见底 → 净代价 0（不许记成 −5）"
+    assert change.decreased in {"class_stat", "super_stat", "melee"}, (
+        "被牺牲的必须是**没有目标**的那几项之一"
+    )
+
+
+# ── "不许凭空长点"：用户发现的那个 bug（2026-09-22） ─────────────────────
+
+
+def test_piece_stats_change_by_exactly_the_tuning_delta() -> None:
+    """换调谐，六维只能按那一对 ±5 变 —— 一项都不许多出来。
+
+    旧实现：`base_with()` 把 `base + delta` **夹在 0**（生命 0 − 5 → 0），而反推
+    `_invert_tuning` 又做 `observed − delta`（0 − (−5) = **+5**）—— 每"牺牲一项已经见底的
+    属性"就凭空长 5 点。贪心对同一件走几步就累加：真机同一件从
+    武器25/生命−5/手雷0/超能0 变成 武器30/生命5/手雷5/超能5（**多 15 点**）。
+
+    真机案例（2026-09-22，`inventory_assistant(intent="item")`）：
+    光芒领主手套 `6917530188462631525` 的组件 304 = 武器25 生命−5 职业35 手雷0 超能0 近战30
+    （职业那 35 里有 10 点是模组，护甲面是 25），装着「+职业 / -生命值」。
+    它的基础值 = 武器25 生命0 职业20 手雷0 超能0 近战30；换成「+武器 / -近战」之后
+    必须是 武器30 生命0 职业20 手雷0 超能0 近战25。
+    """
+    piece = _piece(
+        "光芒领主手套",
+        _stats(weapons=25, health=-5, class_stat=25, grenade=0, super_stat=0, melee=30),
+        tuning=directional_tuning_hash("class_stat", "health"),
+    )
+
+    assert piece.movable is True
+    # STAT_NAMES 顺序：武器 生命 职业 手雷 近战 超能
+    assert piece.base == (25, 0, 20, 0, 30, 0)
+    assert piece.stats_with(None) == (25, -5, 25, 0, 30, 0)
+
+    choice = piece.option(directional_tuning_hash("weapons", "melee"))
+    assert choice is not None
+    assert piece.stats_with(choice) == (30, 0, 20, 0, 25, 0), (
+        "只有 +武器/−近战 生效；生命/手雷/超能 一个点都不许变"
+    )
+    before, after = piece.stats_with(None), piece.stats_with(choice)
+    # `stats_with` 是**记录值**（跟 304 一致、不夹）：变化正好等于那一对 ±5
+    assert sum(after) - sum(before) == 0
+    # 生效值（比较时夹到 0）的变化 == 求解器看到的 delta：
+    # 武器 +5、职业 −5（换走「+职业」就丢掉那 5 点）、近战 −5；生命见底 → 0（白给）
+    assert piece.delta_of(choice) == (5, 0, -5, 0, -5, 0)
+
+    # **防凭空长点的关键不变量**：换调谐不许改基础值 —— 把换完的件再解析一次，
+    # 反推出来的 base 必须与换之前一模一样（上午那个 bug 就是每换一步 base 涨 5）
+    from destiny_mcp.build.models import Armor as _Armor, ArmorStats as _ArmorStats
+    from destiny_mcp.build.tuning import armor_with_tuning
+
+    armor = _Armor(
+        item_instance_id="gold", item_hash=T5_ARMOR_HASH, name="光芒领主手套", slot="gauntlets",
+        stats=_ArmorStats(weapons=25, health=-5, class_stat=25, melee=30),
+        armor_system="armor_3", gear_tier=5,
+        tuning_mod_hash=directional_tuning_hash("class_stat", "health"),
+        # 夹具显式声明"允许全部调谐"（真实的逐件清单来自组件 310，夹具不模拟）
+        tuning_option_hashes=_all_tuning_hashes(),
+    )
+    original = piece_tuning(armor, _manager())
+    assert original is not None
+    tuned_armor = armor_with_tuning(armor, original, choice)
+    again = piece_tuning(tuned_armor, _manager())
+    assert again is not None and again.base == original.base, "换调谐把基础值改了 = 凭空长点"
+
+
+def test_uninvertible_piece_is_not_movable_and_never_invents_stats(monkeypatch) -> None:
+    """反推不出基础六维的件：`movable=False`、`note` 有话说，且**任何改法都返回观测值**。
+
+    这一对（机器可读的 `movable` 与人话 `note`）必须同进同出；而 `stats_with` 在
+    反推不出来时返回观测值 —— 宁可"不动它"，也不许编一个改法出来（以前那条兜底
+    会把当前调谐再加一遍）。
+    """
+    from destiny_mcp.build import tuning as tuning_module
+
+    monkeypatch.setattr(tuning_module, "_invert_tuning", lambda observed, current: None)
+    piece = _piece("腿甲", _stats(weapons=30, health=25, grenade=20))
+
+    assert piece.movable is False
+    assert piece.note, "反推不出来必须有一句人话说明"
+    observed = tuple(getattr(piece, "observed"))
+    for choice in piece.options:
+        assert piece.stats_with(choice) == observed, "不许编改法"
+
+
+# ── 每件的可调谐属性来自组件 310（用户指出、真机核实） ───────────────────────
+
+
+def _legal_for(increased: str, *others: str) -> tuple[int, ...]:
+    """真机 310 里那种"某一个属性 +5 的 5 颗 + 平衡调整"清单。"""
+    return (
+        *(directional_tuning_hash(increased, other) for other in others),
+        BALANCED_HASH,
+    )
+
+
+def test_tuning_options_are_per_piece_and_come_from_component_310() -> None:
+    """每件允许装的调谐**不是** Manifest 那份全局 32 颗，而是组件 310 给的那 6 颗。
+
+    真机（2026-09-22 读组件 310）：两件同名的「光芒领主手套」可调谐属性**不一样** ——
+      - `6917530188462631525` = **职业**：只有 `+职业/−{手雷,武器,生命,超能,近战}` + 平衡调整；
+      - `6917530191138019736` = **近战**：只有 `+近战/−{手雷,武器,生命,职业,超能}` + 平衡调整。
+    所以"给这两件都换 +武器/−近战"是**装不上**的 —— 用户就是这样发现求解器在乱开选项的。
+    """
+    five = ("weapons", "health", "class_stat", "grenade", "super_stat", "melee")
+
+    a = _piece(
+        "光芒领主手套A",
+        _stats(weapons=25, health=-5, class_stat=25, melee=30),
+        tuning=directional_tuning_hash("class_stat", "health"),
+        legal=_legal_for("class_stat", *(s for s in five if s != "class_stat")),
+    )
+    a_directional = {c.name for c in a.options if c.kind == "directional"}
+    assert a_directional == {
+        "+职业 / -手雷", "+职业 / -武器", "+职业 / -生命值", "+职业 / -超能", "+职业 / -近战",
+    }, "这件只能加职业"
+    assert "+武器 / -近战" not in {c.name for c in a.options}, "装不上的不许出现在选项里"
+    assert any(c.kind == "balanced" for c in a.options), "平衡调整在 310 清单里，要保留"
+    assert any(c.kind == "empty" for c in a.options), "撤掉调谐永远可以做"
+
+    b = _piece(
+        "光芒领主手套B",
+        _stats(weapons=20, health=6, class_stat=6, grenade=30, super_stat=25, melee=6),
+        tuning=BALANCED_HASH,
+        legal=_legal_for("melee", *(s for s in five if s != "melee")),
+    )
+    b_directional = {c.name for c in b.options if c.kind == "directional"}
+    assert b_directional == {
+        "+近战 / -手雷", "+近战 / -武器", "+近战 / -生命值", "+近战 / -职业", "+近战 / -超能",
+    }, "这件的可调谐属性是近战"
+    assert not any(c.name.startswith("+武器") for c in b.options)
+
+
+def test_piece_without_component_310_is_not_movable() -> None:
+    """读不到 310 的清单：**缺数据 ≠ 允许** —— 不许规划任何改法，只留"撤掉"。
+
+    以前求解器拿 Manifest 的全局 32 颗当选项，于是给"只能加职业"的件开了 `+武器/−近战`。
+    """
+    piece = _piece("腿甲", _stats(weapons=30, health=25, grenade=20), legal=())
+
+    assert piece.movable is False
+    assert "组件 310" in piece.note
+    assert [choice.kind for choice in piece.options] == ["empty"]

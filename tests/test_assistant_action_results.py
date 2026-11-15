@@ -52,12 +52,18 @@ async def test_write_assistants_propagate_service_status(
     payload = {"success": success, "message": "domain result", "steps": []}
     result = LoadoutOperationResult(**payload) if service_name == "loadout_svc" else payload
     action = AsyncMock(return_value=result)
+    preview = AsyncMock(return_value={"available": False, "reason": "stub"})
     ctx = SimpleNamespace(request_context=SimpleNamespace(lifespan_context={
-        service_name: SimpleNamespace(**{method: action}),
+        service_name: SimpleNamespace(**{method: action}, describe_save=preview),
     }))
 
     confirmation = await tool(intent=intent, confirmed=False, ctx=ctx, **kwargs)
     assert not confirmation["ok"]
+    assert confirmation["next_actions"], "确认信封也要说下一步（得到同意后 confirmed=true 重发）"
+    assert confirmation["candidates"][0]["intent"] == intent
+    if intent == "save":
+        # 保存的确认要带上"这次存的是哪一套"（拿不到预览也要有原因，且不阻断确认）
+        assert confirmation["candidates"][0]["save_preview"]["reason"] == "stub"
     action.assert_not_awaited()
 
     response = await tool(intent=intent, confirmed=True, ctx=ctx, **kwargs)
@@ -72,6 +78,11 @@ async def test_write_assistants_propagate_service_status(
 
 @pytest.mark.asyncio
 async def test_failed_move_preserves_disambiguation_candidates() -> None:
+    """「同名多件，先选一件」不是写入失败：码要说"要你选"，候选只发一份。
+
+    真机 2026-09-24：以前回 `move_failed`，而且同一份候选在信封与 `data.result` 各发一遍，
+    调用方会以为"搬失败了"去重试。
+    """
     result = MoveItemResult(
         success=False,
         needs_disambiguation=True,
@@ -88,8 +99,11 @@ async def test_failed_move_preserves_disambiguation_candidates() -> None:
     )
 
     assert not response["ok"]
+    assert response["error"]["code"] == "item_disambiguation_required"
     assert response["candidates"][0]["item_instance_id"] == "123"
     assert response["data"]["result"]["question"] == "Which instance?"
+    assert "candidates" not in response["data"]["result"], "候选清单只在信封里发一份"
+    assert response["next_actions"], "要让调用方把 question 原样给玩家、拿到编号后重发"
 
 
 @pytest.mark.asyncio
@@ -119,7 +133,7 @@ async def test_equipped_item_failure_carries_a_next_step() -> None:
 
 
 def test_write_failure_hints_ignore_unrelated_failures() -> None:
-    from destiny_mcp.tools._responses import write_failure_hints
+    from destiny_mcp.tools._write_failure_hints import write_failure_hints
 
     assert write_failure_hints({"code": "transfer_failed", "message": "网络超时"}) == []
     assert write_failure_hints({"message": "Cannot perform this action on an equipped item."})
@@ -144,3 +158,21 @@ async def test_timeout_becomes_an_envelope_instead_of_an_empty_message() -> None
     assert response["error"]["code"] == "a_p_i_error"
     assert response["error"]["message"].strip(), "不许是空消息"
     assert "超时" in response["error"]["message"]
+
+
+def test_success_summary_uses_the_service_message() -> None:
+    """成功摘要要用服务层那句 `message`（带着"改了什么/核对结果"）。
+
+    固定话术（"…流程已执行。"）会把真正有用的信息埋进 `data.result`，模型常常只念摘要 ——
+    那回读核对、六维变化这些就白加了。
+    """
+    from destiny_mcp.tools._responses import action_response
+
+    response = action_response(
+        "equip_loadout", "配装装备流程已执行。",
+        {"success": True, "message": "配装 '猎套' 已装备，回读核对通过。"},
+    )
+
+    assert response["summary"] == "配装 '猎套' 已装备，回读核对通过。"
+    # 服务层没给 message 时，退回调用方那句（比如 already_equipped 这类简写）
+    assert action_response("move", "移动流程已执行。", {"success": True})["summary"] == "移动流程已执行。"

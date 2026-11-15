@@ -6,9 +6,11 @@ Extracted from server.py per Rule 1: tools should not contain business logic.
 from __future__ import annotations
 
 from ..bungie_client import BungieClient
+from .. import vocabulary
 from ..exceptions import (
     AuthenticationError,
     ConfigError,
+    DestinyMCPError,
     InvalidArgumentError,
     ItemNotFoundError,
 )
@@ -33,15 +35,6 @@ MISSING_INVENTORY_SCOPE_MESSAGE = (
 )
 
 # 稀有度：英文键 → Manifest 的 tierType（6 异域 / 5 传说 / 4 稀有）
-_RARITY_ALIASES: dict[str, int] = {
-    "exotic": 6,
-    "异域": 6,
-    "legendary": 5,
-    "传说": 5,
-    "rare": 4,
-    "稀有": 4,
-}
-
 _INVENTORY_ITEM_TYPE_ALIASES = {
     "": None,
     "all": "all",
@@ -198,7 +191,7 @@ class InventoryService:
         # 调用方会以为筛过了，把传说件当异域答。
         if rarity and rarity.strip().lower() not in ("all", "", "全部"):
             key = rarity.strip().lower()
-            target_tier = _RARITY_ALIASES.get(key)
+            target_tier = vocabulary.rarity_key(key)
             if target_tier is None:
                 raise InvalidArgumentError(
                     f"rarity={rarity!r} 不受支持。可用：exotic/legendary/rare"
@@ -324,7 +317,21 @@ class InventoryService:
                 ),
                 "vault",
             )
-        class_type = resolve_character_name(location)
+        if normalized in ("postmaster", "邮政官", "邮政长", "lost items", "lost_items"):
+            items = parse_items_from_profile(profile, self._manifest)
+            return (
+                [item for item in items if item.location == "postmaster"],
+                "postmaster",
+            )
+        try:
+            class_type = resolve_character_name(location)
+        except DestinyMCPError as exc:
+            # 以前这里直接冒"该账号上没有 'postmaster' 角色"—— 调用方读成"账号没这个人"，
+            # 实际是"location 取值不认"。按工具层前置校验的口径报 invalid_arguments + 合法取值。
+            raise InvalidArgumentError(
+                f"location 取值不认识：{location!r}。可用：all/全部、vault/仓库、"
+                "postmaster/邮政官、hunter/warlock/titan（或中文职业名）。"
+            ) from exc
         canonical_location = class_type_name(class_type).lower()
         items = parse_items_from_profile(profile, self._manifest)
         return (
@@ -444,12 +451,20 @@ class InventoryService:
 
     # ── Armor Snapshot (Build Engine) ─────────────────────────────────
 
-    async def get_armor_snapshot(self, player_name: str, character_class: str = "") -> InventorySnapshot:
+    async def get_armor_snapshot(
+        self,
+        player_name: str,
+        character_class: str = "",
+        *,
+        with_tuning_options: bool = True,
+        reserved_mod_energy: dict[str, int] | None = None,
+    ) -> InventorySnapshot:
         """Fetch all armor pieces with stats, grouped by slot.
 
         This is the data input for Build Engine. Fetches components
-        102+200+201+205+300+304+305 (includes ItemStats for the 6 armor
-        stats and ItemSockets for artifice detection).
+        102+200+201+205+300+304+305 (ItemStats for the 6 armor stats,
+        ItemSockets for artifice detection) plus **310 `ItemReusablePlugs`**
+        when `with_tuning_options` is on (the default) — 每件允许装哪些调谐只在 310 里。
 
         Must be called after the manifest is loaded.
 
@@ -465,11 +480,20 @@ class InventoryService:
             PlayerNotFoundError: If the player name cannot be resolved.
         """
         logger.info("Building armor snapshot for %s (class=%s)", player_name, character_class or "all")
-        _, profile = await self._resolve_and_fetch(
-            player_name, _ARMOR_SNAPSHOT_COMPONENTS
+        # 默认带 310：这个方法的定位就是"求解器的数据输入"，而**每件允许装哪些调谐只在 310 里**
+        # （Manifest 那份是全局 32 颗，照它会规划出装不上的调谐）。代价 4.11→8.90 MB，
+        # 不规划调谐的调用方（社区模板核对）显式传 `with_tuning_options=False` 省掉它。
+        components = (
+            profile_components.BUILD_ARMOR
+            if with_tuning_options
+            else _ARMOR_SNAPSHOT_COMPONENTS
         )
+        _, profile = await self._resolve_and_fetch(player_name, components)
         self._validate_armor_snapshot_components(profile, character_class)
-        snapshot = InventorySnapshot.from_profile(profile, self._manifest, character_class)
+        snapshot = InventorySnapshot.from_profile(
+            profile, self._manifest, character_class,
+            reserved_mod_energy=reserved_mod_energy,
+        )
         logger.info(
             "Armor snapshot ready: %d pieces across 5 slots",
             snapshot.total_pieces,

@@ -16,6 +16,7 @@ from typing import Any
 from destiny_mcp.services import weapon_local_data as wld
 from destiny_mcp.services.manifest_query_service import ManifestQueryService
 from destiny_mcp.services.perk_service import PerkService
+from destiny_mcp.services.weapon_compare_service import WeaponCompareService
 from destiny_mcp.services.weapon_detail_service import WeaponDetailService
 from destiny_mcp.services.weapon_roll_filter_service import WeaponRollFilterService
 from destiny_mcp.tools.assistants import weapon_assistant
@@ -51,7 +52,7 @@ class _Manifest:
             902: {"name": "萤火虫", "icon": "/p2.png"},
         }
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [{"itemHash": WEAPON_HASH, "name": "测试武器", "itemType": 3}]
 
     def list_weapon_catalog(self, weapon_type: str = "", *, weapon_name: str = "") -> list[dict]:
@@ -201,6 +202,10 @@ def _services(*, broken: bool = False) -> dict[str, Any]:
             manifest, _Resolver(), None, lookup_factory=perk_svc.god_roll_lookup
         ),
         "weapon_roll_filter_svc": WeaponRollFilterService(manifest),  # type: ignore[arg-type]
+        # compare 分支要它（精简档本地资料的唯一去处）
+        "weapon_compare_svc": WeaponCompareService(  # type: ignore[arg-type]
+            manifest, _Resolver(), perk_svc, None, None
+        ),
         # analyze 分支要它；这里只验覆盖表，用最小替身即可
         "weapon_analysis_svc": SimpleNamespace(
             analyze_weapon=_analysis_stub(perk_svc, query_svc)
@@ -351,13 +356,24 @@ async def test_coverage_table_per_intent() -> None:
             assert "不带" in weapon["popularity"]["note"], label
 
 
-async def test_lean_mode_marks_blocks_not_checked() -> None:
-    response = await _call(_services(), intent="type", weapon_type="手炮")
+async def test_compare_instances_mark_local_blocks_not_checked() -> None:
+    """精简档（`mode="lean"`）现在只有副本对比在用：键都在，但明说"这个 intent 不查"。"""
+    response = await _call(_services(), intent="compare", weapon_name="测试武器")
 
-    weapon = response["data"]["weapons"]["items"][0]["weapon"]
+    # 0.7.13 起默认是副本行视图：身份块在 `comparison.weapon`（不再是每个副本各一份）
+    weapon = response["data"]["comparison"]["weapon"]
     assert weapon["popularity"]["available"] is False
     assert "列表类" in weapon["popularity"]["note"]
     assert weapon["community"]["results"] == []
+
+
+async def test_type_list_rows_do_not_read_local_data_per_weapon() -> None:
+    """`type` 是列表行：逐把读本地资料会刷屏也慢，整张列表的清单在 data.farming_list。"""
+    response = await _call(_services(), intent="type", weapon_type="手炮")
+
+    row = response["data"]["weapons"]["items"][0]
+    assert not {"farming", "popularity", "community", "sources"} & row.keys()
+    assert "farming_list" in response["data"]
 
 
 # ── fail-soft：本地资料坏掉不能弄坏官方数据 ─────────────────────────────

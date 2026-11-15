@@ -15,9 +15,12 @@
 
 from __future__ import annotations
 
+import asyncio
+
 from typing import Any
 
 from .. import activity_stats
+from ..data import activity_modes
 from ..error_codes import ErrorCode
 from ..logging_config import get_logger
 from ._responses import error_response, ok_response
@@ -28,11 +31,23 @@ logger = get_logger(__name__)
 # 124,495（计数器，S1 起累计）vs 78,864（统计接口账号级）。配对是**人工确认的实测事实**
 # （不是从上游字段推出来的），所以只有这一条；其余计数器没有可对照的统计项。
 # 计数器自己的 mode/period 分类仍在 `data/pvp_counters.py`，这里只是指出"谁和谁是一回事"。
-COUNTER_STAT_PAIRS: dict[int, tuple[str, str]] = {
-    811894228: ("pvp", "opponents_defeated"),
+# 模式 → {计数器 hash: (统计接口里对应的组, 行 id)}。**按模式分开**：
+# 按模式调用时统计接口的分组 key 就是模式词（实测 `mode=trials` → 组 `trials`），
+# 而默认的账号级调用分组是 pve/pvp —— 同一个"击败对手"在两处的组名不同，所以表要区分。
+#
+# 配上的意义是"把两个来源并排给出来"，**不是让它们相等**：真机 `mode=trials` 统计接口
+# 击败 1,474 / 胜场 105，游戏内计数器 10,696 / 826 —— 差 7 倍，口径不同、都真实
+# （ADR-005：生涯数字以游戏内计数器为准）。以前按模式调用**不带**计数器、也没有任何提示，
+# 用户问"我试炼生涯多少杀"只会看到 1,474，比游戏里小 7 倍。
+COUNTER_STAT_PAIRS: dict[str, dict[int, tuple[str, str]]] = {
+    "crucible": {811894228: ("pvp", "opponents_defeated")},
+    "trials": {
+        2082314848: ("trials", "opponents_defeated"),
+        1365664208: ("trials", "activities_won"),
+    },
 }
 
-# 取数范围：熔炉 + 生涯（配对的那条就在这一格里）。用对照表的词表，不另写字符串。
+# 默认（账号级、不分模式）那一次读的格子：熔炉 + 生涯。
 _COUNTER_MODE = "crucible"
 _COUNTER_PERIOD = "career"
 
@@ -66,9 +81,12 @@ def _account_question(result: dict[str, Any]) -> str:
     )
 
 
-def _counter_rows(counters: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _counter_rows(
+    counters: list[dict[str, Any]], mode_key: str = _COUNTER_MODE
+) -> list[dict[str, Any]]:
     """`game_counters` 只给能和统计接口对上的计数器（配对表说了算，不另挑）。"""
-    return [row for row in counters if row.get("metric_hash") in COUNTER_STAT_PAIRS]
+    pairs = COUNTER_STAT_PAIRS.get(mode_key) or {}
+    return [row for row in counters if row.get("metric_hash") in pairs]
 
 
 def _stat_total(result: dict[str, Any], group: str, stat_id: str) -> Any:
@@ -101,7 +119,8 @@ def _paired_warnings(
             '"没读到"不等于"没有计数"。'
         )
         return warnings
-    for metric_hash, (group, stat_id) in COUNTER_STAT_PAIRS.items():
+    # 配对表按模式分层（账号级那次读的是 `_COUNTER_MODE` 那一层）。
+    for metric_hash, (group, stat_id) in (COUNTER_STAT_PAIRS.get(_COUNTER_MODE) or {}).items():
         counter = next((row for row in counters if row.get("metric_hash") == metric_hash), None)
         total = _stat_total(result, group, stat_id)
         if counter is None or not isinstance(counter.get("progress"), int) or not isinstance(total, int):
@@ -116,18 +135,48 @@ def _paired_warnings(
     return warnings
 
 
-async def _read_counters(svc: dict[str, Any], player_name: str) -> tuple[list[dict], str]:
-    """读熔炉生涯那格计数器。读不到就返回 `([], 原因)`，**不抛**（统计接口的结果是主结果）。"""
+async def _read_counters(
+    svc: dict[str, Any], player_name: str, mode_key: str = _COUNTER_MODE
+) -> tuple[list[dict], str]:
+    """读某个模式的**生涯**计数器。读不到就返回 `([], 原因)`，**不抛**（统计是主结果）。
+
+    配对表里没有这个模式就不读（返回空 + 空原因）：宁可不说，也不塞一堆无关计数器进 payload。
+    """
+    pairs = COUNTER_STAT_PAIRS.get(mode_key) or {}
+    if not pairs:
+        return [], ""
     try:
         payload = await svc["activity_counters_svc"].get_career_counters(
-            player_name, "", 10, _COUNTER_MODE, _COUNTER_PERIOD
+            player_name, "", max(len(pairs) * 4, 10), mode_key, _COUNTER_PERIOD
         )
     except Exception as exc:  # noqa: BLE001 - 可选数据不许弄坏主结果，但要留痕
         logger.warning("生涯统计附带读计数器失败：%s", exc)
         return [], f"读取计数器时出错：{exc}"
     if payload.get("unavailable"):
         return [], payload["unavailable"]
-    return _counter_rows(payload.get("counters") or []), ""
+    return _counter_rows(payload.get("counters") or [], mode_key), ""
+
+
+def _paired_mode_warning(
+    result: dict[str, Any], counters: list[dict[str, Any]], mode_key: str
+) -> str:
+    """把"游戏内计数器 vs 统计接口"两个数并排写出来（不解释成谁对谁错）。"""
+    pairs = COUNTER_STAT_PAIRS.get(mode_key) or {}
+    group = (result.get("mode") or {}).get("key") or mode_key
+    parts = []
+    for row in counters:
+        upstream = _stat_total(result, group, pairs[row["metric_hash"]][1])
+        # 统计接口没给这一项时写"没给"，不写 `None` —— 那读起来像个数字（缺值不编）。
+        upstream_text = "没给这一项" if upstream is None else str(upstream)
+        parts.append(
+            f"{row['name']}：游戏内计数器 {row['progress']}"
+            f"（profile.metrics，哈希 {row['metric_hash']}）、统计接口 {upstream_text}"
+        )
+    return (
+        "同一件事有两个来源、数字**不一样是正常的**（生涯数字以游戏内计数器为准，见 ADR-005）："
+        + "；".join(parts)
+        + "。两个数都给，别相加、也别互相纠正。"
+    )
 
 
 async def stats_response(
@@ -136,8 +185,15 @@ async def stats_response(
     character: str | None = None,
     mode: str = "",
     period: str = "",
+    query: str = "",
 ) -> dict[str, Any]:
-    """`activity_assistant(intent="stats")` 的响应（P1 三档 + P2 双来源 + P3-2 模式/周期）。"""
+    """`activity_assistant(intent="stats")` 的响应（P1 三档 + P2 双来源 + P3-2 模式/周期）。
+
+    `query`：按**统计项名称**（中文名或上游 id 片段）筛行，大小写不敏感。
+    为什么要它：一次账号级 `mode=crucible` 有 60 行 ≈ 30 KB，而"我熔炉击败多少"只需要一行；
+    筛完只回那一行，模型要读的 token 直接降一个数量级。筛不到就**如实说没匹配到**
+    （列一下可用的名称供改词），不回一个空壳当答案。
+    """
     # 上游没有赛季/篇章周期：**先如实报取不到**，别拿生涯冒充，也别去试会 500 的 periodType=3。
     if period.strip().lower() in activity_stats.UNSUPPORTED_PERIOD_REASONS:
         wanted = period.strip().lower()
@@ -155,15 +211,34 @@ async def stats_response(
             ],
         )
 
-    result = await svc["activity_svc"].get_historical_stats(
-        player_name, character, mode, period
+    # 统计接口与游戏内计数器**互不依赖** → 同时去拿（真机实测 4.9s → 约 3s）。
+    # 计数器是账号级的，单角色路径本来就不附它，所以那种情况不预取。
+    stats_coro = svc["activity_svc"].get_historical_stats(
+        player_name, character, mode, period, query
     )
+    prefetched: tuple[list[dict], str] = ([], "")
+    if character:
+        result = await stats_coro
+    else:
+        # 计数器要按"这次问的模式"取：`mode` 报得出来就用它，否则按默认（熔炉生涯）。
+        # 词表外的 `mode` 不预取 —— 那种情况统计调用自己会报明确的错，省一次无谓请求。
+        hinted = activity_modes.resolve(mode) if mode else _COUNTER_MODE
+        if mode and hinted is None:
+            result = await stats_coro
+        else:
+            result, prefetched = await asyncio.gather(
+                stats_coro, _read_counters(svc, player_name, hinted or _COUNTER_MODE)
+            )
     data: dict[str, Any] = {"stats": result}
+    # 筛选发生在服务层（`activity_stats.filter_groups`）——判断逻辑不落工具层；
+    # 这里只把"没匹配到"的说明接进 warnings。
+    query_hint = str(result.get("query_hint") or "")
 
     if result.get("scope") != activity_stats.SCOPE_ACCOUNT:
         name = (result.get("character") or {}).get("name") or character or "该角色"
         scope_label = _mode_period_label(result)
         warnings = [
+            *([query_hint] if query_hint else []),
             f"这是 {name} 一个角色的数字（scope=character、source=GetHistoricalStats），"
             "不是账号生涯；要账号级三档就不传 character。",
             "游戏内计数器是账号级的（不按角色拆），要那个数用 intent=\"counters\"。",
@@ -179,7 +254,9 @@ async def stats_response(
     # 按模式的账号级合计是我们自己合的（上游的账号级端点会忽略 modes），
     # 计数器对照的是"全模式账号级"，所以这两件事不能混在一份 payload 里。
     if result.get("mode"):
+        mode_key = str((result.get("mode") or {}).get("key") or "")
         warnings = [
+            *([query_hint] if query_hint else []),
             "这是按模式的账号级合计（scope=account、aggregation=computed）："
             "逐角色取上游按角色统计后按同一套语义合并（可加相加 / 最多取最大 / 比值重算），"
             "上游**没有**这个模式的合并视图，所以这三个档位不是上游给的。",
@@ -187,6 +264,17 @@ async def stats_response(
             *([result["empty_reason"]] if result.get("empty_reason") else []),
             "游戏内计数器（intent=\"counters\"）按 mode/period 另有一份口径，两者不要相加。",
         ]
+        # 同模式的游戏内计数器一并给出来（配对表有才读）：按模式的生涯数字最容易被读成
+        # "游戏里那个数"，而它其实小得多（真机 trials：1,474 vs 10,696）。
+        mode_counters, mode_unavailable = prefetched
+        if mode_counters:
+            data["game_counters"] = mode_counters
+            warnings.append(_paired_mode_warning(result, mode_counters, mode_key))
+        if mode_unavailable:
+            data["counters_unavailable"] = mode_unavailable
+            warnings.append(
+                f"同模式的游戏内计数器这次没读到（{mode_unavailable}）；统计接口的结果不受影响。"
+            )
         return ok_response(
             f"已读取按模式的生涯统计{_mode_period_label(result)}"
             f"（账号级三档，由 {result.get('characters', {}).get('returned', 0)} 个角色合并而来）。",
@@ -194,7 +282,7 @@ async def stats_response(
             warnings=warnings,
         )
 
-    counters, unavailable = await _read_counters(svc, player_name)
+    counters, unavailable = prefetched
     if counters:
         data["game_counters"] = counters
     if unavailable:
@@ -208,6 +296,8 @@ async def stats_response(
         warnings.append(result["unavailable"])
     if result.get("empty_reason"):
         warnings.append(result["empty_reason"])
+    if query_hint:
+        warnings.append(query_hint)
 
     return ok_response(
         _account_question(result),

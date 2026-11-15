@@ -213,6 +213,41 @@ def group_label(key: str) -> str:
     return {"pve": "PvE", "pvp": "PvP"}.get(key, key)
 
 
+def filter_groups(payload: dict[str, Any], query: str) -> dict[str, Any]:
+    """按名称筛统计行（中文名或上游 id 片段，大小写不敏感）；口径块原样保留。
+
+    只动 `groups[].stats[]`，`scope` / `mode` / `period` / `tiers` 一个不改 ——
+    筛的是"给你看哪几行"，不是"这次查的什么口径"。命中 0 行时把可用名称放进
+    `query_hint`，让调用方如实说明"没匹配到"而不是回一个空壳当答案。
+    """
+    wanted = query.strip().casefold()
+    if not wanted:
+        return payload
+    available = sorted({
+        str(row.get("name") or "")
+        for group in (payload.get("groups") or [])
+        for row in (group.get("stats") or [])
+    })
+    groups = []
+    for group in payload.get("groups") or []:
+        rows = [
+            row for row in (group.get("stats") or [])
+            if wanted in str(row.get("name", "")).casefold()
+            or wanted in str(row.get("stat_id", "")).casefold()
+            or wanted in str(row.get("upstream_id", "")).casefold()
+        ]
+        if not rows:
+            continue
+        groups.append({**group, "stats": rows, "stat_count": len(rows)})
+    filtered = {**payload, "groups": groups, "filtered_by": query}
+    if not groups:
+        filtered["query_hint"] = (
+            f"没有任何统计项的名称包含 {query!r}（大小写不敏感）。"
+            f"这个口径下可用的名称例如：{'、'.join(available[:8])}…去掉 query 就能拿到全部。"
+        )
+    return filtered
+
+
 def stat_groups(
     sections: Mapping[str, Mapping[str, Any]],
     labels: Mapping[str, str] | None = None,

@@ -14,6 +14,13 @@ from __future__ import annotations
 # Intellect/Strength) replaced with (Weapons/Health/Class/Grenade/Melee/Super).
 # 'class' and 'super' are Python reserved words, so we use 'class_stat' and 'super_stat'.
 
+#: 单项属性的"无限"哨兵值（求解器内部用它表示"没设上限"）。
+#: 真机游戏里单项目标上限是 100，但求解器的中间计算（可达上限逐点推、乐观余量）
+#: 需要一个大到不会先撞上的数 —— 200 就是 DIM 同源的那个值。
+#: 放在这里是因为 `ranking` 与 `process_types` **都要用**，而 `constants` 是最底层。
+MAX_STAT: int = 200
+
+
 STAT_NAMES: tuple[str, ...] = (
     "weapons",
     "health",
@@ -22,6 +29,19 @@ STAT_NAMES: tuple[str, ...] = (
     "melee",
     "super_stat",
 )
+
+#: `STAT_NAMES` → `BuildRequest` 的字段名。只有 `class_stat` 不一样（请求里叫
+#: `class_target`）。以前这张表在 `tools/_armor_ladder.py` 里抄了一份，`build_service`
+#: 的日志又按 `STAT_NAMES` 拼字符串，于是 `class_stat_target` 直接 AttributeError ——
+#: 一个事实写三处就会这样，收到这里。
+REQUEST_TARGET_FIELDS: dict[str, str] = {
+    "weapons": "weapons_target",
+    "health": "health_target",
+    "class_stat": "class_target",
+    "grenade": "grenade_target",
+    "melee": "melee_target",
+    "super_stat": "super_target",
+}
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Destiny 2 stat hashes (from DestinyStatDefinition)
@@ -120,4 +140,19 @@ SUBCLASS_BONUSES: dict[int, list[int]] = {
     -401854346:  [0, 0, -10, 10, 10, 0],   # Prismatic Warlock (current)
     1616346845:  [0, 0, -10, 10, 10, 0],   # Prismatic Titan (current)
     -12375465:   [0, 0, -10, 10, 10, 0],   # Prismatic Hunter (current)
+}
+
+
+#: 求解器/快照里的槽位键（复数：`helmets`/`chests`/`class_items`）→ 配装与模组清单里的部位名
+#: （单数：`helmet`/`chest`/`class_item`）。两套键都存在是有历史原因的，但**换算只此一处**：
+#: 照抄模组的能量预留按部位名给，快照按求解器槽位查，靠这张表对上。
+SOLVER_SLOT_TO_LOADOUT: dict[str, str] = {
+    "helmets": "helmet",
+    "helmet": "helmet",
+    "gauntlets": "gauntlets",
+    "chests": "chest",
+    "chest": "chest",
+    "legs": "legs",
+    "class_items": "class_item",
+    "class_item": "class_item",
 }

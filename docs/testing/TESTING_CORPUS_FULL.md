@@ -26,7 +26,7 @@
 | --- | --- | --- | --- |
 | `sweep` | 八个工具面**全部 intent**（含中文别名），给最简但有意义的参数，只验「是不是干净信封」 | 110 个 intent | 发布前；改了 intent 分派/参数守卫后 |
 | `rows` | 其余六个工具面的字段级契约 + 跨切面（默认条数、翻页、中英同义、错误信封） | 约 70 行 | 改了任一工具面后 |
-| `mcp` | 真 stdio 握手：工具数、intent 枚举覆盖、schema 层拒收、legacy 工具面 | 9 行 | 改了工具签名 / schema / 工具面后 |
+| `mcp` | 真 stdio 握手：工具数、intent 枚举覆盖、schema 层拒收、旧工具面确已剥离 | 9 行 | 改了工具签名 / schema / 工具面后 |
 
 `sweep` 的失败线（任一命中即 FAIL）：
 
@@ -75,6 +75,32 @@
 | `↑` 与 `name_plain` | 逐副本：带 `↑` 的已装 perk 同时给 `name_plain`；本账号当前没有已选中的强化 perk 时记 INFO（不假失败） |
 | `filter_rolls` 认规范名 | 用不带箭头的名字能筛到带 `↑` 的副本 |
 
+### weapon_assistant（`intent="patterns"`：锻造武器模式）
+
+| 行 | 断言 |
+| --- | --- |
+| 计数自洽 | `counts` 四档相加 == `total` == 183，且 `not_unlocked` == 进行中 + 还没开始；`catalog_total` == 183 |
+| 两个作用域 | `read.record_scopes == ["profile","character"]`，且本账号 `未开始 == 0`（183 条模式记录分布在档案级 151 + 角色级 32，两处都读过才不会误判） |
+| 角色级抽查 | 面纱威胁 / 至善 = 已解锁（这两把的记录是角色级；只读档案级会报成未开始） |
+| 未开始 ≠ 0 | `status="未开始"` 的行 `progress` 与 `remaining` 都是 `null`（账号里没有这条记录，不是 0/5） |
+| 术语对照 | `terms` 三键（红框 / 模式 / 塑形）随响应给出去，摘要用玩家口径 |
+| 金枪一次拿全 | `rarity="异域"` 返回 **16 把**（全部 `tier=异域`），`by_tier=={"异域":16}`；不筛时 `by_tier=={"异域":16,"传说":167}`。**默认一页 20 条，靠翻页数金枪会漏**（真机把 16 报成 2） |
+| 来源带出处 | `sources.available=true`、`page.updated_at` 有值、`page.trust="untrusted_reference"` |
+| 变体的塑形配置 | 问「惩戒措施（失时）」：指回基础版，且 `variant.shapeable_columns==["框架","枪管","弹夹"]`、`base_shapeable_columns` 5 个、`traits_fixed=true`、`has_deepsight_socket=false` |
+| 名字对不上 | 摘要说清"图鉴共 183 条"，`patterns.items` 为空，不编"没有来源" |
+| 别名等价 | `patterns`/`pattern`/`craft`/`锻造`/`锻造武器`/`图样`/`图样进度`/`模式进度`/`红框`/`红框进度` 同参返回逐字节相同的 `data` |
+| 默认条数 | 不传 `limit` 返回 20 条（`cross` 组的默认条数体检） |
+
+### world_assistant（`intent="rotations"`：周常轮换）
+
+| 行 | 断言 |
+| --- | --- |
+| 口径分离 | 每行 `source` ∈ {official, schedule}；官方 ≥ 14 行（10 特色突袭/地牢 + 4 夜幕/宗师），表那半 6 行 |
+| 夜幕/宗师 | 宗师那条 `name` 是打击名、`difficulty` 是难度、`modifiers` 非空且**不含空串**；奖励 `quantity=0` 原样保留 |
+| 表与锚点 | 上维挑战/异域任务各给本周+下周，名字与 `verified_at` 都在；泉源给今天+明天且**交替**（今天防御 → 明天攻击） |
+| 遗失区域 | `lost_sector.anchored=false`、31 个候选、`how_to_anchor` 有核对办法；**不产出 `kind=lost_sector` 的行** |
+| 别名等价 | `rotations`/`轮换`/`周常轮换`/`这周` 同参返回逐字节相同的 `data` |
+
 ### build_assistant
 
 | 行 | 断言 |
@@ -97,9 +123,9 @@
 
 | 行 | 断言 |
 | --- | --- |
-| list 默认 | 最多 5 套 + 四个分页字段 + 每套带 `build_template` |
-| list 翻页 | `offset` 两页不重叠 |
-| get 传 `loadout_id` | `ignored_parameter`（要 Agent 自己从全部里挑） |
+| list 默认 | 只给**清单行**（`loadout_id`/件数/`execution_supported`/`detail_hint`，**不带** `build_template`）+ 四个分页字段；整包 < 20 KB（121 KB → 2.8 KB 之后不许回涨） |
+| list 翻页 | `offset` 两页不重叠（行里的实例键是 **`loadout_id`**，不是 `id`） |
+| get 传 `loadout_id` | 只给那一套的**完整模板**（0.7.6 起 `get` 与 `list` 是两件事，不再互为别名） |
 | search_identifiers | 按 `kind` 给标识（含 hash） |
 | search_identifiers 乱填 | `invalid_argument_error` 列词表 |
 | save 缺名字 | `invalid_arguments` |
@@ -131,7 +157,7 @@
 | --- | --- |
 | equip 不带确认 | `confirmation_required`，`candidates[0].steps` 里是「先顶下、再装」两步，**零写入** |
 | equip 带确认 | `ok:true` + `verified:true` + `equipped_now` 说清受影响部位现在装着什么 |
-| equip 撞金装冲突 | `equip_blocked`，消息说清全身只能一件异域 + 下一步（不是 `equip_failed`） |
+| equip 撞异域冲突 | `equip_blocked`，消息说清**同类**异域只能一件（武器一件 + 护甲一件）+ 下一步（不是 `equip_failed`） |
 | equip 已在身上 | `ok:true`，无事可做、不写 |
 
 
@@ -194,24 +220,27 @@
 | `item_instance_id=null` | 走 schema 拒绝或干净信封，**不许**裸抛 `AttributeError` |
 | 槽位越界 21 | `less_than_equal`（协议级） |
 | 真握手读账号 | `player_assistant(intent="profile")` 得到 `ok=true` |
-| legacy 工具面 | `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 时工具数 > 8 且含 `get_inventory` |
+| 旧工具面已剥离 | 连旧的 `DESTINY_MCP_TOOL_PROFILE=full` + `ENABLE_LEGACY_TOOLS=1` 一起塞进去，也只该有 8 个工具、且没有 `get_inventory` |
 
-## `sweep` 实测基线（110 个 intent，最简参）
+## `sweep` 实测基线（119 个 intent，最简参）
 
-最近一次全跑：**110 条 PASS + 1 条汇总 INFO，0 FAIL / 0 WARN**。85 个 intent 用最简参就返回 `ok=true`；
-25 个返回**干净的错误码**（这本身就是对的：缺参/越界要在工具层或服务层说清，不许裸抛）：
+最近一次全跑（2026-09-20，0.5.0 + 锻造图样）：**119 条 PASS + 1 条汇总 INFO，0 FAIL / 0 WARN**。
+92 个 intent 用最简参就返回 `ok=true`；27 个返回**干净的错误码**（这本身就是对的：缺参/越界要在工具层
+或服务层说清，不许裸抛）：
 
 | 返回码 | 个数 | 哪些 intent（最简参下） |
 | --- | --- | --- |
-| `confirmation_required` | 4 | `inventory:move`、`loadout:delete`、`loadout:equip_loadout`、`subclass:modify` |
-| `invalid_arguments`（工具层） | 13 | `inventory:{transfer,equip,equip_many,equip_items,pull_postmaster,lock,track_quest,quest_tracking}`、`loadout:{save,snapshot_official,update_official_identifiers,clear_official}`、`subclass:equip_artifact_mod` |
-| `invalid_argument_error`（服务层） | 1 | `inventory:equip_mod`（缺 `item_instance_id`，要先指定哪一件） |
+| `confirmation_required` | 6 | `inventory:move`、`loadout:{delete,equip_loadout}`、`subclass:{modify,equip_artifact_mod,equip_artifact}` |
+| `invalid_arguments`（工具层） | 12 | `inventory:{transfer,equip,equip_many,equip_items,pull_postmaster,lock,track_quest,quest_tracking}`、`loadout:{save,snapshot_official,update_official_identifiers,clear_official}` |
+| `invalid_argument_error`（服务层） | 2 | `inventory:item`（空实例 ID）、`inventory:equip_mod`（缺 `item_instance_id`，要先指定哪一件） |
 | `invalid_canonical_build` | 1 | `build:equip_build`（手拼候选会被拒） |
-| `missing_artifact_mod_hash` | 1 | `subclass:artifact_mod`（`artifact_mod_hash` 传 0/缺省时） |
-| `missing_artifact_name` | 1 | `subclass:equip_artifact`（没给 `artifact_name` 时） |
 | `ignored_parameter` | 3 | `activity:{aggregate,activity_aggregate,activity_stats}`（`mode` 不是它们读的参数） |
 | `a_p_i_error` | 2 | `activity:{leaderboards,leaderboard}`（上游故障，见已知问题） |
 | `upstream_not_found_error` | 1 | `activity:clan_leaderboards`（伪 group_id） |
+
+（`missing_artifact_mod_hash` / `missing_artifact_name` 两条在旧基线里出现过：那时 `sweep` 给
+`artifact_mod` / `equip_artifact` 传的是 0 / 空名字。现在这两个 intent 会带上真机取到的
+神器名与模组 hash，于是走到写入确认那一步，返回 `confirmation_required`。）
 
 三条容易踩的：
 
@@ -343,9 +372,48 @@ FAIL 5 条＝「已知问题」表的 #2/#3/#4/#5/#6；#1（analyze 自相矛盾
   `weapon(type)` 184.2 KB、`loadout(list)` 71.4 KB、`inventory(duplicates)` 85.4 KB。
 - `pytest -q` 1439 通过（新增 12 条回归锁）。
 
+**2026-09-20 复跑（性能六项之后，同一台机器）**
+
+- `weapon_assistant(type)` 这个"最大响应"已经不在榜首：默认 10 件的列表行是 **23.2 KB**
+  （2.3 KB/件），而它改之前是 **184.2 KB / 20 件**。同一份响应的线上文本 387,598 → 41,537 字符。
+- 只读的武器面重新录了基线（`tests/baselines/weapon_responses`，新增 `type_list_default` 用例），
+  `scripts/diff_weapon_baseline.py` 对改前快照 **0 个无理由消失**；其余用例耗时与体积照旧。
+- 口径提醒：本文件里的 KB 是**解码后的紧凑 JSON 字符数**；线上文本带 `\uXXXX` 转义，
+  中文多的时候大约是它的 2 倍（两个数都对，别混着比）。
+
+**2026-09-20 复跑（0.5.0 发布 + 锻造武器模式，含角色级作用域修复之后，同一台机器）**
+
+```bash
+.venv/bin/python scripts/run_corpus_all_rows.py --report /tmp/corpus_patterns.json
+```
+
+| 组 | 行数 | 结果 |
+| --- | --- | --- |
+| `sweep`（119 个 intent + 1 条汇总） | 124 | PASS 123、INFO 1 |
+| `rows`（字段级 + 跨切面） | 98 | PASS 97、INFO 1（含 8 条新的 `patterns` 断言） |
+| `aliases`（别名等价） | 17 | PASS 17（含 `patterns` 的 10 个取值） |
+| `mcp`（协议层） | 10 | PASS 10 |
+| **合计** | **249** | **PASS 246、INFO 3、0 FAIL / 0 WARN / 0 SKIP**，退出码 0 |
+
+（同一份代码连跑两次，只有 `weapon：强化版 perk 名字带 ↑…` 那一行在 PASS/INFO 之间摆动：
+本账号此刻**没有已选中的强化 perk** 时它按设计记 INFO，不假失败。这一轮的耗时是机器有别的负载时跑的
+（`build(analyze)` 106s，闲时 34s），**别拿这一轮的时间当基线**。）
+
+- 新增的 `patterns` 行全绿：计数自洽 183、`未开始` 的 `progress`/`remaining` 为 null、
+  术语对照（红框/模式/塑形）随响应给出、变体的塑形配置（3 栏位 / 三四号固定 / 无深视插槽）、
+  来源带页面与 `trust`、名字对不上时说清图鉴条数、10 个别名 `data` 逐字节相同、默认 20 条。
+- **角色级作用域**（用户拿游戏截图抓出来的事故）：183 条模式记录里 151 条档案级 + 32 条角色级，
+  只读 `profileRecords` 会把那 32 把报成「未开始」（149/183 → 修正为 181/183）。现在语料断言
+  `read.record_scopes == ["profile","character"]`、本账号 `未开始 == 0`、角色级的「面纱威胁」为已解锁。
+- **别名那条语料当场抓到一个真问题**：第一版把"这次读组件用了几毫秒 / 是否命中缓存"放进了
+  `data.read`，10 个别名因此跑出 2 种 `data`（首调未命中缓存、其余命中）。诊断值移出答案、改记日志后一致。
+- `pytest -q` **1631 通过**（`tests/test_pattern_query.py` 33 条、`tests/test_crafting_sources.py` 12 条）。
+- 最慢 8 次：`build(analyze)` 34.2s、`player(profile)`、`activity(pgcr)` 等 6–9s 级；
+  `weapon(patterns)` 首次 3.6s（之后 5 分钟 TTL 内 0.3–0.6s）。`patterns` 默认一页 6.4 KB。
+
 **这一轮里语料自身的 bug（都已修，记在这里免得下次重犯）**
 
 1. **`sweep` 一开始没把 `intent` 传下去**：110 条「体检」全落在各工具的默认 intent 上，等于同一个默认调用跑了 110 遍（还因此把 `weapon_assistant` 的 `query` 参数误判成 bug）。修好后才是真正的 110 个 intent。
 2. 断言路径写错 7 处：`inventory.type` 传了它不读的 `limit`、`search` 的键是 `result.items`（不是 `instances`）、`set_bonus` 的 2/4 件效果在 `perks[].required_count`（不是 `tiers`）、`recommend` 在 `data.recommendation.results[].build.items[]`、`analyze` 在 `data.analysis`、`search_identifiers` 在 `data.results.<kind>`、`loadout.save` 必须先给 `character` 才走到确认门。
 3. 碎片别名行把「void 组」和「strand 组」当成一组比（19 ≠ 16 是两个元素本身不同）。
-4. legacy 工具面行只设了开关、没开 `DESTINY_MCP_TOOL_PROFILE=full`：**光设开关是静默无效的**（实测 full+开关 = 77 个工具、expert+开关 = 49 个、normal+开关 = 8 个且无 warning）。
+4. 旧工具面那一行现在是**反向断言**：旧的 profile/开关都不该再变出工具（历史工具面已剥离到 `legacy/`；哪天又变回 77 个，说明有人把它挂回来了）。

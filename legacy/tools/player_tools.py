@@ -56,7 +56,9 @@ async def find_players(
         find_players(name="guardian")
     """
     svc = get_ctx(ctx)
-    payload = await svc['player_svc'].find_players(name)
+    # 这个工具的契约就是"按置信度评分排序"（下面要用到 confidence/playtime_hours），
+    # 而聚合入口为了省掉 10 次档案读取已改成**默认不算分** —— 所以这里必须显式要。
+    payload = await svc['player_svc'].find_players(name, enrich=True)
     results = payload.get("players") or []
 
     if not results:

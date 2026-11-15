@@ -163,7 +163,6 @@ async def _verify(root: Path, command: Path, timeout: float) -> None:
         args=[],
         env={
             "DESTINY_MCP_ROOT": str(root),
-            "DESTINY_MCP_TOOL_PROFILE": "normal",
         },
     )
     async with asyncio.timeout(timeout):

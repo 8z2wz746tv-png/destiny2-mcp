@@ -10,28 +10,31 @@ from __future__ import annotations
 from typing import Annotated, Any, Literal, cast
 
 from mcp.server.fastmcp import Context
-from pydantic import Field, ValidationError
+from pydantic import Field
 
 from ..build.models import BuildRequest
-from ..build_contracts import ExecutableBuild, canonical_build_error_message
-from ..error_codes import ErrorCode, write_failed
+from ..error_codes import ErrorCode
 from ..exceptions import DestinyMCPError
+from ..services.inventory_analysis_service import duplicate_rows
 from ._registry import mcp
-from ._build_confirmation import (
-    issue_exotic_confirmation_token,
-    verify_exotic_confirmation_token,
-)
+from ._coerce import coerce_scalar_arguments
+from ._build_confirmation import resolve_exotic, verify_exotic_confirmation_token
 from ._farm_target_response import serialize_farm_target_analysis
 from ._formatters import inventory_search_summary
 from ._helpers import get_ctx, handle_tool_error, positive_or_default, resolve_player_name
 from . import _armor_branches as armor_branches
 from . import _build_flow as build_flow
 from . import _counters_branches as counters_branches
+from . import _inventory_branches as inventory_branches
 from . import _equip_branches as equip_branches
 from . import _stats_branches as stats_branches
 from . import _subclass_branches as subclass_branches
 from . import _weapon_branches as weapon_branches
 from . import _leaderboard_branches as leaderboard_branches
+from . import _loadout_branches as loadout_branches
+from . import _player_branches as player_branches
+from . import _patterns_branches as patterns_branches
+from . import _rotation_branches as rotation_branches
 from . import _weapon_usage_branches as weapon_usage_branches
 from ._enrichment import community_enrichment, community_read
 from ._farming import farming_reference as _farming_reference
@@ -42,11 +45,13 @@ from . import _param_docs as fields
 from ._requests import (
     ActivityIntent, BuildIntent, InventoryIntent, LoadoutIntent, PlayerIntent,
     SubclassIntent, WeaponIntent, WorldIntent,
+    WEAPON_PATTERN_INTENTS, WORLD_ROTATION_INTENTS,
     WRITE_INTENTS,
     InventoryRequest, LoadoutRequest, SubclassRequest, validate_request,
 )
 from ._responses import (
-    write_failure_hints,
+    action_response,
+    dump,
     missing_weapon_name,
     confirmation_required_response,
     error_response, ok_response, data_only,
@@ -54,35 +59,15 @@ from ._responses import (
 
 # world_assistant 里「没传 limit」时各 intent 用的条数（vendor 除外，它按菜单/详情取默认）。
 _WORLD_LIMIT_DEFAULT = 12
+# 轮换表：默认 30 行（本周特色突袭/地牢 + 夜幕/宗师 + 周期表那半）
+_WORLD_ROTATION_LIMIT = 30
 _INVENTORY_DEFAULT_LIMIT = 100
 _INVENTORY_PAGE_INTENTS = {"get", "inventory", "list"}
 _LOADOUT_DEFAULT_LIMIT = 5
-_WEAPON_TYPE_DEFAULT_LIMIT = 20
-
-
-def _dump(value: Any) -> Any:
-    """Recursively convert Pydantic/domain objects into plain JSON-ish data."""
-    if hasattr(value, "model_dump"):
-        return value.model_dump()
-    if isinstance(value, list):
-        return [_dump(item) for item in value]
-    if isinstance(value, dict):
-        return {key: _dump(item) for key, item in value.items()}
-    return value
-
-
-def _action_response(intent: str, summary: str, result: Any) -> dict:
-    payload = _dump(result)
-    if payload.get("success") is not True:
-        response = error_response(
-            payload.get("code") or write_failed(intent),
-            payload.get("message") or f"{intent} 执行失败。",
-            candidates=payload.get("candidates") or [],
-            next_actions=write_failure_hints(payload),
-        )
-        response["data"] = {"result": payload}
-        return response
-    return ok_response(summary, {"result": payload})
+# 按类型列武器：列表行（身份+位置+属性值）真机约 2.3k 字符/件，20 件 ≈ 4.6 万字符，
+# 而"我手炮都有哪些"这个问题通常只要看头几件；默认 10 件 + next_offset 翻页。
+_WEAPON_TYPE_DEFAULT_LIMIT = 10
+_WEAPON_PATTERN_DEFAULT_LIMIT = 20
 
 
 # 社区富集与读取实现在 _enrichment（武器分支已搬到 _weapon_branches，避免反向依赖）
@@ -120,6 +105,7 @@ async def player_assistant(
     intent: fields.PlayerIntentField = "profile",
     player_name: fields.PlayerName = None,
     name_prefix: fields.NamePrefix = "",
+    include_profile: fields.IncludeProfile = False,
     ctx: Context = None,
 ) -> dict:
     """玩家/账号聚合入口：搜索玩家、模糊找人、读取角色档案。"""
@@ -130,59 +116,23 @@ async def player_assistant(
     if intent in {"profile", "get_profile", "角色", "档案"}:
         resolved = resolve_player_name(player_name)
         result = await player_svc.get_profile(resolved)
-        return ok_response("已读取玩家档案。", {"profile": _dump(result)})
+        return ok_response("已读取玩家档案。", {"profile": dump(result)})
 
     if intent in {"search", "search_player"}:
         if not player_name:
             return error_response(ErrorCode.MISSING_PLAYER_NAME, "必须提供 player_name。")
         result = await player_svc.search_player(player_name)
-        return ok_response("已搜索玩家。", {"players": _dump(result)})
+        return ok_response("已搜索玩家。", {"players": dump(result)})
 
     if intent in {"find", "find_players", "fuzzy"}:
-        if not name_prefix:
-            return error_response(ErrorCode.MISSING_NAME_PREFIX, "必须提供 name_prefix。")
-        try:
-            result = await player_svc.find_players(name_prefix)
-        except DestinyMCPError as exc:
-            # 上游模糊搜索不可用时必须显式失败 + 给出下一步，**不能**回空列表 ——
-            # 那会被读成「没这个人」（语料第二章：不能把没查到说成不存在）。
-            return error_response(
-                ErrorCode.API_ERROR,
-                str(exc),
-                next_actions=[{
-                    "label": "改用完整 Bungie 名（名字#1234）精确查找",
-                    "tool": "player_assistant",
-                    "arguments": {"intent": "search"},
-                }],
-            )
-        players = result.get("players") or []
-        has_more = bool(result.get("has_more"))
-        if not players:
-            return ok_response(
-                f"模糊搜索没有返回候选（前缀：{name_prefix}）。",
-                {"players": [], "page": result.get("page", 0), "has_more": has_more},
-                warnings=[
-                    "空候选只说明这次没匹配到；若要确认某人是否存在，"
-                    "请用完整 Bungie 名（名字#1234）走 intent=\"search\"。"
-                ],
-            )
-        warnings = []
-        if has_more:
-            warnings.append(
-                "上游还有下一页候选；这里只列了最高置信度的若干条。"
-                "拿到完整名（名字#1234）后用 intent=\"search\" 精确定位。"
-            )
-        return ok_response(
-            f"已模糊搜索玩家：找到 {len(players)} 个候选。",
-            {"players": players, "page": result.get("page", 0), "has_more": has_more},
-            warnings=warnings,
-        )
+        return await player_branches.find_response(svc, name_prefix, bool(include_profile))
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"player_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
 @handle_tool_error
+@coerce_scalar_arguments
 @validate_request(InventoryRequest)
 @check_intent_parameters
 async def inventory_assistant(
@@ -227,6 +177,7 @@ async def inventory_assistant(
 
     if _requires_confirmation(intent) and not confirmed:
         return _confirmation_required(intent, {
+            "intent": intent,
             "player_name": resolved,
             "item_name": item_name,
             "item_instance_id": item_instance_id,
@@ -265,9 +216,8 @@ async def inventory_assistant(
         return ok_response(
             result["summary"],
             {
-                "duplicate_weapons": result["duplicates"],
-                "scan": result["scan"],
-                "filters": result["filters"],
+                "duplicate_weapons": duplicate_rows(result["duplicates"]),
+                "scan": result["scan"], "filters": result["filters"],
                 "pagination": result["pagination"],
                 "farming_list": _farming_reference(
                     svc.get("starside_svc"), _harvest_names(result["duplicates"])
@@ -296,7 +246,7 @@ async def inventory_assistant(
             limit=page_limit,
             offset=offset,
         )
-        inventory = _dump(result)
+        inventory = dump(result)
         warnings = []
         if inventory.get("truncated"):
             warnings.append(
@@ -319,7 +269,7 @@ async def inventory_assistant(
 
     if intent in {"search", "find_item"}:
         result = await svc["inventory_svc"].search_items(resolved, item_name, location)
-        searched = _dump(result)
+        searched = dump(result)
         hits = searched.get("items") if isinstance(searched, dict) else None
         return ok_response(inventory_search_summary(item_name, hits), {
             "result": searched,
@@ -336,7 +286,7 @@ async def inventory_assistant(
             location,
         )
         # 武器走精简身份块（列表类边界：不请求 305/310，所以没有 perk 与可换部件）
-        return weapon_branches.inventory_type_payload(
+        return inventory_branches.inventory_type_payload(
             svc, result, type_name or item_type, location
         )
 
@@ -349,7 +299,7 @@ async def inventory_assistant(
             source=from_character,
             item_instance_id=item_instance_id or None,
         )
-        return _action_response(intent, "移动流程已执行。", result)
+        return action_response(intent, "移动流程已执行。", result)
 
     if intent == "transfer":
         result = await svc["transfer_svc"].transfer_item(
@@ -358,11 +308,11 @@ async def inventory_assistant(
             to_character,
             from_character,
         )
-        return _action_response(intent, "转移已执行。", result)
+        return action_response(intent, "转移已执行。", result)
 
     if intent == "equip":
         equipped = await equip_branches.equip_branch(
-            svc, resolved, item_instance_id, character, confirmed, _action_response
+            svc, resolved, item_instance_id, character, confirmed, action_response
         )
         if equipped is not None:
             return equipped
@@ -371,7 +321,7 @@ async def inventory_assistant(
         if not item_instance_ids:
             return error_response(ErrorCode.MISSING_ITEM_INSTANCE_IDS, "批量装备需要提供 item_instance_ids。")
         result = await svc["transfer_svc"].equip_items(resolved, item_instance_ids, character)
-        return _action_response(intent, "批量装备已执行。", result)
+        return action_response(intent, "批量装备已执行。", result)
 
     if intent == "pull_postmaster":
         result = await svc["transfer_svc"].pull_from_postmaster(
@@ -379,7 +329,7 @@ async def inventory_assistant(
             item_instance_id,
             character or None,
         )
-        return _action_response(intent, "邮政官取回已执行。", result)
+        return action_response(intent, "邮政官取回已执行。", result)
 
     if intent == "lock":
         result = await svc["transfer_svc"].set_item_lock_state(
@@ -388,7 +338,7 @@ async def inventory_assistant(
             locked,
             character or None,
         )
-        return _action_response(intent, "锁定状态已更新。", result)
+        return action_response(intent, "锁定状态已更新。", result)
 
     if intent in {"track_quest", "quest_tracking"}:
         result = await svc["transfer_svc"].set_quest_tracked_state(
@@ -397,26 +347,29 @@ async def inventory_assistant(
             tracked,
             character or None,
         )
-        return _action_response(intent, "任务追踪状态已更新。", result)
+        return action_response(intent, "任务追踪状态已更新。", result)
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"inventory_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
 @handle_tool_error
+@coerce_scalar_arguments
 @check_intent_parameters
 async def weapon_assistant(
     intent: Annotated[WeaponIntent, Field(description=(
         "武器查询意图。analyze=武器分析（不含选取率）；"
         "perk_pool=可能 Roll 到的 Perk 池；popularity=Perk 选取率和热门组合；"
         "catalog=从全量 Manifest 按武器类型和 Perk 查找，不限账号是否拥有；"
-        "filter_rolls=只筛选账号持有副本；community=本地社区武器/Perk/DPS 资料搜索或详情。"
+        "filter_rolls=只筛选账号持有副本；patterns=锻造图样进度（图鉴「模式和催化」那一页，读账号）；"
+        "community=本地社区武器/Perk/DPS 资料搜索或详情。"
     ))] = "analyze",
     player_name: fields.PlayerName = None,
     weapon_name: fields.WeaponName = "",
     weapon_type: Annotated[
-        str, Field(description="武器类型；filter_rolls 留空扫描全部持有武器。")
+        str, Field(description="武器类型；filter_rolls 留空扫描全部持有武器，patterns 用它筛图样。")
     ] = "",
+    rarity: fields.Rarity = "",
     perk_name: Annotated[
         str, Field(description="单个 Perk 名称（中英文）；未传 required_perks 时作为必需 Perk。")
     ] = "",
@@ -437,6 +390,8 @@ async def weapon_assistant(
     catalog 查询完整 Manifest，适用于“所有武器中找带某个 perk
     的某类武器”；filter_rolls 才查玩家账号内的实际副本，按当前插槽筛选，
     不包含未选中的可切换 Perk。limit 只限制返回条数，不限制扫描范围。
+    patterns 给图鉴「模式和催化」里 183 条武器图样的进度（账号组件 900，就是游戏里那条
+    「4/5」）与掉落来源；`未开始` = 账号里没有这条记录，不是进度 0。
     coverage_complete=false 时不能将 0 命中解释为账号中没有。
     community 用 weapon_name/perk_name 搜索；knowledge_id 读取详情。
     community_section=text/tables/links；按 next_offset 继续读取，正文 offset 单位为字符。
@@ -445,16 +400,20 @@ async def weapon_assistant(
     svc = get_ctx(ctx)
     intent = cast(WeaponIntent, (intent or "analyze").strip().lower())
     # 未指定的参数在这里补默认值：签名默认值必须是 None，否则显式传默认值会被当成"没传"。
-    # 按类型列武器默认 20 件：每件带完整模板（真机约 9.7 KB 紧凑 JSON），50 件 ≈ 452 KB
-    # ≈ 13 万 tokens，一次就能把调用方上下文吃掉大半；目录/筛选仍是 50（行很轻）。
-    limit = positive_or_default(limit, _WEAPON_TYPE_DEFAULT_LIMIT if intent == "type" else 50)
+    # 按类型列武器（列表行，约 2.3k 字符/件）默认 10 件、锻造图样默认 20 条；其余 50
+    # （目录/筛选命中行很轻，且是"全库找枪"，条数少了反而要反复问）。
+    weapon_defaults = dict.fromkeys(WEAPON_PATTERN_INTENTS, _WEAPON_PATTERN_DEFAULT_LIMIT)
+    weapon_defaults["type"] = _WEAPON_TYPE_DEFAULT_LIMIT
+    limit = positive_or_default(limit, weapon_defaults.get(intent, 50))
     include_inventory = True if include_inventory is None else include_inventory
     community_section = community_section or "text"
     catalog_intents = {"catalog", "search_catalog", "all_weapons", "global", "search_all"}
-    uses_catalog = intent in catalog_intents or (
-        intent == "filter_rolls" and not include_inventory
-    )
+    uses_catalog = intent in catalog_intents or (intent == "filter_rolls" and not include_inventory)
     resolved = None if uses_catalog else resolve_player_name(player_name)
+
+    if intent in WEAPON_PATTERN_INTENTS:
+        return await patterns_branches.patterns_branch(
+            svc, resolved, weapon_name, weapon_type, rarity, limit, offset)
 
     if intent == "community":
         result = _community_read(
@@ -497,7 +456,7 @@ async def weapon_assistant(
         result = await svc["weapon_compare_svc"].compare_weapon_instances(
             resolved, weapon_name, item_instance_id or None
         )
-        return weapon_branches.compare_payload(svc, result, weapon_name)
+        return weapon_branches.compare_payload(svc, result, weapon_name, single=bool(item_instance_id))
 
     if intent in {"perk_pool", "perks"}:
         return await weapon_branches.perk_pool_payload(svc, weapon_name)
@@ -518,31 +477,17 @@ async def weapon_assistant(
         return weapon_branches.popularity_payload(svc, result, weapon_name)
 
     if intent == "type":
-        result = await svc["weapon_detail_svc"].get_weapon_details_by_type(
-            resolved,
-            weapon_type,
-            limit=limit,
-        )
-        return weapon_branches.type_payload(svc, result, weapon_type)
+        return await weapon_branches.type_branch(svc, resolved, weapon_type, limit, offset)
 
     if intent == "filter_rolls":
         if not include_inventory:
             catalog_required_perks = _perk_filter_terms(required_perks, perk_name)
             filtered = svc["weapon_roll_filter_svc"].filter_catalog(
-                weapon_name=weapon_name,
-                weapon_type=weapon_type,
-                required_perks=catalog_required_perks,
-                any_perks=any_perks,
-                excluded_perks=excluded_perks,
-                limit=limit,
+                weapon_name=weapon_name, weapon_type=weapon_type, required_perks=catalog_required_perks,
+                any_perks=any_perks, excluded_perks=excluded_perks, limit=limit,
             )
-            return weapon_branches.catalog_payload(
-                svc, filtered, include_inventory=False, intent=intent
-            )
-        detail = await svc["weapon_detail_svc"].get_weapon_details_by_type(
-            resolved,
-            weapon_type,
-        )
+            return weapon_branches.catalog_payload(svc, filtered, include_inventory=False, intent=intent)
+        detail = await svc["weapon_detail_svc"].get_weapon_details_by_type(resolved, weapon_type)
         filtered = svc["weapon_roll_filter_svc"].filter_rolls(
             [weapon.model_dump(mode="json") for weapon in detail.weapons],
             weapon_name=weapon_name,
@@ -574,6 +519,7 @@ async def weapon_assistant(
 
 @mcp.tool()
 @handle_tool_error
+@coerce_scalar_arguments
 @check_intent_parameters
 async def build_assistant(
     intent: Annotated[BuildIntent, Field(description=(
@@ -586,8 +532,8 @@ async def build_assistant(
         "目标职业：hunter/warlock/titan，或猎人/术士/泰坦。"
     ))] = "",
     exotic_name: Annotated[str | None, Field(description=(
-        "逐字传入玩家说出的异域护甲（金装）名称，禁止翻译、补全或改写。"
-        "它属于硬约束；首次查询总会返回候选，必须先让玩家确认。"
+        "逐字传入玩家说出的异域护甲（金装）名称，禁止翻译、补全或改写。它属于硬约束：唯一精确匹配"
+        "时直接求解（响应 query.exotic_resolution 说明用了哪件）；模糊/多件时返回候选，必须先确认。"
     ))] = None,
     confirmed_exotic_hash: Annotated[int | None, Field(description=(
         "金装候选确认哈希。首次查询不得填写；只有玩家明确选择候选后，"
@@ -616,17 +562,21 @@ async def build_assistant(
     super_target: Annotated[int | None, Field(ge=0, le=200, description=(
         "大招属性最低目标（0-200），属于硬约束；无解时不得自动降低。"
     ))] = None,
-    fragment_names: Annotated[list[str] | None, Field(description=(
+    stat_caps: fields.StatCaps = None,
+    fragment_names: Annotated[list[str] | str | None, Field(description=(
         "要计入配装的碎片名称列表；重试和金装确认时必须原样保留。"
+        '只发标量的宿主写成 "保护之光,聚焦打击"。'
     ))] = None,
     include_subclass_fragment: Annotated[bool, Field(description=(
         "是否计入当前子职业和碎片属性；重试和金装确认时必须原样保留。"
     ))] = False,
     set_bonus_name: fields.SetBonusName = None,
     set_bonus_count: fields.SetBonusCount = None,
-    priority_stats: Annotated[list[str] | None, Field(description=(
+    functional_mods: fields.FunctionalMods = None,
+    priority_stats: Annotated[list[str] | str | None, Field(description=(
         "所有硬目标达标后才按顺序最大化的属性。使用 "
         "weapons/health/class/grenade/melee/super；力量/strength 必须写为 melee。"
+        '只发标量的宿主写成 "weapons,grenade"（顺序就是优先级）。'
     ))] = None,
     priority_stat: fields.PriorityStat = None,
     replacement_slot: Annotated[str | None, Field(description=(
@@ -644,6 +594,7 @@ async def build_assistant(
         "只有单件无解才返回两件方案。两件回退目前只支持 equipped 基线。"
     ))] = None,
     canonical_build: fields.CanonicalBuild = None,
+    execution_id: fields.ExecutionId = "",
     confirmed: fields.Confirmed = False,
     top_n: Annotated[int | None, Field(ge=1, le=20, description="返回的候选配装数量；null=没指定（按 5 处理）。")] = None,
     community_build_id: Annotated[str, Field(description=(
@@ -767,6 +718,7 @@ async def build_assistant(
         "grenade_target": grenade_target,
         "melee_target": melee_target,
         "super_target": super_target,
+        "stat_caps": (None if stat_caps is None else dict(stat_caps)),
         "fragment_names": (
             None if fragment_names is None else list(fragment_names)
         ),
@@ -784,6 +736,7 @@ async def build_assistant(
         build_arguments["baseline"] = baseline
         build_arguments["max_replacements"] = max_replacements
 
+    exotic_resolution: dict[str, Any] | None = None
     if intent in {"recommend", "find", "analyze", "farm_target"}:
         confirmation_requested = (
             confirmed_exotic_hash is not None
@@ -805,74 +758,18 @@ async def build_assistant(
                 )
 
     if intent in {"recommend", "find", "analyze", "farm_target"} and exotic_name:
-        resolution = _dump(
-            svc["build_svc"].resolve_exotic_armor(
-                exotic_name,
-                character,
-                limit=5,
-            )
+        step = resolve_exotic(
+            svc,
+            exotic_name=exotic_name,
+            character=character,
+            player_name=resolved,
+            build_arguments=build_arguments,
+            confirmed_exotic_hash=confirmed_exotic_hash,
         )
-        status = resolution.get("status")
-        matches = resolution.get("matches") or []
-        if status in {"exact", "confirmation_required"} and confirmed_exotic_hash is None:
-            candidates = []
-            for index, match in enumerate(matches, 1):
-                arguments = dict(build_arguments)
-                arguments["exotic_name"] = match.get("name")
-                arguments["confirmed_exotic_hash"] = match.get("item_hash")
-                arguments["exotic_confirmation_token"] = (
-                    issue_exotic_confirmation_token(
-                        arguments,
-                        user_id=None,
-                        player_name=resolved,
-                    )
-                )
-                candidates.append({
-                    "selection": index,
-                    "name": match.get("name"),
-                    "name_en": match.get("nameEn"),
-                    "item_hash": match.get("item_hash"),
-                    "icon_url": match.get("icon_url"),
-                    "character": match.get("character") or character,
-                    "arguments": arguments,
-                })
-            return error_response(
-                ErrorCode.EXOTIC_CONFIRMATION_REQUIRED,
-                f"“{exotic_name}”匹配到以下金装。请确认你指的是哪件。"
-                "确认后我会保留原来的职业、属性目标、优先级和碎片设置继续配装。",
-                candidates=candidates,
-            )
-        if status == "not_found":
-            return error_response(
-                ErrorCode.EXOTIC_NOT_FOUND,
-                f"没有找到与“{exotic_name}”匹配的{character or '目标职业'}金装。"
-                "请换一个更短或更完整的名称后重试，原属性目标不会被降低。",
-            )
-        if status not in {"exact", "confirmation_required"}:
-            return error_response(
-                ErrorCode.EXOTIC_RESOLUTION_FAILED,
-                "金装名称解析失败，未启动配装求解。请稍后重试。",
-            )
-        confirmed_match = next(
-            (
-                match
-                for match in matches
-                if int(match.get("item_hash") or 0) == confirmed_exotic_hash
-            ),
-            None,
-        )
-        if confirmed_match is None:
-            return error_response(
-                ErrorCode.INVALID_EXOTIC_CONFIRMATION,
-                "金装确认信息无效或已与当前候选不一致，未启动配装求解。"
-                "请重新搜索并让玩家确认候选。",
-            )
-        exotic_name = confirmed_match.get("name") or resolution.get("canonical_name")
-        if not exotic_name:
-            return error_response(
-                ErrorCode.EXOTIC_RESOLUTION_FAILED,
-                "金装名称解析失败，未启动配装求解。请稍后重试。",
-            )
+        if step.error is not None:
+            return step.error
+        exotic_name = step.exotic_name
+        exotic_resolution = step.resolution
 
     request = BuildRequest(
         character_class=character,
@@ -883,6 +780,7 @@ async def build_assistant(
         grenade_target=grenade_target,
         melee_target=melee_target,
         super_target=super_target,
+        stat_caps=dict(stat_caps or {}),
         include_subclass_fragment=include_subclass_fragment,
         fragment_names=fragment_names or [],
         set_bonus_name=set_bonus_name,
@@ -892,6 +790,8 @@ async def build_assistant(
         top_n=top_n,
     )
     query: dict[str, Any] = {
+        # 金装是"唯一精确匹配"时这里多一项 exotic_resolution：说明用的是哪件、为什么不确认。
+        **({"exotic_resolution": exotic_resolution} if exotic_resolution else {}),
         "character": request.character_class,
         "exotic_name": request.exotic_name,
         "targets": {
@@ -903,6 +803,7 @@ async def build_assistant(
             "super": request.super_target,
         },
         "priority_stats": request.priority_stats,
+        "stat_caps": request.stat_caps or None,
     }
     if intent == "farm_target":
         query["replacement_slot"] = replacement_slot
@@ -911,14 +812,15 @@ async def build_assistant(
         query["set_bonus_name"] = request.set_bonus_name
         query["set_bonus_count"] = request.set_bonus_count
 
+    # 照抄社区配装的功能模组：清单原样交给服务层（解析与"没抄上哪几颗"都在那边做）
     if intent == "recommend":
-        return await build_flow.recommend(svc, resolved, request, query, _dump)
+        return await build_flow.recommend(svc, resolved, request, query, dump, functional_mods)
 
     if intent == "find":
-        return await build_flow.find(svc, resolved, request, query, _dump)
+        return await build_flow.find(svc, resolved, request, query, dump, functional_mods)
 
     if intent == "analyze":
-        return await build_flow.analyze(svc, resolved, request, query, _dump)
+        return await build_flow.analyze(svc, resolved, request, query, dump)
 
 
     if intent == "farm_target":
@@ -945,55 +847,12 @@ async def build_assistant(
         )
 
     if intent == "equip_build":
-        if canonical_build is None:
-            return error_response(
-                ErrorCode.EXACT_BUILD_REQUIRED,
-                "装备配装需要传回候选中的 canonical_build，不能使用 score。",
-            )
-        try:
-            exact_build = ExecutableBuild.model_validate(canonical_build)
-        except ValidationError as exc:
-            return error_response(ErrorCode.INVALID_CANONICAL_BUILD, canonical_build_error_message(exc))
-        if not confirmed:
-            return _confirmation_required(
-                intent,
-                {
-                    "canonical_build": exact_build.model_dump(mode="json"),
-                    "character": character,
-                    # 逐件预览（光等/能量/模组）与 canonical 并列：canonical 要能原样回传
-                    "items_preview": await armor_branches.equip_preview(
-                        svc, resolved, exact_build.model_dump(mode="json")
-                    ),
-                },
-            )
-        result = await svc["build_svc"].equip_build(
-            resolved, exact_build, character
+        return await armor_branches.equip_build(
+            svc, resolved, canonical_build, execution_id, character, confirmed
         )
-        if not result.get("success"):
-            return error_response(
-                result.get("code", write_failed("build_equip")),
-                result.get("message", "配装装备失败。"),
-                candidates=[{"result": _dump(result)}],
-                next_actions=[{
-                    "label": "重新求解并确认配装",
-                    "tool": "build_assistant",
-                    "arguments": {"intent": "recommend", "character": character},
-                }],
-            )
-        return ok_response("配装装备流程已执行。", {"result": _dump(result)})
 
     if intent == "armor_mods":
-        # match 一起返回：词表外的词（如"速度"）会靠名字/描述子串蒙中一批模组，
-        # 光看 mods 分不出"按属性筛的"和"只在描述里出现过的"。
-        picked = svc["manifest"].get_armor_mods_filtered(
-            slot="", category="all", stat=priority_stat or ""
-        )
-        warning = picked["match"].get("warning")
-        return ok_response(
-            "已读取护甲模组。",
-            {"mods": picked["mods"], "match": picked["match"]},
-            warnings=[warning] if warning else None,
-        )
+        return armor_branches.armor_mods(svc, priority_stat)
 
     if intent == "exotic_armor":
         return armor_branches.exotic_armor(svc, character, exotic_name)
@@ -1046,67 +905,30 @@ async def loadout_assistant(
     resolved = resolve_player_name(player_name)
 
     if _requires_confirmation(intent) and not confirmed:
-        return _confirmation_required(intent, {
-            "loadout_id": loadout_id,
-            "character": character,
-            "slot_number": slot_number,
-            "name": name,
-        })
+        return await loadout_branches.confirm_write(
+            svc, resolved, intent=intent, character=character, loadout_id=loadout_id,
+            slot_number=slot_number, name=name, notes=notes,
+            name_hash=name_hash, icon_hash=icon_hash, color_hash=color_hash,
+        )
 
     if intent in {"list", "get"}:
-        # 每套配装带完整 build_template（约 11 KB），整套账号 20 套 ≈ 227 KB：
-        # 默认只给 5 套（切片在服务层做，工具层只负责把"被截断"讲清楚）。
-        page_limit = positive_or_default(limit, _LOADOUT_DEFAULT_LIMIT)
-        _ = page_limit
-        result = await svc["loadout_svc"].get_loadouts(
-            resolved, character or None, page_limit, offset
-        )
-        payload = _dump(result)
-        cut = bool(payload.get("truncated"))
-        warnings = []
-        if cut:
-            warnings.append(
-                f"只返回了 {payload['returned_loadouts']} / {payload['total_loadouts']} 套"
-                f"（按 limit={page_limit} 截断）；继续读传 offset={payload['next_offset']}，"
-                "或用 character 收窄。"
-            )
-        return ok_response(
-            "已读取玩家已存配装（统一模板格式）"
-            + (f"，{payload['returned_loadouts']}/{payload['total_loadouts']} 套。" if cut else "。"),
-            {
-                "player_name": payload["player_name"],
-                "loadouts": payload["loadouts"],
-                # 列表类响应都要能自证是否全量
-                "total_loadouts": payload["total_loadouts"],
-                "returned_loadouts": payload["returned_loadouts"],
-                "truncated": cut,
-                "next_offset": payload["next_offset"],
-                "scope": payload["scope"],
-                "loadout_format": payload["loadout_format"],
-                "community_route": {
-                    "tool": "build_assistant",
-                    "arguments": {
-                        "intent": "community",
-                        "character": character or "",
-                    },
-                },
-            },
-            warnings=warnings + [
-                "这里仅包含玩家本地配装和 Bungie 官方槽位，不代表社区热门或推荐排序。",
-            ],
+        return await loadout_branches.list_or_get(
+            svc, resolved,
+            character=character, limit=limit, offset=offset,
+            loadout_id=loadout_id, intent=intent,
         )
 
     if intent == "save":
         result = await svc["loadout_svc"].save_loadout(resolved, name, character, notes)
-        return _action_response(intent, "本地配装已保存。", result)
+        return action_response(intent, "本地配装已保存。", result)
 
     if intent == "delete":
         result = await svc["loadout_svc"].delete_loadout(loadout_id)
-        return _action_response(intent, "本地配装已删除。", result)
+        return action_response(intent, "本地配装已删除。", result)
 
     if intent == "equip_loadout":
         result = await svc["loadout_svc"].equip_loadout(resolved, loadout_id)
-        return _action_response(intent, "配装装备流程已执行。", result)
+        return action_response(intent, "配装装备流程已执行。", result)
 
     if intent == "search_identifiers":
         result = svc["loadout_svc"].search_official_loadout_identifiers(kind, query)
@@ -1116,23 +938,24 @@ async def loadout_assistant(
         result = await svc["loadout_svc"].snapshot_official_loadout(
             resolved, character, slot_number, name_hash, icon_hash, color_hash
         )
-        return _action_response(intent, "官方配装槽已保存。", result)
+        return action_response(intent, "官方配装槽已保存。", result)
 
     if intent == "update_official_identifiers":
         result = await svc["loadout_svc"].update_official_loadout_identifiers(
             resolved, character, slot_number, name_hash, icon_hash, color_hash
         )
-        return _action_response(intent, "官方配装槽标识已更新。", result)
+        return action_response(intent, "官方配装槽标识已更新。", result)
 
     if intent == "clear_official":
         result = await svc["loadout_svc"].clear_official_loadout(resolved, character, slot_number)
-        return _action_response(intent, "官方配装槽已清空。", result)
+        return action_response(intent, "官方配装槽已清空。", result)
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"loadout_assistant 不支持 intent={intent!r}。")
 
 
 @mcp.tool()
 @handle_tool_error
+@coerce_scalar_arguments
 @validate_request(SubclassRequest)
 @check_intent_parameters
 async def subclass_assistant(
@@ -1177,15 +1000,17 @@ async def subclass_assistant(
         ])
 
     if _requires_confirmation(intent) and not confirmed:
-        return _confirmation_required(intent, {"character": character, "changes": changes or {}})
+        return _confirmation_required(intent, {
+            "intent": intent, "character": character, "changes": changes or {},
+        })
 
     if intent in {"get", "subclass"}:
         result = await svc["subclass_svc"].get_subclass(resolved, character)
-        return ok_response("已读取子职业配置。", {"subclass": _dump(result)})
+        return ok_response("已读取子职业配置。", {"subclass": dump(result)})
 
     if intent == "modify":
         result = await svc["subclass_svc"].modify_subclass(resolved, character, changes or {})
-        return _action_response(intent, "子职业修改已执行。", result)
+        return action_response(intent, "子职业修改已执行。", result)
 
     if intent == "options":
         result = svc["fragment_svc"].list_subclass_options(character, element, component)
@@ -1196,16 +1021,14 @@ async def subclass_assistant(
         return ok_response("已读取碎片列表。", {"fragments": result})
 
     if intent == "fragment_details":
-        result = svc["fragment_svc"].get_fragment_details(fragment_name)
-        return ok_response("已读取碎片详情。", {
-            "fragment": result,
-            "community_references": _community_enrichment(
-                svc.get("starside_svc"), fragment_name, "subclass"
-            ),
-        })
+        return subclass_branches.fragment_details_payload(
+            svc,
+            fragment_name,
+            _community_enrichment(svc.get("starside_svc"), fragment_name, "subclass"),
+        )
 
     artifact_result = await subclass_branches.artifact_branch(
-        svc, intent, resolved, character, artifact_name, artifact_mod_hash, _action_response
+        svc, intent, resolved, character, artifact_name, artifact_mod_hash, action_response
     )
     if artifact_result is not None:
         return artifact_result
@@ -1274,7 +1097,7 @@ async def activity_assistant(
         return ok_response("已读取活动结算。", {"pgcr": await svc["activity_svc"].get_pgcr(activity_id)})
 
     if intent in {"stats", "career", "historical_stats"}:
-        return await stats_branches.stats_response(svc, resolved, character, mode or "", period or "")
+        return await stats_branches.stats_response(svc, resolved, character, mode or "", period or "", query)
 
     if intent == "counters":
         return await counters_branches.counters_response(svc, resolved, query, count, mode or "", period or "")
@@ -1325,7 +1148,9 @@ async def world_assistant(
     # 自动填参时也分不清"传了 12"和"没传"。vendor 自己按菜单/详情分别取默认，留给它 None。
     community_section = community_section or "text"
     # vendor 自己按菜单/详情分别取默认，所以只有它保留 None（见上面那段注释）。
-    limit = limit if intent == "vendor" else positive_or_default(limit, _WORLD_LIMIT_DEFAULT)
+    # rotations 一屏要给 10 条特色突袭/地牢 + 夜幕/宗师 + 三张表，默认 30 行（见 _WORLD_ROTATION_LIMIT）。
+    world_default = _WORLD_ROTATION_LIMIT if intent in WORLD_ROTATION_INTENTS else _WORLD_LIMIT_DEFAULT
+    limit = limit if intent == "vendor" else positive_or_default(limit, world_default)
 
     if intent == "community":
         result = _community_read(
@@ -1334,21 +1159,20 @@ async def world_assistant(
             section=community_section, limit=limit, offset=offset,
         )
         return ok_response("已读取 Starside 社区资料。", result, warnings=[
-            "这是社区机制资料；数值和版本可能变化，回答中会保留来源路径或页面与更新时间。"
-        ])
+            "这是社区机制资料；数值和版本可能变化，回答中会保留来源路径或页面与更新时间。"])
 
     if intent == "weekly":
         result = await svc["weekly_analysis_svc"].summarize_weekly_reset(limit=limit)
-        return ok_response(
-            result["summary"],
-            {"weekly": result["weekly"]},
-            next_actions=result["next_actions"],
-            warnings=result["warnings"],
-        )
+        return ok_response(result["summary"], {"weekly": result["weekly"]},
+                           next_actions=result["next_actions"], warnings=result["warnings"])
+
+    if intent in WORLD_ROTATION_INTENTS:
+        result = await svc["rotation_svc"].rotations(resolve_player_name(player_name), limit=limit)
+        return rotation_branches.rotations_payload(result)
 
     if intent == "weekly_full":
         result = await svc["weekly_svc"].get_weekly_reset()
-        return ok_response("已读取完整周常。", {"weekly": _dump(result)})
+        return ok_response("已读取完整周常。", {"weekly": dump(result)})
 
     if intent == "vendor":
         resolved = resolve_player_name(player_name)
@@ -1358,18 +1182,12 @@ async def world_assistant(
             vendor_name,
             limit=limit,
         )
-        vendors = _dump(result)
+        vendors = dump(result)
         payload: dict[str, Any] = {"vendors": vendors}
         if result.mode == "detail":
-            payload["farming_list"] = _farming_reference(
-                svc.get("starside_svc"), _sale_item_names(vendors)
-            )
-        return ok_response(
-            result.question or "已读取商人库存。",
-            payload,
-            next_actions=result.next_actions,
-            warnings=result.warnings,
-        )
+            payload["farming_list"] = _farming_reference(svc.get("starside_svc"), _sale_item_names(vendors))
+        return ok_response(result.question or "已读取商人库存。", payload,
+                           next_actions=result.next_actions, warnings=result.warnings)
 
     if intent == "search_collectible_nodes":
         result = svc["collection_svc"].search_collectible_nodes(query, limit)
@@ -1378,22 +1196,13 @@ async def world_assistant(
     if intent == "collectible_node":
         resolved = resolve_player_name(player_name)
         result = await svc["collection_svc"].get_collectible_node_status(
-            resolved,
-            collectible_node_hash,
-            character or None,
-            include_invisible,
-            limit,
-        )
+            resolved, collectible_node_hash, character or None, include_invisible, limit)
         return ok_response(result.get("message", "已读取收藏品节点。"), result)
 
     if intent == "collectible_item":
         resolved = resolve_player_name(player_name)
         result = await svc["collection_svc"].get_collectible_item_status(
-            resolved,
-            item_name,
-            character or None,
-            limit,
-        )
+            resolved, item_name, character or None, limit)
         return ok_response(result.get("message", "已读取收藏品状态。"), result)
 
     return error_response(ErrorCode.UNSUPPORTED_INTENT, f"world_assistant 不支持 intent={intent!r}。")

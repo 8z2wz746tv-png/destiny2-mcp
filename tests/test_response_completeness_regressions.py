@@ -74,7 +74,7 @@ def test_catalog_without_truncation_says_so_too() -> None:
 class _WeaponManifest:
     """随机 roll 武器（有随机池）：god_roll 才会走愿单分支。"""
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [{"itemHash": 100, "name": "测试武器", "itemType": 3}]
 
     def get_item_definition(self, item_hash: int) -> dict:
@@ -142,7 +142,7 @@ async def test_god_roll_with_unparsable_entry_explains_instead_of_empty_shell() 
 class _CatalystManifest:
     """传说武器：sockets 里全是 v400 通用大师杰作词条。"""
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [{"itemHash": 500, "name": query, "itemType": 3}]
 
     def get_item_definition(self, item_hash: int) -> dict:
@@ -174,7 +174,7 @@ def test_catalyst_note_names_the_weapon_not_the_identity_block() -> None:
     """
 
     class _Manifest:
-        def search(self, query: str, *, limit: int = 20) -> list[dict]:
+        def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
             return [{"itemHash": 100, "name": "测试异域", "itemType": 3}]
 
         def get_item_definition(self, item_hash: int) -> dict:

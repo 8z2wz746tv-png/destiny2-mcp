@@ -80,12 +80,20 @@ def _manifest() -> ManifestManager:
     return manager
 
 
+def _all_tuning_hashes(manifest=None) -> tuple[int, ...]:
+    """夹具里的件**允许装全部调谐**（真实清单来自组件 310，每件只有 6 颗）。"""
+    from destiny_mcp.build.tuning import tuning_catalog
+
+    return tuple(choice.plug_hash for choice in tuning_catalog(manifest or _manifest()))
+
+
 def _armor(
     slot: str,
     values: dict[str, int],
     *,
     item_hash: int = T5_ARMOR_HASH,
     tuning: int | None = None,
+    legal: tuple[int, ...] | None = None,
 ) -> Armor:
     rounded = {name: values.get(name, 0) for name in STAT_NAMES}
     return Armor(
@@ -97,6 +105,8 @@ def _armor(
         armor_system="armor_3",
         gear_tier=5,
         tuning_mod_hash=tuning,
+        # `legal=None` = 夹具不模拟组件 310，显式声明"全部允许"；真机那份逐件清单用 legal 传
+        tuning_option_hashes=_all_tuning_hashes() if legal is None else legal,
     )
 
 
@@ -223,8 +233,10 @@ def test_rescue_closes_a_five_point_gap_and_reports_the_change() -> None:
     assert rescue.plan.change_count == 1
     change = rescue.plan.changes[0]
     assert change.increased == "grenade"
-    # 这件护甲的近战本来就是 0，−5 打上去白给：不用牺牲任何非零项
-    assert change.decreased == "melee"
+    # 被牺牲的必须是**没有目标**的那一项（这件上是 生命/职业/超能/近战 之一）。
+    # 具体挑哪一件由捐赠代价排序决定 —— 别写死某一件（2026-09-22：去掉"−5 打在 0 上白给"
+    # 那个夹 0 口径之后，这一项从 近战 变成了 生命，两者都合法）。
+    assert change.decreased in {"health", "class_stat", "super_stat", "melee"}
     # 复核后的六维必须真的到 55
     stats = list(rescue.armor_set.stats)
     assert stats[STAT_INDEX["grenade"]] == 55
@@ -297,13 +309,15 @@ async def test_solve_with_tuning_returns_untouched_when_targets_are_met() -> Non
     snapshot = _snapshot(armors)
     compute = _FakeCompute()
 
-    pool, plans = await solve_with_tuning(
+    outcome = await solve_with_tuning(
         compute, snapshot, BuildConstraints(grenade_min=40), manifest
     )
 
     assert len(compute.calls) == 1, "达标时不该再解第二遍"
-    assert plans == {}
-    assert pool and pool[0].stats[STAT_INDEX["grenade"]] == 50
+    assert outcome.tuning_map == {}
+    assert outcome.rescued is False
+    assert outcome.coverage.exhaustive is True, "枚举跑完了才敢说'没有满足下限的方案'"
+    assert outcome.pool and outcome.pool[0].stats[STAT_INDEX["grenade"]] == 50
 
 
 @pytest.mark.asyncio
@@ -314,13 +328,14 @@ async def test_solve_with_tuning_rescues_a_five_point_gap() -> None:
     compute = _FakeCompute()
     constraints = BuildConstraints(grenade_min=55)
 
-    pool, plans = await solve_with_tuning(compute, snapshot, constraints, manifest)
+    outcome = await solve_with_tuning(compute, snapshot, constraints, manifest)
 
     assert len(compute.calls) == 2, "没达标时要用放宽后的目标再解一遍"
     assert compute.calls[1].grenade_min == 30  # 55 − 25
-    assert len(plans) == 1
-    assert pool and list(pool[0].stats)[STAT_INDEX["grenade"]] == 55
-    assert sets_meet_targets(pool, constraints) is True
+    assert outcome.rescued is True
+    assert len(outcome.tuning_map) == 1
+    assert outcome.pool and list(outcome.pool[0].stats)[STAT_INDEX["grenade"]] == 55
+    assert sets_meet_targets(outcome.pool, constraints) is True
 
 
 @pytest.mark.asyncio
@@ -331,12 +346,12 @@ async def test_solve_with_tuning_keeps_the_original_pool_when_it_cannot_help() -
     compute = _FakeCompute()
     constraints = BuildConstraints(grenade_min=100)
 
-    pool, plans = await solve_with_tuning(compute, snapshot, constraints, manifest)
+    outcome = await solve_with_tuning(compute, snapshot, constraints, manifest)
 
-    assert plans == {}
+    assert outcome.tuning_map == {}
     # 这份替身 Manifest 里没有属性模组，所以严格解本身就会被剪掉（pool 为空也正常）；
     # 关键是：没救回来时不能凭空造方案，也不能报"达标"。
-    assert sets_meet_targets(pool, constraints) is False
+    assert sets_meet_targets(outcome.pool, constraints) is False
 
 
 # ── 供"无解"阶梯引用的额度证据 ───────────────────────────────────────
@@ -564,13 +579,44 @@ def test_pick_and_rescue_verifies_only_the_top_k(monkeypatch) -> None:
     ), "排序要按残差从小到大，复核只做最值得的前 K 套"
 
 
-def test_tuning_plan_flags_but_never_ships_plugs_as_writable_mods() -> None:
-    """两条不变量（实机语料第 ⑩ 行抓到的回归）：
+def test_tuning_allowed_compares_hashes_unsigned() -> None:
+    """`tuning_is_allowed` 两边过 `to_unsigned`：真机那一对（-268553035 / 4026414261）。
+
+    组件的 310 清单来自 profile（无符号），而 `manifest.search` 给有符号 —— 裸 `in`
+    会把清单里有的调谐判成"装不到这件上"（真机：光芒领主面具 6917530188460608169）。
+    这条守门钉的是**两个方向**都成立，免得以后有人把它改回集合成员判断。
+    """
+    from destiny_mcp.build.models import (
+        tuning_is_allowed,
+        tuning_options_from_reusable,
+    )
+
+    unsigned = 4026414261
+    signed = -268553035
+    assert signed & 0xFFFFFFFF == unsigned, "这一对就是同一个 hash 的两种写法"
+
+    assert tuning_is_allowed((unsigned,), signed) is True
+    assert tuning_is_allowed((signed,), unsigned) is True
+    assert tuning_is_allowed((unsigned,), unsigned) is True
+    assert tuning_is_allowed((673231129,), signed) is False
+    assert tuning_is_allowed((), signed) is False, "空清单 = 读不到，由调用方决定拦不拦"
+
+    # 源头也统一写法：310 那行即便写成有符号，出来的清单也必须是无符号
+    # 类别用真机那个调谐 plug 类别 hash（3481777685），免得夹具类别对不上、清单被判成"读不到"
+    rows = {"plugs": {"2": [{"plugItemHash": signed}]}}
+    category = 3481777685
+    options = tuning_options_from_reusable(rows, lambda _h: category, category)
+    assert options == (unsigned,), f"清单源头要统一成无符号：{options}"
+
+
+def test_tuning_plan_ships_only_the_tunings_the_piece_allows() -> None:
+    """调谐**能执行**之后的两条不变量：
 
     1. 靠调谐才达标的方案，`requires_tuning` 必须是 True、`tuning_changes` 必须有内容
-       （以前按"有没有插件要写"算，调谐不可写之后就恒为 False）；
-    2. `canonical_build.items[].mods` **不能**夹带调谐插件 —— Bungie 只允许游戏内改，
-       写进去只会让 equip_build 失败或少做一步。
+       （以前按"有没有插件要写"算，调谐不可写那阵子恒为 False —— 实机语料第 ⑩ 行抓到的回归）；
+    2. `canonical_build.items[].mods` 里**带上这颗调谐**（执行器按插件类别找槽，调谐槽本来就是插槽），
+       但**只带这件护甲允许的**（组件 310 清单）—— 清单外的一律不进计划，
+       否则等于让 `equip_build` 去撞 1675。
     """
     from destiny_mcp.build.constraints import parse as parse_constraints
     from destiny_mcp.build.models import BuildRequest
@@ -616,6 +662,28 @@ def test_tuning_plan_flags_but_never_ships_plugs_as_writable_mods() -> None:
     top = results[0]
     assert top.requires_tuning is True
     assert top.tuning_changes and top.tuning_changes[0]["to"]["name"] == "+手雷 / -职业"
-    assert "只能在游戏内" in top.tuning_note
+    # 话术：不再是"要你进游戏手动改"，而是"确认后一起改"
+    assert "一起改" in top.tuning_note
+    assert "手动改" not in top.tuning_note
     mods = [mod for item in top.canonical_build.items for mod in item.mods]
-    assert 1922571986 not in mods, "调谐插件不许进 canonical_build 的 mods"
+    assert 1922571986 in mods, "清单允许的调谐必须进可执行计划"
+
+    # 反面：这件护甲**不允许**这颗 → 计划里不许出现它（宁可少做一步，也不撞 1675）
+    restricted = _armor("helmets", {"grenade": 50, "weapons": 40}, legal=(EMPTY_TUNING_PLUG_HASH,))
+    restricted_set = _set_from([restricted, *armors[1:]])
+    restricted_context = ResultContext(
+        parsed=parsed,
+        request=BuildRequest(character_class="hunter", grenade_target=55),
+        manifest=manifest,
+        class_type="hunter",
+        snapshot_version="test",
+        bonus_vector=[0] * 6,
+        tuning={(("inst-chests", "inst-class_items", "inst-gauntlets", "inst-helmets", "inst-legs")): plan},
+    )
+
+    restricted_top = build_results([restricted_set], restricted_context)[0]
+    restricted_mods = [
+        mod for item in restricted_top.canonical_build.items for mod in item.mods
+    ]
+    assert 1922571986 not in restricted_mods, "清单外的调谐不许进计划"
+    assert restricted_top.requires_tuning is True, "方案本身仍然标着「要改调谐才达标」"

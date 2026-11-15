@@ -28,7 +28,7 @@ from ..utils.hash_utils import to_unsigned
 from .item_parser import parse_items_from_profile
 from .account_action_lock import account_action_lock, serialized_account_action
 from . import write_readback
-from .equip_planner import load_plan_request, plan_equip
+from .equip_planner import item_traits, load_plan_request, plan_equip
 from .inventory_service import (
     MISSING_INVENTORY_SCOPE_MESSAGE,
     looks_like_missing_inventory_scope,
@@ -476,6 +476,25 @@ class TransferService:
             ),
         }
 
+    def _equipped_by_equip_slot(
+        self, profile: dict, char_id: str, class_type: int, slots: set[str]
+    ) -> dict[str, InventoryItem]:
+        """这些**装备槽**现在装着哪一件（键是 `item_traits` 给的槽位键）。
+
+        以前回滚/回读按 `item.slot` 认部位 —— 那是**护甲专用**的键，武器一律是空串，于是
+        计划里一旦出现武器步骤（顶下一把异域武器再装目标），回滚与"账号现在什么样"都会把它
+        整个漏掉。槽位口径与规划层共用 `item_traits`，两者不会再各判一套（ADR-011）。
+        """
+        equipped_keys = self._equipped_keys(profile, char_id)
+        found: dict[str, InventoryItem] = {}
+        for item in self._character_armor(profile, char_id, class_type):
+            if item.item_instance_id not in equipped_keys:
+                continue
+            slot_key = item_traits(self._manifest, item)[0]
+            if slot_key and slot_key in slots:
+                found.setdefault(slot_key, item)
+        return found
+
     async def _worn_by_slot(
         self, mid: str, mtype: int, char_id: str, class_type: int, slots: set[str]
     ) -> dict[str, str]:
@@ -483,11 +502,11 @@ class TransferService:
         profile = await self._resolver.get_profile(
             mid, mtype, profile_components.ARMOR_SNAPSHOT
         )
-        equipped_keys = self._equipped_keys(profile, char_id)
         return {
-            item.slot: item.item_instance_id
-            for item in self._character_armor(profile, char_id, class_type)
-            if item.item_instance_id in equipped_keys and item.slot in slots
+            slot: item.item_instance_id
+            for slot, item in self._equipped_by_equip_slot(
+                profile, char_id, class_type, slots
+            ).items()
         }
 
     async def _rollback_worn(
@@ -524,16 +543,10 @@ class TransferService:
         profile = await self._resolver.get_profile(
             mid, mtype, profile_components.ARMOR_SNAPSHOT
         )
-        equipped_keys = self._equipped_keys(profile, char_id)
-        items = self._character_armor(profile, char_id, class_type)
-        worn = {
-            item.slot: item.name
-            for item in items
-            if item.item_instance_id in equipped_keys and item.slot in slots
-        }
+        worn = self._equipped_by_equip_slot(profile, char_id, class_type, slots)
         if not worn:
             return "相关部位没读到装备（上游可能还在同步）"
-        return "、".join(f"{slot}={name}" for slot, name in sorted(worn.items()))
+        return "、".join(f"{slot}={item.name}" for slot, item in sorted(worn.items()))
 
     # ── Equip ────────────────────────────────────────────────────────
 

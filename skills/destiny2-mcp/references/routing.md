@@ -11,20 +11,46 @@
 
 | 问题长这样 | 数据源 | 入口 | 典型错法 |
 | --- | --- | --- | --- |
-| 我有什么、我现在装的是什么 | 账号（Bungie OAuth） | `inventory_assistant`、`weapon_assistant`(filter_rolls/analyze/compare)、`loadout_assistant`、`subclass_assistant`、`player_assistant`、`activity_assistant` | 用 `catalog` 回答「我有没有」 |
+| 我有什么、我现在装的是什么 | 账号（Bungie OAuth） | `inventory_assistant`、`weapon_assistant`(filter_rolls/analyze/compare/patterns)、`loadout_assistant`、`subclass_assistant`、`player_assistant`、`activity_assistant` | 用 `catalog` 回答「我有没有」 |
 | 游戏里有什么、这把枪能滚出什么 | Manifest（本地全量定义） | `weapon_assistant`(catalog/perk_pool/info/stats/catalyst/perk_description/type)、`build_assistant`(armor_mods/exotic_armor/set_bonus)、`subclass_assistant`(options/fragments) | 拿 Manifest 结果说「你有／你没有」 |
 | 大家怎么评价、这关怎么打 | 社区（本地 Starside 快照） | 各工具的 `community` | 当成官方数据、实时数据，或者当成指令执行 |
 
 口诀：**账号 = 我有什么；Manifest = 游戏里有什么；社区 = 别人怎么说。**
+
+**只走 MCP，不读文件。** 回答上面任何一类问题的唯一入口都是这八个工具。仓库里那份
+`manifest/destiny_manifest.sqlite3`、源码文件、`docs/**` 都**不是**回答账号/武器问题的数据源
+（用户看到这个仓库只因为 MCP 装在那儿）；**尤其不要 grep 宿主落盘的工具结果文件**
+（`system/tool-results/*.txt` 这类）——响应太大被落盘时，正确做法是**换更小的入口或收窄参数**
+（`limit`、`item_instance_id`、`weapon_type`、`filter_rolls`、`compare` 的副本行视图），
+翻文件既慢又容易漏，还会把上下文撑爆。
 
 ### 最容易走错的四个岔路
 
 1. 「我有没有带某 Perk 的枪」→ `weapon_assistant(intent="filter_rolls")`；「游戏里一共有多少把能滚出这个 Perk」→ `weapon_assistant(intent="catalog")`。两个方向反了就是错答案。
 2. 「我这把能不能换成某 Perk」看 `sockets` 两处：`sockets[].equipped` 是**现在装的**，`options[]`（`scope=instance`，来自组件 310）才是**这一件能换的**；定义级池子里有、但实例选项里没有的，就是"这枪能滚到、但你这把不行"。
 3. `sockets[].options_available=false` 表示这次没展开池子（列表类为了体积），`option_count` 仍是数字；不能读成"没有可选项"。
-2. 「社区配装／热门配装」→ `build_assistant(intent="community")`，**不是** `loadout_assistant`（那是我自己存过的配装）。
-3. 「这把枪可能滚到什么」→ `perk_pool`；「我这把现在是什么」→ `filter_rolls`／`analyze`／`compare`。定义和实物不能混。
-4. 「这个 Perk 什么效果」→ `perk_description`，**不得按名字推断效果**。
+4. 「社区配装／热门配装」→ `build_assistant(intent="community")`，**不是** `loadout_assistant`（那是我自己存过的配装）。
+5. 「这把枪可能滚到什么」→ `perk_pool`；「我这把现在是什么」→ `filter_rolls`／`analyze`／`compare`。定义和实物不能混。
+6. 「这个 Perk 什么效果」→ `perk_description`，**不得按名字推断效果**。
+
+### 判「留哪把」的口径（真机被用户抓过一次）
+
+- **必须看每个可切换栏的全部 `options`**（组件 310），不是只看 `equipped`：T5 武器每个特性栏能在
+  3 个固定 perk 间切换，三、四号位共 6 个 —— 只看当前那颗会把「能切成 god roll」的枪误判成垃圾。
+- 一次拿全的入口：`weapon_assistant(intent="compare", weapon_name=…)`（**不给** `item_instance_id`）
+  返回**副本行视图**：每行一把 × 只列有得选的栏 × `equipped` + 全部 `options`（带 `recommended`）。
+  不要一把一次地拉（真机 19 把拉 19 次，还差点去 grep 落盘文件）。
+- 要看某一个副本的完整明细（固定栏、可换件、评分）才传 `item_instance_id`。
+- 光等低、重复、活动可刷**都不是**"该弃"的理由；没有 perk 依据就不要给取舍结论，先把 options 拿到。
+
+### 邮政官（`postmaster`）三条
+
+1. 列清单：`inventory_assistant(intent="get", location="postmaster")`（也认 `邮政官`/`邮政长`）。
+   它**不是**角色名，也不在"角色身上"的清单里 —— `location` 传别的值会被拒并列出合法取值。
+2. 邮政官里的东西**不在身上**：`equip`/`move` 都会被上游拒，先
+   `inventory_assistant(intent="pull_postmaster", item_instance_id=…)` 取回到角色身上。
+3. 邮政官的副本**读不到"现在装着哪颗"**（组件 305 不给这些实例的插槽），但**可切换项（组件 310）
+   能读** —— 所以判"留哪把"用 `compare` 的副本行视图照常可行；要报"当前是什么 roll"得先取回。
 
 ## 二、逐个工具：intent 索引
 
@@ -68,7 +94,7 @@
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
-| `equip_mod` | 给一件护甲换一个模组：先返回「哪件、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写。**调谐是个例外**：Bungie 只允许游戏内改（实测 `This action can only be done in-game.`），所以调谐只给方案（`writable=false`/`written=false` + warning），`confirmed=true` 也不会写 | `item_instance_id`、`mod_name`、`character` |
+| `equip_mod` | 给一件护甲换一个模组：先返回「哪件、哪个槽、从什么换成什么、能量怎么变」的确认请求，确认后才写。**调谐同一条路**：判据是那颗在不在**这件护甲允许的清单**里（组件 310）。在 → `writable=true`，`confirmed=true` 就写（实测不花材料、回读核对）；不在 → `writable=false` + 原因（上游回 1675「这颗装不到这件上」，不是「你没材料」） | `item_instance_id`、`mod_name`、`character` |
 | `move` | 移动物品，可顺带装备 | `item_name`、`destination`、`equip`、`from_character`、`item_instance_id` |
 | `transfer` | 按实例 ID 转移到指定角色 | `item_instance_id`、`to_character`、`from_character` |
 | `equip` | 按实例 ID 装备到指定角色 | `item_instance_id`、`character` |
@@ -85,7 +111,7 @@
   它**只存在于副本上**（组件 300 的 `gearTier`），定义里没有：`info`／`perk_pool`／`god_roll`／
   `popularity` 拿不到它（连键都没有），必须读账号：
   `weapon_assistant(intent="analyze")` → `inventory.instances[].weapon.gear_tier`；
-  `weapon_assistant(intent="type")` → `weapons.items[].weapon.gear_tier`；
+  `weapon_assistant(intent="type")` → `weapons.items[].gear_tier`（列表行的身份字段是摊平的）；
   `weapon_assistant(intent="compare")` → `comparison.instances[].weapon.gear_tier`。
   **`null` 表示"不在分级体系内"**（组件里是 `gearTier=0`，旧装备或不属于分级的武器），
   **不是 T0**；响应里会附一句说明。
@@ -132,8 +158,8 @@ Manifest 侧（**不代表拥有**）：
 | `info` | 武器完整定义（定义级 `sockets` + `stats` + 清单块） | `weapon_name` |
 | `stats` | 基础属性数值（`{weapon, stats[]}`，顺序按 Bungie 的属性组） | `weapon_name` |
 | `catalyst` | 催化剂情况（`weapon` 为身份块 + `unlock_state=not_checked`） | `weapon_name` |
-| `perk_description` | 单个 Perk 的效果（`{perk, community_references}`） | `perk_name` |
-| `type` | 按武器类型列**我持有的**武器（`weapons.items[]`：身份块 + 列计数 `sockets` + 实例 `options`） | `weapon_type`、`limit` |
+| `perk_description` | 单个 Perk 的效果（`{perk, community_references}`） | `perk_name` |（`starside` 块是作者给的 perk 层结构化注记：实机细节/属性变化/冷却/来源 + 套装与反查；`community_references` 是页面正文，两者分工不同）
+| `type` | 按武器类型列**我持有的**武器（`weapons.items[]` 是**列表行**：身份 + 位置/光等 + `stats`，**不带** `sockets`/`options`）。**默认 10 件**，响应给 `total`/`returned`/`truncated`/`offset`/`next_offset`。要看某一件的插槽与可换部件用 `compare(weapon_name, item_instance_id)` | `weapon_type`、`limit`、`offset` |
 | `god_roll` | 社区愿单里的推荐 roll（`{weapon, sockets, god_roll}`；固定武器给固定内容） | `weapon_name` |
 
 账号侧（当前副本）：
@@ -141,9 +167,10 @@ Manifest 侧（**不代表拥有**）：
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
 | `filter_rolls` | 在账号持有副本里筛 Perk（行是精简身份块 + `perks` 当前插槽） | `weapon_name`、`weapon_type`、`required_perks`、`perk_name`、`any_perks`、`excluded_perks`、`include_inventory`、`limit` |
-| `analyze` | 定义＋我持有的副本（`weapon`/`sockets`/`stats`/`god_roll`/`inventory`） | `weapon_name`、`include_inventory` |
+| `analyze` | 定义＋我持有的副本（`weapon`/`sockets`/`stats`/`god_roll`/`inventory`） | `weapon_name`、`include_inventory` |（`starside` 块是 Starside 作者给的社区推荐/评语：两套评级各自成字段、带出处与缺口说明，缺数据时 `available=false` + `reason`，不当事实用）
 | `compare`（`compare_duplicates`） | 对比同名副本，给留哪把的建议（每个副本 = `{weapon, sockets, options, stats}`） | `weapon_name`、`item_instance_id` |
 | `popularity`（`selection_rates`、`perk_selection`、`selection`、`usage_rates`） | Perk 选取率快照（快照当时的数据，与当前 Manifest 数值分开标注） | `weapon_name` |
+| `patterns`（`pattern`、`craft`、`锻造`、`锻造武器`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`） | **锻造武器模式**：图鉴「模式和催化」里武器模式那一页（共 183 条可锻造武器），给每条的**进度**（游戏里那条「模式进度 4/5」）、还差几个红框萃取、需求次数与掉落来源。玩家说的「红框」= 深视共振武器（在它上面萃取涨的就是这里的进度）；游戏官方中文叫「模式」，第三方工具常译作「图样」。`counts` 是账号口径（组件 900），`sources` 是社区资料（带页面与更新时间）；**默认 20 条** + `next_offset`。`未开始` = 账号里没有这条记录（不是 0/5）。`by_tier` 给稀有度汇总，**别把第一页（默认 20 条）里看到的金枪数当成总数**——金枪一共十几把，要「全部金枪图样」就传 `rarity="异域"`（一次拿全）。**只答进度**：不查「包里有哪些红框」，也不管异域催化 | `weapon_name`、`weapon_type`、`rarity`、`limit`、`offset` |
 
 社区：
 
@@ -160,7 +187,7 @@ Manifest 侧（**不代表拥有**）：
 | `recommend` | 按分数排序的推荐（含 `completion_rate`）；**不带**可执行载荷，无解时会给 `ladder` | 同上 |
 | `analyze` | 无解时诊断差在哪 | 同上 |
 | `farm_target` | 反推该刷哪件护甲 | `replacement_slot`、`baseline`、`max_replacements`、`set_bonus_name`、`set_bonus_count`、`character` |
-| `equip_build` | 装备**服务端签发**的候选（写入） | `canonical_build`、`character`、`confirmed` |
+| `equip_build` | 装备**服务端签发**的候选（写入） | `canonical_build` **或** `execution_id`（二选一）、`character`、`confirmed` |
 | `armor_mods` | 护甲模组列表，带 `match` 说明本次筛选口径 | `priority_stat`（属性筛选：weapons/health/class_stat/grenade/super_stat/melee，或中文名） |
 | `exotic_armor` | 异域护甲列表或详情 | `exotic_name`、`character` |
 | `set_bonus` | 套装 2 件／4 件效果 | `set_bonus_name` |
@@ -191,14 +218,26 @@ Manifest 侧（**不代表拥有**）：
 只给优先级、不给硬目标时 `completion_rate` 会是 `null`（附 `completion_rate_note`）——
 那不代表"一个都没满足"。
 
+**上限（`stat_caps`）是软的**：想说"手雷别超过 100"就传 `stat_caps={"super_stat": 100}` 这种形式；
+超了照样出解，但会排到没超的方案后面，并在 `max_violations` 里逐项标出来
+（`{stat,label,actual,max}`）—— 所以**别把 `max_violations` 当失败**，它只是"这套不理想"。
+不传 = 不限。
+
+**`data.reachable` 是保守下界**：那是"其余属性仍满足下限时，这一项**已验证能到**多少"，
+且**逐项可达 ≠ 同时达到**（六个数放在一起不构成一套配装）。真机实测它报 120 而把下限写成 130
+时确实能到 130 —— 所以**要顶上去就把目标写成下限**（可再加优先级），别拿 `reachable` 当上限说事。
+
+**0 候选必须自证搜完了**：`data.search = {exhaustive, combos, truncated_by}`；只有
+`exhaustive=true` 才能说"配不出来"，没搜完时 `ladder.verdict.satisfiable` 是 `null`。
+
 指定 `exotic_name` 的首次查询**必须**返回候选并等玩家确认，重试时原样回传 `confirmed_exotic_hash` 与 `exotic_confirmation_token`，其它参数不得丢失。`community_build_id` 只对 `community` 有效，传给别的 intent 会被拒绝。
 
 ### `loadout_assistant` —— 我存过的配装
 
 | intent | 做什么 | 关键参数 |
 | --- | --- | --- |
-| `list` | 我的配装列表（官方槽位＋本地配装分开标注） | `character` |
-| `get` | 配装列表，和 `list` 走同一个分支、返回同样内容 | `character` |
+| `list` | 我的配装**清单行**（官方槽位＋本地配装分开标注；每行给 `loadout_id`、角色、槽位号、件数、金装、套装、`execution_supported`）。**不带完整模板**（以前一次 121 KB） | `character`、`limit`、`offset` |
+| `get` | 一套或一页配装的**完整模板**（逐件装备/模组/子职业） | `character`、`loadout_id`（只取那一套）、`limit`、`offset` |
 | `save` | 保存配装（写入） | `name`、`character`、`notes` |
 | `delete` | 删除配装（写入） | `loadout_id` |
 | `equip_loadout` | 换上已存配装（写入） | `loadout_id` |
@@ -258,6 +297,7 @@ Manifest 侧（**不代表拥有**）：
 | `collectible_node` | 某个节点的解锁状态 | `collectible_node_hash`、`character`、`include_invisible`、`limit` |
 | `collectible_item` | 某件物品的收藏品状态 | `item_name`、`character`、`limit` |
 | `community` | 社区机制／来源资料，**唯一能跨分类搜的入口** | `query`、`community_category`、`knowledge_id`、`community_section`、`limit`、`offset` |
+| `rotations`（`轮换`、`周常轮换`、`这周`） | **周常轮换表**：本周特色突袭/地牢（官方里程碑，带起止时间）、本周夜幕/宗师（**哪个打击 + 词缀 + 掉落**，来自角色活动组件 204）、上维挑战与异域任务（本周+下周，自维护周期表）、泉源（今天+明天，日循环）。每行带 `source`：`official` = 官方口径，`schedule` = 我们自己排的表（带 `verified_at`/`verified_against`）。**遗失区域的顺序表还没核对过，只给候选、不给「今天是谁」** | `player_name`、`limit` |
 
 商人查询分两步，响应里的 `mode` 直接写明是哪一种：
 
@@ -280,6 +320,20 @@ Manifest 侧（**不代表拥有**）：
 判据是「行为上读没读」，不是「签名里有没有」：传了不改变任何结果的参数一律算没人认。
 
 **有没有传**只按「是不是空值」判断：`null`／`""`／`0`／`false`（也就是签名默认值）算没传，宿主把 schema 默认值一起发过来（`confirmed=false`、`offset=0`）不会被拒；**任何具体值都算传了**，在不读它的 intent 上会拿到 `ignored_parameter`。所以 `limit=12`、`locked=true`、`slot_number=1` 这些既是默认值又是合法请求的值不会被静默吞掉 —— 签名默认值统一是 `null`，真正的默认条数在工具内部补。
+
+**只发标量的宿主怎么写结构化参数**（实测：豆包 connector 转发工具调用时只序列化标量，`list[str]`／`dict` 参数根本送不到服务端）。这类宿主把同一件事写成文本即可，两种形态在 schema 里并列：
+
+| 参数 | 结构化形态 | 文本形态 |
+| --- | --- | --- |
+| `required_perks`／`any_perks`／`excluded_perks` | `["亡者复仇", "速射"]` | `"亡者复仇,速射"` |
+| `priority_stats` | `["weapons", "grenade"]` | `"weapons,grenade"` |
+| `fragment_names` | `["保护之光", "聚焦打击"]` | `"保护之光,聚焦打击"` |
+| `item_instance_ids` | `["6917…", "6918…"]` | `"6917…,6918…"` |
+| `stat_caps` | `{"grenade": 100}` | `"grenade=100,melee=90"` |
+| `changes` | `{"super": "金色枪"}` | `"super=金色枪"` |
+| `canonical_build` | 整块候选 | 改用 `execution_id`（候选行顶层就有这个标量） |
+
+分隔符认半角/全角逗号、顿号、分号与换行；键值之间认 `=`、`:`、`：`。写法不对会返回 `invalid_arguments` 并给出可照抄的例子（不会静默少一半条件）。空串按「没传」处理，与 `null` 同一条规则。
 
 下面这张表由 `destiny_mcp/tools/_param_contracts.py` 生成，测试保证文档与代码逐字一致：
 
@@ -308,17 +362,20 @@ Manifest 侧（**不代表拥有**）：
 | `element` | `subclass_assistant`：`community`、`fragments`、`options` |
 | `equip` | `inventory_assistant`：`move` |
 | `excluded_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
+| `execution_id` | `build_assistant`：`equip_build` |
 | `exotic_confirmation_token` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `exotic_name` | `build_assistant`：`analyze`、`exotic_armor`、`farm_target`、`find`、`recommend` |
 | `fragment_name` | `subclass_assistant`：`community`、`fragment_details` |
 | `fragment_names` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `from_character` | `inventory_assistant`：`move`、`transfer` |
+| `functional_mods` | `build_assistant`：`find`、`recommend` |
 | `grenade_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `group_id` | `activity_assistant`：`clan_leaderboards` |
 | `health_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `icon_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
 | `include_inventory` | `build_assistant`：`community`、`community_build`、`starside`；`weapon_assistant`：`analyze`、`filter_rolls` |
 | `include_invisible` | `world_assistant`：`collectible_node` |
+| `include_profile` | `player_assistant`：`find`、`find_players`、`fuzzy` |
 | `include_subclass_fragment` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `item_instance_id` | `inventory_assistant`：`equip`、`equip_mod`、`item`、`lock`、`move`、`pull_postmaster`、`quest_tracking`、`track_quest`、`transfer`；`weapon_assistant`：`compare`、`compare_duplicates` |
 | `item_instance_ids` | `inventory_assistant`：`equip_items`、`equip_many` |
@@ -326,8 +383,8 @@ Manifest 侧（**不代表拥有**）：
 | `item_type` | `inventory_assistant`：`get`、`inventory`、`list`、`search_type`、`summarize`、`summary`、`type`、`概况` |
 | `kind` | `loadout_assistant`：`search_identifiers` |
 | `knowledge_id` | `activity_assistant`：`community`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
-| `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`summarize`、`summary`、`概况`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`search_all`、`search_catalog`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`community`、`search_collectible_nodes`、`vendor`、`weekly` |
-| `loadout_id` | `loadout_assistant`：`delete`、`equip_loadout` |
+| `limit` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`summarize`、`summary`、`概况`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`all_weapons`、`catalog`、`community`、`craft`、`filter_rolls`、`global`、`pattern`、`patterns`、`search_all`、`search_catalog`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：除 `weekly_full` 外全部 |
+| `loadout_id` | `loadout_assistant`：`delete`、`equip_loadout`、`get`、`list` |
 | `location` | `inventory_assistant`：`find_item`、`get`、`inventory`、`list`、`search`、`search_type`、`summarize`、`summary`、`type`、`概况`；`weapon_assistant`：`filter_rolls` |
 | `locked` | `inventory_assistant`：`lock` |
 | `max_replacements` | `build_assistant`：`farm_target` |
@@ -339,20 +396,21 @@ Manifest 侧（**不代表拥有**）：
 | `name_hash` | `loadout_assistant`：`snapshot_official`、`update_official_identifiers` |
 | `name_prefix` | `player_assistant`：`find`、`find_players`、`fuzzy` |
 | `notes` | `loadout_assistant`：`save` |
-| `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`community`；`world_assistant`：`community` |
+| `offset` | `activity_assistant`：`community`；`build_assistant`：`community`、`community_build`、`starside`；`inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`get`、`inventory`、`list`、`重复武器`；`loadout_assistant`：`get`、`list`；`subclass_assistant`：`community`；`weapon_assistant`：`community`、`craft`、`pattern`、`patterns`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：`community` |
 | `period` | `activity_assistant`：`career`、`counters`、`historical_stats`、`stats` |
 | `perk_name` | `weapon_assistant`：`all_weapons`、`catalog`、`community`、`filter_rolls`、`global`、`perk_description`、`search_all`、`search_catalog` |
-| `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact`、`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`filter_rolls`、`type`；`world_assistant`：`collectible_item`、`collectible_node`、`vendor` |
+| `player_name` | `activity_assistant`：除 `clan_leaderboards`、`community`、`pgcr` 外全部；`build_assistant`：除 `armor_mods`、`exotic_armor`、`set_bonus` 外全部；`inventory_assistant`：全部 intent；`loadout_assistant`：除 `delete`、`search_identifiers` 外全部；`player_assistant`：`get_profile`、`profile`、`search`、`search_player`、`档案`、`角色`；`subclass_assistant`：`equip_artifact`、`equip_artifact_mod`、`get`、`modify`、`subclass`；`weapon_assistant`：`analyze`、`compare`、`compare_duplicates`、`craft`、`filter_rolls`、`pattern`、`patterns`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器`；`world_assistant`：`collectible_item`、`collectible_node`、`rotations`、`vendor`、`周常轮换`、`轮换`、`这周` |
 | `priority_stat` | `build_assistant`：`analyze`、`armor_mods`、`farm_target`、`find`、`recommend` |
 | `priority_stats` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
-| `query` | `activity_assistant`：`community`、`counters`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |
-| `rarity` | `inventory_assistant`：`get`、`inventory`、`list` |
+| `query` | `activity_assistant`：`career`、`community`、`counters`、`historical_stats`、`stats`；`build_assistant`：`community`、`community_build`、`starside`；`loadout_assistant`：`search_identifiers`；`subclass_assistant`：`community`；`world_assistant`：`community`、`search_collectible_nodes` |
+| `rarity` | `inventory_assistant`：`get`、`inventory`、`list`；`weapon_assistant`：`craft`、`pattern`、`patterns`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器` |
 | `replacement_slot` | `build_assistant`：`farm_target` |
 | `required_perks` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog` |
 | `scenario` | `build_assistant`：`community`、`community_build`、`starside` |
 | `set_bonus_count` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `set_bonus_name` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend`、`set_bonus` |
 | `slot_number` | `loadout_assistant`：`clear_official`、`snapshot_official`、`update_official_identifiers` |
+| `stat_caps` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `statid` | `activity_assistant`：`clan_leaderboards`、`leaderboard`、`leaderboards` |
 | `super_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 | `to_character` | `inventory_assistant`：`transfer` |
@@ -361,7 +419,7 @@ Manifest 侧（**不代表拥有**）：
 | `type_name` | `inventory_assistant`：`duplicate_weapons`、`duplicates`、`find_duplicates`、`search_type`、`type`、`重复武器` |
 | `vendor_name` | `world_assistant`：`community`、`vendor` |
 | `weapon_name` | `weapon_assistant`：除 `perk_description`、`type` 外全部 |
-| `weapon_type` | `weapon_assistant`：`all_weapons`、`catalog`、`filter_rolls`、`global`、`search_all`、`search_catalog`、`type` |
+| `weapon_type` | `weapon_assistant`：`all_weapons`、`catalog`、`craft`、`filter_rolls`、`global`、`pattern`、`patterns`、`search_all`、`search_catalog`、`type`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`、`锻造`、`锻造武器` |
 | `weapons_target` | `build_assistant`：`analyze`、`farm_target`、`find`、`recommend` |
 <!-- 参数归属表结束 -->
 
@@ -391,7 +449,8 @@ Manifest 侧（**不代表拥有**）：
 ## 五、评级刻度：三种刻度不能混
 
 单把武器（`info`/`analyze`/`perk_pool`/`god_roll`）的清单评级在 `weapon.farming`，
-列表类（`type`/`catalog`/`filter_rolls`）在顶层 `farming_list`（覆盖整张列表）。
+列表类（`type`/`catalog`/`filter_rolls`）在顶层 `farming_list`（覆盖整张列表）——
+`type` 的列表行**不逐把**读本地资料（那是单件的问题），清单按名字在 `farming_list.results[]` 里对。
 每行都写明来自哪张清单、哪个 `scale`，跨刻度比较是错的；`weapon.sources[]` 给出来源与更新时间。
 
 `weapon.farming.cross_check` 是清单与**当前 Manifest** 的交叉核对：清单写的框架/伤害类型对不对得上、
@@ -426,12 +485,16 @@ Manifest 侧（**不代表拥有**）：
 
 `move`、`transfer`、`equip`、`equip_many`（`equip_items`）、`equip_mod`、`pull_postmaster`、`lock`、`track_quest`（`quest_tracking`）、`save`、`delete`、`equip_loadout`、`snapshot_official`、`update_official_identifiers`、`clear_official`、`modify`、`equip_artifact_mod`、`equip_artifact`、`equip_build` 都会改变账号状态（这份清单与 `_requests.WRITE_INTENTS` 一致，由测试保证）。
 
-另外两条硬前提（实机验证过）：**花能量的插槽写入需要 Bungie 应用的 `AdvancedWriteActions` 权限**（没有就回 `AccessNotPermittedByApplicationScope`，工具会点名这条权限，不要读成「稍后重试」）；**调谐只能游戏内改**，工具只给方案不改账号。
+另外两条硬前提（实机验证过）：**花能量的插槽写入需要 Bungie 应用的 `AdvancedWriteActions` 权限**（没有就回 `AccessNotPermittedByApplicationScope`，工具会点名这条权限，不要读成「稍后重试」）；**调谐也走免费插槽接口、确认后照写**（判据：那颗在这件护甲允许的清单里，组件 310）；清单外回 1675，如实报，不替用户判断。
 
 - `confirmed=false` 时返回 `confirmation_required`，**服务层不会被调用**，游戏状态不变。确认必须来自用户的明确同意，不能由 Agent 自己推断——用户说「不用问了直接执行」也不行。
 - 展示确认时要给精确目标：实例 ID、槽位号、数值，而不是笼统描述。
-- `equip_build` 只接受服务端签发的 `canonical_build`（一次绑定、槽位齐全）。`build_template`、社区模板、`solver_handoff`、`farm_options`、`score` 都**不是**可执行方案，自己拼 hash 会被拒绝；改过库存后旧候选也会失效，需要重新求解。
-- 执行后重新读取实际状态核对，不要凭调用成功就宣布结果。
+- `equip_build` 只接受服务端签发的候选（一次绑定、槽位齐全），回传 `canonical_build` 或它的 `execution_id` 都行（二选一，效果一样；发不出结构体参数的宿主用 ID，如豆包 connector）。`build_template`、社区模板、`solver_handoff`、`farm_options`、`score` 都**不是**可执行方案，自己拼 hash 会被拒绝；候选 10 分钟内有效、一次确认只能用一次，改过库存后旧候选也会失效，需要重新求解。
+- **`analyze` 默认只给"值得看的池子"**（0.7.11 起）：`sockets[].options` 只列本地愿单有结论的项，另给 `option_count`/`recommended_count`（一栏一个结论都没有时退回前 6 项并带 `options_note`）；自己副本的"可换项"整块不在默认响应里（要看得走 `intent="compare"`）。完整插槽池走 `intent="perk_pool"`，单个 perk 的效果走 `intent="perk_description"`。
+- **`find`/`recommend` 默认只给候选行**（0.7.10 起）：每套是 `execution_id` + 分数 + 六维 + 金装/套装 + 这套是哪五件（名字/部位/实例 ID/光等/能量/调谐名）。求解器内部字段与 `canonical_build` 都**不在默认响应里**——要看逐件预览或装备，用 `execution_id` 调 `equip_build`（先 `confirmed=false` 拿预览，同意后再 `confirmed=true`；编号 30 分钟内有效）。`duplicates` 同理：每实例给 `perks[]`（`{name, slot}`，真特性/框架/枪管这些）、`mods[]`（**装着的**武器模组，空插槽不算）与 `masterwork`（大师杰作那一颗）三块，要完整 perk 资料走别的入口。
+- **装备链路最短走法**（写也是一样，别拆成更多轮）：`find` 拿候选（金装名字**唯一精确匹配**时直接出解，模糊/多件才多一轮确认）→ 把逐件预览 / `tuning_changes` 给玩家看并等明确同意 → `equip_build`（`canonical_build` 或 `execution_id` + `confirmed=true`）→ 看 `steps` 回执汇报。确认阶段可以先调一次 `confirmed=false` 拿 `items_preview`，但那不是必须的第三轮。
+- **写后证据在响应里，不要再逐件复查**：`equip_build`/`equip_loadout` 成功后，`steps[]` 里那条 `verify` 就是服务端**已经回读核对**过的结果（装备实例、模组、子职业都对过），`mod` 步骤按名字给出装了哪颗模组。要给人看逐件状态，把确认阶段的 `items_preview` 与这份 `steps` 一起报即可；**不要逐件 `intent="item"` 查一遍**（实测有调用方一次链路查 5 次，纯属重复往返），最多补一次汇总查询。失败时同样看 `steps` 里哪一步 `success=false` 与上游原文，别凭"调用成功"宣布结果。
+- **失败读一处就够**：任何写入失败或被挡住（`equip_failed`/`move_failed`/`equip_blocked`/`build_equip_failed`…），原因与 `steps`/`blockers` 都在 `data.result`；`candidates` 只放**真候选**（多件同名让你选、确认载荷）。「同名多件先选一件」是 `item_disambiguation_required`——**没写、也不是失败**，把 `data.result.question` 原样给玩家，拿到编号后带 `item_instance_id` 重发。成功时的 `summary` 就是服务层那句结论（如"已装备，回读核对通过"），照它汇报即可。
 
 ## 七、引用与不确定
 

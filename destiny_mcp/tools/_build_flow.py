@@ -16,6 +16,33 @@ from ..build.analyzer import narrowing_actions
 from ..exceptions import BuildTooLargeError
 
 
+def _functional_mods_payload(payload: Any) -> dict[str, Any] | None:
+    """回执里的照抄清单：服务层已经挂在每套候选上（`functional_mods`），这里只取一份。
+
+    挂的是**清单**不是可执行计划：可执行的那份在服务端签发的候选里（`items[].functional_mod_groups`）。
+    """
+    rows = payload if isinstance(payload, list) else (payload or {}).get("results")
+    for build in rows or []:
+        if isinstance(build, dict) and build.get("functional_mods"):
+            return build["functional_mods"]
+    return None
+
+
+def _summary_with_functional_mods(message: str, payload: dict[str, Any] | None) -> str:
+    """摘要里点一句"带上了社区作者的功能模组"，并说清没抄上的几颗。"""
+    if not payload:
+        return message
+    copied = len(payload.get("mods") or [])
+    if not copied:
+        return message
+    text = f"{message}（含照抄社区配装的 {copied} 颗功能模组，已从六维求解里扣掉它们的能量）"
+    unresolved = payload.get("unresolved") or []
+    if unresolved:
+        names = "、".join(str(row.get("entry")) for row in unresolved)
+        text += f"；{len(unresolved)} 颗没抄上：{names}"
+    return text
+
+
 def _has_hard_targets(request: Any) -> bool:
     return any(
         getattr(request, field, None) is not None
@@ -61,16 +88,24 @@ async def recommend(
     request: Any,
     query: dict[str, Any],
     dump: Callable[[Any], Any],
+    functional_mods: Any = None,
 ) -> dict[str, Any]:
     try:
-        result = await svc["build_svc"].recommend_build(player_name, request)
+        result = await svc["build_svc"].recommend_build(
+            player_name, request, functional_mods=functional_mods
+        )
     except BuildTooLargeError as exc:
         return _not_computed(str(exc), query, key="recommendation")
     recommendation = with_slot_keys(dump(result))
+    copied_mods = _functional_mods_payload(recommendation)
+    recommendation["results"] = candidate_rows(recommendation.get("results"))
+    rows = recommendation["results"]
     if not _has_hard_targets(request):
         _mark_completion_rate_na(recommendation)
     if not recommendation.get("results"):
-        ladder = await armor_ladder.no_solution_ladder(svc, player_name, request)
+        ladder = await armor_ladder.no_solution_ladder(
+            svc, player_name, request, base_order_empty=True
+        )
         return ok_response(
             "真实库存中没有满足原始硬约束的配装；金装和全部属性目标都保持不变。",
             {"recommendation": recommendation, "query": query, "ladder": ladder},
@@ -85,8 +120,110 @@ async def recommend(
             ],
         )
     return ok_response(
-        "已生成配装推荐。",
-        {"recommendation": recommendation, "query": query},
+        _summary_with_functional_mods(
+            f"已生成 {len(rows)} 套配装推荐（每套只给行；细节与装备走 execution_id）。", copied_mods
+        ),
+        {"recommendation": recommendation, "query": query, "builds_note": _ROWS_NOTE},
+        next_actions=[_row_hint(rows[0])] if rows else [],
+    )
+
+
+# ── 候选行（响应投影：默认出口只给行 + execution_id）─────────────────────
+#
+# 真机基线（2026-09-25）：`find` 一次 21.5 KB / 2 套，其中每套 `build` 6.74 KB —— 那是**求解器的
+# 内部模型**（`tuning_option_hashes` / `base_roll_stats` / `archetype_*` / `armor3_roll_verified` /
+# `roll_parse_error` / `icon_url` …），模型看不懂也用不上；`canonical_build` 又占 2 KB 且是
+# "原样回传"的执行载荷。两者都不该出现在默认响应里：默认给行，细节与执行走 `execution_id`
+# （确认信封 `equip_build(execution_id, confirmed=false)` 会给出逐件预览与 canonical_build）。
+#
+# 保留什么：**能让人决定"穿不穿这套"的东西** —— 分数/达标率/六维/金装/套装/是否要改调谐，
+# 以及这套是哪五件（名字、部位、实例 ID、光等、能量、六维、调谐名）。
+_ROW_ITEM_FIELDS = (
+    "name", "item_hash", "item_instance_id", "slot", "slot_key", "slot_display",
+    "power", "energy_capacity", "stats", "is_exotic", "set_bonus_name",
+    "tuning_name", "is_masterworked", "is_artifice",
+)
+
+
+def _tuning_rows(changes: Any) -> list[dict[str, Any]]:
+    """调谐改动：只留"哪一件、从什么换成什么、六维怎么动"。
+
+    真机形状是 `{item_instance_id, item_name, slot, from{hash,name}, to{hash,name}, delta{…},
+    slot_key, slot_display}`；hash 对玩家没意义（要执行的话用 `execution_id` 取候选，
+    那里有完整的 `tuning_changes`），所以这里只留名字与六维变化。
+    """
+    rows: list[dict[str, Any]] = []
+    for change in changes or []:
+        if not isinstance(change, dict):
+            continue
+        row: dict[str, Any] = {
+            key: change[key]
+            for key in ("item_instance_id", "item_name", "slot", "slot_key", "slot_display", "delta")
+            if change.get(key) is not None
+        }
+        for key in ("from", "to"):
+            block = change.get(key)
+            if isinstance(block, dict) and block.get("name"):
+                row[key] = {"name": block["name"]}
+        rows.append(row)
+    return rows
+
+
+def candidate_rows(results: Any) -> list[dict[str, Any]]:
+    """把 `find` / `recommend` 的结果投影成**候选行**（默认出口）。"""
+    rows: list[dict[str, Any]] = []
+    for result in results or []:
+        if not isinstance(result, dict):
+            continue
+        candidate = result.get("build") if isinstance(result.get("build"), dict) else {}
+        canonical = result.get("canonical_build") if isinstance(result.get("canonical_build"), dict) else {}
+        items = candidate.get("items") if isinstance(candidate.get("items"), list) else []
+        row: dict[str, Any] = {
+            "execution_id": result.get("execution_id") or canonical.get("execution_id") or "",
+            "score": result.get("score"),
+            "completion_rate": result.get("completion_rate"),
+            "stats": {
+                name: candidate.get(name)
+                for name in ("weapons", "health", "class_stat", "grenade", "melee", "super_stat")
+                if candidate.get(name) is not None
+            },
+            "missing_requirements": result.get("missing_requirements") or [],
+            "max_violations": result.get("max_violations") or [],
+            "requires_tuning": bool(result.get("requires_tuning")),
+            "tuning_changes": _tuning_rows(result.get("tuning_changes")),
+            "items": [
+                {key: item.get(key) for key in _ROW_ITEM_FIELDS if item.get(key) is not None}
+                for item in items
+                if isinstance(item, dict)
+            ],
+        }
+        if result.get("tuning_note"):
+            row["tuning_note"] = result["tuning_note"]
+        if result.get("functional_mods"):
+            row["functional_mods"] = result["functional_mods"]
+        exotic = next((i.get("name") for i in row["items"] if i.get("is_exotic")), "")
+        sets = [i.get("set_bonus_name") for i in row["items"] if i.get("set_bonus_name")]
+        row["exotic"] = exotic or ""
+        # 同一套里同一套装名会出现多次：去重但保序（"埃希恩记忆 ×4"这种话要靠它）
+        row["set"] = list(dict.fromkeys(sets))
+        rows.append(row)
+    return rows
+
+
+#: 默认出口只给候选行：说明一次，别再逐行重复（`detail_hint` 那种每行一遍的做法已经吃过亏）
+_ROWS_NOTE = (
+    "这里是**候选行**：分数/六维/金装/套装 + 这套是哪五件（名字、部位、实例 ID、光等、能量、"
+    "调谐名）。求解器内部字段与可执行载荷（canonical_build）不在默认响应里 —— "
+    "要看逐件预览或装备它，用 execution_id 调 equip_build。"
+)
+
+
+def _row_hint(row: dict[str, Any]) -> str:
+    """每一行都带一句"下一步"：不给就把"怎么把行变成动作"丢给模型猜。"""
+    return (
+        "要看逐件预览或装备它：build_assistant(intent=\"equip_build\", "
+        f'execution_id="{row.get("execution_id")}", character=…)；先不确认拿预览，'
+        "得到同意后加 confirmed=true（编号 30 分钟内有效）。"
     )
 
 
@@ -109,12 +246,28 @@ def _tuning_summary(builds: Any) -> dict[str, Any] | None:
         "note": (
             "这些方案是「按原目标求解器没达标 → 放宽目标复解 → 用真实目标逐套复核」"
             "找出来的；tuning_changes 里是要改的调谐（从什么改成什么、六维怎么变）。"
-            "注意：调谐**只能在游戏内手动改**（Bungie 接口实测回 "
-            "「This action can only be done in-game.」），"
-            "canonical_build 里不含调谐插件 —— 确认装备只换护甲与模组，"
-            "调谐这一步要把清单交给玩家。"
+            "调谐**确认后一起改**（2026-09-22 起开放代写）：条件只有一条 —— 这颗在这件护甲"
+            "允许的清单里（组件 310）。canonical_build 里带着它，equip_build 会连同护甲与模组"
+            "一起写；清单外的不会进计划（那种情况上游会回 1675「这颗装不到这件上」）。"
         ),
     }
+
+
+def _empty_message(search: dict[str, Any] | None) -> str:
+    """0 候选时说的话**必须自证"搜完了"**。
+
+    否则读的人分不清"枚举完了、真没有满足下限的方案"与"没搜完/被截断"——
+    这正是本仓库栽过的坑（`analyze` 曾在没验证过的情况下断言"没有合法组合"）。
+    """
+    if search is None or search.get("exhaustive"):
+        combos = (search or {}).get("combos")
+        scope = f"（枚举了 {combos:,} 套组合）" if isinstance(combos, int) else ""
+        return f"找到 0 个候选配装：枚举完了，没有任何一套能满足这些下限{scope}。"
+    return (
+        "这次**没有搜完**，所以不能说「没有满足下限的方案」"
+        f"（截断原因：{search.get('truncated_by') or '未说明'}）。"
+        "可以收窄请求后重试，或调高搜索预算。"
+    )
 
 
 async def find(
@@ -123,18 +276,32 @@ async def find(
     request: Any,
     query: dict[str, Any],
     dump: Callable[[Any], Any],
+    functional_mods: Any = None,
 ) -> dict[str, Any]:
+    diagnostics: list[Any] = []
     try:
-        result = await svc["build_svc"].find_build(player_name, request)
+        result = await svc["build_svc"].find_build(
+            player_name, request, diagnostics, functional_mods=functional_mods
+        )
     except BuildTooLargeError as exc:
         return _not_computed(str(exc), query, key="builds")
-    builds = with_slot_keys(dump(result))
-    tuning = _tuning_summary(builds)
+    report = diagnostics[0].to_dict() if diagnostics else None
+    search = (
+        {key: report[key] for key in ("exhaustive", "combos", "truncated_by")}
+        if report
+        else None
+    )
+    dumped = with_slot_keys(dump(result))
+    copied_mods = _functional_mods_payload(dumped)
+    tuning = _tuning_summary(dumped)
+    builds = candidate_rows(dumped)
     if not builds:
-        ladder = await armor_ladder.no_solution_ladder(svc, player_name, request)
+        ladder = await armor_ladder.no_solution_ladder(
+            svc, player_name, request, coverage=search, base_order_empty=True
+        )
         return ok_response(
-            "找到 0 个候选配装。",
-            {"builds": builds, "query": query, "ladder": ladder},
+            _empty_message(search),
+            {"builds": builds, "query": query, "ladder": ladder, "search": search},
             next_actions=[
                 "ladder 给了差距（shortfall）、当前能到的上限（ceiling）与建议降哪一项；"
                 "降级要用户同意后再重试。",
@@ -148,15 +315,38 @@ async def find(
                     "completion_rate_note",
                     "没有硬目标时这个比例没有意义（不是 0%）。",
                 )
-    payload: dict[str, Any] = {"builds": builds, "query": query}
-    message = f"找到 {len(builds)} 个候选配装。"
+    payload: dict[str, Any] = {"builds": builds, "query": query, "builds_note": _ROWS_NOTE}
+    if copied_mods is not None:
+        payload["functional_mods"] = copied_mods
+    message = _summary_with_functional_mods(
+        f"找到 {len(builds)} 个候选配装。", copied_mods
+    )
     if tuning is not None:
         payload["tuning"] = tuning
         message += (
             f"其中 {tuning['build_count']} 个要先改调谐才能达标"
-            "（调谐免费、不占能量；逐件改动见各自的 tuning_changes）。"
+            "（调谐不占能量、不影响模组；逐件改动见各自的 tuning_changes）。"
         )
-    return ok_response(message, payload)
+    # 有解时也给"每项单独能顶到多少" —— 用户说"不够极限"时，答案就在这几个数里。
+    # `reachable_note` 必须一起带上：逐项可达**不等于**同一套能同时达到。
+    #
+    # "没量过就不给"这条规则在形状工厂里（`SearchDiagnostics.to_dict`：全 0 视为没量过），
+    # 这里只管照发，别在这里再判一次。
+    if report and report.get("reachable"):
+        payload["reachable"] = report["reachable"]
+        payload["reachable_note"] = report.get("reachable_note")
+    violated = [row for row in builds if isinstance(row, dict) and row.get("max_violations")]
+    if violated:
+        payload["max_violations"] = [
+            {"build_index": index, "item": row.get("max_violations")}
+            for index, row in enumerate(builds)
+            if isinstance(row, dict) and row.get("max_violations")
+        ]
+        message += (
+            f"其中 {len(violated)} 套超过了指定的属性上限（见各自的 max_violations），"
+            "已排到没超上限的方案后面。"
+        )
+    return ok_response(message, payload, next_actions=[_row_hint(builds[0])] if builds else [])
 
 
 async def analyze(

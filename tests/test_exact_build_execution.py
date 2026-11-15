@@ -17,28 +17,24 @@ os.environ.setdefault("BUNGIE_CLIENT_SECRET", "dummy")
 from destiny_mcp.build.constraints import parse as parse_constraints
 from destiny_mcp.build.models import (
     Armor,
-    BuildCandidate,
-    BuildRecommendation,
     BuildRequest,
-    BuildResult,
     InventorySnapshot,
 )
-from destiny_mcp.build_import.models import CanonicalBuild
+from destiny_mcp.build_contracts import CanonicalBuild
 from destiny_mcp.exceptions import BuildValidationError
 from destiny_mcp.models import (
     ArmorStats,
     Loadout,
     LoadoutItem,
     LoadoutOperationResult,
+    MoveItemStep,
 )
-from destiny_mcp.services import build_service as build_service_module
+from destiny_mcp.services import build_candidates as build_candidates_module
 from destiny_mcp.services import loadout_equipment_service as equipment_module
 from destiny_mcp.services.build_service import BuildService, _snapshot_version
 from destiny_mcp.services.loadout_equipment_service import LoadoutEquipmentService
-from destiny_mcp.server import build_optimizer
 from destiny_mcp.tools import _build_confirmation
 from destiny_mcp.tools.assistants import build_assistant
-from destiny_mcp.tools.build_tools import recommend_build as legacy_recommend_build
 
 
 class _Client:
@@ -345,47 +341,147 @@ async def test_build_assistant_returns_structured_domain_errors() -> None:
 
 
 @pytest.mark.asyncio
-async def test_full_recommendation_preserves_exact_build_contract() -> None:
-    snapshot, canonical = _exact_contract()
-    armor = [
-        snapshot.helmets[0],
-        snapshot.gauntlets[0],
-        snapshot.chests[0],
-        snapshot.legs[0],
-        snapshot.class_items[0],
-    ]
-    result = BuildResult(
-        score=950,
-        completion_rate=1,
-        build=BuildCandidate(items=armor),
-        canonical_build=canonical,
-    )
-    build_service = SimpleNamespace(
-        recommend_build=AsyncMock(
-            return_value=BuildRecommendation(results=[result])
-        )
+async def test_equip_build_by_execution_id_against_the_real_service(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """工具层"只给候选 ID"那条路对**真服务**跑一遍。
+
+    替身对替身的测试抓不到"工具 await 了一个同步方法"这类形状错配
+    （真机语料 ⑯b 抓到过：候选查询在进程内、是同步的，工具层却 await 它）。
+    """
+    from destiny_mcp.tools import _armor_branches as armor_branches
+
+    async def _no_preview(svc, player_name, canonical_build):
+        return []
+
+    monkeypatch.setattr(armor_branches, "equip_preview", _no_preview)
+    service = _build_service()
+    snapshot, build = _exact_contract()
+    service._candidates.register(build, "Alpha#0100")
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
+    service._equipment.equip_exact = AsyncMock(return_value=LoadoutOperationResult(
+        success=True,
+        loadout_name="Exact",
+        message="OK",
+    ))
+    services = {"build_svc": service}
+
+    confirm = await armor_branches.equip_build(
+        services, "Alpha#0100", None, build.execution_id, "hunter", False
     )
 
-    response = await legacy_recommend_build(
+    assert confirm["error"]["code"] == "confirmation_required"
+    assert confirm["candidates"][0]["execution_id"] == build.execution_id
+    service._inventory.get_armor_snapshot.assert_not_awaited()
+
+    done = await armor_branches.equip_build(
+        services, "Alpha#0100", None, build.execution_id, "hunter", True
+    )
+
+    assert done["ok"] is True
+    service._equipment.equip_exact.assert_awaited_once()
+    # 一次确认只能用一次：同一个 ID 再来一次就是"不认识"
+    replay = await armor_branches.equip_build(
+        services, "Alpha#0100", None, build.execution_id, "hunter", True
+    )
+    assert replay["error"]["code"] == "unknown_execution_id"
+
+
+@pytest.mark.asyncio
+async def test_exact_exotic_name_solves_without_a_confirmation_round() -> None:
+    """唯一**精确**匹配不再多问一轮（ADR-017）：直接求解，并说明用的是哪件。
+
+    模糊/多个命中仍然要确认（下一条测试钉住），这条只管"没有选择可做"的那种。
+    """
+    build_service = SimpleNamespace(
+        resolve_exotic_armor=MagicMock(return_value={
+            "status": "exact",
+            "query": "快速装弹松身裤",
+            "canonical_name": "快速装弹松身裤",
+            "matches": [{
+                "name": "快速装弹松身裤",
+                "name_en": "St0mp-EE5",
+                "item_hash": 456,
+                "icon_url": "",
+                "class_type": 0,
+                "score": 1.0,
+            }],
+        }),
+        recommend_build=AsyncMock(return_value={"results": [{"id": "build-1"}]}),
+    )
+
+    result = await build_assistant(
+        intent="recommend",
         player_name="Alpha#0100",
         character="hunter",
-        include_subclass_fragment=True,
-        priority_stats=["melee", "weapons"],
+        exotic_name="快速装弹松身裤",
+        class_target=200,
         ctx=_tool_context({"build_svc": build_service}),
     )
 
-    expected = canonical.model_dump(mode="json")
-    request = build_service.recommend_build.await_args.args[1]
-    assert request.include_subclass_fragment is True
-    assert request.priority_stats == ["melee", "weapons"]
-    assert response["data"]["builds"][0]["canonical_build"] == expected
-    assert response["data"]["builds"][0]["armor"][0]["item_instance_id"]
-    assert response["candidates"][0]["canonical_build"] == expected
-    assert response["next_actions"][0]["arguments"] == {
-        "character": "hunter",
-        "canonical_build": expected,
-    }
-    assert "canonical_build" in build_optimizer()
+    assert result["ok"] is True, result.get("error")
+    build_service.recommend_build.assert_awaited_once()
+    resolution = (result["data"]["query"] or {}).get("exotic_resolution") or {}
+    assert resolution.get("status") == "exact_match"
+    assert resolution.get("item_hash") == 456
+    assert (result["data"]["query"] or {}).get("exotic_name") == "快速装弹松身裤"
+
+
+@pytest.mark.asyncio
+async def test_fuzzy_exotic_name_still_requires_confirmation() -> None:
+    """模糊命中（要挑一件）仍然停一轮：不替玩家选定，并给出每个候选的 arguments。"""
+    build_service = SimpleNamespace(
+        resolve_exotic_armor=MagicMock(return_value={
+            "status": "confirmation_required",
+            "query": "卡利班手",
+            "matches": [
+                {"name": "卡利班之手", "name_en": "Caliban's Hand", "item_hash": 1,
+                 "icon_url": "", "class_type": 1, "score": 0.8},
+                {"name": "卡利班之握", "name_en": "Caliban's Grips", "item_hash": 2,
+                 "icon_url": "", "class_type": 1, "score": 0.7},
+            ],
+        }),
+        recommend_build=AsyncMock(return_value={"results": []}),
+    )
+
+    result = await build_assistant(
+        intent="recommend",
+        player_name="Alpha#0100",
+        character="hunter",
+        exotic_name="卡利班手",
+        ctx=_tool_context({"build_svc": build_service}),
+    )
+
+    assert result["error"]["code"] == "exotic_confirmation_required"
+    assert [row["item_hash"] for row in result["candidates"]] == [1, 2]
+    build_service.recommend_build.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_apply_failure_always_carries_a_reason() -> None:
+    """写入失败的回执**不许留白**：`TimeoutError()` 的 str 是空的（真机 2026-09-23 踩到）。
+
+    那次 `apply` 步骤 detail 为空，谁也看不出发生了什么；现在至少给出异常类型与"状态未知"。
+    """
+    service = _build_service()
+    snapshot, build = _exact_contract()
+    service._candidates.register(build, "Alpha#0100")
+    service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
+    service._equipment._capture_recovery_state = AsyncMock(return_value={})
+    service._equipment._restore_exact_state = AsyncMock(return_value=True)
+
+    async def _boom(*args, **kwargs):
+        raise TimeoutError()
+
+    service._equipment._equip_local_unlocked = _boom
+
+    result = await service.equip_build("Alpha#0100", build, "hunter")
+
+    assert result["success"] is False
+    apply_step = next(step for step in result["steps"] if step["action"] == "apply")
+    assert apply_step["detail"].strip(), "失败必须带原因，不能是空串"
+    assert "超时" in apply_step["detail"]
+    assert "未知" in apply_step["detail"], "超时后写入是否生效是未知的，要说清"
 
 
 def test_priority_stats_keep_strict_order_and_remove_duplicates() -> None:
@@ -417,6 +513,32 @@ async def test_exact_equipment_verifies_success() -> None:
     assert result.success is True
     assert result.steps[-1].action == "verify"
     service._restore_exact_state.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_a_blocked_plug_keeps_the_equipment_and_skips_rollback() -> None:
+    """上游拒绝某一颗插件（1675 等）时**不回退**：装备已经换好了，如实汇报就行。
+
+    这条分支以前**没有测试**盖住（`_equip_local_unlocked` 返回 `success=False` + 一个
+    `mod_blocked` step）。2026-09-22 起它是"调谐写不进去不回退"的落地处 —— 调谐插件现在跟在
+    `mods` 里由同一个执行器写，所以要钉住：既不能回退，也不能报成"成功"。
+    """
+    service = _equipment_service()
+    service._capture_recovery_state = AsyncMock(return_value={})
+    service._equip_local_unlocked = AsyncMock(return_value=LoadoutOperationResult(
+        success=False,
+        loadout_name="Exact",
+        message="装备已经换上；但 1 颗模组被上游拒绝写入",
+        steps=[MoveItemStep(action="mod_blocked", detail="要材料（1675）", success=False)],
+    ))
+    service._verify_loadout = AsyncMock(return_value=False)
+    service._restore_exact_state = AsyncMock(return_value=True)
+
+    result = await service.equip_exact("Alpha#0100", _loadout())
+
+    assert result.success is False, "被挡住不许报成功"
+    service._restore_exact_state.assert_not_awaited()
+    assert not any(step.action == "verify" for step in result.steps)
 
 
 @pytest.mark.asyncio
@@ -577,7 +699,7 @@ async def test_partial_batch_equip_stops_mods_and_rolls_back() -> None:
 async def test_build_candidate_is_player_bound_and_tamper_protected() -> None:
     service = _build_service()
     _, build = _exact_contract()
-    service._register_build_candidate(build, "Alpha#0100")
+    service._candidates.register(build, "Alpha#0100")
     service._inventory.get_armor_snapshot = AsyncMock()
     service._equipment.equip_exact = AsyncMock()
 
@@ -598,7 +720,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     _, incomplete_build = _exact_contract()
     incomplete_build.execution_id = "candidate-incomplete"
     incomplete_build.items.pop()
-    incomplete_service._register_build_candidate(
+    incomplete_service._candidates.register(
         incomplete_build, "Alpha#0100"
     )
     incomplete_service._inventory.get_armor_snapshot = AsyncMock()
@@ -617,7 +739,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     duplicate_build.items[1].item_instance_id = (
         duplicate_build.items[0].item_instance_id
     )
-    duplicate_service._register_build_candidate(
+    duplicate_service._candidates.register(
         duplicate_build, "Alpha#0100"
     )
     duplicate_service._inventory.get_armor_snapshot = AsyncMock()
@@ -633,7 +755,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     _, duplicate_slot_build = _exact_contract()
     duplicate_slot_build.execution_id = "candidate-duplicate-slot"
     duplicate_slot_build.items[1].slot = duplicate_slot_build.items[0].slot
-    slot_service._register_build_candidate(
+    slot_service._candidates.register(
         duplicate_slot_build, "Alpha#0100"
     )
     slot_service._inventory.get_armor_snapshot = AsyncMock()
@@ -647,7 +769,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
 
     service = _build_service()
     snapshot, build = _exact_contract()
-    service._register_build_candidate(build, "Alpha#0100")
+    service._candidates.register(build, "Alpha#0100")
     snapshot.helmets[0].energy_capacity = 9
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
     service._equipment.equip_exact = AsyncMock()
@@ -661,7 +783,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     missing_snapshot, missing_build = _exact_contract()
     missing_build.execution_id = "candidate-missing"
     missing_build.items[0].item_instance_id = "missing-instance"
-    missing_service._register_build_candidate(missing_build, "Alpha#0100")
+    missing_service._candidates.register(missing_build, "Alpha#0100")
     missing_service._inventory.get_armor_snapshot = AsyncMock(
         return_value=missing_snapshot
     )
@@ -677,7 +799,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
     _, invalid_mod_build = _exact_contract()
     invalid_mod_build.execution_id = "candidate-invalid-mod"
     invalid_mod_build.items[0].mods = [0]
-    mod_service._register_build_candidate(invalid_mod_build, "Alpha#0100")
+    mod_service._candidates.register(invalid_mod_build, "Alpha#0100")
     mod_service._inventory.get_armor_snapshot = AsyncMock()
     mod_service._equipment.equip_exact = AsyncMock()
 
@@ -693,7 +815,7 @@ async def test_build_candidate_rejects_invalid_inventory_contracts() -> None:
 async def test_build_candidate_is_one_time_and_score_path_is_disabled() -> None:
     service = _build_service()
     snapshot, build = _exact_contract()
-    service._register_build_candidate(build, "Alpha#0100")
+    service._candidates.register(build, "Alpha#0100")
     service._inventory.get_armor_snapshot = AsyncMock(return_value=snapshot)
     service._equipment.equip_exact = AsyncMock(return_value=LoadoutOperationResult(
         success=True,
@@ -720,11 +842,12 @@ async def test_build_candidate_expires(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     now = 1_000.0
-    monkeypatch.setattr(build_service_module.time, "monotonic", lambda: now)
-    monkeypatch.setattr(build_service_module, "_BUILD_CANDIDATE_TTL_SECONDS", 10)
+    # 候选暂存的时钟与 TTL 都在 build_candidates 里（单一出处），换钟得打到那一边。
+    monkeypatch.setattr(build_candidates_module.time, "monotonic", lambda: now)
+    monkeypatch.setattr(build_candidates_module, "TTL_SECONDS", 10)
     service = _build_service()
     _, build = _exact_contract()
-    service._register_build_candidate(build, "Alpha#0100")
+    service._candidates.register(build, "Alpha#0100")
     now = 1_010.0
     service._inventory.get_armor_snapshot = AsyncMock()
 

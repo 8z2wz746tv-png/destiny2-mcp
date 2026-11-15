@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from typing import Any, Callable, Literal
 
+from ..build.armor_rules import balanced_tuning_bonus
+from ..build.constants import STAT_NAMES
 from ..utils.hash_utils import to_unsigned
 from ..vocabulary import CLASS_LABELS_ZH as CLASS_DISPLAY
 from ..vocabulary import class_key
@@ -66,6 +68,46 @@ SLOT_DISPLAY: dict[str, str] = {
 # 反向：定义级查询手里只有 `itemTypeDisplayName`（"腿部护甲"），没有 bucket 字符串
 _DISPLAY_TO_SLOT: dict[str, str] = {value: key for key, value in SLOT_DISPLAY.items()}
 
+# ── 装备槽：武器与护甲同一套键（ADR-011）────────────────────────────────
+# 正主是物品定义的 `equippingBlock.equipmentSlotTypeHash`（2026-09-21 实测：护甲给护甲桶 hash、
+# 武器给武器桶 hash）。以前这套代码里**武器没有槽位**概念（`InventoryItem.slot` 是护甲专用的），
+# 装备编排因此看不见武器上的异域；这里补上武器那一半，护甲那半复用 `SLOT_DISPLAY`，
+# 保证"槽位键"只有一个出处。
+_ARMOR_SLOT_HASHES: dict[str, int] = {
+    "helmet": 3448274439,
+    "gauntlets": 3551918588,
+    "chest": 14239492,
+    "legs": 20886954,
+    "class_item": 1585787867,
+}
+_WEAPON_SLOT_LABELS: dict[int, tuple[str, str]] = {
+    1498876634: ("kinetic", "动能武器"),
+    2465295065: ("energy", "能量武器"),
+    953998645: ("power", "威能武器"),
+}
+#: 护甲 bucket hash（无符号）→ 槽位键。与 `_ARMOR_SLOT_HASHES` 同一张表，方向相反。
+_ARMOR_BUCKET_TO_KEY: dict[int, str] = {
+    slot_hash: key for key, slot_hash in _ARMOR_SLOT_HASHES.items()
+}
+EQUIP_SLOT_LABELS: dict[int, tuple[str, str]] = {
+    **{slot_hash: (key, SLOT_DISPLAY[key]) for key, slot_hash in _ARMOR_SLOT_HASHES.items()},
+    **_WEAPON_SLOT_LABELS,
+}
+
+
+def equip_slot_of(definition: dict | None) -> tuple[str, str]:
+    """物品定义 → (装备槽键, 中文名)；武器与护甲同一套键（ADR-011）。
+
+    判不了给 `("", "")` —— 不猜，也不把"没查到"说成某个槽。
+    """
+    block = (definition or {}).get("equippingBlock")
+    if not isinstance(block, dict):
+        return "", ""
+    slot_hash = block.get("equipmentSlotTypeHash")
+    if not isinstance(slot_hash, int):
+        return "", ""
+    return EQUIP_SLOT_LABELS.get(slot_hash & 0xFFFFFFFF, ("", ""))
+
 # 定义级没有实例，就不给 T 级 / 分族结论（族是按实例结构判的）
 DEFINITION_TIER_NOTE = (
     "这是定义级查询，没有具体副本：T 级与护甲分族要看实例，"
@@ -106,6 +148,19 @@ GEAR_TIER_NOTE = "这件不在分级体系内（组件里的 gearTier=0 或缺�
 def slot_key_from_bucket(bucket: str) -> str:
     """`"Leg Armor"` → `"legs"`；认不出来就原样返回。"""
     return _BUCKET_TO_KEY.get(bucket, bucket)
+
+
+def slot_key_from_bucket_hash(bucket_hash: int) -> str:
+    """护甲 bucket hash → 统一槽位键；认不出来给空串。
+
+    **必须按无符号比**：Manifest 里 `inventory.bucketTypeHash` 存的是无符号值
+    （头盔 3448274439、臂铠 3551918588），拿有符号的 -846692857 去查会静默给空串 ——
+    换模组的确认请求因此印成「光芒领主面具（，540，T5）」（真机日志可见）。
+    `to_unsigned` 两种写法都收，调用方不用自己判正负。
+    """
+    if not isinstance(bucket_hash, int):
+        return ""
+    return _ARMOR_BUCKET_TO_KEY.get(to_unsigned(bucket_hash), "")
 
 
 def slot_key_from_solver(slot: str) -> str:
@@ -322,6 +377,7 @@ def armor_payload(
     if include_stats_layers and final is not None:
         # 调谐的**实际生效**量：定向就是那两个 ±5；"平衡调整"只加在（满大师后）
         # 最低的三项上 —— plug 定义里写的是"六维各 +1"，照它算会多算。
+        # 规则本身只有一处实现：`build.armor_rules.balanced_tuning_bonus`（真机实测见 ADR-014）。
         tuning_delta: dict[str, int] = {}
         if tuning is not None and not tuning_plug_stats:
             tuning["kind"] = "empty"
@@ -332,8 +388,18 @@ def armor_payload(
                 after = {
                     key: roll_full[key] + masterwork_stats.get(key, 0) for key in STAT_KEYS
                 }
-                lowest = sorted(STAT_KEYS, key=lambda key: (after[key], key))[:3]
-                tuning_delta = {key: 1 for key in lowest}
+                # 注意两套键顺序不同：这里按载荷顺序存，规则函数按 `STAT_NAMES` 顺序收。
+                bonus = balanced_tuning_bonus([after[name] for name in STAT_NAMES])
+                tuning_delta = {
+                    name: value for name, value in zip(STAT_NAMES, bonus) if value
+                }
+                if not tuning_delta:
+                    # 并列最低的不是"恰好三项"：真机只验过三项那一档。**不猜** ——
+                    # 记 0 会让下面反推出的"大师增量"偏大，所以必须留一句话说清。
+                    notes.append(
+                        "这件护甲的「平衡调整」加成没算出来（并列最低的不是恰好三项），"
+                        "调谐增量按 0 记，大师增量可能因此偏大。"
+                    )
                 tuning["kind"] = "balanced"
             else:
                 tuning_delta = dict(tuning_plug_stats)

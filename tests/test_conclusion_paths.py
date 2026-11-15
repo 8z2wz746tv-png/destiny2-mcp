@@ -55,6 +55,10 @@ class _FindingService:
             raise self._raises
         return self._results
 
+    async def probe_find_build(self, player_name: str, request: Any):
+        """阶梯走这个入口（只读并发档）；替身接到同一条脚本上。"""
+        return await self.find_build(player_name, request)
+
 
 class _AnalyzeService:
     def __init__(self) -> None:
@@ -80,6 +84,7 @@ async def test_failed_probe_is_marked_not_probed_instead_of_no_solution() -> Non
         {
             "analyze_build": _AnalyzeService().analyze_build,
             "find_build": _FindingService(raises=RuntimeError("上游 503")).find_build,
+            "probe_find_build": _FindingService(raises=RuntimeError("上游 503")).probe_find_build,
         },
     )()
 

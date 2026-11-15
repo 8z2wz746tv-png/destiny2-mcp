@@ -7,6 +7,7 @@ character class names to classType integers.
 from __future__ import annotations
 
 from ..exceptions import BuildValidationError
+from ..vocabulary import STAT_LABELS_ZH
 from ..logging_config import get_logger
 from .constants import STAT_NAMES
 from .models import BuildConstraints, BuildRequest
@@ -128,6 +129,23 @@ def parse(request: BuildRequest, manifest) -> BuildConstraints:
         priority_stat_indices[0] if priority_stat_indices else None
     )
 
+    # 属性上限：键走**同一张** `_PRIORITY_STAT_MAP`（所以 `手雷`/`class` 这类写法都认）。
+    # 不认识的键**必须报错**，不能像 priority_stats 那样只 warning —— 上限被悄悄忽略，
+    # 用户会拿到一套"他自己声明过不要超过"的配装，而且看不出哪里错了（静默降级）。
+    caps: dict[str, int] = {name: 0 for name in STAT_NAMES}
+    for raw_key, raw_value in (request.stat_caps or {}).items():
+        index = _PRIORITY_STAT_MAP.get(str(raw_key).strip().lower())
+        if index is None:
+            raise BuildValidationError(
+                f"不认识的上限属性: {raw_key!r}。可用: weapons/health/class_stat/"
+                "grenade/super_stat/melee（也认 武器/生命/职业/手雷/超能/近战）"
+            )
+        if not 0 <= int(raw_value) <= 200:
+            raise BuildValidationError(
+                f"{STAT_LABELS_ZH[STAT_NAMES[index]]}的上限 {raw_value} 超出 0-200 的范围。"
+            )
+        caps[STAT_NAMES[index]] = int(raw_value)
+
     constraints = BuildConstraints(
         weapons_min=request.weapons_target or 0,
         health_min=request.health_target or 0,
@@ -143,7 +161,19 @@ def parse(request: BuildRequest, manifest) -> BuildConstraints:
         set_bonus_count=set_bonus_count,
         priority_stat_indices=priority_stat_indices,
         priority_stat_index=priority_stat_index,
+        **{f"{name}_max": value for name, value in caps.items()},
     )
+
+    # 上限低于下限是自相矛盾的要求：报出来，别偷偷按某一头截断。
+    mins = constraints.as_vector()
+    maxes = constraints.max_vector()
+    contradiction = [
+        f"{STAT_LABELS_ZH[STAT_NAMES[i]]} 上限 {maxes[i]} < 下限 {mins[i]}"
+        for i in range(6)
+        if maxes[i] > 0 and maxes[i] < mins[i]
+    ]
+    if contradiction:
+        raise BuildValidationError("属性上限与下限矛盾：" + "；".join(contradiction))
 
     logger.debug(
         "Parsed constraints: exotic=%s class=%s set_bonus=%s(%d) stats=%s priority=%s",

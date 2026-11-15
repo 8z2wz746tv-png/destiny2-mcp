@@ -27,6 +27,12 @@ Thumbs.db
 # Data / manifests (generated / downloaded)
 manifest/
 destiny_mcp/data/dim_wishlists.json
+# 归档/：用户放的第三方派生转储（DIM 风格三张表，约 18 MB）。2026-09-23 对过账：
+# 5,760 条与本地 Manifest 逐条一致（hash 归一符号后交集 5760/5760，中文名抽查 300/300），
+# 我们库里本来就有这些字段（trait 定义我们 554 条 vs 归档 46 条）。所以它只作分析/校验用，
+# 不进 git —— 和 manifest/ 一个道理：上游/派生快照不是我们的口径。
+归档/
+归档.zip
 # Starside 归档只入库 MCP 运行需要的部分（index/records/exports/texts）；
 # pages/ 是原始 HTML、assets/ 是 3824 个图标与前端资源，运行时都不读，
 # 需要时用 scripts/fetch_starside.py 重新抓取即可。

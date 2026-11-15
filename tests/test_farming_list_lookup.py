@@ -13,6 +13,7 @@ from destiny_mcp.services.starside_service import StarsideService
 from destiny_mcp.tools._farming import (
     farming_reference as _farming_reference,
     harvest_names as _harvest_names,
+    item_names as _item_names,
     sale_item_names as _sale_item_names,
 )
 
@@ -483,6 +484,30 @@ def test_harvest_names_skips_duplicates_and_stays_bounded() -> None:
 
     assert _harvest_names(payload, limit=2) == ["真相", "牵引器火炮"]
     assert _harvest_names({"weapons": [{"item_hash": 1}, {"name": "  "}]}) == []
+
+
+def test_item_names_only_takes_the_row_own_name() -> None:
+    """列表行里的属性名/perk 名不是武器名，不许混进刷取清单查询。
+
+    真机实测（改前）：`catalog` 的 `unmatched` 里有 perk 名「萤火虫」，
+    `type` 的 `unmatched` 里有一串属性名（"伤害""射程"）—— 那是把属性/perk 名
+    拿去问"这把武器在不在清单里"，看起来像"这些武器不在清单里"。
+    """
+    rows = [
+        {
+            "name": "三冠得主",
+            "instance_id": "1",
+            "roll_summary": {"roll_kind": "random"},
+            "stats": [{"name": "伤害", "value": 96}, {"name": "射程", "value": 33}],
+        },
+        {"name": "信任", "stats": [{"name": "稳定性", "value": 84}]},
+        {"name": "三冠得主"},  # 同名副本只算一次
+        {"name": "  "},
+    ]
+
+    assert _item_names(rows) == ["三冠得主", "信任"]
+    assert _item_names(rows, limit=1) == ["三冠得主"]
+    assert _item_names(None) == []
 
 
 def test_sale_item_names_ignores_vendor_category_and_perk_names() -> None:

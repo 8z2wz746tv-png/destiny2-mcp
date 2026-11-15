@@ -99,8 +99,25 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - 每个新守门都要**注入一次违规、确认变红、再恢复**——不验证就不知道它会不会咬人。
 - 改响应形状：跑 `pytest` + 对应语料 runner + 基线 diff。
 - 单测用替身、任何机器能跑（干净 `HOME` 下也要过）；真机脚本单独放，分工见 `docs/testing/TESTING_CORPUS.md` 第一张表。
+- **CI 跑 ruff 的规则集是写死的**（`pyproject.toml` 的 `[tool.ruff.lint] select`，版本钉在 `ruff>=0.15,<0.16`）：ruff 的默认集随版本变（0.16 把 UP/SIM/FURB 都算默认），不写死就是「本地绿、CI 红」。想收规则要显式加进 select 并一次修完。
 - **CI 现在跑 ruff**（`python -m ruff check`，紧挨在 pytest 前面）：它抓「未定义的 name / 未使用的 import」这类，比测试更早——真机上它抓到过 `profile_components` 用了没导入（build 取账号护甲那条路直接 NameError）。mypy 存量 411 个错，**不进 CI**；路线是「新代码先干净」：先把某个模块修到 mypy 干净，再加进 ci.yml 里那行注释的文件列表。
 - **声称之前先量**：性能改动给前后对比，文档里的数字必须来自实跑。
+
+**验证成本与省时约定**（2026-09-21 实测，写在这是为了让每个 agent 都少烧时间）：
+
+| 动作 | 实测耗时 | 什么时候才跑 |
+| --- | --- | --- |
+| `pytest -q`（1652 条） | ≈ 2.5 分钟 | 代码改完、提交前跑一次；**文档改动不要跑全量** |
+| `pytest -q tests/test_agent_docs.py` | 5 秒 | 只动 `docs/**` 时 |
+| `+ tests/test_skill_contracts.py` | 3 秒 | 动了 `skills/**` 或 intent/参数契约时 |
+| `scripts/run_corpus_all_rows.py`（260 行，打真机） | ≈ 4–5 分钟 | 一个功能**只在提交前跑一次**；不要每改一处就跑 |
+| `scripts/install_skill.py` | < 1 秒 | 动过 `skills/**` 之后 |
+| `scripts/install_skill.py --mcp`（重连标记改成**代码版本**，DSH 随即重组重连） | < 1 秒 + 重连 ≈ 40 秒 | 要让宿主/GUI 用上新代码时；同一版本重复跑是幂等的 |
+
+- **别把重活并发跑**：实测与其它任务并发时 pytest 从 100 秒涨到 155 秒，还会让
+  `tests/test_build_compute.py::test_queue_wait_is_not_charged_to_the_budget` 假失败。
+- 要游戏内才能确认的事实（入口是常驻还是轮换、某个名字到底叫啥）**先问用户**，
+  不要围着未知先造一套表再返工。
 
 ### 注释、文档与提交
 
@@ -119,6 +136,10 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - 标题写"做了什么"，不写「抓出的 XXX」这类腔调；不用 emoji、结尾不加句号。
 - **一次提交只做一件事**：跨主题的改动拆成多条；发布提交也一样——内容照发，标题只留一行。
 - 破坏性变更在标题里点明（例：`活动统计改为行式（破坏性）`），影响面写进 CHANGELOG。
+- **推到哪**：工作分支是 `codex/bundle-starside-markdown`，`origin/main` 与它同源。发布用
+  `git push origin HEAD:main HEAD:codex/bundle-starside-markdown --tags` —— 本地那个 `main` 是
+  2026-09 的旧分支，`git push origin main` 会被非快进拒绝（2026-09-24 踩过）。
+  GitHub 直连常超时（SSL / 443），加 `-c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20` 重试几轮即可。
 
 ## 代码地图
 
@@ -164,7 +185,6 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - `destiny_mcp/wishlist_data.py`
 **第 2 层：领域层（纯计算，可被服务和工具复用）**
 - `destiny_mcp/build/`
-- `destiny_mcp/build_import/`
 - `destiny_mcp/rag/`
 **第 3 层：服务层：账号读写、外部数据、形状工厂**
 - `destiny_mcp/services/`
@@ -174,6 +194,9 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 - `destiny_mcp/__main__.py`
 - `destiny_mcp/server.py`
 <!-- code-map:end -->
+
+`legacy/`（仓库根目录）不在这张清单里，也**不进包、不参与测试与 lint**：它是 2026-09-20 剥离的
+历史工具面存档（67 个低层工具 + 配装导入整块），只作查阅用。要复活里面的东西，见 `legacy/README.md`。
 
 ### 各模块一句话职责
 
@@ -214,9 +237,8 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 | `destiny_mcp/wishlist_data.py` | DIM 愿单数据获取（个人安装用）。 |
 | `destiny_mcp/data/` | 纯数据表（静态常量/映射）：`activity_modes.py` 是**模式词与 `modeType` 的唯一出处**（中文名去 Manifest 取，别再抄标签表）；`pvp_counters.py` 是「计数器 → 模式/周期」对照表。每条带实测证据，改表先看 `tests/test_activity_modes.py` / `tests/test_pvp_counters_table.py`。 |
 | `destiny_mcp/build/` | 配装求解引擎（护甲优化）：纯计算、不碰账号；`farm_target.py` 贴着 1296 上限。 |
-| `destiny_mcp/build_import/` | 从文章/截图导入配装；产出只是配方，不能直接拿去 `equip_build`。 |
 | `destiny_mcp/rag/` | 本地社区资料检索（Phase 3）。 |
-| `destiny_mcp/services/` | 服务层：账号读写、外部数据、形状工厂；判断逻辑落这里，别落工具层。**PvP 武器榜**（逐场 PGCR 聚合）在 `services/pvp_weapon_service.py`，它的结算缓存单独在 `services/pgcr_cache.py`（两者都登记了体积上限）；**游戏内生涯计数器**（profile 组件 1100）在 `services/activity_counters_service.py`：它与统计接口是两个来源，读抖动要重试、空要报 `unavailable`（不许当 0）；口径见 `docs/reference/bungie_api.md`。 |
+| `destiny_mcp/services/` | 服务层：账号读写、外部数据、形状工厂；判断逻辑落这里，别落工具层。**PvP 武器榜**（逐场 PGCR 聚合）在 `services/pvp_weapon_service.py`，它的结算缓存单独在 `services/pgcr_cache.py`（两者都登记了体积上限）；**游戏内生涯计数器**（profile 组件 1100）在 `services/activity_counters_service.py`：它与统计接口是两个来源，读抖动要重试、空要报 `unavailable`（不许当 0）；**锻造武器模式/红框**（图鉴「模式和催化」，进度在 profile 组件 900）在 `services/pattern_service.py`，社区来源的按名索引在 `services/starside_crafting_sources.py`（见 ADR-009）；口径见 `docs/reference/bungie_api.md`。 |
 | `destiny_mcp/tools/` | 工具层：只做分派、参数守卫与话术；intent 取值/参数归属/响应信封三张契约表都在这层。分支响应按域放 `_*_branches.py`（如 `_counters_branches.py` = `activity_assistant(intent="counters")`）。 |
 | `destiny_mcp/__main__.py` | `python -m destiny_mcp` 入口；写法要 spawn 安全（构建求解 worker 会重跑它）。 |
 | `destiny_mcp/server.py` | MCP 门面装配：注册工具与握手；别塞业务逻辑。 |
@@ -228,17 +250,31 @@ After registering or changing the MCP server, tell the user to restart Codex or 
 ADR 单独一张台账，见 `docs/adr/README.md`。
 
 - `docs/COMPATIBILITY.md` — 改响应形状、加/删别名、删旧键之前：哪些入口必须留、哪些能删、删之前先做什么。
+- `docs/benchmarks/README.md` — 引用 `docs/benchmarks/*.json` 里的性能数字之前看它：怎么读、哪些不能当结论、P0 的实测结论是什么。
 - `docs/community/COMMUNITY_DATA_NOTICE.md` — 引用或再分发社区资料（Starside）之前看授权与边界。
 - `docs/community/小黑盒_功能总览.md` — 面向中文玩家的八工具功能总览；写对外说明或话术时对齐口径。
+- `docs/community/小黑盒_更新公告_2026-09-18.md` — 上次发文以来的**新增与修复**发布稿（计数器/生涯三档/纯 PvP 武器榜 + 一串口径修复）；要发更新文章或对齐对外口径时看它。
 - `docs/plans/ARMOR_FORMAT_PLAN.md` — 动护甲载荷格式（体积口径、字段取舍）之前看实机证据与取舍。
 - `docs/plans/EQUIP_FLOW_PLAN.md` — 动装备流程（候选签发 → `confirmed` → 回读）之前看它为什么长这样。
+- `docs/plans/HOST_COMPAT_PLAN.md` — 要支持「只发标量」的宿主（豆包 connector 这类）时看它：哪些参数收文本写法、为什么 `equip_build` 改成也能收 `execution_id`、守门在哪。
 - `docs/plans/PVP_STATS_PLAN.md` — 动生涯/赛季战绩（计数器 vs 统计接口、模式与角色范围标注）之前看它为什么分三档。
+- `docs/plans/LEGACY_SURFACE_REMOVAL_PLAN.md` — 要动历史工具面（`full`/`expert` profile、`ENABLE_LEGACY_TOOLS`）或配装导入入口之前看它：删什么、导入怎么搬、怎么验都在里面。
+- `docs/plans/PATTERN_QUERY_PLAN.md` — 要做锻造武器模式（玩家说的红框、「模式和催化」那一页、游戏里的「模式进度 4/5」）查询之前看它：进度只在组件 900、183 vs 219 两个口径的实测证据都在里面。
+- `docs/plans/ROTATION_PLAN.md` — 要做周常轮换（夜幕/宗师词缀、遗失区域、上维挑战、泉源、异域任务、突袭/地牢特色）之前看它：官方接口给了哪半、哪半只能维护周期表、锚点与诚实口径都在里面。
+- `docs/plans/RESPONSE_PROJECTION_PLAN.md` — 要动「响应投影」（默认出口给行还是给整包）之前看它：两个大响应的实测基线、这轮只投影 `find`/`recommend` 与 `duplicates` 的边界、`execution_id` 作为引用协议的口径，以及冻结清单。
+- `docs/plans/PERFORMANCE_PLAN.md` — 要动性能（搜索 N+1、武器目录全量展开、载荷体积、启动、并发与缓存）之前看它：六项的实测基线与验收口径，外加**第七项（装备流程的往返次数）的基线、四步方案与实测口径**。
+- `docs/plans/SOLVER_OPTIMALITY_PLAN.md` — 要动护甲求解器的**目标函数与排序**（"刚好达标"、上限、偏好、调谐进搜索、可达区间）之前看它：根因的代码位置、五条待拍板口径与 P0–P6 阶段划分都在里面。
 - `docs/plans/PVP_WEAPON_BOARD_PLAN.md` — 动 PvP 武器榜（PGCR 窗口聚合、成本与并发实测、模式名出处）之前看它为什么只能给"最近 N 场"。
+- `docs/plans/STARSIDE_ENTITY_PLAN.md` — 要把 Starside 作者给的新归档（按 hash 的武器推荐/评语/神器关联/帧级 DPS）
+  接进工具面之前看它：全量字段与覆盖、hash 归一纪律、标记解析表、八条硬口径与 P0–P5 阶段都在里面。
+- `docs/plans/TUNING_WRITE_PLAN.md` — 要把「代写调谐」做成正式功能（`equip_build`/`equip_mod` 写调谐）之前看它：
+  三条硬口径（只写组件 310 清单里的、并进 `mods` 走同一执行器、写不进去不回退）与守门/验收清单都在里面。
 - `docs/plans/SUBCLASS_ARTIFACT_PLAN.md` — 动子职业/神器读写之前看计划与取舍。
 - `docs/plans/WEAPON_FORMAT_PLAN.md` — 动武器载荷格式之前看计划与实机证据。
 - `docs/reference/bungie_api.md` — 遇到 Bungie API 问题（scope、端点、AWA、组件号、上游错误码）时的实测事实清单；与官方文档冲突时以它为准。
 - `docs/testing/TESTING_CORPUS.md` — 改响应形状、加 intent、发版之前必读：测试分层与语料总纲。
 - `docs/testing/TESTING_CORPUS_FULL.md` — 要跑逐 intent 的全量回归、或查某个字段该长什么样时看它。
+- `docs/testing/TESTING_PHRASES.md` — 要**手动**试功能（照着念的口语清单：一句话一个功能、组合句、必须拒绝的句子）时看它；和代码行的语料分工不同。
 
 ## 决策记录（ADR）
 

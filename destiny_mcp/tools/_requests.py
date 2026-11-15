@@ -21,7 +21,16 @@ WeaponIntent = Literal[
     "analyze", "catalog", "search_catalog", "all_weapons", "global", "search_all", "filter_rolls",
     "compare", "compare_duplicates", "perk_pool", "perks", "god_roll", "popularity", "selection_rates",
     "perk_selection", "selection", "usage_rates", "type", "info", "stats", "perk_description", "catalyst", "community",
+    # 锻造武器模式（图鉴「模式和催化」的武器模式那一半）：进度读账号组件 900。
+    # 别名按玩家话术收：玩家说「红框」（带红框的深视共振武器）与「锻造武器」，
+    # 游戏官方中文叫「模式」（那条进度写「模式进度」），第三方工具常译作「图样」。
+    "patterns", "pattern", "craft", "锻造", "锻造武器", "图样", "图样进度", "模式进度", "红框", "红框进度",
 ]
+# 同一组同义 intent 写一次：工具层分派与参数归属都从这里取，别再各抄一份。
+# 内容必须与上面的 Literal 一致 —— `tests/test_pattern_query.py` 会核对。
+WEAPON_PATTERN_INTENTS: tuple[str, ...] = (
+    "patterns", "pattern", "craft", "锻造", "锻造武器", "图样", "图样进度", "模式进度", "红框", "红框进度",
+)
 BuildIntent = Literal["recommend", "find", "analyze", "farm_target", "equip_build", "armor_mods", "exotic_armor", "set_bonus", "community", "community_build", "starside"]
 LoadoutIntent = Literal["list", "get", "save", "delete", "equip_loadout", "search_identifiers", "snapshot_official", "update_official_identifiers", "clear_official"]
 SubclassIntent = Literal[
@@ -29,7 +38,9 @@ SubclassIntent = Literal[
     "artifact", "artifact_mod", "equip_artifact_mod", "equip_artifact", "community",
 ]
 ActivityIntent = Literal["history", "pgcr", "stats", "career", "historical_stats", "counters", "weapon_history", "weapons", "weapon_usage", "weapon_leaderboard", "pvp_weapons", "aggregate", "activity_aggregate", "activity_stats", "leaderboards", "leaderboard", "clan_leaderboards", "community"]
-WorldIntent = Literal["weekly", "weekly_full", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item", "community"]
+WorldIntent = Literal["weekly", "weekly_full", "rotations", "轮换", "周常轮换", "这周", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item", "community"]
+# 周常轮换：一组同义 intent 写一次，分派与参数归属都从这里取（守门：tests/test_rotations.py）
+WORLD_ROTATION_INTENTS: tuple[str, ...] = ("rotations", "轮换", "周常轮换", "这周")
 
 NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 

@@ -456,7 +456,7 @@ def update_max_stats(
     num_artifice_mods: int,
     desired_min_stats: list[int],
     desired_max_stats: list[int],
-    stat_ranges: list[list[int]],
+    reachable_ceilings: list[int],
 ) -> bool:
     """Update max stat ranges by per-point iteration with choose_auto_mods validation.
 
@@ -472,7 +472,7 @@ def update_max_stats(
         num_artifice_mods: Number of artifice mod slots.
         desired_min_stats: Minimum stat targets.
         desired_max_stats: Maximum stat targets.
-        stat_ranges: Current min/max ranges per stat (mutated).
+        reachable_ceilings: 每项属性的可达上限（原地更新，按 STAT_NAMES 顺序）。
 
     Returns:
         True if any stat can be improved beyond its current max.
@@ -485,8 +485,8 @@ def update_max_stats(
             value = set_stats[stat_index]
             filter_min = desired_min_stats[stat_index]
             filter_max = desired_max_stats[stat_index]
-            if value > stat_ranges[stat_index][1]:
-                stat_ranges[stat_index][1] = value
+            if value > reachable_ceilings[stat_index]:
+                reachable_ceilings[stat_index] = value
                 if filter_min < filter_max and value > filter_min:
                     found_any_improvement = True
         return found_any_improvement
@@ -505,15 +505,16 @@ def update_max_stats(
         value = set_stats[stat_index]
         filter_min = desired_min_stats[stat_index]
         filter_max = desired_max_stats[stat_index]
-        stat_range = stat_ranges[stat_index]
+        ceiling = reachable_ceilings[stat_index]
 
-        # Bump range to at least the filter minimum
-        if stat_range[1] < filter_min:
-            stat_range[1] = filter_min
+        # Bump ceiling to at least the filter minimum
+        if ceiling < filter_min:
+            ceiling = filter_min
 
-        if value > stat_range[1]:
-            stat_range[1] = value
+        if value > ceiling:
+            ceiling = value
             found_any_improvement = filter_min < filter_max
+        reachable_ceilings[stat_index] = ceiling
 
         needed = filter_min - value
         required_minimum_extra_stats[stat_index] = max(0, needed)
@@ -523,17 +524,17 @@ def update_max_stats(
         value = set_stats[stat_index]
         filter_min = desired_min_stats[stat_index]
         filter_max = desired_max_stats[stat_index]
-        stat_range = stat_ranges[stat_index]
+        ceiling = reachable_ceilings[stat_index]
 
-        if stat_range[1] >= MAX_STAT:
+        if ceiling >= MAX_STAT:
             continue
 
         # Save and modify: temporarily set this stat's requirement to its current max
         previous_required = required_minimum_extra_stats[stat_index]
-        required_minimum_extra_stats[stat_index] = stat_range[1] - value
+        required_minimum_extra_stats[stat_index] = ceiling - value
 
         # Iterate one point at a time
-        while stat_range[1] < MAX_STAT:
+        while ceiling < MAX_STAT:
             required_minimum_extra_stats[stat_index] += 1
 
             if not choose_auto_mods(
@@ -550,7 +551,8 @@ def update_max_stats(
             found_any_improvement = found_any_improvement or (
                 filter_min < filter_max and new_value > filter_min
             )
-            stat_range[1] = new_value
+            ceiling = new_value
+            reachable_ceilings[stat_index] = ceiling
 
         # Restore
         required_minimum_extra_stats[stat_index] = previous_required

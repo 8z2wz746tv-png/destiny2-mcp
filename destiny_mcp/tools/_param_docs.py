@@ -88,10 +88,11 @@ ItemInstanceId = Annotated[
 ]
 
 ItemInstanceIds = Annotated[
-    list[str] | None,
+    list[str] | str | None,
     Field(description=(
         '多个副本 instance ID，只被批量装备 intent="equip_many" 使用；'
         "单个副本用 item_instance_id。"
+        '只发标量的宿主可以写成 "id1,id2"（逗号、顿号、分号或换行分隔）。'
     )),
 ]
 
@@ -173,6 +174,17 @@ CanonicalBuild = Annotated[
         '服务端签发的完整配装候选（一次绑定、五个护甲部位齐全）。'
         '只能在用户确认后原样回传给 intent="equip_build"；'
         "禁止自己拼 hash、用 score，或把社区模板/build_template 当成它。"
+        "发不出结构体的宿主改用 execution_id（与它二选一，效果一样）。"
+    )),
+]
+
+ExecutionId = Annotated[
+    str,
+    Field(description=(
+        "服务端签发的配装候选 ID（在候选的 canonical_build.execution_id 里，"
+        "候选行上也单独给了一份）。**只发标量的宿主（如豆包 connector）用这个**："
+        'intent="equip_build" 传它就不必回传整个 canonical_build，服务端凭 ID 取回'
+        "自己签发的那份。与 canonical_build 二选一，10 分钟内、同一玩家、一次确认只能用一次。"
     )),
 ]
 
@@ -213,6 +225,7 @@ WorldIntentField = Annotated[
     WorldIntent,
     Field(description=(
         "世界/周常意图。weekly=本周概要；weekly_full=完整周常；vendor=商人当前货架；"
+        "rotations=周常轮换表（本周特色突袭/地牢、夜幕/宗师词缀与掉落、上维挑战/异域任务/泉源）；"
         "search_collectible_nodes=按关键词搜收藏品节点；collectible_node=某节点解锁状态（需要 collectible_node_hash）；"
         "collectible_item=某件物品的收藏状态；community=本地社区资料（唯一能跨分类搜的入口）。"
     )),
@@ -222,7 +235,7 @@ WorldIntentField = Annotated[
 
 _LIMIT_DESCRIPTION = (
     "最多返回多少条；null（或不传）= 没指定，按该 intent 的默认条数（背包清单 100 件、"
-    "配装 5 套、按类型列武器 20、武器目录/筛选 50、重复武器 10、商人菜单 15／详情 40）。传 0 或负数等于没指定。"
+    "配装 5 套、按类型列武器 20／锻造图样 20、武器目录/筛选 50、重复武器 10、商人菜单 15／详情 40）。传 0 或负数等于没指定。"
     "只限制返回条数，不限制扫描范围；被截断时响应里会带 truncated、总数与 next_offset，"
     "翻页把 next_offset 传给 offset。"
     "上面这些默认值只在声明了 limit 的工具里生效：同一个工具里不读它的 intent 传了会拿到"
@@ -299,7 +312,11 @@ ArmorSlot = Annotated[
 
 Rarity = Annotated[
     str,
-    Field(description="稀有度过滤（如 传说/异域、legendary/exotic）。只有列出清单的 intent 读它。"),
+    Field(description=(
+        "稀有度过滤（传说/异域/稀有，也认 legendary/exotic/rare 与玩家说的 金枪/金装/紫枪/紫装）。"
+        '筛"我的金枪图样"用 weapon_assistant(intent="patterns", rarity="异域")；'
+        "筛账号库存用 inventory_assistant(intent=\"get\")；其他 intent 传了会被拒。"
+    )),
 ]
 
 ToCharacter = Annotated[
@@ -334,22 +351,55 @@ Tracked = Annotated[
 
 RequiredPerks = Annotated[
     list[str] | str | None,
-    Field(description="必须全部命中的 Perk（同栏任一即可满足其中一项）。只有 catalog 与 filter_rolls 支持。"),
+    Field(description=(
+        "必须全部命中的 Perk（同栏任一即可满足其中一项）。只有 catalog 与 filter_rolls 支持。"
+        '多个 Perk 写成 "亡者复仇,速射"；单个 Perk 直接写名字。'
+    )),
 ]
 
 AnyPerks = Annotated[
     list[str] | str | None,
-    Field(description="命中任意一个即可的 Perk。只有 catalog 与 filter_rolls 支持。"),
+    Field(description=(
+        "命中任意一个即可的 Perk。只有 catalog 与 filter_rolls 支持。"
+        '多个 Perk 写成 "亡者复仇,速射"。'
+    )),
 ]
 
 ExcludedPerks = Annotated[
     list[str] | str | None,
-    Field(description="命中就排除的 Perk。只有 catalog 与 filter_rolls 支持。"),
+    Field(description=(
+        "命中就排除的 Perk。只有 catalog 与 filter_rolls 支持。"
+        '多个 Perk 写成 "亡者复仇,速射"。'
+    )),
+]
+
+FunctionalMods = Annotated[
+    list[str] | str | None,
+    Field(description=(
+        "照抄社区配装作者写的**部位功能模组**（抗性/搜寻/回收/吸引这类流派取向，不是六维属性模组）："
+        '传模组名列表，如 ["充沛", "特殊武器弹药搜寻者"]；重名的两颗就写两遍'
+        "（如两个「火力无限」）；认不出部位时写成「部位:名字」（helmet:充沛）。"
+        "它们**不进求解器**，但要占能量 —— 求解器会把这部分能量先扣掉，只给属性模组留剩下的。"
+        "插不进这一位角色或能量不够的会跳过并在回执里点名，不会让整条配装失败。"
+        "社区模板给的清单可以直接照传（见 community 响应的 solver_handoff.functional_mods）。"
+    )),
 ]
 
 SetBonusName = Annotated[
     str | None,
     Field(description='套装名。intent="set_bonus" 查它的 2/4 件效果；求解类 intent 把它当硬约束。'),
+]
+
+StatCaps = Annotated[
+    dict[str, int] | str | None,
+    Field(description=(
+        "属性**上限**映射，键与 priority_stats 同一套词（weapons/health/class_stat/grenade/"
+        "super_stat/melee，也认 武器/生命/职业/手雷/超能/近战）。例："
+        '{"grenade": 100} = 手雷别超过 100；只发标量的宿主写成 "grenade=100,melee=90"。'
+        "语义：超上限算**违规** —— 会被排到没超上限的"
+        "方案后面、并在结果的 max_violations 里逐项标注，**但不阻止出解**（不会因此报无解）；"
+        "同时求解器不再往已经到上限的属性上堆模组。不传 = 不限。上限低于下限会直接报错。"
+    )),
 ]
 
 SetBonusCount = Annotated[
@@ -419,9 +469,10 @@ ArtifactName = Annotated[
 ]
 
 Changes = Annotated[
-    dict[str, str] | None,
+    dict[str, str] | str | None,
     Field(description=(
-        "要改的组件 → 目标名称，例如 {\"super\": \"金色枪\"}。"
+        "要改的组件 → 目标名称，例如 {\"super\": \"金色枪\"}"
+        '（只发标量的宿主写成 "super=金色枪"）。'
         "键可用 super/melee/grenade/class_ability/movement/aspect/fragment，"
         "另外 subclass 用来换整套子职业（如 {\"subclass\": \"烈日\"}，也认\"火术\"或官方名破晓），值中英文皆可。"
         '只有 intent="modify" 读它，且必填。'
@@ -494,5 +545,16 @@ PriorityStat = Annotated[
         "（也认 武器/生命/职业/手雷/超能/近战/敏捷/韧性/恢复/纪律/智慧）；词表外的词只在模组名字或描述里"
         "做子串匹配，响应会用 match.kind=keyword 标出来，别当成按属性筛的结果。"
         "求解类 intent 里是排序用的优先级属性名。"
+    )),
+]
+
+
+IncludeProfile = Annotated[
+    bool,
+    Field(description=(
+        "模糊搜人（intent=\"find\"）时要不要连候选的档案一起读：true 会补"
+        "「游玩时长 / 最近游玩 / 凯旋分」并按置信度排序（**并发拉，约 5 秒**）；"
+        "false（默认）只给名字、ID 与平台，**不读任何人的档案**（快，约 1 秒）。"
+        "只有 intent=find 读它。"
     )),
 ]

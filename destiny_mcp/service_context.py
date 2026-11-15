@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     from .player_resolver import PlayerResolver
     from .services.build_service import BuildService
     from .services.armor_mod_service import ArmorModService
-    from .services.build_import_service import BuildImportService
     from .services.collection_service import CollectionService
     from .services.inventory_analysis_service import InventoryAnalysisService
     from .services.inventory_service import InventoryService
@@ -35,7 +34,10 @@ if TYPE_CHECKING:
     from .services.fragment_service import FragmentService
     from .services.artifact_service import ArtifactService
     from .services.set_bonus_service import SetBonusService
+    from .services.starside_entities import StarsideEntities
     from .services.starside_service import StarsideService
+    from .services.pattern_service import PatternService
+    from .services.rotation_service import RotationService
 
 
 class ServiceContext(TypedDict):
@@ -60,7 +62,6 @@ class ServiceContext(TypedDict):
     weekly_svc: WeeklyService
     weekly_analysis_svc: WeeklyAnalysisService
     loadout_svc: LoadoutService
-    build_import_svc: BuildImportService
     activity_svc: ActivityService
     activity_counters_svc: ActivityCountersService
     pvp_weapon_svc: PvpWeaponService
@@ -70,3 +71,6 @@ class ServiceContext(TypedDict):
     set_bonus_svc: SetBonusService
     collection_svc: CollectionService
     starside_svc: StarsideService
+    starside_entities_svc: StarsideEntities
+    pattern_svc: PatternService
+    rotation_svc: RotationService

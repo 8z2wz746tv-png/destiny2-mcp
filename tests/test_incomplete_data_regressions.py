@@ -32,7 +32,7 @@ class _InventoryManifest:
         self.last_search_limit = None
         self.last_type_limit = None
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         self.last_search_limit = limit
         return [item for item in self.items.values() if query in item["name"]]
 
@@ -204,3 +204,75 @@ async def test_collectible_node_rejects_missing_status_component() -> None:
             123,
             character="hunter",
         )
+
+
+async def test_collectible_node_without_any_status_explains_itself() -> None:
+    """节点声明了 50 条条目、组件 800 里却一条状态都没有时，不许把 0 当"一件都没有"。
+
+    真机（2026-09-18）：`search_collectible_nodes(query="动能武器")` 说「50 件物品」，
+    紧接着 `collectible_node` 回 `counts{total:0, acquired:0, missing:0, invisible:0}`、items 空 ——
+    对提问的人来说这条回答等于没说，还容易被读成"我一件都没解锁"。
+    """
+    node_def = {
+        "displayProperties": {"name": "动能武器"},
+        "children": {
+            "records": [{"recordHash": 1000 + i} for i in range(50)],
+            "collectibles": [],
+            "presentationNodes": [],
+        },
+    }
+    manifest = SimpleNamespace(
+        get_definition=lambda table, item_hash: node_def if table == "DestinyPresentationNodeDefinition" else None,
+    )
+    bungie = SimpleNamespace(
+        get_collectible_node_details=AsyncMock(
+            return_value={"ErrorCode": 1, "Response": {"collectibles": {"data": {"collectibles": {}}}}}
+        )
+    )
+    service = CollectionService(
+        bungie,
+        manifest,
+        _CollectionResolver(),  # type: ignore[arg-type]
+    )
+
+    result = await service.get_collectible_node_status("player", 2538646043, character="hunter")
+
+    assert result["counts"]["total"] == 0
+    assert result["declared"] == {"records": 50, "collectibles": 0, "presentation_nodes": 0}
+    reason = result["empty_reason"]
+    assert "50" in reason and "不能" in reason, reason
+    assert "一件都没有" in reason, reason
+
+
+async def test_collectible_node_with_child_nodes_points_at_them() -> None:
+    """有子节点时要把子节点 hash 交出来，让人能继续下钻（不是只说"没有"）。"""
+    child = {"displayProperties": {"name": "动能武器 > 手炮"}}
+    node_def = {
+        "displayProperties": {"name": "动能武器"},
+        "children": {
+            "records": [],
+            "collectibles": [],
+            "presentationNodes": [{"presentationNodeHash": 999}],
+        },
+    }
+
+    def definition(table: str, item_hash: int) -> dict | None:
+        if table != "DestinyPresentationNodeDefinition":
+            return None
+        return child if item_hash == 999 else node_def
+
+    bungie = SimpleNamespace(
+        get_collectible_node_details=AsyncMock(
+            return_value={"ErrorCode": 1, "Response": {"collectibles": {"data": {"collectibles": {}}}}}
+        )
+    )
+    service = CollectionService(
+        bungie,
+        SimpleNamespace(get_definition=definition),
+        _CollectionResolver(),  # type: ignore[arg-type]
+    )
+
+    result = await service.get_collectible_node_status("player", 2538646043, character="hunter")
+
+    assert result["child_nodes"] == [{"hash": 999, "name": "动能武器 > 手炮"}]
+    assert "child_nodes" in result["empty_reason"]

@@ -49,8 +49,15 @@ ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
         "compare": ("compare_duplicates",),
         "perk_pool": ("perks",),
         "popularity": ("selection_rates", "perk_selection", "selection", "usage_rates"),
+        # 锻造武器模式：玩家说「红框」「锻造武器」（永久别名），游戏官方中文叫「模式」，
+        # 第三方工具常译作「图样」；英文近义 pattern/craft 只登记不宣传
+        "patterns": (
+            "pattern", "craft", "锻造", "锻造武器", "图样", "图样进度", "模式进度", "红框", "红框进度",
+        ),
     },
-    "LoadoutIntent": {"list": ("get",)},
+    # `list` 与 `get` 在 0.7.6 之后是**两件事**（list 给清单行、get 给完整模板并可按 id 取一套），
+    # 所以 `get` 不再是 `list` 的别名 —— 留在别名表里，语料的"同参同 data"那行会一直红。
+    "LoadoutIntent": {},
     "SubclassIntent": {"get": ("subclass",)},
     "ActivityIntent": {
         "stats": ("career", "historical_stats"),
@@ -59,7 +66,10 @@ ALIASES: dict[str, dict[str, tuple[str, ...]]] = {
         "leaderboards": ("leaderboard",),
     },
     "BuildIntent": {"community": ("starside",)},
-    "WorldIntent": {},
+    "WorldIntent": {
+        # 周常轮换：中文说法（永久别名）
+        "rotations": ("轮换", "周常轮换", "这周"),
+    },
 }
 
 # 独立行为：自己有单独一段分派、不是任何东西的别名。新增 intent 必须落进
@@ -72,6 +82,7 @@ STANDALONE: dict[str, tuple[str, ...]] = {
         "perk_description", "catalyst", "community",
     ),
     "LoadoutIntent": (
+        "list", "get",
         "save", "delete", "equip_loadout", "search_identifiers",
         "snapshot_official", "update_official_identifiers", "clear_official",
     ),
@@ -100,7 +111,37 @@ def _dispatch_groups() -> list[set[str]]:
     groups: list[set[str]] = []
     for path in _DISPATCH_FILES:
         groups.extend(_groups_in(path))
+    # 同义 intent 收进 `_requests.py` 的模块常量、分派里只写 `intent in SOME_CONST`
+    # 是正确做法（单一出处），这里要把那些常量也算成"同一处分派"。
+    groups.extend(_module_constants().values())
     return groups
+
+
+def _module_constants() -> dict[str, set[str]]:
+    """`_requests.py` 与分派文件里的模块级"全字符串常量"：名字 → 取值集合。"""
+    found: dict[str, set[str]] = {}
+    for path in [Path(R.__file__), *_DISPATCH_FILES]:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in tree.body:
+            if isinstance(node, ast.AnnAssign):
+                targets: list[ast.expr] = [node.target]
+            elif isinstance(node, ast.Assign):
+                targets = list(node.targets)
+            else:
+                continue
+            value = node.value
+            if not isinstance(value, (ast.Set, ast.Tuple, ast.List)) or not value.elts:
+                continue
+            if not all(
+                isinstance(element, ast.Constant) and isinstance(element.value, str)
+                for element in value.elts
+            ):
+                continue
+            names = {element.value for element in value.elts}
+            for target in targets:
+                if isinstance(target, ast.Name):
+                    found[target.id] = names
+    return found
 
 
 def _groups_in(path: Path) -> list[set[str]]:
@@ -182,4 +223,53 @@ def test_alias_groups_share_one_dispatch_site() -> None:
     assert not detached, (
         "这些别名组没有共同的处分派（说明有人给其中某个别名写了单独分支）：\n  "
         + "\n  ".join(detached)
+    )
+
+
+def test_corpus_alias_groups_come_from_the_alias_table() -> None:
+    """语料脚本里的别名组必须与这张表一致 —— 别名表改了、语料那份副本没改就会一直红。
+
+    真机 2026-09-24：0.7.6 把 `list`/`get` 拆成两件事（list 只给清单行、get 给完整模板），
+    别名表跟着改了，可 `scripts/run_corpus_all_rows.py` 里**另抄了一份** `_ALIAS_GROUPS`，
+    于是每一轮真机语料都在报"list/get 同参不同 data"。这条闸扫那份副本：
+    同组取值必须同属一个 canonical 组（或同为 STANDALONE 的那种"独立行为"成组）。
+    """
+    import importlib.util
+    from pathlib import Path
+
+    script = Path(__file__).parents[1] / "scripts" / "run_corpus_all_rows.py"
+    spec = importlib.util.spec_from_file_location("_corpus_rows_for_alias_check", script)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    # 取值会跨工具重名（`find`/`get`/`list`/`type`/`stats` 都有两份），所以按**工具的 Literal**查
+    literal_of_tool = {
+        "player_assistant": "PlayerIntent",
+        "inventory_assistant": "InventoryIntent",
+        "weapon_assistant": "WeaponIntent",
+        "loadout_assistant": "LoadoutIntent",
+        "subclass_assistant": "SubclassIntent",
+        "activity_assistant": "ActivityIntent",
+        "world_assistant": "WorldIntent",
+        "build_assistant": "BuildIntent",
+    }
+    known: dict[tuple[str, str], str] = {}
+    for literal, groups in ALIASES.items():
+        for canonical, aliases in groups.items():
+            for value in (canonical, *aliases):
+                known[(literal, value)] = f"{canonical}"
+    for literal, values in STANDALONE.items():
+        for value in values:
+            known[(literal, value)] = f"STANDALONE:{value}"
+
+    problems = []
+    for tool, _args, intents, _slow in module._ALIAS_GROUPS:
+        literal = literal_of_tool[tool]
+        groups = {known.get((literal, value)) for value in intents}
+        if None in groups or len(groups) != 1:
+            problems.append(f"{tool} {intents} → {sorted(str(g) for g in groups)}")
+
+    assert not problems, (
+        "语料里的别名组与别名表对不上（同参断言会一直红）：" + "；".join(problems)
     )

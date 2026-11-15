@@ -54,7 +54,7 @@ def check(row: str, ok: bool, evidence: str) -> None:
 
 async def main() -> int:
     _patch_display_name_symbol()
-    async with app_lifespan(create_server("normal")) as svc:
+    async with app_lifespan(create_server()) as svc:
         ctx = type("C", (), {"request_context": type("R", (), {"lifespan_context": svc})})()
 
         # ① 工具入口：intent="counters"（这就是用户会走的那条路）

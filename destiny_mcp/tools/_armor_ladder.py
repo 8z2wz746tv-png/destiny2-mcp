@@ -16,8 +16,11 @@
 
 from __future__ import annotations
 
+import asyncio
+
 from typing import Any, Sequence
 
+from ..build.constants import REQUEST_TARGET_FIELDS
 from ..logging_config import get_logger
 from ..vocabulary import STAT_LABELS_ZH as STAT_LABELS  # 单一出处：vocabulary.py
 
@@ -25,14 +28,8 @@ logger = get_logger(__name__)
 
 STAT_ORDER: tuple[str, ...] = tuple(STAT_LABELS)
 
-TARGET_FIELDS: dict[str, str] = {
-    "weapons": "weapons_target",
-    "health": "health_target",
-    "class_stat": "class_target",
-    "grenade": "grenade_target",
-    "melee": "melee_target",
-    "super_stat": "super_target",
-}
+#: 单一出处：`build/constants.REQUEST_TARGET_FIELDS`（这里只换名字，调用点照旧）
+TARGET_FIELDS: dict[str, str] = dict(REQUEST_TARGET_FIELDS)
 
 _LADDER_STEP = 10
 
@@ -347,6 +344,8 @@ async def no_solution_ladder(
     request: Any,
     *,
     max_probes: int = 4,
+    coverage: dict[str, Any] | None = None,
+    base_order_empty: bool = False,
 ) -> dict[str, Any]:
     """无解时算这张表：逐级放松目标再解，把"降哪一档就能穿"摊开。
 
@@ -359,6 +358,10 @@ async def no_solution_ladder(
       而且当目标是互斥的时候，光换优先级每一种都是 0 候选，得**把目标放下来**再解。
 
     采样只在无解时发生（有解时一次都不用多跑）。
+
+    `base_order_empty=True` 表示"调用方刚刚用**原始请求 + 原始优先级**解过一次，0 候选"——
+    那一次的解不必再跑一遍（第一档的"原样"探测就是它），直接按已知结果记账。
+    协议输出一模一样：那一档本来也只会记成 `ok=false`。
     """
     analysis = await svc["build_svc"].analyze_build(player_name, request)
     single_stat = {
@@ -368,34 +371,38 @@ async def no_solution_ladder(
     reason = str(getattr(analysis, "reason", ""))
     analysis_precision = str(getattr(analysis, "precision", "exact"))
 
-    trials: list[dict[str, Any]] = []
-    samples: list[dict[str, int]] = []
-    for probe in relaxation_probes(request, max_probes=max_probes):
+    probes = relaxation_probes(request, max_probes=max_probes)
+
+    async def run_probe(probe_index: int, probe: dict[str, Any]) -> dict[str, Any]:
+        """跑一档：档内按顺序试优先级顺序（换顺序要拿到结果才能决定停不停），档与档之间并发。"""
         relaxed = apply_drops(request, probe["drop"])
         probe_error = ""
-        for order in sample_orders(relaxed, max_orders=2):
+        orders = sample_orders(relaxed, max_orders=2)
+        if base_order_empty and probe_index == 0:
+            # 第一档的"原样"就是调用方刚跑过的那次解（0 候选）：不重复求解，只跳过第一个顺序。
+            # 后面那个"换优先级顺序"的采样照旧 —— 那是新信息。
+            orders = orders[1:]
+        for order in orders:
             candidate = relaxed.model_copy(update={"priority_stats": order})
             try:
-                results = await svc["build_svc"].find_build(player_name, candidate)
+                results = await svc["build_svc"].probe_find_build(player_name, candidate)
             except Exception as exc:  # noqa: BLE001 - 探测失败要留痕，不能算"试过没成"
                 probe_error = f"{type(exc).__name__}: {exc}"
                 logger.warning("阶梯探测 %s 失败：%s", probe["label"], exc)
                 continue
             if results:
                 stats = _stats_of(results[0])
-                samples.append(stats)
-                trials.append({
+                return {
                     "label": probe["label"],
                     "dropped": list(probe["drop"]),
                     "priority": list(order),
                     "reached": stats,
                     "ok": True,
-                })
-                break
+                }
         else:
             if probe_error:
                 # 一次都没探成：**不能**记成"试过没有解"，那会把没测过的档说成否定结论。
-                trials.append({
+                return {
                     "label": probe["label"],
                     "dropped": list(probe["drop"]),
                     "priority": None,
@@ -403,16 +410,22 @@ async def no_solution_ladder(
                     "ok": None,
                     "not_probed": True,
                     "reason": probe_error,
-                })
+                }
             else:
-                trials.append({
+                return {
                     "label": probe["label"],
                     "dropped": list(probe["drop"]),
                     "priority": None,
                     "reached": {},
                     "ok": False,
-                })
+                }
 
+    # 档与档之间**并发**：每档 1–2 次求解、每次真机实测 ~35 秒，串行五次要 187 秒；
+    # 档内仍严格顺序（试完一个优先级顺序才决定要不要换下一个），所以结果与串行逐字相同。
+    trials = list(await asyncio.gather(*(
+        run_probe(index, probe) for index, probe in enumerate(probes)
+    )))
+    samples = [trial["reached"] for trial in trials if trial.get("ok") is True]
     ceiling = ceiling_from_samples(samples)
     precision = "sampled" if samples else "not_computed"
     tuning_evidence, tuning_unavailable = await _tuning_evidence(svc, player_name, request)
@@ -434,9 +447,19 @@ async def no_solution_ladder(
     # 这张阶梯**只在工具按原始请求 0 候选时**才会生成，所以 satisfiable 一定是 false；
     # 但 trials 里可能有 ok=true 的档 —— 那是"换了优先级顺序"或"放下目标"之后的结果。
     # 实机踩过：把 trials[0].ok 当结论会说成"其实配得出来"，而工具自己那一次是 0 候选。
+    # `coverage` 是生成这张阶梯的那次求解的自证：只有"枚举完了"才敢说不可行。
+    # 没搜完（预算/配额截断）时 `satisfiable` 必须是 None —— **不许把"没搜完"写成"不可行"**
+    # （d2-armor-solver 的原话：no limit can create an infeasibility proof）。
+    exhausted = True if coverage is None else bool(coverage.get("exhaustive"))
     table["verdict"] = {
-        "satisfiable": False,
-        "evidence": "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）",
+        "satisfiable": False if exhausted else None,
+        "evidence": (
+            "工具按原始优先级实测 0 候选（这张阶梯就是因此生成的）"
+            if exhausted
+            else f"工具按原始优先级返回 0 候选，但**这次没搜完**"
+                 f"（截断原因：{(coverage or {}).get('truncated_by') or '未说明'}），"
+                 "所以不能断言不可行"
+        ),
         "note": (
             "ceiling 是各次探测**逐项**取的最大值，不等于同一套护甲能同时达到；"
             "trials 里 ok=true 的档是**换了优先级顺序或放下目标**之后的解，原始请求一个字没改；"

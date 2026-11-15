@@ -34,6 +34,10 @@ class _Manifest:
     def get_item_info(self, item_hash: int):
         return self._infos.get(item_hash)
 
+    def get_item_name(self, item_hash: int) -> str:
+        """真 Manifest 的取名义口。替身也按真形状给（键是 `name`，不是 `displayProperties`）。"""
+        return str((self._infos.get(item_hash) or {}).get("name") or f"#{item_hash}")
+
     def get_definition(self, table: str, hash_id: int):
         if table == "DestinyPlugSetDefinition":
             return self._plug_sets.get(hash_id)
@@ -95,6 +99,21 @@ def test_plug_category_hash_falls_back_to_item_summary() -> None:
     service = _service(manifest)
 
     assert service._plug_category_hash(500) == GENERAL_MOD_CATEGORY
+
+
+def test_mod_label_reads_the_name_the_way_the_real_manifest_gives_it() -> None:
+    """回执里的模组名要真的取到 —— 模板是照**真 Manifest** 的形状给的。
+
+    真机 2026-09-24：`mod_label` 从 `get_item_info()` 的返回值里读 `displayProperties`，
+    而那个访问器给的是规范化小字典（键叫 `name`，没有 `displayProperties`）→ 每次都取空、
+    一路退回 hash：文档写着"steps 里的模组写中文名"，实际发出去的 30 条步骤全是 hash。
+    单测当时没抓到，是因为替身返回的是原始定义。
+    """
+    manifest = _Manifest(infos={600: {"name": "手雷模组"}})
+    service = _service(manifest)
+
+    assert service.mod_label(600) == "手雷模组"
+    assert service.mod_label(999) == "#999", "查不到时退回 hash，别编一个名字"
 
 
 def test_plug_category_hash_is_zero_for_unknown_plug() -> None:
@@ -264,7 +283,7 @@ async def test_prepare_mod_operations_uses_explicit_socket_map_in_order() -> Non
         {"item-1": {"energy": {"energyCapacity": 10, "energyUsed": 0}}},
     )
 
-    assert operations == [("mod", 600, 1), ("mod", 601, 3)]
+    assert [op.as_tuple() for op in operations] == [("mod", 600, 1), ("mod", 601, 3)]
 
 
 async def test_prepare_mod_operations_rejects_a_mod_without_a_unique_socket() -> None:
@@ -321,7 +340,9 @@ async def test_prepare_mod_operations_derives_used_energy_from_sockets() -> None
     )
 
     # 推导出的已用能量是 5 + 5 = 10；加目标 4 点后超 6 点上限，必须腾出两个插槽。
-    assert operations == [("clear", 800, 0), ("clear", 800, 1), ("mod", 600, 2)]
+    assert [op.as_tuple() for op in operations] == [
+        ("clear", 800, 0), ("clear", 800, 1), ("mod", 600, 2)
+    ]
 
 
 async def test_prepare_mod_operations_clears_minimum_energy_first() -> None:
@@ -350,7 +371,7 @@ async def test_prepare_mod_operations_clears_minimum_energy_first() -> None:
         {"item-1": {"energy": {"energyCapacity": 6, "energyUsed": 3}}},
     )
 
-    assert operations == [("clear", 800, 1), ("mod", 600, 0)]
+    assert [op.as_tuple() for op in operations] == [("clear", 800, 1), ("mod", 600, 0)]
 
 
 async def test_prepare_mod_operations_refuses_when_energy_cannot_be_freed() -> None:
@@ -785,3 +806,37 @@ async def test_empty_socket_cache_is_reread_instead_of_failing_the_preflight() -
     )
 
     assert index == 0, "空缓存要触发重读，而不是当成没有插槽"
+
+
+async def test_find_mod_socket_writes_tuning_like_any_other_mod() -> None:
+    """**调谐槽也是插槽**：`equip_build` 把调谐和属性模组一视同仁地写进去。
+
+    这是"代写调谐"这条能力的执行端守门（口径见 `docs/plans/TUNING_WRITE_PLAN.md`）：
+    候选计划里带的调谐插件走的就是 `mods` → `_find_mod_socket`（它按插件类别找槽，
+    调谐类别本来就在 `_MOD_CATEGORY_HASHES` 里），不需要第二条写入路径。
+    """
+    tuning_category = 3481777685  # core.gear_systems.armor_tiering.plugs.tuning.mods
+    manifest = _Manifest(
+        definitions={900: _mod(tuning_category, 0)},
+        plug_sets={701: {"reusablePlugItems": [{"plugItemHash": 900}]}},
+    )
+    service = _service(manifest)
+    manifest._definitions[100] = {
+        "sockets": {
+            "socketEntries": [
+                {"reusablePlugSetHash": 0},
+                {"reusablePlugSetHash": 701},   # 调谐槽在这一位
+            ]
+        }
+    }
+
+    result = await service._find_mod_socket(
+        "item-1",
+        100,
+        900,
+        "player",
+        3,
+        sockets_cache={"item-1": [{"plugHash": 0}, {"plugHash": 0}]},
+    )
+
+    assert result == 1, "调谐必须和别的模组一样，按类别找到它自己的插槽"

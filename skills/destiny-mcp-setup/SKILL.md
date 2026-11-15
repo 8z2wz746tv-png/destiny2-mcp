@@ -1,6 +1,6 @@
 ---
 name: destiny-mcp-setup
-description: Install, authenticate, register, verify, and troubleshoot the local Destiny MCP server in Codex. Use when setting up this repository for a new user, configuring Bungie API or OAuth credentials, registering the stdio server with codex mcp, handling the HTTPS localhost callback, diagnosing ERR_CONNECTION_REFUSED or missing secret and token failures, or confirming the normal eight-tool profile.
+description: Install, authenticate, register, verify, and troubleshoot the local Destiny MCP server in Codex. Use when setting up this repository for a new user, configuring Bungie API or OAuth credentials, registering the stdio server with codex mcp, handling the HTTPS localhost callback, diagnosing ERR_CONNECTION_REFUSED or missing secret and token failures, or confirming that exactly eight assistant tools are exposed.
 ---
 
 # Destiny MCP Setup
@@ -66,7 +66,6 @@ If `.env` is absent, create it from `.env.example` without modifying `.env.examp
 BUNGIE_API_KEY=
 BUNGIE_CLIENT_ID=
 BUNGIE_CLIENT_SECRET=
-DESTINY_MCP_TOOL_PROFILE=normal
 DESTINY_OAUTH_REDIRECT_URI=https://localhost:8765/callback
 ```
 
@@ -190,7 +189,7 @@ The verifier raises its own timeout to 1800s and prints `MANIFEST=missing ...` w
 
 Allow Bungie network and token-file access when the sandbox requires approval. The verifier starts the same stdio command, initializes an MCP client session, calls the read-only `player_assistant(intent="profile")`, and then calls `list_tools` without printing secrets or profile data.
 
-For the default `normal` profile, require exactly these eight tools:
+The tool face is exactly these eight assistant tools（2026-09-20 起没有 profile / 历史工具开关）:
 
 ```text
 player_assistant
@@ -252,5 +251,5 @@ Finish only when all conditions hold:
 2. `.env` contains all required values, is ignored, and is not printed.
 3. OAuth saves a refresh token.
 4. `codex mcp get destiny` reports an enabled stdio entry with the expected absolute command.
-5. `verify_mcp.py` reports `BUNGIE_PROFILE_CHECK=ok` and all eight normal-profile tools.
+5. `verify_mcp.py` reports `BUNGIE_PROFILE_CHECK=ok` and all eight assistant tools.
 6. The user is told to restart Codex or use a new task.

@@ -7,9 +7,10 @@ keep the Build Engine domain isolated (see docs/adr/001-canonical-build-strategy
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, cast
+from collections.abc import Callable, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Literal, cast
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 from ..logging_config import get_logger
 from ..models import ArmorStats
@@ -22,7 +23,9 @@ from .armor_rules import (
     tier5_templates,
     tuning_options,
 )
+from .constants import SOLVER_SLOT_TO_LOADOUT
 from .constants import (
+    REQUEST_TARGET_FIELDS,
     ARMOR_SLOT_MAP,
     NAME_TO_STAT_HASH,
     STAT_HASH_TO_NAME,
@@ -48,15 +51,27 @@ def _matching_armor3_roll(
     gear_tier: int,
     archetype_hash: int,
     tuning_hash: int | None,
+    *,
+    masterwork_bonus: int = 0,
 ) -> tuple[ArmorRollTemplate, ArmorTuningOption | None] | None:
-    """Restore a legal Tier-5 roll from stats after installed mods are removed."""
+    """Restore a legal Tier-5 roll from stats after installed mods are removed.
+
+    `masterwork_bonus` = **大师插槽那颗插件声明的档位**（1–5；没改造过就是 0）。
+    真机（2026-09-22）：插件声明的是"六维各 +N"，但**实际只加在"非词条那三项"上** ——
+    和 `平衡调整` 一样属于"声明值 ≠ 生效范围"。降临回音臂铠 `…539530` 是档位 3：
+    词条 武器20/超能30/近战25 + 非词条三项各 +3 = 304 里那六个 `20 3 3 3 30 25`。
+    以前这里固定拿 `gear_tier`（=5）当加成，于是"只升到 3 档"的件永远反推不出来。
+    """
     archetype = resolve_archetype(archetype_hash)
     if archetype is None:
         return None
     actual = tuple(int(final_stats.get(stat_name, 0)) for stat_name in STAT_NAMES)
     matches: list[tuple[ArmorRollTemplate, ArmorTuningOption | None]] = []
     for template in tier5_templates(archetype):
-        expected = [value + gear_tier if value == 0 else value for value in template.base_stats]
+        expected = [
+            value + masterwork_bonus if value == 0 else value
+            for value in template.base_stats
+        ]
         option: ArmorTuningOption | None = None
         if tuning_hash is not None:
             option = next(
@@ -80,6 +95,54 @@ def _matching_armor3_roll(
         if actual == tuple(expected):
             matches.append((template, option))
     return matches[0] if len(matches) == 1 else None
+
+
+def tuning_options_from_reusable(
+    item_reusable: Mapping[str, Any],
+    category_of: Callable[[int], int],
+    tuning_category: int,
+) -> tuple[int, ...]:
+    """从组件 310（`ItemReusablePlugs`）里取出"**这件护甲允许装**的调谐插件"。
+
+    为什么必须用它、不能用 Manifest：Manifest 的调谐 plug set 是全局那 32 颗（真机里两件
+    同名手套指向同一个集合），而每件实际只开放"某一个属性 +5"的 5 颗 + 平衡调整。
+    返回空元组 = **读不到**（没请求 310 / 这件没有调谐槽）—— 缺数据 ≠ 允许，调用方要么不规划，
+    要么拦下写入。真机口径见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 四·十四。
+
+    单一出处：解析（`InventorySnapshot.from_profile`）与写入前的校验（`ArmorModService.plan`）
+    都走这里，避免两处各写一遍"哪个槽是调谐槽"。
+
+    **返回值统一成无符号**（`to_unsigned`）：profile/310 本来就是无符号，但清单会一路流到求解器与
+    写入兜底，那里再跟 `manifest.search` 的有符号 hash 比 —— 与其让每个消费方各自记得换算，
+    不如在这里定成一种写法（比较那颗仍走 `tuning_is_allowed`）。
+    """
+    for rows in (item_reusable.get("plugs") or {}).values():
+        first = next((int((r or {}).get("plugItemHash", 0) or 0) for r in (rows or []) if r), 0)
+        # 同一个槽里的插件同类别，看第一颗就够（每件要过好几个槽，别全查）
+        if not first or category_of(first) != tuning_category:
+            continue
+        return tuple(
+            to_unsigned(int((r or {}).get("plugItemHash", 0) or 0))
+            for r in (rows or [])
+            if r and (r or {}).get("plugItemHash")
+        )
+    return ()
+
+
+def tuning_is_allowed(tuning_options: Sequence[int], plug_hash: int) -> bool:
+    """这颗调谐在**这件护甲允许的清单**里吗 —— 两边都过 `to_unsigned`。
+
+    为什么必须归一：`manifest.search` 给的是**有符号** hash，组件 310 给的是**无符号**，
+    裸 `in` 永远不相等。真机踩到（2026-09-22）：光芒领主面具 `6917530188460608169` 的 310
+    清单里明明有 `+超能 / -生命值`（4026414261），而按名字搜出来是 `-268553035`
+    → 工具把清单里有的调谐判成"装不到这件上"，还给了个 1675 的理由（**错判**）。
+    这是本项目的老坑（`plug_is_insertable` / `_find_mod_socket` 都为此过 `to_unsigned`，
+    见 `loadout_plug_lookup` 的注释），所以调谐这条也收进同一个规矩里。
+
+    空清单 = **读不到**（缺数据 ≠ 允许）：由调用方决定是"不规划"还是"不拦"。
+    """
+    target = to_unsigned(int(plug_hash))
+    return any(to_unsigned(int(option)) == target for option in (tuning_options or ()))
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -123,6 +186,14 @@ class Armor(BaseModel):
     base_roll_stats: ArmorStats = Field(default_factory=ArmorStats)
     masterwork_level: int = Field(default=0, ge=0, le=5)
     tuning_mod_hash: int | None = None
+    #: 已装的"方案不会去动"的模组占掉的能量（手臂/职业/头盔那些 `enhancements.v2_*`）。
+    #: 求解器只能拿**剩下的**能量装属性模组 —— 见 `armor_to_process_item` 与
+    #: docs/plans/SOLVER_OPTIMALITY_PLAN.md 四·十六。**一般插槽里那颗不算**（它会被替换掉）。
+    energy_used_by_other_mods: int = 0
+    #: 这件护甲**允许装**的调谐插件 hash（组件 310 的清单）。**空 = 读不到，缺数据 ≠ 允许** ——
+    #: 求解器不许拿 Manifest 那份全局 32 颗当选项（每件实际只开放"某一个属性 +5"的 5 颗
+    #: + 平衡调整，真机实测见 `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 四·十四）。
+    tuning_option_hashes: tuple[int, ...] = ()
     tuning_name: str = ""
     armor3_roll_verified: bool = False
     roll_parse_error: str = ""
@@ -237,6 +308,7 @@ class InventorySnapshot(BaseModel):
         profile: dict,
         manifest: "ManifestManager",
         character_class: str = "",
+        reserved_mod_energy: dict[str, int] | None = None,
     ) -> "InventorySnapshot":
         """Build an InventorySnapshot from a raw GetProfile response.
 
@@ -249,6 +321,8 @@ class InventorySnapshot(BaseModel):
             manifest: ManifestManager for item name/type/tier lookups.
             character_class: Target class filter — "hunter"/"warlock"/"titan" (or Chinese).
                            If empty, includes all classes.
+            reserved_mod_energy: 部位 → "照抄来的功能模组要占掉的能量"。给了就保证求解器
+                           给属性模组只留**剩下的**能量（照抄模组不进求解，但它的成本要算进去）。
 
         Returns:
             InventorySnapshot with armor grouped by slot.
@@ -264,6 +338,9 @@ class InventorySnapshot(BaseModel):
             .get("stats", {})
             .get("data", {})
         )
+        reusable_plugs_map = (
+            profile.get("itemComponents", {}).get("reusablePlugs", {}).get("data", {})
+        )
         sockets_data_map = (
             profile.get("itemComponents", {})
             .get("sockets", {})
@@ -275,6 +352,14 @@ class InventorySnapshot(BaseModel):
         _ARTIFICE_PLUG_CATEGORIES = {3773173029, 595201146}
         _ARMOR3_ARCHETYPE_CATEGORY = 778194869
         _ARMOR3_TUNING_CATEGORY = 3481777685
+        #: 大师插槽的**类别标识字符串**（不是 hash）—— 判断"有没有真大师"要用它比对
+        #: `plugCategoryIdentifier`；同名「升级护甲」两种插件的区别就在 `investmentStats` 上。
+        _ARMOR3_MASTERWORK_CATEGORY = "v460.plugs.armor.masterworks"
+
+        def _plug_category(plug_hash: int) -> int:
+            """插件的 `plugCategoryHash`（读不到定义返回 0）。"""
+            definition = manifest.get_item_definition(plug_hash) or {}
+            return int(((definition.get("plug") or {}).get("plugCategoryHash", 0) or 0))
         _SET_BONUS_SELECTOR_CATEGORY = 1313063513
         _MOD_CATEGORIES = {
             2487827355,  # armor mods (grenade, melee, etc.)
@@ -393,15 +478,25 @@ class InventorySnapshot(BaseModel):
             # an informational field for Armor 3.0 pieces.
             energy = instance.get("energy", {}) if isinstance(instance, dict) else {}
             energy_capacity = int(energy.get("energyCapacity", 0) or 0) if isinstance(energy, dict) else 0
-            is_masterworked = gear_tier == 5 if armor_system == "armor_3" else energy_capacity >= 10
+            # 满大师先按老口径给个初值；Armor 3.0 的件读完插槽后会**由大师插件改写**
+            # （真机 2026-09-22 纠正：以前 `gear_tier == 5` 把"没改造过"的 T5 也算满大师，
+            # 于是词条反推按 +5×3 去凑、永远对不上，农场反推跟着错）。
+            is_masterworked = (
+                gear_tier == 5 if armor_system == "armor_3" else energy_capacity >= 10
+            )
 
             # Artifice armor & set bonus wildcard: check sockets
             sockets_data = sockets_data_map.get(inst_id, {}).get("sockets", [])
             is_artifice = False
+            #: 已装的**非一般插槽**模组占的能量（求解器不能拿它来装属性模组）。
+            other_mod_energy = 0
             has_set_bonus_mod_socket = False
             archetype_hashes: list[int] = []
             tuning_hash: int | None = None
             tuning_name = ""
+            #: 大师插槽那颗「升级护甲」声明的**档位**（1–5；只带能量标记的那种是 0）。
+            #: 真机：插件声明"六维各 +N"，实际只加在"非词条那三项"上（见 `_matching_armor3_roll`）。
+            masterwork_tier = 0
             for socket in sockets_data:
                 plug_hash = socket.get("plugHash", 0)
                 if plug_hash:
@@ -414,6 +509,31 @@ class InventorySnapshot(BaseModel):
                             has_set_bonus_mod_socket = True
                         if plug_category == _ARMOR3_ARCHETYPE_CATEGORY:
                             archetype_hashes.append(int(plug_hash))
+                        category_identifier = str(
+                            (plug_def.get("plug") or {}).get("plugCategoryIdentifier") or ""
+                        )
+                        if category_identifier.startswith("enhancements.") and (
+                            category_identifier != "enhancements.v2_general"
+                        ):
+                            # 部位模组（手臂/职业/头盔…）：方案不改它们，但它们**占着能量**。
+                            # 一般插槽（v2_general，属性模组）不算 —— 那颗会被替换掉。
+                            other_mod_energy += int(
+                                ((plug_def.get("plug") or {}).get("energyCost") or {})
+                                .get("energyCost", 0) or 0
+                            )
+                        if (
+                            (plug_def.get("plug") or {}).get("plugCategoryIdentifier")
+                            == _ARMOR3_MASTERWORK_CATEGORY
+                        ):
+                            masterwork_tier = max(
+                                (
+                                    int(entry.get("value", 0) or 0)
+                                    for entry in plug_def.get("investmentStats", [])
+                                    if isinstance(entry, dict)
+                                    and entry.get("statTypeHash") in MAIN_STAT_HASHES
+                                ),
+                                default=0,
+                            )
                         if plug_category == _ARMOR3_TUNING_CATEGORY:
                             if any(
                                 entry.get("statTypeHash") in MAIN_STAT_HASHES
@@ -440,6 +560,10 @@ class InventorySnapshot(BaseModel):
             base_roll_stats = ArmorStats()
             masterwork_level = gear_tier or 0
             if armor_system == "armor_3":
+                # 大师看**插槽里那颗插件声明的档位**（0 = 没改造）：以前按 T 级一律当满大师，
+                # 于是"只升到 3 档"的件被当成 +5、词条反推永远对不上。见 `_matching_armor3_roll`。
+                is_masterworked = masterwork_tier > 0
+                masterwork_level = masterwork_tier
                 # 这些是**给人看**的话（会进分析结果），所以写中文、说清"能不能反推"，
                 # 不要留英文开发者口气（语料「已知问题」表里登记过这条）。
                 if gear_tier is None:
@@ -456,7 +580,10 @@ class InventorySnapshot(BaseModel):
                     roll_parse_error = "这件护甲的词条原型插槽缺失或无法确定，无法反推。"
                 else:
                     archetype_hash = archetype_hashes[0]
-                    roll = _matching_armor3_roll(base_stats_dict, gear_tier, archetype_hash, tuning_hash)
+                    roll = _matching_armor3_roll(
+                        base_stats_dict, gear_tier, archetype_hash, tuning_hash,
+                        masterwork_bonus=masterwork_tier,
+                    )
                     if roll is None:
                         roll_parse_error = (
                             "这件护甲的属性组合对不上任何合法的 T5 词条模板，无法反推。"
@@ -494,6 +621,13 @@ class InventorySnapshot(BaseModel):
                 else f"https://www.bungie.net{icon_path}" if icon_path else ""
             )
 
+            # ── 调谐：**允许装哪些只信组件 310**（单一出处：模块级 `tuning_options_from_reusable`）
+            tuning_options = tuning_options_from_reusable(
+                reusable_plugs_map.get(inst_id) or {},
+                _plug_category,
+                _ARMOR3_TUNING_CATEGORY,
+            )
+
             return Armor(
                 item_instance_id=inst_id,
                 item_hash=item_hash,
@@ -520,6 +654,14 @@ class InventorySnapshot(BaseModel):
                 masterwork_level=masterwork_level,
                 tuning_mod_hash=tuning_hash,
                 tuning_name=tuning_name,
+                tuning_option_hashes=tuning_options,
+                # 照抄来的功能模组要占的能量：取 `max(已装的部位模组, 预留额度)`。
+                # 为什么是 max：只替换得掉**同类**的那几颗，抄不满的旧模组还占着能量 ——
+                # 少算的后果是属性模组装不下（12/11 预检失败并回退），多算只是少用一点能量。
+                energy_used_by_other_mods=max(
+                    other_mod_energy,
+                    int((reserved_mod_energy or {}).get(SOLVER_SLOT_TO_LOADOUT.get(slot, slot), 0) or 0),
+                ),
                 armor3_roll_verified=armor3_roll_verified,
                 roll_parse_error=roll_parse_error,
                 is_artifice=is_artifice,
@@ -648,6 +790,19 @@ class BuildRequest(BaseModel):
         default=None, ge=2, le=4,
         description="Required number of set pieces (2 or 4). Default: 2",
     )
+    stat_caps: dict[str, int] = Field(
+        default_factory=dict,
+        description=(
+            "属性**上限**映射，键与 priority_stats 同一套词（weapons/health/class_stat/"
+            "grenade/super_stat/melee，也认 职业/手雷 这类中文）。超上限算违规：会被排到后面"
+            "并在结果里标注，但**不阻止出解**。不传 = 不限。"
+        ),
+    )
+
+    def target_vector(self) -> list[int | None]:
+        """六个下限，按 `STAT_NAMES` 顺序（没给的项是 None，不是 0）。"""
+        return [getattr(self, REQUEST_TARGET_FIELDS[name], None) for name in STAT_NAMES]
+
     priority_stats: list[str] = Field(
         default_factory=list,
         description="Stats to maximize in strict order after meeting all minimums. "
@@ -680,6 +835,14 @@ class BuildConstraints(BaseModel):
     grenade_min: int = 0
     melee_min: int = 0
     super_stat_min: int = 0
+    #: 上限：0 = 不限（与 `process_utils` 里 `desired_max_stats` 的 0 语义一致）。
+    #: **超上限不阻止出解**，只是排到后面 + 在结果里标注 —— 见 docs/plans/SOLVER_OPTIMALITY_PLAN.md 决定 1。
+    weapons_max: int = 0
+    health_max: int = 0
+    class_stat_max: int = 0
+    grenade_max: int = 0
+    melee_max: int = 0
+    super_stat_max: int = 0
     exotic_hash: int | None = None
     exotic_hashes: set[int] = Field(default_factory=set, description="All hashes for the exotic (different versions of same item)")
     class_type: int | None = None
@@ -694,6 +857,10 @@ class BuildConstraints(BaseModel):
     def as_vector(self) -> list[int]:
         """Return stat minimums as a list in STAT_NAMES order."""
         return [getattr(self, f"{s}_min") for s in STAT_NAMES]
+
+    def max_vector(self) -> list[int]:
+        """Return stat **caps** in STAT_NAMES order；0 = 不限。"""
+        return [getattr(self, f"{s}_max") for s in STAT_NAMES]
 
     def subclass_and_fragment_vector(self) -> list[int]:
         """Return combined subclass + fragment bonuses as a vector."""
@@ -774,9 +941,23 @@ class BuildResult(BaseModel):
         default_factory=list,
         description="Stat targets that weren't met",
     )
+    max_violations: list[dict] = Field(
+        default_factory=list,
+        description=(
+            "超过 `stat_caps` 的项：[{stat, label, actual, max}]。空表 = 没超过任何上限。"
+            "超上限**不阻止出解**，只是这套会被排到没超上限的方案后面（口径见计划文档决定 1）。"
+        ),
+    )
     fragment_details: list[dict] = Field(
         default_factory=list,
         description="Fragment stat details: [{name, stats: {stat: bonus}}]",
+    )
+    functional_mods: dict = Field(
+        default_factory=dict,
+        description=(
+            "这次照抄社区配装的部位功能模组（空 = 没照抄）：{mods, energy_by_slot, unresolved}。"
+            "它们是流派取向、不进求解器，但占掉的能量已经从六维求解里扣掉"
+        ),
     )
     active_set_bonuses: list[dict] = Field(
         default_factory=list,
@@ -801,6 +982,18 @@ class BuildResult(BaseModel):
         default="",
         description="调谐改动的人话说明；不用动调谐时为空串",
     )
+
+    @computed_field
+    @property
+    def execution_id(self) -> str:
+        """候选 ID 单独露一份（标量）。
+
+        只发标量的宿主（豆包 connector 实测）拿不到嵌套结构体里的字段，
+        而"要装备就必须把候选 ID 带回来"这件事对每个宿主都成立 ——
+        放在结果行顶层，谁都能一眼取到。**派生字段**：不存一份，就不会与
+        `canonical_build.execution_id` 分叉。
+        """
+        return self.canonical_build.execution_id if self.canonical_build else ""
 
 
 class BuildAnalysis(BaseModel):

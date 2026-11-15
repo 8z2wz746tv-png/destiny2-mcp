@@ -30,7 +30,6 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
 from typing import Any
 
 from ..bungie_client import BungieClient
@@ -41,6 +40,7 @@ from ..manifest import ManifestManager, class_type_name
 from ..player_resolver import PlayerResolver
 from .activity_service import _unwrap_bungie_response
 from .pgcr_cache import PgcrCache
+from .pgcr_values import days_span, rounded_int, stat_value
 
 logger = get_logger(__name__)
 
@@ -59,22 +59,6 @@ BOARD_KEYS: tuple[str, ...] = (*activity_modes.pvp_keys(), "gambit")
 
 # 失败场次的样本上限（全量数字在 `failed_matches.total` 与 `window.matches_failed`）。
 FAILED_SAMPLE = 10
-
-
-def _stat_value(values: dict, *keys: str) -> float | None:
-    """从 `values.<key>.basic.value` 取数字；取不到给 `None`（缺值不编 0）。"""
-    for key in keys:
-        entry = values.get(key)
-        basic = entry.get("basic") if isinstance(entry, dict) else None
-        if isinstance(basic, dict):
-            value = basic.get("value")
-            if isinstance(value, (int, float)) and not isinstance(value, bool):
-                return float(value)
-    return None
-
-
-def _as_int(value: float | None) -> int | None:
-    return None if value is None else int(round(value))
 
 
 class PvpWeaponService:
@@ -220,13 +204,20 @@ class PvpWeaponService:
         history_failures: list[str] = []
         candidates: dict[str, dict] = {}
         per_character: list[dict] = []
-        for char_id, class_name in targets:
-            try:
-                activities = await self._pvp_matches(mid, mtype, char_id, mode_type)
-            except Exception as exc:  # 单角色失败只丢这个角色，其余照算（带 warnings）
-                logger.warning("PvP 历史拉取失败 char=%s: %s", char_id, exc)
-                history_failures.append(f"{class_name}：{exc}")
+        # 三个角色**同时**拉（与 `activity_service.get_activity_history` 同一取舍）：
+        # 角色之间独立，串行要等 3 次往返。用 return_exceptions 保住原来的降级语义 ——
+        # 单个角色失败只丢那个角色，其余照算并写进 warnings。
+        fetched = await asyncio.gather(
+            *(self._pvp_matches(mid, mtype, char_id, mode_type) for char_id, _ in targets),
+            return_exceptions=True,
+        )
+
+        for (char_id, class_name), outcome in zip(targets, fetched):
+            if isinstance(outcome, BaseException):
+                logger.warning("PvP 历史拉取失败 char=%s: %s", char_id, outcome)
+                history_failures.append(f"{class_name}：{outcome}")
                 continue
+            activities = outcome
             per_character.append({
                 "character_id": char_id,
                 "class": class_name,
@@ -294,8 +285,8 @@ class PvpWeaponService:
                 if not isinstance(item_hash, int):
                     continue
                 values = weapon.get("values") or {}
-                kills = _as_int(_stat_value(values, "uniqueWeaponKills"))
-                precision = _as_int(_stat_value(values, "uniqueWeaponPrecisionKills"))
+                kills = rounded_int(stat_value(values, "uniqueWeaponKills"))
+                precision = rounded_int(stat_value(values, "uniqueWeaponPrecisionKills"))
                 if kills is None:
                     continue
                 row = totals.setdefault(
@@ -399,7 +390,7 @@ class PvpWeaponService:
         if history_failures:
             warnings.append("有角色的历史没读成，已跳过：" + "；".join(history_failures))
         if window["oldest"]:
-            days = self._days_span(window["oldest"], window["newest"])
+            days = days_span(window["oldest"], window["newest"])
             if days is not None and days > 60:
                 warnings.append(
                     f"时间窗跨度 {days} 天：这是\"最近打过的 {len(analyzed)} 场\"，"
@@ -441,21 +432,3 @@ class PvpWeaponService:
             },
             "warnings": warnings,
         }
-
-    @staticmethod
-    def _days_span(oldest: str, newest: str) -> int | None:
-        """时间窗天数；解析不出来给 `None`（不编一个数字）。"""
-        def parse(value: str) -> datetime | None:
-            try:
-                return datetime.fromisoformat(value.replace("Z", "+00:00"))
-            except ValueError:
-                return None
-
-        start, end = parse(oldest), parse(newest)
-        if start is None or end is None:
-            return None
-        if start.tzinfo is None:
-            start = start.replace(tzinfo=timezone.utc)
-        if end.tzinfo is None:
-            end = end.replace(tzinfo=timezone.utc)
-        return abs((end - start).days)

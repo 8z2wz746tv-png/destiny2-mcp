@@ -12,7 +12,12 @@ import aiobungie
 import anyio
 
 from ..bungie_client import BungieClient
-from ..exceptions import DestinyMCPError, ItemNotFoundError, TransferError
+from ..exceptions import (
+    DestinyMCPError,
+    ItemNotFoundError,
+    TransferError,
+    describe_exception,
+)
 from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager
@@ -24,7 +29,10 @@ from ..models import (
 from ..player_resolver import PlayerResolver
 from ..services.transfer_service import TransferService
 from .account_action_lock import account_action_lock
-from .loadout_mod_sockets import ModSocketMixin
+from .write_readback import read_until
+from .loadout_functional_mods import FunctionalModMixin
+from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
+from .loadout_transfer_step import TransferStepMixin
 from .loadout_recovery import RecoveryStateMixin
 from .loadout_subclass_sockets import SubclassSocketMixin
 
@@ -32,26 +40,10 @@ logger = get_logger(__name__)
 
 _CANCEL_ROLLBACK_TIMEOUT_SECONDS = 60
 
-def _mod_write_needs_in_game(result: dict) -> bool:
-    """模组写入是不是被 Bungie 的策略挡了（而不是我们写错）。
 
-    真机实测两种：
-    - 403 `Access not permitted by application scope`：装护甲模组要 `AdvancedWriteActions`，
-      本应用没有这个 scope；
-    - 500 `This action can only be done in-game.`：卸/换模组只能在游戏里做。
-
-    这两种都不是"重试能成"的错误，也不该把已经换好的装备回滚掉 —— 如实告诉用户
-    "这几颗模组请在游戏里装"才是对的。
-    """
-    text = f"{result.get('Message', '')} {result.get('ErrorStatus', '')}"
-    return (
-        "Access not permitted by application scope" in text
-        or "can only be done in-game" in text
-        or result.get("ErrorCode") in (403, 500) and "in-game" in text
-    )
-
-
-class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocketMixin):
+class LoadoutEquipmentService(
+    RecoveryStateMixin, ModSocketMixin, FunctionalModMixin, SubclassSocketMixin, TransferStepMixin
+):
     """Apply loadout equipment: transfer, equip, mods, subclass config."""
 
     def __init__(
@@ -110,39 +102,13 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                 message=f"找不到角色 '{loadout.character}'。",
             )
 
-        # Step 1: Transfer every item before one batch equip. Equipping piece by
-        # piece can fail for valid exotic swaps while the old exotic is active.
-        transferred_ids: list[str] = []
-        for lo_item in loadout.items:
-            if not lo_item.item_instance_id:
-                steps.append(MoveItemStep(
-                    action="skip",
-                    detail=f"跳过 '{lo_item.name}'（无实例 ID）",
-                    success=False,
-                ))
-                all_ok = False
-                continue
-
-            try:
-                transfer_result = await self._transfer.transfer_item(
-                    player_name, lo_item.item_instance_id, loadout.character,
-                )
-                steps.append(MoveItemStep(
-                    action="transfer",
-                    detail=f"转移 '{lo_item.name}' → {loadout.character}",
-                    success=transfer_result.success,
-                ))
-                if transfer_result.success:
-                    transferred_ids.append(lo_item.item_instance_id)
-                else:
-                    all_ok = False
-            except (ItemNotFoundError, TransferError) as e:
-                steps.append(MoveItemStep(
-                    action="error",
-                    detail=f"'{lo_item.name}' 装备失败: {e}",
-                    success=False,
-                ))
-                all_ok = False
+        # Step 1: 搬运（有界并发）。顺序不能动：先都搬过来、再一起装，见 loadout_transfer_step。
+        transfer_steps, transferred_ids, transfers_ok = await self.transfer_loadout_items(
+            player_name, loadout
+        )
+        steps.extend(transfer_steps)
+        if not transfers_ok:
+            all_ok = False
 
         if loadout.items and len(transferred_ids) == len(loadout.items):
             try:
@@ -195,8 +161,12 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
             ).items()
         }
         mod_operations: dict[str, list[tuple[str, int, int]]] = {}
+        # "这一位角色实际能插哪些 plug"（组件 207，随 305 一起回来）。不给就等于不判断 ——
+        # 上游没给这份数据时，"装不了"与"没查到"必须分开（本项目的老毛病）。
+        insertable = self.insertable_plugs(profile, char_id)
         for lo_item in loadout.items:
-            if (not lo_item.mods and not lo_item.mod_sockets) or not lo_item.item_instance_id:
+            has_work = lo_item.mods or lo_item.mod_sockets or lo_item.functional_mod_groups
+            if not has_work or not lo_item.item_instance_id:
                 continue
             try:
                 mod_operations[lo_item.item_instance_id] = (
@@ -206,6 +176,7 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                         mtype,
                         sockets_cache,
                         instances_data,
+                        insertable,
                     )
                 )
             except TransferError as exc:
@@ -224,11 +195,18 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                 steps=steps,
             )
 
-        manual_mods: list[tuple[str, int, int]] = []
+        blocked_mods: list[tuple[str, int, str]] = []
         for lo_item in loadout.items:
-            for operation, mod_hash, socket_idx in mod_operations.get(
+            for operation, mod_hash, socket_idx, reason in mod_operations.get(
                 lo_item.item_instance_id, []
             ):
+                if operation == "keep":
+                    steps.append(self.keep_mod_step(lo_item, mod_hash, socket_idx))
+                    continue
+                if operation == "blocked":
+                    # 装不上的那一颗：不写、也不回退整条配装，如实报给玩家（ADR-013）。
+                    steps.append(self.blocked_mod_step(lo_item, mod_hash, socket_idx, reason))
+                    continue
                 try:
                     mod_result = await self._insert_armor_mod(
                         lo_item.item_instance_id,
@@ -237,23 +215,39 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                         char_id,
                         mtype,
                     )
-                    ok = mod_result.get("ErrorCode", 0) == 1
                     upstream = str(mod_result.get("Message") or "").strip()
-                    steps.append(MoveItemStep(
-                        action="mod_clear" if operation == "clear" else "mod",
-                        detail=(
-                            f"为属性模组腾出能量：'{lo_item.name}' 插槽 {socket_idx}"
+                    # 1679 = 这个槽已经装着它了：状态已成立，不算失败（当成失败会让整条配装
+                    # 回退，真机实测 3.5 分钟）。判据与 equip_mod 那条路共用一份。
+                    already = plug_already_installed(mod_result)
+                    ok = mod_result.get("ErrorCode", 0) == 1 or already
+                    # 回执写**模组名字**：这份 steps 是调用方唯一的写后证据，写 hash 会逼它
+                    # 再逐件查护甲（实测一次链路因此多 5 次往返）。
+                    mod_label = self.mod_label(mod_hash)
+                    if already:
+                        detail = (
+                            f"'{lo_item.name}' 插槽 {socket_idx} 已经空着"
                             if operation == "clear"
-                            else f"模组 {mod_hash} → '{lo_item.name}'"
+                            else f"'{lo_item.name}' 插槽 {socket_idx} 已经装着 '{mod_label}'，未改动"
+                        )
+                    else:
+                        detail = (
+                            f"为 '{mod_label}' 腾出能量：'{lo_item.name}' 插槽 {socket_idx}"
+                            if operation == "clear"
+                            else f"模组 '{mod_label}' → '{lo_item.name}'"
                         )
                         # 失败要带上游原文（以前只写"为…腾出能量"，真因看不到）
-                        + ("" if ok else f" 失败：{upstream or '上游没给原因'}"),
+                        if not ok:
+                            detail += f" 失败：{upstream or '上游没给原因'}"
+                    steps.append(MoveItemStep(
+                        action="mod_clear" if operation == "clear" else "mod",
+                        detail=detail,
                         success=ok,
                     ))
                     if not ok:
-                        if _mod_write_needs_in_game(mod_result):
-                            # 策略限制：记下来，继续走完剩下的模组，最后如实汇报。
-                            manual_mods.append((lo_item.name, mod_hash, socket_idx))
+                        blocker = self.mod_write_blocker(mod_result, mod_hash)
+                        if blocker:
+                            # 上游明确拒绝的：记下原因，继续走完剩下的模组，最后如实汇报。
+                            blocked_mods.append((lo_item.name, mod_hash, blocker))
                             continue
                         all_ok = False
                         break
@@ -266,21 +260,18 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                     all_ok = False
                     break
 
-        if manual_mods and all_ok:
-            names = "、".join(f"'{name}' 上的模组 {mod_hash}" for name, mod_hash, _ in manual_mods)
-            steps.append(MoveItemStep(
-                action="mod_in_game",
-                detail=(
-                    f"这些模组 Bungie 不允许通过 API 装（403/仅游戏内），请在游戏里手动装：{names}"
-                ),
-                success=False,
-            ))
+        if blocked_mods and all_ok:
+            detail = "；".join(
+                f"'{name}' 的模组 {mod_hash}：{why}" for name, mod_hash, why in blocked_mods
+            )
+            steps.append(MoveItemStep(action="mod_blocked", detail=detail, success=False))
             return LoadoutOperationResult(
                 success=False,
                 loadout_name=loadout.name,
                 message=(
-                    f"配装 '{loadout.name}' 的装备已经换上；但 {len(manual_mods)} 颗模组需要你"
-                    "在游戏里手动装（Bungie 不允许 API 改护甲模组），装完六维就是求解器给的那套。"
+                    f"配装 '{loadout.name}' 的装备已经换上；但 {len(blocked_mods)} 颗模组被上游"
+                    "拒绝写入（原因见 steps.mod_blocked）—— 这些条件在游戏里同样要先解决，"
+                    "不是 API 的限制。"
                 ),
                 steps=steps,
             )
@@ -301,15 +292,28 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
             if not subclass_ok:
                 all_ok = False
 
+        # Step 4: 回读核对 —— 与 `equip_exact` 同一条纪律：没核对过就不能说"已装备"。
+        # 真机 2026-09-24：这条路以前直接以"已装备"收尾，回执里没有任何一步证明装备真在身上。
+        # 写入有 3～10 秒同步窗口，所以按 `write_readback` 重试；核对不上只报"没确认"，
+        # **不改写入结论**（"没读到"和"没写上"是两件事）。
+        detail, verified = "已回读核对：装备实例、模组与子职业配置都对得上。", False
+        try:
+            verified = await read_until(lambda: self._verify_loadout(player_name, loadout), bool)
+            if not verified:
+                detail = "写入步骤都成功了，但回读重试后仍对不上（可能是同步窗口）——过十几秒再看一次，别当成没装上。"
+        except Exception as exc:  # noqa: BLE001 —— 回读是**可选证据**：它自己炸了不能把写成功报成失败
+            logger.exception("Local loadout verification failed: %s", exc)
+            detail = f"回读核对没做成：{describe_exception(exc)}"
+        steps.append(MoveItemStep(action="verify", detail=detail, success=verified))
+
+        if not all_ok:
+            message = f"配装 '{loadout.name}' 未完全生效（原因见 steps）。"
+        elif verified:
+            message = f"配装 '{loadout.name}' 已装备，回读核对通过。"
+        else:
+            message = f"配装 '{loadout.name}' 的写入都成功了，但回读没确认：{detail}"
         return LoadoutOperationResult(
-            success=all_ok,
-            loadout_name=loadout.name,
-            message=(
-                f"配装 '{loadout.name}' 已装备。"
-                if all_ok
-                else f"配装 '{loadout.name}' 部分装备失败。"
-            ),
-            steps=steps,
+            success=all_ok, loadout_name=loadout.name, message=message, steps=steps,
         )
 
     async def equip_exact(
@@ -362,16 +366,24 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
         try:
             applied = await self._equip_local_unlocked(player_name, loadout)
         except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:
-            logger.error("Exact loadout application failed: %s", exc)
+            # `describe_exception`：`TimeoutError()` 的 str 是空的，直接写会留下"失败但没有原因"
+            # （真机 2026-09-23：apply 步骤 detail 为空，谁也看不出发生了什么）。
+            logger.exception("Exact loadout application failed: %s", describe_exception(exc))
+            reason = describe_exception(exc)
             applied = LoadoutOperationResult(
                 success=False,
                 loadout_name=loadout.name,
-                message=str(exc),
-                steps=[MoveItemStep(action="apply", detail=str(exc), success=False)],
+                message=reason,
+                steps=[MoveItemStep(action="apply", detail=reason, success=False)],
             )
         verified = False
         if applied.success:
-            verification_detail = "执行结果与确认的配装不一致。"
+            # 有模组被上游挡住时，"对不上"的原因就是它 —— 别让调用方以为整个装备都没生效。
+            blocked = [step for step in applied.steps if step.action == "mod_blocked"]
+            verification_detail = (
+                f"有 {len(blocked)} 颗模组没装上（见 mod_blocked 步骤），其余已按确认内容写入。"
+                if blocked else "执行结果与确认的配装不一致。"
+            )
             try:
                 verified = await self._verify_loadout(player_name, loadout)
             except (DestinyMCPError, aiobungie.HTTPError, OSError) as exc:
@@ -387,9 +399,9 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                 success=verified,
             ))
 
-        # 模组被上游策略挡住时 equipment 是好的：不回滚，交给上层如实汇报。
+        # 模组被上游拒绝写入时 equipment 是好的：不回滚，交给上层如实汇报。
         if applied.success and verified or any(
-            st.action == "mod_in_game" for st in applied.steps
+            st.action == "mod_blocked" for st in applied.steps
         ):
             return applied
 
@@ -506,3 +518,4 @@ class LoadoutEquipmentService(RecoveryStateMixin, ModSocketMixin, SubclassSocket
                 return False
 
         return True
+

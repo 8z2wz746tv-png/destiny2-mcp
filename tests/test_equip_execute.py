@@ -66,10 +66,26 @@ class _Item:
     def __init__(self, instance_id: str, slot: str, name: str, *, equipped: bool) -> None:
         self.item_instance_id = instance_id
         self.slot = slot
+        self.slot_display = {"chest": "胸部护甲", "gauntlets": "臂铠"}.get(slot, "")
         self.name = name
         self.is_equipped = equipped
         self.item_hash = 1
         self.character_id = "c1"
+
+
+class _Manifest:
+    """`item_traits` 会问定义拿槽位与互斥组。
+
+    这里一律回 `None` = **定义里读不到**，于是退回实例上的 `slot` —— 这批夹具的 `_Item.slot`
+    本来就是护甲槽键（`chest`/`gauntlets`），走的正是那条回退路径。
+    """
+
+    def get_item_definition(self, item_hash: int) -> dict | None:
+        return None
+
+
+# 武器槽 hash：武器在实例上的 `slot` 是空串（护甲专用字段），槽位只能从定义读（ADR-011）。
+_WEAPON_SLOT_HASH = {"energy": 2465295065, "power": 953998645}
 
 
 def _service(fail_on: str = "", target_equipped_after: bool = True):
@@ -100,7 +116,7 @@ def _service(fail_on: str = "", target_equipped_after: bool = True):
             for name in [names[instance_id]]
         ] + [_Item("gaunt-legendary", "gauntlets", "光芒领主手套", equipped=worn["gauntlets"] == "gaunt-legendary")]
 
-    service = TransferService(bungie, AsyncMock(), AsyncMock())
+    service = TransferService(bungie, _Manifest(), AsyncMock())
     service._resolver.resolve_player = AsyncMock(
         return_value={"membership_id": "1", "membership_type": 3}
     )
@@ -172,3 +188,77 @@ async def test_readback_miss_is_unverified_not_success() -> None:
     assert result["success"] is False
     assert result["unverified"] is True
     assert "回读没确认" in result["message"]
+
+
+async def test_weapon_step_is_rolled_back_too() -> None:
+    """武器步骤也要能回滚 —— ADR-011 带出来的连带修复。
+
+    回滚/回读以前按 `item.slot` 找部位，而那是**护甲专用**的键（武器一律空串），于是
+    "顶下一把异域武器再装目标"里的武器那一步，在回滚与"账号现在什么样"里会凭空消失。
+    这里让武器的 `slot` 保持空串、槽位只从定义读，走的正是真机那条路。
+    """
+    plan = EquipPlan(
+        status="ready",
+        character="hunter",
+        character_id="c1",
+        target_item="狼毒",
+        target_item_instance_id="sword-exotic",
+        target_slot="power",
+        steps=[
+            EquipPlanStep(
+                action="downgrade", item="信任", item_instance_id="bow-legendary",
+                slot="energy", replaces="需求层级",
+            ),
+            EquipPlanStep(
+                action="equip", item="狼毒", item_instance_id="sword-exotic", slot="power",
+            ),
+        ],
+    )
+    worn = {"energy": "bow-exotic", "power": "sword-legendary"}
+    names = {"bow-exotic": "需求层级", "bow-legendary": "信任", "sword-legendary": "远方黎明"}
+
+    class _WeaponItem:
+        def __init__(self, instance_id: str, kind: str) -> None:
+            self.item_instance_id = instance_id
+            self.slot = ""  # 真机上武器就是空串
+            self.slot_display = ""
+            self.name = names[instance_id]
+            self.is_equipped = worn[kind] == instance_id
+            self.item_hash = 1 if kind == "energy" else 2
+            self.character_id = "c1"
+
+    class _WeaponManifest:
+        def get_item_definition(self, item_hash: int) -> dict | None:
+            kind = "energy" if item_hash == 1 else "power"
+            return {"equippingBlock": {"equipmentSlotTypeHash": _WEAPON_SLOT_HASH[kind]}}
+
+    def _items():
+        return [_WeaponItem(instance_id, kind) for kind, instance_id in worn.items()]
+
+    bungie = _Bungie(fail_on="sword-exotic")
+    original = bungie.equip_item
+
+    async def equip(item_instance_id, character_id, membership_type):
+        result = await original(item_instance_id, character_id, membership_type)
+        if result.get("ErrorCode") == 1:
+            worn["energy" if item_instance_id.startswith("bow") else "power"] = item_instance_id
+        return result
+
+    bungie.equip_item = equip  # type: ignore[assignment]
+
+    service = TransferService(bungie, _WeaponManifest(), AsyncMock())
+    service._resolver.resolve_player = AsyncMock(
+        return_value={"membership_id": "1", "membership_type": 3}
+    )
+    service._resolver.resolve_character_id = AsyncMock(return_value="c1")
+    service._resolver.get_profile = AsyncMock(return_value={})
+    service._character_armor = lambda profile, char_id, class_type: _items()
+    service._equipped_keys = lambda profile, char_id: {
+        i.item_instance_id for i in _items() if i.is_equipped
+    }
+
+    result = await service.execute_equip_plan("P#1", plan, "hunter")
+
+    assert result["stopped_at"] == 2
+    assert bungie.equips == ["bow-legendary", "sword-exotic", "bow-exotic"], "武器那步也要回滚"
+    assert result["rolled_back"] is True

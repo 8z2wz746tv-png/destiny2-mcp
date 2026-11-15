@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from ..bungie_client import BungieClient
 from ..exceptions import InvalidArgumentError, APIError
 from ..logging_config import get_logger
@@ -20,6 +22,38 @@ _COLLECTIBLE_STATE_FLAGS = {
     32: "唯一性冲突",
     64: "无法购买",
 }
+
+
+def _declared_children(manifest: ManifestManager, node_def: dict[str, Any]) -> dict[str, Any]:
+    """展示节点自己声明的内容：条目 / 子收藏品 / 子节点（带名字，便于继续下钻）。
+
+    `records`（条目）和 `collectibles`（收藏品）是两件事：前者的解锁状态**不在**组件 800 里，
+    所以"节点有 50 条条目"与"组件里 0 条收藏状态"可以同时为真 —— 这不是矛盾，
+    是两种数据。把它们分开列出来，读的人才不会把 0 当成"什么都没有"。
+    """
+    children = node_def.get("children") if isinstance(node_def, dict) else None
+    if not isinstance(children, dict):
+        return {"counts": {"records": 0, "collectibles": 0, "presentation_nodes": 0}, "child_nodes": []}
+    child_nodes = []
+    for raw in children.get("presentationNodes") or []:
+        if not isinstance(raw, dict):
+            continue
+        child_hash = raw.get("presentationNodeHash")
+        if not isinstance(child_hash, int):
+            continue
+        child_def = manifest.get_definition("DestinyPresentationNodeDefinition", child_hash) or {}
+        child_nodes.append({
+            "hash": to_unsigned(child_hash),
+            "name": (child_def.get("displayProperties") or {}).get("name", f"PresentationNode({child_hash})"),
+        })
+    return {
+        "counts": {
+            "records": len(children.get("records") or []),
+            "collectibles": len(children.get("collectibles") or []),
+            "presentation_nodes": len(children.get("presentationNodes") or []),
+        },
+        "child_nodes": child_nodes,
+    }
 
 
 class CollectionService:
@@ -309,10 +343,32 @@ class CollectionService:
             "name",
             f"PresentationNode({collectible_node_hash})",
         )
+        declared = _declared_children(self._manifest, node_def)
 
-        return {
+        result: dict[str, Any] = {
             "node_hash": collectible_node_hash,
             "node_name": node_name,
             "counts": counts,
             "items": limited_items,
+            # 节点自己声明有什么（上游组件给不出这些）：条目、子收藏品、子节点。
+            "declared": declared["counts"],
+            "child_nodes": declared["child_nodes"],
         }
+        # 真机踩过：搜索说「动能武器（50 件物品）」，节点详情却回 0/0/0/0、items 空 ——
+        # 因为那 50 条是 `records`（条目），在组件 800 里**一条收藏状态都没有**。
+        # 直接给 0 会被读成"一件都没有"，所以这里必须把"为什么是 0"写出来。
+        if not counts["total"] and (declared["counts"]["records"] or declared["child_nodes"]):
+            result["empty_reason"] = (
+                f"这个节点在组件 800 里没有任何收藏状态（total=0）：它声明的是 "
+                f"{declared['counts']['records']} 条**条目（records）**、"
+                f"{declared['counts']['collectibles']} 件子收藏品、"
+                f"{declared['counts']['presentation_nodes']} 个子节点。"
+                "条目的解锁状态**不在这个组件里**，所以 0 只能读成「这个口径下没有可查的收藏品」，"
+                "**不能**读成「一件都没有」。"
+                + (
+                    "要继续查就传 child_nodes 里的 hash。"
+                    if declared["child_nodes"]
+                    else "要看它列了哪些条目，用 intent=\"search_collectible_nodes\" 的条目列表。"
+                )
+            )
+        return result

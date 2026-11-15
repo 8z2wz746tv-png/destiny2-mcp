@@ -36,7 +36,8 @@ from .process_utils import (
     precalculate_structures,
     update_max_stats,
 )
-from .set_tracker import HeapEntry, HeapSetTracker, encode_stat_mix
+from .ranking import goodness_key, vectors_for
+from .set_tracker import HeapEntry, HeapSetTracker
 
 logger = get_logger(__name__)
 
@@ -44,23 +45,6 @@ logger = get_logger(__name__)
 RETURNED_ARMOR_SETS = 200
 _STAT_RANK_BASE = MAX_STAT + 1
 _TOTAL_STAT_RANK_BASE = MAX_STAT * 6 + 1
-
-
-def _ranking_metric(
-    stats: list[int],
-    priority_indices: list[int],
-    optimistic_bonus: int = 0,
-) -> int:
-    """Encode strict priority order, then total stats, into one heap key."""
-    if not priority_indices:
-        return sum(stats) + optimistic_bonus
-
-    metric = 0
-    for index in priority_indices:
-        value = min(MAX_STAT, stats[index] + optimistic_bonus)
-        metric = metric * _STAT_RANK_BASE + value
-    total = min(MAX_STAT * 6, sum(stats) + optimistic_bonus)
-    return metric * _TOTAL_STAT_RANK_BASE + total
 
 
 def _snapshot_auto_mod_data(snapshot: InventorySnapshot) -> AutoModData:
@@ -224,7 +208,24 @@ def prepare_fixed_set_context(
     bonus_vector = constraints.subclass_and_fragment_vector()
     desired_min = [max(0, raw_min[i] - bonus_vector[i]) for i in range(6)]
     priority_indices = constraints.ordered_priority_indices
-    if priority_indices:
+    # 上限（`stat_caps`，0 = 不限）优先；没给上限时退回老口径：
+    # 优先属性允许吃到满，其余属性的上限就压在它的下限上（"没要求就别浪费能量"）。
+    raw_max = constraints.max_vector()
+    capped = [
+        max(0, raw_max[i] - bonus_vector[i]) if raw_max[i] > 0 else 0 for i in range(6)
+    ]
+    if any(capped):
+        desired_max = [
+            capped[i]
+            if capped[i] > 0
+            else (MAX_STAT if i in priority_indices else desired_min[i])
+            for i in range(6)
+        ]
+        # 上限不许低于下限：调用方（`build/constraints.parse`）已经拦过矛盾输入，
+        # 这里再兜一次是为了"从别的入口直接调 solve()"时不出现 desired_max < desired_min
+        # （那会让 pick_optimal_stat_mods 的 max_added_stats 变成负数）。
+        desired_max = [max(desired_min[i], desired_max[i]) for i in range(6)]
+    elif priority_indices:
         desired_max = [
             MAX_STAT if index in priority_indices else desired_min[index]
             for index in range(6)
@@ -356,8 +357,7 @@ def validate_fixed_process_items(
         bonus_stats=bonus_stats,
         stat_mods=mod_hashes,
         stat_mod_assignments=assignments,
-        enabled_stats_total=_ranking_metric(final_stats, context.priority_indices),
-        stats_total=sum(stats),
+        rank_key=goodness_key(final_stats, context.constraints),
     )
 
 
@@ -495,14 +495,19 @@ def solve(
     bonus_vector = context.bonus_vector
     desired_min = context.desired_min
     desired_max = context.desired_max
-    priority_indices = context.priority_indices
     info = context.info
 
     # ── Build tracker ──────────────────────────────────────────────────
     tracker = HeapSetTracker(returned_sets or RETURNED_ARMOR_SETS)
+    # 排序用的派生向量**只在这里算一次**：下面是最内层循环，按组合调用的
+    # `goodness_key` 如果每次都去读 pydantic 约束，实测能占掉整个内核的大头
+    # （628 万组合那条用例：光 `max_vector()` 就被调 857 万次、36 秒）。见 ranking.py。
+    rank_vectors = vectors_for(constraints)
 
-    # Track stat ranges for reporting
-    stat_ranges: list[list[int]] = [[MAX_STAT, 0] for _ in range(6)]
+    # 逐项可达上限（"其余属性仍满足下限时这一项单独能到多少"）。
+    # 以前这里叫 `stat_ranges`，形状是 `[[MAX_STAT, 0]] * 6` 且只有 [1] 被写 —— [0] 永远留着
+    # MAX_STAT 那个假下限，而整个变量算完就丢。现在只留上限、并且真的返回给调用方。
+    reachable_ceilings: list[int] = [0] * 6
 
     combo_count = 0
     # ── 5-level nested loop ────────────────────────────────────────────
@@ -587,14 +592,13 @@ def solve(
 
                         armor = [helm, gaunt, chest, leg, class_item]
 
-                        # This deliberately overestimates every priority so the
-                        # top-N prune cannot discard a lexicographically better set.
-                        opt_total = _ranking_metric(
-                            stats,
-                            priority_indices,
-                            optimistic_bonus=max_mod_bonus,
+                        # 乐观键：规则维度按"缺口还能靠模组补上"算（上限例外，见 `gap_vector`），
+                        # 偏好维度加上"这套最多还能再涨多少"。乐观键的每一项都不比真实键差，
+                        # 所以拿它剪枝是保守的 —— 只会少剪，不会把还能更好的方案剪掉。
+                        opt_key = goodness_key(
+                            stats, constraints, span=max_mod_bonus, vectors=rank_vectors
                         )
-                        if not tracker.could_insert(opt_total):
+                        if not tracker.could_insert(opt_key):
                             continue
 
                         fixed_result = validate_fixed_process_items(armor, context)
@@ -609,7 +613,7 @@ def solve(
                             num_artifice,
                             desired_min,
                             desired_max,
-                            stat_ranges,
+                            reachable_ceilings,
                         )
 
                         bonus_stats = fixed_result.bonus_stats
@@ -620,15 +624,11 @@ def solve(
                         ]
 
                         # ── Final prune and insertion ────────────────────
-                        priority_weighted_total = _ranking_metric(
-                            final_stats,
-                            priority_indices,
+                        rank_key = goodness_key(
+                            final_stats, constraints, vectors=rank_vectors
                         )
-                        if not tracker.could_insert(priority_weighted_total):
+                        if not tracker.could_insert(rank_key):
                             continue
-
-                        # ── Encode stat mix and insert ─────────────────
-                        stat_mix = encode_stat_mix(final_stats, desired_max)
 
                         # Store both Armor objects (for output) and ProcessItems (for reference)
                         original_armor = [
@@ -640,9 +640,7 @@ def solve(
                         ]
 
                         tracker.insert(HeapEntry(
-                            enabled_stats_total=priority_weighted_total,
-                            stat_mix=stat_mix,
-                            stats_total=sum(stats),
+                            rank_key=rank_key,
                             power=sum(a.power for a in armor if a.power > 0) // 5,
                             armor=original_armor,
                             stats=stats,
@@ -664,9 +662,7 @@ def solve(
             bonus_stats=entry.bonus_stats,
             stat_mods=entry.stat_mods,
             stat_mod_assignments=entry.stat_mod_assignments,
-            enabled_stats_total=entry.enabled_stats_total,
-            stats_total=entry.stats_total,
-            stat_mix=entry.stat_mix,
+            rank_key=entry.rank_key,
             power=entry.power,
         )
         for entry in tracker.get_armor_sets()
@@ -675,4 +671,5 @@ def solve(
     return ProcessResult(
         sets=result_sets,
         combos=combo_count,
+        reachable_ceilings=reachable_ceilings,
     )

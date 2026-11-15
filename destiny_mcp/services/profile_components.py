@@ -37,6 +37,17 @@ INVENTORY_SOCKETS: list[int] = [102, 200, 201, 205, 300, *ITEM_SOCKETS]
 # 护甲快照：属性值 + 插槽（模组要写进插槽，所以两个都要）
 ARMOR_SNAPSHOT: list[int] = [102, 200, 201, 205, 300, 304, *ITEM_SOCKETS]
 
+#: 配装求解/规划要用的组件：比 `ARMOR_SNAPSHOT` 多一个 **310 `ItemReusablePlugs`**。
+#:
+#: 为什么非它不可：**每件护甲允许装哪些调谐，只在 310 里**。Manifest 的调谐 plug set 是
+#: 全局那 32 颗（真机实测：两件同名「光芒领主手套」指向同一个 plug set、内容一模一样），
+#: 而实际每件只开放"某一个属性 +5"的 5 颗 + 平衡调整（这两件分别是 职业 和 近战）。
+#: 求解器照 Manifest 规划，就会给出"这件根本装不上"的调谐 —— 用户发现的就是这个。
+#:
+#: 代价（真机实测，术士一具角色的全账号护甲）：响应 **4.11 MB → 8.90 MB**。
+#: 所以**只给需要规划调谐的那条路**（配装求解）用，不要往 `ARMOR_SNAPSHOT`（单件详情）上加。
+BUILD_ARMOR: list[int] = [*ARMOR_SNAPSHOT, 310]
+
 # 武器详情/按类型列武器：已装 plug + 能换的 plug + Bungie 的展示 perk + 催化剂进度
 WEAPON_DETAIL: list[int] = INVENTORY + [*ITEM_SOCKETS, 302, 310, 308]
 
@@ -63,6 +74,25 @@ SUBCLASS: list[int] = [200, 201, 205, *ITEM_SOCKETS]
 # 注意：真机实测这个组件会**整块缺失**（同一 URL 连续请求会返回 0 条，重试后恢复），
 # 所以读取方必须重试，拿不到要如实报不可用，绝不能把"空"当成 0。
 METRICS: list[int] = [1100]
+
+# 锻造武器模式进度（900 = profileRecords + characterRecords）：读的是
+# `Response.profileRecords.data.records[记录hash].objectives[0].progress / completionValue`
+# —— 就是游戏里那条「模式进度 4/5」。
+#
+# **两个作用域都要读**：实测 183 条模式记录里 151 条是档案级（scope=0）、32 条是角色级（scope=1），
+# 角色级那批只在 `Response.characterRecords.<角色>.data.records` 里 —— 只读 `profileRecords`
+# 会把它们全判成「未开始」（真机被用户拿游戏截图当场抓出来，见 ADR-009）。
+#
+# 谁需要它：pattern_service（`weapon_assistant(intent="patterns")`）。**不要**并进 FULL：
+# 实测 1.44 MB / 2.5 s，而模式进度是它唯一的用途；另外两条候选都给不出进度 ——
+# 组件 800（收藏品）里模式解锁状态一条都没有，1300（Craftables）只回答"能塑形哪些 perk"
+# （219 条 `visible` 全为 true）。实测见 docs/plans/PATTERN_QUERY_PLAN.md。
+PATTERNS: list[int] = [900]
+
+# 角色当前可打的活动（204 = characterActivities）：`availableActivities[]` 里带
+# `modifierHashes` 与 `visibleRewards` —— 实测**本周夜幕/宗师及其词缀、掉落**就在这里
+# （三个角色的该组条目完全一致）。谁需要它：rotation_service（`world_assistant(intent="rotations")`）。
+CHARACTER_ACTIVITIES: list[int] = [204]
 
 # 缓存里一次取全：读多写少的场景共用（profile_cache）。
 # 必须覆盖所有调用方要的组件（含 308 催化剂进度），否则后台刷新会把并集降级、

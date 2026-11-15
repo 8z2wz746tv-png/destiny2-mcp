@@ -9,7 +9,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock
 
 from destiny_mcp.tools._equip_branches import equip_branch
-from destiny_mcp.tools.assistants import _action_response
+from destiny_mcp.tools._responses import action_response as _action_response
 from destiny_mcp.models import EquipPlan
 
 STEP = {
@@ -107,6 +107,10 @@ async def test_blocked_is_reported_with_the_plan_and_nothing_is_written() -> Non
 
     assert response["error"]["code"] == "equip_blocked"
     assert "非异域" in response["error"]["message"]
+    # 计划整包在 `data.result`（与其它写入路径同一条读法），candidates 不装它
+    assert response["data"]["result"]["blockers"][0]["reason"] == "exotic_conflict"
+    assert response["candidates"] == []
+    assert response["next_actions"], "被挡住也要说下一步（按 blockers 先解决）"
     svc["transfer_svc"].execute_equip_plan.assert_not_awaited()
 
 

@@ -14,10 +14,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..services import weapon_local_data, weapon_payload, weapon_profile
+from ..services import weapon_analysis_projection, weapon_local_data, weapon_payload
 from ..services.weapon_payload import schema_block
-from ._enrichment import community_enrichment
-from ._farming import farming_reference, harvest_names
+from ._farming import farming_reference, item_names
+from ..services.starside_notes import weapon_note_from_svc
+from . import _perk_branches as perk_branches
 from ._responses import ok_response
 
 
@@ -127,21 +128,30 @@ async def perk_pool_payload(svc: dict[str, Any], weapon_name: str) -> dict[str, 
 
 def analyze_payload(svc: dict[str, Any], result: dict[str, Any], weapon_name: str) -> dict[str, Any]:
     local = _local(svc, weapon_name)
+    starside = weapon_note_from_svc(svc, int((result.get("weapon") or {}).get("item_hash") or 0))
     warnings = _attach_local(
         svc, local, weapon=result["weapon"], sockets=result["sockets"], weapon_name=weapon_name
     )
+    # 默认出口投影（真机 68.6 → 34.7 KB）：池子只给"值得看的那几个"、副本去掉可换项明细。
+    # 口径与 find/duplicates 同一套，见 services/weapon_analysis_projection.py。
+    payload = weapon_analysis_projection.project_analysis({
+        "weapon": result["weapon"],
+        "sockets": result["sockets"],
+        "stats": result["stats"],
+        "god_roll": result["god_roll"],
+        "inventory": result["inventory"],
+        "inventory_status": result["inventory_status"],
+        "starside": starside,
+        **schema_block(),
+    })
     return ok_response(
         result["summary"],
-        {
-            "weapon": result["weapon"],
-            "sockets": result["sockets"],
-            "stats": result["stats"],
-            "god_roll": result["god_roll"],
-            "inventory": result["inventory"],
-            "inventory_status": result["inventory_status"],
-            **schema_block(),
-        },
-        next_actions=result["next_actions"],
+        payload,
+        next_actions=[
+            *(result["next_actions"] or []),
+            '要看完整插槽池（不筛愿单结论）用 weapon_assistant(intent="perk_pool", '
+            f'weapon_name="{weapon_name}")；要看某个副本每个栏位能换成什么用 intent="compare"。',
+        ],
         warnings=list(result["warnings"]) + warnings,
     )
 
@@ -157,33 +167,53 @@ def stats_payload(svc: dict[str, Any], weapon_name: str) -> dict[str, Any]:
 # ── 副本级：type / compare ───────────────────────────────────────────────
 
 
-def type_payload(
-    svc: dict[str, Any], result: Any, weapon_type: str
+async def type_branch(
+    svc: dict[str, Any],
+    player_name: str,
+    weapon_type: str,
+    limit: int,
+    offset: int,
 ) -> dict[str, Any]:
-    """按类型列持有武器：每件=完整模板（定义级 sockets + 实例级 options）。"""
-    items: list[dict[str, Any]] = []
-    lean_warnings: list[str] = []
-    for weapon in result.weapons:
-        item = weapon.model_dump(mode="json")
-        block = item.get("weapon")
-        if isinstance(block, dict):
-            # 列表类口径：逐件只查清单摘要（本地索引在内存里，代价很小），
-            # 但四个键必须都在 —— 少键会被读成"这把没有本地资料"。
-            name = str(block.get("name") or "")
-            local = _local(svc, name) if name else weapon_local_data.LocalWeaponData()
-            lean_warnings += _attach_local(
-                svc, local, weapon=block, sockets=[], weapon_name=name, mode="lean"
-            )
-        items.append(item)
+    """`weapon_assistant(intent="type")`：按类型列**持有**的武器（列表行）。"""
+    result = await svc["weapon_detail_svc"].get_weapon_details_by_type(
+        player_name, weapon_type, limit=limit, offset=offset, list_view=True
+    )
+    return type_payload(svc, result, weapon_type, offset=offset)
+
+
+def type_payload(
+    svc: dict[str, Any],
+    result: Any,
+    weapon_type: str,
+    *,
+    offset: int = 0,
+) -> dict[str, Any]:
+    """按类型列持有武器：一行一件的**列表行**（身份 + 副本位置 + 属性值）。
+
+    列表不展开插槽池与可换项 —— 那是"你要看某一件"的问题。真机实测（2026-09-20）：
+    20 件带 sockets/options 时是 18.9 万字符，其中 2/3 是这两块；看某一件的部件走
+    `weapon_assistant(intent="compare", weapon_name=…, item_instance_id=…)`。
+    """
+    rows = [
+        weapon_payload.list_row(item.weapon, stats=item.stats, notes=item.notes)
+        for item in result.weapons
+    ]
     label = weapon_type or "全部武器"
     summary = (
         f"已读取「{label}」持有 {result.total_weapons} 件，本次返回 {result.returned_weapons} 件"
         + ("（已截断）。" if result.truncated else "。")
     )
-    warnings = _collect_notes(items) + lean_warnings
+    next_offset = offset + result.returned_weapons if result.truncated else None
+    warnings = _collect_notes(rows)
     if result.truncated:
         warnings.append(
-            f"只返回了前 {result.returned_weapons} 件；提高 limit 或缩小 weapon_type 才能看全。"
+            f"只返回了前 {result.returned_weapons} 件；"
+            + (f"继续读传 offset={next_offset}。" if next_offset else "提高 limit 才能看全。")
+        )
+    if rows:
+        warnings.append(
+            "列表行只有身份/位置/属性值：要看某一件的插槽与可换部件，用 "
+            'weapon_assistant(intent="compare", weapon_name=…, item_instance_id=…)。'
         )
     return ok_response(
         summary,
@@ -193,18 +223,43 @@ def type_payload(
                 "total": result.total_weapons,
                 "returned": result.returned_weapons,
                 "truncated": result.truncated,
-                "items": items,
+                "offset": offset,
+                "next_offset": next_offset,
+                "items": rows,
             },
-            "farming_list": _farming(svc, harvest_names(items)),
+            "farming_list": _farming(svc, item_names(rows)),
             **schema_block(),
         },
         warnings=warnings,
     )
 
 
-def compare_payload(svc: dict[str, Any], result: Any, weapon_name: str) -> dict[str, Any]:
+def compare_payload(
+    svc: dict[str, Any], result: Any, weapon_name: str, *, single: bool = False
+) -> dict[str, Any]:
+    """`compare`：给了 `item_instance_id` → 单副本完整明细；没给 → **同名多副本的行视图**。
+
+    行视图是 0.7.13 的新默认出口：判"留哪把"要的是"每把 × 每栏全部可切换项"，
+    一次给全（≤ 5 把约 5 KB），而不是让调用方一把一次地拉（真机 19 次 + 落盘 grep）。
+    """
     comparison = result.model_dump(mode="json")
     instances = comparison.get("instances") or []
+    if not single:
+        rows = weapon_analysis_projection.compare_rows(comparison)
+        local_rows = _local(svc, weapon_name)
+        weapon_block = rows.get("weapon") or {}
+        weapon_local_data.attach(
+            local_rows, weapon=weapon_block, sockets=[], weapon_name=weapon_name, mode="lean"
+        )
+        return ok_response(
+            f"已列出「{weapon_block.get('name') or weapon_name}」的 {len(rows['instances'])} 个副本"
+            "（每把一行：现在装着什么 + 每个可切换栏的全部项）。",
+            {"comparison": rows, "farming_list": _farming(svc, weapon_name), **schema_block()},
+            warnings=[
+                "`recommended` 是本地愿单结论（PvE/PvP），空表示愿单没收录 —— 不是「不好」。",
+                "判「留哪把」要看整栏 options，只看 equipped 会误判（T5 武器每栏可切 3 项）。",
+            ],
+        )
     weapon = comparison.get("weapon") or {}
     # 副本的身份块也补齐本地四块（列表类口径：只给清单摘要），保证形状一致
     local = _local(svc, weapon_name)
@@ -276,7 +331,7 @@ def catalog_payload(
         summary,
         {
             **filtered,
-            "farming_list": _farming(svc, harvest_names(filtered)),
+            "farming_list": _farming(svc, item_names(filtered.get("matched"))),
             **schema_block(),
         },
         warnings=warnings,
@@ -376,76 +431,5 @@ def catalyst_payload(svc: dict[str, Any], weapon_name: str) -> dict[str, Any]:
 
 
 def perk_description_payload(svc: dict[str, Any], perk_name: str) -> dict[str, Any]:
-    perk = svc["manifest_query_svc"].get_perk_description(perk_name)
-    # perk 不是武器，没有 weapon 块可挂；社区资料单独给一块，且必须**照实说**
-    # 资料可不可用（语料里"腐坏的可选资料不能静默消失"这条横切规则）。
-    community = community_enrichment(svc.get("starside_svc"), perk_name, "weapons")
-    return ok_response(
-        f"已读取 Perk「{perk.get('name') or perk_name}」的说明。",
-        {
-            "perk": perk,
-            "community_references": community,
-            **schema_block(),
-        },
-    )
-
-
-def inventory_type_payload(
-    svc: dict[str, Any],
-    result: Any,
-    type_name: str,
-    location: str = "",
-) -> dict[str, Any]:
-    """`inventory_assistant(intent="type")`：按类型列**持有**的物品。
-
-    边界（与 `weapon.type` 的分工）：这里只请求库存+实例组件，不请求 305/310，
-    所以给的是精简身份块 + 位置/光等，**没有 perk 与可换部件**；要看"能换成什么"
-    用 `weapon_assistant(intent="type")`。物品不是武器时原样返回，不硬套武器字段。
-    """
-    payload = result.model_dump(mode="json") if hasattr(result, "model_dump") else dict(result)
-    manifest = svc.get("manifest")
-    rows: list[dict[str, Any]] = []
-    weapons = 0
-    for item in payload.get("items") or []:
-        definition = (
-            manifest.get_item_definition(item.get("item_hash", 0)) if manifest else None
-        )
-        if not isinstance(definition, dict) or definition.get("itemType") != 3:
-            rows.append({"kind": "item", **item})
-            continue
-        weapons += 1
-        row = weapon_payload.lean_identity(
-            manifest,
-            definition,
-            roll_kind=weapon_profile.roll_kind(definition),
-            fallback_name=str(item.get("name") or ""),
-        )
-        row.update({
-            "kind": "weapon",
-            "instance_id": item.get("item_instance_id", ""),
-            "location": item.get("location", ""),
-            "power": item.get("power"),
-            "is_equipped": item.get("is_equipped", False),
-            "bucket_type": item.get("bucket_type", ""),
-            "icon_url": row.get("icon_url") or item.get("icon_url", ""),
-        })
-        rows.append(row)
-
-    label = type_name or "全部"
-    scope = f"（{location}）" if location else ""
-    return ok_response(
-        f"「{label}」{scope}持有 {len(rows)} 件（其中武器 {weapons} 件）；"
-        "这里只有身份与位置，要看可换部件请用 weapon_assistant(intent=\"type\")。",
-        {
-            "result": {
-                "query": payload.get("query", type_name),
-                "location": location,
-                "total": len(rows),
-                "returned": len(rows),
-                "truncated": False,
-                "items": rows,
-                "weapon_count": weapons,
-            },
-            **schema_block(),
-        },
-    )
+    """薄转发：实现在 `_perk_branches.py`（perk 域名，别把这文件顶过 412 上限）。"""
+    return perk_branches.perk_description_payload(svc, perk_name)

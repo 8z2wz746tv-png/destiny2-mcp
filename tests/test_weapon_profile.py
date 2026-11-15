@@ -300,3 +300,45 @@ def test_no_duplicate_rarity_table_left_in_services() -> None:
             offenders.append(path.relative_to(ROOT).as_posix())
 
     assert not offenders, f"这些文件里还有自己的稀有度表：{offenders}"
+
+
+def test_find_weapon_filters_by_item_type_instead_of_scanning_a_window() -> None:
+    """同名非武器条目很多时，也必须找到那把武器 —— 真机「玉兔」案例。
+
+    实测（2026-09-18）：`search("玉兔")` 命中 54 条，前 53 条是同名的 `itemType=20` 条目，
+    真武器排在第 7 位；以前"扫前 5 条挑 itemType==3"永远挑不到，用户看到
+    `manifest_error: 找不到武器: 玉兔`（英文名 Jade Rabbit 也一样），而枪就在 Manifest 里。
+    """
+    import json
+    import sqlite3
+
+    from destiny_mcp.manifest import ManifestManager
+    from destiny_mcp.services.weapon_profile import find_weapon
+
+    def _row(name: str, item_type: int) -> dict:
+        return {
+            "displayProperties": {"name": name},
+            "itemType": item_type,
+            "itemTypeDisplayName": "斥候步枪",
+            "inventory": {"tierType": 6},
+        }
+
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.execute("CREATE TABLE DestinyInventoryItemDefinition (id INTEGER PRIMARY KEY, json TEXT)")
+    # 53 条同名的非武器条目（真机就是这么多），真武器排在最后
+    rows = [(1000 + i, _row("玉兔", 20)) for i in range(53)]
+    rows.append((3844694310, _row("玉兔", 3)))
+    for item_hash, data in rows:
+        conn.execute(
+            "INSERT INTO DestinyInventoryItemDefinition (id, json) VALUES (?, ?)",
+            (item_hash, json.dumps(data, ensure_ascii=False)),
+        )
+    manifest = ManifestManager()
+    manifest._build_name_index(conn, language="zh-chs")
+    manifest._conn = conn
+
+    item_hash, definition = find_weapon(manifest, "玉兔")
+
+    assert item_hash == 3844694310, item_hash
+    assert definition["itemType"] == 3

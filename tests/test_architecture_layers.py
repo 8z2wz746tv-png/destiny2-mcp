@@ -55,7 +55,6 @@ _LAYERS: dict[str, int] = {
     "wishlist_data": 1,
     # 2 领域层（纯计算，可被服务和工具复用）
     "build": 2,
-    "build_import": 2,
     "rag": 2,
     # 3 服务层：账号读写、外部数据、形状工厂
     "services": 3,

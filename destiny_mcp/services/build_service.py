@@ -14,15 +14,20 @@ Workflow:
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
-import time
-from collections import OrderedDict
 from difflib import SequenceMatcher
-from typing import Literal, cast
+from typing import Any, Literal, cast
 
-from ..build.analyzer import analyze, ensure_within_combination_limit
+from ..build.analyzer import (
+    analyze_from_probes,
+    ensure_within_combination_limit,
+    oversized_reason,
+    probe_stat,
+)
 from ..build.constants import MAIN_STAT_HASHES, STAT_NAMES, SUBCLASS_BONUSES
+from ..build.functional_mods import resolve_functional_mods
 from ..build.constraints import parse as _parse_constraints
 from ..build.farm_target import find_farm_targets
 from ..build.models import (
@@ -30,18 +35,24 @@ from ..build.models import (
     BuildRecommendation,
     BuildRequest,
     BuildResult,
+    InventorySnapshot,
 )
 from ..bungie_client import BungieClient
 from ..build_contracts import CanonicalBuild, ExecutableBuild
 from . import profile_components
 from ..exceptions import BuildValidationError
 from ..logging_config import get_logger
+from ..utils.arg_text import split_items
 from ..manifest import ManifestManager, class_type_name, resolve_character_name
 from ..models import Loadout, LoadoutSubclassConfig
 from ..player_resolver import PlayerResolver
 from .account_action_lock import account_action_lock, serialized_account_action
-from .build_tuning import solve_with_tuning
+from ..build.process_types import SearchDiagnostics
+from ..build.ranking import rank_results
+from .build_tuning import apply_local_tuning, solve_with_tuning
+from .build_candidates import BuildCandidateStore, describe_candidate
 from .build_results import (
+    canonical_subclass,
     LOADOUT_SLOT_NAMES as _LOADOUT_SLOT_NAMES,
     ResultContext,
     build_results as _build_results,
@@ -49,12 +60,13 @@ from .build_results import (
 from .loadout_equipment_service import LoadoutEquipmentService
 from .build_compute import BuildCompute
 
+# 单项上限探测的并发档：纯 CPU、只读，4 个够用且不会把机器压满
+_PROBE_CONCURRENCY = 4
+
 logger = get_logger(__name__)
 
 
 _EXPECTED_ARMOR_SLOTS = {"helmet", "gauntlets", "chest", "legs", "class_item"}
-_MAX_BUILD_CANDIDATES = 200
-_BUILD_CANDIDATE_TTL_SECONDS = 10 * 60
 
 
 def _snapshot_version(snapshot) -> str:
@@ -97,32 +109,6 @@ def _snapshot_version(snapshot) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def _canonical_subclass(build: CanonicalBuild) -> LoadoutSubclassConfig | None:
-    values = {
-        "subclass_item_hash": build.subclass_item_hash or 0,
-        "subclass_instance_id": build.subclass_instance_id,
-        "super_hash": build.super_hash or 0,
-        "grenade_hash": build.grenade_hash or 0,
-        "melee_hash": build.melee_hash or 0,
-        "class_ability_hash": build.class_ability_hash or 0,
-        "movement_hash": build.movement_hash or 0,
-        "aspect_hashes": build.aspect_hashes,
-        "fragment_hashes": build.fragment_hashes,
-        "plug_sockets": build.subclass_plug_sockets,
-    }
-    if not any([
-        values["super_hash"],
-        values["grenade_hash"],
-        values["melee_hash"],
-        values["class_ability_hash"],
-        values["movement_hash"],
-        values["aspect_hashes"],
-        values["fragment_hashes"],
-        values["plug_sockets"],
-    ]):
-        return None
-    return LoadoutSubclassConfig(**values)
-
 class BuildService:
     """Orchestrates the full Build Engine pipeline.
 
@@ -140,40 +126,11 @@ class BuildService:
         self._inventory = InventoryService(bungie, manifest, resolver)
         self._equipment = LoadoutEquipmentService(bungie, manifest, resolver)
         self._compute = BuildCompute()
-        self._build_candidates: OrderedDict[str, CanonicalBuild] = OrderedDict()
-        self._build_candidate_issued_at: dict[str, float] = {}
-        self._build_candidate_players: dict[str, str] = {}
-
-    def _evict_expired_build_candidates(self, now: float) -> None:
-        """Drop expired or incomplete one-time execution candidates."""
-        for execution_id, issued_at in tuple(self._build_candidate_issued_at.items()):
-            if now - issued_at >= _BUILD_CANDIDATE_TTL_SECONDS:
-                self._build_candidate_issued_at.pop(execution_id, None)
-                self._build_candidate_players.pop(execution_id, None)
-                self._build_candidates.pop(execution_id, None)
-        for execution_id in tuple(self._build_candidates):
-            if execution_id not in self._build_candidate_issued_at:
-                self._build_candidate_players.pop(execution_id, None)
-                self._build_candidates.pop(execution_id, None)
-
-    def _register_build_candidate(
-        self,
-        build: CanonicalBuild,
-        player_name: str = "",
-    ) -> None:
-        """Store one exact build for a short, one-time execution window."""
-        if not build.execution_id:
-            return
-        now = time.monotonic()
-        self._evict_expired_build_candidates(now)
-        self._build_candidates[build.execution_id] = build.model_copy(deep=True)
-        self._build_candidates.move_to_end(build.execution_id)
-        self._build_candidate_issued_at[build.execution_id] = now
-        self._build_candidate_players[build.execution_id] = player_name.casefold()
-        while len(self._build_candidates) > _MAX_BUILD_CANDIDATES:
-            execution_id, _ = self._build_candidates.popitem(last=False)
-            self._build_candidate_issued_at.pop(execution_id, None)
-            self._build_candidate_players.pop(execution_id, None)
+        # 只读诊断探测走这条：允许 4 个并发（见 _probe_single_stat_ceilings）
+        self._probe_compute = BuildCompute(capacity=_PROBE_CONCURRENCY)
+        # 候选暂存（execution_id → 签发的那份方案）：怎么存、什么时候过期在
+        # services/build_candidates.py，这里只管签发与执行。
+        self._candidates = BuildCandidateStore()
 
     async def _get_subclass_and_fragment_stats(
         self, player_name: str, character_class: str | None = None
@@ -487,42 +444,49 @@ class BuildService:
         self,
         player_name: str,
         request: BuildRequest,
+        diagnostics: list[SearchDiagnostics] | None = None,
+        *,
+        compute: BuildCompute | None = None,
+        register: bool = True,
+        functional_mods: list[str] | str | None = None,
     ) -> list[BuildResult]:
+        """`compute` / `register` 只给**只读探测**用（阶梯的逐档试解）：
+
+        - `compute=self._probe_compute` → 走并发档；`register=False` → 不把探测出的方案
+          塞进候选暂存（一次求解 200 套，会把调用方真正要装备的那份挤出去）。
+        """
         """Find the best armor builds for the given request.
 
         Uses the DIM algorithm: 5-level nested loop + mod assignment.
-        Results include mod bonuses in stat calculations.
 
         Args:
             player_name: Bungie name.
             request: User's build request (targets + constraints).
+            diagnostics: 可选收集器。给了就把"这次搜索到底搜完了没有 + 每项属性单独
+                能顶到多少"塞进去（`build/process_types.SearchDiagnostics`）—— 空结果必须能
+                自证"枚举完了"，否则调用方分不清"真没有"与"没搜完"。
 
         Returns:
-            Top-K BuildResults sorted by score (best first). Empty list
-            if no build satisfies the constraints.
+            Top-K BuildResults sorted by score (best first)；空表 = 枚举完了但没有满足下限的方案。
         """
         if not request.character_class:
             raise BuildValidationError("必须指定 hunter、warlock 或 titan。")
-
         canonical_class = cast(
             Literal["hunter", "warlock", "titan"],
             class_type_name(resolve_character_name(request.character_class)).lower(),
         )
 
         logger.info(
-            "find_build: player=%s exotic=%s targets=(wep=%s hp=%s cls=%s gre=%s mel=%s sup=%s)",
-            player_name,
-            request.exotic_name,
-            request.weapons_target,
-            request.health_target,
-            request.class_target,
-            request.grenade_target,
-            request.melee_target,
-            request.super_target,
+            "find_build: player=%s exotic=%s targets=%s",
+            player_name, request.exotic_name, request.target_vector(),
         )
 
+        # 照抄来的功能模组（流派取向，不进求解器）只影响一件事：这件护甲还剩多少能量能给属性模组。
+        plan = resolve_functional_mods(
+            self._manifest, [] if functional_mods is None else split_items(functional_mods))
         # Step 1: Fetch armor data (filtered by character class)
-        snapshot = await self._inventory.get_armor_snapshot(player_name, request.character_class)
+        snapshot = await self._inventory.get_armor_snapshot(
+            player_name, request.character_class, reserved_mod_energy=plan.energy_by_slot() or None)
         snapshot_version = _snapshot_version(snapshot)
         logger.info("Snapshot: %d pieces across 5 slots", snapshot.total_pieces)
 
@@ -579,7 +543,17 @@ class BuildService:
 
         # Step 3: Solve（含调谐补齐，见 services/build_tuning.py）——达标就原样返回；
         # 没达标才用调谐额度复解一遍（把"差 5 点"变成可执行方案）并逐套精确复核。
-        pool, tuning_map = await solve_with_tuning(self._compute, snapshot, parsed, self._manifest)
+        solved = await solve_with_tuning(compute or self._compute, snapshot, parsed, self._manifest)
+        pool, tuning_map = solved.pool, solved.tuning_map
+        # P4 便宜路径：达标之后把免费的调谐额度吃干净（0 能量、+5/−5）。局部搜索、每步过权威复核；
+        # 只对进池的候选做，所以**不是全局最优的证明**（边界写在 build/tuning.local_tuning_improvement）。
+        pool, tuning_map = apply_local_tuning(
+            pool, tuning_map, snapshot, parsed, self._manifest, top_n=parsed.top_n
+        )
+        if diagnostics is not None:
+            diagnostics.append(SearchDiagnostics(
+                coverage=solved.coverage, reachable_ceilings=solved.reachable_ceilings
+            ))
         logger.info("Solver: %d sets (%d 靠调谐补齐)", len(pool), len(tuning_map))
         if not pool:
             logger.warning("No build satisfies constraints for %s", player_name)
@@ -599,28 +573,20 @@ class BuildService:
                 fragment_details=fragment_details,
                 execution_subclass=execution_subclass,
                 tuning=tuning_map,
+                functional_mods=plan,
             ),
         )
 
-        priority_indices = parsed.ordered_priority_indices
-        if priority_indices:
-            results.sort(
-                key=lambda result: (
-                    result.completion_rate,
-                    *(
-                        result.build.stat(STAT_NAMES[index])
-                        for index in priority_indices
-                    ),
-                    result.score,
-                ),
-                reverse=True,
-            )
-        else:
-            results.sort(key=lambda result: result.score, reverse=True)
+        # 展示排序与**求解器内部**共用同一个比较器（`build/ranking.rank_results`）。
+        # 以前这里是第三套口径：`completion_rate` 打头、再按优先级、最后才是加权总分 ——
+        # 而求解器堆里用的是另一套字典序，`score` 又是第三套。三套口径必然互相打架，
+        # "超一点就扣分"就是加权那套写出来的。
+        results = rank_results(results, parsed)
 
-        for result in results:
-            if result.canonical_build:
-                self._register_build_candidate(result.canonical_build, player_name)
+        if register:
+            for result in results:
+                if result.canonical_build:
+                    self._candidates.register(result.canonical_build, player_name)
 
         return results
 
@@ -652,7 +618,33 @@ class BuildService:
             )
             parsed.subclass_stats = subclass_stats
             parsed.fragment_stats = fragment_stats
-        return await self._compute.run(analyze, snapshot, parsed)
+        oversized = oversized_reason(snapshot, parsed)
+        if oversized:
+            return BuildAnalysis(reason=oversized, precision="not_computed")
+        return analyze_from_probes(parsed, await self._probe_single_stat_ceilings(snapshot, parsed))
+
+    async def probe_find_build(
+        self, player_name: str, request: BuildRequest
+    ) -> list[BuildResult]:
+        """阶梯的逐档试解：与 `find_build` 同一条路，走只读并发档、不登记候选。"""
+        return await self.find_build(
+            player_name, request, compute=self._probe_compute, register=False
+        )
+
+    async def _probe_single_stat_ceilings(
+        self, snapshot: InventorySnapshot, parsed: Any
+    ) -> dict[str, int]:
+        """六项单项上限：**并发**跑（互不依赖、都是只读纯计算）。
+
+        真机实测（2026-09-23，真无解请求）：串行 6 次 = **227 秒**，占了整张阶梯 427 秒的
+        一半；并发后 wall 时间约等于其中最慢的一次。写入路径一个字没碰 —— 并发只给这种
+        只读探测用（`_probe_compute` 的档位固定 4，主链路仍是 `_compute` 的串行档）。
+        """
+        probes = await asyncio.gather(*[
+            self._probe_compute.run(probe_stat, snapshot, parsed, index)
+            for index in range(len(STAT_NAMES))
+        ])
+        return dict(probes)
 
     async def infer_required_armor(
         self,
@@ -719,14 +711,23 @@ class BuildService:
         self,
         player_name: str,
         request: BuildRequest,
+        functional_mods: list[str] | str | None = None,
     ) -> BuildRecommendation:
         """Find builds and include diagnostics when no candidate is available."""
-        results = await self.find_build(player_name, request)
+        results = await self.find_build(player_name, request, functional_mods=functional_mods)
         if results:
             return BuildRecommendation(results=results)
 
         analysis = await self.analyze_build(player_name, request)
         return BuildRecommendation(results=[], analysis=analysis)
+
+    def get_build_candidate(self, player_name: str, execution_id: str) -> dict:
+        """按候选 ID 取回服务端签发的那份方案（只读，不焚烧）—— 给只发标量的宿主用。
+
+        判定与话术在 `services/build_candidates.describe_candidate`（那边与暂存同一处），
+        这里只转发。
+        """
+        return describe_candidate(self._candidates, player_name, execution_id)
 
     @serialized_account_action
     async def equip_build(
@@ -752,40 +753,27 @@ class BuildService:
                 "code": "missing_execution_id",
                 "message": "配装缺少服务端候选 ID，请重新运行 find_build 后再确认。",
             }
-        now = time.monotonic()
-        trusted = self._build_candidates.get(build.execution_id)
-        issued_at = self._build_candidate_issued_at.get(build.execution_id)
-        candidate_player = self._build_candidate_players.get(build.execution_id)
-        if (
-            trusted is None
-            or issued_at is None
-            or candidate_player is None
-            or (candidate_player and candidate_player != player_name.casefold())
-        ):
-            return {
-                "success": False,
-                "code": "unknown_execution_id",
-                "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
-            }
-        if now - issued_at >= _BUILD_CANDIDATE_TTL_SECONDS:
-            self._build_candidates.pop(build.execution_id, None)
-            self._build_candidate_issued_at.pop(build.execution_id, None)
-            self._build_candidate_players.pop(build.execution_id, None)
+        trusted, status = self._candidates.resolve(build.execution_id, player_name)
+        if status == "expired":
             return {
                 "success": False,
                 "code": "expired_execution_id",
                 "message": "该配装候选已过期，请重新求解并确认。",
             }
-        self._evict_expired_build_candidates(now)
+        if trusted is None:
+            # 别人的候选与不存在的候选回同一句话：不泄露"这个 ID 存在，只是不属于你"。
+            return {
+                "success": False,
+                "code": "unknown_execution_id",
+                "message": "该配装候选已失效或不属于当前玩家，请重新求解并确认。",
+            }
         if trusted.model_dump(mode="json") != build.model_dump(mode="json"):
             return {
                 "success": False,
                 "code": "canonical_build_mismatch",
                 "message": "确认后的配装内容发生变化，已拒绝执行。请重新选择候选。",
             }
-        self._build_candidates.pop(build.execution_id, None)
-        self._build_candidate_issued_at.pop(build.execution_id, None)
-        self._build_candidate_players.pop(build.execution_id, None)
+        self._candidates.consume(build.execution_id)
         build = trusted
         if build.class_type:
             build_character = class_type_name(
@@ -868,7 +856,7 @@ class BuildService:
             name="已确认的精确配装",
             character=normalized_character,
             items=build.items,
-            subclass=_canonical_subclass(build),
+            subclass=canonical_subclass(build),
             source="build",
         )
         result = await self._equipment.equip_exact(player_name, loadout)

@@ -1,0 +1,1590 @@
+{
+  "_case": {
+    "elapsed_ms": 253,
+    "is_error": false,
+    "payload_chars": 45316,
+    "steps": [
+      {
+        "arguments": {
+          "intent": "type",
+          "weapon_type": "手炮"
+        },
+        "tool": "weapon_assistant"
+      }
+    ],
+    "tool": "weapon_assistant"
+  },
+  "candidates": [],
+  "data": {
+    "farming_list": {
+      "available": true,
+      "coverage_scope": "indexed_rated_lists_only",
+      "list_count": 9,
+      "lists": [
+        "刷取清单-威能紫枪",
+        "刷取清单-异域武器",
+        "刷取清单-护甲套装",
+        "刷取清单-白弹紫枪",
+        "刷取清单-绿弹紫枪",
+        "购物清单-其他",
+        "购物清单-威能",
+        "购物清单-白弹",
+        "购物清单-绿弹"
+      ],
+      "matched_count": 6,
+      "results": [
+        {
+          "element": "冰影",
+          "frame": "散射",
+          "list": "购物清单-白弹",
+          "name": "三冠得主",
+          "note": "对于以水晶为基础的配装来说很不错 框架优秀 起源+结晶残花 搭配很好",
+          "perks": {
+            "三号位": [
+              "结晶残花"
+            ],
+            "四号位": [
+              "混沌重塑",
+              "战嚎炮管"
+            ]
+          },
+          "rank": "19",
+          "scale": "S-F",
+          "source": "忠诚纪念碑",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "A"
+        },
+        {
+          "element": "烈日",
+          "frame": "精密",
+          "list": "购物清单-白弹",
+          "name": "信任",
+          "note": "有双溅射 Perk 和不错框架 但 Perk 多样性少 起源也差",
+          "perks": {
+            "三号位": [
+              "萤火虫"
+            ],
+            "四号位": [
+              "辉耀炽热",
+              "高爆载荷"
+            ]
+          },
+          "rank": "20",
+          "scale": "S-F",
+          "source": "智谋",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "A"
+        },
+        {
+          "element": "动能",
+          "frame": "攻击型",
+          "list": "购物清单-白弹",
+          "name": "克瑞米尔之匕",
+          "note": "起源不错 + 框架最差 溅射 Perk 尚可",
+          "perks": {
+            "三号位": [
+              "萤火虫"
+            ],
+            "四号位": [
+              "高爆载荷"
+            ]
+          },
+          "rank": "47",
+          "scale": "S-F",
+          "source": "铁旗",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "C"
+        },
+        {
+          "dps": "13514",
+          "list": "刷取清单-异域武器",
+          "name": "叛贼",
+          "note": "叛贼 bug，在触发了叛贼 buff 后开脱手大，大招结束后马上切到爆炸武器会把叛贼的 30% 增伤转移到该武器上左侧的 DPS 是在触发了叛贼 buff 后的双增伤光芒复仇是目前游戏中能够被实际应用的最高 DPS 叛贼“潜藏能量”进度快，能够频繁进入“释放力量”模式释放力量模式自带虚弱高爆弹药，邪恶收割虚空覆盖护盾弥补了持续扣血的不足",
+          "scale": "T",
+          "scenario_tiers": {
+            "清怪": "T1",
+            "输出": "T0"
+          },
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6",
+            "url": "https://starside.work/exotic-weapons/index.html"
+          },
+          "total_damage": "118926"
+        },
+        {
+          "element": "动能",
+          "frame": "适配 140",
+          "list": "刷取清单-白弹紫枪",
+          "name": "命运终结者",
+          "note": "手感好，perk 池和起源特性优秀",
+          "perks": {
+            "三号位": [
+              "高爆载荷",
+              "动能震颤"
+            ],
+            "四号位": [
+              "狂乱",
+              "元素磨砺",
+              "萤火虫"
+            ]
+          },
+          "scale": "T",
+          "source": "玻璃拱顶",
+          "source_ref": {
+            "local_path": "share/legendary-primary.md",
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "author_markdown",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.9.6"
+          },
+          "tier": "T1"
+        },
+        {
+          "element": "电弧",
+          "frame": "适配",
+          "list": "购物清单-白弹",
+          "name": "回文",
+          "note": "伏特子弹在手炮上不算好 框架和起源不错 但整体 Perk 组合令人失望",
+          "perks": {
+            "三号位": [
+              "高爆载荷"
+            ],
+            "四号位": [
+              "伏特子弹"
+            ]
+          },
+          "rank": "49",
+          "scale": "S-F",
+          "source": "巅峰行动",
+          "source_ref": {
+            "snapshot_id": "4692e7623104afb51cd2fe99823a326e5c7e8499b1207479ca17e176155ce06c",
+            "source_type": "web_archive_v2",
+            "trust": "untrusted_reference",
+            "updated_at": "2026.8.30",
+            "url": "https://starside.work/shopping-primary/index.html"
+          },
+          "tier": "C"
+        }
+      ],
+      "returned_count": 6,
+      "truncated": false,
+      "unmatched": [
+        "典狱长的规则（专家）",
+        "命运终结者（失时）"
+      ],
+      "warnings": [
+        "清单是社区评级，不是官方数据；引用时保留清单名、刻度与更新时间。",
+        "scale=T 是精选刷取清单（值不值得刷）；scale=S-F 是购物清单的全武器梯队（强不强），两者刻度不同，不能互相比较。",
+        "未命中只说明本地清单没有这个名称，不代表该名称不值得刷。"
+      ]
+    },
+    "weapon_schema_version": 1,
+    "weapons": {
+      "items": [
+        {
+          "ammo_type": "白弹",
+          "damage_type": "冰影",
+          "frame": null,
+          "gear_tier": 5,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/95f79ae16f450a7d3fe0af1f49f5768f.jpg",
+          "instance_id": "6917530183210837452",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 2908653246,
+          "item_level": 55,
+          "location": "仓库",
+          "locked": false,
+          "name": "三冠得主",
+          "name_en": "Triple Laureate",
+          "notes": [],
+          "power": 550,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "roll_summary": {
+            "option_counts": {
+              "弹匣": 26,
+              "枪管": 12,
+              "特性1": 1
+            },
+            "random_columns": [
+              "枪管",
+              "弹匣",
+              "特性1",
+              "特性1"
+            ],
+            "roll_kind": "random",
+            "scope": "definition"
+          },
+          "rpm": 100,
+          "stats": [
+            {
+              "display": "100",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 100
+            },
+            {
+              "display": "96",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 96
+            },
+            {
+              "display": "33",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 33
+            },
+            {
+              "display": "51",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 51
+            },
+            {
+              "display": "55",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 55
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 47
+            },
+            {
+              "display": "8",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 8
+            },
+            {
+              "display": "61",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 61
+            },
+            {
+              "display": "12",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 12
+            },
+            {
+              "display": "82",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 82
+            },
+            {
+              "display": "22",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 22
+            },
+            {
+              "display": "56",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 56
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "烈日",
+          "frame": "精密框架",
+          "gear_tier": 5,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+          "instance_id": "6917530193973399564",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 810474118,
+          "item_level": 55,
+          "location": "仓库",
+          "locked": false,
+          "name": "信任",
+          "name_en": "Trust",
+          "notes": [],
+          "power": 550,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "roll_summary": {
+            "option_counts": {
+              "弹匣": 26,
+              "枪管": 22,
+              "特性1": 1
+            },
+            "random_columns": [
+              "枪管",
+              "弹匣",
+              "特性1",
+              "特性1"
+            ],
+            "roll_kind": "random",
+            "scope": "definition"
+          },
+          "rpm": 180,
+          "stats": [
+            {
+              "display": "180",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 180
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 78
+            },
+            {
+              "display": "33",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 33
+            },
+            {
+              "display": "84",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 84
+            },
+            {
+              "display": "38",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 38
+            },
+            {
+              "display": "50",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 50
+            },
+            {
+              "display": "12",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 12
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 78
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "96",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 96
+            },
+            {
+              "display": "42",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 42
+            },
+            {
+              "display": "60",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 60
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "烈日",
+          "frame": "精密框架",
+          "gear_tier": 5,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+          "instance_id": "6917530193975673732",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 810474118,
+          "item_level": 55,
+          "location": "仓库",
+          "locked": false,
+          "name": "信任",
+          "name_en": "Trust",
+          "notes": [],
+          "power": 550,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "roll_summary": {
+            "option_counts": {
+              "弹匣": 26,
+              "枪管": 22,
+              "特性1": 1
+            },
+            "random_columns": [
+              "枪管",
+              "弹匣",
+              "特性1",
+              "特性1"
+            ],
+            "roll_kind": "random",
+            "scope": "definition"
+          },
+          "rpm": 180,
+          "stats": [
+            {
+              "display": "180",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 180
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 78
+            },
+            {
+              "display": "37",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 37
+            },
+            {
+              "display": "56",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 56
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 47
+            },
+            {
+              "display": "55",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 55
+            },
+            {
+              "display": "15",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 15
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 78
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "100",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 100
+            },
+            {
+              "display": "35",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 35
+            },
+            {
+              "display": "60",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 60
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "烈日",
+          "frame": "精密框架",
+          "gear_tier": 5,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7c66564c131978aae4c3d11e025a4226.jpg",
+          "instance_id": "6917530193978049636",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 810474118,
+          "item_level": 55,
+          "location": "Hunter",
+          "locked": false,
+          "name": "信任",
+          "name_en": "Trust",
+          "notes": [],
+          "power": 550,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "roll_summary": {
+            "option_counts": {
+              "弹匣": 26,
+              "枪管": 22,
+              "特性1": 1
+            },
+            "random_columns": [
+              "枪管",
+              "弹匣",
+              "特性1",
+              "特性1"
+            ],
+            "roll_kind": "random",
+            "scope": "definition"
+          },
+          "rpm": 180,
+          "stats": [
+            {
+              "display": "180",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 180
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 78
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 47
+            },
+            {
+              "display": "68",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 68
+            },
+            {
+              "display": "51",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 51
+            },
+            {
+              "display": "66",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 66
+            },
+            {
+              "display": "12",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 12
+            },
+            {
+              "display": "78",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 78
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "96",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 96
+            },
+            {
+              "display": "35",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 35
+            },
+            {
+              "display": "72",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 72
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "动能",
+          "frame": "攻击型框架",
+          "gear_tier": 5,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/063b3d4db62ef73dff4297c33ea1ec88.jpg",
+          "instance_id": "6917530195652349780",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 1617917863,
+          "item_level": 55,
+          "location": "仓库",
+          "locked": false,
+          "name": "克瑞米尔之匕",
+          "name_en": "Crimil's Dagger",
+          "notes": [],
+          "power": 550,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "roll_summary": {
+            "option_counts": {
+              "弹匣": 26,
+              "枪管": 22,
+              "特性1": 1
+            },
+            "random_columns": [
+              "枪管",
+              "弹匣",
+              "特性1",
+              "特性1"
+            ],
+            "roll_kind": "random",
+            "scope": "definition"
+          },
+          "rpm": 120,
+          "stats": [
+            {
+              "display": "120",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 120
+            },
+            {
+              "display": "92",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 92
+            },
+            {
+              "display": "82",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 82
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 47
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 47
+            },
+            {
+              "display": "24",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 24
+            },
+            {
+              "display": "8",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 8
+            },
+            {
+              "display": "67",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 67
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "98",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 98
+            },
+            {
+              "display": "21",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 21
+            },
+            {
+              "display": "56",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 56
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "动能",
+          "frame": null,
+          "gear_tier": null,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/44a28fd1d59042f6c154119c571a2c3e.jpg",
+          "instance_id": "6917529971897680226",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 267089201,
+          "item_level": 55,
+          "location": "仓库",
+          "locked": true,
+          "name": "典狱长的规则（专家）",
+          "name_en": "Warden's Law (Adept)",
+          "notes": [
+            "这件装备没有分级（组件里的 gearTier=0，旧装备或不属于分级体系），不是 T0；gear_tier 输出 null。"
+          ],
+          "power": 550,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "roll_summary": {
+            "option_counts": {
+              "弹匣": 26,
+              "枪管": 22,
+              "特性1": 2
+            },
+            "random_columns": [
+              "枪管",
+              "弹匣",
+              "特性1",
+              "特性1",
+              "特性1"
+            ],
+            "roll_kind": "random",
+            "scope": "definition"
+          },
+          "rpm": 257,
+          "stats": [
+            {
+              "display": "257",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 257
+            },
+            {
+              "display": "92",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 92
+            },
+            {
+              "display": "65",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 65
+            },
+            {
+              "display": "48",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 48
+            },
+            {
+              "display": "34",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 34
+            },
+            {
+              "display": "49",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 49
+            },
+            {
+              "display": "18",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 18
+            },
+            {
+              "display": "68",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 68
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "97",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 97
+            },
+            {
+              "display": "10",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 10
+            },
+            {
+              "display": "52",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 52
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "虚空",
+          "frame": null,
+          "gear_tier": null,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/39441735ec0f1e7f7760775f6ee4bd24.jpg",
+          "instance_id": "6917530182808974608",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 253843484,
+          "item_level": 55,
+          "location": "仓库",
+          "locked": false,
+          "name": "叛贼",
+          "name_en": "Turncoat",
+          "notes": [
+            "这件装备没有分级（组件里的 gearTier=0，旧装备或不属于分级体系），不是 T0；gear_tier 输出 null。"
+          ],
+          "power": 550,
+          "rarity": "异域",
+          "rarity_tier": 6,
+          "roll_kind": "fixed",
+          "roll_summary": {
+            "option_counts": {},
+            "random_columns": [],
+            "roll_kind": "fixed",
+            "scope": "definition"
+          },
+          "rpm": 140,
+          "stats": [
+            {
+              "display": "140",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 140
+            },
+            {
+              "display": "84",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 84
+            },
+            {
+              "display": "62",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 62
+            },
+            {
+              "display": "68",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 68
+            },
+            {
+              "display": "42",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 42
+            },
+            {
+              "display": "39",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 39
+            },
+            {
+              "display": "13",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 13
+            },
+            {
+              "display": "77",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 77
+            },
+            {
+              "display": "13",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 13
+            },
+            {
+              "display": "97",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 97
+            },
+            {
+              "display": "22",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 22
+            },
+            {
+              "display": "39",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 39
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "动能",
+          "frame": "适配框架",
+          "gear_tier": 5,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/7741689cbc1102aa9fc742b33a106f19.jpg",
+          "instance_id": "6917530194681767321",
+          "is_craftable": true,
+          "is_equipped": false,
+          "item_hash": 4184168210,
+          "item_level": 55,
+          "location": "仓库",
+          "locked": false,
+          "name": "命运终结者",
+          "name_en": "Fatebringer",
+          "notes": [],
+          "power": 550,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "roll_summary": {
+            "option_counts": {
+              "弹匣": 26,
+              "枪管": 22,
+              "特性1": 19
+            },
+            "random_columns": [
+              "枪管",
+              "弹匣",
+              "特性1",
+              "特性1"
+            ],
+            "roll_kind": "random",
+            "scope": "definition"
+          },
+          "rpm": 140,
+          "stats": [
+            {
+              "display": "140",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 140
+            },
+            {
+              "display": "84",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 84
+            },
+            {
+              "display": "87",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 87
+            },
+            {
+              "display": "66",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 66
+            },
+            {
+              "display": "57",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 57
+            },
+            {
+              "display": "48",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 48
+            },
+            {
+              "display": "10",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 10
+            },
+            {
+              "display": "84",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 84
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "98",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 98
+            },
+            {
+              "display": "10",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 10
+            },
+            {
+              "display": "53",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 53
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "动能",
+          "frame": "适配框架",
+          "gear_tier": null,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/0e281ebb76f5e5ba169bd44c036fcf39.jpg",
+          "instance_id": "6917529431004309171",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 1216319404,
+          "item_level": 55,
+          "location": "Hunter",
+          "locked": true,
+          "name": "命运终结者（失时）",
+          "name_en": "Fatebringer (Timelost)",
+          "notes": [
+            "这件装备没有分级（组件里的 gearTier=0，旧装备或不属于分级体系），不是 T0；gear_tier 输出 null。"
+          ],
+          "power": 550,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "roll_summary": {
+            "option_counts": {
+              "弹匣": 26,
+              "枪管": 22,
+              "特性1": 6
+            },
+            "random_columns": [
+              "枪管",
+              "弹匣",
+              "特性1",
+              "特性1"
+            ],
+            "roll_kind": "random",
+            "scope": "definition"
+          },
+          "rpm": 140,
+          "stats": [
+            {
+              "display": "140",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 140
+            },
+            {
+              "display": "84",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 84
+            },
+            {
+              "display": "49",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 49
+            },
+            {
+              "display": "70",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 70
+            },
+            {
+              "display": "73",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 73
+            },
+            {
+              "display": "81",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 81
+            },
+            {
+              "display": "10",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 10
+            },
+            {
+              "display": "84",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 84
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "98",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 98
+            },
+            {
+              "display": "10",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 10
+            },
+            {
+              "display": "53",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 53
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        },
+        {
+          "ammo_type": "白弹",
+          "damage_type": "电弧",
+          "frame": "适配框架",
+          "gear_tier": 5,
+          "icon_url": "https://www.bungie.net/common/destiny2_content/icons/dfc092e7b3a9927e2250cfd43177ef0a.jpg",
+          "instance_id": "6917530183261080693",
+          "is_craftable": false,
+          "is_equipped": false,
+          "item_hash": 739029152,
+          "item_level": 55,
+          "location": "仓库",
+          "locked": false,
+          "name": "回文",
+          "name_en": "The Palindrome",
+          "notes": [],
+          "power": 550,
+          "rarity": "传说",
+          "rarity_tier": 5,
+          "roll_kind": "random",
+          "roll_summary": {
+            "option_counts": {
+              "弹匣": 26,
+              "枪管": 22,
+              "特性1": 1
+            },
+            "random_columns": [
+              "枪管",
+              "弹匣",
+              "特性1",
+              "特性1"
+            ],
+            "roll_kind": "random",
+            "scope": "definition"
+          },
+          "rpm": 140,
+          "stats": [
+            {
+              "display": "140",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "每分钟发射数",
+              "stat_hash": 4284893193,
+              "value": 140
+            },
+            {
+              "display": "84",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "伤害",
+              "stat_hash": 4043523819,
+              "value": 84
+            },
+            {
+              "display": "73",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "射程",
+              "stat_hash": 1240592695,
+              "value": 73
+            },
+            {
+              "display": "68",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "稳定性",
+              "stat_hash": 155624089,
+              "value": 68
+            },
+            {
+              "display": "41",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "操控性",
+              "stat_hash": 943549884,
+              "value": 41
+            },
+            {
+              "display": "47",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "填装速度",
+              "stat_hash": 4188031367,
+              "value": 47
+            },
+            {
+              "display": "10",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "弹匣",
+              "stat_hash": 3871231066,
+              "value": 10
+            },
+            {
+              "display": "79",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "辅助瞄准",
+              "stat_hash": 1345609583,
+              "value": 79
+            },
+            {
+              "display": "14",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "变焦",
+              "stat_hash": 3555269338,
+              "value": 14
+            },
+            {
+              "display": "100",
+              "display_as_numeric": true,
+              "is_primary": false,
+              "name": "后坐方向",
+              "stat_hash": 2715839340,
+              "value": 100
+            },
+            {
+              "display": "21",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "空中效率",
+              "stat_hash": 2714457168,
+              "value": 21
+            },
+            {
+              "display": "50",
+              "display_as_numeric": false,
+              "is_primary": false,
+              "name": "弹药生成",
+              "stat_hash": 1931675084,
+              "value": 50
+            }
+          ],
+          "tracked": false,
+          "weapon_type": "手炮"
+        }
+      ],
+      "next_offset": 10,
+      "offset": 0,
+      "query": "手炮",
+      "returned": 10,
+      "total": 124,
+      "truncated": true
+    }
+  },
+  "next_actions": [],
+  "ok": true,
+  "summary": "已读取「手炮」持有 124 件，本次返回 10 件（已截断）。",
+  "warnings": [
+    "这件装备没有分级（组件里的 gearTier=0，旧装备或不属于分级体系），不是 T0；gear_tier 输出 null。（3 件）",
+    "只返回了前 10 件；继续读传 offset=10。",
+    "列表行只有身份/位置/属性值：要看某一件的插槽与可换部件，用 weapon_assistant(intent=\"compare\", weapon_name=…, item_instance_id=…)。"
+  ]
+}

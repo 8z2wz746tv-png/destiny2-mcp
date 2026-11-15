@@ -42,6 +42,8 @@ from ._requests import (
     LoadoutIntent,
     PlayerIntent,
     SubclassIntent,
+    WEAPON_PATTERN_INTENTS,
+    WORLD_ROTATION_INTENTS,
     WeaponIntent,
     WorldIntent,
 )
@@ -91,6 +93,8 @@ _W_ROLL_FILTERS = ("filter_rolls", *_W_CATALOG)
 _W_POPULARITY = (
     "popularity", "selection_rates", "perk_selection", "selection", "usage_rates",
 )
+# 锻造图样：读账号（组件 900）+ Manifest 图鉴，按名/按类型筛、可翻页
+_W_PATTERNS = WEAPON_PATTERN_INTENTS
 # ── build_assistant ─────────────────────────────────────────────────────────
 _B_CRAFT = ("recommend", "find", "analyze", "farm_target")
 _B_COMMUNITY = ("community", "community_build", "starside")
@@ -112,6 +116,14 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint=(
             '名字记不全时用 intent="find" 传 name_prefix（返回候选，含 名字#数字 与 has_more）；'
             '精确查人用 intent="search" 传完整 player_name。'
+        ),
+        suggestion=("player_assistant", "find"),
+    ),
+    ("player_assistant", "include_profile"): _contract(
+        _only("find", "find_players", "fuzzy"),
+        hint=(
+            '模糊搜人默认不读别人的档案（只给名字/ID/平台）；要按"游玩时长/凯旋分"排序就传 '
+            "include_profile=true（并发拉，约 5 秒）。精确查人不读它。"
         ),
         suggestion=("player_assistant", "find"),
     ),
@@ -212,15 +224,21 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ),
     # ══ weapon_assistant ═══════════════════════════════════════════════════
     ("weapon_assistant", "player_name"): _contract(
-        _only("analyze", "compare", "compare_duplicates", "type", "filter_rolls"),
+        _only("analyze", "compare", "compare_duplicates", "type", "filter_rolls", *_W_PATTERNS),
         hint="只有读账号的武器 intent 需要玩家名；纯定义查询（catalog/info/stats/perk_pool 等）与账号无关。",
     ),
     ("weapon_assistant", "weapon_name"): _contract(
         _only(*(i for i in _all(WeaponIntent) if i not in {"type", "perk_description"})),
         hint='按武器类型查要传 weapon_type（intent="type"，不是 weapon_name）；查单个 Perk 用 perk_name（intent="perk_description"）。',
     ),
+    ("weapon_assistant", "rarity"): _contract(
+        _only(*_W_PATTERNS),
+        hint='只有 intent="patterns" 读它（异域/金枪、传说、稀有）；筛账号库存的稀有度用 '
+             'inventory_assistant(intent="get", rarity=...)。',
+        suggestion=("inventory_assistant", "get"),
+    ),
     ("weapon_assistant", "weapon_type"): _contract(
-        _only(*_W_ROLL_FILTERS, "type"),
+        _only(*_W_ROLL_FILTERS, "type", *_W_PATTERNS),
         hint='按类型列举用 intent="type"；按类型在全量定义里筛用 intent="catalog"。',
         suggestion=("weapon_assistant", "catalog"),
     ),
@@ -256,8 +274,11 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("weapon_assistant", "compare"),
     ),
     ("weapon_assistant", "limit"): _contract(
-        _only(*_W_ROLL_FILTERS, "type", "community"),
-        hint="catalog、filter_rolls、type 和 community 支持限量；type 会另给 total_weapons/truncated。",
+        _only(*_W_ROLL_FILTERS, "type", "community", *_W_PATTERNS),
+        hint=(
+            "catalog、filter_rolls、type、patterns 和 community 支持限量；type 默认 10 件、"
+            "patterns 默认 20 条，响应里给 total/returned/truncated/next_offset。"
+        ),
         suggestion=("weapon_assistant", "filter_rolls"),
     ),
     ("weapon_assistant", "knowledge_id"): _contract(
@@ -269,7 +290,8 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("weapon_assistant", "community"),
     ),
     ("weapon_assistant", "offset"): _contract(
-        _only("community"), hint='只有 intent="community" 支持翻页。',
+        _only("community", "type", *_W_PATTERNS),
+        hint='community、type 与 patterns 支持翻页：响应里有 next_offset，接着传它。',
         suggestion=("weapon_assistant", "community"),
     ),
     # ══ build_assistant ════════════════════════════════════════════════════
@@ -316,6 +338,11 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         _only(*_B_CRAFT), hint='属性目标是求解类 intent 的硬约束；社区配装不受它影响。',
         suggestion=("build_assistant", "recommend"),
     ),
+    ("build_assistant", "stat_caps"): _contract(
+        _only(*_B_CRAFT),
+        hint='属性上限只被求解类 intent 读（community 等模板查询不受它影响）。',
+        suggestion=("build_assistant", "recommend"),
+    ),
     ("build_assistant", "fragment_names"): _contract(
         _only(*_B_CRAFT), hint='碎片计入配装只在求解类 intent 上生效。',
         suggestion=("build_assistant", "recommend"),
@@ -337,6 +364,14 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint='查套装效果用 intent="set_bonus"；把套装当求解约束用 intent="farm_target"/"recommend"。',
         suggestion=("build_assistant", "set_bonus"),
     ),
+    ("build_assistant", "functional_mods"): _contract(
+        _only("recommend", "find"),
+        hint=(
+            '照抄社区配装的功能模组只在求解类 intent（recommend/find）上生效：'
+            '它们的能量会从六维求解里扣掉，analyze/farm_target 不带执行计划。'
+        ),
+        suggestion=("build_assistant", "find"),
+    ),
     ("build_assistant", "set_bonus_count"): _contract(
         _only(*_B_CRAFT), hint='套装件数是求解约束，只在求解类 intent 上生效。',
         suggestion=("build_assistant", "recommend"),
@@ -356,6 +391,12 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ("build_assistant", "canonical_build"): _contract(
         _only("equip_build"),
         hint='canonical_build 只能回传给 intent="equip_build"，而且必须是服务端签发的候选。',
+        suggestion=("build_assistant", "equip_build"),
+    ),
+    ("build_assistant", "execution_id"): _contract(
+        _only("equip_build"),
+        hint='execution_id 只能回传给 intent="equip_build"，而且必须是服务端签发的那份候选的 ID'
+             "（与 canonical_build 二选一，给发不出结构体的宿主用）。",
         suggestion=("build_assistant", "equip_build"),
     ),
     ("build_assistant", "top_n"): _contract(
@@ -411,10 +452,10 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         hint="按 ID 删配装/装备配装，以及搜标识，都不按角色过滤。",
     ),
     ("loadout_assistant", "loadout_id"): _contract(
-        _only("delete", "equip_loadout"),
+        _only("get", "list", "delete", "equip_loadout"),
         hint=(
-            'list/get 只按 character 过滤并返回全部配装，不接受 loadout_id；'
-            "要哪一套请从返回结果里按 ID 或名字挑出来。"
+            'get/list 用它可以只取一套（不给就按 character 过滤后整页返回）；'
+            "delete/equip_loadout 用它指定操作对象。全部配装的 ID 在 list 的每一行里。"
         ),
     ),
     ("loadout_assistant", "name"): _contract(
@@ -578,9 +619,12 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("activity_assistant", "history"),
     ),
     ("activity_assistant", "query"): _contract(
-        _only("counters", "community"),
-        hint='关键词搜索在 intent="counters"（筛计数器名称/描述）和社区活动资料 intent="community" 上用。',
-        suggestion=("activity_assistant", "community"),
+        _only("counters", *_A_STATS, "community"),
+        hint=(
+            '关键词在 intent="counters"（筛计数器名称/描述）、intent="stats"（按统计项名称筛行，'
+            '例如"击败"，省得一次读 60 行）与社区活动资料 intent="community" 上用。'
+        ),
+        suggestion=("activity_assistant", "stats"),
     ),
     ("activity_assistant", "knowledge_id"): _contract(
         _only("community"), hint='读资料详情用 intent="community" 并给 knowledge_id。',
@@ -596,8 +640,8 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
     ),
     # ══ world_assistant ════════════════════════════════════════════════════
     ("world_assistant", "player_name"): _contract(
-        _only("vendor", "collectible_node", "collectible_item"),
-        hint="周常、搜节点、社区资料与账号无关；商人库存和收藏品状态才需要玩家名。",
+        _only("vendor", "collectible_node", "collectible_item", *WORLD_ROTATION_INTENTS),
+        hint="周常、搜节点、社区资料与账号无关；商人库存、收藏品状态和轮换（要读角色活动组件 204）才需要玩家名。",
     ),
     ("world_assistant", "character"): _contract(
         _only("vendor", "collectible_node", "collectible_item", "community"),
@@ -632,8 +676,10 @@ PARAMETER_OWNERS: dict[tuple[str, str], ParameterContract] = {
         suggestion=("world_assistant", "collectible_node"),
     ),
     ("world_assistant", "limit"): _contract(
-        _only("weekly", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item", "community"),
-        hint="完整周常（weekly_full）不读 limit；vendor 用它限制商人数（菜单）或每个商人的商品数（详情）。",
+        _only("weekly", "vendor", "search_collectible_nodes", "collectible_node", "collectible_item",
+              "community", *WORLD_ROTATION_INTENTS),
+        hint="完整周常（weekly_full）不读 limit；vendor 用它限制商人数（菜单）或每个商人的商品数（详情）；"
+             "rotations 用它限制返回行数（默认 30）。",
     ),
     ("world_assistant", "community_category"): _contract(
         _only("community"), hint='只有 intent="community" 能跨分类搜索。',

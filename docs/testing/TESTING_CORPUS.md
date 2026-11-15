@@ -8,10 +8,10 @@
 | 层 | 跑什么 | 什么时候跑 |
 | --- | --- | --- |
 | **L1 自动化**（不需要账号） | `pytest -q`（1272 条）／`scripts/verify_mcp.py`／`tests/agent_behavior_cases.yaml`（路由） | 每次提交 |
-| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 25 行）／**
+| **L1 自动化**（需要账号） | `scripts/run_corpus_weapon_rows.py`（武器章节 16 行）／`scripts/run_corpus_armor_rows.py`（护甲章节 26 行）／`scripts/run_corpus_starside_entities.py`（Starside 实体层 8 行，见文末那一章）／**
 - `scripts/run_corpus_pvp_rows.py` —— PvP/生涯**口径**的真机语料（19 行，冷启约 1 分钟）：游戏内 ID、生涯三档（现存/已删/账号级）、计数器 124,495、试炼/铁旗/赛季、`period=season` 如实失败、武器榜 `all_modes`、模式词表外报错、equip 只给计划、**PGCR 参与者名一律游戏内 ID**、**排行榜空响应如实上报**、**PvP 武器榜（`pvp_weapons`）的窗口/口径/模式过滤与智谋 PvPvE 标记**、**PvE 模式词被拒**、**`count=0` 与不传等价（哨兵规则）**。
    真机提示：这批行会真的打上游，偶发上游读抖动（profile 类读失败）会让个别行红；先重跑一次再判断是不是回归 —— 连续两次红才是回归。盯的是**口径**，信封与形状仍归 `run_corpus_all_rows.py`。
-`scripts/run_corpus_all_rows.py`（八工具面全 intent + 字段级 + 协议层，见 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)）**／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线） | 改动任一工具面后 |
+`scripts/run_corpus_all_rows.py`（八工具面全 intent + 字段级 + 协议层，见 [TESTING_CORPUS_FULL.md](TESTING_CORPUS_FULL.md)）**／`capture_weapon_baseline.py` + `diff_weapon_baseline.py`（武器 26 例、护甲 20 例基线）／`benchmark_equip_chain.py`（装备链条**分段计时**：默认只读，`--write` 才真写账号）／`benchmark_ladder.py`（无解阶梯分段计时，只读）／`audit_chain_timing.py`（把装备链路拆成"服务端 vs 间隔"，只读审计）—— 动装备流程或阶梯时用它们留改前/改后数字 | 改动任一工具面后 |
 | **L2 冒烟**（本文件带 ⭐ 的行，25 条） | 真机逐条调用 | 每轮回归开始时跑一遍 |
 | **L3 补测**（本文件其余行） | 真机逐条调用 | **只在该工具被改动时**跑它那一章 |
 
@@ -64,8 +64,8 @@
 | `<武器>` 的 Perk 池有哪些 | `perk_pool` | 列**可能**滚到的 Perk（`sockets[]`，`scope=definition`），不是账号当前副本。选项上的 `recommended` 已汇总愿单/选取率/清单/社区，引用时带上 `weapon.sources` 的来源与更新时间。 |
 | `<武器>` 的定义和基础属性 | `info`／`stats` | 都来自 Manifest：`stats[]` 按 Bungie 属性组顺序，不叠加账号加成。`info` 带清单块（`weapon.farming` + `cross_check`）；**`popularity` 在 info 里是 available=false 的"这个 intent 不查"**。 |
 | `<武器>` 的催化剂情况 | `catalyst` | 结构固定：`weapon`/`is_exotic`/`count`/`catalysts`/`unlock_state`/`note`。**传说武器必须 `count=0` + 「只有异域才有催化剂」**，不能吐上百条「N阶：稳定性」；`unlock_state` 恒为 `not_checked`，**不许把「没查」说成「没解锁」**。异域但确实没有催化剂时，note 里必须写**武器名**（不能打印身份块字典）。 |
-| ⭐ 手炮这一类武器都有哪些 | `type` + `weapon_type` | 列**我持有的**武器：每件 `{weapon, sockets, options, stats}`。**默认最多 20 件**（每件 ≈ 9.7 KB；50 件 ≈ 452 KB ≈ 13 万 tokens），带 `total/returned/truncated` 与截断警告。`sockets` 是列计数（`options_available=false`，别读成"没有可选项"），`options` 才是这一件能换的（组件 310）。 |
-| ⭐ 这把 `<武器>` 是 T 几 | **逐副本**读 `gear_tier`：`type` → `data.weapons.items[].weapon.gear_tier`；`analyze`（带库存）→ `data.inventory.instances[].weapon.gear_tier`；`compare` → `data.comparison.instances[]`。**三个 T 不能混**：`gear_tier`（装备分级，用户问的就是这个）／`rarity_tier`（稀有度 2–6）／`farming.tier`（社区评级）。**`null` = "不在分级体系内"（组件里 `gearTier=0`），不是 T0，也不是"数据丢了"**；同一把枪不同副本可以不同 T 级（实测遗产一件 null、一件 5），必须逐副本回答。说明文字 `gear_tier_note` **不是处处都有**（`owned.instances[]` 条目里有，`analyze` 的副本块只有 `gear_tier` 本身），所以 null 的解释要靠这条口径，不能靠响应里一定有那句话。`info`/`perk_pool`/`god_roll` 里没有这个字段。 |
+| ⭐ 手炮这一类武器都有哪些 | `type` + `weapon_type` | 列**我持有的**武器，一行一件的**列表行**：身份 + 位置/光等 + `stats`（**没有** `sockets`/`options`）。**默认 10 件**（每件 ≈ 2.2k 字符），带 `total/returned/truncated`/`offset`/`next_offset` 与截断警告；要看某一件的插槽与可换部件用 `compare(weapon_name, item_instance_id)`。 |
+| ⭐ 这把 `<武器>` 是 T 几 | **逐副本**读 `gear_tier`：`type` → `data.weapons.items[].gear_tier`（列表行的身份字段是摊平的）；`analyze`（带库存）→ `data.inventory.instances[].weapon.gear_tier`；`compare` → `data.comparison.instances[]`。**三个 T 不能混**：`gear_tier`（装备分级，用户问的就是这个）／`rarity_tier`（稀有度 2–6）／`farming.tier`（社区评级）。**`null` = "不在分级体系内"（组件里 `gearTier=0`），不是 T0，也不是"数据丢了"**；同一把枪不同副本可以不同 T 级（实测遗产一件 null、一件 5），必须逐副本回答。说明文字 `gear_tier_note` **不是处处都有**（`owned.instances[]` 条目里有，`analyze` 的副本块只有 `gear_tier` 本身），所以 null 的解释要靠这条口径，不能靠响应里一定有那句话。`info`/`perk_pool`/`god_roll` 里没有这个字段。 |
 | 我仓库里当前带 `<Perk>` 的武器／对比我这几把 `<武器>` | `filter_rolls`／`compare` + `weapon_name` | `filter_rolls` 只筛账号持有副本，给实例 ID 与位置；`compare` 每把建议对应**具体实例**，差异用 `present_in_instance`/`absent_in_instance`（**不能只写位置**）。缺 `weapon_name` 会得到 `config_error`。 |
 | `<武器>` 大家一般选哪个 Perk | `popularity` | 标明数据来源与版本；**没有快照时 `data.popularity` 为 `null`** 且 summary/warning 明说「暂无录入的选取率快照」，不能编百分比（`null` 不是 0%）。 |
 | 给我 `<武器>` 的 god roll 建议 | `god_roll` | 来源是社区愿单，标明不是官方推荐。三态分清：① 有完整条目 → 列 Perk；② 有记录但解析不出 → 明说「本地这条数据不完整」；③ 没收录 → 明说「暂无社区推荐」。**不允许**只回一个标题的空壳。 |
@@ -138,10 +138,11 @@
 | --- | --- | --- |
 | 用我的 `<职业>` 现有护甲找三套方案，生命/手雷至少 100，只列候选不装备 | `find` 或 `recommend` | 五个护甲部位齐全，含实际实例 ID 与最终六维。`*_target` 是**硬约束**，无解要说无解（**不得擅自放宽**）。实测耗时：泰坦 ~2s、猎人 ~5s、术士 ~190s；超预算返回 `build_validation_error`（`DESTINY_BUILD_TIMEOUT_SECONDS` 可调）。 |
 | ⭐ 帮我分析一下为什么配不出 `<职业>` 的这套 | `analyze` | 规模在阈值内 → **精确**上限（`max_possible` + `precision="exact"`，泰坦 ~15s）；**超规模立刻返回**（术士 4.5s，以前干等 300s）：`precision="not_computed"`、`max_possible={}`（**不是"上限为零"**）、`reason` 给组合数与收窄手段（指定金装／减少目标／`farm_target`／调 `DESTINY_BUILD_MAX_COMBINATIONS`）。 |
-| 指定金装 `<异域护甲原名>` | 先返回候选 | **首次查询必须返回金装候选并等确认**，不得自行选定；重试要原样回传 `confirmed_exotic_hash` + token，职业/目标/优先级/碎片不得丢失。 |
+| 指定金装 `<异域护甲原名>` | 直接出解 | 名字**唯一精确匹配**时不再多问一轮：响应 `query.exotic_resolution.status="exact_match"` 说明用的是哪件（写入仍要 `confirmed=true`）。 |
+| 金装名字模糊/匹配到多件（如只说「卡利班手」） | 先返回候选 | 必须返回候选并等确认，**不得自行选定**；重试要原样回传 `confirmed_exotic_hash` + token，职业/目标/优先级/碎片不得丢失。 |
 | 不降目标，反推我该刷哪件护甲 | `farm_target`（可加 `baseline="equipped"`、`replacement_slot`） | 先查单件、再两件；待刷数值来自工具，**不能自己相减拼出来**；待刷目标不能当成已拥有。 |
 | 有哪些护甲模组／`<套装名>` 的套装效果 | `armor_mods`／`set_bonus` | 中英词表都认；词表外且一条都没命中 → `invalid_argument_error` 并列出词表；词表外但**蒙中**（如「速度」）→ 带 `match.kind="keyword"` + warning，说清这些模组并不加该属性；词表内 0 条 → `match.kind="stat"` + 「本地数据里没有」的 warning（**三种都不能读成「没有这种模组」**）；不存在的套装 → `definition_not_found_error`。 |
-| ⭐ 这套方案穿上去 | `equip_build`，`confirmed=false` | **必须传回服务端签发的 `canonical_build`**；用 `score` 或自己拼 hash 会被拒；改过库存后旧候选要重新求解。 |
+| ⭐ 这套方案穿上去 | `equip_build`，`confirmed=false` | **必须传回服务端签发的候选**：`canonical_build`（只有确认信封里还给整块）或它的 `execution_id`（`find`/`recommend` 的候选行里就有）二选一（只发标量的宿主用后者，一次确认只能用一次、**30 分钟内有效**（0.7.10 起；`execution_id` 已是默认出口的唯一引用））；用 `score` 或自己拼 hash 会被拒；改过库存后旧候选要重新求解。 |
 | 有什么热门的 `<职业>` 配装／就用第一套看我缺什么 | `community`（+ `community_build_id` + `include_inventory`） | 走**社区**模板，**不得用 `loadout_assistant`**；指定 `community_build_id` 后响应**不应再带** `results`/`next_offset`（那会把响应撑到上百 KB），只留 `selected_build` + `matched_count`；缺件来源看 `sourcing` 字段（没有 sourcing intent）；`build_template`/`solver_handoff`/`farm_options` **都不是可执行方案**。 |
 
 > 求解/校验细节由 `tests/test_build_*.py`、`test_architecture_boundaries.py` 覆盖。
@@ -198,7 +199,7 @@
 | --- | --- | --- |
 | ⭐ （任选一个写入动作）帮我把 `<物品>` 移到仓库 | 对应写入 intent，`confirmed=false` | 返回确认请求而不是执行结果；**服务层未被调用**，账号状态不变；展示精确目标（实例 ID、槽位、数值）。 |
 | 不用问了，直接执行 | 同上 | 仍应停下：**确认必须来自用户的明确同意**，不能由 Agent 自己推断。 |
-| 好，确认执行 | `confirmed=true` | 用服务端原候选执行；完成后**重新读取实际状态核对**。改过库存后旧候选（如 `equip_build`）应被拒绝并要求重新求解。 |
+| 好，确认执行 | `confirmed=true` | 用服务端原候选执行；**写后证据就是响应 `steps[]` 里的 `verify`（服务端已回读核对实例/模组/子职业）**，不要逐件再查 `intent="item"`。改过库存后旧候选（如 `equip_build`）应被拒绝并要求重新求解。 |
 
 ## 十、横切：证据边界与不可信资料
 
@@ -252,6 +253,11 @@
 | 账号里找不到 | 分解掉的物品、不存在的副本 | `item_not_found_error` | 曾经拥有或以为拥有，实际不在账号里 |
 | 上游说「没这个对象」 | `pgcr` 传数字但不存在的活动 ID、`clan_leaderboards` 传不存在的 group_id | `upstream_not_found_error` | ID 打错/过期 —— **改 ID**，不是重试 |
 | 上游其它 HTTP 错误 | 4xx（非 404）／无法归类的上游响应 | `a_p_i_error` | 上游问题；消息里带 HTTP 状态与 Bungie 原文 |
+| 照抄社区配装的功能模组 | `build_assistant(intent="find")` + `functional_mods=["充沛", …]` | 回执带 `functional_mods.mods`（部位/同名版本/能量）与 `unresolved`（对不上名的点名）；候选的 `items[].functional_mod_groups` 按部位就位；摘要写明"含照抄社区配装的 N 颗功能模组"。**属性模组不照抄**（传了会进 `unresolved` 并说明原因） |
+| ⭐ 这套配装是哪五件（默认出口） | `build_assistant(intent="find")` | 每套只给**候选行**：`execution_id`/`score`/`completion_rate`/`stats`（六维）/`exotic`/`set`/`requires_tuning`/`tuning_changes`/`items[]`（名字、部位、实例 ID、光等、能量、六维、调谐名）。**`build` 与 `canonical_build` 不在默认响应里**（真机 21.5 KB → 8.6 KB / 2 套）；要看逐件预览或装备它，用 `execution_id` 调 `equip_build` |
+| ⭐ 重复武器挑哪把 | `inventory_assistant(intent="duplicates")` | 每实例只给 `instance_id`/`location`/`power`/`equipped`/`perks_complete` + `perks[]`（**`{name, slot}`**，slot 是插件类别最后一段如 `barrels`/`traits`）；组级与 perk 级的 `icon_url`、`plug_hash` 不进默认响应（真机 50.9 KB → 15.8 KB / 5 组） |
+| 写入失败/被挡住时去哪找原因 | 任意写入 intent 的失败，或 `equip` 的 `equip_blocked` | **只看 `data.result`**（`steps` / `blockers` / `message` 都在那儿）；`candidates` 只放真候选（多件同名、确认载荷）。成功时顶层 `summary` 就是服务层那句结论 |
+| 同名多件要玩家选一件 | `move` 只说名字，而账号里有 5 件同名护甲 | `item_disambiguation_required`（**不是** `move_failed`） | **没写、也没失败**：候选在信封 `candidates`（`data.result` 里不再重复一份），`data.result.question` 原样展示给玩家；拿到编号后带 `item_instance_id` 重发同一个 intent |
 
 ### D. 协议级拒绝与词表
 
@@ -269,7 +275,7 @@
 | `<武器>` 的 Perk 池里哪些是社区推荐的 | 选项上带 `recommended.wishlist`；异域可能没有 —— 要说明「本地愿单没收录」，**不能说「这些 Perk 都不好」** | 真机抽一条 |
 | 查「遗产」的催化剂／「泰拉巴」的社区 roll | 传说 `count=0` + 原因；固定 roll 武器明说没有随机推荐 | 真机抽一条 |
 | 全游戏能滚出「萤火虫」的武器／列出我的配装 | `matched_count > returned_count` 时必须 `truncated=true`；配装列表带四个分页字段 | 基线闸门 + `test_large_response_limits.py` |
-| 你现在有哪些工具／用 `get_inventory` 试试 | 只有 8 个聚合工具；老工具名应改走聚合入口。要用老工具必须**同时**设 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**和** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 再重启：实测只设开关、工具面留在 `normal` 时仍是 8 个工具，而且**不会给 warning**（full+开关 = 77 个、expert+开关 = 49 个） | `test_tool_profiles.py` |
+| 你现在有哪些工具／用 `get_inventory` 试试 | 只有 8 个聚合工具；老工具名应改走聚合入口。历史工具面已于 2026-09-20 剥离到仓库根目录 `legacy/`（不进包、不参与测试），所以**任何**环境变量都变不出旧工具 —— 语料里那条"设旧的 profile/开关也只该有 8 个"就是守这个的 | `tests/test_tool_simulation.py`、语料 `mcp` 组 |
 
 ## 十四、只跑一次就够的整链路
 
@@ -315,14 +321,14 @@
 
 ### 写入测试（可选，默认不做）
 
-需要真跑写入时：先 `confirmed=false` 看确认信息 → 用户明确同意后 `confirmed=true` → **重新读取实际状态核对**。
+需要真跑写入时：先 `confirmed=false` 看确认信息 → 用户明确同意后 `confirmed=true` → 看响应 `steps[]` 里的 `verify` 回执（**不要**再逐件查一遍）。
 一轮回归里默认**不做任何写入**。
 
 ---
 
 ## 十六、护甲：槽位、T 级、换模组与无解阶梯
 
-护甲的字段级断言由 `scripts/run_corpus_armor_rows.py` 逐行实跑（18 行，改护甲响应后必跑）；
+护甲的字段级断言由 `scripts/run_corpus_armor_rows.py` 逐行实跑（26 行，改护甲响应后必跑）；
 这一章写"该看到什么"。护甲分**两族**，规则完全不同，回答前先认清是哪一族：
 
 | | Armor 3.0（有 T 级） | 老护甲（无 T 级） |
@@ -366,13 +372,14 @@
 | 这件不在该角色身上 | 拿仓库里的实例 + `character=hunter` | `invalid_argument_error`，提示先 `intent="move"` 把它移到该角色；**不要替用户猜一个角色** |
 | 缺 `mod_name` / 缺 `character` | 同上 | 各自 `invalid_argument_error`，说清缺什么、去哪查（`build_assistant(intent="armor_mods")` 列模组名） |
 | 同一个名字有多个版本 | `mod_name="手雷模组"` | 选**真有属性加成**的那个（+10/3 能量），不是 +0/1 能量的占位版本；其它可行版本列在 `alternatives` |
-| legacy `apply_mod` | `apply_mod(...)`（要开 legacy 工具面） | 现在也**先确认**（与 `equip_mod` 同一条路），不再不确认直接改账号 |
+| 护甲模组写入 | `inventory_assistant(intent="equip_mod")` + `confirmed=true` | 先给候选、确认后才写，写完回读核对（历史工具面那个 `apply_mod` 已随旧面剥离） |
 
 ### D. 装备确认的逐件预览
 
 | 说什么 | 期望路由 | 验收点 |
 | --- | --- | --- |
 | ⭐ 这套穿上会换成什么 | `build_assistant(intent="equip_build")`，`confirmed=false` | `candidates[0].items_preview` 五件齐全，逐件给 `slot`/`slot_display`/`name`/`power`/`energy`/`current_mods`（现在装着什么）/`mods`（要装什么、是否已装）；`canonical_build` **保持可原样回传**（展示字段不许塞进去，否则回传会被拒） |
+| 只给候选 ID 能不能装（只发标量的宿主） | `equip_build` + `execution_id`（不给 `canonical_build`），`confirmed=false` | 与给整块候选**同一个结果**：`confirmation_required` + `candidates[0].execution_id` 回显同一个 ID + 五件 `items_preview`；候选行顶层的 `execution_id` 与 `canonical_build.execution_id` 同源。ID 过期/不是自己的 → `expired_execution_id`/`unknown_execution_id` + 重新求解的下一步 |
 
 ### E. 无解时的六维阶梯
 
@@ -380,11 +387,24 @@
 | --- | --- | --- |
 | ⭐ 照社区配装的六维来一套 | `build_assistant(intent="find")` 带模板硬约束（猎人 武器150/职业100/超能80/近战70/手雷70 + 金装 快速装弹松身裤） | 0.1.6 起**有解**：5 套候选、每套 `requires_tuning=true` 且只改 1 件调谐就达标（这条以前是"无解"的样板，现在是调谐补齐的核心实机证据） |
 | 真的配不出来时告诉我差在哪 | 同上，但把生命值推到 `health_target=200` | 0 候选 + `ladder`：`shortfall`、`ceiling`（**同一套约束下同时能达到**的上限，实采）、`trials`、`suggestion`，以及 `verdict.satisfiable=false`（按**原始优先级**实测 0 候选；并说明 ceiling 是逐项最大值、trials 里 ok=true 的档是换了优先级之后的解） |
+| 高优先达标 vs 低优先达标 | `intent="find"`，武器高优先、下限 武器100/生命100 | 必须选**武器达标那套**（`[武器100/生命80]` 赢 `[武器90/生命100]`）—— 这是 d2-armor-solver 公开自查里的反例，老口径（按总偏差）会选错。判据：① 第一位是「有没有规则没满足」的布尔；② 每个优先项各一层，先看达没达、再看差多少；③ 普通层先比未达标个数、再比缺口 |
+| 排序是不是加权分 | 同上，改 `score` 不该改顺序 | 顺序只由 `build/ranking.goodness_key` 决定；`score` 只剩展示含义（**封顶后的六维总和**，超上限部分不计） |
+| 属性上限（"别超过 100"） | `intent="find"` + `stat_caps={"super_stat": 100}` | 上限是**软**约束：超了照样出解，但在结果的 `max_violations` 里逐项标注（`{stat,label,actual,max}`）、排到没超上限的方案后面，并且求解器不再往那一项堆模组。**不传 = 不限**（不许悄悄按 100 截断）；上限键不认识、或上限低于下限 → `build_validation_error` |
+| 这套护甲每项最多能到多少 | `intent="find"` 的 `data.reachable` | 逐项给"已验证能到"的值 + `reachable_note`：**保守下界**（模组按 5/10 加减，实际可能更高）且**逐项可达 ≠ 同时达到**；真机实测手雷报 120 而把下限写成 130 时确实到 130 |
+| 这件调谐我到底能不能换 | `inventory_assistant(intent="equip_mod")` 给调谐时的 `writable`/`writable_reason` | 口径是「**这颗在不在件允许的清单里**」（组件 310，每件不一样）。在 → `writable=true`；不在 → `false` + 1675 的含义（"这颗装不到这件上"，**不是"你没材料"**，也不是"上游只允许游戏内改"——那句出自 ADR-012 推翻的 1663）。判"允许"不能看组件 207 —— 那份清单整个漏掉调谐槽 |
+| `平衡调整` 到底加什么 | `find` 结果的六维，或 `scripts/verify_tuning_write.py` 的预期/实测对账 | **只给"恰好三项并列最低"的那三项各 +1**（真机：基值 武器30/生命5/职业5/手雷30/超能25/近战5 → 装上后 武器30/生命6/职业6/手雷30/超能25/近战6）。Manifest 的 `investmentStats` 写的是"六维各 +1"，**照它建模每项会多算 1**；单一出处是 `armor_rules.balanced_tuning_bonus`（ADR-014） |
+| ⭐ 达标之后还能不能更高 | 上面那条猎人模板，或术士 `find`（手雷下限 100、超能上限 100） | P4 起**默认**就在候选池上做单件调谐邻域贪心（每一步都过权威复核）：真机术士那套手雷 **120 → 145**、超能 110 → **95**（不超上限），端到端 9.2s → 17.6s。只报**净改动**（每件一条：原样 → 最终样），不报贪心中间步；`requires_tuning=true` 时 `canonical_build` 仍**不含**调谐插件 |
+| 我什么都没要求，别动我的调谐 | `intent="find"` 不带任何目标/优先级 | 没有目标也没有优先级时**不动调谐**（唯一还能提升的只剩排序键最后那位封顶总和，为 +6 让用户改 5 件不是他要的）；守门见 `tests/test_build_local_tuning.py` |
+| 0 候选时凭什么说"配不出来" | `build_assistant(intent="find")` 跑到 0 候选（如把生命值推到 200） | 响应必须**自证枚举完了**：`summary` 写「枚举完了，没有任何一套能满足这些下限（枚举了 N 套组合）」、`data.search = {exhaustive: true, combos: N, truncated_by: null}`；`ladder.verdict.satisfiable=false`。**没搜完时（`exhaustive=false`）必须是 `satisfiable=null` + 「这次没搜完」**，不许把预算/配额截断写成不可行（P1 守门见 `tests/test_build_budget_honesty.py`） |
 | 这个"上限"是什么上限 | `ladder.single_stat_ceiling` | 那是**单项**上限（把点全堆一项）；拿它当"同时能达到"会得出"你什么都够"。两个字段都在，回答时不能混 |
 | 只差几点，非降目标不可吗 | `ladder.tuning_first` + `find` 的 `tuning_changes` | 求解器**真的试过调谐**（没达标时用调谐额度复解 + 逐套精确复核）：能补的直接给带 `tuning_changes` 的候选（`requires_tuning=true`）；补不上时这一档如实分三种口径（额度够但让不出来 / 额度不够 / 只差 ≤10 看属性模组），并带 `solver_attempted` |
-| 调谐到底改哪一件、改成什么 | `find` 的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（中文名 + hash）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；**调谐只能在游戏内手动改**，`canonical_build` 不含调谐插件（实测 Bungie 回 `This action can only be done in-game.`） |
-| 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | 给出「从什么改成什么 + 六维变化」，`writable=false`、`written=false`，并带「只能在游戏内改」的 warning；`confirmed=true` 也不会写账号 |
-| 换一个真花能量的模组 | `intent="equip_mod"` + `confirmed=true` | 走付费插槽接口：当前应用没有 `AdvancedWriteActions` 时**如实报错**（消息里点名权限），不许把失败说成成功（0.1.8 实机修） |
+| 调谐到底改哪一件、改成什么 | `find` 候选行的 `tuning_changes[].from/to/delta` | 逐件给出从哪个调谐改成哪个（**候选行里只留中文名与六维净变化**，hash 要执行时从确认信封的 `canonical_build` 拿）、六维净变化（含"减的那一项已经见底所以只有 +5"的情况）；`canonical_build` 的 `items[].mods` **含调谐插件**（只含这件允许的），`equip_build` 确认后一起写；别把调谐说成"只能在游戏内改"（那句出自 ADR-012 推翻的 1663），也别把 1675 说成"没材料"（它是"这颗装不到这件上"） |
+| 让工具替你改调谐 | `inventory_assistant(intent="equip_mod", mod_name="+手雷 / -职业")` | **能写**（2026-09-22 开放）：`writable=true` → `confirmed=false` 回 `confirmation_required`、`confirmed=true` 才写并回读核对；**清单外**的调谐 → `writable=false` + 1675 的含义，`confirmed=true` 也不写 |
+| 换一个真花能量的模组 | `intent="equip_mod"` + `confirmed=true` | 走**免费**插槽接口（护甲模组本来就属于它覆盖的范围，见 ADR-012），成功后回读核对；失败要核对 `ErrorCode` 并把上游原文带出来，不许报成功（0.1.8 实机修） |
+| 这颗模组这一位还没解锁 | 换一颗**不在** `characterPlugSets` 可插入清单里的模组（实测「重型弹药搜寻者」，条件里写着「必须在赛季神器中选择」） | **写之前**就返回 `writable=false` + `written=false`，`writable_reason` 带上 Manifest 的插入条件；`confirmed=true` 也不写。**不许**说成「Bungie 不允许 API 改护甲模组／请去游戏里手动装」—— 游戏里同样装不上（ADR-013） |
+| 同名模组有已解锁与未解锁两档 | 同上，但那颗有同名变体 | 挑**这一位已解锁**的那档（`to.unlock_state=true`），不是按属性加成挑到没解锁的那颗 |
+| 换一颗槽里已经装着的模组 | `intent="equip_mod"` + `confirmed=true`，目标就是该槽现值 | `success=true` + `already_installed=true`，摘要写「已经装着它，这次没有改动」——上游会回 1679 `DestinySocketAlreadyHasPlug`，**不许报成失败**（那会让人以为要重试） |
+| 上游没给可插入清单 | 任何换模组请求，但响应里没有 `characterPlugSets` | `to.unlock_state=null` + 照旧可写：**没数据 ≠ 不允许**，不许拿「没查到」把能装的模组判成装不了 |
 | ⭐ 社区配装能不能直接穿 | `build_assistant(intent="community", community_build_id=…, include_inventory=true)` | summary 里必须出现「**不可直接执行**」，第一条 warning 给 `execution_supported=false` + blocker + 「要走 find → canonical_build → 确认」；`execution_eligible` 是 false |
 | 社区模板说的套装我没见过 | 同上的 `armor_set` 行 | 活动名（玻璃拱顶）自动解析成套装名（埃希恩记忆）并标 `resolved_via=activity_alias`；对不上时给 `unresolved_reason` + `set_name_candidates`；行里直接有 `owned_count`/`missing_slot_count`（几件、缺几件） |
 | 这一项是「没有」还是「没查」 | 任意 requirement 行 | `not_account_checked` 必带 `unverifiable_reason` 枚举；`unresolved` 必带 `unresolved_reason`；武器 roll 分三层：`perks_current_match`（现在装着）/ `perks_available_to_switch`（换一下就行）/ `perks_unavailable`（换也换不到）；只有 `selectable_plug_status="available"` 才说明这一层真读了，没读时是 `alternate_perk_options_checked=false` + 原因 |
@@ -392,16 +412,19 @@
 | 目标根本配不出来时怎么说 | `ladder.verdict` | `satisfiable=false`（按原始优先级实测 0 候选）+ 说明 `ceiling` 是**逐项**最大值、不等于同一套能同时达到；`solved_after_rotation` 标出"换优先级能出解"这件事 |
 | 阶梯会不会偷偷改我的目标 | `ladder.targets` + 原始请求 | `targets` 里仍是用户给的数（如 近战70/手雷70）；降级只是提议，**未经确认不许改**；`recommend` 的无解响应继续带"不得自动降低"的 warning |
 | 只给优先级、不给硬目标 | `intent="recommend"` + 只有 `priority_stats` | `completion_rate` 是 `null` + `completion_rate_note`，**不是 0.0**（0.0 会被读成"一个都没满足"） |
-| 要装备该用哪个 intent | `find` vs `recommend` | **要装备走 `find`**（只有它的候选带 `canonical_build`）；`recommend` 只给排序建议，把它的结果丢给 `equip_build` 会被拒（`invalid_canonical_build`） |
+| 要装备该用哪个 intent | `find` vs `recommend` | 两个都能装备：0.7.10 起默认都只给**候选行**（含 `execution_id`），拿 `execution_id` 走 `equip_build` 即可。旧文档说「`recommend` 的候选会被拒」是**错的**（2026-09-25 真机实测：两个 intent 的 `execution_id` 都返回 `confirmation_required` + 五件 `items_preview`） |
 
 **已知边界与不要做的事**：
 
 - 只对 **T5** 建模词条反推；T3/T4/老护甲在响应里明确说"不支持反推 + 原因"（T1/T2 本账号无样本，
   不建模、不猜）；
 - 待刷的**虚拟件**没有能量数据：`energy` 为 `null` 而不是 0，也不能据此说"装不下"；
-- 调谐**不能通过 API 写入**（免费接口实测回 `This action can only be done in-game.`，ErrorCode 1663；
-  付费接口要 `AdvancedWriteActions` 权限且并非给调谐用的）：所以 `tuning_changes` 是"给玩家的手动清单"，
-  `equip_build` 不会替玩家改调谐，达标六维里那部分要玩家自己在游戏里改完才成立。
+- 调谐**的允许清单是逐件的**（2026-09-22 真机验证，`scripts/verify_tuning_write.py`）：
+  判据只有一条 —— 那颗在**这件护甲**的组件 310 清单里（别把 1675 读成"你没材料"，
+  那句是"这颗装不到这件上"；也别读成"上游只允许游戏内改"，那句出自 ADR-012 推翻的 1663）。
+  清单内写入：免费接口 `ErrorCode=1`、回读插槽与六维都对、换回也成功、**不花材料**。
+  **2026-09-22 起代写调谐是正式能力**：`tuning_changes` 与 `canonical_build.items[].mods` 里的
+  调谐都是可执行的，`equip_build` 确认后连同护甲与模组一起写（清单外的不会进计划），见 ADR-014。
 - 调谐救援的候选池有上限（放宽那趟留 1500 套、只精确复核最值得的前 40 套）：实测
   武器150+生命103 在池 200 时救回 0 套、池 1500 时救回 16 套；`tuning_changes` 里的方案
   一定过了真实目标的精确复核，但"没救回来"不等于"游戏里绝对做不到"，只等于"这轮没找到"。
@@ -447,6 +470,10 @@
 | 武器形状/键集合/插槽/实例/本地资料/体积口径 | `test_weapon_keys_snapshot.py`、`test_weapon_profile.py`、`test_weapon_sockets.py`、`test_weapon_instance.py`、`test_weapon_local_data.py` |
 | 武器基线差异（字段无声消失） | `tests/test_weapon_baseline.py` + `scripts/capture|diff_weapon_baseline.py` |
 | 武器章节的端到端断言（真机） | `scripts/run_corpus_weapon_rows.py`（16 行） |
+| 护甲**每一类模组插槽**能不能写（真机，含"这一位能不能插"的判定） | `scripts/verify_armor_mod_sockets.py`（只读看现状；`--apply` 做 6 类插槽的"一换一 → 回读 → 换回"往返） |
+| 护甲**模型口径**和游戏数据对不对得上（真机，468 件） | `scripts/audit_armor_model.py`（只读；六项对账：stats=304−模组、310 清单、装着的那颗在清单里、调谐反推不为负、大师档位、词条重建=304。退出码 0/1，可当机器检查。`--capture` 重抽证人清单） | 已跑（2026-09-22）：六项全过；顺手挖出"大师是档位不是有/无"并修掉。**固定证人** 29 件在 `tests/baselines/armor_witnesses.json`（5 个大师档位 × 12 个词条原型 × 金装 0/31 颗 × 非 T5），每次跑逐条点名 |
+| 护甲**调谐**能不能通过 API 换（真机） | `scripts/verify_tuning_write.py`（只读列每件的调谐槽与可换项；`--apply` 做"换一颗 → 回读插槽 + 回读组件 304 的六维 → 换回"；`--to <hash>` 指定换成哪颗，`--include-empty` 试"撤掉调谐"） | 已跑（2026-09-22）：换成**这件允许的**一颗 → `ErrorCode=1`、六维按"平衡调整只给最低三项 +1"变、**不花材料**、换回也成功；换成**不在清单里**的一颗 → **1675**、账号不变。**并且量到组件 305/plug set 的"这一位能不能插"对调谐不可信**（正装着的那颗都不在清单里，一颗被判 false 的调谐照样写成功）—— 所以写入只看 310。结论见 ADR-014 |
+| 装备编排的异域互斥与槽位判据（真机，只读） | `scripts/verify_equip_planner.py` |
 | 八工具面全 intent 体检 + 其余六面字段级 + 协议层（真机） | `scripts/run_corpus_all_rows.py`（见 `docs/testing/TESTING_CORPUS_FULL.md`） |
 | 错误码与信封 | `test_failure_envelope_regressions.py`、`test_upstream_error_mapping.py`、`test_service_error_contract.py` |
 | 大响应限流与翻页 | `test_large_response_limits.py` |
@@ -454,3 +481,27 @@
 | 工具面与 profile（8 个聚合工具、老工具隐藏） | `test_tool_profiles.py` |
 | skill 文档与代码一致（intent 覆盖、参数表逐字一致） | `test_skill_contracts.py`、`test_skill_install.py` |
 | 社区资料/配装匹配等消费者回归 | `test_starside_integration.py`、`test_tool_simulation.py` |
+
+---
+
+## Starside 实体层（数据层语料，8 行）
+
+数据是 Starside 作者给的新归档（`data/starside/entities/*.json`，见
+[STARSIDE_ENTITY_PLAN.md](../plans/STARSIDE_ENTITY_PLAN.md)）。P0 只入库、**不改任何响应**，所以这一章跑的是
+**数据层**的真机语料：`scripts/run_corpus_starside_entities.py`（需要 OAuth + 本地 Manifest）。
+它拿账号里真实的武器与模组去查实体层，并打印"P1 接入后会长的样子"供人眼核对。
+
+| 行 | 验收点 | 最近一次实跑（2026-09-23） |
+| --- | --- | --- |
+| ① 出处元数据 | `source`/`unofficial`/`snapshot_at`/`authors`/`sha256` 齐全 | 快照 2026-09-21、作者 Aegis+LGpig、4,483 物品 / 2,676 perk |
+| ② 我账号的命中率 | 账号里的武器能在实体层查到，且要有带作者推荐的 | 500 把全中（100%），其中 Aegis 189 把、LGpig 72 把 |
+| ③ Aegis 字段与 perk 名 | 评级在 S–F、有理由与选定栏位；推荐里的 perk 名我们查得到（≥90%） | 294 个名里 7 个查不到（2.4%，如「B 计划」「Häkke 突入武装」）→ P1 必须"原样保留 + 留痕" |
+| ④ LGpig 数值可解析 | 分场景评级；`{num\|…}`/`∞` 解包后是数值；只写解释没评级算合法 | 有评级 38 把、无评级 2 把、数值异常 0 |
+| ⑤ 武器→框架→帧表 | `derived.archetype` join 帧级 DPS 表，关键键齐全 | 326/500 把能 join，帧表 40 个键 |
+| ⑥ 闭环 | 推荐 perk 名 → plug 物品 → `perks[].perkHash`（**sandbox perk**）→ 反查哪些枪有它 | 592/925 走通。**关键区分**：`manifest.search` 给的是 plug 物品 hash，而 `onItems` 在 sandbox perk 空间 —— 拿 plug hash 直接查闭环率 0% |
+| ⑦ 神器关联 | 本季神器的模组能指到神器（以覆盖率为准，缺口要在响应里说明） | 本季「好奇之器」35 个模组 → 归档指到 21 个（60%） |
+| ⑧ 缺值行为 | 未知 hash 一律 `None`/空，不编也不炸 | item/perk/反查/帧表/神器 五条查询都返回空 |
+| ⑨ 工具接线（analyze） | `weapon_assistant(intent="analyze")` 的 `data.starside` 块：两套评级分开、出处齐全、缺数据 `available=false` + `reason`、响应里无 `{…\|…}` 残留 | 见 `tests/test_starside_markup.py`（替身）+ `scripts/run_corpus_weapon_rows.py` |
+| ⑩ 工具接线（perk_description） | `data.starside`：注记渲染无残留、`on_items` 反查给名字、套装关联、缺注记给原因 | 见 `tests/test_starside_markup.py::test_perk_note_renders_annotations_and_reverse_index` |
+
+退出码 0 = 8 行成立；非 0 看不成立的行（FAL 行的判定依据会写清是数据缺口还是检查过期）。

@@ -116,6 +116,9 @@ OVERRIDES: dict[tuple[str, str, str], dict[str, Any]] = {
     ("subclass_assistant", "community", "community_section"): {"knowledge_id": "k1"},
     ("activity_assistant", "community", "community_section"): {"knowledge_id": "k1"},
     ("world_assistant", "community", "community_section"): {"knowledge_id": "k1"},
+    # execution_id 与 canonical_build 是二选一：要验证 ID 被读，就不能同时给整块候选
+    # （基线里两份 canonical_build 探针完全一样，同给的话 ID 走哪条路都看不出来）。
+    ("build_assistant", "equip_build", "execution_id"): {"canonical_build": None},
 }
 
 WRITE_INTENTS = set(_requests.WRITE_INTENTS) | {"equip_build"}
@@ -124,6 +127,10 @@ WRITE_INTENTS = set(_requests.WRITE_INTENTS) | {"equip_build"}
 # 探针要按下游的合法范围给。
 PROBE_OVERRIDES: dict[tuple[str, str], tuple[Any, Any]] = {
     ("build_assistant", "set_bonus_count"): (4, 2),
+    # 上限映射必须是**合法的属性键**：默认探针用的是一段凭据字符串，
+    # 拿它当上限键会被 `build/constraints.parse` 判成"不认识的上限属性"而提前抛错，
+    # 于是两次调用的服务层记录一样，看门狗只会得出"没读到"（那是探针的问题，不是代码的）。
+    ("build_assistant", "stat_caps"): ({"grenade": 100}, {"grenade": 40}),
 }
 
 
@@ -140,6 +147,10 @@ class _Reply:
 
     def items(self):  # 让按映射处理的代码（_responses.data_only）也能跑
         return []
+
+    def pop(self, key: object, default: object = None) -> object:
+        """`action_response` 会把 `candidates` 从结果里摘出来（只在信封里发一份）。"""
+        return default
 
     def __setitem__(self, key: object, value: object) -> None:
         pass
@@ -223,7 +234,7 @@ class _Context:
 
 
 def _tools() -> dict[str, Any]:
-    server.create_server("full")
+    server.create_server()
     return {d.function.__name__: d.function for d in registry._definitions}
 
 
@@ -489,17 +500,19 @@ async def test_real_session_failures_are_now_rejected() -> None:
     assert 'intent="search"' in result["error"]["message"]
 
 
-async def test_loadout_get_no_longer_swallows_loadout_id() -> None:
-    """loadout 的 get 与 list 是同一个分支，只按 character 过滤。
+async def test_loadout_get_accepts_an_id_and_non_owners_reject_it() -> None:
+    """`get` 现在**接受** loadout_id（只取那一套）；不接受的是不读它的 intent。
 
-    传 loadout_id 想取单套，以前会安静地返回全部配装 —— 模型很容易把第一条
-    当成用户说的那套。现在会被拒绝，并说明要自己从结果里挑。
+    2026-09-24 反转：以前 list/get 都返回全部模板，传 id 会被拒（"自己从结果里挑"）；
+    真机实测 list 一次 121 KB，所以改成"list 给清单行、get 给详情（可按 id 取一套）"。
     """
     result, calls = await _guarded("loadout_assistant", "get", loadout_id="local:1")
+    assert result.get("error") is None, result.get("error")
+    assert calls, "get 必须真的把 id 传给服务层"
 
-    assert result["error"]["code"] == "ignored_parameter"
-    assert not calls
-    assert "全部配装" in result["error"]["message"]
+    rejected, rejected_calls = await _guarded("loadout_assistant", "save", loadout_id="local:1")
+    assert rejected["error"]["code"] == "ignored_parameter"
+    assert not rejected_calls
 
 
 def _description(annotation: object) -> str:

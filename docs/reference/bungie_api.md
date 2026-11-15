@@ -12,6 +12,53 @@
 
 ---
 
+## 大师加成是"档位"，且只落在非词条三项上（2026-09-22 实测）
+
+- 护甲的大师插槽（`v460.plugs.armor.masterworks`）那颗「升级护甲」在 Manifest 里声明的是
+  **"六维各 +N"**，N 就是档位（实测见过 1/3/4/5 档；只带能量标记的那种是 **0 档**）：
+  `1283668724` → `{武器3 生命3 职业3 手雷3 超能3 近战3}`、`1283668722` → 各 5、
+  `3266153492` → 只有 `16120457: 11`（能量标记，没有属性）。
+- 但**真正生效的是"非词条那三项"各 +N**（词条 = 那三个 30/25/20 的属性）：
+  降临回音臂铠 `6917530197749539530` 是 3 档，词条 武器20/超能30/近战25，
+  304 就是 `武器20 生命3 职业3 手雷3 超能30 近战25`。
+- 所以"满大师 = +5×3"这句话只在 5 档成立；`is_masterworked` 必须看**插件声明的档位**，
+  不是 T 级（T5 也可能是 0 档）。
+
+## 每件护甲允许装哪些调谐：只在组件 310（2026-09-22 实测）
+
+- Manifest 的调谐 plug set（`1155052024`）是**全局 32 颗**，三件同名「光芒领主手套」指向的就是
+  同一个集合、内容一模一样 —— **照它规划会给出装不上的调谐**。
+- 真正逐件的是 **310 `ItemReusablePlugs`**：`itemComponents.reusablePlugs.data[实例].plugs["槽号"]`
+  给出这一槽能插的插件。调谐槽那儿是 **6 颗**（5 颗"某一个属性 +5"的定向调谐 + 平衡调整），
+  而这"某一个属性"**逐件不同**（实测：两件同名手套分别是 职业 / 近战；护腿 职业；面具 超能；
+  至高碎片 武器）。**金装（星火协议）是 31 颗 = 任意属性**。
+- 角色的可插入清单（`profilePlugSets`）里，调谐集合只有 **1 颗"空调整模组插槽"**，
+  `characterPlugSets` 里没有调谐集合 —— 那两份**不能**用来判"这件能装什么调谐"。
+  **也别拿它们判"这一位能不能插"**（2026-09-22 追加实测）：调谐槽里**正装着的那颗都不在**那份
+  清单里，而一颗被判"不可插入"的调谐写入上游**照样接受**（真机：至高碎片 `6917530188462629544`
+  槽 11，`+武器 / -超能` = 305/plug set 判 false → `ErrorCode=1`，回读六维 超能 25→20、近战 0→5、
+  再换回也成功）。**调谐写入的判据只有组件 310 一条**；`unlock_state` 对调谐一律报 `null`，
+  免得那个 false 被读成"写不了"（见 ADR-014 修订、`scripts/verify_tuning_write.py`）。
+- 代价：请求 310 会让护甲快照响应从 **4.11 MB 涨到 8.90 MB**（术士全账号护甲），
+  所以只有"要规划调谐"的那条路带它（`profile_components.BUILD_ARMOR`）。
+- **310 给的是无符号 hash，`manifest.search` 给的是有符号** —— 同一个插件两种写法
+  （真机：`+超能 / -生命值` = 310 的 `4026414261` / 搜索的 `-268553035`）。比较必须过
+  `to_unsigned`（`build.models.tuning_is_allowed` 是这条的唯一出处）；裸 `in` 会把清单里
+  明明有的调谐判成"装不到这件上"（真机踩过：光芒领主面具 `6917530188460608169`，2026-09-22）。
+- 组件 304 读回来的**插槽当前值**同样是这份口径：`from.hash` 可能是无符号、而 `to.hash`
+  （来自搜索）是有符号 —— 两者是同一个 hash 空间的两种写法，不是两颗粒子。
+
+## 护甲六维不夹 0：组件 304 会报负数（2026-09-22 实测）
+
+一件护甲装着「+职业 / -生命值」，而它的生命**基础值是 0** 时，组件 304 给的是
+**生命 −5**（真机：光芒领主手套 `6917530188462631525`；护甲面 = 武器25 生命−5 职业25 手雷0 超能0 近战30，
+职业那 10 点是模组）。也就是说：
+
+- **API 不夹 0** —— 谁按"每个属性最低 0"去算，反推基础值时就会凭空长出 5 点；
+- 我们的求解器口径因此定为"**等于游戏报的数**"（不夹），见
+  `docs/plans/SOLVER_OPTIMALITY_PLAN.md` 的四·十三；
+- 待确认（要游戏里看一眼）：游戏**界面**是否按件夹 0 显示、人物总属性是否受这 −5 影响。
+
 ## 一、OAuth scope
 
 ### scope 表：三个名字的官方原文一句话
@@ -25,13 +72,12 @@
 - 出处：<https://bungie-net.github.io/>（文档版本 2.21.8，2026-09-17 查阅）
 - 实测：2026-09-16 把令牌解出来看，`scope` 字段**没有**任何 scope（授权 URL 一个 `scope` 都没带）；
   写入因此被上游拒成 403 `AccessNotPermittedByApplicationScope`。
-- 结论：**令牌里有哪个 scope，取决于授权 URL 上显式申请了什么**，不是"应用有权限就自动带"。
-
-### 本项目申请了哪些、为什么
-- 事实：`AdvancedWriteActions` 是**按应用审批**的 scope —— 应用没被 Bungie 授予时，授权页会直接回
-  `invalid_scope`。
-- 出处：<https://bungie-net.github.io/>（文档版本 2.21.8，2026-09-17 查阅）；申请入口
-  <https://www.bungie.net/en/Application>
+- **授权 URL 上不许带 `scope`**（2026-09-23 真机反转）：带上就 100% 登录失败，Bungie 回
+  `invalid_scope` + `Scope is always configured value. Do not specify scope parameter.`。
+  令牌里的 scope **由 Developer Portal 的应用配置决定**（`https://www.bungie.net/en/Application` 勾选），
+  旧结论"取决于授权 URL 上显式申请了什么"（09-16 场景是"带了但应用没批"）已作废。
+  代码见 `destiny_mcp/oauth_setup.py`：`_auth_url` 不再输出 `scope`，也不再有"退回不带 scope"的降级；
+  回调页面会先透出 Bungie 的 `error`/`error_description`，不再把它吞成 `invalid_state`。
 - 实测：2026-09-16 真机 —— 0.4.6 刚在授权 URL 上加了 `scope=AdvancedWriteActions`，**连登录都做不成**
   （授权页回 `invalid_scope`），因为该应用没被授予。0.4.7 改成：先按"带 scope"试一次，撞到
   `invalid_scope` 就打印说明并自动退回"不带 scope"再登一次。
@@ -90,6 +136,45 @@
   用户指出"DIM 能操作模组"后复查官方原文，确认护甲模组属于 free 覆盖范围（它消耗的是能量、不是材料）。
 - 结论：**接口语义 ≠ 权限**。护甲模组走 free；要不要 scope 是另一条线（付费接口才要
   `AdvancedWriteActions`）。别再拿"消耗大不大"去决定用哪个接口。
+
+### 插槽写入的第三种结局：1676 `DestinyFailedPlugInsertionRules`（"条件没满足"）
+- 事实：除了 403（没 scope）与 1663（`in-game` 含糊话术），还有 **1676**
+  `DestinyFailedPlugInsertionRules` —— "The request to apply a change to an item failed.
+  The requirements have not been met."，`message_data` 是**空的**，不说是哪条没过。
+- 出处：<https://bungie-net.github.io/> → `Destiny2/Actions/Items/InsertSocketPlugFree/`
+  与 `Exceptions` 的 `PlatformErrorCodes`（文档版本 2.21.8，2026-09-21 查阅）
+- 实测：2026-09-21 真机 —— 给护甲换部位模组时，四颗被回 1676；它们在 Manifest 的
+  `plug.insertionRules[].failureMessage` 里都写着「**必须在赛季神器中选择**」。
+  同批的另一颗（职业物品的终结技模组）条件里没有这条，**写通了**。
+- 结论：1676 = **这颗模组这一位还没解锁**，游戏里同样装不上；不许报成"请去游戏里手动装"、
+  也不许当成重试能成的错误。能拿到的中文说法只有 `plug.insertionRules[].failureMessage`
+  （`services/loadout_plug_lookup.py: plug_insertion_conditions`）。这条由
+  `tests/test_armor_mod_unlock.py` 的 1676 两条钉住。
+
+### 能不能插，看组件 207 `characterPlugSets`（随 305 一起回来）
+- 事实：`DestinyProfilePlugSetsComponent` / `DestinyCharacterPlugSetsComponent` 给出
+  **每一位玩家/角色实际能插入**的 plug 清单（`plugItems[].canInsert` / `enabled`），
+  比 Manifest 的 `reusablePlugItems` 小得多。
+- 出处：<https://bungie-net.github.io/> → `DestinyComponentType`（106 `ProfilePlugSets`、
+  207 `CharacterPlugSets`）与 `DestinyPlugSet`（文档版本 2.21.8，2026-09-21 查阅）
+- 实测：2026-09-21 真机 —— 请求 305 时响应里**已经带着** `profilePlugSets` 与
+  `characterPlugSets`（不用单独请求 106/207；实测专门请求 `components=106,207` 反而什么都不回）。
+  头盔 plug set：Manifest 61 颗、这一位只能插 21 颗；手臂 25/56；一般模组 9/24。
+  四颗被 1676 拒掉的全不在这份清单里，写通的全在。
+- 结论：`insertable_plugs(profile, character_id)` 是"这一位能插哪些"的唯一读法，
+  profile 级与角色级**都要并**；**上游没给这个 plug set 时返回缺键**（`None` = 不判断），
+  绝不能把"没数据"读成"不允许"。调谐槽里正装着的那颗不在清单里 —— 所以"已装在槽里的那颗"
+  单独放行（见 ADR-013）。
+
+### 1679 `DestinySocketAlreadyHasPlug`：原样重插的回执
+- 事实：往某个槽插入它**已经有**的 plug，上游回 1679 `DestinySocketAlreadyHasPlug`
+  （"Refresh the item and try again."），不是 1663。
+- 实测：2026-09-21 真机 —— 用免费接口把两颗调谐插件原样重插，都是 1679。
+- 处置：`ArmorModService.apply` 把 1679 当**无操作成功**（`already_installed=true`，摘要写
+  「已经装着它，这次没有改动」）—— 用户要的状态已经成立，报失败会诱使重试。
+- 结论：这条说明免费接口**能寻址调谐槽**（旧说法"免费接口对调谐回 1663、所以第三方写不进去"
+  是那个字段名 bug 的残留，见 ADR-012）。这只证明"寻址得到"，**不证明"换一颗能成"** ——
+  真要放开调谐写入得另做一次可逆的真机验证。
 
 ### 两个端点官方都标 Preview
 - 事实：官方端点清单里 `InsertSocketPlug` 与 `InsertSocketPlugFree` 都挂着
@@ -235,6 +320,7 @@
 | 事实 | 唯一出处 |
 | --- | --- |
 | 组件号集合 | `destiny_mcp/services/profile_components.py` |
+| 锻造图样进度只在组件 900 | `destiny_mcp/services/pattern_service.py`（见本文第十四节、ADR-009） |
 | 游戏内生涯计数器（组件 1100）与统计接口的分工 | `destiny_mcp/services/activity_counters_service.py`（见本文第十一节） |
 | 三档口径与合并语义（sum/max/min/derived/none） | `destiny_mcp/activity_stats.py`（「三档并存」段） |
 | 统计接口两条路（按角色 / 账号级）与 `modes`/`periodType` | `destiny_mcp/bungie_stats.py`（见本文第十二节） |
@@ -386,4 +472,75 @@
 - **结论**：展示玩家名一律走 `destiny_mcp/utils/player_names.bungie_display_name()`
   （游戏内 ID 优先，平台名只作兜底），`tests/test_player_display_name.py` 会扫**裸用
   `displayName` 拼名字**的代码并判红。
+
+## 十三、玩家名 / 武器名 / 计数器查询的实测坑（2026-09-18）
+
+| 现象 | 实测 | 结论 |
+| --- | --- | --- |
+| 搜索结果里名字是 `名字#`（尾随空 `#`） | `SearchDestinyPlayerByBungieName` 对部分账号把 `bungieGlobalDisplayNameCode` 返回成**空字符串**（不是缺字段） | 拼名字必须走 `utils/player_names`（它把 `None/""/0` 都当"没有编码"）；自己拼 `f"{name}#{code}"` 会漏 |
+| 按名找武器报"找不到武器" | `搜索"玉兔"` 命中 **54 条**：53 条 `itemType=20`（`itemTypeDisplayName` 仍是"斥候步枪·异域"）+ 1 条 `itemType=3` 真武器，真武器在**第 7 位** | 同名条目会占满搜索窗口：按类型过滤要在**切片之前**做（`search(item_type=3)`），不能"扫前 N 条再挑" |
+| 同一条武器的 hash 两种写法 | 武器榜（PGCR `referenceId`）给无符号 `3844694310`；Manifest 名字索引里是**有符号** `-450272986`（`to_signed` 的结果） | 比较 hash 前先归一（`to_signed`/`to_unsigned`） |
+| `counters(query="crucible")` 返回 0 条 | 同一账号 `query="熔炉"` → 13 条；`query="已击败对手"` → 6 条 | `query` 是**名称/描述子串**匹配，而计数器名称来自中文 Manifest；英文模式词匹配不到（按模式用 `mode=`） |
+| 统计接口按模式的数字远小于游戏内计数器 | `stats(mode="trials")`：击败 1,474 / 胜场 105；计数器：**10,696 / 826** | 按模式的生涯数字同样要并列计数器（ADR-005）；统计接口没有"这个模式的合并视图" |
+| 收藏品节点 `counts` 全 0，但搜索说这个节点有 50 件 | 那 50 条是 `children.records`（条目），组件 800 里**没有**它们的收藏状态（`children.collectibles=0`） | `records` 与 `collectibles` 是两种数据：节点详情必须说明"0 只是这个口径下没有可查的收藏品" |
+
+## 十四、锻造图样（武器模式）：进度只在组件 900（2026-09-20 实测）
+
+**事实**：游戏里「收藏品 → 模式和催化」那一页的武器图样是**记录**结构（不是收藏品）：
+根展示节点 `2642502414` → 分组容器 `3442838224` → 主武器模式 `127506319` /
+特殊武器模式 `3289524180` / 重武器模式 `1464475380`（+ 异域催化 `2744330515`）→ 武器类型节点 →
+183 条 `DestinyRecordDefinition`。每条记录的名字与武器同名，`objectives[0]` 的
+`progressDescription` =「模式进度」、`completionValue` = 需要萃取几次
+（实测：5 次 148 把 / 3 次 7 把 / 2 次 4 把 / 1 次 24 把，其中金枪 16 把）。
+
+| 组件 | 里面有图样进度吗 | 实测 |
+| --- | --- | --- |
+| 900 `profileRecords` | **有**：`records[记录hash].objectives[0].progress / completionValue` 就是游戏里那条「图样进度 4/5」 | 1.44 MB / 约 2.5 s；本账号 151 条图样记录返回（149 完成、2 进行中） |
+| 800 `profileCollectibles` | 没有 | 拿 `2642502414`/`3442838224` 查 `collectible_node` 回 `total=0`（"条目的解锁状态不在这个组件里"） |
+| 1300 `craftables` | 没有 | `characterCraftables.<角色>.craftables` 219 条、`visible` **全为 true**、2.93 MB / 0.90 s；它回答"能塑形哪些 perk"（`sockets[].plugs[].failedRequirementIndexes`） |
+
+**结论**：图样进度只走 900；不进组件 800/1300。口径与取舍见 ADR-009，
+实测过程与成本见 `docs/plans/PATTERN_QUERY_PLAN.md`，代码在
+`destiny_mcp/services/pattern_service.py`（目录 + 进度）与
+`destiny_mcp/services/starside_crafting_sources.py`（社区来源）。
+
+**另一个坑**：`is_craftable`（`inventory.recipeItemHash` 非空）是 **219 件**，比图鉴多 36 件
+`（专家）/（失时）/（痛苦）`变体，它们不单列图样（图样记录挂在基础版上）。
+"图样数"只能说 183，别拿 219 顶替。
+
+**模式记录分两个作用域（2026-09-20 实测，被用户拿游戏截图抓出来的事故）**：
+
+| 作用域 | 条数 | 数据在哪 |
+| --- | --- | --- |
+| 档案级（`scope=0`） | 151 | `Response.profileRecords.data.records` |
+| 角色级（`scope=1`） | **32** | `Response.characterRecords.<角色>.data.records`（同一 URL、同一个组件 900） |
+
+只读 `profileRecords` 会把那 32 条全判成「未开始」（实测：本账号 181/183 被报成 149/183）。
+**同一个组件 900 就同时返回两份**，不需要多请求一次；角色级记录取"进度最靠前的角色"
+（模式解锁是账号级的）。判别脚本可以是"已锻造副本反证"：账号里带 Crafted 标记（组件 300 的
+item 条目 `state & 8`）的武器，其模式必然已解锁 —— 实测这一步当场指出 33 件冲突。
+
+**变体（专家/失时/痛苦）的塑形配置不同**（2026-09-20 实测，36 件无一例外）：
+
+| 项 | 基础版 | 变体 |
+| --- | --- | --- |
+| 图样条目 `crafting.requiredSocketTypeHashes` | 5 个（3868679925 框架 / 3694362576 枪管 / 2316004942 弹夹 / 3036227398 特征1 / 3036227399 特征2） | **3 个**（只有框架/枪管/弹夹）→ 三四号特性固定 |
+| 组件 1300 里每条插槽的可选项数 | 11 / 19 / 15 / 19 / 19 | 11 / 19 / 15 |
+| 插槽里的「空深视插槽」（socketType 1085237186） | 有 | **没有**（换成强化插槽 4251072212）→ 红框只掉基础版 |
+
+组件 1300（`characterCraftables`）的键是**图样条目 hash**（0.9 MB 那个 219 条），不是武器 hash；
+要按武器找就用 `inventory.recipeItemHash` 换算。
+
+## 十五、周常轮换：官方只给两处（2026-09-21 实测）
+
+| 数据 | 在哪 | 实测 |
+| --- | --- | --- |
+| 本周特色突袭/地牢 | `/Destiny2/Milestones/` | 本周 12 条（带 `startDate`/`endDate`/`order`/`activities[].activityHash`）；**`challenges` 全空、`phaseHash` 全 null** —— 所以"本周突袭挑战"做不了 |
+| 本周夜幕/宗师（打击 + 词缀 + 掉落） | profile **组件 204** `characterActivities.availableActivities[]` | 294 条可用活动里日落/宗师 4 条：`切除: 宗师` 带 10 条 `modifierHashes` 与 `visibleRewards`（故我在 / 故我在催化 / 上维碎片）；**三个角色完全一致**；上游只给难度时（名字就是 `日落: 大师`）拿不到打击名 |
+| 遗失区域（专家） | 常驻列表，**不在 API**（靠 Manifest） | 有「专家」变体的地点 **27 个**：游戏内「World Lost Sector」页按目的地列出（用户截图核对）；`空坦克` 只有传说/大师、`消息，第一/二/三部分` 一条难度变体都没有 → 排除 |
+| 遗失区域（传说/大师） | **哪都没有** | 里程碑没有；组件 204 的 294 条里一条都没有；Manifest 的「遗失区域」清单（`3142056444`，42 条，**角色级组件 202**）记的是"打过哪些"（本账号 42/42），不是"今天轮到哪个" |
+| 上维挑战 / 异域任务 / 泉源 | 只有候选 | Manifest 里活动与名字齐，但没有任何接口给"这周/今天是哪个"；社区工具都自己排表（Braytech 的 `rotationLostSectors` 甚至是用户可填参数） |
+| 顺带：清单（checklists） | 组件 **104**（档案级 19 条）+ **202**（角色级 3 条） | 地区宝箱 / 猫雕像 / 腐化的卵 / 阿罕卡拉遗骨 / 遗失区域 42 / 玉兔 2/9 / 永恒远古头骨 0/7 —— 零新增端点的收集品进度源 |
+
+口径与取舍见 ADR-010，实现见 `destiny_mcp/data/rotations.py` + `services/rotation_service.py`。
 

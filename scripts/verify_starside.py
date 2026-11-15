@@ -35,7 +35,7 @@ def payload(result) -> dict:
 async def verify(root: Path, *, inventory: bool, timeout: float) -> None:
     params = StdioServerParameters(
         command=str(root / ".venv/bin/destiny-mcp"),
-        env={"DESTINY_MCP_ROOT": str(root), "DESTINY_MCP_TOOL_PROFILE": "normal"},
+        env={"DESTINY_MCP_ROOT": str(root)},
     )
     async with asyncio.timeout(timeout):
         with tempfile.TemporaryFile(mode="w+", encoding="utf-8") as server_log:

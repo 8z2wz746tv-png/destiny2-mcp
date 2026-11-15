@@ -1,0 +1,247 @@
+{
+  "label": "p0-baseline",
+  "sourceRoot": "/Users/husky/项目/destiny2-mcp",
+  "destinyMcpFile": "/Users/husky/项目/destiny2-mcp/destiny_mcp/__init__.py",
+  "trials": 3,
+  "heavy": false,
+  "rows": [
+    {
+      "case": "hunter_priority_set",
+      "character": "hunter",
+      "request": {
+        "exotic_name": "快速装弹松身裤",
+        "weapons_target": 150,
+        "class_target": 100,
+        "super_target": 80,
+        "melee_target": 70,
+        "grenade_target": 70,
+        "priority_stats": [
+          "weapons",
+          "class_stat",
+          "super_stat",
+          "melee",
+          "grenade"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 283205.7,
+        "solveMs": 253.5,
+        "combos": 75712,
+        "candidates": 2
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 279094.1,
+          "candidates": 2,
+          "topStats": {
+            "weapons": 150,
+            "health": 6,
+            "class_stat": 116,
+            "grenade": 70,
+            "super_stat": 80,
+            "melee": 71
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 253.5,
+          "combos": 75712,
+          "setsFromKernel": 0
+        },
+        {
+          "trial": 1,
+          "status": "ok",
+          "serviceMs": 283205.7,
+          "candidates": 2,
+          "topStats": {
+            "weapons": 150,
+            "health": 6,
+            "class_stat": 116,
+            "grenade": 70,
+            "super_stat": 80,
+            "melee": 71
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 323.7,
+          "combos": 75712,
+          "setsFromKernel": 0
+        },
+        {
+          "trial": 2,
+          "status": "ok",
+          "serviceMs": 304317.1,
+          "candidates": 2,
+          "topStats": {
+            "weapons": 150,
+            "health": 6,
+            "class_stat": 116,
+            "grenade": 70,
+            "super_stat": 80,
+            "melee": 71
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 222.0,
+          "combos": 75712,
+          "setsFromKernel": 0
+        }
+      ]
+    },
+    {
+      "case": "hunter_priority_only",
+      "character": "hunter",
+      "request": {
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 18041.8,
+        "solveMs": 12388.2,
+        "combos": 6283200,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 15787.6,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 102,
+            "health": 14,
+            "class_stat": 80,
+            "grenade": 190,
+            "super_stat": 35,
+            "melee": 4
+          },
+          "topCompletionRate": 0.0,
+          "solveMs": 12388.2,
+          "combos": 6283200,
+          "setsFromKernel": 200
+        },
+        {
+          "trial": 1,
+          "status": "ok",
+          "serviceMs": 18574.2,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 102,
+            "health": 14,
+            "class_stat": 80,
+            "grenade": 190,
+            "super_stat": 35,
+            "melee": 4
+          },
+          "topCompletionRate": 0.0,
+          "solveMs": 12674.5,
+          "combos": 6283200,
+          "setsFromKernel": 200
+        },
+        {
+          "trial": 2,
+          "status": "ok",
+          "serviceMs": 18041.8,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 102,
+            "health": 14,
+            "class_stat": 80,
+            "grenade": 190,
+            "super_stat": 35,
+            "melee": 4
+          },
+          "topCompletionRate": 0.0,
+          "solveMs": 12238.0,
+          "combos": 6283200,
+          "setsFromKernel": 200
+        }
+      ]
+    },
+    {
+      "case": "titan_meets_minimum",
+      "character": "titan",
+      "request": {
+        "weapons_target": 100,
+        "grenade_target": 100,
+        "class_target": 70,
+        "melee_target": 70,
+        "super_target": 80,
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 7803.5,
+        "solveMs": 5302.0,
+        "combos": 3876000,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 7558.6,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 105,
+            "health": 0,
+            "class_stat": 70,
+            "grenade": 130,
+            "super_stat": 80,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 5272.7,
+          "combos": 3876000,
+          "setsFromKernel": 200
+        },
+        {
+          "trial": 1,
+          "status": "ok",
+          "serviceMs": 7932.6,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 105,
+            "health": 0,
+            "class_stat": 70,
+            "grenade": 130,
+            "super_stat": 80,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 5336.6,
+          "combos": 3876000,
+          "setsFromKernel": 200
+        },
+        {
+          "trial": 2,
+          "status": "ok",
+          "serviceMs": 7803.5,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 105,
+            "health": 0,
+            "class_stat": 70,
+            "grenade": 130,
+            "super_stat": 80,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 5302.0,
+          "combos": 3876000,
+          "setsFromKernel": 200
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "秒数受机器负载影响，跨机器比较无意义；有意义的只有同机 paired 对照与 combos 这类计数。",
+    "没解时对应字段是 null，不是 0。",
+    "端到端走 BuildService.find_build（含 worker 进程开销），内核是直接 solve()。"
+  ]
+}

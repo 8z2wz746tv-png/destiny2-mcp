@@ -1,0 +1,59 @@
+{
+  "label": "p5-grenade130-repeat",
+  "sourceRoot": "/Users/husky/项目/destiny2-mcp",
+  "destinyMcpFile": "/Users/husky/项目/destiny2-mcp/destiny_mcp/__init__.py",
+  "trials": 1,
+  "heavy": true,
+  "rows": [
+    {
+      "case": "warlock_grenade_130",
+      "character": "warlock",
+      "request": {
+        "exotic_name": "星火协议",
+        "set_bonus_name": "埃希恩记忆",
+        "set_bonus_count": 4,
+        "weapons_target": 100,
+        "grenade_target": 130,
+        "class_target": 70,
+        "melee_target": 70,
+        "super_target": 80,
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 235918.6,
+        "solveMs": 5326.1,
+        "combos": 3769920,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 235918.6,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 100,
+            "health": 0,
+            "class_stat": 70,
+            "grenade": 150,
+            "super_stat": 95,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 5326.1,
+          "combos": 3769920,
+          "setsFromKernel": 0
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "秒数受机器负载影响，跨机器比较无意义；有意义的只有同机 paired 对照与 combos 这类计数。",
+    "没解时对应字段是 null，不是 0。",
+    "端到端走 BuildService.find_build（含 worker 进程开销），内核是直接 solve()。"
+  ]
+}

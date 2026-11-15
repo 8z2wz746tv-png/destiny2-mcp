@@ -30,6 +30,27 @@ def farming_reference(service: Any, names: str | list[str], *, limit: int = 8) -
         }
 
 
+def item_names(rows: Any, *, limit: int = 8) -> list[str]:
+    """列表行的武器名：**只读行自己的 `name`，不下钻**。
+
+    列表行里还嵌着别的 `name`：`stats[].name`（"射程""稳定性"）、`matched_perk_details[].name`
+    （perk 名）。下钻收集会把它们当成武器名送去回查刷取清单，于是 `unmatched` 里出现
+    "萤火虫""伤害"这种条目 —— 看起来像"这些武器不在清单里"，其实是把属性/perk 名问错了地方
+    （真机实测：`catalog` 的 `unmatched` 里就有 perk 名）。
+    扁平的行（库存/护甲）本来就只有一个 `name`，用 `harvest_names` 那个通用遍历没问题。
+    """
+    found: list[str] = []
+    for row in rows or []:
+        if not isinstance(row, dict):
+            continue
+        name = str(row.get("name") or "").strip()
+        if name and name not in found:
+            found.append(name)
+        if len(found) >= limit:
+            break
+    return found
+
+
 def harvest_names(value: Any, *, limit: int = 8) -> list[str]:
     """从结果载荷里收集物品名，用于按名字回查刷取清单。
 

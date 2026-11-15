@@ -10,19 +10,26 @@ Destiny 2 装备管理 MCP Server，通过 AI Agent 管理武器和装备。
 - 转移、装备武器和护甲
 - 管理子职业配置（超能、手雷、碎片等）
 - 查询武器 perk 池、对比副本、god roll 推荐
-- 护甲配装与反推：库存无解时先查单件，单件不足再给合法的两件待刷方案
+- 护甲配装与反推：库存无解时先查单件，单件不足再给合法的两件待刷方案；
+  目标既支持下限（"手雷至少 100"）也支持**软上限**（`stat_caps={"super_stat": 100}`，超了会排到后面
+  并逐项标注，不会因此不给方案）；有解时还会报**每项单独特到多少**（`data.reachable`，
+  保守下界，且逐项可达不等于同时达到）
 - 查询商人库存和每周重置活动
-- 从配装文章或截图导入配装方案
 - 保存和装备配装方案（含模组与碎片配置）
 - 默认暴露 8 个聚合 assistant 工具，不把几十个低层工具直接铺给 Agent
 - 随附 Starside 中文资料：Perk、武器推荐、护甲、技能、神器、机制和活动数据
 - 可选 Starside 网页归档：提供社区配装模板，保留出处，可匹配账号库存
 - 调谐（Tuning）参与配装求解：目标差一点时，求解器会实际尝试更换调谐，能补上就返回带
   `tuning_changes`（逐件 from/to 与六维变化）的候选，补不上则说明是额度不足还是无法让步。
-  调谐只能在游戏内手动修改（Bungie 插槽接口返回 `This action can only be done in-game.`），
-  工具输出的是「改哪几件、改成什么」的清单，`equip_build` 不会代替玩家改调谐
-- 写入失败会如实报错：需要消耗能量的插槽写入要求 Bungie 应用具备 `AdvancedWriteActions` 权限，
-  缺少权限时接口返回 `AccessNotPermittedByApplicationScope`，工具会指出这一权限，不会把失败报成成功
+  调谐**能通过 API 换，也能替你换**（2026-09-22 真机验证并开放）：条件只有一条 —— 那颗在**这件
+  护甲允许的清单**里（组件 310，每件不一样）。在 → `equip_build` 确认后连同护甲与模组一起写、
+  不花材料；不在 → 上游回 **1675**，那句读作"这颗装不到这件上"（不是"你没材料"），工具如实报且不写。
+- **护甲模组是真的能通过 API 装的**（工具会直接装，装不上才列清单）：走免费插槽接口
+  `InsertSocketPlugFree`，官方明确它覆盖 Perks / **Armor Mods** / Shaders / Ornaments，且
+  **不需要** `AdvancedWriteActions`。子职业插槽（超能/手雷/近战/职业技能/星相/碎片）同理。
+  详见 ADR-012——此前"个人应用没权限、只能游戏内装"的结论是一次**归因错误**
+- 写入失败会如实转述上游原文：不把"角色不在社交区/轨道"、插槽禁用、缺 AWA 流程混成一句
+  "需要更高权限"，也不把失败报成成功
 
 ## 快速开始
 
@@ -100,23 +107,10 @@ cp .env.example .env
 
 然后编辑 `.env`，填入 Bungie 应用凭据。
 
-默认工具面是 `normal`，只暴露面向自然语言的聚合入口：
-
-```bash
-DESTINY_MCP_TOOL_PROFILE=normal
-```
-
-历史工具默认屏蔽。那 69 个旧工具没有参数拦截、没有参数说明、返回契约也不统一，混在工具面里只会增加选错的概率，所以不论哪个 profile 都只暴露 8 个聚合工具。需要排查或兼容旧提示词时显式打开：
-
-```bash
-DESTINY_MCP_ENABLE_LEGACY_TOOLS=1   # 打开历史工具，配合下面的 profile 使用
-```
-
-| Profile | 默认（历史工具关闭） | 打开 `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 后 |
-|---|---|---|
-| `normal` | 8 个聚合工具（推荐） | 8 个聚合工具 |
-| `expert` | 8 个聚合工具 | 聚合工具 + 常用查询类旧工具，用于排查查询问题 |
-| `full` | 8 个聚合工具 | 聚合工具 + 全部历史工具，用于兼容旧提示词或开发调试 |
+工具面固定是 **8 个聚合工具**（`player_assistant` … `world_assistant`），每个工具按 `intent` 分派。
+没有 profile、也没有"历史工具"开关 —— 那 67 个低层工具（没有参数拦截、没有参数说明、返回契约混用三种）
+已于 2026-09-20 整块剥离到仓库根目录 `legacy/`（只作存档，不进包、不参与测试与 lint，
+要查旧行为见 `legacy/README.md`）。
 
 ### 3. 准备可选数据（Manifest / DIM Wish List）
 
@@ -238,9 +232,12 @@ VERIFY_OK=Destiny MCP is ready
 - 写入权限：读操作不受限制；消耗能量的插槽写入需要在 Bungie 应用里勾选 `AdvancedWriteActions`。
   没有该权限时接口返回 403 `AccessNotPermittedByApplicationScope`，工具会指出这一权限；
   这属于权限配置问题，重试不会成功。
-- 调谐只能游戏内修改：Bungie 的免费插槽接口对调谐返回 `This action can only be done in-game.`
-  （ErrorCode 1663）。`find`/`recommend` 返回的 `tuning_changes` 是给玩家的手动清单，
-  照着在游戏里改完，方案里的六维才成立；`equip_build` 只更换护甲与模组。
+- 调谐怎么换：调谐**能通过 API 换**，条件只有一条 —— 那颗在**这件护甲允许的清单**里
+  （组件 310；真机实测：清单内的写入 `ErrorCode=1`、回读插槽与六维都对、**不花材料**；清单外回
+  **1675**，那句读作"这颗装不到这件上"）。`find`/`recommend` 的 `tuning_changes` 与
+  `canonical_build` 里的调谐插件都**是可执行的**：`equip_build` 确认后连同护甲与模组一起改
+  （旧说法「调谐只能在游戏内改、要材料」出自 ADR-012 推翻的那个字段名 bug，已作废；
+  见 ADR-014 与 `docs/plans/TUNING_WRITE_PLAN.md`）。
 - 无解诊断耗时较长：真正配不出来时会给「六维阶梯」（逐级放松目标实采），实测 80–165 秒；
   求解器还会先尝试调谐补齐。MCP 客户端超时建议设为 300 秒（DSH 的 `toolCallTimeoutMs`）。
 
@@ -276,9 +273,9 @@ VERIFY_OK=Destiny MCP is ready
 
 单进程、单用户的模块化单体。所有 Bungie 写操作在进程内共享账号锁，写入完成、失败或取消后，依赖账号状态的缓存都会失效。不要同时启动多个实例操作同一 Bungie 账号，跨进程互斥不在设计范围内。
 
-对外始终只暴露 8 个聚合工具（历史工具要显式打开），内部按意图校验参数并委托领域服务；配装组合计算在独立工作进程中运行，每个服务实例最多同时计算一个任务，默认 300 秒预算（`DESTINY_BUILD_TIMEOUT_SECONDS` 可调，只计算真正在计算的时间，排队不计入）；超时或取消会终止该计算进程，不阻塞 MCP 请求循环。
+对外始终只暴露 8 个聚合工具，内部按意图校验参数并委托领域服务；配装组合计算在独立工作进程中运行，每个服务实例最多同时计算一个任务，默认 300 秒预算（`DESTINY_BUILD_TIMEOUT_SECONDS` 可调，只计算真正在计算的时间，排队不计入）；超时或取消会终止该计算进程，不阻塞 MCP 请求循环。
 
-服务器通过 `create_server()` 显式注册工具。认证或 Manifest 初始化失败时停止启动，`/health` 仅在初始化完成后的生命周期内返回就绪。配装导入输出 `BuildRecipe`，可执行候选使用 `ExecutableBuild`，并继续校验一次性候选凭据和库存快照。
+服务器通过 `create_server()` 显式注册工具。认证或 Manifest 初始化失败时停止启动，`/health` 仅在初始化完成后的生命周期内返回就绪。配装候选分三档：`BuildRecipe`（只是配方）→ `CanonicalBuild`（全 hash 的候选）→ `ExecutableBuild`（可执行），执行前继续校验一次性候选凭据和库存快照。
 
 ```
 destiny_mcp/
@@ -289,11 +286,10 @@ destiny_mcp/
 ├── bungie_client.py   # Bungie API 客户端
 ├── manifest.py        # 游戏数据清单管理
 ├── models/            # Pydantic 数据模型
-├── tools/             # MCP 工具定义（默认 8 个 assistant；69 个历史工具需显式打开）
+├── tools/             # MCP 工具定义（8 个聚合工具 + 各自的 *_branches 分支）
 ├── services/          # 业务逻辑层（25+ 个 service）
-├── build/             # Armor 3.0 配装求解与合法刷取目标反推
+└── build/             # Armor 3.0 配装求解与合法刷取目标反推
 ├── utils/             # 工具函数
-└── build_import/      # 配装导入模块
 ```
 
 ## 默认工具分组
@@ -304,7 +300,7 @@ destiny_mcp/
 |---|---|
 | `player_assistant` | 玩家搜索、档案、角色概况 |
 | `inventory_assistant` | 背包/仓库查询、精确重复武器扫描、移动、装备、批量装备、邮政官、锁定、任务追踪 |
-| `weapon_assistant` | 武器分析、指定实例对比、perk 池、全武器目录筛选、perk 选取率、god roll |
+| `weapon_assistant` | 武器分析、指定实例对比、perk 池、全武器目录筛选、perk 选取率、god roll、锻造武器模式（红框）进度与来源 |
 | `build_assistant` | 护甲配装推荐、候选、诊断、合法 Armor 3.0 单件/两件刷取目标反推、确认后精确装备 |
 | `loadout_assistant` | 玩家已存配装、Bungie 官方配装槽读取/写入/清空；社区模板走 `build_assistant` |
 | `subclass_assistant` | 子职业、碎片、神器查询和确认后修改 |

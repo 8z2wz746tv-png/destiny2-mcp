@@ -21,7 +21,8 @@ from ..manifest import ManifestManager
 from ..player_resolver import PlayerResolver
 from ..vocabulary import LEGACY_STAT_ALIASES
 from . import profile_components
-from .loadout_mod_sockets import ModSocketMixin
+from .loadout_mod_sockets import ModSocketMixin, plug_already_installed
+from ..utils.hash_utils import to_unsigned
 
 # 属性模组（+5/+10 六维）与部位功能模组在插槽里分属不同 plug 类别，名字可能撞车，
 # 所以解析模组名时只在"护甲模组"这一类里找。
@@ -186,13 +187,15 @@ class ArmorModService(ModSocketMixin):
         )
 
         # 必须带上容器组件（200 角色背包 / 201 已装备），否则拿不到"这件在谁身上"，
-        # 会把每件护甲都误判成"不在该角色身上"。305 用来读插槽，300 读能量与 T 级。
+        # 会把每件护甲都误判成"不在该角色身上"。305 用来读插槽，300 读能量与 T 级，
+        # **310 用来读"这件允许哪些调谐"**（调谐写入的唯一判据，见 ADR-014 修订）。
         profile = await self._resolver.get_profile(
-            membership_id, membership_type, INVENTORY_SOCKETS
+            membership_id, membership_type, [*INVENTORY_SOCKETS, 310]
         )
         components = profile.get("itemComponents") or {}
         instances = (components.get("instances") or {}).get("data") or {}
         sockets_data = (components.get("sockets") or {}).get("data") or {}
+        reusable_plugs = (components.get("reusablePlugs") or {}).get("data") or {}
         equipment = ((profile.get("characterEquipment") or {}).get("data") or {}).get(
             character_id, {}
         ).get("items") or []
@@ -215,6 +218,7 @@ class ArmorModService(ModSocketMixin):
             raise InvalidArgumentError("intent=equip_mod 只处理护甲（itemType=2）。")
 
         sockets = (sockets_data.get(item_instance_id) or {}).get("sockets") or []
+        pools = self.insertable_plugs(profile, character_id)
         candidates = self._resolve_mod_candidates(mod_name)
         fits: list[tuple[int, int]] = []
         for candidate in candidates:
@@ -225,15 +229,32 @@ class ArmorModService(ModSocketMixin):
             )
             if found is not None:
                 fits.append((found, candidate))
+
+        def _unlock_state(socket_index: int, plug_hash: int) -> bool | None:
+            """这一位能不能插这颗；None = 上游没给这个槽的 plug set（不判断）。"""
+            current = int((sockets[socket_index] or {}).get("plugHash", 0) or 0) \
+                if socket_index < len(sockets) else 0
+            return self.plug_is_insertable(
+                pools, definition, socket_index, plug_hash, current
+            )
+
         # 同名会有多个版本（实测「手雷模组」既有 +0/1 能量的占位版本，也有 +10/3 能量的
-        # 真模组），随便挑一个会装上去一个没用的。优先选真有属性加成的那个。
-        def _strength(plug_hash: int) -> tuple[int, int, int]:
+        # 真模组），随便挑一个会装上去一个没用的。
+        # **解锁优先**：同名模组还有"已解锁/未解锁"两档（实测被上游 1676 拒掉的那几颗
+        # 全都不在这一位角色的可插入清单里），挑错那个会让用户确认完才发现装不上。
+        def _strength(pair: tuple[int, int]) -> tuple[int, int, int, int]:
+            socket_index, plug_hash = pair
             bonus = _stat_bonus_of(self._manifest.get_item_definition(plug_hash))
-            return (1 if bonus else 0, sum(bonus.values()), self._plug_energy_cost(plug_hash) or 0)
+            return (
+                1 if _unlock_state(socket_index, plug_hash) else 0,
+                1 if bonus else 0,
+                sum(bonus.values()),
+                self._plug_energy_cost(plug_hash) or 0,
+            )
 
         socket_index, matched_hash = (0, 0)
         if fits:
-            socket_index, matched_hash = max(fits, key=lambda pair: _strength(pair[1]))
+            socket_index, matched_hash = max(fits, key=_strength)
         if not fits:
             raise InvalidArgumentError(
                 f"{definition.get('displayProperties', {}).get('name', item_instance_id)} "
@@ -266,24 +287,70 @@ class ArmorModService(ModSocketMixin):
                     "stat_bonus": bonus,
                     "energy_cost": self._plug_energy_cost(alt_hash) or 0,
                     "socket_index": alt_socket,
+                    # 调谐一律 null：那份"这一位能不能插"的判定在调谐槽上不可信（见下面 is_tuning
+                    # 那段），报出去会被读成"写不了"。与 `to.unlock_state` 同一口径。
+                    "unlock_state": (
+                        None
+                        if self._plug_category_hash(alt_hash) == _TUNING_CATEGORY_HASH
+                        else _unlock_state(alt_socket, alt_hash)
+                    ),
                 })
 
         is_tuning = self._plug_category_hash(matched_hash) == _TUNING_CATEGORY_HASH
+        # 调谐：这颗在不在"这件护甲允许的清单"里（组件 310，单一出处见 models）。
+        # 读不到清单 = 不拦（缺数据 ≠ 不许，交给上游说话）；读到了且不在里面 = 明确不写 ——
+        # 省得让用户确认完再去撞 1675。
+        from ..build.models import (  # 局部导入，同上
+            tuning_is_allowed,
+            tuning_options_from_reusable,
+        )
+
+        allowed = tuning_options_from_reusable(
+            (reusable_plugs.get(item_instance_id) or {}),
+            self._plug_category_hash,
+            _TUNING_CATEGORY_HASH,
+        )
+        # `tuning_is_allowed` 两边过 `to_unsigned`：`matched_hash` 来自 manifest.search（有符号），
+        # 310 清单来自 profile（无符号）—— 裸 `in` 会把清单里有的那颗判成"装不到这件上"（真机踩过）。
+        tuning_allowed = (
+            (not is_tuning) or (not allowed) or tuning_is_allowed(allowed, matched_hash)
+        )
+        raw_unlock_state = _unlock_state(socket_index, matched_hash)
+        # **调谐不看 `unlock_state`** —— 那份"这一位能不能插"的判定在调谐槽上不可信：实测连
+        # 正装着的那颗调谐都被判 false（`loadout_plug_lookup.plug_is_insertable` 为此打过补丁），
+        # 而一颗被判 false 的调谐写入上游照样接受（2026-09-22 真机：至高碎片槽 11
+        # `+武器 / -超能` → `ErrorCode=1`，回读插槽与六维都对）。拿它拦会把能装的调谐说成
+        # "游戏里同样装不上"。判据只有组件 310 清单一条（ADR-014 修订）。
+        # 也不把它报出去：调谐配上 `unlock_state: false` 会被读成"写不了"。
+        unlock_state = None if is_tuning else raw_unlock_state
+        conditions = self.plug_insertion_conditions(matched_hash)
+        # 写不进去的情形都别走"确认后写入"：用户确认了、我们却只能失败。三条各自说清：
+        #   ① 调谐不在**这件护甲**允许的清单里（组件 310）→ 上游回 1675，
+        #      那句话读作"这颗装不到这件上"，**不是**"你没材料"；
+        #   ② 非调谐模组不在这一位角色的可插入清单里 → 上游回 1676（插入条件没满足），游戏里同样装不上；
+        #   ③ 其余情况可写（角色级清单"没数据"不算拦截 —— 缺数据 ≠ 不许，交给上游说话）。
+        if is_tuning and not tuning_allowed:
+            reason = (
+                "这颗调谐**不在这件护甲允许的调谐里**（组件 310 的清单里没有它）："
+                "上游会回 1675「这颗装不到这件上」，不是「你没材料」。"
+                "换一件能装它的护甲，或者换成这件清单里已有的那几颗。"
+            )
+        elif (not is_tuning) and unlock_state is False:
+            reason = (
+                f"「{_mod_label(self._manifest.get_item_definition(matched_hash), mod_name)}」"
+                "不在 Bungie 给这一位角色的可插入清单里 —— 实测这种写入会被回 1676"
+                "（插入条件没满足），游戏里同样装不上。它的插入条件是："
+                + ("；".join(conditions) if conditions else "上游没给条件文本")
+                + "。条件里有「必须在赛季神器中选择」时，先在赛季神器里解锁它。"
+            )
+        else:
+            reason = ""
         return {
             "player_name": player_name,
             "item_instance_id": item_instance_id,
             "kind": "tuning" if is_tuning else "mod",
-            "writable": not is_tuning,
-            "writable_reason": (
-                # 实机实测（0.1.8）：免费插槽接口对调谐明确回
-                # "This action can only be done in-game."（ErrorCode 1663），
-                # 付费接口要 AdvancedWriteActions 权限、且同样不是给调谐用的。
-                "调谐只能**在游戏里**改：Bungie 的插槽接口实测回"
-                "「This action can only be done in-game.」（ErrorCode 1663），"
-                "第三方写不进去。这条方案告诉你要把哪一件改成什么，请进游戏手动改。"
-                if is_tuning
-                else ""
-            ),
+            "writable": tuning_allowed if is_tuning else unlock_state is not False,
+            "writable_reason": reason,
             "note": (
                 "调谐不花能量、也不占模组槽；它是零和的："
                 "to.stat_bonus 里同时有 +5 和 −5 两项。"
@@ -309,6 +376,11 @@ class ArmorModService(ModSocketMixin):
                 if current_hash
                 else None,
                 "energy_cost": current_cost,
+                # 与 `to.stat_bonus` 同一套键：换模组是**有代价**的（−10 武器 / +10 手雷），
+                # 只给 `to` 的话调用方只会说"加了 10 点"，永远不说减了什么。
+                "stat_bonus": _stat_bonus_of(
+                    self._manifest.get_item_definition(current_hash)
+                ) if current_hash else {},
             },
             "to": {
                 "hash": matched_hash,
@@ -316,25 +388,51 @@ class ArmorModService(ModSocketMixin):
                 "energy_cost": new_cost,
                 # 六维可读键，和 alternatives 同一套（工具层不用再自己算一遍）
                 "stat_bonus": _stat_bonus_of(self._manifest.get_item_definition(matched_hash)),
+                # None = 上游没给这个槽的 plug set（不判断，不是"没解锁"）
+                "unlock_state": unlock_state,
+                "conditions": conditions,
             },
             "energy": {"capacity": capacity, "used": used, "after": after},
         }
 
     @staticmethod
     def _slot_key(definition: dict[str, Any]) -> str:
-        from .armor_payload import slot_key_from_bucket  # 局部导入，避免循环依赖
+        """护甲槽短键。
+
+        以前这里自己抄了一张**有符号** bucket hash 表（helmet 写 -846692857），而 Manifest 的
+        `inventory.bucketTypeHash` 存的是**无符号**值（3448274439）→ 头盔与臂铠的槽名一直是空串，
+        确认请求里读成「光芒领主面具（，540，T5）」（真机日志可见）。改走 `armor_payload` 里
+        已有的那张表（`_ARMOR_SLOT_HASHES`，键是无符号 hash），单一出处、不再抄第二份。
+        """
+        from .armor_payload import slot_key_from_bucket_hash  # 局部导入，避免循环依赖
 
         bucket_hash = (definition.get("inventory") or {}).get("bucketTypeHash", 0)
-        mapping = {
-            20886954: "Leg Armor",
-            14239492: "Chest Armor",
-            -846692857: "Helmet",
-            -743048708: "Gauntlets",
-            1585787867: "Class Armor",
-        }
-        return slot_key_from_bucket(mapping.get(bucket_hash, ""))
+        return slot_key_from_bucket_hash(bucket_hash)
 
     # ── 执行 ─────────────────────────────────────────────────────────
+
+    async def verify(self, plan: dict[str, Any]) -> dict[str, Any]:
+        """写后回读这个槽，确认目标模组真的在里面。
+
+        返回 `{"verified": True}` 或 `{"verified": None, "reason": ...}` —— **读不到不等于没装上**：
+        上游 profile 有 3–10 秒同步窗口，而写入本身已经被上游确认过（`ErrorCode=1`）。
+        没探成记 null + 原因，不记 false（本项目的老规矩）。
+        """
+        sockets = await self._read_sockets(
+            plan["item_instance_id"], plan["membership_id"], plan["membership_type"],
+            attempts=3,
+        )
+        target = plan["to"]["hash"]
+        index = plan["socket_index"]
+        if not sockets:
+            return {"verified": None, "reason": "回读时读不到插槽数据（上游还没同步），未核对"}
+        current = int(sockets[index].get("plugHash", 0) or 0) if index < len(sockets) else 0
+        if to_unsigned(current) == to_unsigned(int(target)):
+            return {"verified": True}
+        return {
+            "verified": None,
+            "reason": "同步窗口内还没读回目标模组（上游已确认写入，稍后自会生效）",
+        }
 
     async def apply(self, plan: dict[str, Any]) -> dict[str, Any]:
         """按方案写入。失败时把 Bungie 的原文一并带出来（不吞错）。
@@ -363,11 +461,43 @@ class ArmorModService(ModSocketMixin):
         code = (result or {}).get("ErrorCode", 0) if isinstance(result, dict) else 0
         if code != 1:
             message = str((result or {}).get("Message") or "Bungie 没有说明原因")
-            lowered = message.lower()
-            if "accessnotpermittedbyapplicationscope" in lowered or "scope" in lowered:
+            status = str((result or {}).get("ErrorStatus") or "")
+            if plug_already_installed(result if isinstance(result, dict) else None):
+                # 1679：这个槽**已经装着**这颗了。用户要的状态已经成立，不是失败 ——
+                # 报成失败会让人以为要重试。以前"已装的那颗认不出来"是因为 `_find_mod_socket`
+                # 拿有符号 hash 比无符号的实时 plugHash（ADR-013），现在两边都转无符号了，
+                # 于是重复装同一颗会走到这里而不是错装到别的槽。
+                return {
+                    "success": True,
+                    "already_installed": True,
+                    "item_instance_id": plan["item_instance_id"],
+                    "item_name": plan["item_name"],
+                    "socket_index": plan["socket_index"],
+                    "installed": plan["to"],
+                    "replaced": plan["from"],
+                    "energy": plan["energy"],
+                    "bungie_response": result,
+                }
+            if "DestinyFailedPlugInsertionRules" in f"{status} {message}":
+                # 1676：这颗模组的**插入条件**没满足。错误体里不说是哪条没过（message_data 空），
+                # 唯一能拿到的中文说法是 Manifest 的 `plug.insertionRules[].failureMessage`。
+                # 实测被它拒掉的那些，条件里都有「必须在赛季神器中选择」—— 游戏里同样装不上，
+                # 所以不能报成"请在游戏里手动装"（以前那句就是这么错的）。
+                conditions = self.plug_insertion_conditions(plan["to"]["hash"])
+                raise TransferError(
+                    "装模组失败：Bungie 回了 1676（这颗模组的插入条件没满足）。"
+                    "Manifest 里它的条件是："
+                    + ("；".join(conditions) if conditions else "上游没给条件文本")
+                    + "。条件里有「必须在赛季神器中选择」时，先在赛季神器里解锁它再装。"
+                )
+            if "accessnotpermittedbyapplicationscope" in message.lower() or "scope" in message.lower():
+                # 免费插槽接口**不需要** AWA（官方原文：does not require 'Advanced Write Action'
+                # authorization and is available to 3rd-party apps）。所以撞到缺 scope，
+                # 说明这颗 plug 走到了**付费**接口——那类要 AWA 三段流程，我们没实现（ADR-012）。
                 message = (
-                    "Bungie 拒绝了这次写入：当前授权的应用没有 AdvancedWriteActions 权限"
-                    "（要改模组/深层配置需要在 Bungie 应用页面开启并重新登录）。原文："
+                    "Bungie 拒绝了这次写入：这颗模组的写入走到了需要 `AdvancedWriteActions` 的"
+                    "付费插槽接口，而本项目没有实现 AWA 的授权流程（要用户在某一步亲自批准）。"
+                    "护甲模组本身走免费接口就能装，报到这里说明这颗不属于免费可逆的那类。原文："
                     + message[:200]
                 )
             raise TransferError(f"装模组失败：{message[:300]}")

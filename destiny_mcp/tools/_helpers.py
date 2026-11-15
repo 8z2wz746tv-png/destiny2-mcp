@@ -92,3 +92,4 @@ def positive_or_default(value: int | None, default: int) -> int:
     if value is None or value <= 0:
         return default
     return value
+

@@ -11,7 +11,7 @@ from ..logging_config import get_logger
 from . import profile_components
 from ..manifest import ManifestManager, class_type_name
 from ..models import WeaponDetail, WeaponDetailResponse
-from . import weapon_payload, weapon_profile
+from . import weapon_payload, weapon_profile, weapon_stats_payload
 from ..manifest_names import names_for
 from ..player_resolver import PlayerResolver
 from ..utils.hash_utils import to_unsigned
@@ -49,6 +49,9 @@ class WeaponDetailService:
         type_name: str,
         limit: int | None = None,
         include_selectable_plugs: bool = False,
+        offset: int = 0,
+        *,
+        list_view: bool = False,
     ) -> WeaponDetailResponse:
         """Get comprehensive details for all weapons of a given type.
 
@@ -56,11 +59,22 @@ class WeaponDetailService:
             player_name: Bungie name.
             type_name: Weapon type display name; empty means all owned weapons.
             limit: Max weapons returned; None or <= 0 returns everything.
+            offset: Skip this many weapons (after排序) —— 列表类翻页用。
+            list_view: 只服务"我有哪些"的列表行：**不取 305/310、不造 sockets/options**。
+                插槽池与可换项是单件的问题（`compare`），列表带着它们曾经占到载荷的 2/3。
 
         Returns:
             WeaponDetailResponse with matching weapons and their full details, plus
             total/returned counts so a cut list is never mistaken for a short one.
+
+        实现要点：**先排完序、切出这一页，再逐件造明细**。以前是先给全部命中件造完明细
+        再截断 —— 命中 124 件只返回 20 件时，那 104 件的插槽池白造。
         """
+        if list_view and include_selectable_plugs:
+            # 两者互斥：列表行不带插槽，而 selectable plugs 要挂到插槽上。放过去就会
+            # 静默返回"没有可选 perk"，让社区配装核对得出**错误结论**（比报错糟得多）。
+            raise ValueError("list_view 不带 sockets，不能同时要 include_selectable_plugs")
+
         logger.info("Getting weapon details: player=%s, type=%s", player_name, type_name)
 
         # Type matching must not use the capped general Manifest search.
@@ -76,14 +90,15 @@ class WeaponDetailService:
         mid = p["membership_id"]
         mtype = p["membership_type"]
 
+        # 列表行不展开插槽池，就不请求 305/310 —— 两个分支必须用同一个掩码，
+        # 只改带缓存那条会让"没缓存时"多拉 305/310（测试当场抓到过）。
+        components = (
+            profile_components.INVENTORY if list_view else profile_components.WEAPON_DETAIL
+        )
         if self._profile_cache:
-            profile = await self._profile_cache.get_profile(
-                player_name, profile_components.WEAPON_DETAIL
-            )
+            profile = await self._profile_cache.get_profile(player_name, components)
         else:
-            profile = await self._resolver.get_profile(
-                mid, mtype, profile_components.WEAPON_DETAIL
-            )
+            profile = await self._resolver.get_profile(mid, mtype, components)
         if looks_like_missing_inventory_scope(profile):
             raise AuthenticationError(MISSING_INVENTORY_SCOPE_MESSAGE)
         require_complete_inventory_components(profile)
@@ -137,6 +152,11 @@ class WeaponDetailService:
                 "location": location,
                 "is_equipped": is_equipped,
                 "state": raw.get("state"),
+                # 排序要用光等与名字：先记下来，免得排完序回头再查一遍组件/定义
+                "power": (instances_data.get(inst_id) or {}).get("primaryStat", {}).get("value"),
+                "name": weapon_profile.display_name_of(
+                    self._manifest, self._manifest.get_item_definition(item_hash)
+                ),
             })
 
         # From vault
@@ -155,19 +175,31 @@ class WeaponDetailService:
             for raw in equip_data.get(char_id, {}).get("items", []):
                 add_weapon(raw, loc_name, True)
 
-        # Step 5: Build detailed weapon info
+        # Step 5: 排序 → 切页 → 只给这一页造明细（顺序与旧的"先全造再截断"一致）
+        # 末位用 instance_id 兜底：同名同光等的副本否则没有稳定次序，翻页会漏件或重件。
+        total = len(weapon_instances)
+        weapon_instances.sort(
+            key=lambda wi: (
+                not wi["is_equipped"],
+                -int(wi.get("power") or 0),
+                str(wi.get("name") or ""),
+                wi["instance_id"],
+            )
+        )
+        page = weapon_instances[offset:] if not limit or limit <= 0 else weapon_instances[offset:offset + limit]
+
         names = names_for(self._manifest)
         # 同一个定义会被多个副本复用：能滚几栏的计数按 item_hash 缓存一次
         summary_cache: dict[int, dict] = {}
         details: list[WeaponDetail] = []
-        for wi in weapon_instances:
+        for wi in page:
             inst_id = wi["instance_id"]
             item_hash = wi["item_hash"]
 
             inst_info = instances_data.get(inst_id, {})
             weapon_def = self._manifest.get_item_definition(item_hash)
 
-            raw_sockets = sockets_data.get(inst_id, {}).get("sockets", [])
+            raw_sockets = [] if list_view else sockets_data.get(inst_id, {}).get("sockets", [])
             plug_hashes = [int(socket.get("plugHash") or 0) for socket in raw_sockets]
             perks_complete = bool(raw_sockets)
             for plug_hash in plug_hashes:
@@ -182,7 +214,8 @@ class WeaponDetailService:
                 )
             # 列表类只放"这一件能换什么"（组件 310）+ 现在装的；完整池是单把武器的问题
             # （`info`/`perk_pool`）。实测把整张池子塞进列表：5 把武器 597 KB。
-            sockets = weapon_payload.column_list(
+            # `list_view` 连"这一件能换什么"都不要：那是单件的问题，列表行不带 sockets/options。
+            sockets = [] if list_view else weapon_payload.column_list(
                 self._manifest, weapon_def, equipped=plug_hashes
             )
             if include_selectable_plugs:
@@ -199,7 +232,7 @@ class WeaponDetailService:
                         socket["selectable_plug_hashes"] = selectable.get(
                             int(socket.get("socket_index", -1)), []
                         )
-            options = weapon_payload.socket_list(
+            options = [] if list_view else weapon_payload.socket_list(
                 self._manifest,
                 weapon_def,
                 scope="instance",
@@ -213,7 +246,7 @@ class WeaponDetailService:
             )
 
             inst_stats = (stats_data.get(inst_id, {}) or {}).get("stats", {})
-            stats = weapon_payload.stat_list(self._manifest, weapon_def, inst_stats)
+            stats = weapon_stats_payload.stat_list(self._manifest, weapon_def, inst_stats)
             weapon = weapon_payload.weapon_block(
                 self._manifest,
                 weapon_def,
@@ -239,7 +272,8 @@ class WeaponDetailService:
                 )
             if state_flags["locked"] is None:
                 notes.append("库存条目未带 state 字段：locked/tracked 为 null")
-            if not options:
+            if not list_view and not options:
+                # list_view 这次**没请求** 310，说"没有可换部件"就是把"没读"写成"没有"。
                 notes.append(
                     "该副本没有可更换部件数据（组件 310 未返回）：options 为空，"
                     "只能看 sockets 里已装的内容"
@@ -263,26 +297,18 @@ class WeaponDetailService:
                 notes=notes,
             ))
 
-        details.sort(
-            key=lambda d: (
-                not d.weapon.get("instance", {}).get("is_equipped", False),
-                -int(d.weapon.get("instance", {}).get("power") or 0),
-                str(d.weapon.get("name") or ""),
-            )
-        )
-
-        total = len(details)
-        returned = details if not limit or limit <= 0 else details[:limit]
+        # 明细已经在页内构建，这里不再排序（排序在切页之前做完，两处排序迟早会分叉）
 
         logger.info(
             "Weapon details for '%s': %d of %d instance(s) returned",
-            type_name, len(returned), total,
+            type_name, len(details), total,
         )
 
         return WeaponDetailResponse(
             weapon_type_query=type_name,
-            weapons=returned,
+            weapons=details,
             total_weapons=total,
-            returned_weapons=len(returned),
-            truncated=len(returned) < total,
+            returned_weapons=len(details),
+            # "还有更多"要按**整张列表**算：翻了页之后 len(details) < total 不代表后面还有
+            truncated=offset + len(details) < total,
         )

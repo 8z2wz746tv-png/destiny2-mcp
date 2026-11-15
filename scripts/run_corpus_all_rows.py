@@ -28,6 +28,7 @@ import json
 import re
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, get_args
 
@@ -35,9 +36,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from destiny_mcp.data import rotations as tables  # noqa: E402
 from destiny_mcp.server import app_lifespan, create_server  # noqa: E402
 from destiny_mcp.tools import assistants as assistants_module  # noqa: E402
 from destiny_mcp.tools._requests import (  # noqa: E402
+    WEAPON_PATTERN_INTENTS,
     WRITE_INTENTS,
     ActivityIntent,
     BuildIntent,
@@ -90,6 +93,8 @@ SLOW_INTENTS = {
     ("weapon_assistant", "all_weapons"),
     ("weapon_assistant", "global"),
     ("weapon_assistant", "search_all"),
+    # 锻造图样：读账号组件 900（首次约 3s，之后 5 分钟 TTL 内是缓存）
+    ("weapon_assistant", "patterns"),
     ("player_assistant", "find"),
     ("player_assistant", "find_players"),
     ("player_assistant", "fuzzy"),
@@ -182,6 +187,28 @@ def first_row(value: Any) -> dict:
     return value if isinstance(value, dict) else {}
 
 
+# 调用层失败（抛异常 / 上游类错误信封）。**不是断言失败**，但会让依赖这次调用的行变红 ——
+# 真机 2026-09-24：上游抖动时 10 行同时红，证据里只有 `实际=None`，看不出是抖动还是产品坏了。
+CALL_FAILURES: list[str] = []
+# 上游**超时**自动重试一次：2026-09-25 实测这类抖动会把正常行判红（`equip_mod` 的一次超时
+# 让"旧名/规范名走同一颗模组"那行变红，而同一行的另一次调用完全正常）。只重试"超时"，
+# 不重试"空响应/404"那种（它们往往是反面用例本身要断言的东西，重试只是白花时间）。
+CALL_RETRIES: list[str] = []
+# 只收"真抖动"：异常（超时/取消）与上游空响应。语料自己的反面用例（假名字、不存在的 ID）
+# 也会走 a_p_i_error/not_found，所以这里只是**提示**，别当断言失败读。
+_UPSTREAM_CODES = {"a_p_i_error", "upstream_unavailable_error"}
+
+
+def _is_timeout_flake(payload: Any, error: BaseException | None) -> bool:
+    """这次调用是"超时抖动"吗（值得原样重试一次）。"""
+    if isinstance(error, (TimeoutError, asyncio.TimeoutError)):
+        return True
+    if error is not None:
+        return "超时" in str(error) or "timeout" in str(error).lower()
+    message = str(((payload or {}).get("error") or {}).get("message") or "")
+    return "超时" in message or "timeout" in message.lower()
+
+
 class Runner:
     def __init__(self, timeout: float, slow_timeout: float) -> None:
         self.timeout = timeout
@@ -201,16 +228,31 @@ class Runner:
         start = time.perf_counter()
         payload: dict | None = None
         error: BaseException | None = None
-        try:
-            payload = await asyncio.wait_for(TOOLS[tool](ctx=self.ctx, **kwargs), limit)
-        except BaseException as exc:  # noqa: BLE001 - 断言要看到具体异常类型
-            error = exc
+        for attempt in range(2):
+            payload, error = None, None
+            try:
+                payload = await asyncio.wait_for(TOOLS[tool](ctx=self.ctx, **kwargs), limit)
+            except BaseException as exc:  # noqa: BLE001 - 断言要看到具体异常类型
+                error = exc
+            if attempt == 0 and _is_timeout_flake(payload, error):
+                CALL_RETRIES.append(tag)
+                await asyncio.sleep(2)
+                continue
+            break
         elapsed = time.perf_counter() - start
         TIMINGS.append((elapsed, tag))
         if isinstance(payload, dict):
             SIZES.append(
                 (len(json.dumps(payload, ensure_ascii=False, default=str)), tag)
             )
+        if error is not None:
+            CALL_FAILURES.append(f"{tag}: {type(error).__name__}: {error}")
+        elif isinstance(payload, dict) and payload.get("ok") is False:
+            err = payload.get("error") or {}
+            if err.get("code") in _UPSTREAM_CODES:
+                CALL_FAILURES.append(
+                    f"{tag}: ok=false {err.get('code')}: {str(err.get('message'))[:120]}"
+                )
         return payload, elapsed, error
 
     @staticmethod
@@ -333,8 +375,10 @@ async def discover(runner: Runner) -> dict[str, Any]:
 
     loadouts, _, _ = await runner.call("loadout_assistant", intent="list", limit=2)
     live["loadouts"] = loadouts or {}
+    # 清单行的实例键是 `loadout_id`（0.7.6 起；以前是 `id`，改完这里必须跟着改，
+    # 否则 live["loadout_id"] 静默变成 None，下面 get/equip_loadout 两行就都在测"不存在的 ID"）
     live["loadout_id"] = first_row(((loadouts or {}).get("data") or {}).get("loadouts") or []).get(
-        "id"
+        "loadout_id"
     )
 
     names, _, _ = await runner.call(
@@ -418,6 +462,8 @@ def sweep_args(tool: str, intent: str, live: dict[str, Any]) -> dict[str, Any]:
     elif tool == "weapon_assistant":
         if intent == "type":
             args["weapon_type"] = "手炮"
+        elif intent in WEAPON_PATTERN_INTENTS:
+            args["weapon_name"] = "累积救赎"
         elif intent == "perk_description":
             args["perk_name"] = "萤火虫"
         elif intent == "community":
@@ -621,14 +667,36 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     row = first_row(candidates)
     check(
         "rows",
-        "player：find 前缀模糊给人选 + 置信度 + has_more",
+        "player：find 前缀模糊给人选 + has_more，默认**不读别人档案**（不算置信度）",
         err is None and (find or {}).get("ok") is True and bool(candidates)
-        and {"confidence", "last_played", "membership_id", "playtime_hours"} <= set(row)
-        and "has_more" in fdata,
-        f"候选={len(candidates)} 首项={short({k: row.get(k) for k in ('display_name','confidence','playtime_hours')}, 120)} "
-        f"has_more={fdata.get('has_more')}",
+        and {"membership_id", "display_name"} <= set(row)
+        # 没读的字段**不给键**（给 null 会被读成"读了但没有"），并说明怎么才能拿到
+        and not {"confidence", "playtime_hours", "last_played"} & set(row)
+        and "has_more" in fdata
+        and any("include_profile" in str(w) for w in (find or {}).get("warnings") or []),
+        f"候选={len(candidates)} "
+        f"首项={short({k: row.get(k) for k in ('display_name','confidence','playtime_hours')}, 120)} "
+        f"has_more={fdata.get('has_more')} 用时={dt:.1f}s",
         seconds=dt,
-        warn=dt > 20,
+        warn=dt > 5,
+    )
+
+    enriched, dt_e, err_e = await call(
+        "player_assistant", intent="find", name_prefix=(live.get("player_name") or "husky")[:5],
+        include_profile=True, slow=True,
+    )
+    edata = (enriched or {}).get("data") or {}
+    erow = first_row(edata.get("players") or [])
+    check(
+        "rows",
+        "player：find + include_profile=true 才去读档案、给置信度与游玩时长",
+        err_e is None and (enriched or {}).get("ok") is True
+        and {"confidence", "last_played", "playtime_hours", "triumph_score"} <= set(erow)
+        and not any("include_profile" in str(w) for w in (enriched or {}).get("warnings") or []),
+        f"首项={short({k: erow.get(k) for k in ('display_name','confidence','playtime_hours')}, 120)} "
+        f"用时={dt_e:.1f}s",
+        seconds=dt_e,
+        warn=dt_e > 12,
     )
 
     gibberish, dt, err = await call(
@@ -838,7 +906,28 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         "weapon_assistant", intent="analyze", weapon_name="无感", include_inventory=True,
         slow=True,
     )
-    instances = (((analyze or {}).get("data") or {}).get("inventory") or {}).get("instances") or []
+    adata = (analyze or {}).get("data") or {}
+    instances = (adata.get("inventory") or {}).get("instances") or []
+    analyze_bytes = len(json.dumps(analyze, ensure_ascii=False, default=str).encode("utf-8"))
+    sockets_rows = adata.get("sockets") or []
+    check(
+        "rows",
+        "weapon：analyze 只给值得看的池子 + 副本不带可换项 + 载荷 ≤ 45 KB",
+        err is None and bool(sockets_rows)
+        # 定义级池子：给结论项 + 两个计数（`options` 留着，那是"值得看的项"本身）
+        and all({"recommended_count", "option_count", "options"} <= set(row) for row in sockets_rows)
+        # 副本与副本内插槽：可换项整块不在（那是 compare 的活）
+        and all("options" not in (i or {}) for i in instances)
+        and all(
+            "options" not in socket
+            for i in instances for socket in (i.get("sockets") or [])
+        )
+        and analyze_bytes <= 45_000,
+        f"{analyze_bytes}B 栏={len(sockets_rows)} 副本={len(instances)} "
+        f"首栏推荐={((sockets_rows or [{}])[0]).get('recommended_count')}/"
+        f"{((sockets_rows or [{}])[0]).get('option_count')}",
+        seconds=dt,
+    )
     marked, plain_pairs, instance_options = [], 0, 0
     for instance in instances:
         for socket in instance.get("sockets") or []:
@@ -877,6 +966,168 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         f"matched={fdata2.get('matched_count')} unknown={fdata2.get('unknown_count')} "
         f"coverage_complete={fdata2.get('coverage_complete')}",
         seconds=dt,
+    )
+
+    # ── weapon_assistant(intent="patterns")：锻造图样 ───────────────────
+    patterns, dt, err = await call("weapon_assistant", intent="patterns", slow=True)
+    pdata = (patterns or {}).get("data") or {}
+    pcounts = pdata.get("counts") or {}
+    pitems = (pdata.get("patterns") or {}).get("items") or []
+    psources = pdata.get("sources") or {}
+    ptotal = pcounts.get("total") or 0
+    check(
+        "rows",
+        "patterns：四档计数自洽，且图鉴总数 183（游戏里那一页的条数）",
+        err is None and (patterns or {}).get("ok") is True
+        and ptotal == 183 and pdata.get("catalog_total") == 183
+        and (pcounts.get("unlocked") or 0) + (pcounts.get("in_progress") or 0)
+        + (pcounts.get("not_started") or 0) == ptotal,
+        f"counts={pcounts} catalog_total={pdata.get('catalog_total')} 返回={len(pitems)}"
+        f" read={pdata.get('read')}",
+        seconds=dt,
+    )
+    check(
+        "rows",
+        "patterns：两个作用域都读过（read 声明 profile+character），本账号未开始必须为 0",
+        err is None
+        and ((pdata.get("read") or {}).get("record_scopes") == ["profile", "character"])
+        and (pcounts.get("not_started") or 0) == 0,
+        f"read={pdata.get('read')} not_started={pcounts.get('not_started')}"
+        "｜注：183 条模式记录里 151 条档案级、32 条角色级（characterRecords）；只读档案级时"
+        "这 32 把会被误判成未开始",
+    )
+
+    scoped, dt, err = await call("weapon_assistant", intent="patterns", weapon_name="面纱威胁")
+    srow = first_row(((scoped or {}).get("data") or {}).get("patterns", {}).get("items") or [])
+    check(
+        "rows",
+        "patterns：角色级记录的那把（面纱威胁）读出来是已解锁",
+        err is None and srow.get("status") == "已解锁",
+        f"row={short(srow, 160)}",
+        seconds=dt,
+    )
+
+    check(
+        "rows",
+        "patterns：「未开始」的行 progress 必须是 null（没有记录 ≠ 进度 0）",
+        all(row.get("progress") is None for row in pitems if row.get("status") == "未开始"),
+        f"未开始={sum(1 for row in pitems if row.get('status') == '未开始')} "
+        f"进行中={[(r.get('name'), r.get('progress'), r.get('need')) for r in pitems if r.get('status') == '进行中'][:3]}",
+    )
+    check(
+        "rows",
+        "patterns：来源是社区资料，带页面与更新时间，且跟账号进度分开",
+        psources.get("available") is True and (psources.get("page") or {}).get("updated_at")
+        and (psources.get("page") or {}).get("trust") == "untrusted_reference",
+        f"matched={psources.get('matched')}/{psources.get('total')} page={short(psources.get('page'), 160)}",
+    )
+
+    exotics, dt, err = await call("weapon_assistant", intent="patterns", rarity="异域", limit=50)
+    edata = (exotics or {}).get("data") or {}
+    erows = (edata.get("patterns") or {}).get("items") or []
+    check(
+        "rows",
+        "patterns：rarity=异域 一次拿全金枪（16 把），不受默认一页 20 条影响",
+        err is None and len(erows) == 16 and all(r.get("tier") == "异域" for r in erows)
+        and (edata.get("by_tier") or {}) == {"异域": 16},
+        f"返回={len(erows)} by_tier={edata.get('by_tier')} "
+        f"名单={[r.get('name') for r in erows]}",
+        seconds=dt,
+    )
+
+    check(
+        "rows",
+        "patterns：by_tier 汇总跟着筛选走（不筛时异域 16 + 传说 167 = 183）",
+        (pdata.get("by_tier") or {}) == {"异域": 16, "传说": 167},
+        f"by_tier={pdata.get('by_tier')}",
+    )
+
+    variant, dt, err = await call("weapon_assistant", intent="patterns", weapon_name="惩戒措施（失时）")
+    vdata = (variant or {}).get("data") or {}
+    vrow = first_row((vdata.get("patterns") or {}).get("items") or [])
+    check(
+        "rows",
+        "patterns：变体（失时）指回基础版，并给出它的塑形配置（3 栏位 / 三四号固定 / 无深视插槽）",
+        err is None and vrow.get("name") == "惩戒措施" and "没有单独的模式" in str((variant or {}).get("summary"))
+        and (vdata.get("variant") or {}).get("shapeable_columns") == ["框架", "枪管", "弹夹"]
+        and (vdata.get("variant") or {}).get("base_shapeable_columns")
+        == ["框架", "枪管", "弹夹", "特征1", "特征2"]
+        and (vdata.get("variant") or {}).get("traits_fixed") is True
+        and (vdata.get("variant") or {}).get("has_deepsight_socket") is False
+        and (vdata.get("variant") or {}).get("has_upgrade_socket") is True,
+        f"summary={short((variant or {}).get('summary'), 200)} variant={short(vdata.get('variant'), 200)}",
+        seconds=dt,
+    )
+
+    check(
+        "rows",
+        "patterns：术语对照随响应给出去（玩家说红框、游戏说模式、工具说图样）",
+        set(((pdata.get("terms") or {}).keys())) == {"红框", "模式", "塑形"},
+        f"terms={short(pdata.get('terms'), 200)}",
+    )
+
+    typo, dt, err = await call("weapon_assistant", intent="patterns", weapon_name="zzqq不存在")
+    check(
+        "rows",
+        "patterns：名字对不上时说清「图鉴共 183 条」，不编一句「没有来源」",
+        err is None and (typo or {}).get("ok") is True
+        and "183" in str((typo or {}).get("summary"))
+        and not ((typo or {}).get("data") or {}).get("patterns", {}).get("items"),
+        f"summary={short((typo or {}).get('summary'), 140)}",
+        seconds=dt,
+    )
+
+    # ── world_assistant(intent="rotations")：周常轮换 ───────────────────
+    rot, dt, err = await call("world_assistant", intent="rotations", slow=True)
+    rdata = (rot or {}).get("data") or {}
+    rrows = rdata.get("rows") or []
+    kinds = {row.get("kind") for row in rrows}
+    check(
+        "rows",
+        "rotations：每行都标了口径（official/schedule），官方那半含特色突袭/地牢 + 夜幕/宗师",
+        err is None and (rot or {}).get("ok") is True
+        and all(row.get("source") in ("official", "schedule") for row in rrows)
+        and (rdata.get("counts") or {}).get("official", 0) >= 5
+        and {"raid", "nightfall"} <= kinds,
+        f"counts={rdata.get('counts')} kinds={sorted(k for k in kinds if k)}",
+        seconds=dt,
+    )
+
+    nf = next((row for row in rrows if row.get("kind") == "nightfall" and row.get("strike_known")), None)
+    check(
+        "rows",
+        "rotations：夜幕/宗师带打击名 + 难度 + 词缀（不含空串）+ 掉落（quantity=0 原样）",
+        bool(nf) and nf.get("name") and nf.get("difficulty")
+        and bool(nf.get("modifiers")) and "" not in nf["modifiers"]
+        and all("quantity" in item for item in nf.get("rewards") or []),
+        f"row={short(nf, 260)}",
+    )
+
+    table_rows = [row for row in rrows if row.get("source") == "schedule"]
+    # 泉源**按天交替，不能把"今天是哪个"写死** —— 这里原先是 `== ["泉源：防御", "泉源：攻击"]`，
+    # 写的是作者那天的顺序，2026-09-22 跑就红了（工具是对的，是断言过期：
+    # 锚点 09-15T17:00Z=攻击 ⇒ 09-22 攻击）。与 `tests/test_rotations.py` 同一条规矩：
+    # 期望值从同一个出处现算（`wellspring_upcoming` 就是响应里用的那个函数）。
+    expected_wellspring = [
+        f"泉源：{mode}" for _, mode in tables.wellspring_upcoming(datetime.now(timezone.utc))
+    ]
+    check(
+        "rows",
+        "rotations：自维护表那半带核对元数据，泉源今天/明天交替",
+        all(row.get("verified_at") and row.get("verified_against") for row in table_rows)
+        and [row["name"] for row in table_rows if row.get("kind") == "wellspring"]
+        == expected_wellspring,
+        f"表行={[(r['kind'], r['name']) for r in table_rows]} 期望={expected_wellspring}",
+    )
+
+    lost = rdata.get("lost_sector") or {}
+    check(
+        "rows",
+        "rotations：遗失区域说明「专家常驻、传说/大师未核对」，只给候选不给「今天是谁」",
+        lost.get("anchored") is False and lost.get("total") == 27 and lost.get("expert_always_available") is True
+        and bool(lost.get("how_to_anchor"))
+        and not [row for row in rrows if row.get("kind") == "lost_sector"],
+        f"anchored={lost.get('anchored')} total={lost.get('total')} 行数={len(rrows)}",
     )
 
     community, dt, err = await call(
@@ -1072,16 +1323,28 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         recommendation = rdata.get("recommendation") or {}
         builds = recommendation.get("results") or []
         first = first_row(builds)
-        items = ((first.get("build") or {}).get("items")) or []
+        items = first.get("items") or []
         slots = [row.get("slot_key") for row in items if isinstance(row, dict)]
         check(
             "rows",
-            "build：recommend 给齐五件护甲（slot_key 是统一名）+ 实例 ID + 达标率",
+            "build：recommend 只给候选行（五件身份 + execution_id，不带求解器内部字段）",
             err is None and bool(builds) and len([s for s in slots if s]) >= 5
-            and all(row.get("item_instance_id") for row in items),
-            f"候选={len(builds)} 部位={slots} completion_rate={first.get('completion_rate')} "
-            f"（内部复数名 slot={[row.get('slot') for row in items if isinstance(row, dict)]}）",
+            and all(row.get("item_instance_id") for row in items)
+            and bool(first.get("execution_id"))
+            and "build" not in first and "canonical_build" not in first
+            and isinstance(first.get("stats"), dict),
+            f"候选={len(builds)} 部位={slots} execution_id={bool(first.get('execution_id'))} "
+            f"行键={sorted(first)[:9]}",
             seconds=dt,
+        )
+        # 投影闸：真机 2026-09-25 实测 recommend 7.3 KB / 2 套（投影前 43.1 KB / 5 套）。
+        # 按**每套**算，才不会被"这次解出几套"带偏；另加一条总量兜底防整体回涨。
+        rec_bytes = len(json.dumps(rec, ensure_ascii=False, default=str).encode("utf-8"))
+        check(
+            "rows",
+            "build：recommend 每套候选 ≤ 5 KB、总量 ≤ 15 KB（候选行投影之后不许回涨）",
+            rec_bytes <= 15_000 and rec_bytes / max(len(builds), 1) <= 5_000,
+            f"{rec_bytes}B / {len(builds)} 套 = {rec_bytes / max(len(builds), 1):.0f}B 每套",
         )
 
         gate, dt, err = await call(
@@ -1167,19 +1430,31 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     rows_l = ldata.get("loadouts") or []
     check(
         "rows",
-        "loadout：list 默认最多 5 套 + 四个分页字段 + 每套带 build_template",
+        "loadout：list 只给清单行（每行有 loadout_id/件数/能不能执行），完整模板归 get",
         loadouts.get("ok") is True and len(rows_l) <= 5
         and {"total_loadouts", "returned_loadouts", "truncated", "next_offset"} <= set(ldata)
-        and all("build_template" in row for row in rows_l),
+        and all(
+            {"loadout_id", "item_count", "execution_supported", "detail_hint"} <= set(row)
+            and "build_template" not in row
+            for row in rows_l
+        ),
         f"total={ldata.get('total_loadouts')} returned={ldata.get('returned_loadouts')} "
         f"truncated={ldata.get('truncated')} next_offset={ldata.get('next_offset')} "
         f"首套键={keys_of(first_row(rows_l))}",
     )
+    # 清单行真机 121 KB → 2.8 KB（5 套）；行里塞回模板就会顶破这里
+    body = len(json.dumps(loadouts, ensure_ascii=False).encode("utf-8"))
+    check(
+        "rows",
+        "loadout：list 的载荷守在 20 KB 以内（121 KB → 2.8 KB 之后不许回涨）",
+        body < 20_000,
+        f"{body}B returned={ldata.get('returned_loadouts')}",
+    )
 
     page_a, dt, err = await call("loadout_assistant", intent="list", limit=2, offset=0)
     page_b, dt2, err2 = await call("loadout_assistant", intent="list", limit=2, offset=2)
-    ids_a = {row.get("id") for row in (((page_a or {}).get("data") or {}).get("loadouts") or [])}
-    ids_b = {row.get("id") for row in (((page_b or {}).get("data") or {}).get("loadouts") or [])}
+    ids_a = {row.get("loadout_id") for row in (((page_a or {}).get("data") or {}).get("loadouts") or [])}
+    ids_b = {row.get("loadout_id") for row in (((page_b or {}).get("data") or {}).get("loadouts") or [])}
     check(
         "rows",
         "loadout：offset 翻页不重叠",
@@ -1191,14 +1466,47 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
     got, dt, err = await call(
         "loadout_assistant", intent="get", loadout_id=live.get("loadout_id") or "x"
     )
+    gdata = (got or {}).get("data") or {}
+    grows = gdata.get("loadouts") or []
     check(
         "rows",
-        "loadout：get 不接受 loadout_id（要 Agent 自己从全部里挑）",
-        err is None and (got or {}).get("ok") is False
-        and ((got or {}).get("error") or {}).get("code") == "ignored_parameter",
-        f"code={((got or {}).get('error') or {}).get('code')} "
-        f"msg={short(((got or {}).get('error') or {}).get('message'), 160)}",
+        "loadout：get + loadout_id 只给那一套的完整模板（0.7.6 后的读法）",
+        err is None and (got or {}).get("ok") is True and len(grows) == 1
+        and grows[0].get("id") == (live.get("loadout_id") or "x")
+        and "build_template" in grows[0],
+        f"code={((got or {}).get('error') or {}).get('code')} 返回={len(grows)} "
+        f"id={first_row(grows).get('id') if grows else None}",
         seconds=dt,
+    )
+
+    dup, dup_dt, dup_err = await call("inventory_assistant", intent="duplicates", limit=5)
+    dup_data = (dup or {}).get("data") or {}
+    dup_groups = dup_data.get("duplicate_weapons") or []
+    dup_first = first_row(dup_groups)
+    dup_inst = first_row(dup_first.get("instances") or [])
+    dup_bytes = len(json.dumps(dup, ensure_ascii=False, default=str).encode("utf-8"))
+    check(
+        "rows",
+        "inventory：duplicates 只给行（perk 名字与栏位，模组/大师杰作分开，空插槽不算模组）",
+        dup_err is None and bool(dup_groups) and "icon_url" not in dup_first
+        and "icon_url" not in dup_inst
+        and all("plug_hash" not in perk for perk in (dup_inst.get("perks") or []))
+        and isinstance(dup_inst.get("mods"), list)
+        and not any("空" in str(m) for m in dup_inst.get("mods") or [])
+        and all(
+            str(perk.get("slot") or "") not in {"mod_empty", "reload", "stability", "handling", "range"}
+            for perk in (dup_inst.get("perks") or [])
+        ),
+        f"组={len(dup_groups)} 首实例键={keys_of(dup_inst)} "
+        f"perk 栏={[p.get('slot') for p in (dup_inst.get('perks') or [])]} "
+        f"模组={dup_inst.get('mods')} 大师杰作={dup_inst.get('masterwork')!r}",
+        seconds=dup_dt,
+    )
+    check(
+        "rows",
+        "inventory：duplicates 的载荷守在 20 KB 以内（50.9 KB → 行视图之后不许回涨）",
+        dup_bytes <= 20_000,
+        f"{dup_bytes}B 组={len(dup_groups)}",
     )
 
     ident, dt, err = await call(
@@ -1604,14 +1912,18 @@ async def run_rows(runner: Runner, live: dict[str, Any], skip_slow: bool) -> Non
         group_id="4611686018490000000",
         slow=True,
     )
+    # 伪公会 ID 的答案取决于上游当时怎么回：正常是 404 → upstream_not_found_error，
+    # 但实测（2026-09-20）会返回**空响应** → a_p_i_error + "不要凭记忆给排名"。两种都是
+    # 如实回答（我们分不清"没这个公会"和"上游抖了一下"），所以两种码都算过；
+    # 缺 group_id 那条仍然必须是我们自己的 invalid_argument_error。
+    fake_code = ((clan_fake or {}).get("error") or {}).get("code")
     check(
         "rows",
-        "activity：clan_leaderboards 缺 group_id → invalid_argument_error；伪 ID → upstream_not_found_error",
+        "activity：clan_leaderboards 缺 group_id → invalid_argument_error；伪 ID → 上游如实报错",
         err is None and err2 is None
         and ((clan_missing or {}).get("error") or {}).get("code") == "invalid_argument_error"
-        and ((clan_fake or {}).get("error") or {}).get("code") == "upstream_not_found_error",
-        f"缺 ID → {((clan_missing or {}).get('error') or {}).get('code')} "
-        f"| 伪 ID → {((clan_fake or {}).get('error') or {}).get('code')}",
+        and fake_code in {"upstream_not_found_error", "a_p_i_error"},
+        f"缺 ID → {((clan_missing or {}).get('error') or {}).get('code')} | 伪 ID → {fake_code}",
         seconds=dt,
     )
 
@@ -1831,10 +2143,12 @@ async def run_cross(runner: Runner, live: dict[str, Any], skip_slow: bool) -> No
     defaults = [
         ("inventory_assistant", {"intent": "get", "location": "vault"}, 100,
          lambda p: pick(p, "inventory", "items"), "inventory.items"),
-        ("weapon_assistant", {"intent": "type", "weapon_type": "手炮"}, 20,
+        ("weapon_assistant", {"intent": "type", "weapon_type": "手炮"}, 10,
          lambda p: pick(p, "weapons", "items"), "weapons.items"),
         ("weapon_assistant", {"intent": "catalog", "perk_name": "萤火虫"}, 50,
          lambda p: pick(p, "matched"), "matched"),
+        ("weapon_assistant", {"intent": "patterns"}, 20,
+         lambda p: pick(p, "patterns", "items"), "patterns.items"),
         ("inventory_assistant", {"intent": "duplicates"}, 10,
          lambda p: pick(p, "duplicate_weapons"), "duplicate_weapons"),
         ("loadout_assistant", {"intent": "list"}, 5,
@@ -1970,10 +2284,15 @@ _ALIAS_GROUPS: list[tuple[str, dict[str, Any], list[str], bool]] = [
     ("weapon_assistant", {"weapon_name": "无感"}, ["compare", "compare_duplicates"], False),
     ("weapon_assistant", {"weapon_name": "遗产"}, ["perk_pool", "perks"], False),
     ("weapon_assistant", {"weapon_name": "遗产"}, ["popularity", "selection_rates", "perk_selection", "selection", "usage_rates"], False),
+    ("world_assistant", {}, ["rotations", "轮换", "周常轮换", "这周"], False),
+    ("weapon_assistant", {"weapon_name": "累积救赎"},
+     ["patterns", "pattern", "craft", "锻造", "锻造武器", "图样", "图样进度", "模式进度", "红框", "红框进度"], False),
     ("subclass_assistant", {"character": "hunter"}, ["get", "subclass"], False),
     ("activity_assistant", {"character": "hunter"}, ["stats", "career", "historical_stats"], False),
     ("activity_assistant", {"count": 2}, ["weapon_history", "weapons", "weapon_usage", "weapon_leaderboard"], False),
-    ("loadout_assistant", {"limit": 2}, ["list", "get"], False),
+    # `list` / `get` 自 0.7.6 起是两件事（list 只给清单行、get 给完整模板），**不再是别名** ——
+    # 这一行以前一直红（同参不同 data），2026-09-24 收口时删掉，并在 tests/test_intent_aliases.py
+    # 加了"语料的别名组必须来自别名表"的扫描闸，防止再抄一份表。
 ]
 
 
@@ -2044,7 +2363,6 @@ async def run_mcp(live: dict[str, Any]) -> None:
             args=[],
             env={
                 "DESTINY_MCP_ROOT": str(ROOT),
-                "DESTINY_MCP_TOOL_PROFILE": "normal",
                 **env_extra,
             },
         )
@@ -2162,43 +2480,31 @@ async def run_mcp(live: dict[str, Any]) -> None:
     except BaseException as exc:  # noqa: BLE001
         check("mcp", "正常工具面握手", False, f"握手失败 {type(exc).__name__}: {str(exc)[:200]}")
 
-    async def legacy_body(session: Any) -> dict[str, Any]:
-        names = sorted(tool.name for tool in (await session.list_tools()).tools)
-        return {"names": names}
+    async def tool_names_body(session: Any) -> dict[str, Any]:
+        return {"names": sorted(tool.name for tool in (await session.list_tools()).tools)}
 
     try:
-        # 只设开关、用默认 normal 面：静默无效（仍是 8 个工具，而且不会给 warning）。
-        flag_only = await asyncio.wait_for(
-            with_session({"DESTINY_MCP_ENABLE_LEGACY_TOOLS": "1"}, legacy_body), timeout=300
-        )
-        flag_names = (flag_only or {}).get("names") or []
-        check(
-            "mcp",
-            "legacy：光设 DESTINY_MCP_ENABLE_LEGACY_TOOLS=1、工具面仍是 normal 时不生效（静默）",
-            len(flag_names) == 8,
-            f"count={len(flag_names)}（要老工具得同时把 DESTINY_MCP_TOOL_PROFILE 设成 full/expert）",
-            info=True,
-        )
-        # 正确组合：工具面 + 开关。
-        legacy = await asyncio.wait_for(
+        # 历史工具面已于 2026-09-20 剥离到 legacy/：现在**任何**环境变量都变不出别的工具，
+        # 连旧开关一起塞进去也只该有 8 个（少了这条，谁把旧面挂回来都不会被发现）。
+        stale = await asyncio.wait_for(
             with_session(
                 {
                     "DESTINY_MCP_TOOL_PROFILE": "full",
                     "DESTINY_MCP_ENABLE_LEGACY_TOOLS": "1",
                 },
-                legacy_body,
+                tool_names_body,
             ),
             timeout=300,
         )
-        names = (legacy or {}).get("names") or []
+        names = (stale or {}).get("names") or []
         check(
             "mcp",
-            "legacy：DESTINY_MCP_TOOL_PROFILE=full + 开关 → 暴露老工具",
-            len(names) > 8 and "get_inventory" in names,
+            "历史工具面已剥离：设旧的 profile/开关也只暴露 8 个聚合工具",
+            len(names) == 8 and "get_inventory" not in names,
             f"count={len(names)} 含 get_inventory={'get_inventory' in names}",
         )
     except BaseException as exc:  # noqa: BLE001
-        check("mcp", "legacy 工具面", False, f"{type(exc).__name__}: {str(exc)[:160]}")
+        check("mcp", "历史工具面已剥离", False, f"{type(exc).__name__}: {str(exc)[:160]}")
 
 
 async def main() -> int:
@@ -2221,7 +2527,7 @@ async def main() -> int:
     args = parser.parse_args()
 
     runner = Runner(timeout=args.timeout, slow_timeout=args.slow_timeout)
-    async with app_lifespan(create_server("normal")) as service:
+    async with app_lifespan(create_server()) as service:
         runner.ctx = type(
             "C", (), {"request_context": type("R", (), {"lifespan_context": service})}
         )()
@@ -2267,6 +2573,15 @@ async def main() -> int:
     print("最大 8 个响应：")
     for size, tag in sorted(SIZES, reverse=True)[:8]:
         print(f"  {size / 1024:8.1f} KB  {tag}")
+    if CALL_RETRIES:
+        print(f"\n上游超时自动重试过 {len(CALL_RETRIES)} 次（重试后仍有问题的才进下面的清单）：")
+        for line in CALL_RETRIES[:8]:
+            print(f"  ↻ {line}")
+    if CALL_FAILURES:
+        print(f"\n调用层失败 {len(CALL_FAILURES)} 次（上游抖动/超时；不是断言失败，"
+              "但依赖它的行会红 —— 先重跑再判断）：")
+        for line in CALL_FAILURES[:12]:
+            print(f"  ! {line}")
     failures = [row for row in RESULTS if row["status"] == "FAIL"]
     if failures:
         print(f"\nFAIL {len(failures)} 条：")
@@ -2282,6 +2597,8 @@ async def main() -> int:
                     "timings": TIMINGS,
                     "sizes": SIZES,
                     "counts": counts,
+                    "call_failures": CALL_FAILURES,
+                    "call_retries": CALL_RETRIES,
                     "live": {k: v for k, v in live.items() if k != "profile"},
                 },
                 ensure_ascii=False,

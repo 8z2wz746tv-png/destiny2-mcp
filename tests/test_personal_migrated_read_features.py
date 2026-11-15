@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from unittest.mock import AsyncMock, MagicMock
 
 from destiny_mcp.exceptions import WeaponPopularityDataError
 from destiny_mcp.manifest import ManifestManager
@@ -189,7 +190,7 @@ class _PopularityManifest:
         201: {"itemHash": 201, "name": "集体爆破", "icon": "/collective-action.png"},
     }
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(self, query: str, *, limit: int = 20, item_type: int | None = None) -> list[dict]:
         return [self._items[100]] if query == "测试火箭筒" else []
 
     def get_item_definition(self, item_hash: int) -> dict:
@@ -400,3 +401,182 @@ async def test_duplicate_weapon_scan_groups_instances_and_returns_current_perks(
         for instance in duplicate["instances"]
         for perk in instance["perks"]
     )
+
+
+@pytest.mark.asyncio
+async def test_find_players_does_not_read_anyones_profile_by_default() -> None:
+    """模糊搜人默认**不拉任何人的档案** —— 那 10 次串行读取实测 21.8 秒（整次的 96%）。
+
+    真机基线（2026-09-19）：`find` 22.6 秒，其中 21.8 秒花在给前 10 个候选逐个
+    `get_profile` 上，只为算"置信度"；返回的载荷只有 1.9 KB。
+    """
+    from destiny_mcp.services.player_service import PlayerService
+
+    bungie = AsyncMock()
+    bungie.search_users.return_value = {
+        "searchResults": [
+            {"bungieGlobalDisplayName": f"候选{i}", "bungieGlobalDisplayNameCode": 1000 + i,
+             "destinyMemberships": [{"membershipId": str(100 + i), "membershipType": 3,
+                                     "crossSaveOverride": 3}]}
+            for i in range(10)
+        ],
+        "page": 0, "hasMore": False,
+    }
+    resolver = AsyncMock()
+    service = PlayerService(bungie, MagicMock(), resolver)
+
+    result = await service.find_players("候选")
+
+    assert len(result["players"]) == 10
+    assert result["enriched"] is False
+    resolver.get_profile.assert_not_awaited()          # ← 关键：一次档案都不读
+    assert all("confidence" not in row for row in result["players"])
+
+
+@pytest.mark.asyncio
+async def test_find_players_enrich_reads_concurrently() -> None:
+    """`enrich=True` 才补评分，而且**并发**拉（10 个候选不该是 10 倍等待）。
+
+    每个档案故意睡 0.1 秒：串行 ≈ 1.0 秒，并发 5 ≈ 0.2–0.3 秒；断言 < 0.6 秒把
+    "有没有真的并发"钉住（阈值放宽到不易抖动的程度）。
+    """
+    import asyncio
+    import time
+
+    from destiny_mcp.services.player_service import PlayerService
+
+    bungie = AsyncMock()
+    bungie.search_users.return_value = {
+        "searchResults": [
+            {"bungieGlobalDisplayName": f"候选{i}", "bungieGlobalDisplayNameCode": 1000 + i,
+             "destinyMemberships": [{"membershipId": str(100 + i), "membershipType": 3,
+                                     "crossSaveOverride": 3}]}
+            for i in range(10)
+        ],
+        "page": 0, "hasMore": False,
+    }
+    resolver = AsyncMock()
+
+    async def slow_profile(*_args, **_kwargs):
+        await asyncio.sleep(0.1)
+        return {
+            "characters": {"data": {"c": {"dateLastPlayed": "2026-09-01T00:00:00Z",
+                                          "minutesPlayedTotal": 6000}}},
+            "profileRecords": {"data": {"activeScore": 12345}},
+        }
+
+    resolver.get_profile.side_effect = slow_profile
+    service = PlayerService(bungie, MagicMock(), resolver)
+
+    started = time.monotonic()
+    result = await service.find_players("候选", enrich=True)
+    elapsed = time.monotonic() - started
+
+    assert result["enriched"] is True
+    assert resolver.get_profile.await_count == 10
+    assert all("confidence" in row for row in result["players"])
+    # 档案必须**真的读成了**：失败会被降级成低分（这是有意的），
+    # 所以只断言"有 confidence"的话，读挂了也能过 —— 那样这条测试就白测了。
+    assert {row["triumph_score"] for row in result["players"]} == {12345}
+    assert {row["playtime_hours"] for row in result["players"]} == {100}
+    assert elapsed < 0.6, f"看起来没并发：10 个 0.1s 的档案读了 {elapsed:.2f}s"
+
+
+def test_matched_perk_details_collapse_the_enhanced_duplicate(monkeypatch) -> None:
+    """池子里同时有 `X` 与 `X↑` 时，明细只留基础版。
+
+    强化版的 hash 已经写在基础版的 `enhanced_plug_hash` 里，两条都发等于同一句话
+    说两遍，而且真机实测把 catalog_perk 从 55.9k 撑到 77.1k 字符。
+    池子里**只有**强化版时要保留它，否则会答成"滚不出"。
+    """
+    from destiny_mcp.services import weapon_payload
+    from destiny_mcp.services.weapon_roll_filter_service import WeaponRollFilterService
+
+    def sockets_with(*names: str) -> list[dict]:
+        return [{
+            "slot": "特性1", "kind": "trait",
+            "options": [
+                {
+                    "name": name, "plug_hash": 1 + index, "can_roll": True,
+                    "enhanced_plug_hash": 2,
+                    **({"name_plain": "萤火虫"} if name.endswith("↑") else {}),
+                }
+                for index, name in enumerate(names)
+            ],
+        }]
+
+    service = WeaponRollFilterService(manifest=object())  # type: ignore[arg-type]
+    monkeypatch.setattr(weapon_payload, "socket_list", lambda *a, **k: sockets_with("萤火虫", "萤火虫↑"))
+    details = service._matched_perk_details({}, ["萤火虫"])
+    assert [entry["name"] for entry in details] == ["萤火虫"]
+    assert details[0]["enhanced_plug_hash"] == 2, "强化版的存在要留在基础版条目上"
+
+    monkeypatch.setattr(weapon_payload, "socket_list", lambda *a, **k: sockets_with("萤火虫↑"))
+    assert [entry["name"] for entry in service._matched_perk_details({}, ["萤火虫"])] == ["萤火虫↑"]
+
+
+@pytest.mark.asyncio
+async def test_candidate_profiles_are_reused_within_ttl(monkeypatch) -> None:
+    """同一个前缀连搜两次，第二次不再重拉那 10 个人的档案（TTL 内复用）。"""
+    import time
+
+    from destiny_mcp.services import player_service as ps
+
+    bungie = AsyncMock()
+    bungie.search_users.return_value = {
+        "searchResults": [
+            {"bungieGlobalDisplayName": f"候选{i}", "bungieGlobalDisplayNameCode": 1000 + i,
+             "destinyMemberships": [{"membershipId": str(100 + i), "membershipType": 3,
+                                     "crossSaveOverride": 3}]}
+            for i in range(3)
+        ],
+        "page": 0, "hasMore": False,
+    }
+    resolver = AsyncMock()
+    resolver.get_profile.return_value = {
+        "characters": {"data": {"c": {"dateLastPlayed": "2026-09-01T00:00:00Z",
+                                      "minutesPlayedTotal": 6000}}},
+        "profileRecords": {"data": {"activeScore": 12345}},
+    }
+    service = ps.PlayerService(bungie, MagicMock(), resolver)
+
+    await service.find_players("候选", enrich=True)
+    assert resolver.get_profile.await_count == 3
+    started = time.monotonic()
+    second = await service.find_players("候选", enrich=True)
+    elapsed = time.monotonic() - started
+
+    assert resolver.get_profile.await_count == 3, "TTL 内不该再拉一次"
+    assert {row["triumph_score"] for row in second["players"]} == {12345}, "复用也要给同样的分"
+    assert elapsed < 0.2
+
+    # TTL 过了要重新拉（别把别人的档案当永久事实）
+    monkeypatch.setattr(ps, "_CANDIDATE_PROFILE_TTL_SECONDS", 0)
+    await service.find_players("候选", enrich=True)
+    assert resolver.get_profile.await_count == 6
+
+
+@pytest.mark.asyncio
+async def test_candidate_profile_failures_are_not_cached() -> None:
+    """失败不缓存：这次没读到就是没读到，下次还要再试（否则会把降级当成结论）。"""
+    from destiny_mcp.services import player_service as ps
+
+    bungie = AsyncMock()
+    bungie.search_users.return_value = {
+        "searchResults": [
+            {"bungieGlobalDisplayName": "候选", "bungieGlobalDisplayNameCode": 1000,
+             "destinyMemberships": [{"membershipId": "100", "membershipType": 3,
+                                     "crossSaveOverride": 3}]},
+        ],
+        "page": 0, "hasMore": False,
+    }
+    resolver = AsyncMock()
+    resolver.get_profile.side_effect = RuntimeError("上游抖了一下")
+    service = ps.PlayerService(bungie, MagicMock(), resolver)
+
+    first = await service.find_players("候选", enrich=True)
+    second = await service.find_players("候选", enrich=True)
+
+    assert resolver.get_profile.await_count == 2
+    assert {row["triumph_score"] for row in first["players"]} == {0}
+    assert {row["triumph_score"] for row in second["players"]} == {0}

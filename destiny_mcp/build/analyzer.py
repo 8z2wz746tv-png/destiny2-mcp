@@ -97,36 +97,60 @@ def too_large_reason(total: int, counts: list[int], limit: int) -> str:
         "DESTINY_BUILD_MAX_COMBINATIONS 设为 0 或调高上限后重试。"
     )
 
-def analyze(
+def oversized_reason(
     snapshot: InventorySnapshot,
     constraints: BuildConstraints,
-) -> BuildAnalysis:
-    """Analyze why no build satisfies the given constraints.
+) -> str | None:
+    """规模超限就给出"收窄请求"的建议；没超给 None。
 
-    Args:
-        snapshot: The player's armor inventory.
-        constraints: The target constraints.
-
-    Returns:
-        BuildAnalysis with failure reason and farming suggestions.
+    提前失败：精确上限要对每个属性各跑一次求解器，规模一大必然跑满预算，
+    让用户干等 5 分钟才拿到"缩小请求"是浪费。
     """
     total, counts = estimate_combinations(snapshot, constraints)
     limit = config.BUILD_MAX_COMBINATIONS
     if limit > 0 and total > limit:
-        # 提前失败：精确上限要对每个属性各跑一次求解器，规模一大必然跑满预算，
-        # 让用户干等 5 分钟才拿到"缩小请求"是浪费。这里直接给可操作建议，
-        # 并**不**编一个 max_possible（没算就是没算）。
         logger.info(
             "Analyzer: combination estimate %s exceeds limit %s; returning early", total, limit
         )
-        return BuildAnalysis(
-            reason=too_large_reason(total, counts, limit),
-            # 这一行不能少：默认值是 "exact"，漏了就会变成"精确算过、上限为空"——
-            # 调用方会读成"你什么都达不到"。实测 smoke 行抓到过这次回归。
-            precision="not_computed",
-        )
+        return too_large_reason(total, counts, limit)
+    return None
 
-    max_possible = _max_possible_stats(snapshot, constraints)
+
+def probe_stat(
+    snapshot: InventorySnapshot,
+    constraints: BuildConstraints,
+    stat_index: int,
+) -> tuple[str, int]:
+    """把点全堆在某**一项**上能到多少（含模组规则）—— 一次求解器探测。
+
+    返回 `(属性名, 值)`。六项互不依赖，调用方可以并发跑（`services/build_service`）。
+    为什么要探测而不是简单相加：老分析器只把护甲原始属性加起来，遇到 +10 通用模组
+    或 +3 工匠模组时会把"其实够得着"说成"够不着"。
+    """
+    from .solver import solve
+
+    stat_name = STAT_NAMES[stat_index]
+    bonus_vector = constraints.subclass_and_fragment_vector()
+    result = solve(snapshot, _probe_constraints_for_stat(constraints, stat_index))
+    if not result.sets:
+        return stat_name, bonus_vector[stat_index]
+    return stat_name, max(
+        armor_set.stats[stat_index]
+        + (
+            armor_set.bonus_stats[stat_index]
+            if stat_index < len(armor_set.bonus_stats)
+            else 0
+        )
+        + bonus_vector[stat_index]
+        for armor_set in result.sets
+    )
+
+
+def analyze_from_probes(
+    constraints: BuildConstraints,
+    max_possible: dict[str, int],
+) -> BuildAnalysis:
+    """把六项单项上限组装成结论（原因、建议、六维表）。纯函数、不再求解。"""
 
     # Check each target
     failures: list[str] = []
@@ -223,3 +247,37 @@ def _probe_constraints_for_stat(
         set_bonus_count=constraints.set_bonus_count,
         priority_stat_index=stat_index,
     )
+
+
+def _max_possible_stats(
+    snapshot: InventorySnapshot,
+    constraints: BuildConstraints,
+) -> dict[str, int]:
+    """六项单项上限（**就地串行**版）。
+
+    服务层的生产路径走并发那条（`BuildService._probe_single_stat_ceilings`）：
+    六次探测互不依赖，串行一次真机实测 227 秒（2026-09-23），并发后 wall 时间
+    约等于其中最慢的一次。这里的组合逻辑与那边**同一个 `probe_stat`**。
+    """
+    return dict(probe_stat(snapshot, constraints, index) for index in range(len(STAT_NAMES)))
+
+
+def analyze(
+    snapshot: InventorySnapshot,
+    constraints: BuildConstraints,
+) -> BuildAnalysis:
+    """Analyze why no build satisfies the given constraints（就地串行版）。
+
+    进程内直调与单测用这条；MCP 工具走 `services/build_service.analyze_build`（并发探测）。
+    两条路的"单项上限怎么算"与"结论怎么组装"共用同一个 `probe_stat` 与 `analyze_from_probes`。
+    """
+    oversized = oversized_reason(snapshot, constraints)
+    if oversized:
+        return BuildAnalysis(
+            reason=oversized,
+            # 这一行不能少：默认值是 "exact"，漏了就会变成"精确算过、上限为空"——
+            # 调用方会读成"你什么都达不到"。实测 smoke 行抓到过这次回归。
+            precision="not_computed",
+        )
+    return analyze_from_probes(constraints, _max_possible_stats(snapshot, constraints))
+

@@ -105,7 +105,9 @@ class SearchIndexMixin:
         )
         return result
 
-    def search(self, query: str, *, limit: int = 20) -> list[dict]:
+    def search(
+        self, query: str, *, limit: int = 20, item_type: int | None = None
+    ) -> list[dict]:
         """Fuzzy search items by name (Chinese or English).
 
         Supports community nicknames via ITEM_ALIASES mapping (e.g. 千语 → 千言萬語).
@@ -120,6 +122,9 @@ class SearchIndexMixin:
         Args:
             query: Partial or full item name.
             limit: Max results to return; 0 returns all matches.
+            item_type: 只要这个 `itemType`（如 3=武器）。**过滤发生在切片之前** ——
+                同名条目很多时（真机：「玉兔」54 条命中里 53 条不是武器），先切片会把
+                真正要的那条挡在窗口外，再怎么加大 limit 都碰运气。
 
         Returns:
             List of item dicts with keys: itemHash, name, itemType, itemTypeName, tier, icon.
@@ -174,6 +179,8 @@ class SearchIndexMixin:
 
         # Combine: exact → prefix → substring
         combined = exact + prefix + substring
+        if item_type is not None:
+            combined = [item for item in combined if item.get("itemType") == item_type]
         return combined if limit <= 0 else combined[:limit]
 
     def search_fuzzy(

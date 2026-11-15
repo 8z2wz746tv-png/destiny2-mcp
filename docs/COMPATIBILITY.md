@@ -1,4 +1,4 @@
-# 兼容面规矩（别名与历史工具）
+# 兼容面规矩（别名与历史工具面）
 
 这个文件回答一个问题：**已经存在但"看起来多余"的入口，哪些必须留、哪些可以删、删之前要先做什么。**
 写法是「实测 + 决定」，不是「感觉」：下面每一组别名都在本机真账号上跑过——同一组参数下
@@ -11,7 +11,335 @@
 | --- | --- | --- |
 | **永久别名**（中文说法） | `概况` = `summary`、`重复武器` = `duplicates`、`角色`/`档案` = `profile` | **不许删**。中文用户会这么说，删了等于砍功能；它们必须永远和 canonical 走同一段代码 |
 | **待删别名**（英文近义） | `search_catalog`/`all_weapons`/`global`/`search_all` = `catalog`；`selection_rates`/`perk_selection`/`selection`/`usage_rates` = `popularity` | **保留到 0.2.0**。现在只登记不宣传；`skills/destiny2-mcp/references/routing.md` 只写 canonical。删之前先看一圈真实调用日志 |
-| **历史工具面**（69 个旧工具） | `get_inventory`、`search_items` … | 只在 `DESTINY_MCP_TOOL_PROFILE=full`（或 `expert`）**且** `DESTINY_MCP_ENABLE_LEGACY_TOOLS=1` 时暴露；不进主路径文档、不保证契约、不单独修 bug |
+| **历史工具面**（67 个旧工具，**已剥离**，见 ADR-008） | `get_inventory`、`search_items`、`import_build_from_*` … | 2026-09-20 整块移到仓库根目录 `legacy/`：不进包、不参与测试与 lint，只作查阅（见 `legacy/README.md`）。原来的口径是「默认屏蔽、不保证契约、不单独修 bug」——这个口径下必然腐烂（复核时已经有两个工具在裸抛 `KeyError` / 把有数据说成「未找到」），而 62/67 在 8 个聚合工具里都有对应。没有对应的三个：`raw_api_call`、`get_item_definition`（按设计不再提供）与**配装导入**（整个功能已决定不要，README 与技能文档里的宣传同步删掉） |
+
+## 未发布：`location` 支持邮政官、`compare` 默认给副本行（**破坏性**，2026-09-25）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `inventory_assistant` 的 `location` | 只认 all/vault/角色名；传 `postmaster` 会得到「该账号上没有 'postmaster' 角色」 | 多认 `postmaster`（`邮政官`/`邮政长`）；取值不认时回 `invalid_argument_error` + 合法取值 |
+| 邮政官物品的 `location` | 标成 `hunter`/`warlock`（谎报"在身上"） | 标 `postmaster`（`bucket_type` 仍是 `Lost Items`） |
+| `weapon_assistant(intent="compare")` | 不带 `item_instance_id` → 全部副本的完整明细 + `differences`（每个副本十几 KB，没人一次读得完） | **副本行视图**：每行一把 × 只列有得选的栏 × `equipped` + 全部 `options`（`recommended` 是愿单结论）；带 `item_instance_id` 时仍是单副本完整明细 |
+
+真机：`location="postmaster"` 列出 22 件武器（全部标 `postmaster`）；「岁时之巅」7 副本行视图 12.3 KB
+（此前按副本逐个拉，每次 16.4 KB）。**插件/模组的中文名与愿单结论照旧**；行视图里不再给 `stat_effects`。
+
+## 未发布：`duplicates` 的插槽按类别拆成 perks / mods / masterwork（**破坏性**，2026-09-25）
+
+压成 `{name, slot}` 之后暴露的口径问题：插槽里**不只有 perk**。以前它们带着 `plug_category`，
+模型自己能分辨；压短之后就分不清了 —— 真机回执里「空模组插槽」(`v400.weapon.mod_empty`)、
+「3阶：填装速度」(`v400.plugs.weapons.masterworks.stat.reload`) 与「维度偏移」(`frames`) 长一个样，
+而"留哪把"正是这个 intent 的用途。现在按**类别**（不是名字）分三块：
+
+| 字段 | 内容 |
+| --- | --- |
+| `perks[]` | 真 perk：框架(`intrinsics`)/枪管(`barrels`)/弹匣(`magazines`)/特性(`frames`)/起源(`origins`) 等，仍是 `{name, slot}` |
+| `mods[]` | **装着的**武器模组名（`v400.weapon.mod_*`）；空插槽（`mod_empty`）不算 —— 空列表 = 没装模组 |
+| `masterwork` | 大师杰作那一颗的名字（如「3阶：填装速度」）；没有就不给这个键 |
+
+## 未发布：`weapon_assistant(intent="analyze")` 只给"值得看的池子"（**破坏性**，2026-09-25）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 定义级 `sockets[].options` | 整栏全给（枪管 22 项 / 弹匣 16 / 特性各 20），每项带 `plug_hash` + `enhanced_plug_hash` + `stat_effects` + `recommended` | 只给**本地愿单有结论**的项 + `option_count`/`recommended_count`；一栏一个结论都没有时退回前 6 项并给 `options_note`（**不许静默变空**）。完整池子走 `perk_pool` |
+| 选项字段 | 每项带两个 hash（`enhanced_plug_hash: 0` 也逐项发） | `name`/`can_roll`/`stat_effects`/`recommended`；有强化版时给 `enhanced: true` |
+| `inventory.instances[].options`（可换项，每件 9 KB，每项还带整句 `description`） | 默认带上 | **默认不带**（那是 `compare` 的活，ADR-007）；改给 `options_hint` 指路 |
+| 副本内的 `sockets[].options` | 带上 | 不带（保留现在装着什么：`equipped` 的名字，含强化版 `name_plain`） |
+
+真机（`weapon_name="遗产"`）：**68.6 → 34.7 KB（−49%）**，其中池子 21.1 → 6.6 KB、副本明细 34.2 → 14.8 KB；
+`weapon`/`stats`/`god_roll`/`starside`（合计 13 KB）是答案本身，不动。语料加闸：`analyze` ≤ 45 KB。
+
+## 未发布：`find` / `recommend` 只给候选行，`duplicates` 只给判定依据（**破坏性**，2026-09-25）
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `build_assistant(intent="find"/"recommend")` 的每套候选 | 整包：求解器内部模型 `build`（`tuning_option_hashes`/`base_roll_stats`/`archetype_*`/`roll_parse_error`/`icon_url`…）+ `canonical_build` | **候选行**：`execution_id`/`score`/`completion_rate`/`stats`/`exotic`/`set`/`requires_tuning`/`tuning_changes`（只留中文名与六维净变化）/`items[]`（名字、部位、实例 ID、光等、能量、六维、调谐名）。**`build` 与 `canonical_build` 消失**；详情与执行走 `equip_build(execution_id=…)`（先 `confirmed=false` 拿逐件预览，同意后 `confirmed=true`） |
+| `execution_id` | 10 分钟有效，是"只发标量宿主"的兼容路径 | **30 分钟**有效，是默认出口的**唯一**引用（行里自带五件身份，过期也能说清是哪套） |
+| `inventory_assistant(intent="duplicates")` 的每实例 | `{instance_id, location, power, equipped, perks_complete, perks:[{socket_index, plug_hash, name, plug_category, icon_url}]}` + 组级/ perk 级 `icon_url` | `{instance_id, location, power, equipped, perks_complete, perks:[{name, slot}]}`（`slot` = 插件类别最后一段，如 `barrels`/`traits`）；`icon_url`/`plug_hash`/`plug_category` 不进默认响应 |
+| `tuning_changes` | 每项带 `from/to` 的 hash 与完整 delta | `from/to` 只留中文名 + `delta`（六维净变化）；hash 要执行时从确认信封的 `canonical_build` 拿 |
+
+真机实测（同账号同参数）：`find` 21.5 → **8.6 KB**（2 套）、`recommend` 43.1 → **7.3 KB**（2 套）、
+`duplicates` 50.9 → **15.8 KB**（5 组）。语料新增两条体量闸（每套候选 ≤ 5 KB 且总量 ≤ 15 KB、
+`duplicates` ≤ 20 KB），并纠正一条旧断言：`recommend` 的 `execution_id` **可以**直接拿去 `equip_build`
+（旧文档说会被拒，实测不会）。
+
+## 未发布：`build_assistant` 多一个 `functional_mods`（照抄社区配装的功能模组，2026-09-25）
+
+社区模板里作者写的部位功能模组（每件 3 颗：抗性/搜寻/回收/吸引…）现在能跟着配装一起装：
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `build_assistant(intent="find"/"recommend")` | 没有"功能模组"这个入参 | 新增 `functional_mods`：模组名列表（`["充沛", "特殊武器弹药搜寻者"]`，重名的写两遍；认不出部位时写 `部位:名字`）。只发标量的宿主写 `"充沛,特殊武器弹药搜寻者"` |
+| 这些模组的定位 | 只出现在模板展示里（`armor.mods`），**既不核对也不代装** | **照抄**：不进求解器，但占掉的能量先从六维求解里扣掉（`reserved_mod_energy`） |
+| 社区模板的 `solver_handoff` | 只给角色/金装/套装/六维下限 | 多一项 `functional_mods`（照抄清单），可原样传给 `find` |
+| 回执 | — | `functional_mods`（`{mods, energy_by_slot, unresolved}`）+ 摘要里"含照抄社区配装的 N 颗功能模组"；确认信封的 `items_preview[].mods` 用 `copied_from_template: true` 标出来源 |
+| 装不下 / 插不进 | — | **跳过 + 点名**（`steps[].action="mod_blocked"` 与 warnings），不许让整条配装失败或回退；已经装着的不写 |
+
+照抄的边界：**只有功能模组可以照抄**。武器、六维、装备、子职业仍然必须走我们的求解与核对，
+社区模板依旧不是可执行凭据（`COMMUNITY_TEMPLATE_NOT_EXECUTABLE` 不变）。
+真机实测：作者那套 15 颗（每件 7–9 点 / 上限 11）会让原来能达标的六维目标变成无解 ——
+这是护甲 3.0 的能量规则，不是 bug；回执要如实说"是照抄模组吃掉了能量"，由玩家决定砍哪一头。
+
+## 未发布：`loadout_assistant` 的 `list` / `get` 不再是别名（**破坏性**，2026-09-24）
+
+0.7.6 把两者拆成了**两件事**：`list` 只给清单行、`get` 给完整模板且可按 `loadout_id` 取一套。
+别名表里"`get` = `list` 的近义别名"这一行随之作废 —— 语料里"别名同参必须返回相同 data"那行
+因此一直是红的（真机实测抓到）。现在 `get` 与 `list` 都是独立 intent（`tests/test_intent_aliases.py`
+的 `STANDALONE`），`intent="get"` 不传 `loadout_id` 时给全部套的完整模板、传了只给那一套。
+
+## 未发布：写入信封收口 —— 失败读一处、成功摘要是服务层那句（**破坏性**，2026-09-24）
+
+真机走查发现同一个"写不成"有**三套读法**，调用方得按 intent 记三种找法：
+
+| 入口 | 以前 | 现在 |
+| --- | --- | --- |
+| `move`/`transfer`/`save`/`equip`/`lock`… （通用写入路径） | 详情在 `data.result`；失败时候选清单在 `candidates` | 不变（`candidates` 里不再有重复的第二份） |
+| `equip_build` 失败 | 详情在 `candidates[0].result`，**没有** `data.result` | 详情在 `data.result`，`candidates` 为空 |
+| `equip` 被游戏规则挡住（`equip_blocked`） | 整份计划放在 `candidates[0]` | 计划在 `data.result`，并补上 `next_actions`（按 `blockers` 先解决） |
+
+另一条：**成功信封的 `summary` 现在用服务层那句 `message`**（如"配装 '猎套' 已装备，回读核对通过。"、
+"配装 'X' 已保存（5 件装备，5 个模组）"），固定话术（"…流程已执行。"）只在服务层没给 message 时兜底。
+理由：真正的结论（回读核对、六维变化、存了什么）以前只写在 `data.result.message` 里，模型常常只念顶层摘要。
+
+守门：`tests/test_failure_envelope_regressions.py`（`failure_response` 契约 + 扫描闸：
+不许再出现 `candidates=[{"result": …}]`）、`tests/test_equip_plan_path.py`、`tests/test_assistant_action_results.py`。
+
+## 未发布：写入类信封的三处口径（2026-09-24）
+
+真机做改账号调用（搬东西、换模组、存配装）时从**回执本身**发现的问题：
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 同名多件的 `move` | `ok=false` + `error.code="move_failed"` | `item_disambiguation_required` + `recoverable=true`：**没写、也没失败**，缺的只是"选哪一件"；候选进 `candidates`，`data.result.question` 照旧原样展示给玩家 |
+| 失败/歧义时的 `candidates` | 信封与 `data.result` 各发一份 | 只在**信封**里发一份（同一个清单不再读两遍） |
+| 确认信封（所有写入 intent） | `next_actions` 恒为空 | 每条都给"得到明确同意后用同一组参数 + `confirmed=true` 重发；在那之前账号不会被改动"；`candidates[0].intent` 说明这次要改什么 |
+
+`loadout_assistant(intent="save")` 的确认另加一块 `save_preview`（角色、五件护甲含部位中文名与已装模组、
+武器名、子职业、件数与模组数）：取自与 `save_loadout` **同一段采集**，所以预览里列的就是存下来的那套；
+读不到时给 `available=false` + `reason`，**不阻断确认**（预览失败不该让人连"确认"都做不了）。
+`save` 的确认信封不再塞它不读的 `loadout_id`/`slot_number`。
+
+## 未发布：`equip_mod` 给六维净变化与回读结论、`save` 回 `loadout_id`（2026-09-24）
+
+- `equip_mod` 的确认与回执多一段**六维净变化**（装上去 vs 换下来，用中文属性名），
+  并对"到底装上没"做一次回读：读到新值写 `verification={"verified": true}`；落在写入同步窗口内
+  写 `{"verified": null, "reason": …}`——**不许报成"没换成"**。
+- `loadout save` 的 `data.result` 多 `loadout_id`：以前保存完拿不到 id，只能去 `list` 里按名字找回来。
+
+## 未发布：`loadout_assistant(intent="list")` 只给清单行（**破坏性**，2026-09-24）
+
+`list` 一次回 **121 KB**（5 套，还是截断状态；共 21 套，全量约 500 KB——每件装备把同一份插槽数据
+发了三遍）→ 现在 **2.8 KB**：行里只有身份、件数、能不能执行与"去哪看详情"
+（`loadout_id`/`name`/`character`/`source`/`slot_number`/`item_count`/`exotic_armor`/`armor_set`/
+`subclass`/`weapon_count`/`mod_count`/`subclass_plug_count`/`created_at`/`execution_supported`/`detail_hint`）。
+**完整 `build_template` 只在 `intent="get"`**，并且 `get` 可以用 `loadout_id` 只取一套。
+
+## 未发布：`equip_build` 的成败口径更细了（2026-09-23）
+
+三个 bug 一起修（详见 ADR-018）：1679「这个槽已经装着它」以前被当成失败 → 整条配装回退；
+子职业插槽每次都重写一遍（必然回退）；预检遇到"这一位装不上"的模组直接抛错（也回退）。
+现在：
+
+- 「已经装着」算成功，回执写 `已经装着 '模组名'，未改动`，**不调用上游**；
+- 「这一位装不上」标成 `steps[].action="mod_blocked"`，**跳过这一颗、不回退**，
+  摘要在这种情况下是「配装已装备，但有 N 颗模组装不上（原因见 warnings 与 steps）」；
+- `steps` 里的模组写**中文名**（以前是 hash），`verify` 步骤在"只因模组没装上而对不上"时
+  会直说，不再笼统写"执行结果与确认的配装不一致"。
+
+**读法变了，键没变**：`ok=true` 不再自动等于"每颗模组都装上了"—— 看 `steps`/`warnings`。
+真机同日实测：一次装备 335 秒（失败+回退）→ **64.7 秒（成功）**。
+
+## 未发布：只发标量的宿主也能送结构化参数（2026-09-23，同日追加）
+
+豆包 connector 转发工具调用时只序列化标量，`list[str]` / `dict` 参数送不到服务端
+（真机：`required_perks` 变成 `[[]]`、`changes` 直接消失）。现在这些参数**多收一种文本写法**：
+列表 `"A,B"`、映射 `"k=v,k2=v2"`。原生形态仍是一等公民，两种形态走同一段解析
+（`destiny_mcp/utils/arg_text.py` 是分隔符的唯一出处）。**没有删任何东西、也没有双写**：
+schema 里 `array`/`object` 与 `string` 并列，写法不对回 `invalid_arguments` + 可照抄的例子。
+
+| 参数 | 新增的文本写法 |
+| --- | --- |
+| `required_perks` / `any_perks` / `excluded_perks` | `"亡者复仇,速射"` |
+| `priority_stats` / `fragment_names` / `item_instance_ids` | `"weapons,grenade"` / `"保护之光,聚焦打击"` / `"id1,id2"` |
+| `stat_caps` / `changes` | `"grenade=100,melee=90"` / `"super=金色枪"` |
+
+分隔符认半角/全角逗号、顿号、分号与换行；键值之间认 `=`、`:`、`：`；空串按「没传」处理。
+
+## 未发布：`build_assistant` 多一个 `execution_id` 参数（2026-09-23，同日追加）
+
+`equip_build` 以前只能回传整块 `canonical_build`（结构体）—— 只发标量的宿主因此**整个用不了装备功能**。
+现在 `canonical_build` 与 `execution_id` 二选一：给 ID 时服务端凭它取回**自己签发的那份**，
+内容根本不经过调用方。配套两处新增字段：候选行顶层的派生 `execution_id`（标量，与
+`canonical_build.execution_id` 同源）与确认回显里的 `execution_id`。
+
+**新增参数与新增字段，旧键一个没少**；候选的 10 分钟 TTL、绑定玩家、一次确认只能用一次这些语义不变。
+
+## 未发布：候选排序口径统一（**破坏性**，见计划文档决定 2）
+
+求解器内部堆、展示排序、`score` 以前是**三套口径**，现在只有一套
+（`build/ranking.goodness_key`：布尔违规位 → 每个优先项一层「先达没达、再差多少」→
+普通层「先个数、再缺口」→ 优先级值 → 封顶总和）。**候选顺序会变**。
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 排序键 | 求解器堆：优先级字典序；展示：`completion_rate` 打头 → 优先级 → 加权总分 | 三处**共用**同一把键 |
+| `score` 的含义 | 加权总分（达标率×1000 + 六维总和×0.1 − **超出目标每点×0.5**） | **封顶后的六维总和**（超上限部分不计）；**不再是排序键** |
+| 「多堆 10 点手雷」 | 在评分里是负收益（浪费惩罚） | 不影响达标判定；达标之后按优先级"越高越好" |
+| 超上限 | 无概念 | 与「没达下限」同级：掉到不违规的方案后面 |
+| `completion_rate` | 排序第一键 | 只作展示 |
+
+`BuildResult.score` 的**数值会整体变化**（量级从"1000+ 的加权分"变成"200~1200 的总和"）。
+只把它当"越大越好"读的调用方不受影响；把绝对值当阈值的要改。
+
+## 未发布：`perk_description` 支持套装 perk（2026-09-23，同日追加）
+
+套装 perk（集体之力这类）不在我们 Manifest 的名字索引里，`get_perk_description` 对它是**抛异常**而不是返回空，
+于是整次调用直接 `manifest_error`。现在：接住异常 → 按归档名字回退（`perk_by_name`）→ 用它的 sandbox perk hash
+出注记；`data.perk` 会带 `fallback: "starside_entity_name"`。套装名查不到时给 `gaps` 说明，**不把裸 hash 当名字**。
+
+## 未发布：碎片详情与异域职业物品也带 `starside` 块（2026-09-23，同日追加）
+
+- `subclass_assistant(intent="fragment_details")`：`data.starside` = 碎片/星象的社区注记
+  （**属性变化**（分职业）、效果、冷却、碎片槽位、来源）；`community_references` 仍是页面正文检索。
+- `build_assistant(intent="exotic_armor")` 带 `exotic_name` 时：`data.starside` = 异域职业物品的
+  **双栏配对**（每条"之灵"配到谁、组合后的实际效果，来自 perk 层的 `右栏` / `realgame_details#2`）；
+  非职业物品时 `available=false` + `reason`。
+
+## 未发布：神器/套装/护甲模组也带 `starside` 块（2026-09-23，同日追加）
+
+- `subclass_assistant(intent="artifact")`：`data.starside` = 这件神器各模组的社区注记（档位/效果/实机细节/
+  冷却）+ `coverage`（**当季覆盖不全**，例如本季 35 个模组里 21 个有注记）。
+- `build_assistant(intent="set_bonus")`：`data.starside` = 这套装的 perk 评语（`onSets` 反查 + 机制说明）。
+- `build_assistant(intent="armor_mods")`：`data.starside` = 前 20 条**有社区注记**的模组（效果/冷却/来源）+
+  `coverage.annotated`/`returned_mods`（不逐条塞全文）。
+- `weapon_assistant(intent="analyze")` 的 `starside.frame` 增加 `headline`（typical_mdps/typical_edps/
+  boss_total… 与口径一起给），`rows` 仍是完整帧表。
+
+## 未发布：`perk_description` 也带 `starside` 块（2026-09-23，同日追加）
+
+`weapon_assistant(intent="perk_description")` 的数据里多一个 `starside`：作者给的 perk 层结构化注记
+（实机细节／口语效果／属性变化（分职业）／冷却秒数与回复倍率／来源／异域 PERK／碎片槽位／右栏）、
+套装关联（`sets`）与反查索引（`on_items`：出现在哪些物品上，名字回我们 Manifest 取）。
+`community_references` 仍是**页面正文**检索，两者分工不同、都保留。没注记时 `available=false` + `reason`。
+
+## 未发布：`weapon_assistant(intent="analyze")` 多一个 `starside` 块（2026-09-23）
+
+Starside 作者给的新归档（按 hash 的实体数据）接进来了：`analyze` 的数据里多一个 `starside` 键，
+内容是社区层（Aegis/LGpig 两套推荐、机制说明、标签、帧级 DPS 表）+ **出处四件套**
+（`source`/`snapshot_at`/`authors`/`unofficial`）+ `gaps`（缺什么、为什么缺）+ `unresolved_names`
+（站点用了我们库里没有的名字，原样保留并标注）。没评过的装备给 `available: false` + `reason`，
+不编。口径与字段见 `docs/plans/STARSIDE_ENTITY_PLAN.md`。
+
+## 未发布：调谐变成可执行的一部分（2026-09-22，行为变化）
+
+调谐以前只出现在"给玩家的手动清单"里；现在它是**可执行计划的一部分**：
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| `canonical_build.items[].mods` | 只有属性模组（调谐被排除） | **带上调谐插件**（只要它在组件 310 的清单里） |
+| `equip_build` | 只换护甲与模组，调谐要玩家自己改 | 确认后**连调谐一起写**（写失败如实报哪几件没成，不回退） |
+| `equip_mod` 对调谐的 `writable` | 恒 `false`（"本项目还没验证过"） | 清单里有 → `true`；清单里没有 → `false` + 1675 的含义（"这颗装不到这件上"，不是"你没材料"） |
+| `equip_mod` 的 `unlock_state`（含 `to.unlock_state`、`alternatives[].unlock_state`） | 对调谐也照报组件 305/plug set 的判定 | 调谐一律 `null` —— 那份判定在调谐槽上不可信（实测一颗被判 false 的调谐写入成功），报出去会被读成"写不了"；非调谐模组不变 |
+| 调谐的 `writable`（hash 为负的那些） | 裸比较 hash → 清单里**有**也判 `false` + 一句 1675 的理由（错判、过严） | 两边过 `to_unsigned`（`build.models.tuning_is_allowed`）→ 判 `true`；真机：光芒领主面具 `+超能 / -生命值`（`-268553035`）原来被判装不上，改后写入成功 |
+| `tuning_changes` / `tuning_note` | "要你在游戏里手动改" | "确认后一起改；改不了会说明是哪一件、为什么" |
+
+## 未发布：有解时默认会动调谐（P4，行为变化）
+
+以前只有"没达标"时才去试调谐（补救路径）；现在**有解也会**在候选池上做一次单件调谐的邻域贪心
+（`build/tuning.local_tuning_improvement`，每一步都过权威复核）。看得见的变化：
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 六维 | 刚好达标就交卷 | 达标之后按优先级继续吃调谐额度（真机：手雷 120 → 145） |
+| `tuning_changes` / `requires_tuning` | 只有补救路径会给 | 有解也可能给（**2026-09-22 起确认后一起写**：`canonical_build` 带着这件允许的调谐插件） |
+| 没有目标也没有优先级时 | 无 | **不动**（不为了封顶总和 +6 让用户改 5 件） |
+| 耗时 | — | 池子上多一趟：真机小池 +8s（9.2s→17.6s）；补救路径那类**没变**（仍是分钟级，见计划 P4 记录） |
+
+## 未发布：`build_assistant` 新增 `stat_caps`（属性上限）与 `data.reachable`（可达区间）
+
+求解类 intent（`recommend`/`find`/`analyze`/`farm_target`）新增参数 `stat_caps`：
+属性**上限**映射，键与 `priority_stats` 同一套词。`find` 的有解响应新增 `data.reachable` 与
+`data.reachable_note`（只在算得出时出现）。
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 表达"别超过 100" | 没有办法 —— 模板里的区间上半截被丢掉，超了也没人报 | `stat_caps={"super_stat": 100}`；超了在 `builds[].max_violations` 里逐项标注并排到后面，**但不阻止出解** |
+| 模组分配 | 只受下限与优先级支配 | 到了上限就不再往那一项堆（`desired_max` 吃 caps） |
+| 每项能到多少 | 只在"无解"的阶梯里给，且是逐项最大值 | 有解时也给 `data.reachable`（**保守下界**）+ `reachable_note` 两句免责 |
+| 上限输入错误 | —— | 不认识的键、超 0-200、上限低于下限都是 `build_validation_error`，**不静默忽略** |
+
+`stat_caps` 没认领的 intent 传它会被 `ignored_parameter` 拒收（走既有的参数归属表）。
+
+## 未发布：0 候选时新增 `search` 自证、`ladder.verdict.satisfiable` 可能是 `null`（见 ADR-013 之后的 P1）
+
+`build_assistant(intent="find"|"recommend")` 在 **0 候选**或**没搜完**时多一个 `data.search`
+（`{exhaustive, combos, truncated_by}`）；`ladder.verdict.satisfiable` 多了 `null` 取值。
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 0 候选的 `summary` | 「找到 0 个候选配装。」 | 「找到 0 个候选配装：枚举完了，没有任何一套能满足这些下限（枚举了 6,283,200 套组合）。」 |
+| 空结果的可信度 | 只能自己相信"求解器跑完了" | `data.search.exhaustive=true` + `combos`（确定性工作量）自证 |
+| `ladder.verdict.satisfiable` | 恒为 `false` | **可能是 `null`** —— 表示"这次没搜完"，不是"配不出来"；只有 `exhaustive=true` 才是 `false` |
+| 超时错误话术 | 英文："Build computation exceeded the 300s budget; …" | 中文，并明说「**没算完**，不代表配不出来」+ 收窄建议 + `DESTINY_BUILD_TIMEOUT_SECONDS` |
+
+`search` 只在"0 候选"或"没搜完"时出现 —— 有候选的正常响应**逐字节不变**（护甲基线不用改）。
+
+## 未发布：换模组的响应多出"能不能插"的字段，配装步骤名从 `mod_in_game` 改成 `mod_blocked`（见 ADR-013）
+
+`inventory_assistant(intent="equip_mod")` 的方案新增 `to.unlock_state`（`true`/`false`/`null`）、
+`to.conditions` 与 `alternatives[].unlock_state`；目标已经是槽里现值的请求现在回
+`success=true` + `already_installed=true`（上游 1679），摘要改成「已经装着它，这次没有改动」；`writable=false` 的 `writable_reason` 改成
+"没解锁 + Manifest 的插入条件"。配装执行里"模组被上游拒绝"那一步的 `action` 从
+**`mod_in_game` 改名成 `mod_blocked`**，`detail` 里带具体原因（1676 插入条件 / 403 AWA / 1663 含糊话术）。
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 调谐方案的 `writable_reason` | "Bungie 的插槽接口实测回 1663…第三方写不进去" | "本项目**还没验证过**调谐写入"（1663 那句出自 ADR-012 推翻的字段名 bug，不再引用）。**2026-09-22 起**：能写，判据是组件 310 清单 —— 见上面「未发布」那条 |
+| 没解锁的模组 | 当能装：给确认请求，确认后上游回 1676，被说成"请游戏内手动装" | 直接 `writable=false` + `written=false`，reason 给出 Manifest 的插入条件；`confirmed=true` 也不写 |
+| 同名多版本 | 按属性加成 / 能量挑 | **先按这一位是否已解锁**挑，其余列在 `alternatives[].unlock_state` |
+| 上游没给可插入清单 | （以前根本没读这份清单） | `unlock_state=null` 且照旧可写 —— **没数据 ≠ 不允许** |
+| 配装步骤 `action` | `mod_in_game`（"Bungie 不允许 API 装，请游戏内手动装"） | `mod_blocked`（"上游拒绝写入，原因见 detail；这些条件游戏里同样要先解决"） |
+| 目标已是槽里现值 | 上游回 1679 被当失败抛出 | `success=true` + `already_installed=true` + 摘要「已经装着它，这次没有改动」 |
+
+`writable` / `written` 两个键的语义没变（`false` 就是"这次不写账号"），
+所以只判断"写没写"的调用方不用改；把 `writable_reason` 当固定话术转述的调用方要跟着更新。
+
+## 未发布：`equip` 的异域互斥改成"同类"判据，计划里出现武器槽位（见 ADR-011）
+
+`equip` 的异域互斥判据从"全身只能穿一件异域"改成 Manifest 自己的 `equippingBlock.uniqueLabel`：
+异域**武器**一件 + 异域**护甲**一件，两类**互不冲突**。
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 装异域武器、身上穿着异域护甲 | 计划里多一步"顶下异域护甲"（**错**，执行了也解决不了问题） | 不冲突，直接装 |
+| 装异域武器、身上穿着另一把异域武器 | **零冲突识别**，真执行撞 500 `UniqueEquipRestricted` | 给出"先用**同槽位**的非异域顶下"的步骤 |
+| 失败话术 `UniqueEquipRestricted` | "全身只能穿一件异域**护甲**…挑一件非异域的同部位护甲" | "同类的异域只能穿一件（异域武器一件 + 异域护甲一件）…挑一件非异域的同部位装备" |
+
+**`slot` 取值**：护甲那半的键一个没动（`helmet`/`gauntlets`/`chest`/`legs`/`class_item`），
+但 `EquipPlan.target_slot` / `EquipPlanStep.slot` / `EquipPlanBlock.slot` 现在**也可能是武器槽位**
+（`kinetic`/`energy`/`power`）—— 武器目标以前这里给的是**空串**（认不出部位），现在给真实槽位。
+把 `slot` 当"只会是护甲槽"读的调用方要放宽；只看护甲的调用方行为不变。
+
+## 未发布：武器类型列表改列表行、默认 10 件、可翻页（破坏性，见 ADR-007）
+
+`weapon_assistant(intent="type")`（"我手炮都有哪些"）以前每件发**完整模板**
+（`{weapon, sockets, options, stats, perks_complete, notes}`），20 件就是 **18.9 万字符**，
+其中 **2/3** 是插槽池与可换项 —— 而列表只是"有哪些"。现在改成既定的**列表行**
+（`services/weapon_payload.py` 的 `LIST_ROW_KEYS`，与 `catalog` 的 `matched[]` 同一套写法）：
+
+| 变了什么 | 以前 | 现在 |
+| --- | --- | --- |
+| 行形状 | `{weapon, sockets, options, stats, perks_complete, notes}` | **摊平**的身份字段 + 副本字段（`instance_id`/`location`/`power`/`is_equipped`/`locked`/`tracked`）+ `stats` + `notes` |
+| 插槽池与可换项 | 每件都给（定义级 `sockets` + 实例级 `options`） | **不给**：要看某一件的部件用 `compare(weapon_name, item_instance_id)`（一次调用拿全） |
+| 每件还会读的组件 | 305（已装 plug）+ 310（能换什么） | **不读**（profile 10.16 MB → 1.86 MB，实测 3.79s → 0.63s） |
+| 逐件的本地资料 | `farming`/`popularity`/`community`/`sources` 四块（精简版） | **不带**：整张列表的清单在顶层 `farming_list`，单把的结论用 `info`/`analyze` |
+| 默认条数 | 20 件 | **10 件**（响应里 `total`/`returned`/`truncated` 照旧） |
+| 翻页 | 无（只能靠调大 `limit`） | `offset` + 响应里的 `next_offset`；最后一页 `truncated=false` |
+| `perks_complete` | 有 | 不给了（它说的是"插槽解析完整性"，而列表行没有插槽） |
+
+真机实测（2026-09-20，同一账号）：`type 手炮` 默认调用 **387,598 → 41,537 字符**（9.3×），
+热调用 0.78s → 0.30s。**信息没丢**：插件明细在 `compare` 里一件不少，`stats` 每行照给，
+清单评级在 `farming_list.results[]` 里按名字对。
 
 ## 未发布：`stats` 的口径与行形状（破坏性，见 ADR-005）
 
@@ -71,6 +399,9 @@
 | 换神器 | `subclass_assistant(intent="equip_artifact")` | 新 intent（写入，走确认信封）；名字精确匹配，不模糊 |
 | 纯 PvP 武器榜 | `activity_assistant(intent="pvp_weapons")` | 新 intent（`scope="pvp_recent"`、`source="pgcr_aggregation"`，逐场 PGCR 聚合最近 N 场）；**不是** `weapon_history` 的别名，两者口径不同、并存。**只认 PvP 家族 + 智谋**：`mode="raid"` 这类 PvE 词报 `invalid_argument_error`（要全模式武器击杀用 `weapon_history`） |
 | 角色身上的神器 | `subclass_assistant(intent="artifact", character=…)` | `artifact` 原来的返回一个键没少，多附 `character_artifact` |
+| 周常轮换表 | `world_assistant(intent="rotations")` | 新 intent（只读）：本周特色突袭/地牢（官方里程碑）、本周夜幕/宗师**哪个打击 + 词缀 + 掉落**（角色活动组件 204）、上维挑战/异域任务/泉源（自维护周期表 + 锚点）。每行带 `source=official\|schedule`；**遗失区域顺序未核对，只给候选**（见 ADR-010） |
+| 图样按稀有度筛 | `weapon_assistant(intent="patterns", rarity="异域")` | 新参数（只被 `patterns` 读）：异域/金枪、传说/紫枪、稀有；稀有度词表收拢到 `vocabulary.RARITY_ALIASES`（`inventory_assistant` 原来私藏一份）。同时 `counts` 旁多了 `by_tier` 汇总——真机上出现过"只读第一页把 16 把金枪报成 2 把" |
+| 锻造武器模式查询 | `weapon_assistant(intent="patterns")` | 新 intent（只读）：图鉴「模式和催化」183 条武器模式的进度（组件 900，就是游戏里那条「模式进度 4/5」）、还差几个红框萃取、需求次数、掉落来源。**新能力，非破坏性**：没动任何既有 intent 的键；两个"可锻造"口径并存（模式 183 条 vs `is_craftable` 219 件，后者含 36 件变体，变体可塑形栏位更少、且不带深视插槽），见 ADR-009 |
 
 **删除的行为（不留兼容分支）**：`equip_loadout` 遇到"保存的子职业与当前不一致"以前直接失败并返回
 「当前子职业与保存/确认的子职业不一致。」；0.3.0 起改成**先换上再配**（用户 2026-09-15 拍板），
@@ -94,12 +425,13 @@
 | | `compare` | `compare_duplicates` |
 | | `perk_pool` | `perks` |
 | | `popularity` | `selection_rates`、`perk_selection`、`selection`、`usage_rates` |
-| `loadout_assistant` | `list` | `get` |
+| | `patterns` | `pattern`、`craft`、`锻造`、`锻造武器`、`图样`、`图样进度`、`模式进度`、`红框`、`红框进度`（永久中文说法：玩家说「红框」「锻造武器」，游戏官方中文叫「模式」；`pattern`/`craft` 是英文近义，只登记不宣传） |
 | `subclass_assistant` | `get` | `subclass` |
 | `activity_assistant` | `stats` | `career`、`historical_stats` |
 | | `weapon_history` | `weapons`、`weapon_usage`、`weapon_leaderboard` |
 | | `aggregate` | `activity_aggregate`、`activity_stats` |
 | | `leaderboards` | `leaderboard` |
+| `world_assistant` | `rotations` | `轮换`、`周常轮换`、`这周`（永久中文说法） |
 | `build_assistant` | `community` | `starside` |
 
 ## 三个"看着像别名、其实不是"的坑

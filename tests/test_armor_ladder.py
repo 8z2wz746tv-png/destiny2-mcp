@@ -11,6 +11,17 @@ import pytest
 from destiny_mcp.tools import _armor_ladder as ladder
 
 
+class _ProbeEntry:
+    """测试替身：阶梯走 `probe_find_build`（只读并发档）。
+
+    真实服务里它是 `find_build(compute=_probe_compute, register=False)` 的薄入口；
+    替身只需把它接到自己的 `find_build` 上。
+    """
+
+    async def probe_find_build(self, player_name, request):
+        return await self.find_build(player_name, request)
+
+
 class _Request:
     """最小 BuildRequest 替身：只要工具读得到的字段。"""
 
@@ -104,11 +115,11 @@ async def test_ladder_finds_the_smallest_relaxation_that_works() -> None:
     analysis = SimpleNamespace(max_possible={"weapons": 200}, precision="exact", reason="no_solution")
     seen: list[Any] = []
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             seen.append(request.melee_target)
             if request.melee_target is None:
                 return [SimpleNamespace(build=SimpleNamespace(weapons=200, grenade=41, melee=26))]
@@ -130,17 +141,58 @@ async def test_ladder_finds_the_smallest_relaxation_that_works() -> None:
 
 
 @pytest.mark.asyncio
+async def test_base_order_hint_skips_only_the_solve_the_caller_already_did() -> None:
+    """`base_order_empty=True` = 调用方刚用原始请求 + 原始优先级解过一次且 0 候选。
+
+    那一档的解不重复跑（真机一次省 ~34 秒），但**输出必须一模一样**：
+    换优先级的采样照跑，trials/ceiling/shortfall 与不传这个提示时逐字相同。
+    """
+    analysis = SimpleNamespace(max_possible={"weapons": 200}, precision="exact", reason="no_solution")
+
+    class _Build(_ProbeEntry):
+        def __init__(self, working: bool) -> None:
+            self.seen: list[tuple] = []
+            self.working = working
+
+        async def analyze_build(self, player_name, request):
+            return analysis
+
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
+            self.seen.append((request.melee_target, tuple(request.priority_stats or ())))
+            if self.working and request.melee_target is None:
+                return [SimpleNamespace(build=SimpleNamespace(weapons=200, grenade=41, melee=26))]
+            return []
+
+    def _request():
+        return _Request(weapons_target=150, grenade_target=70, melee_target=70,
+                        priority_stats=["weapons", "grenade", "melee"])
+
+    plain, hinted = _Build(working=True), _Build(working=True)
+    without = await ladder.no_solution_ladder({"build_svc": plain}, "Tester#1234", _request())
+    with_hint = await ladder.no_solution_ladder(
+        {"build_svc": hinted}, "Tester#1234", _request(), base_order_empty=True
+    )
+
+    assert len(hinted.seen) == len(plain.seen) - 1, (plain.seen, hinted.seen)
+    assert plain.seen[0][0] == 70, "原样那一档（近战 70 仍在目标里）"
+    assert plain.seen[0][1][:3] == ("weapons", "grenade", "melee"), "被跳过的是基础顺序那一次"
+    assert with_hint["trials"] == without["trials"]
+    assert with_hint["ceiling"] == without["ceiling"]
+    assert with_hint["shortfall"] == without["shortfall"]
+
+
+@pytest.mark.asyncio
 async def test_single_stat_maximum_is_not_used_as_the_simultaneous_ceiling() -> None:
     """`analyze` 的 max_possible 是单项上限：不能当成"同时能达到"（实机踩过）。"""
     analysis = SimpleNamespace(
         max_possible={"weapons": 200, "melee": 150}, precision="exact", reason="no_solution"
     )
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             # 同一套约束下按当前优先级：武器能到 200，但近战只有 26
             return [SimpleNamespace(build=SimpleNamespace(weapons=200, melee=26))]
 
@@ -165,8 +217,8 @@ async def test_completion_rate_becomes_na_without_hard_targets() -> None:
     """只给优先级时 completion_rate 没有意义：标 None + 说明，而不是 0.0。"""
     from destiny_mcp.tools import _build_flow
 
-    class _Build:
-        async def recommend_build(self, player_name, request):
+    class _Build(_ProbeEntry):
+        async def recommend_build(self, player_name, request, **kwargs):
             return {"results": [{"score": 50.3, "completion_rate": 0.0,
                                  "build": {"items": [{"slot": "helmets"}]}}]}
 
@@ -185,8 +237,8 @@ async def test_completion_rate_becomes_na_without_hard_targets() -> None:
 async def test_completion_rate_stays_when_targets_are_given() -> None:
     from destiny_mcp.tools import _build_flow
 
-    class _Build:
-        async def recommend_build(self, player_name, request):
+    class _Build(_ProbeEntry):
+        async def recommend_build(self, player_name, request, **kwargs):
             return {"results": [{"score": 51.2, "completion_rate": 1.0, "build": {}}]}
 
     response = await _build_flow.recommend(
@@ -277,11 +329,11 @@ async def test_too_large_requests_are_refused_with_narrowing_advice() -> None:
 
     reason = too_large_reason(243_400_640, [38, 56, 38, 70, 43], 20_000_000)
 
-    class _Build:
-        async def recommend_build(self, player_name, request):
+    class _Build(_ProbeEntry):
+        async def recommend_build(self, player_name, request, **kwargs):
             raise BuildTooLargeError(reason)
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             raise BuildTooLargeError(reason)
 
     svc = {"build_svc": _Build()}
@@ -326,6 +378,13 @@ class _StubManifest:
         return ""
 
 
+def _all_tuning_hashes() -> tuple[int, ...]:
+    """夹具里的件**允许装全部调谐**（真实清单来自组件 310，每件只有 6 颗）。"""
+    from destiny_mcp.build.tuning import tuning_catalog
+
+    return tuple(choice.plug_hash for choice in tuning_catalog(_StubManifest()))
+
+
 def _tunable_snapshot():
     from destiny_mcp.build.models import Armor, ArmorStats, InventorySnapshot
     from destiny_mcp.build.constants import STAT_NAMES
@@ -341,6 +400,7 @@ def _tunable_snapshot():
                 stats=ArmorStats(**{name: 10 for name in STAT_NAMES}),
                 armor_system="armor_3",
                 gear_tier=5,
+                tuning_option_hashes=_all_tuning_hashes(),
             )
         ]
     return InventorySnapshot(**buckets)
@@ -351,11 +411,11 @@ async def test_ladder_pulls_tuning_evidence_from_the_inventory_service() -> None
     """有库存服务时，阶梯要说"已经试过调谐"并给出每项额度，而不是老口径的提示。"""
     analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             # 放开目标那一档能解出手雷 65（于是原目标 70 差 5 点）
             if request.grenade_target is None:
                 return [SimpleNamespace(build=SimpleNamespace(grenade=65))]
@@ -384,11 +444,11 @@ async def test_ladder_survives_a_failing_inventory_lookup() -> None:
     """拿不到额度数据时退回"杠杆提示"，不能让诊断跟着崩。"""
     analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             return []
 
     class _Inventory:
@@ -396,7 +456,7 @@ async def test_ladder_survives_a_failing_inventory_lookup() -> None:
             raise RuntimeError("组件缺失")
 
     class _BuildWithSample(_Build):
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             if request.grenade_target is None:
                 return [SimpleNamespace(build=SimpleNamespace(grenade=65))]
             return []
@@ -426,8 +486,8 @@ async def test_find_reports_which_candidates_need_tuning() -> None:
         "delta": {"grenade": 5, "class_stat": -5},
     }
 
-    class _Build:
-        async def find_build(self, player_name, request):
+    class _Build(_ProbeEntry):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             return [
                 {
                     "score": 50.0,
@@ -449,15 +509,21 @@ async def test_find_reports_which_candidates_need_tuning() -> None:
     assert data["tuning"]["change_count"] == 1
     assert data["tuning"]["changes"][0]["to"]["name"] == "+手雷 / -职业"
     assert "要先改调谐" in response["summary"]
-    assert data["builds"][0]["tuning_changes"] == [change]
+    # 投影后的调谐行：只留"哪一件、从什么换成什么、六维怎么动"（hash 不进默认响应）
+    tuning_row = data["builds"][0]["tuning_changes"][0]
+    assert tuning_row["item_name"] == "测试腿甲"
+    assert tuning_row["from"]["name"] == "空调整模组插槽"
+    assert tuning_row["to"]["name"] == "+手雷 / -职业"
+    assert tuning_row["delta"] == {"grenade": 5, "class_stat": -5}
+    assert "hash" not in tuning_row["to"]
 
 
 @pytest.mark.asyncio
 async def test_find_hides_the_tuning_block_when_nothing_needs_it() -> None:
     from destiny_mcp.tools import _build_flow
 
-    class _Build:
-        async def find_build(self, player_name, request):
+    class _Build(_ProbeEntry):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             return [
                 {
                     "score": 50.0,
@@ -483,11 +549,11 @@ async def test_ladder_says_when_the_original_targets_are_impossible() -> None:
     """「原样」实测 0 候选时必须给 verdict，别让 ceiling 的逐项最大值看起来像"其实能满足"。"""
     analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             return []
 
     table = await ladder.no_solution_ladder(
@@ -505,11 +571,11 @@ async def test_ladder_reports_insufficient_tuning_headroom_instead_of_silence() 
     """缺口比调谐额度大：也要有一档说明"补不上"，不能什么都不给。"""
     analysis = SimpleNamespace(max_possible={}, precision="exact", reason="no_solution")
 
-    class _Build:
+    class _Build(_ProbeEntry):
         async def analyze_build(self, player_name, request):
             return analysis
 
-        async def find_build(self, player_name, request):
+        async def find_build(self, player_name, request, coverage=None, **kwargs):
             if request.grenade_target is None:
                 return [SimpleNamespace(build=SimpleNamespace(grenade=20))]
             return []

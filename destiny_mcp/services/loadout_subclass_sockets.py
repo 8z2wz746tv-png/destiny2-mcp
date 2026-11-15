@@ -8,8 +8,10 @@ from __future__ import annotations
 import aiobungie
 
 from ..models import Loadout, LoadoutSubclassConfig, MoveItemStep
+from ..utils.hash_utils import to_unsigned
 from . import profile_components, write_readback
 from .loadout_plug_lookup import PlugLookupMixin
+from .loadout_mod_sockets import plug_already_installed
 from .subclass_service import identify_socket_type
 
 
@@ -279,14 +281,32 @@ class SubclassSocketMixin(PlugLookupMixin):
                     all_ok = False
                     continue
                 assigned_sockets.add(socket_idx)
+                sockets = sockets_map.get(subclass_inst_id, {}).get("sockets", [])
+                if to_unsigned(int(sockets[socket_idx].get("plugHash", 0) or 0)) == to_unsigned(plug_hash):
+                    # 这个槽已经装着它：**不调用上游**。再写一次回的是 HTTP 500 + 1679
+                    # （客户端还会退避重试四次），真机实测每颗白花数秒。
+                    steps.append(MoveItemStep(
+                        action="subclass",
+                        detail=f"{plug_type} '{self.mod_label(plug_hash)}' 已经装着，未改动",
+                        success=True,
+                    ))
+                    continue
                 result = await self._bungie.insert_socket_plug_free(
                     subclass_inst_id, plug_hash, socket_idx,
                     0, char_id, membership_type,
                 )
-                ok = result.get("ErrorCode", 0) == 1
+                # 1679：这个槽已经装着它了。**配装带着"当前这套子职业"时，每一颗都会撞上它**
+                # （`execution_subclass` 就是按当前配置读出来的）—— 把它当失败的话，
+                # 每次 equip_build 都会失败并回退，真机实测一次白烧 5 分钟以上。
+                already = plug_already_installed(result)
+                ok = result.get("ErrorCode", 0) == 1 or already
                 steps.append(MoveItemStep(
                     action="subclass",
-                    detail=f"{plug_type} {plug_hash} 已应用",
+                    detail=(
+                        f"{plug_type} '{self.mod_label(plug_hash)}' 已经装着，未改动"
+                        if already
+                        else f"{plug_type} {plug_hash} 已应用"
+                    ),
                     success=ok,
                 ))
                 if not ok:

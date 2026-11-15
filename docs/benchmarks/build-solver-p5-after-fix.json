@@ -1,0 +1,93 @@
+{
+  "label": "p5-after-fix",
+  "sourceRoot": "/Users/husky/项目/destiny2-mcp",
+  "destinyMcpFile": "/Users/husky/项目/destiny2-mcp/destiny_mcp/__init__.py",
+  "trials": 1,
+  "heavy": false,
+  "rows": [
+    {
+      "case": "hunter_priority_only",
+      "character": "hunter",
+      "request": {
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 45563.5,
+        "solveMs": 35507.7,
+        "combos": 6283200,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 45563.5,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 110,
+            "health": 10,
+            "class_stat": 75,
+            "grenade": 200,
+            "super_stat": 85,
+            "melee": 20
+          },
+          "topCompletionRate": 0.0,
+          "solveMs": 35507.7,
+          "combos": 6283200,
+          "setsFromKernel": 200
+        }
+      ]
+    },
+    {
+      "case": "titan_meets_minimum",
+      "character": "titan",
+      "request": {
+        "weapons_target": 100,
+        "grenade_target": 100,
+        "class_target": 70,
+        "melee_target": 70,
+        "super_target": 80,
+        "priority_stats": [
+          "grenade",
+          "weapons"
+        ],
+        "top_n": 5
+      },
+      "median": {
+        "serviceMs": 14546.0,
+        "solveMs": 8574.9,
+        "combos": 3876000,
+        "candidates": 5
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "status": "ok",
+          "serviceMs": 14546.0,
+          "candidates": 5,
+          "topStats": {
+            "weapons": 100,
+            "health": 15,
+            "class_stat": 70,
+            "grenade": 165,
+            "super_stat": 80,
+            "melee": 70
+          },
+          "topCompletionRate": 1.0,
+          "solveMs": 8574.9,
+          "combos": 3876000,
+          "setsFromKernel": 200
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "秒数受机器负载影响，跨机器比较无意义；有意义的只有同机 paired 对照与 combos 这类计数。",
+    "没解时对应字段是 null，不是 0。",
+    "端到端走 BuildService.find_build（含 worker 进程开销），内核是直接 solve()。"
+  ]
+}
